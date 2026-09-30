@@ -1,6 +1,6 @@
 # P09-infrastructure-resilienc-01 — P09 · Infrastructure & Resilience
 
-**4 screens · 11 operations · 10 schemas · 2 permissions**
+**4 screens · 11 operations · 11 schemas · 2 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 2 permissions apply here:
   `PLATFORM_CELL_MANAGE, PLATFORM_CELL_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,7 +60,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-014` | Auto-Scaling Configuration | listDetail | 8 | 1 | — |
-| `ADM-030` | Infrastructure Sizing & Scaling Policy | listDetail | 9 | 1 | — |
-| `ADM-033` | Backup & DR Status | listDetail | 8 | 1 | — |
-| `ADM-034` | Archival Job Monitor | listDetail | 8 | 1 | — |
+| `ADM-014` | Auto-Scaling Configuration | listDetail | 8 | 3 | — |
+| `ADM-030` | Infrastructure Sizing & Scaling Policy | listDetail | 9 | 4 | — |
+| `ADM-033` | Backup & DR Status | listDetail | 8 | 3 | — |
+| `ADM-034` | Archival Job Monitor | listDetail | 8 | 3 | — |

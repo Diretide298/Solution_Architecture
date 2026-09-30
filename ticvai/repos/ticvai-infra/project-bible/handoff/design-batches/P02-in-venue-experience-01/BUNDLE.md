@@ -779,6 +779,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "orderId": {
     "type": "string",
+    "format": "uuid",
     "nullable": true,
     "description": "The paid online order that created this collection (audit R236)."
    },

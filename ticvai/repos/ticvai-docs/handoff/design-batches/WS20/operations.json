@@ -1,1 +1,159 @@
-{}
+{
+ "getApprovalAnalytics": {
+  "method": "GET",
+  "path": "/approval-analytics",
+  "contract": "approvals",
+  "summary": "Volumes, times, rejections and bottlenecks",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalAnalytics"
+ },
+ "getApprovalRequestScore": {
+  "method": "GET",
+  "path": "/approval-requests/{approvalRequestId}/score",
+  "contract": "ai",
+  "summary": "The latest context score of an approval request",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiApprovalRequestScore"
+ },
+ "listGovernanceRiskLaunch": {
+  "method": "GET",
+  "path": "/governance-risk-launch",
+  "contract": "promotions",
+  "summary": "Governance Audit, AI Risk & Launch Readiness",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GovernanceAuditAiRiskLaunchReadinessView"
+ },
+ "listGovernanceRiskMonitoring": {
+  "method": "GET",
+  "path": "/governance-risk-monitoring",
+  "contract": "catalogue",
+  "summary": "Governance Risk, AI Monitoring & Control Center",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "severity",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "risk",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "owner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listSlaEscalationBottleneck": {
+  "method": "GET",
+  "path": "/sla-escalation-bottleneck",
+  "contract": "approvals",
+  "summary": "SLA, Escalation & Bottleneck Monitor",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "workflow",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "risk",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "escalationLevel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "simulateWorkflowTestingImpact": {
+  "method": "PUT",
+  "path": "/workflow-testing-impact",
+  "contract": "approvals",
+  "summary": "Workflow Testing, Simulation & Impact Analysis",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WorkflowTestingSimulationImpactAnalysisInput",
+  "responds": "WorkflowTestingSimulationImpactAnalysisView"
+ }
+}

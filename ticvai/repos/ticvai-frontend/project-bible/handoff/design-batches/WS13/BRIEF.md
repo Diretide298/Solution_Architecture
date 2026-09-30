@@ -1,6 +1,6 @@
 # WS13 — Approval Workflows and Governance board 1
 
-**10 screens · 8 operations · 10 schemas · 3 permissions**
+**10 screens · 9 operations · 16 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -63,9 +63,9 @@ convincingly. It is never a caption.
 | `BO-364` | Approval Command Center Dashboard | listDetail | 2 | 0 | — |
 | `BO-365` | My Approval Inbox | listDetail | 1 | 0 | — |
 | `BO-366` | Team / Shared Approval Queue | listDetail | 1 | 0 | — |
-| `BO-367` | Approval Request Detail | listDetail | 2 | 0 | — |
-| `BO-368` | AI Decision Support | listDetail | 1 | 0 | — |
-| `BO-369` | High Priority & Risk Queue | listDetail | 1 | 0 | — |
+| `BO-367` | Approval Request Detail | listDetail | 3 | 0 | — |
+| `BO-368` | AI Decision Support | listDetail | 2 | 0 | — |
+| `BO-369` | High Priority & Risk Queue | listDetail | 2 | 0 | — |
 | `BO-370` | Escalated Approval Center | listDetail | 2 | 0 | — |
 | `BO-371` | Completed Approval History | listDetail | 1 | 0 | — |
 | `BO-372` | Approval SLA & Workload Monitor | commandCentre | 2 | 0 | — |

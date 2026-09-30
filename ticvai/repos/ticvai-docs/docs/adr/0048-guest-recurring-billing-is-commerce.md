@@ -3,7 +3,7 @@
 **Status:** Accepted
 **Date:** 21 September 2026
 **Decides:** the boundary half of **BL-100**
-**Relates to:** [ADR-0039](0039-control-plane-and-tenant-database-lifecycle.md), [ADR-0043](0043-the-control-plane-splits-on-personal-data.md), [ADR-0028](0028-service-decomposition.md)
+**Relates to:** [ADR-0039](0039-control-plane-and-tenant-database-lifecycle.md), [ADR-0043](0043-the-control-plane-splits-on-personal-data.md), [ADR-0028](0028-service-decomposition.md) (amended by ADR-0055)
 
 ---
 

@@ -1,6 +1,6 @@
 # P06-rentals-02 — P06 · Rentals (2 of 3)
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 9 operations · 7 schemas · 3 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -47,11 +47,11 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `MARKETING_SEND, RENTAL_OPERATE, RENTAL_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **1 of these operations work offline**: reportRentalIncident
+  — and the rest do not. A surface that looks the same online and off is lying.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +61,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `EMP-081` | Active Rental Operations Command Center | commandCentre | 0 | 0 | — |
-| `EMP-082` | Active Rental Detail & Live Timeline | listDetail | 0 | 0 | — |
-| `EMP-083` | Rental Extension Request | listDetail | 0 | 0 | — |
-| `EMP-084` | Extension Pricing & Confirmation | listDetail | 0 | 0 | — |
-| `EMP-085` | Equipment Swap / Replacement | listDetail | 0 | 0 | — |
-| `EMP-086` | Rental Incident & Operational Exception | listDetail | 0 | 0 | — |
-| `EMP-087` | Due Soon & Customer Notification Management | listDetail | 0 | 0 | — |
-| `EMP-088` | Overdue Rental Management | listDetail | 0 | 0 | — |
-| `EMP-089` | Active Group Rental Management | listDetail | 0 | 0 | — |
-| `EMP-090` | Active Rental Intelligence & Operational Alerts | listDetail | 0 | 0 | — |
+| `EMP-081` | Active Rental Operations Command Center | commandCentre | 2 | 0 | — |
+| `EMP-082` | Active Rental Detail & Live Timeline | listDetail | 1 | 0 | — |
+| `EMP-083` | Rental Extension Request | listDetail | 1 | 0 | — |
+| `EMP-084` | Extension Pricing & Confirmation | listDetail | 2 | 0 | — |
+| `EMP-085` | Equipment Swap / Replacement | listDetail | 1 | 0 | — |
+| `EMP-086` | Rental Incident & Operational Exception | listDetail | 1 | 0 | — |
+| `EMP-087` | Due Soon & Customer Notification Management | listDetail | 1 | 0 | — |
+| `EMP-088` | Overdue Rental Management | listDetail | 2 | 0 | — |
+| `EMP-089` | Active Group Rental Management | listDetail | 1 | 0 | — |
+| `EMP-090` | Active Rental Intelligence & Operational Alerts | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**EMP-082, EMP-083, EMP-084, EMP-085, EMP-086, EMP-087, EMP-088, EMP-089, EMP-090 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**EMP-082, EMP-084, EMP-085, EMP-086, EMP-087, EMP-088, EMP-089, EMP-090 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

@@ -1,1 +1,462 @@
-{}
+{
+ "ApprovalControlPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.control_policy",
+  "description": "Approvals boards 6.2 and 6.3. **Which decisions one person may not take alone** — distinct from which roles one person may not hold, which is `identity.setSegregationRules`.\n",
+  "required": [
+   "code",
+   "control"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "appliesToRequestKinds": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ApprovalKind"
+    }
+   },
+   "appliesAboveValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "control": {
+    "type": "string",
+    "enum": [
+     "fourEyes",
+     "dualControl",
+     "separationFromRequester",
+     "separationFromExecutor"
+    ],
+    "description": "**`fourEyes` is two different people; `dualControl` is two people from different groups.** The second is stronger and is what a finance auditor means, and collapsing them makes the stronger control unexpressible.\n"
+   },
+   "requiredApproverGroupIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "minimumApprovers": {
+    "type": "integer",
+    "default": 2
+   },
+   "requiresStepUp": {
+    "type": "boolean",
+    "default": false
+   },
+   "requiresSignature": {
+    "type": "boolean",
+    "default": false
+   },
+   "breakGlassAllowed": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Whether the control may be overridden in an emergency**, and if so it raises an alert rather than passing quietly. A control with no break-glass will be worked around by hand at three in the morning, which is worse.\n"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
+ "ApprovalKind": {
+  "type": "string",
+  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n",
+  "enum": [
+   "refund",
+   "priceOverride",
+   "discountOverride",
+   "complimentaryTicket",
+   "membershipCancellation",
+   "accessPermissionChange",
+   "configurationChange",
+   "aiRecommendation",
+   "releasePromotion",
+   "requisition",
+   "stockWriteOff",
+   "journalEntry",
+   "periodClose",
+   "periodReopen",
+   "purchaseOrderCancel",
+   "purchaseOrderShortClose",
+   "tenantMigration",
+   "productChange",
+   "pricingChange"
+  ]
+ },
+ "ApprovalMatrix": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.matrix",
+  "required": [
+   "kind",
+   "scopeLevel",
+   "rules"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "kind": {
+    "$ref": "#/components/schemas/ApprovalKind"
+   },
+   "scopeLevel": {
+    "type": "string",
+    "enum": [
+     "tenant",
+     "region",
+     "venue"
+    ]
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true
+   },
+   "version": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "11.1.80. **A request is decided by the rules it was raised under.** Changing the matrix mid-flight would mean an approver answering a question that changed while they read it.\n**(`kind`, `scopePath`, `version`) is unique**, and a stored version is never edited: a request's `matrixVersion` names exactly one rule set (decided 28 September, audit R129 (2)).\n"
+   },
+   "rules": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ApprovalRule"
+    }
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ApprovalRequirement": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed",
+  "description": "The answer to \"does this need approval\", returned before the action.",
+  "required": [
+   "isRequired"
+  ],
+  "properties": {
+   "isRequired": {
+    "type": "boolean"
+   },
+   "matchedRule": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ApprovalRule"
+     }
+    ],
+    "nullable": true
+   },
+   "matrixVersion": {
+    "type": "integer",
+    "nullable": true
+   },
+   "approvers": {
+    "type": "array",
+    "description": "Resolved, with delegations applied. **Named so the caller can say \"this needs Sara\"** rather than \"this needs approval\".\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "principalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "displayName": {
+       "type": "string"
+      },
+      "level": {
+       "type": "integer"
+      },
+      "isDelegate": {
+       "type": "boolean"
+      },
+      "delegatedFrom": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "slaMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "noApproverAvailable": {
+    "type": "boolean",
+    "description": "**The case that must not fail silently.** A rule requiring a role nobody at this venue holds means the action is blocked forever, and the caller needs to know that now rather than after raising a request nobody can decide.\n"
+   }
+  }
+ },
+ "ApprovalRule": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.rule",
+  "required": [
+   "order",
+   "approverRoleIds",
+   "mode"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "order": {
+    "type": "integer",
+    "description": "**First match wins.** Explicit ordering is what makes a matrix reviewable — an unordered set of overlapping rules is one nobody can reason about.\n"
+   },
+   "minAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "maxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "riskScoreAbove": {
+    "type": "number",
+    "nullable": true,
+    "description": "11.1.12. **Not matched against the AI risk score** (29 September, build pass, group G2). The AI assessment on a request (`ApprovalRequest.aiAssessment`, from `ai.scoreApprovalRequest`) is context for the reviewer only (MoM 8 September: AI never influences approve or reject), and routing a request to more approvers because of it would be influence. A rule with this set matches only a `riskScore` the requesting contract passes in `attributes` from its own deterministic rules (a payment's rule score, for example). Using the AI score here needs the client to say so.\n"
+   },
+   "condition": {
+    "type": "string",
+    "nullable": true,
+    "description": "11.1.13. Evaluated against the attributes the caller supplied.\n\n**No condition language is defined yet** (pull audit R104, 26 September): the grammar, the attributes it may name and how two conditions are compared for `unreachableRule` are an open decision, not something to infer from this field.\n"
+   },
+   "approverRoleIds": {
+    "type": "array",
+    "minItems": 1,
+    "description": "Role ids from `identity.listRoles` (`Role.id`), which is where an editor gets the names to show and pick from. This contract stores the ids only.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "approverScopeLevel": {
+    "type": "string",
+    "enum": [
+     "venue",
+     "department",
+     "region",
+     "tenant"
+    ],
+    "description": "11.1.39. Which organisational level the approver must sit at."
+   },
+   "mode": {
+    "$ref": "#/components/schemas/ApprovalMode"
+   },
+   "levels": {
+    "type": "integer",
+    "default": 1,
+    "description": "11.1.3. Multi-level chains ask each level in turn."
+   },
+   "requiresMfa": {
+    "type": "boolean",
+    "default": false
+   },
+   "requiresSignature": {
+    "type": "boolean",
+    "default": false
+   },
+   "slaMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "11.1.14. Null means no SLA, which is different from a long one."
+   },
+   "escalateAfterMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "escalateToRoleIds": {
+    "type": "array",
+    "description": "Role ids from `identity.listRoles`, as `approverRoleIds`.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "expiresAfterMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "11.1.53. An unanswered request eventually stops waiting."
+   },
+   "externalProviderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "11.1.65 (29 September). **This level is decided in an external workflow system** (`ApprovalExternalProvider`) rather than by a person in TICVAI. `approverRoleIds` stay required: they are who decides if the provider does not answer in time and its `onTimeout` is `fallBackToRoles`.\n"
+   }
+  }
+ },
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
+   }
+  }
+ },
+ "WorkflowTestingSimulationImpactAnalysisInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; the outcome is recorded as approvals.workflow_version test results (data model for the agreed operations, 29 September)",
+  "description": "**What Workflow Testing, Simulation & Impact Analysis submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "workflowId": {
+    "type": "string",
+    "description": "Workflow under test"
+   },
+   "testMode": {
+    "type": "string",
+    "enum": [
+     "manualTestCase",
+     "sampleTransaction",
+     "historicalReplay",
+     "scenarioSimulation",
+     "batchTest"
+    ],
+    "description": "How the workflow is tested"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version under test"
+   },
+   "compareWithVersion": {
+    "type": "string",
+    "description": "Existing version to compare against for regression"
+   },
+   "inputPayload": {
+    "type": "string",
+    "description": "Sample transaction as a JSON document, for manual and sample tests"
+   },
+   "replayFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Historical replay start"
+   },
+   "replayTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Historical replay end"
+   }
+  },
+  "required": [
+   "workflowId",
+   "testMode"
+  ]
+ },
+ "WorkflowTestingSimulationImpactAnalysisView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — computed by simulation over approvals.workflow_version and the rules it calls; never executes actions (data model for the agreed operations, 29 September)",
+  "description": "**What Workflow Testing, Simulation & Impact Analysis displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "workflowId": {
+    "type": "string",
+    "description": "Workflow under test"
+   },
+   "testMode": {
+    "type": "string",
+    "enum": [
+     "manualTestCase",
+     "sampleTransaction",
+     "historicalReplay",
+     "scenarioSimulation",
+     "batchTest"
+    ],
+    "description": "How the workflow is tested"
+   },
+   "rulesEvaluated": {
+    "type": "integer",
+    "description": "Rules Evaluated"
+   },
+   "conditionsMatched": {
+    "type": "integer",
+    "description": "Conditions Matched"
+   },
+   "decisions": {
+    "type": "integer",
+    "description": "Decisions"
+   },
+   "approvalPath": {
+    "type": "string",
+    "description": "Approval Path"
+   },
+   "actions": {
+    "type": "integer",
+    "description": "Actions"
+   },
+   "notifications": {
+    "type": "integer",
+    "description": "Notifications"
+   },
+   "sla": {
+    "type": "string",
+    "description": "SLA"
+   },
+   "expectedOutcome": {
+    "type": "string",
+    "description": "Expected Outcome"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version under test"
+   },
+   "compareWithVersion": {
+    "type": "string",
+    "description": "Existing version to compare against for regression"
+   },
+   "inputPayload": {
+    "type": "string",
+    "description": "Sample transaction as a JSON document, for manual and sample tests"
+   },
+   "replayFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Historical replay start"
+   },
+   "replayTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Historical replay end"
+   }
+  },
+  "required": [
+   "workflowId",
+   "testMode"
+  ]
+ }
+}

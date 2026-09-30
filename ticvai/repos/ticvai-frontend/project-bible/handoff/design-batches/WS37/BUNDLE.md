@@ -1,6 +1,6 @@
 # WS37 — Pricing   Revenue Management board 4
 
-**10 screens · 10 operations · 13 schemas · 2 permissions**
+**10 screens · 15 operations · 18 schemas · 4 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `PRICE_CONFIGURE, PRODUCT_APPROVE, PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,20 +60,20 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-078` | Pricing Governance Command Center | listDetail | 1 | 0 | — |
-| `ADM-079` | Pricing Change Request & Workspace | configEditor | 1 | 0 | — |
+| `ADM-078` | Pricing Governance Command Center | listDetail | 2 | 0 | — |
+| `ADM-079` | Pricing Change Request & Workspace | configEditor | 3 | 0 | — |
 | `ADM-080` | Bulk Pricing Update, Import & Mass Maintenance | listDetail | 1 | 0 | — |
 | `ADM-081` | Pricing Version & Baseline Management | listDetail | 1 | 0 | — |
-| `ADM-082` | Pricing Change Impact Analysis | listDetail | 1 | 0 | — |
+| `ADM-082` | Pricing Change Impact Analysis | listDetail | 2 | 0 | — |
 | `ADM-083` | Pricing Approval Workflow & Authority Matrix | configEditor | 1 | 0 | — |
 | `ADM-084` | Pricing Publication & Effective-Date Scheduler | configEditor | 1 | 0 | — |
 | `ADM-085` | Pricing Distribution, Synchronization & Publication Monitor | listDetail | 1 | 0 | — |
-| `ADM-086` | Pricing Rollback & Emergency Control Center | listDetail | 1 | 0 | — |
+| `ADM-086` | Pricing Rollback & Emergency Control Center | listDetail | 3 | 2 | — |
 | `ADM-087` | Pricing History, Audit & Compliance Explorer | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**ADM-081, ADM-082, ADM-085, ADM-087 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-081, ADM-082, ADM-085 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -124,16 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
-    },
-    {
-     "to": "ADM-079",
-     "trigger": "Works in Pricing Change Request & Workspace",
-     "provenance": "flow F146 step 1→2",
-     "operation": "listPricingGovernance"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-078 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-080",
@@ -182,14 +172,23 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "trigger": "Works in Pricing History, Audit & Compliance Explorer",
      "provenance": "flow F146 step 17→18",
      "operation": "listPricingGovernance"
+    },
+    {
+     "to": "ADM-079",
+     "trigger": "Works in Pricing Change Request & Workspace",
+     "provenance": "flow F146 step 1→2",
+     "operation": "listPricingGovernance",
+     "carries": [
+      "changeId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized administrators can monitor and control the complete pricing-change lifecycle from a centralized governance workspace.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide Commercial, Revenue, Finance, and authorized management with one operational view of all pricing changes and governance activities.",
-  "purposeNote": "Authorized administrators can monitor and control the complete pricing-change lifecycle from a centralized governance workspace.",
   "gaps": [
    {
     "operation": null,
@@ -233,25 +232,101 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     },
     {
      "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Pricing Changes in Draft",
+       "bindsTo": "PricingGovernanceCommandCenterSummary.pricingChangesInDraft",
+       "operation": "listPricingGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pending Validation",
+       "bindsTo": "PricingGovernanceCommandCenterSummary.pendingValidation",
+       "operation": "listPricingGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pending Approval",
+       "bindsTo": "PricingGovernanceCommandCenterSummary.pendingApproval",
+       "operation": "listPricingGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Approved Changes",
+       "bindsTo": "PricingGovernanceCommandCenterSummary.approvedChanges",
+       "operation": "listPricingGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Scheduled Publications",
+       "bindsTo": "PricingGovernanceCommandCenterSummary.scheduledPublications",
+       "operation": "listPricingGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Published today",
+       "bindsTo": "PricingGovernanceCommandCenterSummary.publishedToday",
+       "operation": "listPricingGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Failed Publications",
+       "bindsTo": "PricingGovernanceCommandCenterSummary.failedPublications",
+       "operation": "listPricingGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Emergency Changes",
+       "bindsTo": "PricingGovernanceCommandCenterSummary.emergencyChanges",
+       "operation": "listPricingGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Rollbacks",
+       "bindsTo": "PricingGovernanceCommandCenterSummary.rollbacks",
+       "operation": "listPricingGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Expiring prices",
+       "bindsTo": "PricingGovernanceCommandCenterSummary.expiringPrices",
+       "operation": "listPricingGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Governance exceptions",
+       "bindsTo": "PricingGovernanceCommandCenterSummary.governanceExceptions",
+       "operation": "listPricingGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "High risk changes",
+       "bindsTo": "PricingGovernanceCommandCenterSummary.highRiskChanges",
+       "operation": "listPricingGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
      "slot": "collection",
      "components": [
       {
        "kind": "dataTable",
        "label": "Every pricing governance",
-       "columns": [
-        "PricingGovernanceCommandCenterView.pricingChangesInDraft",
-        "PricingGovernanceCommandCenterView.pendingValidation",
-        "PricingGovernanceCommandCenterView.pendingApproval",
-        "PricingGovernanceCommandCenterView.approvedChanges",
-        "PricingGovernanceCommandCenterView.scheduledPublications",
-        "PricingGovernanceCommandCenterView.publishedToday",
-        "PricingGovernanceCommandCenterView.failedPublications",
-        "PricingGovernanceCommandCenterView.emergencyChanges",
-        "PricingGovernanceCommandCenterView.rollbacks",
-        "PricingGovernanceCommandCenterView.expiringPrices",
-        "PricingGovernanceCommandCenterView.governanceExceptions",
-        "PricingGovernanceCommandCenterView.highRiskChanges"
-       ],
        "bindsTo": "PricingGovernanceCommandCenterView",
        "operation": "listPricingGovernance",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 57 §Display"
@@ -266,20 +341,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "detailPanel",
        "label": "The selected pricing governance",
        "bindsTo": "PricingGovernanceCommandCenterView",
-       "columns": [
-        "PricingGovernanceCommandCenterView.pricingChangesInDraft",
-        "PricingGovernanceCommandCenterView.pendingValidation",
-        "PricingGovernanceCommandCenterView.pendingApproval",
-        "PricingGovernanceCommandCenterView.approvedChanges",
-        "PricingGovernanceCommandCenterView.scheduledPublications",
-        "PricingGovernanceCommandCenterView.publishedToday",
-        "PricingGovernanceCommandCenterView.failedPublications",
-        "PricingGovernanceCommandCenterView.emergencyChanges",
-        "PricingGovernanceCommandCenterView.rollbacks",
-        "PricingGovernanceCommandCenterView.expiringPrices",
-        "PricingGovernanceCommandCenterView.governanceExceptions",
-        "PricingGovernanceCommandCenterView.highRiskChanges"
-       ],
        "notes": "The pack groups this record's detail under its own headings: “Change Scope Impact Status”, “VAT Update UAE Finance Scheduled”.",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 57 §Display"
       }
@@ -312,6 +373,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "secondaryButton",
        "label": "Approve",
+       "operation": "decidePricingChangeRequest",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 57 §Quick Actions"
       },
       {
@@ -341,22 +403,35 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Pricing Governance Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "decidePricingChangeRequest",
+    "contract": "catalogue",
+    "purpose": "Approve, reject or return a pricing change request",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "changeId",
+     "from": "navigation"
+    }
+   ],
    "preloaded": [
-    "PricingGovernanceCommandCenterView.pricingChangesInDraft",
-    "PricingGovernanceCommandCenterView.pendingValidation",
-    "PricingGovernanceCommandCenterView.pendingApproval",
-    "PricingGovernanceCommandCenterView.approvedChanges",
-    "PricingGovernanceCommandCenterView.scheduledPublications",
-    "PricingGovernanceCommandCenterView.publishedToday"
+    "PricingGovernanceCommandCenterSummary.pricingChangesInDraft",
+    "PricingGovernanceCommandCenterSummary.pendingValidation",
+    "PricingGovernanceCommandCenterSummary.pendingApproval",
+    "PricingGovernanceCommandCenterSummary.approvedChanges",
+    "PricingGovernanceCommandCenterSummary.scheduledPublications",
+    "PricingGovernanceCommandCenterSummary.publishedToday"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-078"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-078",
+   "workshopBoard": "wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-078"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 57. 12 of 24 labels bound to a contract property; 31 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -415,15 +490,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "ADM-078",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F146 step 2→3",
-     "operation": "setPricingChangeRequest"
+     "operation": "setPricingChangeRequest",
+     "carries": [
+      "changeId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "All governed pricing modifications can originate from a traceable change request without directly editing live commercial configuration.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
   "purpose": "Provide a governed workspace for creating individual or structured pricing changes before modifying production pricing.",
-  "purposeNote": "All governed pricing modifications can originate from a traceable change request without directly editing live commercial configuration.",
   "gaps": [
    {
     "operation": null,
@@ -558,6 +636,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "secondaryButton",
        "label": "Emergency Change",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 58 §Support"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Submit",
+       "operation": "submitPricingChangeRequest",
+       "provenance": "contract catalogue.yaml POST /pricing-change-request/{changeId}/submit (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Approve, reject or return",
+       "operation": "decidePricingChangeRequest",
+       "notes": "Shown to an approver holding PRODUCT_APPROVE once the request is submitted; the author cannot decide their own.",
+       "provenance": "contract catalogue.yaml POST /pricing-change-request/{changeId}/decision (decided 29 September, readiness close-out)"
       }
      ]
     }
@@ -574,18 +665,36 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setPricingChangeRequest",
     "contract": "catalogue",
     "purpose": "Pricing Change Request & Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setPricingChangeRequest"
-    ]
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "submitPricingChangeRequest",
+    "contract": "catalogue",
+    "purpose": "Submit the draft pricing change for validation and approval",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "decidePricingChangeRequest",
+    "contract": "catalogue",
+    "purpose": "Approve, reject or return the pricing change request",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-079"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-079",
+   "workshopBoard": "wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-079"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 58. 0 of 0 labels bound to a contract property; 23 of 46 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "changeId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -647,14 +756,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Large-scale pricing changes can be safely prepared, validated, previewed, and submitted through controlled bulk operations.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Allow large pricing portfolios to be updated efficiently without manually editing hundreds or thousands of records.",
-  "purposeNote": "Large-scale pricing changes can be safely prepared, validated, previewed, and submitted through controlled bulk operations.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Increase by %, Increase Fixed Amount, Change Currency, Clone for New Season, Increase 5%, CSV/XLSX pricing files, Price lists. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 12 actions on this screen and the screen declares 1 operation.** Unserved: Increase by %, Decrease by %, Increase Fixed Amount, Decrease Fixed Amount, Replace Amount, Copy Rate, Change Currency, Set Effective Dates …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 60 §Support"
    }
   ],
@@ -669,10 +778,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every bulk pricing update",
        "columns": [
-        "BulkPricingUpdateImportMassMaintenanceView.recordsRead5420",
-        "BulkPricingUpdateImportMassMaintenanceView.valid5371",
-        "BulkPricingUpdateImportMassMaintenanceView.warnings37",
-        "BulkPricingUpdateImportMassMaintenanceView.errors12"
+        "BulkPricingUpdateImportMassMaintenanceView.recordsRead",
+        "BulkPricingUpdateImportMassMaintenanceView.validRecords",
+        "BulkPricingUpdateImportMassMaintenanceView.warningCount",
+        "BulkPricingUpdateImportMassMaintenanceView.errorCount"
        ],
        "bindsTo": "BulkPricingUpdateImportMassMaintenanceView",
        "operation": "listBulkPricingUpdate",
@@ -689,10 +798,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected bulk pricing update",
        "bindsTo": "BulkPricingUpdateImportMassMaintenanceView",
        "columns": [
-        "BulkPricingUpdateImportMassMaintenanceView.recordsRead5420",
-        "BulkPricingUpdateImportMassMaintenanceView.valid5371",
-        "BulkPricingUpdateImportMassMaintenanceView.warnings37",
-        "BulkPricingUpdateImportMassMaintenanceView.errors12"
+        "BulkPricingUpdateImportMassMaintenanceView.recordsRead",
+        "BulkPricingUpdateImportMassMaintenanceView.validRecords",
+        "BulkPricingUpdateImportMassMaintenanceView.warningCount",
+        "BulkPricingUpdateImportMassMaintenanceView.errorCount"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Preview”, “Before committing”, “Export”.",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 60 §Show"
@@ -710,7 +819,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       },
       {
        "kind": "secondaryButton",
+       "label": "Decrease by %",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 60 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Increase Fixed Amount",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 60 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Decrease Fixed Amount",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 60 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Replace Amount",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 60 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Copy Rate",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 60 §Support"
       },
       {
@@ -720,23 +849,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       },
       {
        "kind": "secondaryButton",
-       "label": "Clone for New Season",
+       "label": "Set Effective Dates",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 60 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Increase 5%",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 60 §Action"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "CSV/XLSX pricing files",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 60 §Support controlled import of"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Price lists",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 60 §Support controlled import of"
       }
      ]
     }
@@ -759,18 +873,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "BulkPricingUpdateImportMassMaintenanceView.recordsRead5420",
-    "BulkPricingUpdateImportMassMaintenanceView.valid5371",
-    "BulkPricingUpdateImportMassMaintenanceView.warnings37",
-    "BulkPricingUpdateImportMassMaintenanceView.errors12"
+    "BulkPricingUpdateImportMassMaintenanceView.recordsRead",
+    "BulkPricingUpdateImportMassMaintenanceView.validRecords",
+    "BulkPricingUpdateImportMassMaintenanceView.warningCount",
+    "BulkPricingUpdateImportMassMaintenanceView.errorCount"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-080"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-080",
+   "workshopBoard": "wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-080"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 60. 4 of 4 labels bound to a contract property; 22 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 60. 4 of 4 labels bound to a contract property; 27 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -832,10 +947,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "configuration was effective for any historical transaction.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Compare; Show) and no metric row",
   "purpose": "Maintain immutable versions of pricing configuration so TICVAI always knows what configuration existed at a particular time.",
-  "purposeNote": "configuration was effective for any historical transaction.",
   "layout": {
    "template": "split",
    "regions": [
@@ -856,8 +971,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "PricingVersionBaselineManagementView.productCount",
         "PricingVersionBaselineManagementView.changeCount",
         "PricingVersionBaselineManagementView.status",
-        "PricingVersionBaselineManagementView.version42",
-        "PricingVersionBaselineManagementView.version43",
         "PricingVersionBaselineManagementView.added",
         "PricingVersionBaselineManagementView.removed",
         "PricingVersionBaselineManagementView.modified",
@@ -887,8 +1000,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "PricingVersionBaselineManagementView.productCount",
         "PricingVersionBaselineManagementView.changeCount",
         "PricingVersionBaselineManagementView.status",
-        "PricingVersionBaselineManagementView.version42",
-        "PricingVersionBaselineManagementView.version43",
         "PricingVersionBaselineManagementView.added",
         "PricingVersionBaselineManagementView.removed",
         "PricingVersionBaselineManagementView.modified",
@@ -929,7 +1040,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-081"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-081",
+   "workshopBoard": "wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-081"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 62. 15 of 15 labels bound to a contract property; 15 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -993,10 +1105,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Approvers can understand financial, customer, channel, dependency, and operational impact before authorizing a pricing change.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Analyze) and no metric row",
   "purpose": "Determine the commercial and operational consequences of a pricing change before approval and publication. This is one of the most important screens in Board 4.",
-  "purposeNote": "Approvers can understand financial, customer, channel, dependency, and operational impact before authorizing a pricing change.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1071,6 +1183,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Pricing Change Impact Analysis",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listChangeImpactAnalysis",
+    "contract": "catalogue",
+    "purpose": "Change Impact Analysis",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -1086,7 +1204,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-082"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-082",
+   "workshopBoard": "wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-082"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 63. 13 of 13 labels bound to a contract property; 13 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1150,10 +1269,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Pricing changes cannot progress beyond their configured governance threshold without all required approvals.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure who must approve pricing changes based on their commercial risk and scope.",
-  "purposeNote": "Pricing changes cannot progress beyond their configured governance threshold without all required approvals.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1207,16 +1326,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "approvePricingWorkflowAuthority",
     "contract": "catalogue",
     "purpose": "Pricing Approval Workflow & Authority Matrix",
-    "trigger": "onAction",
-    "invalidates": [
-     "approvePricingWorkflowAuthority"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-083"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-083",
+   "workshopBoard": "wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-083"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 64. 0 of 0 labels bound to a contract property; 4 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1280,10 +1397,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Only validated and fully approved pricing configurations can be scheduled and activated at controlled effective dates.",
   "pattern": "configEditor",
   "patternReason": "the screen declares a publishing operation over fields the pack configures",
   "purpose": "Control exactly when approved pricing becomes commercially effective.",
-  "purposeNote": "Only validated and fully approved pricing configurations can be scheduled and activated at controlled effective dates.",
   "gaps": [
    {
     "operation": null,
@@ -1345,16 +1462,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "publishPricingEffectiveDate",
     "contract": "catalogue",
     "purpose": "Pricing Publication & Effective-Date Scheduler",
-    "trigger": "onAction",
-    "invalidates": [
-     "publishPricingEffectiveDate"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-084"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-084",
+   "workshopBoard": "wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-084"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 66. 7 of 7 labels bound to a contract property; 11 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1418,10 +1533,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can confirm that approved pricing has been successfully distributed and synchronized to all intended channels and systems.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Monitor; Display) and no metric row",
   "purpose": "Ensure published pricing reaches every TICVAI channel and dependent system consistently.",
-  "purposeNote": "Administrators can confirm that approved pricing has been successfully distributed and synchronized to all intended channels and systems.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1433,18 +1548,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every pricing distribution synchronization",
        "columns": [
-        "PricingDistributionSynchronizationPublicationMonitorView.b2c",
-        "PricingDistributionSynchronizationPublicationMonitorView.mobileApp",
-        "PricingDistributionSynchronizationPublicationMonitorView.pos",
-        "PricingDistributionSynchronizationPublicationMonitorView.mobilePos",
-        "PricingDistributionSynchronizationPublicationMonitorView.kiosk",
-        "PricingDistributionSynchronizationPublicationMonitorView.callCenter",
-        "PricingDistributionSynchronizationPublicationMonitorView.b2b",
-        "PricingDistributionSynchronizationPublicationMonitorView.reseller",
-        "PricingDistributionSynchronizationPublicationMonitorView.ota",
-        "PricingDistributionSynchronizationPublicationMonitorView.apis",
-        "PricingDistributionSynchronizationPublicationMonitorView.cacheCdnWhereApplicable",
-        "PricingDistributionSynchronizationPublicationMonitorView.externalIntegratedSystems",
+        "PricingDistributionSynchronizationPublicationMonitorView.target",
         "PricingDistributionSynchronizationPublicationMonitorView.publicationStarted",
         "PricingDistributionSynchronizationPublicationMonitorView.lastUpdated",
         "PricingDistributionSynchronizationPublicationMonitorView.recordsPublished",
@@ -1467,18 +1571,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected pricing distribution synchronization",
        "bindsTo": "PricingDistributionSynchronizationPublicationMonitorView",
        "columns": [
-        "PricingDistributionSynchronizationPublicationMonitorView.b2c",
-        "PricingDistributionSynchronizationPublicationMonitorView.mobileApp",
-        "PricingDistributionSynchronizationPublicationMonitorView.pos",
-        "PricingDistributionSynchronizationPublicationMonitorView.mobilePos",
-        "PricingDistributionSynchronizationPublicationMonitorView.kiosk",
-        "PricingDistributionSynchronizationPublicationMonitorView.callCenter",
-        "PricingDistributionSynchronizationPublicationMonitorView.b2b",
-        "PricingDistributionSynchronizationPublicationMonitorView.reseller",
-        "PricingDistributionSynchronizationPublicationMonitorView.ota",
-        "PricingDistributionSynchronizationPublicationMonitorView.apis",
-        "PricingDistributionSynchronizationPublicationMonitorView.cacheCdnWhereApplicable",
-        "PricingDistributionSynchronizationPublicationMonitorView.externalIntegratedSystems",
+        "PricingDistributionSynchronizationPublicationMonitorView.target",
         "PricingDistributionSynchronizationPublicationMonitorView.publicationStarted",
         "PricingDistributionSynchronizationPublicationMonitorView.lastUpdated",
         "PricingDistributionSynchronizationPublicationMonitorView.recordsPublished",
@@ -1510,18 +1603,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "PricingDistributionSynchronizationPublicationMonitorView.b2c",
-    "PricingDistributionSynchronizationPublicationMonitorView.mobileApp",
-    "PricingDistributionSynchronizationPublicationMonitorView.pos",
-    "PricingDistributionSynchronizationPublicationMonitorView.mobilePos",
-    "PricingDistributionSynchronizationPublicationMonitorView.kiosk",
-    "PricingDistributionSynchronizationPublicationMonitorView.callCenter"
+    "PricingDistributionSynchronizationPublicationMonitorView.target"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-085"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-085",
+   "workshopBoard": "wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-085"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 67. 18 of 18 labels bound to a contract property; 18 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1585,14 +1674,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can rapidly contain and reverse problematic pricing changes without altering historical transactions or losing audit traceability.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide controlled recovery when a pricing publication is incorrect or creates unacceptable commercial impact.",
-  "purposeNote": "Authorized users can rapidly contain and reverse problematic pricing changes without altering historical transactions or losing audit traceability.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Previous Price, Selected Channel, Entire Publication. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 9 actions on this screen; 8 are served since the writers pass (29 September): Previous Version, Selected Version, Previous Price, Commercial Baseline, Selected Products, Selected Venue, Selected Market, Selected Channel by `requestPricingRollback`.** Still unserved: the rest of the pack list past the eight shown here. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 69 §Support"
    },
    {
@@ -1615,7 +1704,37 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Previous Version",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 69 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected Version",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 69 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Previous Price",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 69 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Commercial Baseline",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 69 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected Products",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 69 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected Venue",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 69 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected Market",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 69 §Support"
       },
       {
@@ -1624,15 +1743,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 69 §Support"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Entire Publication",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 69 §Support"
-      },
-      {
        "kind": "banner",
        "label": "Permissions this screen separates",
        "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Freeze Price List, Freeze Product Pricing, Freeze Venue Pricing, Stop Scheduled Publication, Stop Distribution, Restore Last Known Good Version. Each needs attaching to the control it gates, or the screen needs the control.",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 69 §Authorized users should have"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request pricing rollback",
+       "operation": "requestPricingRollback",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**A pricing rollback or emergency action, as a record first** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml POST /pricing-rollback-emergency"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Cancel pricing rollback",
+       "operation": "cancelPricingRollback",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**Only before it runs** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml POST /pricing-rollback-emergency/{actionId}/cancel"
       }
      ]
     },
@@ -1655,23 +1785,89 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Pricing Rollback & Emergency Control Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "requestPricingRollback",
+    "contract": "catalogue",
+    "purpose": "Roll pricing back, or take an emergency pricing action",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPricingRollbackEmergency"
+    ]
+   },
+   {
+    "operationId": "cancelPricingRollback",
+    "contract": "catalogue",
+    "purpose": "Cancel a rollback that has not started",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPricingRollbackEmergency"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "PricingRollbackEmergencyControlCenterView.previousVersion",
-    "PricingRollbackEmergencyControlCenterView.selectedVersion",
-    "PricingRollbackEmergencyControlCenterView.previousPrice",
-    "PricingRollbackEmergencyControlCenterView.commercialBaseline",
-    "PricingRollbackEmergencyControlCenterView.selectedProducts"
+    "PricingRollbackEmergencyControlCenterView.rollbackTarget",
+    "PricingRollbackEmergencyControlCenterView.rollbackScope"
+   ],
+   "params": [
+    {
+     "name": "actionId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-086"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-086",
+   "workshopBoard": "wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-086"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 69. 0 of 0 labels bound to a contract property; 9 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 69. 0 of 0 labels bound to a contract property; 15 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formRequestPricingRollback",
+    "component": "modal",
+    "trigger": "Request pricing rollback",
+    "body": "**Collects what `requestPricingRollback` sends before it is called.** Required: `id`, `scopePath`, `subject`, `actionType`, `reason`, `status`, `requestedByPrincipalId`, `requestedAt`. Optional: `productId`, `priceListId`, `fromVersion`, `toVersion`, `productScope`, `rollbackTarget`, `rollbackScope`, `scopeIds`, `dependencies`, `executionMode`, `isEmergency`, `scheduledAt` and 6 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CatalogueRollbackAction",
+    "confirm": {
+     "label": "Request pricing rollback",
+     "operation": "requestPricingRollback"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "subject",
+      "actionType",
+      "reason",
+      "status",
+      "requestedByPrincipalId",
+      "requestedAt",
+      "productId",
+      "priceListId",
+      "fromVersion",
+      "toVersion",
+      "productScope",
+      "rollbackTarget",
+      "rollbackScope",
+      "scopeIds",
+      "dependencies",
+      "executionMode"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /pricing-rollback-emergency"
+   },
+   {
+    "id": "confirmCancelPricingRollback",
+    "component": "confirmDialog",
+    "trigger": "Cancel pricing rollback",
+    "body": "**Names what `cancelPricingRollback` changes and what it leaves alone**, in the consequence rather than the verb. A catalogue rollback action this affects should be identified in the dialog, not just counted. **Collects what `cancelPricingRollback` sends before it is called.** Required: `reason`.",
+    "provenance": "contract catalogue.yaml POST /pricing-rollback-emergency/{actionId}/cancel"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1722,14 +1918,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "ADM-078"
    ],
    "inferred": false,
-   "notes": "**Reached from ADM-078, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+   "notes": "**Reached from ADM-078, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-078",
+     "trigger": "Pricing Governance Command Center",
+     "provenance": "derived — ADM-078 declares entryState.params changeId and ADM-087 holds none of them, so the edge carries nothing and ADM-078 opens cold"
+    }
+   ]
   },
   "density": "compact",
+  "purposeNote": "Every material pricing configuration, approval, publication, override, and rollback is fully traceable and can be reconstructed for operational, financial, and compliance purposes. Board 4 — Final Screen Register # Backend Screen Core Responsibility 10.4. Pricing Governance Command Center Governance operations 1 10.4. Pricing Change Request & Workspace Controlled change creation 2 10.4. Bulk Pricing Update, Import & Mass Maintenance Mass pricing operations 3 10.4. Pricing Version & Baseline Management Version control 4 10.4. Pricing Change Impact Analysis Pre-change impact 5 10.4. Pricing Appr",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide complete forensic traceability for every pricing configuration and change. Enable TICVAI revenue administrators to configure dynamic-pricing strategies using real-time commercial conditions such as: Demand + Occupancy + Availability + Inventory + Booking Velocity + Time-to- Event + Season + Day + Timeslot + Channel + Customer Segment + Location The engine converts those conditions into controlled price movements while always respecting commercial guardrails.",
-  "purposeNote": "Every material pricing configuration, approval, publication, override, and rollback is fully traceable and can be reconstructed for operational, financial, and compliance purposes. Board 4 — Final Screen Register # Backend Screen Core Responsibility 10.4. Pricing Governance Command Center Governance operations 1 10.4. Pricing Change Request & Workspace Controlled change creation 2 10.4. Bulk Pricing Update, Import & Mass Maintenance Mass pricing operations 3 10.4. Pricing Version & Baseline Management Version control 4 10.4. Pricing Change Impact Analysis Pre-change impact 5 10.4. Pricing Appr",
   "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Board 5 — Dynamic Pricing, Revenue. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 70 §Operations"
+   },
    {
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
@@ -1775,6 +1983,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "rowActions",
      "components": [
       {
+       "kind": "primaryButton",
+       "label": "Board 5 — Dynamic Pricing, Revenue",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 70 §Operations"
+      },
+      {
        "kind": "banner",
        "label": "Permissions this screen separates",
        "notes": "**The pack separates these permissions and no action on the screen claims them yet:** “Who approved the Dubai summer pricing?”. Each needs attaching to the control it gates, or the screen needs the control.",
@@ -1802,9 +2015,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-087"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-087",
+   "workshopBoard": "wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-087"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 70. 0 of 12 labels bound to a contract property; 13 of 118 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 70. 0 of 12 labels bound to a contract property; 14 of 118 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1847,9 +2061,53 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PricingApprovalWorkflowAuthorityMatrixInput",
   "responds": "PricingApprovalWorkflowAuthorityMatrixView"
+ },
+ "cancelPricingRollback": {
+  "method": "POST",
+  "path": "/pricing-rollback-emergency/{actionId}/cancel",
+  "contract": "catalogue",
+  "summary": "Cancel a rollback that has not started",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CatalogueRollbackAction"
+ },
+ "decidePricingChangeRequest": {
+  "method": "POST",
+  "path": "/pricing-change-request/{changeId}/decision",
+  "contract": "catalogue",
+  "summary": "Approve, reject or return a pricing change request",
+  "permission": "PRODUCT_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PricingChangeRequestDecisionInput",
+  "responds": "PricingChangeRequestWorkspaceView"
  },
  "listBulkPricingUpdate": {
   "method": "GET",
@@ -1860,9 +2118,74 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "jobKind",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "operation",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "BulkPricingUpdateImportMassMaintenanceView"
+  "responds": "Page"
+ },
+ "listChangeImpactAnalysis": {
+  "method": "GET",
+  "path": "/change-impact-analysi",
+  "contract": "catalogue",
+  "summary": "Change Impact Analysis",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "changeRequestId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "area",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "minRisk",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "ChangeImpactAnalysisView"
  },
  "listPricingChangeImpact": {
   "method": "GET",
@@ -1873,9 +2196,30 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "changeRequestId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "riskLevel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PricingChangeImpactAnalysisView"
+  "responds": "Page"
  },
  "listPricingCompliance": {
   "method": "GET",
@@ -1926,10 +2270,50 @@ Method, path, parameters, request and response for every operation these screens
     "name": "market",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "transaction",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "approval",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "auditType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "PricingHistoryAuditComplianceExplorerView"
+  "responds": "Page"
  },
  "listPricingDistributionSynchronization": {
   "method": "GET",
@@ -1940,9 +2324,40 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "publicationVersion",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "target",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "outOfSyncOnly",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PricingDistributionSynchronizationPublicationMonitorView"
+  "responds": "Page"
  },
  "listPricingGovernance": {
   "method": "GET",
@@ -1985,18 +2400,53 @@ Method, path, parameters, request and response for every operation these screens
     "required": false
    },
    {
+    "name": "owner",
+    "in": "query",
+    "required": false
+   },
+   {
     "name": "changeType",
     "in": "query",
     "required": false
    },
    {
-    "name": "owner",
+    "name": "approver",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "riskLevel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "effectiveFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "effectiveTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "PricingGovernanceCommandCenterView"
+  "responds": "Page"
  },
  "listPricingRollbackEmergency": {
   "method": "GET",
@@ -2007,9 +2457,40 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "actionType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PricingRollbackEmergencyControlCenterView"
+  "responds": "Page"
  },
  "listPricingVersionBaseline": {
   "method": "GET",
@@ -2020,9 +2501,40 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "priceList",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "compareTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "effectiveOn",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PricingVersionBaselineManagementView"
+  "responds": "Page"
  },
  "publishPricingEffectiveDate": {
   "method": "PUT",
@@ -2033,9 +2545,34 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PricingPublicationEffectiveDateSchedulerInput",
   "responds": "PricingPublicationEffectiveDateSchedulerView"
+ },
+ "requestPricingRollback": {
+  "method": "POST",
+  "path": "/pricing-rollback-emergency",
+  "contract": "catalogue",
+  "summary": "Roll pricing back, or take an emergency pricing action",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CatalogueRollbackAction",
+  "responds": "CatalogueRollbackAction"
  },
  "setPricingChangeRequest": {
   "method": "PUT",
@@ -2046,8 +2583,33 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PricingChangeRequestWorkspaceInput",
+  "responds": "PricingChangeRequestWorkspaceView"
+ },
+ "submitPricingChangeRequest": {
+  "method": "POST",
+  "path": "/pricing-change-request/{changeId}/submit",
+  "contract": "catalogue",
+  "summary": "Submit a draft pricing change for validation and approval",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
   "responds": "PricingChangeRequestWorkspaceView"
  }
 }
@@ -2065,7 +2627,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Bulk Pricing Update, Import & Mass Maintenance displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "byType": {
+   "selectBy": {
     "type": "string",
     "enum": [
      "priceList",
@@ -2081,94 +2643,471 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "description": "Vocabulary listed under Select by."
    },
-   "increaseBy": {
+   "recordsRead": {
+    "type": "integer",
+    "description": "Records read (import preview)",
+    "nullable": true
+   },
+   "validRecords": {
+    "type": "integer",
+    "description": "Valid records",
+    "nullable": true
+   },
+   "warningCount": {
+    "type": "integer",
+    "description": "Records with warnings",
+    "nullable": true
+   },
+   "errorCount": {
+    "type": "integer",
+    "description": "Records with errors; the job cannot be submitted while above zero",
+    "nullable": true
+   },
+   "jobId": {
+    "type": "string",
+    "description": "Bulk job ID"
+   },
+   "jobKind": {
+    "type": "string",
+    "enum": [
+     "bulkOperation",
+     "import"
+    ],
+    "description": "Bulk operation on selected records, or spreadsheet import (CSV/XLSX)"
+   },
+   "selectionValues": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "IDs selected under selectBy (e.g. the price lists or products)"
+   },
+   "effectivePeriodFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Selection: effective period from",
+    "nullable": true
+   },
+   "effectivePeriodTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Selection: effective period to",
+    "nullable": true
+   },
+   "recordsSelected": {
+    "type": "integer",
+    "description": "Records selected, e.g. 428 admission rates"
+   },
+   "operation": {
+    "type": "string",
+    "enum": [
+     "increasePercent",
+     "decreasePercent",
+     "increaseFixedAmount",
+     "decreaseFixedAmount",
+     "replaceAmount",
+     "copyRate",
+     "changeCurrency",
+     "applyRounding",
+     "setEffectiveDates",
+     "activateDeactivate",
+     "cloneForNewSeason"
+    ],
+    "description": "Bulk Operation (pack p.60)",
+    "nullable": true
+   },
+   "adjustmentPercent": {
     "type": "number",
-    "description": "Increase by %"
+    "description": "Percent for increasePercent / decreasePercent",
+    "nullable": true
    },
-   "decreaseBy": {
-    "type": "number",
-    "description": "Decrease by %"
+   "adjustmentAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Amount for fixed-amount and replace operations",
+    "nullable": true
    },
-   "increaseFixedAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Increase Fixed Amount"
-   },
-   "decreaseFixedAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Decrease Fixed Amount"
-   },
-   "changeCurrency": {
+   "targetCurrency": {
     "type": "string",
-    "description": "Change Currency"
+    "description": "ISO 4217 currency for changeCurrency",
+    "nullable": true
    },
-   "activateDeactivate": {
+   "currentPortfolioValue": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Preview: current portfolio value",
+    "nullable": true
+   },
+   "proposedPortfolioValue": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Preview: proposed portfolio value",
+    "nullable": true
+   },
+   "fileName": {
     "type": "string",
-    "description": "Activate/Deactivate"
+    "description": "Imported file name",
+    "nullable": true
    },
-   "increase5": {
-    "type": "number",
-    "description": "Increase 5%"
+   "columnMappings": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "sourceColumn": {
+       "type": "string",
+       "description": "Column in the file"
+      },
+      "targetField": {
+       "type": "string",
+       "description": "TICVAI field, e.g. rateAmount"
+      },
+      "suggestedByAi": {
+       "type": "boolean",
+       "description": "Suggested by AI mapping"
+      },
+      "confirmed": {
+       "type": "boolean",
+       "description": "Confirmed by the administrator; unconfirmed mappings block validation"
+      }
+     },
+     "description": "Column mapping"
+    },
+    "description": "Import column mappings"
    },
-   "csvXlsxPricingFiles": {
+   "validationIssues": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "invalidProduct",
+        "unknownRateCode",
+        "duplicateRecord",
+        "unsupportedCurrency",
+        "missingMandatoryField",
+        "invalidDate",
+        "invalidAmount"
+       ],
+       "description": "Import Validation check (pack p.61)"
+      },
+      "rowNumber": {
+       "type": "integer",
+       "description": "File row",
+       "nullable": true
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "warning",
+        "error"
+       ],
+       "description": "Errors block submission"
+      },
+      "message": {
+       "type": "string",
+       "description": "Message"
+      }
+     },
+     "description": "One issue"
+    },
+    "description": "Validation issues found before commit"
+   },
+   "changeRequestId": {
     "type": "string",
-    "description": "CSV/XLSX pricing files"
+    "description": "Change request the job was submitted as",
+    "nullable": true
    },
-   "priceLists": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price lists"
-   },
-   "rateValues": {
-    "type": "number",
-    "description": "Rate values"
-   },
-   "effectiveDates": {
+   "status": {
     "type": "string",
-    "description": "Effective dates"
+    "description": "Status: draft, validating, validationFailed, readyToSubmit, submitted or cancelled"
    },
-   "mappings": {
+   "createdBy": {
     "type": "string",
-    "description": "Mappings"
+    "description": "Created by"
    },
-   "invalidProduct": {
-    "type": "string",
-    "description": "Invalid Product"
-   },
-   "unknownRateCode": {
-    "type": "number",
-    "description": "Unknown Rate Code"
-   },
-   "unsupportedCurrency": {
-    "type": "string",
-    "description": "Unsupported Currency"
-   },
-   "missingMandatoryField": {
-    "type": "string",
-    "description": "Missing Mandatory Field"
-   },
-   "invalidDate": {
+   "createdAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Invalid Date"
-   },
-   "invalidAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Invalid Amount"
-   },
-   "recordsRead5420": {
+    "description": "Created at"
+   }
+  }
+ },
+ "CatalogueRollbackAction": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.rollback_action",
+  "description": "**A rollback or emergency action on a product or on pricing** (29 September, data model DM3). Merges product rollback (ADM-133) and the pricing rollback and emergency centre (ADM-086). A rollback restores an earlier `catalogue.product_version` or `catalogue.price_list_version` as a new version; nothing is edited in place. Emergency actions may run before approval and then need `retrospectiveApprovalRequired`.",
+  "required": [
+   "id",
+   "scopePath",
+   "subject",
+   "actionType",
+   "reason",
+   "status",
+   "requestedByPrincipalId",
+   "requestedAt"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "Records Read: 5,420"
+    "format": "uuid",
+    "readOnly": true
    },
-   "valid5371": {
+   "scopePath": {
     "type": "string",
-    "description": "Valid: 5,371"
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
    },
-   "warnings37": {
+   "subject": {
     "type": "string",
-    "description": "Warnings: 37"
+    "enum": [
+     "product",
+     "pricing"
+    ]
    },
-   "errors12": {
+   "actionType": {
+    "type": "string",
+    "enum": [
+     "rollback",
+     "freezePriceList",
+     "freezeProductPricing",
+     "freezeVenuePricing",
+     "stopScheduledPublication",
+     "stopDistribution",
+     "restoreLastKnownGood"
+    ],
+    "description": "Product rollbacks are `rollback`."
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "priceListId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "fromVersion": {
     "type": "integer",
-    "description": "Errors: 12"
+    "nullable": true
+   },
+   "toVersion": {
+    "type": "integer",
+    "nullable": true
+   },
+   "productScope": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "entireProduct",
+      "pricingAssociation",
+      "channelAssociation",
+      "validityConfiguration",
+      "media",
+      "policy",
+      "entitlementConfiguration"
+     ]
+    },
+    "description": "Product rollbacks: which parts are restored."
+   },
+   "rollbackTarget": {
+    "type": "string",
+    "enum": [
+     "previousVersion",
+     "selectedVersion",
+     "previousPrice",
+     "commercialBaseline",
+     null
+    ],
+    "nullable": true
+   },
+   "rollbackScope": {
+    "type": "string",
+    "enum": [
+     "selectedProducts",
+     "selectedVenue",
+     "selectedMarket",
+     "selectedChannel",
+     "entirePublication",
+     null
+    ],
+    "nullable": true
+   },
+   "scopeIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "dependencies": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Product rollbacks: the dependent objects reviewed before executing."
+   },
+   "reason": {
+    "type": "string"
+   },
+   "executionMode": {
+    "type": "string",
+    "enum": [
+     "immediate",
+     "scheduled"
+    ],
+    "default": "immediate"
+   },
+   "isEmergency": {
+    "type": "boolean",
+    "default": false
+   },
+   "scheduledAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "incidentReference": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "authorisedRole": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "retrospectiveApprovalRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "changeRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The change request whose publication is being rolled back."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "requested",
+     "scheduled",
+     "executing",
+     "completed",
+     "failed",
+     "cancelled"
+    ],
+    "default": "requested"
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "requestedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   }
+  }
+ },
+ "ChangeImpactAnalysisView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Change Impact Analysis displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "area": {
+    "type": "string",
+    "enum": [
+     "futureOrders",
+     "reservations",
+     "issuedTickets",
+     "capacity",
+     "pricing",
+     "tax",
+     "promotions",
+     "membership",
+     "entitlements",
+     "accessControl",
+     "salesChannels",
+     "b2bPartners",
+     "otas",
+     "pos",
+     "b2c",
+     "kiosk",
+     "media",
+     "finance",
+     "reporting"
+    ],
+    "description": "Impact area (pack p.21-22)"
+   },
+   "changeRequestId": {
+    "type": "string",
+    "description": "Change request analysed",
+    "format": "uuid"
+   },
+   "affectedCount": {
+    "type": "integer",
+    "description": "How many items in this area are affected (orders, reservations, agreements, channels...)"
+   },
+   "riskLevel": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
+    "description": "Risk classification"
+   },
+   "explanation": {
+    "type": "string",
+    "description": "AI explanation in business language; advisory",
+    "nullable": true
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
    }
   }
  },
@@ -2178,115 +3117,121 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.channel_allocation at 4%, so this is not an update to anything the package stores today and no new table has been decided",
   "description": "**What Pricing Approval Workflow & Authority Matrix submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *Every approval action records* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.",
   "properties": {
-   "change": {
-    "type": "number",
-    "description": "Change %"
-   },
-   "monetaryImpact": {
-    "type": "string",
-    "description": "Monetary Impact"
-   },
-   "revenueImpact": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue Impact"
-   },
-   "priceList": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price List"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Scope: venue; empty for all",
+    "nullable": true
    },
    "market": {
     "type": "string",
-    "description": "Market"
+    "description": "Scope: market; empty for all",
+    "nullable": true
    },
    "legalEntity": {
     "type": "string",
-    "description": "Legal Entity"
+    "description": "Scope: legal entity; empty for all",
+    "nullable": true
    },
-   "channel": {
+   "policyId": {
     "type": "string",
-    "description": "Channel"
+    "description": "Authority policy ID; empty on create",
+    "nullable": true
    },
-   "taxChange": {
+   "policyName": {
     "type": "string",
-    "description": "Tax Change"
+    "description": "Policy name"
    },
-   "feeChange": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fee Change"
+   "tiers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "dimension": {
+       "type": "string",
+       "enum": [
+        "changePercent",
+        "monetaryImpact",
+        "revenueImpact",
+        "priceList",
+        "product",
+        "venue",
+        "market",
+        "legalEntity",
+        "channel",
+        "taxChange",
+        "feeChange",
+        "emergencyStatus"
+       ],
+       "description": "Approval Rules dimension (pack pp.64-65)"
+      },
+      "minValue": {
+       "type": "number",
+       "description": "Lower bound (exclusive) for numeric dimensions, e.g. 5 for >5%",
+       "nullable": true
+      },
+      "maxValue": {
+       "type": "number",
+       "description": "Upper bound (inclusive), e.g. 10 for up to 10%",
+       "nullable": true
+      },
+      "matchValue": {
+       "type": "string",
+       "description": "Matching value for non-numeric dimensions (a price list, venue, channel...); taxChange/feeChange/emergencyStatus match true",
+       "nullable": true
+      },
+      "approvalLevels": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "properties": {
+         "sequence": {
+          "type": "integer",
+          "description": "Order in the multi-level workflow, 1 first"
+         },
+         "approverRole": {
+          "type": "string",
+          "description": "Role that must approve, e.g. Pricing Manager, Commercial Director, Finance"
+         },
+         "approverUserId": {
+          "type": "string",
+          "description": "Named approver instead of the role",
+          "nullable": true
+         }
+        },
+        "description": "One approval step"
+       },
+       "description": "Approvers in sequence"
+      }
+     },
+     "description": "One row of the authority matrix"
+    },
+    "description": "Authority matrix: the first matching row applies; when several dimensions match, all their approval levels are required (decided 29 September, readiness close-out)"
    },
-   "emergencyStatus": {
+   "creatorCannotGiveFinalApproval": {
+    "type": "boolean",
+    "description": "Segregation of duties: the user who created a change cannot give final approval; defaults to true (decided 29 September, readiness close-out)"
+   },
+   "expectedApprovalHours": {
+    "type": "integer",
+    "description": "Approval SLA: expected approval time in hours; defaults to 48 (decided 29 September, readiness close-out)"
+   },
+   "reminderAfterHours": {
+    "type": "integer",
+    "description": "Reminder sent to the pending approver after this many hours; defaults to 24 (decided 29 September, readiness close-out)"
+   },
+   "escalateAfterHours": {
+    "type": "integer",
+    "description": "Escalation after this many hours; defaults to 72 (decided 29 September, readiness close-out)"
+   },
+   "escalateToRole": {
     "type": "string",
-    "description": "Emergency Status"
+    "description": "Role escalated to",
+    "nullable": true
    },
-   "commercialDirector": {
+   "alternateApproverRole": {
     "type": "string",
-    "description": "Commercial Director +"
-   },
-   "financeCompliance": {
-    "type": "string",
-    "description": "Finance + Compliance"
-   },
-   "returnForModification": {
-    "type": "string",
-    "description": "Return for Modification"
-   },
-   "requestInformation": {
-    "type": "string",
-    "description": "Request Information"
-   },
-   "delegate": {
-    "type": "string",
-    "description": "Delegate"
-   },
-   "expectedApprovalTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Expected Approval Time"
-   },
-   "escalation": {
-    "type": "string",
-    "description": "Escalation"
-   },
-   "reminder": {
-    "type": "string",
-    "description": "Reminder"
-   },
-   "alternateApprover": {
-    "type": "string",
-    "description": "Alternate Approver"
-   },
-   "user": {
-    "type": "string",
-    "description": "User"
-   },
-   "role": {
-    "type": "string",
-    "description": "Role"
-   },
-   "dateTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date/Time"
-   },
-   "decision": {
-    "type": "string",
-    "description": "Decision"
-   },
-   "comment": {
-    "type": "string",
-    "description": "Comment"
-   },
-   "version": {
-    "type": "string",
-    "description": "Version"
+    "description": "Alternate approver role when the approver is unavailable or delegates",
+    "nullable": true
    }
   },
   "x-ticvai-record-definition": "Every approval action records"
@@ -2297,115 +3242,121 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Pricing Approval Workflow & Authority Matrix displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "change": {
-    "type": "number",
-    "description": "Change %"
-   },
-   "monetaryImpact": {
-    "type": "string",
-    "description": "Monetary Impact"
-   },
-   "revenueImpact": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue Impact"
-   },
-   "priceList": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price List"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Scope: venue; empty for all",
+    "nullable": true
    },
    "market": {
     "type": "string",
-    "description": "Market"
+    "description": "Scope: market; empty for all",
+    "nullable": true
    },
    "legalEntity": {
     "type": "string",
-    "description": "Legal Entity"
+    "description": "Scope: legal entity; empty for all",
+    "nullable": true
    },
-   "channel": {
+   "policyId": {
     "type": "string",
-    "description": "Channel"
+    "description": "Authority policy ID; empty on create",
+    "nullable": true
    },
-   "taxChange": {
+   "policyName": {
     "type": "string",
-    "description": "Tax Change"
+    "description": "Policy name"
    },
-   "feeChange": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fee Change"
+   "tiers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "dimension": {
+       "type": "string",
+       "enum": [
+        "changePercent",
+        "monetaryImpact",
+        "revenueImpact",
+        "priceList",
+        "product",
+        "venue",
+        "market",
+        "legalEntity",
+        "channel",
+        "taxChange",
+        "feeChange",
+        "emergencyStatus"
+       ],
+       "description": "Approval Rules dimension (pack pp.64-65)"
+      },
+      "minValue": {
+       "type": "number",
+       "description": "Lower bound (exclusive) for numeric dimensions, e.g. 5 for >5%",
+       "nullable": true
+      },
+      "maxValue": {
+       "type": "number",
+       "description": "Upper bound (inclusive), e.g. 10 for up to 10%",
+       "nullable": true
+      },
+      "matchValue": {
+       "type": "string",
+       "description": "Matching value for non-numeric dimensions (a price list, venue, channel...); taxChange/feeChange/emergencyStatus match true",
+       "nullable": true
+      },
+      "approvalLevels": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "properties": {
+         "sequence": {
+          "type": "integer",
+          "description": "Order in the multi-level workflow, 1 first"
+         },
+         "approverRole": {
+          "type": "string",
+          "description": "Role that must approve, e.g. Pricing Manager, Commercial Director, Finance"
+         },
+         "approverUserId": {
+          "type": "string",
+          "description": "Named approver instead of the role",
+          "nullable": true
+         }
+        },
+        "description": "One approval step"
+       },
+       "description": "Approvers in sequence"
+      }
+     },
+     "description": "One row of the authority matrix"
+    },
+    "description": "Authority matrix: the first matching row applies; when several dimensions match, all their approval levels are required (decided 29 September, readiness close-out)"
    },
-   "emergencyStatus": {
+   "creatorCannotGiveFinalApproval": {
+    "type": "boolean",
+    "description": "Segregation of duties: the user who created a change cannot give final approval; defaults to true (decided 29 September, readiness close-out)"
+   },
+   "expectedApprovalHours": {
+    "type": "integer",
+    "description": "Approval SLA: expected approval time in hours; defaults to 48 (decided 29 September, readiness close-out)"
+   },
+   "reminderAfterHours": {
+    "type": "integer",
+    "description": "Reminder sent to the pending approver after this many hours; defaults to 24 (decided 29 September, readiness close-out)"
+   },
+   "escalateAfterHours": {
+    "type": "integer",
+    "description": "Escalation after this many hours; defaults to 72 (decided 29 September, readiness close-out)"
+   },
+   "escalateToRole": {
     "type": "string",
-    "description": "Emergency Status"
+    "description": "Role escalated to",
+    "nullable": true
    },
-   "commercialDirector": {
+   "alternateApproverRole": {
     "type": "string",
-    "description": "Commercial Director +"
-   },
-   "financeCompliance": {
-    "type": "string",
-    "description": "Finance + Compliance"
-   },
-   "returnForModification": {
-    "type": "string",
-    "description": "Return for Modification"
-   },
-   "requestInformation": {
-    "type": "string",
-    "description": "Request Information"
-   },
-   "delegate": {
-    "type": "string",
-    "description": "Delegate"
-   },
-   "expectedApprovalTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Expected Approval Time"
-   },
-   "escalation": {
-    "type": "string",
-    "description": "Escalation"
-   },
-   "reminder": {
-    "type": "string",
-    "description": "Reminder"
-   },
-   "alternateApprover": {
-    "type": "string",
-    "description": "Alternate Approver"
-   },
-   "user": {
-    "type": "string",
-    "description": "User"
-   },
-   "role": {
-    "type": "string",
-    "description": "Role"
-   },
-   "dateTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date/Time"
-   },
-   "decision": {
-    "type": "string",
-    "description": "Decision"
-   },
-   "comment": {
-    "type": "string",
-    "description": "Comment"
-   },
-   "version": {
-    "type": "string",
-    "description": "Version"
+    "description": "Alternate approver role when the approver is unavailable or delegates",
+    "nullable": true
    }
   }
  },
@@ -2416,56 +3367,56 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "description": "**What Pricing Change Impact Analysis displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "products": {
-    "type": "string",
-    "description": "Products"
+    "type": "integer",
+    "description": "Affected products (count)"
    },
    "events": {
-    "type": "string",
-    "description": "Events"
+    "type": "integer",
+    "description": "Affected events (count)"
    },
    "performances": {
-    "type": "string",
-    "description": "Performances"
+    "type": "integer",
+    "description": "Affected performances (count)"
    },
    "venues": {
-    "type": "string",
-    "description": "Venues"
+    "type": "integer",
+    "description": "Affected venues (count)"
    },
    "markets": {
-    "type": "string",
-    "description": "Markets"
+    "type": "integer",
+    "description": "Affected markets (count)"
    },
    "channels": {
-    "type": "string",
-    "description": "Channels"
+    "type": "integer",
+    "description": "Affected channels (count)"
    },
    "b2bPartners": {
-    "type": "string",
-    "description": "B2B Partners"
+    "type": "integer",
+    "description": "Affected b2bPartners (count)"
    },
    "memberships": {
-    "type": "string",
-    "description": "Memberships"
+    "type": "integer",
+    "description": "Affected memberships (count)"
    },
    "packages": {
-    "type": "string",
-    "description": "Packages"
+    "type": "integer",
+    "description": "Affected packages (count)"
    },
    "existingReservations": {
-    "type": "string",
-    "description": "Existing Reservations"
+    "type": "integer",
+    "description": "Existing reservations affected; normally 0 because changes never reach already-sold tickets (MoM 31 Aug §4.10)"
    },
    "futureReservations": {
-    "type": "string",
-    "description": "Future Reservations"
+    "type": "integer",
+    "description": "Affected futureReservations (count)"
    },
    "apis": {
-    "type": "string",
-    "description": "APIs"
+    "type": "integer",
+    "description": "Affected apis (count)"
    },
    "integrations": {
-    "type": "string",
-    "description": "Integrations"
+    "type": "integer",
+    "description": "Affected integrations (count)"
    },
    "currentRevenue": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
@@ -2477,71 +3428,124 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "averagePriceChange": {
     "type": "number",
-    "description": "Average Price Change"
+    "description": "Average price change in percent"
    },
    "maximumChange": {
-    "type": "string",
-    "description": "Maximum Change"
+    "type": "number",
+    "description": "Largest single price change in percent"
    },
    "minimumChange": {
-    "type": "string",
-    "description": "Minimum Change"
+    "type": "number",
+    "description": "Smallest single price change in percent"
    },
    "marginImpact": {
     "type": "number",
-    "description": "Margin Impact"
+    "description": "Margin impact in percentage points"
    },
    "customerExposure": {
-    "type": "string",
-    "description": "Customer Exposure"
+    "type": "integer",
+    "description": "Customers or tickets exposed per year at current volumes (decided 29 September, readiness close-out)"
    },
    "transactionVolume": {
     "type": "integer",
-    "description": "Transaction Volume"
-   },
-   "aed34m": {
-    "type": "string",
-    "description": "+AED 3.4M"
+    "description": "Transactions per year affected at current volumes (decided 29 September, readiness close-out)"
    },
    "derivedRates": {
     "type": "integer",
-    "description": "Derived Rates"
+    "description": "Dependency impact: derivedRates affected (count)"
    },
    "contractRates": {
     "type": "integer",
-    "description": "Contract Rates"
+    "description": "Dependency impact: contractRates affected (count)"
    },
    "membershipRates": {
     "type": "integer",
-    "description": "Membership Rates"
+    "description": "Dependency impact: membershipRates affected (count)"
    },
    "groupRates": {
     "type": "integer",
-    "description": "Group Rates"
+    "description": "Dependency impact: groupRates affected (count)"
    },
    "promotions": {
     "type": "integer",
-    "description": "Promotions"
+    "description": "Dependency impact: promotions affected (count)"
    },
    "dynamicPricingGuardrails": {
     "type": "integer",
-    "description": "Dynamic Pricing Guardrails"
+    "description": "Dependency impact: dynamicPricingGuardrails affected (count)"
    },
-   "existingOrdersNo": {
+   "changeRequestId": {
     "type": "string",
-    "description": "Existing Orders: No"
+    "description": "Change request analysed"
    },
-   "existingReservationsNo": {
+   "changeName": {
     "type": "string",
-    "description": "Existing Reservations: No"
+    "description": "Change name"
    },
-   "futureUnsoldInventoryYes": {
+   "analysedAt": {
     "type": "string",
-    "description": "Future Unsold Inventory: Yes"
+    "format": "date-time",
+    "description": "When the analysis was computed"
    },
-   "basedOnConfigurableCriteria": {
+   "revenueImpact": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Projected minus current revenue (annualised)"
+   },
+   "affectsExistingOrders": {
+    "type": "boolean",
+    "description": "Whether the change affects existing orders; always false for price changes (never retroactive)"
+   },
+   "affectsExistingReservations": {
+    "type": "boolean",
+    "description": "Whether the change affects existing reservations"
+   },
+   "affectsFutureUnsoldInventory": {
+    "type": "boolean",
+    "description": "Whether the change affects future unsold inventory"
+   },
+   "riskLevel": {
     "type": "string",
-    "description": "based on configurable criteria"
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
+    "description": "Risk score, classified by the tenant's configurable criteria"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI summary lines for this record: advisory only, never approves, publishes or changes a price"
+   }
+  }
+ },
+ "PricingChangeRequestDecisionInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; the decision is recorded on the approvals request",
+  "description": "What `decidePricingChangeRequest` takes (decided 29 September, readiness close-out).",
+  "required": [
+   "decision"
+  ],
+  "properties": {
+   "decision": {
+    "type": "string",
+    "enum": [
+     "approve",
+     "reject",
+     "returnForModification"
+    ]
+   },
+   "comment": {
+    "type": "string",
+    "maxLength": 2000,
+    "description": "Required for reject and returnForModification."
    }
   }
  },
@@ -2553,7 +3557,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "changeId": {
     "type": "string",
-    "description": "Change ID"
+    "description": "Change ID; empty on create (the server assigns it), set to update a draft",
+    "nullable": true
    },
    "changeName": {
     "type": "string",
@@ -2561,15 +3566,23 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "changeType": {
     "type": "string",
-    "description": "Change Type"
+    "enum": [
+     "priceChange",
+     "newRate",
+     "rateRemoval",
+     "priceListChange",
+     "eligibilityRuleChange",
+     "taxChange",
+     "feeChange",
+     "formulaChange",
+     "currencyRoundingChange",
+     "emergencyChange"
+    ],
+    "description": "Change Type (pack p.59)"
    },
    "businessReason": {
     "type": "string",
-    "description": "Business Reason"
-   },
-   "requestedBy": {
-    "type": "string",
-    "description": "Requested By"
+    "description": "Business reason in the requester's words"
    },
    "owner": {
     "type": "string",
@@ -2577,99 +3590,58 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "businessUnit": {
     "type": "string",
-    "description": "Business Unit"
+    "description": "Business unit",
+    "nullable": true
    },
    "legalEntity": {
     "type": "string",
-    "description": "Legal Entity"
+    "description": "Legal entity",
+    "nullable": true
    },
    "market": {
     "type": "string",
-    "description": "Market"
+    "description": "Market",
+    "nullable": true
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue",
+    "nullable": true
    },
    "effectiveDate": {
     "type": "string",
     "format": "date-time",
-    "description": "Effective Date"
+    "description": "Effective date and time requested; must be in the future, never retroactive (MoM 31 Aug §4.10)"
    },
    "expiryDate": {
     "type": "string",
     "format": "date-time",
-    "description": "Expiry Date"
+    "description": "Expiry date and time; empty for open-ended",
+    "nullable": true
    },
    "priority": {
     "type": "string",
-    "description": "Priority"
+    "enum": [
+     "low",
+     "normal",
+     "high",
+     "urgent"
+    ],
+    "description": "Priority; defaults to normal (decided 29 September, readiness close-out)"
    },
    "supportingNotes": {
     "type": "string",
-    "description": "Supporting Notes"
+    "description": "Supporting notes",
+    "nullable": true
    },
    "attachments": {
-    "type": "string",
-    "description": "Attachments"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Attachment document IDs"
    },
-   "priceChange": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price Change"
-   },
-   "newRate": {
-    "type": "integer",
-    "description": "New Rate"
-   },
-   "rateRemoval": {
-    "type": "number",
-    "description": "Rate Removal"
-   },
-   "priceListChange": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price List Change"
-   },
-   "eligibilityRuleChange": {
-    "type": "string",
-    "description": "Eligibility Rule Change"
-   },
-   "taxChange": {
-    "type": "string",
-    "description": "Tax Change"
-   },
-   "feeChange": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fee Change"
-   },
-   "formulaChange": {
-    "type": "string",
-    "description": "Formula Change"
-   },
-   "currencyRoundingChange": {
-    "type": "string",
-    "description": "Currency/Rounding Change"
-   },
-   "emergencyChange": {
-    "type": "string",
-    "description": "Emergency Change"
-   },
-   "multipleProducts": {
-    "type": "string",
-    "description": "Multiple Products"
-   },
-   "multipleRates": {
-    "type": "string",
-    "description": "Multiple Rates"
-   },
-   "multipleVenues": {
-    "type": "string",
-    "description": "Multiple Venues"
-   },
-   "multipleMarkets": {
-    "type": "string",
-    "description": "Multiple Markets"
-   },
-   "reasonsType": {
+   "reasonCode": {
     "type": "string",
     "enum": [
      "annualPriceReview",
@@ -2683,6 +3655,62 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "emergency"
     ],
     "description": "Vocabulary listed under Standard reasons."
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "objectType": {
+       "type": "string",
+       "enum": [
+        "product",
+        "rate",
+        "priceList",
+        "eligibilityRule",
+        "tax",
+        "fee",
+        "formula",
+        "currencyRounding"
+       ],
+       "description": "What this line changes"
+      },
+      "objectId": {
+       "type": "string",
+       "description": "ID of the product, rate, price list, rule, tax, fee or formula"
+      },
+      "venue": {
+       "type": "string",
+       "description": "Venue the line applies to; empty for all in scope",
+       "nullable": true
+      },
+      "market": {
+       "type": "string",
+       "description": "Market the line applies to; empty for all in scope",
+       "nullable": true
+      },
+      "proposedAmount": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "description": "Proposed amount for a monetary line; empty for removals and non-monetary changes",
+       "nullable": true
+      },
+      "proposedValue": {
+       "type": "string",
+       "description": "Proposed value for a non-monetary line (rule, formula, rounding), as the target screen's own format",
+       "nullable": true
+      },
+      "remove": {
+       "type": "boolean",
+       "description": "True when the line removes the rate or object (Rate Removal)"
+      }
+     },
+     "description": "One changed object"
+    },
+    "description": "Change lines: one request may cover many products, rates, venues and markets"
    }
   }
  },
@@ -2694,7 +3722,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "changeId": {
     "type": "string",
-    "description": "Change ID"
+    "description": "Change ID; empty on create (the server assigns it), set to update a draft",
+    "nullable": true
    },
    "changeName": {
     "type": "string",
@@ -2702,15 +3731,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "changeType": {
     "type": "string",
-    "description": "Change Type"
+    "enum": [
+     "priceChange",
+     "newRate",
+     "rateRemoval",
+     "priceListChange",
+     "eligibilityRuleChange",
+     "taxChange",
+     "feeChange",
+     "formulaChange",
+     "currencyRoundingChange",
+     "emergencyChange"
+    ],
+    "description": "Change Type (pack p.59)"
    },
    "businessReason": {
     "type": "string",
-    "description": "Business Reason"
+    "description": "Business reason in the requester's words"
    },
    "requestedBy": {
     "type": "string",
-    "description": "Requested By"
+    "description": "Requested by: the user who created the request (server-set)"
    },
    "owner": {
     "type": "string",
@@ -2718,103 +3759,58 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "businessUnit": {
     "type": "string",
-    "description": "Business Unit"
+    "description": "Business unit",
+    "nullable": true
    },
    "legalEntity": {
     "type": "string",
-    "description": "Legal Entity"
+    "description": "Legal entity",
+    "nullable": true
    },
    "market": {
     "type": "string",
-    "description": "Market"
+    "description": "Market",
+    "nullable": true
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue",
+    "nullable": true
    },
    "effectiveDate": {
     "type": "string",
     "format": "date-time",
-    "description": "Effective Date"
+    "description": "Effective date and time requested; must be in the future, never retroactive (MoM 31 Aug §4.10)"
    },
    "expiryDate": {
     "type": "string",
     "format": "date-time",
-    "description": "Expiry Date"
+    "description": "Expiry date and time; empty for open-ended",
+    "nullable": true
    },
    "priority": {
     "type": "string",
-    "description": "Priority"
+    "enum": [
+     "low",
+     "normal",
+     "high",
+     "urgent"
+    ],
+    "description": "Priority; defaults to normal (decided 29 September, readiness close-out)"
    },
    "supportingNotes": {
     "type": "string",
-    "description": "Supporting Notes"
+    "description": "Supporting notes",
+    "nullable": true
    },
    "attachments": {
-    "type": "string",
-    "description": "Attachments"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Attachment document IDs"
    },
-   "priceChange": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price Change"
-   },
-   "newRate": {
-    "type": "integer",
-    "description": "New Rate"
-   },
-   "rateRemoval": {
-    "type": "number",
-    "description": "Rate Removal"
-   },
-   "priceListChange": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price List Change"
-   },
-   "eligibilityRuleChange": {
-    "type": "string",
-    "description": "Eligibility Rule Change"
-   },
-   "taxChange": {
-    "type": "string",
-    "description": "Tax Change"
-   },
-   "feeChange": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fee Change"
-   },
-   "formulaChange": {
-    "type": "string",
-    "description": "Formula Change"
-   },
-   "currencyRoundingChange": {
-    "type": "string",
-    "description": "Currency/Rounding Change"
-   },
-   "emergencyChange": {
-    "type": "string",
-    "description": "Emergency Change"
-   },
-   "difference": {
-    "type": "string",
-    "description": "Difference (the pack shows +AED 25 / +10%)"
-   },
-   "multipleProducts": {
-    "type": "string",
-    "description": "Multiple Products"
-   },
-   "multipleRates": {
-    "type": "string",
-    "description": "Multiple Rates"
-   },
-   "multipleVenues": {
-    "type": "string",
-    "description": "Multiple Venues"
-   },
-   "multipleMarkets": {
-    "type": "string",
-    "description": "Multiple Markets"
-   },
-   "reasonsType": {
+   "reasonCode": {
     "type": "string",
     "enum": [
      "annualPriceReview",
@@ -2828,6 +3824,103 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "emergency"
     ],
     "description": "Vocabulary listed under Standard reasons."
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "objectType": {
+       "type": "string",
+       "enum": [
+        "product",
+        "rate",
+        "priceList",
+        "eligibilityRule",
+        "tax",
+        "fee",
+        "formula",
+        "currencyRounding"
+       ],
+       "description": "What this line changes"
+      },
+      "objectId": {
+       "type": "string",
+       "description": "ID of the product, rate, price list, rule, tax, fee or formula"
+      },
+      "venue": {
+       "type": "string",
+       "description": "Venue the line applies to; empty for all in scope",
+       "nullable": true
+      },
+      "market": {
+       "type": "string",
+       "description": "Market the line applies to; empty for all in scope",
+       "nullable": true
+      },
+      "proposedAmount": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "description": "Proposed amount for a monetary line; empty for removals and non-monetary changes",
+       "nullable": true
+      },
+      "proposedValue": {
+       "type": "string",
+       "description": "Proposed value for a non-monetary line (rule, formula, rounding), as the target screen's own format",
+       "nullable": true
+      },
+      "remove": {
+       "type": "boolean",
+       "description": "True when the line removes the rate or object (Rate Removal)"
+      },
+      "currentAmount": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "description": "Current live amount (Before)",
+       "nullable": true
+      },
+      "differenceAmount": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "description": "Proposed minus current",
+       "nullable": true
+      },
+      "differencePercent": {
+       "type": "number",
+       "description": "Difference in percent of the current amount",
+       "nullable": true
+      }
+     },
+     "description": "One changed object with before/after"
+    },
+    "description": "Change lines: one request may cover many products, rates, venues and markets"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, pendingValidation, pendingApproval, returnedForModification, approved, scheduled, published, publicationFailed, rejected, cancelled or rolledBack; saving leaves it draft"
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `approvals.ApprovalRequest` opened by `submitPricingChangeRequest`; null while the request is a draft (decided 29 September, readiness close-out)."
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI summary lines for this record: advisory only, never approves, publishes or changes a price"
    }
   }
  },
@@ -2837,105 +3930,87 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Pricing Distribution, Synchronization & Publication Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "b2c": {
-    "type": "string",
-    "description": "B2C"
-   },
-   "mobileApp": {
-    "type": "string",
-    "description": "Mobile App"
-   },
-   "pos": {
-    "type": "integer",
-    "description": "POS"
-   },
-   "mobilePos": {
-    "type": "integer",
-    "description": "Mobile POS"
-   },
-   "kiosk": {
-    "type": "string",
-    "description": "Kiosk"
-   },
-   "callCenter": {
-    "type": "string",
-    "description": "Call Center"
-   },
-   "b2b": {
-    "type": "string",
-    "description": "B2B"
-   },
-   "reseller": {
-    "type": "string",
-    "description": "Reseller"
-   },
-   "ota": {
-    "type": "string",
-    "description": "OTA"
-   },
-   "apis": {
-    "type": "integer",
-    "description": "APIs"
-   },
-   "cacheCdnWhereApplicable": {
-    "type": "string",
-    "description": "Cache/CDN where applicable"
-   },
-   "externalIntegratedSystems": {
-    "type": "integer",
-    "description": "External Integrated Systems"
-   },
-   "queue": {
-    "type": "string",
-    "description": "Queue"
-   },
-   "investigate": {
-    "type": "string",
-    "description": "Investigate"
-   },
-   "rollbackTarget": {
-    "type": "string",
-    "description": "Rollback Target"
-   },
-   "channels": {
-    "type": "string",
-    "description": "channels"
-   },
    "publicationStarted": {
     "type": "string",
-    "description": "Publication Started"
+    "format": "date-time",
+    "description": "Publication started"
    },
    "lastUpdated": {
     "type": "string",
     "format": "date-time",
-    "description": "Last Updated"
+    "description": "Last updated"
    },
    "recordsPublished": {
-    "type": "string",
-    "description": "Records Published"
+    "type": "integer",
+    "description": "Records published"
    },
    "recordsFailed": {
     "type": "integer",
-    "description": "Records Failed"
+    "description": "Records failed"
    },
    "latency": {
-    "type": "string",
-    "description": "Latency"
+    "type": "number",
+    "description": "Latency in seconds from publication start to confirmation",
+    "nullable": true
    },
    "targetVersion": {
     "type": "string",
-    "description": "Target Version"
+    "description": "Pricing version the target currently serves"
+   },
+   "publicationVersion": {
+    "type": "string",
+    "description": "Version being published"
+   },
+   "target": {
+    "type": "string",
+    "enum": [
+     "b2c",
+     "mobileApp",
+     "pos",
+     "mobilePos",
+     "kiosk",
+     "callCenter",
+     "b2b",
+     "reseller",
+     "ota",
+     "api",
+     "cacheCdn",
+     "externalSystem"
+    ],
+    "description": "Distribution Target (pack p.68)"
+   },
+   "targetName": {
+    "type": "string",
+    "description": "Named target where there are several, e.g. OTA A",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: pending, publishing, synchronized, warning, failed or suspended"
+   },
+   "currentProductionVersion": {
+    "type": "string",
+    "description": "Current production version"
+   },
+   "inSync": {
+    "type": "boolean",
+    "description": "Consistency check: targetVersion equals currentProductionVersion"
+   },
+   "failureReason": {
+    "type": "string",
+    "description": "Failure reason",
+    "nullable": true
    }
   }
  },
- "PricingGovernanceCommandCenterView": {
+ "PricingGovernanceCommandCenterSummary": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What Pricing Governance Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Pricing Governance Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
   "properties": {
    "pricingChangesInDraft": {
-    "type": "string",
+    "type": "integer",
     "description": "Pricing Changes in Draft"
    },
    "pendingValidation": {
@@ -2955,8 +4030,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Scheduled Publications"
    },
    "publishedToday": {
-    "type": "string",
-    "description": "Published Today"
+    "type": "integer",
+    "description": "Published Today: change requests published since 00:00 venue time"
    },
    "failedPublications": {
     "type": "integer",
@@ -2972,27 +4047,111 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "expiringPrices": {
     "type": "integer",
-    "description": "Expiring Prices"
+    "description": "Expiring Prices: rates whose expiry falls within the next 30 days (decided 29 September, readiness close-out)"
    },
    "governanceExceptions": {
     "type": "integer",
-    "description": "Governance Exceptions"
+    "description": "Governance Exceptions: changes that breached a configured threshold, bypassed a step under emergency override, or await retrospective approval (decided 29 September, readiness close-out)"
    },
    "highRiskChanges": {
     "type": "integer",
-    "description": "High-Risk Changes"
+    "description": "High-Risk Changes: open changes whose risk score is high or critical"
    },
-   "by": {
-    "type": "string",
-    "description": "By"
+   "governanceAlerts": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Governance Alerts (pack p.58), e.g. changes activating within 24 hours, changes over the configured commercial-change threshold, failed channel synchronizations"
    },
-   "aed": {
+   "aiSummary": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI Governance Assistant summary lines: advisory only"
+   }
+  }
+ },
+ "PricingGovernanceCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Pricing Governance Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "changeId": {
     "type": "string",
-    "description": "−AED"
+    "description": "Change request ID"
    },
-   "bulkUpdate": {
+   "changeName": {
     "type": "string",
-    "description": "Bulk Update"
+    "description": "Change name, e.g. Summer Admission 2027"
+   },
+   "changeType": {
+    "type": "string",
+    "enum": [
+     "priceChange",
+     "newRate",
+     "rateRemoval",
+     "priceListChange",
+     "eligibilityRuleChange",
+     "taxChange",
+     "feeChange",
+     "formulaChange",
+     "currencyRoundingChange",
+     "emergencyChange"
+    ],
+    "description": "Change Type (pack p.59)"
+   },
+   "scope": {
+    "type": "string",
+    "description": "Scope summary, e.g. \"24 products\", \"8 partners\", \"UAE\""
+   },
+   "revenueImpact": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Estimated revenue impact from the impact analysis; empty when not monetary (e.g. a regulatory VAT change)",
+    "nullable": true
+   },
+   "impactNote": {
+    "type": "string",
+    "description": "Impact label when not monetary, e.g. Regulatory",
+    "nullable": true
+   },
+   "requestedBy": {
+    "type": "string",
+    "description": "Requested by (user or team)"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "approver": {
+    "type": "string",
+    "description": "Current approver (role or user) awaited",
+    "nullable": true
+   },
+   "riskLevel": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
+    "description": "Risk score from the impact analysis (pack p.64)"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, pendingValidation, pendingApproval, returnedForModification, approved, scheduled, published, publicationFailed, rejected, cancelled or rolledBack"
+   },
+   "effectiveDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective date requested"
    }
   }
  },
@@ -3002,103 +4161,102 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Pricing History, Audit & Compliance Explorer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "oldValueNewValue": {
-    "type": "string",
-    "description": "Old Value → New Value"
-   },
-   "plus": {
-    "type": "string",
-    "description": "plus"
-   },
    "changedBy": {
     "type": "string",
-    "description": "Changed By"
+    "description": "Changed by (user, or the system actor)"
    },
    "dateTime": {
     "type": "string",
     "format": "date-time",
-    "description": "Date/Time"
+    "description": "Date/time"
    },
    "reason": {
     "type": "string",
-    "description": "Reason"
+    "description": "Reason",
+    "nullable": true
    },
    "source": {
     "type": "string",
-    "description": "Source"
+    "enum": [
+     "backOffice",
+     "bulkImport",
+     "api",
+     "dynamicPricingEngine",
+     "rollback",
+     "emergencyAction"
+    ],
+    "description": "Source of the change (decided 29 September, readiness close-out)"
    },
    "effectiveDate": {
     "type": "string",
     "format": "date-time",
-    "description": "Effective Date"
+    "description": "Effective date",
+    "nullable": true
    },
    "publication": {
     "type": "string",
-    "description": "Publication"
+    "description": "Publication ID",
+    "nullable": true
    },
-   "configurationAudit": {
+   "auditId": {
     "type": "string",
-    "description": "Configuration Audit"
+    "description": "Audit entry ID"
    },
-   "approvalAudit": {
+   "auditType": {
     "type": "string",
-    "description": "Approval Audit"
+    "enum": [
+     "configuration",
+     "approval",
+     "publication",
+     "synchronization",
+     "override",
+     "rollback",
+     "emergencyAction"
+    ],
+    "description": "Audit Type (pack p.71)"
    },
-   "publicationAudit": {
+   "entityType": {
     "type": "string",
-    "description": "Publication Audit"
+    "description": "What changed: price list, rate, rule, tax, fee, formula, strategy, guardrail..."
    },
-   "synchronizationAudit": {
+   "entityId": {
     "type": "string",
-    "description": "Synchronization Audit"
+    "description": "ID of what changed"
    },
-   "rollbackAudit": {
+   "field": {
     "type": "string",
-    "description": "Rollback Audit"
+    "description": "Field changed",
+    "nullable": true
    },
-   "emergencyActionAudit": {
+   "oldValue": {
     "type": "string",
-    "description": "Emergency Action Audit"
+    "description": "Old value",
+    "nullable": true
    },
-   "internalAudit": {
+   "newValue": {
     "type": "string",
-    "description": "Internal Audit"
+    "description": "New value",
+    "nullable": true
    },
-   "finance": {
+   "changeRequestId": {
     "type": "string",
-    "description": "Finance"
+    "description": "Change request",
+    "nullable": true
    },
-   "compliance": {
+   "approvalId": {
     "type": "string",
-    "description": "Compliance"
+    "description": "Approval",
+    "nullable": true
    },
-   "regulatoryReview": {
+   "version": {
     "type": "string",
-    "description": "Regulatory Review"
+    "description": "Pricing version",
+    "nullable": true
    },
-   "producedThisPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "produced this price?"
-   },
-   "whatPricesExist": {
+   "rollbackId": {
     "type": "string",
-    "description": "What prices exist?"
-   },
-   "price": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "price?"
-   },
-   "inBoards6And7": {
-    "type": "string",
-    "description": "in Boards 6 and 7"
-   },
-   "respectingCommercialGuardrails": {
-    "type": "string",
-    "description": "respecting commercial guardrails"
-   },
-   "guardrailsResolvedDynamicPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Guardrails → Resolved Dynamic Price"
+    "description": "Rollback, if applicable",
+    "nullable": true
    }
   }
  },
@@ -3108,59 +4266,102 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Pricing Publication & Effective-Date Scheduler submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "scheduledPublication": {
+   "version": {
+    "type": "string",
+    "description": "Approved pricing version to publish"
+   },
+   "publicationDate": {
     "type": "string",
     "format": "date-time",
-    "description": "Scheduled Publication"
+    "description": "Publish configuration at (empty for immediate)",
+    "nullable": true
    },
-   "futureEffectiveDate": {
+   "effectiveDate": {
     "type": "string",
     "format": "date-time",
-    "description": "Future Effective Date"
+    "description": "Sales effective from; must not be in the past (never retroactive)"
    },
-   "stagedPublication": {
+   "expiryDate": {
     "type": "string",
-    "description": "Staged Publication"
+    "format": "date-time",
+    "description": "Expiry; empty for open-ended",
+    "nullable": true
    },
-   "marketByMarket": {
+   "venue": {
     "type": "string",
-    "description": "Market-by-Market"
+    "description": "Scope: venue; empty for all venues in the version",
+    "nullable": true
    },
-   "venueByVenue": {
+   "market": {
     "type": "string",
-    "description": "Venue-by-Venue"
+    "description": "Scope: market; empty for all",
+    "nullable": true
    },
-   "channelByChannel": {
-    "type": "string",
-    "description": "Channel-by-Channel"
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+     }
+    ],
+    "nullable": true,
+    "description": "Scope: channel; empty for all"
    },
-   "theseDatesMayDiffer": {
+   "changeRequestId": {
     "type": "string",
-    "description": "These dates may differ"
+    "description": "Change request being published"
    },
-   "approvalComplete": {
+   "publicationMode": {
     "type": "string",
-    "description": "Approval Complete"
+    "enum": [
+     "immediate",
+     "scheduled",
+     "futureEffectiveDate",
+     "staged"
+    ],
+    "description": "Publication Mode (pack p.66)"
    },
-   "validationPassed": {
+   "visitEffectiveFrom": {
     "type": "string",
-    "description": "Validation Passed"
+    "format": "date",
+    "description": "Visit dates from which the new prices apply, when different from the sales effective date",
+    "nullable": true
    },
-   "noCriticalConflicts": {
-    "type": "string",
-    "description": "No Critical Conflicts"
+   "stages": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "dimension": {
+       "type": "string",
+       "enum": [
+        "market",
+        "venue",
+        "channel"
+       ],
+       "description": "Staged by"
+      },
+      "target": {
+       "type": "string",
+       "description": "Market, venue or channel ID"
+      },
+      "publicationDate": {
+       "type": "string",
+       "format": "date-time",
+       "description": "Publish at"
+      },
+      "effectiveDate": {
+       "type": "string",
+       "format": "date-time",
+       "description": "Effective from"
+      }
+     },
+     "description": "One stage"
+    },
+    "description": "Stages for staged publication (market-by-market, venue-by-venue, channel-by-channel)"
    },
-   "dependenciesAvailable": {
-    "type": "string",
-    "description": "Dependencies Available"
-   },
-   "channelsReady": {
-    "type": "string",
-    "description": "Channels Ready"
-   },
-   "effectiveDatesValid": {
-    "type": "string",
-    "description": "Effective Dates Valid"
+   "cancel": {
+    "type": "boolean",
+    "description": "True cancels this scheduled publication; allowed only before activation"
    }
   }
  },
@@ -3170,90 +4371,144 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Pricing Publication & Effective-Date Scheduler displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "scheduledPublication": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Scheduled Publication"
-   },
-   "futureEffectiveDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Future Effective Date"
-   },
-   "stagedPublication": {
-    "type": "string",
-    "description": "Staged Publication"
-   },
-   "marketByMarket": {
-    "type": "string",
-    "description": "Market-by-Market"
-   },
-   "venueByVenue": {
-    "type": "string",
-    "description": "Venue-by-Venue"
-   },
-   "channelByChannel": {
-    "type": "string",
-    "description": "Channel-by-Channel"
-   },
    "publicationDate": {
     "type": "string",
     "format": "date-time",
-    "description": "Publication Date"
+    "description": "Publish configuration at (empty for immediate)",
+    "nullable": true
    },
    "effectiveDate": {
     "type": "string",
     "format": "date-time",
-    "description": "Effective Date"
+    "description": "Sales effective from; must not be in the past (never retroactive)"
    },
    "expiryDate": {
     "type": "string",
     "format": "date-time",
-    "description": "Expiry Date"
+    "description": "Expiry; empty for open-ended",
+    "nullable": true
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Scope: venue; empty for all venues in the version",
+    "nullable": true
    },
    "market": {
     "type": "string",
-    "description": "Market"
+    "description": "Scope: market; empty for all",
+    "nullable": true
    },
    "channel": {
-    "type": "string",
-    "description": "Channel"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+     }
+    ],
+    "nullable": true,
+    "description": "Scope: channel; empty for all"
    },
    "version": {
     "type": "string",
-    "description": "Version"
+    "description": "Approved pricing version to publish"
    },
-   "theseDatesMayDiffer": {
+   "changeRequestId": {
     "type": "string",
-    "description": "These dates may differ"
+    "description": "Change request being published"
    },
-   "approvalComplete": {
+   "publicationMode": {
     "type": "string",
-    "description": "Approval Complete"
+    "enum": [
+     "immediate",
+     "scheduled",
+     "futureEffectiveDate",
+     "staged"
+    ],
+    "description": "Publication Mode (pack p.66)"
    },
-   "validationPassed": {
+   "visitEffectiveFrom": {
     "type": "string",
-    "description": "Validation Passed"
+    "format": "date",
+    "description": "Visit dates from which the new prices apply, when different from the sales effective date",
+    "nullable": true
    },
-   "noCriticalConflicts": {
-    "type": "string",
-    "description": "No Critical Conflicts"
+   "stages": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "dimension": {
+       "type": "string",
+       "enum": [
+        "market",
+        "venue",
+        "channel"
+       ],
+       "description": "Staged by"
+      },
+      "target": {
+       "type": "string",
+       "description": "Market, venue or channel ID"
+      },
+      "publicationDate": {
+       "type": "string",
+       "format": "date-time",
+       "description": "Publish at"
+      },
+      "effectiveDate": {
+       "type": "string",
+       "format": "date-time",
+       "description": "Effective from"
+      }
+     },
+     "description": "One stage"
+    },
+    "description": "Stages for staged publication (market-by-market, venue-by-venue, channel-by-channel)"
    },
-   "dependenciesAvailable": {
-    "type": "string",
-    "description": "Dependencies Available"
+   "cancel": {
+    "type": "boolean",
+    "description": "True cancels this scheduled publication; allowed only before activation"
    },
-   "channelsReady": {
-    "type": "string",
-    "description": "Channels Ready"
+   "prePublicationChecks": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "check": {
+       "type": "string",
+       "enum": [
+        "approvalComplete",
+        "validationPassed",
+        "noCriticalConflicts",
+        "dependenciesAvailable",
+        "channelsReady",
+        "effectiveDatesValid"
+       ],
+       "description": "Pre-Publication Check (pack p.67)"
+      },
+      "passed": {
+       "type": "boolean",
+       "description": "Passed"
+      },
+      "message": {
+       "type": "string",
+       "description": "Detail, e.g. the colliding version",
+       "nullable": true
+      }
+     },
+     "description": "One check"
+    },
+    "description": "Pre-publication check results"
    },
-   "effectiveDatesValid": {
+   "collisions": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Other versions scheduled to become effective for the same object and date"
+   },
+   "status": {
     "type": "string",
-    "description": "Effective Dates Valid"
+    "description": "Status: scheduled, blocked, published, cancelled or failed"
    }
   }
  },
@@ -3263,90 +4518,33 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Pricing Rollback & Emergency Control Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "previousVersion": {
-    "type": "string",
-    "description": "Previous Version"
-   },
-   "selectedVersion": {
-    "type": "string",
-    "description": "Selected Version"
-   },
-   "previousPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Previous Price"
-   },
-   "commercialBaseline": {
-    "type": "string",
-    "description": "Commercial Baseline"
-   },
-   "selectedProducts": {
-    "type": "string",
-    "description": "Selected Products"
-   },
-   "selectedVenue": {
-    "type": "string",
-    "description": "Selected Venue"
-   },
-   "selectedMarket": {
-    "type": "string",
-    "description": "Selected Market"
-   },
-   "selectedChannel": {
-    "type": "string",
-    "description": "Selected Channel"
-   },
-   "entirePublication": {
-    "type": "string",
-    "description": "Entire Publication"
-   },
-   "version53": {
-    "type": "string",
-    "description": "Version 5.3"
-   },
-   "incorrectAdultRate": {
-    "type": "number",
-    "description": "Incorrect Adult Rate"
-   },
-   "version52": {
-    "type": "string",
-    "description": "Version 5.2"
-   },
-   "dubaiVenueOnly": {
-    "type": "string",
-    "description": "Dubai Venue only"
-   },
    "productsAffected": {
-    "type": "string",
-    "description": "Products Affected"
+    "type": "integer",
+    "description": "Products affected"
    },
    "channelsAffected": {
-    "type": "string",
-    "description": "Channels Affected"
+    "type": "integer",
+    "description": "Channels affected"
    },
    "transactionsSinceActivation": {
-    "type": "string",
-    "description": "Transactions Since Activation"
+    "type": "integer",
+    "description": "Transactions since the faulty version activated"
    },
    "revenueExposure": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue Exposure"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Revenue exposure"
    },
    "existingOrders": {
-    "type": "string",
-    "description": "Existing Orders"
+    "type": "integer",
+    "description": "Existing orders in scope; kept at the price they were sold at"
    },
    "futureSales": {
-    "type": "string",
-    "description": "Future Sales"
-   },
-   "stopScheduledPublication": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Stop Scheduled Publication"
-   },
-   "stopDistribution": {
-    "type": "string",
-    "description": "Stop Distribution"
+    "type": "integer",
+    "description": "Future sales (unsold inventory) whose price the action changes"
    },
    "reason": {
     "type": "string",
@@ -3354,16 +4552,94 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "authorizedRole": {
     "type": "string",
-    "description": "Authorized Role"
+    "description": "Role under which the action was authorised"
    },
    "incidentReference": {
     "type": "string",
-    "description": "Incident Reference"
+    "description": "Incident reference",
+    "nullable": true
    },
    "timestamp": {
     "type": "string",
     "format": "date-time",
-    "description": "Timestamp"
+    "description": "When the action was executed",
+    "nullable": true
+   },
+   "actionId": {
+    "type": "string",
+    "description": "Action ID"
+   },
+   "actionType": {
+    "type": "string",
+    "enum": [
+     "rollback",
+     "freezePriceList",
+     "freezeProductPricing",
+     "freezeVenuePricing",
+     "stopScheduledPublication",
+     "stopDistribution",
+     "restoreLastKnownGood"
+    ],
+    "description": "Rollback or Emergency Freeze control (pack pp.69-70)"
+   },
+   "rollbackTarget": {
+    "type": "string",
+    "enum": [
+     "previousVersion",
+     "selectedVersion",
+     "previousPrice",
+     "commercialBaseline"
+    ],
+    "description": "Rollback to",
+    "nullable": true
+   },
+   "rollbackScope": {
+    "type": "string",
+    "enum": [
+     "selectedProducts",
+     "selectedVenue",
+     "selectedMarket",
+     "selectedChannel",
+     "entirePublication"
+    ],
+    "description": "Rollback scope",
+    "nullable": true
+   },
+   "scopeIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Products, venue, market or channel in scope"
+   },
+   "fromVersion": {
+    "type": "string",
+    "description": "Version in force before the action",
+    "nullable": true
+   },
+   "toVersion": {
+    "type": "string",
+    "description": "Version restored",
+    "nullable": true
+   },
+   "performedBy": {
+    "type": "string",
+    "description": "User who performed the action"
+   },
+   "retrospectiveApprovalRequired": {
+    "type": "boolean",
+    "description": "Retrospective approval required; true by default for emergency actions (decided 29 September, readiness close-out)"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: previewed, executed, awaitingRetrospectiveApproval, approved, failed or released"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI summary lines for this record: advisory only, never approves, publishes or changes a price"
    }
   }
  },
@@ -3375,30 +4651,31 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "version": {
     "type": "string",
-    "description": "Version"
+    "description": "Version number, e.g. 5.3"
    },
    "priceList": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price List"
+    "type": "string",
+    "description": "Price list name"
    },
    "createdDate": {
     "type": "string",
     "format": "date-time",
-    "description": "Created Date"
+    "description": "Created date"
    },
    "effectiveDate": {
     "type": "string",
     "format": "date-time",
-    "description": "Effective Date"
+    "description": "Effective date",
+    "nullable": true
    },
    "createdBy": {
     "type": "string",
-    "format": "date-time",
-    "description": "Created By"
+    "description": "Created by"
    },
    "changeRequest": {
     "type": "string",
-    "description": "Change Request"
+    "description": "Change request ID that produced the version",
+    "nullable": true
    },
    "productCount": {
     "type": "integer",
@@ -3409,56 +4686,28 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Change Count"
    },
    "status": {
-    "type": "integer",
-    "description": "Status"
-   },
-   "version42": {
     "type": "string",
-    "description": "Version 4.2"
-   },
-   "version43": {
-    "type": "string",
-    "description": "Version 4.3"
+    "description": "Status: draft, candidate, approved, scheduled, active, superseded, rolledBack or archived"
    },
    "added": {
-    "type": "string",
-    "description": "Added"
+    "type": "integer",
+    "description": "Rates added compared with the compareTo version (default: the commercial baseline)"
    },
    "removed": {
-    "type": "string",
-    "description": "Removed"
+    "type": "integer",
+    "description": "Rates removed compared with the compareTo version"
    },
    "modified": {
-    "type": "string",
-    "description": "Modified"
+    "type": "integer",
+    "description": "Rates modified compared with the compareTo version"
    },
    "unchanged": {
-    "type": "string",
-    "description": "Unchanged"
+    "type": "integer",
+    "description": "Rates unchanged compared with the compareTo version"
    },
-   "rateV42V43": {
-    "type": "number",
-    "description": "Rate V4.2 V4.3"
-   },
-   "ce": {
-    "type": "string",
-    "description": "ce"
-   },
-   "adult10": {
-    "type": "number",
-    "description": "Adult +10%"
-   },
-   "child83": {
-    "type": "number",
-    "description": "Child +8.3%"
-   },
-   "r190200": {
-    "type": "string",
-    "description": "r 190 200"
-   },
-   "transactionOccurred": {
-    "type": "string",
-    "description": "transaction occurred"
+   "isCommercialBaseline": {
+    "type": "boolean",
+    "description": "Designated as the commercial baseline for its price list"
    }
   }
  }

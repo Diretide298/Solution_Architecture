@@ -89,11 +89,11 @@ Open the file and match it. Do not describe it in words.
 - **77 screens.** 77 are Block A (the first 35 days of the build, from Monday 5 October).
 - **77 have a frame; 77 of those are client-verified** (a capture of the client-approved prototype).
 
-**All 77 frames are captures of the 28 September build (Mobile v2).** Mobile App v4 replaced it on 29 September. So:
+**The frames were captures of the 28 September build (Mobile v2).** Mobile App v4 replaced it on 29 September. So:
 
-1. **17 screens are views in v4** (GST-063, GST-012, GST-007, GST-008, GST-049, GST-041, GST-001, GST-002, GST-003, GST-004, GST-006, GST-051, GST-053, GST-054, GST-021, GST-022, GST-038). Do not draw these. Re-capture them from v4 and re-import. That is a capture job, not a design batch.
+1. **17 screens are views in v4** (GST-063, GST-012, GST-007, GST-008, GST-049, GST-041, GST-001, GST-002, GST-003, GST-004, GST-006, GST-051, GST-053, GST-054, GST-021, GST-022, GST-038). **Done: captured from v4 on 30 September** and re-imported, replacing their v2 frames. Do not draw these. The views and proof texts are in `tools/capture-plans/guest-mobile-v4.json`; the captures, with a manifest, in `wireframes/incoming/P02-mobile-v4/`. To capture again: `node tools/capture-prototype.mjs tools/capture-plans/guest-mobile-v4.json wireframes/incoming/P02-mobile-v4`, then `python tools/applied/guest-v4-capture-30-september.py --apply`.
 2. **19 changed Block A screens have no v4 view** (GST-059, GST-019, GST-039, GST-042, GST-066, GST-073, GST-048, GST-050, GST-056, GST-058, GST-074, GST-075, GST-009, GST-031, GST-032, GST-052, GST-011, GST-015, GST-036). Draw these in the v4 look, in the batches below.
-3. The other 41 screens keep their v2 frames for now. Restyle them to v4 when their batch comes round.
+3. The other 41 screens keep their Mobile v2 frames for now. Restyle them to v4 when their batch comes round.
 
 The manifest counts every P02 batch as drawn, because it counts frames on disk. It cannot see that the frames are one build old. The batches below are exported and current anyway.
 

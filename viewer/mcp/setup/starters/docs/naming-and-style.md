@@ -102,8 +102,8 @@ wrong.
 
 | Use | Type | Why |
 |---|---|---|
-| High-volume entity created at the edge | **ULID** `char(26)` | Offline devices generate IDs before the server sees them; doubles as the idempotency key; time-ordered so index locality is preserved without a central allocator |
-| Configuration entity created server-side | **UUID v4** | No ordering requirement |
+| Every entity, wherever it is created | **`uuid`**, new values **UUIDv7** | One id type (ADR-0056). Minted by the application, `Id.New()` on the server or `newId()` on a device; offline devices generate IDs before the server sees them, and the id doubles as the idempotency key; time-ordered so index locality is preserved without a central allocator |
+| Human code (order number, ticket code) | **text**, its own column | People read and type it; it is not the id and never stands in for one |
 | Scope node addressing | **ltree path** | Ancestor queries without recursive CTEs |
 | Outbox sequence | `bigserial` | Single-writer, ordering is the point |
 | **Anything on a partitioned table** | **Never `bigserial`** | A shared sequence is a contention point |

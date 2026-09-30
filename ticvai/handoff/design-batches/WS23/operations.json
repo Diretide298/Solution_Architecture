@@ -1,4 +1,123 @@
 {
+ "actOnPartnerCase": {
+  "method": "POST",
+  "path": "/partner-cases/{caseId}/actions",
+  "contract": "subscription",
+  "summary": "Work a partner case",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PartnerCase"
+ },
+ "actOnPartnerCommissionLine": {
+  "method": "POST",
+  "path": "/partner-commission-lines/{lineId}/actions",
+  "contract": "subscription",
+  "summary": "Hold, release, dispute or reverse a single commission line",
+  "permission": "SETTLEMENT_RECONCILE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PartnerCommissionLine"
+ },
+ "actOnPartnerReconciliationException": {
+  "method": "POST",
+  "path": "/partner-reconciliation-exceptions/{exceptionId}/actions",
+  "contract": "subscription",
+  "summary": "Work a partner reconciliation exception",
+  "permission": "SETTLEMENT_RECONCILE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PartnerReconciliationException"
+ },
+ "actOnPartnerSettlementBatch": {
+  "method": "POST",
+  "path": "/partner-settlement-batches/{batchId}/actions",
+  "contract": "subscription",
+  "summary": "Move a commission settlement batch through Finance",
+  "permission": "SETTLEMENT_RECONCILE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PartnerSettlementBatch"
+ },
+ "createPartnerCase": {
+  "method": "POST",
+  "path": "/partner-cases",
+  "contract": "subscription",
+  "summary": "Open a partner dispute or service case",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PartnerCase",
+  "responds": "PartnerCase"
+ },
+ "createPartnerChangeRequest": {
+  "method": "POST",
+  "path": "/partner-change-requests",
+  "contract": "subscription",
+  "summary": "A partner asks to cancel or amend a booking",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "dryRun",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": "PartnerChangeRequestInput",
+  "responds": "PartnerChangeRequest"
+ },
  "listCommissionCalculationSettlement": {
   "method": "GET",
   "path": "/commission-calculation-settlement",
@@ -8,9 +127,124 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "settlementBatchId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CommissionCalculationSettlementManagementView"
+  "responds": "Page"
+ },
+ "listPartner": {
+  "method": "GET",
+  "path": "/partner",
+  "contract": "subscription",
+  "summary": "Partner Management Command Center",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "brand",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "accountManager",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "risk",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "integrationType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partnerType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "territory",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "agreementStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "creditStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listPartner2": {
   "method": "GET",
@@ -43,13 +277,53 @@
     "required": false
    },
    {
-    "name": "date",
+    "name": "from",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partnerType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "accountManager",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "operationalStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "risk",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "PartnerOperationsCommandCenterView"
+  "responds": "Page"
  },
  "listPartnerCancellationRefund": {
   "method": "GET",
@@ -60,9 +334,45 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "requestType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PartnerCancellationsRefundsAmendmentsView"
+  "responds": "Page"
  },
  "listPartnerDisputeCase": {
   "method": "GET",
@@ -73,9 +383,50 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "category",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priority",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "owner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "slaBreach",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PartnerDisputesCasesServiceManagementView"
+  "responds": "Page"
  },
  "listPartnerOrderBooking": {
   "method": "GET",
@@ -126,10 +477,35 @@
     "name": "visitEventDate",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "agent",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "PartnerOrdersBookingManagementView"
+  "responds": "Page"
  },
  "listPartnerPerformanceScorecard": {
   "method": "GET",
@@ -140,9 +516,50 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partnerType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "market",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "riskRating",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "trend",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PartnerPerformanceScorecardRiskMonitoringView"
+  "responds": "Page"
  },
  "listPartnerReconciliationException": {
   "method": "GET",
@@ -153,9 +570,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "mismatchType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PartnerReconciliationExceptionManagementView"
+  "responds": "Page"
  },
  "listPartnerRelationship": {
   "method": "GET",
@@ -166,9 +609,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "category",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "opportunityClass",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PartnerAiIntelligenceRelationshipOptimizationView"
+  "responds": "Page"
  },
  "listPartnerStatementAccount": {
   "method": "GET",
@@ -179,9 +653,45 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "transactionType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PartnerStatementAccountActivityView"
+  "responds": "Page"
  },
  "listReservationHoldRelease": {
   "method": "GET",
@@ -192,8 +702,39 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "expiringBefore",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ReservationsHoldsReleaseManagementView"
+  "responds": "Page"
  }
 }

@@ -124,7 +124,7 @@ The reporting replica is **in-cell** and in-region. It is a replica of that cell
 not a central warehouse.
 
 Cross-cell and cross-tenant reporting comes from the central warehouse, which receives
-aggregates only and never personal data (ADR-0009, ADR-0010). **A cell is never queried by
+aggregates only and never personal data (ADR-0009, section 2 amended by ADR-0049, and ADR-0010). **A cell is never queried by
 another cell for reporting.** That constraint is data residency, not performance, and it does
 not bend under load.
 

@@ -2,6 +2,7 @@ id: LLD-InventoryService
 title: InventoryService — 58 operations, 22 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
+deployable: operations
 index: diagrams/hld/02-services.yaml
 why: '**Stock, counting and procurement.** Its own service because `inventory.stock_level` is derived
   from movements — a rule 58 operations broke on 20 August — and that derivation is expensive enough

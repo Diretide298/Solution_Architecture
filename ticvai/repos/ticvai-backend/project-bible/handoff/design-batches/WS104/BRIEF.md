@@ -1,6 +1,6 @@
 # WS104 — Subscription Licensing AI Self Service board 7
 
-**10 screens · 8 operations · 28 schemas · 6 permissions**
+**10 screens · 9 operations · 33 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -62,8 +62,8 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `BO-595` | AI Setup Command Center | configEditor | 1 | 0 | — |
 | `BO-596` | Guided Setup Plan | listDetail | 1 | 0 | — |
-| `BO-597` | AI Configuration Workspace | listDetail | 1 | 0 | — |
-| `BO-598` | AI Draft Review & Approval | listDetail | 1 | 0 | — |
+| `BO-597` | AI Configuration Workspace | listDetail | 2 | 0 | — |
+| `BO-598` | AI Draft Review & Approval | listDetail | 2 | 0 | — |
 | `BO-599` | Manual Configuration Center | listDetail | 1 | 0 | — |
 | `BO-600` | Venue, Calendar & Operational Setup | listDetail | 1 | 0 | — |
 | `BO-601` | Product, Pricing & Sales Channel Setup | configEditor | 2 | 0 | — |

@@ -18,6 +18,38 @@
   "requestBody": null,
   "responds": "ImportJob"
  },
+ "decideProposedAction": {
+  "method": "POST",
+  "path": "/proposed-actions/{actionId}/decide",
+  "contract": "ai",
+  "summary": "Approve or reject a proposal",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProposedAction"
+ },
+ "getActionPlan": {
+  "method": "GET",
+  "path": "/action-plans/{planId}",
+  "contract": "ai",
+  "summary": "A plan with its steps",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiActionPlanDetail"
+ },
  "getImportJob": {
   "method": "GET",
   "path": "/seat-maps/{seatMapId}/import/{jobId}",
@@ -101,6 +133,25 @@
   "requestBody": null,
   "responds": "SeatMapImportJob"
  },
+ "proposeSeatMapChanges": {
+  "method": "POST",
+  "path": "/ai/seat-maps/{seatMapId}/proposals",
+  "contract": "ai",
+  "summary": "Propose changes to an existing seat map, as a plan a person approves",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiSeatMapProposal"
+ },
  "publishSeatMap": {
   "method": "POST",
   "path": "/seat-maps/{seatMapId}/publish",
@@ -134,6 +185,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -149,6 +205,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

@@ -1,6 +1,6 @@
 # WS146 — Marketing CRM Configuration Reference v1.0 board 12
 
-**10 screens · 11 operations · 9 schemas · 3 permissions**
+**10 screens · 11 operations · 16 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -1816,6 +1816,306 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "ComplianceEvidenceAuditWaiverRepositoryView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over marketing.form_submission, marketing.waiver_signature, marketing.form_definition + marketing.form_definition_field, marketing.guest_document, marketing.waiver_verification (new), marketing.waiver_requirement (new) and marketing.waiver_requirement_event (new); names from pii.subject",
+  "description": "One signed waiver as evidence. Nothing here changes after signing except the verification and the audit events appended to it.",
+  "required": [
+   "submissionId",
+   "waiverId",
+   "exactVersion",
+   "participant",
+   "signatory",
+   "submittedAt",
+   "documentHash",
+   "auditEvents"
+  ],
+  "properties": {
+   "submissionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "signatureId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `MarketingWaiverSignature` row."
+   },
+   "waiverId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The waiver form (`FormDefinition.id`)."
+   },
+   "waiverName": {
+    "type": "string"
+   },
+   "exactVersion": {
+    "type": "integer",
+    "minimum": 1,
+    "description": "The form version presented and signed; `getForm` with this `version` returns its wording and questions."
+   },
+   "participant": {
+    "type": "object",
+    "properties": {
+     "subjectId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "name": {
+      "type": "string"
+     },
+     "dateOfBirth": {
+      "type": "string",
+      "format": "date",
+      "nullable": true
+     }
+    }
+   },
+   "signatory": {
+    "type": "object",
+    "properties": {
+     "subjectId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "name": {
+      "type": "string"
+     },
+     "signedName": {
+      "type": "string",
+      "description": "The name as typed or drawn at signing."
+     }
+    }
+   },
+   "signatoryType": {
+    "type": "string",
+    "enum": [
+     "participant",
+     "guardian",
+     "organisationRepresentative"
+    ]
+   },
+   "guardianRelationshipId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `GuestRelationship` relied on when a guardian or representative signed."
+   },
+   "submittedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Device time of signing."
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Server time the submission arrived."
+   },
+   "channel": {
+    "type": "string",
+    "description": "`FormSubmission.capturedAtChannel`."
+   },
+   "collectionMethod": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "email",
+     "sms",
+     "whatsapp",
+     "guestWeb",
+     "guestApp",
+     "groupPortal",
+     "qrCode",
+     "pos",
+     "kiosk",
+     "staffAssistedDevice"
+    ]
+   },
+   "assistedByStaffId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The staff member who helped on a staff-assisted device; never the signer."
+   },
+   "responses": {
+    "type": "object",
+    "description": "`FormSubmission.answers`, keyed by field key.",
+    "additionalProperties": true
+   },
+   "acknowledgements": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "key",
+      "accepted"
+     ],
+     "properties": {
+      "key": {
+       "type": "string"
+      },
+      "label": {
+       "type": "string",
+       "description": "The wording as presented in `exactVersion`."
+      },
+      "accepted": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "signatureEvidence": {
+    "type": "object",
+    "properties": {
+     "signatureKind": {
+      "type": "string",
+      "enum": [
+       "drawn",
+       "typed",
+       "checkbox"
+      ]
+     },
+     "signatureAssetId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     },
+     "signedDocumentId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "The rendered document as signed (`GuestDocument`, kind `signedWaiver`)."
+     }
+    }
+   },
+   "documentHash": {
+    "type": "string",
+    "maxLength": 128,
+    "description": "Hash of the rendered document as signed."
+   },
+   "deviceEvidence": {
+    "type": "object",
+    "nullable": true,
+    "description": "Personal data (ADR-0023); null once the subject is erased.",
+    "properties": {
+     "ipAddress": {
+      "type": "string",
+      "nullable": true
+     },
+     "deviceInfo": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   },
+   "verification": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "result": {
+      "type": "string",
+      "enum": [
+       "automaticallyValidated",
+       "pendingManualVerification",
+       "verified",
+       "correctionRequired",
+       "rejected",
+       "escalated"
+      ]
+     },
+     "reviewedBy": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     },
+     "reviewedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
+   },
+   "relatedBooking": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "relatedTicket": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "applicableProductId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "applicablePerformanceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "retainUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "From the retention policy in force."
+   },
+   "auditEvents": {
+    "type": "array",
+    "description": "The requirement's timeline, oldest first (link issued, opened, completed, signed, validated, verified and every staff action).",
+    "items": {
+     "type": "object",
+     "required": [
+      "at",
+      "event",
+      "actor"
+     ],
+     "properties": {
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "event": {
+       "type": "string",
+       "enum": [
+        "linkIssued",
+        "linkOpened",
+        "participantIdentified",
+        "guardianInformationCompleted",
+        "questionsCompleted",
+        "acknowledgementsAccepted",
+        "signatureSubmitted",
+        "validationPassed",
+        "validationFailed",
+        "markedComplete",
+        "verified",
+        "rejected",
+        "correctionRequested",
+        "signatoryReplaced",
+        "exceptionApproved",
+        "evidenceViewed"
+       ]
+      },
+      "actor": {
+       "type": "string",
+       "enum": [
+        "participant",
+        "guardian",
+        "staff",
+        "system"
+       ]
+      },
+      "staffId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
  "DigitalWaiverFormBuilderInput": {
   "description": "The request body of `setDigitalWaiverForm`, the layout record itself; read-only properties are ignored.",
   "allOf": [
@@ -2006,6 +2306,192 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "type": "string"
   }
  },
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
+ },
+ "MinorGuardianGroupConsentManagementView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over marketing.guest_relationship, marketing.waiver_requirement (new), marketing.form_submission, orders.group_booking and orders.order_line; names and contacts from pii.subject and pii.subject_contact",
+  "description": "One minor participant on one booking, their guardians and their group.",
+  "required": [
+   "minor",
+   "booking",
+   "guardians",
+   "consentStatus"
+  ],
+  "properties": {
+   "minor": {
+    "type": "object",
+    "required": [
+     "subjectId",
+     "name"
+    ],
+    "properties": {
+     "subjectId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "name": {
+      "type": "string"
+     },
+     "age": {
+      "type": "integer",
+      "minimum": 0,
+      "nullable": true
+     }
+    }
+   },
+   "booking": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The order id."
+   },
+   "visitDate": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "guardians": {
+    "type": "array",
+    "description": "Everyone holding a parent or guardian relationship to the minor; empty when none is recorded.",
+    "items": {
+     "type": "object",
+     "required": [
+      "subjectId",
+      "name",
+      "relationship",
+      "verificationStatus",
+      "signatureStatus"
+     ],
+     "properties": {
+      "relationshipId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "subjectId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "relationship": {
+       "type": "string",
+       "enum": [
+        "parent",
+        "guardian"
+       ]
+      },
+      "contact": {
+       "type": "string",
+       "nullable": true,
+       "description": "The address the guardian link goes to (email or mobile)."
+      },
+      "mayWaive": {
+       "type": "boolean",
+       "description": "The relationship carries the `signWaiver` authority and is in effect."
+      },
+      "verificationStatus": {
+       "type": "string",
+       "enum": [
+        "verified",
+        "unverified"
+       ],
+       "description": "`verified` when `GuestRelationship.verifiedAt` is set."
+      },
+      "signatureStatus": {
+       "type": "string",
+       "enum": [
+        "notRequested",
+        "sent",
+        "opened",
+        "signed",
+        "rejected",
+        "expired"
+       ]
+      }
+     }
+    }
+   },
+   "consentStatus": {
+    "type": "string",
+    "enum": [
+     "complete",
+     "pending",
+     "rejected"
+    ],
+    "description": "`complete` when every mandatory guardian consent for the minor on this booking is signed by an authorised signatory."
+   },
+   "group": {
+    "type": "object",
+    "nullable": true,
+    "description": "The group booking the minor is part of, and its leader.",
+    "properties": {
+     "groupBookingId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "organization": {
+      "type": "string",
+      "nullable": true,
+      "description": "The school, club or company."
+     },
+     "groupLeader": {
+      "type": "object",
+      "properties": {
+       "subjectId": {
+        "type": "string",
+        "format": "uuid"
+       },
+       "name": {
+        "type": "string"
+       }
+      }
+     },
+     "contact": {
+      "type": "string",
+      "nullable": true,
+      "description": "The leader's email or mobile."
+     },
+     "groupBooking": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The group's order id."
+     },
+     "responsibility": {
+      "type": "string",
+      "enum": [
+       "coordinatorOnly",
+       "supervisingAdult",
+       "organisationRepresentative"
+      ],
+      "description": "`organisationRepresentative` when the leader's `GuestRelationship` (kind `groupLeader`) carries `signWaiver`; `supervisingAdult` when the leader is a participant on the booking; otherwise `coordinatorOnly`."
+     },
+     "permittedActions": {
+      "type": "array",
+      "description": "What the leader may do for this group under the form's signatory rule.",
+      "items": {
+       "type": "string",
+       "enum": [
+        "viewStatus",
+        "sendLinks",
+        "receiveNotifications",
+        "signOnBehalf"
+       ]
+      }
+     }
+    }
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -2022,6 +2508,240 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "hasMore": {
     "type": "boolean"
+   }
+  }
+ },
+ "ParticipantWaiverStatusTrackingView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over marketing.waiver_requirement (new), marketing.form_definition, marketing.form_submission, marketing.waiver_verification (new), marketing.waiver_exception (new), orders.order_line, orders.group_booking and catalogue.performance; names from pii.subject",
+  "description": "One participant on one booking and the waivers that participant needs. Purchaser, participant and each waiver's signatory are separate people.",
+  "required": [
+   "participantId",
+   "participant",
+   "booking",
+   "waiverRequirements",
+   "completionStatus"
+  ],
+  "properties": {
+   "participantId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The participant's subject id."
+   },
+   "participant": {
+    "type": "string",
+    "description": "The participant's name."
+   },
+   "customerPurchaser": {
+    "type": "object",
+    "nullable": true,
+    "description": "Who bought the booking; may differ from the participant.",
+    "properties": {
+     "subjectId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "name": {
+      "type": "string"
+     }
+    }
+   },
+   "booking": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The order id."
+   },
+   "ticket": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The ticket (entitlement) id."
+   },
+   "product": {
+    "type": "object",
+    "properties": {
+     "productId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "name": {
+      "type": "string"
+     }
+    }
+   },
+   "event": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "eventId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "performanceId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "name": {
+      "type": "string"
+     }
+    }
+   },
+   "visitDate": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "ageCategory": {
+    "type": "string",
+    "enum": [
+     "adult",
+     "minor"
+    ],
+    "description": "From the participant's date of birth against the age of majority configured for the venue's jurisdiction (no shipped default). A participant whose age cannot be established is treated as a minor."
+   },
+   "group": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "groupBookingId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "name": {
+      "type": "string"
+     }
+    }
+   },
+   "waiverRequirements": {
+    "type": "array",
+    "description": "Each waiver this participant needs on this booking.",
+    "items": {
+     "type": "object",
+     "required": [
+      "requirementId",
+      "formId",
+      "formName",
+      "mandatory",
+      "status"
+     ],
+     "properties": {
+      "requirementId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "formId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "formName": {
+       "type": "string"
+      },
+      "formVersion": {
+       "type": "integer",
+       "minimum": 1,
+       "nullable": true,
+       "description": "The version assigned, or signed once completed."
+      },
+      "mandatory": {
+       "type": "boolean",
+       "description": "False for an optional consent (e.g. media), which never blocks readiness."
+      },
+      "status": {
+       "type": "string",
+       "enum": [
+        "notAssigned",
+        "assigned",
+        "sent",
+        "opened",
+        "inProgress",
+        "completed",
+        "verified",
+        "rejected",
+        "expired",
+        "superseded"
+       ]
+      },
+      "declined": {
+       "type": "boolean",
+       "default": false,
+       "description": "An optional consent answered no."
+      },
+      "signatory": {
+       "type": "object",
+       "nullable": true,
+       "properties": {
+        "subjectId": {
+         "type": "string",
+         "format": "uuid"
+        },
+        "name": {
+         "type": "string"
+        },
+        "signatoryType": {
+         "type": "string",
+         "enum": [
+          "participant",
+          "guardian",
+          "organisationRepresentative"
+         ]
+        }
+       }
+      },
+      "deliveryChannel": {
+       "type": "string",
+       "nullable": true,
+       "enum": [
+        "email",
+        "sms",
+        "whatsapp",
+        "push",
+        "inApp",
+        "qrCode",
+        "pos",
+        "kiosk",
+        "staffAssistedDevice",
+        "groupPortal"
+       ]
+      },
+      "lastSentAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "completedAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "submissionId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "blocks": {
+       "type": "array",
+       "description": "What an incomplete requirement blocks, from the trigger configuration.",
+       "items": {
+        "type": "string",
+        "enum": [
+         "ticketDownload",
+         "activation",
+         "checkIn",
+         "access"
+        ]
+       }
+      }
+     }
+    }
+   },
+   "completionStatus": {
+    "type": "string",
+    "enum": [
+     "ready",
+     "notReady",
+     "exceptionApproved"
+    ],
+    "description": "`ready` when every mandatory requirement is completed or verified; `exceptionApproved` when the gap is covered by an approved exception."
    }
   }
  },
@@ -2219,6 +2939,188 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "readOnly": true
+   }
+  }
+ },
+ "VersioningEffectiveDatesLegalChangeControlView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over marketing.form_definition, marketing.waiver_version_control (new), marketing.form_submission and marketing.waiver_signature",
+  "description": "One version of one waiver and its change control (pack 11.1.8).",
+  "required": [
+   "formId",
+   "versionNumber",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "formId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "waiverName": {
+    "type": "string"
+   },
+   "versionNumber": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "published",
+     "superseded",
+     "retired"
+    ],
+    "description": "`FormDefinition.status` (states/form-definition.yaml)."
+   },
+   "lifecycleStatus": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "review",
+     "pendingApproval",
+     "approved",
+     "scheduled",
+     "published",
+     "suspended",
+     "expired",
+     "archived"
+    ]
+   },
+   "createdByUserId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "changeReason": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "legalReviewer": {
+    "type": "string",
+    "nullable": true,
+    "description": "`FormDefinition.legalReviewedBy`."
+   },
+   "legalReviewedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "approvedByUserId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "approvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "resignRule": {
+    "type": "string",
+    "enum": [
+     "noResign",
+     "resignAtNextBooking",
+     "resignBeforeNextVisit"
+    ],
+    "description": "Whether people who signed an earlier version must sign this one."
+   },
+   "suspended": {
+    "type": "boolean",
+    "default": false
+   },
+   "suspensionReason": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "signatureCount": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Signatures taken against this exact version."
+   },
+   "comparison": {
+    "type": "object",
+    "nullable": true,
+    "description": "Present when `compareWith` is given.",
+    "properties": {
+     "comparedWithVersion": {
+      "type": "integer",
+      "minimum": 1
+     },
+     "addedText": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "blockKey": {
+         "type": "string"
+        },
+        "language": {
+         "type": "string"
+        },
+        "text": {
+         "type": "string"
+        }
+       }
+      }
+     },
+     "removedText": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "blockKey": {
+         "type": "string"
+        },
+        "language": {
+         "type": "string"
+        },
+        "text": {
+         "type": "string"
+        }
+       }
+      }
+     },
+     "changedQuestions": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "description": "Field keys added, removed or changed."
+     },
+     "changedSignatoryRules": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "description": "Names of the signatory-rule properties that differ."
+     },
+     "changedAssociations": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "description": "Associations added, removed or changed between the two versions' publication."
+     }
+    }
    }
   }
  },
@@ -2490,6 +3392,368 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "WaiverTemplateLibraryMasterSetupView": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.waiver_master",
+  "description": "The master record of one waiver (pack 11.1.2), one per `FormDefinition` of kind `waiver`. The name, wording, fields and versions live on the form; this holds classification, ownership and business scope.",
+  "required": [
+   "waiverId",
+   "waiverType",
+   "ownerUserId",
+   "businessOwnerUserId",
+   "defaultLanguage",
+   "templateSource"
+  ],
+  "properties": {
+   "waiverId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The `FormDefinition.id`; the natural key."
+   },
+   "waiverName": {
+    "type": "string",
+    "readOnly": true,
+    "description": "`FormDefinition.name`, shown here, written by `createForm`."
+   },
+   "internalDescription": {
+    "type": "string",
+    "maxLength": 2000,
+    "nullable": true
+   },
+   "waiverType": {
+    "type": "string",
+    "enum": [
+     "liabilityWaiver",
+     "parentGuardianConsent",
+     "participationConsent",
+     "medicalDeclaration",
+     "safetyAcknowledgement",
+     "mediaConsent",
+     "rentalAgreement",
+     "termsAcceptance",
+     "membershipDeclaration",
+     "customForm"
+    ]
+   },
+   "customTypeLabel": {
+    "type": "string",
+    "maxLength": 80,
+    "nullable": true,
+    "description": "The tenant's own classification name; required when `waiverType` is `customForm`."
+   },
+   "ownerUserId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "department": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "brandId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null for a corporate waiver every brand may use."
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The finance legal entity the waiver is given in favour of."
+   },
+   "defaultLanguage": {
+    "type": "string",
+    "maxLength": 10
+   },
+   "applicableCountries": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "pattern": "^[A-Z]{2}$"
+    },
+    "description": "ISO 3166-1 alpha-2. Empty means the waiver is not yet scoped, which blocks publication."
+   },
+   "applicableJurisdiction": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true,
+    "description": "A sub-national jurisdiction where the law differs within a country."
+   },
+   "status": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "draft",
+     "review",
+     "pendingApproval",
+     "approved",
+     "scheduled",
+     "published",
+     "suspended",
+     "expired",
+     "archived"
+    ],
+    "description": "The lifecycle status of the latest version (see `listWaiverConsent`)."
+   },
+   "templateSource": {
+    "type": "string",
+    "enum": [
+     "createNew",
+     "duplicateExisting",
+     "masterTemplate",
+     "corporateTemplate"
+    ],
+    "default": "createNew"
+   },
+   "sourceWaiverId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The waiver it was duplicated or created from; required unless `createNew`."
+   },
+   "sourceVersion": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true
+   },
+   "isMasterTemplate": {
+    "type": "boolean",
+    "default": false,
+    "description": "Offered in the reusable library. A corporate template is a master template with no `brandId`."
+   },
+   "businessOwnerUserId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "legalReviewerUserId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "complianceOwnerUserId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "operationalOwnerUserId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "legalReviewRequired": {
+    "type": "boolean",
+    "default": true,
+    "description": "Whether the approval chain includes the legal/compliance step. On unless the tenant turns it off."
+   },
+   "usage": {
+    "type": "object",
+    "readOnly": true,
+    "description": "Where the waiver is used now (pack Usage Indicator, Template Dependency).",
+    "properties": {
+     "products": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "venues": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "futureBookings": {
+      "type": "integer",
+      "minimum": 0
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "WaiverTriggerEligibilityCompletionRulesView": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.waiver_trigger_rule",
+  "description": "One trigger, eligibility and completion rule of a waiver (pack 11.1.7).",
+  "required": [
+   "formId",
+   "name",
+   "triggerPoint",
+   "completionDeadline",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Absent on create."
+   },
+   "formId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 150
+   },
+   "triggerPoint": {
+    "type": "string",
+    "enum": [
+     "duringCheckout",
+     "afterPurchase",
+     "beforeTicketIssuance",
+     "beforeTicketDownload",
+     "beforeEvent",
+     "beforeCheckIn",
+     "beforeAccess",
+     "beforeEquipmentCollection",
+     "beforeMembershipActivation",
+     "beforeActivityStart"
+    ]
+   },
+   "eligibility": {
+    "type": "array",
+    "description": "All must hold (AND). Empty means every participant the association reaches.",
+    "items": {
+     "type": "object",
+     "required": [
+      "attribute",
+      "operator",
+      "values"
+     ],
+     "properties": {
+      "attribute": {
+       "type": "string",
+       "enum": [
+        "age",
+        "isMinor",
+        "product",
+        "event",
+        "venue",
+        "activity",
+        "customerType",
+        "membership",
+        "country",
+        "channel",
+        "participantType",
+        "bookingType"
+       ]
+      },
+      "operator": {
+       "type": "string",
+       "enum": [
+        "equals",
+        "notEquals",
+        "in",
+        "notIn",
+        "lessThan",
+        "greaterThan"
+       ]
+      },
+      "values": {
+       "type": "array",
+       "minItems": 1,
+       "items": {
+        "type": "string",
+        "maxLength": 100
+       }
+      }
+     }
+    }
+   },
+   "completionDeadline": {
+    "type": "object",
+    "required": [
+     "kind"
+    ],
+    "properties": {
+     "kind": {
+      "type": "string",
+      "enum": [
+       "immediately",
+       "beforeTicketRelease",
+       "hoursBeforeEvent",
+       "daysBeforeVisit",
+       "beforeArrival",
+       "beforeAccess"
+      ]
+     },
+     "offset": {
+      "type": "integer",
+      "minimum": 1,
+      "nullable": true,
+      "description": "Hours for `hoursBeforeEvent`, days for `daysBeforeVisit`."
+     }
+    }
+   },
+   "enforcement": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "blockTicketDownload",
+      "blockTicketActivation",
+      "blockCheckIn",
+      "blockAccess"
+     ]
+    },
+    "description": "What an incomplete waiver blocks. Empty means warn only."
+   },
+   "allowStaffOverride": {
+    "type": "boolean",
+    "default": false,
+    "description": "An authorised operator may admit the participant anyway; the override is recorded."
+   },
+   "reminders": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "offsetHours",
+      "channels"
+     ],
+     "properties": {
+      "offsetHours": {
+       "type": "integer",
+       "minimum": 1,
+       "description": "Hours before the deadline, e.g. 168, 72, 24."
+      },
+      "channels": {
+       "type": "array",
+       "minItems": 1,
+       "items": {
+        "$ref": "#/components/schemas/MessageChannel"
+       }
+      }
+     }
+    }
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "inactive"
+    ],
+    "default": "active"
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "WaiverVerificationValidationWorkspaceInput": {
   "type": "object",
   "x-ticvai-persistence": "marketing.waiver_verification",
@@ -2643,7 +3907,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "booking": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "signatory": {

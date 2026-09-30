@@ -1,4 +1,61 @@
 {
+ "closeRiskCase": {
+  "method": "POST",
+  "path": "/risk/cases/{caseId}/close",
+  "contract": "ai",
+  "summary": "Close a case with an outcome",
+  "permission": "RISK_INVESTIGATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiRiskCase"
+ },
+ "createRiskCase": {
+  "method": "POST",
+  "path": "/risk/cases",
+  "contract": "ai",
+  "summary": "Open an investigation",
+  "permission": "RISK_INVESTIGATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiRiskCase"
+ },
+ "decideRiskAlert": {
+  "method": "POST",
+  "path": "/risk/alerts/{alertId}/decide",
+  "contract": "ai",
+  "summary": "Dismiss, monitor, mark false positive, or escalate",
+  "permission": "RISK_REVIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiRiskAlert"
+ },
  "diffWalletConfigurationVersion": {
   "method": "GET",
   "path": "/wallet-configuration/versions/{version}/diff",
@@ -18,6 +75,19 @@
   "requestBody": null,
   "responds": "WalletConfigurationDiff"
  },
+ "getRiskCase": {
+  "method": "GET",
+  "path": "/risk/cases/{caseId}",
+  "contract": "ai",
+  "summary": "A case with its evidence and actions",
+  "permission": "RISK_INVESTIGATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiRiskCaseDetail"
+ },
  "linkWalletCredential": {
   "method": "POST",
   "path": "/wallet-credentials",
@@ -25,7 +95,7 @@
   "summary": "Bind a wristband, card or device to a wallet",
   "permission": "WALLET_OPERATE",
   "offlineCapable": true,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -101,6 +171,50 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listRiskAlerts": {
+  "method": "GET",
+  "path": "/risk/alerts",
+  "contract": "ai",
+  "summary": "Risk alerts",
+  "permission": "RISK_REVIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "band",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "entityType",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listWalletConfigurationVersions": {
   "method": "GET",
   "path": "/wallet-configuration/versions",
@@ -151,7 +265,7 @@
   "summary": "Validate and publish the wallet configuration as a version",
   "permission": "WALLET_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {
@@ -189,7 +303,7 @@
   "summary": "Block, freeze or restrict a wallet",
   "permission": "WALLET_OPERATE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -227,9 +341,14 @@
   "summary": "Velocity, behaviour and what happens when a rule trips",
   "permission": "WALLET_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -246,7 +365,7 @@
   "summary": "Which credit this purchase would actually use",
   "permission": "WALLET_VIEW",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {

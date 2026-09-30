@@ -1292,7 +1292,7 @@
     "type": "array",
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     }
    },
    "supplierName": {
@@ -1448,10 +1448,11 @@
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderLineId": {
     "type": "string",
+    "format": "uuid",
     "nullable": true
    },
    "description": {

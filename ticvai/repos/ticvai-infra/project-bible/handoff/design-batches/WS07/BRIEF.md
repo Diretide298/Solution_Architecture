@@ -1,6 +1,6 @@
 # WS07 — Access Control board 7
 
-**10 screens · 15 operations · 14 schemas · 5 permissions**
+**10 screens · 15 operations · 24 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

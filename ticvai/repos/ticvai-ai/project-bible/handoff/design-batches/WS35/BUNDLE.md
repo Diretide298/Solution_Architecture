@@ -1,6 +1,6 @@
 # WS35 — Pricing   Revenue Management board 2
 
-**10 screens · 10 operations · 10 schemas · 1 permissions**
+**10 screens · 11 operations · 14 schemas · 1 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 1 permissions apply here:
   `PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,7 +60,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-058` | Pricing Rule Command Center | commandCentre | 1 | 1 | — |
+| `ADM-058` | Pricing Rule Command Center | commandCentre | 3 | 0 | — |
 | `ADM-059` | Customer Segment & Profile Pricing Rules | configEditor | 1 | 0 | — |
 | `ADM-060` | Membership & Loyalty Pricing Rules | configEditor | 1 | 0 | — |
 | `ADM-061` | Residency, Nationality & Market Pricing Rules | configEditor | 1 | 0 | — |
@@ -70,7 +69,7 @@ convincingly. It is never a caption.
 | `ADM-064` | Quantity, Group & Volume Pricing Rules | listDetail | 1 | 0 | — |
 | `ADM-065` | Effective Date, Season & Day-Based Pricing Rules | configEditor | 1 | 0 | — |
 | `ADM-066` | Timeslot, Performance & Time-of-Day Pricing Rules | listDetail | 1 | 0 | — |
-| `ADM-067` | Pricing Rule Priority, Conflict Resolution & Testing | listDetail | 1 | 0 | — |
+| `ADM-067` | Pricing Rule Priority, Conflict Resolution & Testing | listDetail | 3 | 0 | — |
 
 ## Thin screens in this batch
 
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-058 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-059",
@@ -181,19 +177,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "ADM-067",
      "trigger": "Works in Pricing Rule Priority, Conflict Resolution & Testing",
      "provenance": "flow F144 step 17→18",
-     "operation": "listPricingRule"
+     "operation": "listPricingRule",
+     "carries": [
+      "ruleId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can identify, search, and manage all contextual pricing rules from one workspace.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each rule should show) — counts over a population, then the population",
   "purpose": "Provide administrators with a centralized workspace for all pricing eligibility and contextual pricing rules.",
-  "purposeNote": "Administrators can identify, search, and manage all contextual pricing rules from one workspace.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 10 actions on this screen and the screen declares 1 operation.** Unserved: Customer Segment, Membership, Channel, Create Rule, Duplicate, Test Rule, Compare, Disable …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 13 actions on this screen and the screen declares 1 operation.** Unserved: Customer Segment, Membership, Channel, Quantity, Timeslot, Event, Create Rule, Duplicate …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Support"
    }
   ],
@@ -208,73 +207,73 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "metricTile",
        "label": "Active Pricing Rules",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "PricingRuleCommandCenterView.activePricingRules"
+       "bindsTo": "PricingRuleCommandCenterSummary.activePricingRules"
       },
       {
        "kind": "metricTile",
        "label": "Draft Rules",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "PricingRuleCommandCenterView.draftRules"
+       "bindsTo": "PricingRuleCommandCenterSummary.draftRules"
       },
       {
        "kind": "metricTile",
        "label": "Customer Segment Rules",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "PricingRuleCommandCenterView.customerSegmentRules"
+       "bindsTo": "PricingRuleCommandCenterSummary.customerSegmentRules"
       },
       {
        "kind": "metricTile",
        "label": "Membership Rules",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "PricingRuleCommandCenterView.membershipRules"
+       "bindsTo": "PricingRuleCommandCenterSummary.membershipRules"
       },
       {
        "kind": "metricTile",
        "label": "Residency Rules",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "PricingRuleCommandCenterView.residencyRules"
+       "bindsTo": "PricingRuleCommandCenterSummary.residencyRules"
       },
       {
        "kind": "metricTile",
        "label": "Channel Rules",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "PricingRuleCommandCenterView.channelRules"
+       "bindsTo": "PricingRuleCommandCenterSummary.channelRules"
       },
       {
        "kind": "metricTile",
        "label": "Location Rules",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "PricingRuleCommandCenterView.locationRules"
+       "bindsTo": "PricingRuleCommandCenterSummary.locationRules"
       },
       {
        "kind": "metricTile",
        "label": "Quantity Rules",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "PricingRuleCommandCenterView.quantityRules"
+       "bindsTo": "PricingRuleCommandCenterSummary.quantityRules"
       },
       {
        "kind": "metricTile",
        "label": "Seasonal Rules",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "PricingRuleCommandCenterView.seasonalRules"
+       "bindsTo": "PricingRuleCommandCenterSummary.seasonalRules"
       },
       {
        "kind": "metricTile",
        "label": "Timeslot Rules",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "PricingRuleCommandCenterView.timeslotRules"
+       "bindsTo": "PricingRuleCommandCenterSummary.timeslotRules"
       },
       {
        "kind": "metricTile",
        "label": "Rule Conflicts",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "PricingRuleCommandCenterView.ruleConflicts"
+       "bindsTo": "PricingRuleCommandCenterSummary.ruleConflicts"
       },
       {
        "kind": "metricTile",
        "label": "Rules Expiring Soon",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "PricingRuleCommandCenterView.rulesExpiringSoon"
+       "bindsTo": "PricingRuleCommandCenterSummary.rulesExpiringSoon"
       }
      ]
     },
@@ -355,6 +354,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       },
       {
        "kind": "secondaryButton",
+       "label": "Quantity",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Timeslot",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Event",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Create Rule",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Quick Actions"
       },
@@ -366,31 +380,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "secondaryButton",
        "label": "Test Rule",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Quick Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Compare",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Quick Actions"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Disable",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Quick Actions"
+       "operation": "testPricingRule",
+       "provenance": "contract catalogue.yaml POST /pricing-rule/{ruleId}/test (decided 29 September, readiness close-out)"
       }
      ]
     }
    ]
   },
-  "overlays": [
-   {
-    "id": "confirmDisable",
-    "component": "confirmDialog",
-    "trigger": "Disable",
-    "body": "**Disable on a pricing rule is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
-    "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Quick Actions"
-   }
-  ],
   "states": {
    "loading": "The pricing rule list; the counts above it resolve separately.",
    "error": "Could not load. Names which read failed and leaves the pricing rule untouched.",
@@ -404,14 +400,35 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Pricing Rule Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPricingRulePriority",
+    "contract": "catalogue",
+    "purpose": "Pricing Rule Priority, Conflict Resolution & Testing",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "testPricingRule",
+    "contract": "catalogue",
+    "purpose": "Test one pricing rule against a sample booking, on demand",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-058"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-058",
+   "workshopBoard": "wireframes/WS96 Pricing   Revenue Management Board 2.dc.html#adm-058"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 23. 25 of 25 labels bound to a contract property; 35 of 52 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 23. 25 of 25 labels bound to a contract property; 38 of 52 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "ruleId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -468,15 +485,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "ADM-058",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F144 step 2→3",
-     "operation": "listCustomerSegmentProfile"
+     "operation": "listCustomerSegmentProfile",
+     "carries": [
+      "ruleId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "segmentation.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure by; Capture) and no display directory — it is settings, not a population",
   "purpose": "Define price eligibility based on customer characteristics and commercial segments.",
-  "purposeNote": "segmentation.",
   "layout": {
    "template": "form",
    "regions": [
@@ -590,7 +610,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-059"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-059",
+   "workshopBoard": "wireframes/WS96 Pricing   Revenue Management Board 2.dc.html#adm-059"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 25. 0 of 0 labels bound to a contract property; 17 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -649,19 +670,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "ADM-058",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F144 step 4→5",
-     "operation": "listMembershipLoyaltyPricing"
+     "operation": "listMembershipLoyaltyPricing",
+     "carries": [
+      "ruleId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "entitlement logic.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure whether benefits apply to) and no display directory — it is settings, not a population",
   "purpose": "Control member-specific and loyalty-tier pricing.",
-  "purposeNote": "entitlement logic.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Customer Status. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Customer Status. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 26 §Support"
    }
   ],
@@ -720,6 +744,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       },
       {
        "kind": "secondaryButton",
+       "label": "Loyalty Tier",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 26 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Customer Status",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 26 §Support"
       }
@@ -744,9 +773,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-060"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-060",
+   "workshopBoard": "wireframes/WS96 Pricing   Revenue Management Board 2.dc.html#adm-060"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 26. 0 of 0 labels bound to a contract property; 9 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 26. 0 of 0 labels bound to a contract property; 10 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -803,15 +833,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "ADM-058",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F144 step 6→7",
-     "operation": "listResidencyNationalityMarket"
+     "operation": "listResidencyNationalityMarket",
+     "carries": [
+      "ruleId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Residency, nationality, and market-specific pricing can be applied only when the configured eligibility criteria are satisfied.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure by; Configure whether eligibility requires) and no display directory — it is settings, not a population",
   "purpose": "Support geographically differentiated commercial pricing.",
-  "purposeNote": "Residency, nationality, and market-specific pricing can be applied only when the configured eligibility criteria are satisfied.",
   "layout": {
    "template": "form",
    "regions": [
@@ -905,7 +938,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-061"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-061",
+   "workshopBoard": "wireframes/WS96 Pricing   Revenue Management Board 2.dc.html#adm-061"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 27. 0 of 0 labels bound to a contract property; 13 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -964,7 +998,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "ADM-058",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F144 step 8→9",
-     "operation": "listChannelBasedPricing"
+     "operation": "listChannelBasedPricing",
+     "carries": [
+      "ruleId"
+     ]
     }
    ]
   },
@@ -1018,7 +1055,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-062"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-062",
+   "workshopBoard": "wireframes/WS96 Pricing   Revenue Management Board 2.dc.html#adm-062"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 29. 0 of 0 labels bound to a contract property; 0 of 12 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1077,15 +1115,25 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "ADM-058",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F144 step 10→11",
-     "operation": "listLocationVenueEvent"
+     "operation": "listLocationVenueEvent",
+     "carries": [
+      "ruleId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "event, or performance context.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Allow rates to vary according to where and for which event/experience the product is sold.",
-  "purposeNote": "event, or performance context.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Attraction, Zone, Experience, Pop-up Venue, Temporary Event Location. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 30 §Support"
+   }
+  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1124,6 +1172,47 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 30 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Venue",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Attraction",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Event",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Zone",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Experience",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Pop-up Venue",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Temporary Event Location",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 30 §Support"
+      }
+     ]
     }
    ]
   },
@@ -1144,9 +1233,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-063"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-063",
+   "workshopBoard": "wireframes/WS96 Pricing   Revenue Management Board 2.dc.html#adm-063"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 30. 0 of 0 labels bound to a contract property; 6 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 30. 0 of 0 labels bound to a contract property; 13 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1203,7 +1293,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "ADM-058",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F144 step 12→13",
-     "operation": "listQuantityGroupVolume"
+     "operation": "listQuantityGroupVolume",
+     "carries": [
+      "ruleId"
+     ]
     }
    ]
   },
@@ -1212,6 +1305,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Support commercial rates based on purchased quantity or group size.",
   "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Minimum Quantity. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 31 §Support"
+   },
    {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
@@ -1227,15 +1325,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "actionBar",
+     "slot": "rowActions",
      "components": [
       {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listQuantityGroupVolume",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "kind": "primaryButton",
+       "label": "Minimum Quantity",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 31 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Quantity Bands",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 31 §Support"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -1256,19 +1363,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "QuantityGroupVolumePricingRulesView.minimumQuantity",
-    "QuantityGroupVolumePricingRulesView.quantityBands",
-    "QuantityGroupVolumePricingRulesView.groupSize",
-    "QuantityGroupVolumePricingRulesView.volumeThreshold",
-    "QuantityGroupVolumePricingRulesView.buyXRate"
+    "QuantityGroupVolumePricingRulesView.quantityModel"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-064"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-064",
+   "workshopBoard": "wireframes/WS96 Pricing   Revenue Management Board 2.dc.html#adm-064"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 31. 0 of 0 labels bound to a contract property; 0 of 7 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 31. 0 of 0 labels bound to a contract property; 2 of 7 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1325,15 +1429,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "ADM-058",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F144 step 14→15",
-     "operation": "listEffectiveDateSeason"
+     "operation": "listEffectiveDateSeason",
+     "carries": [
+      "ruleId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "day-based rules.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Control commercial price selection over time.",
-  "purposeNote": "day-based rules.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1402,7 +1509,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-065"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-065",
+   "workshopBoard": "wireframes/WS96 Pricing   Revenue Management Board 2.dc.html#adm-065"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 32. 0 of 0 labels bound to a contract property; 8 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1461,15 +1569,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "ADM-058",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F144 step 16→17",
-     "operation": "listTimeslotPerformanceTime"
+     "operation": "listTimeslotPerformanceTime",
+     "carries": [
+      "ruleId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "time-of-day context.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Detect) and no metric row",
   "purpose": "Allow commercial pricing to differ across times within the same day or event.",
-  "purposeNote": "time-of-day context.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1481,9 +1592,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every timeslot performance time-of-day",
        "columns": [
-        "TimeslotPerformanceTimeOfDayPricingRulesView.overlappingTimeRanges",
-        "TimeslotPerformanceTimeOfDayPricingRulesView.missingTimeslotRate",
-        "TimeslotPerformanceTimeOfDayPricingRulesView.conflictingPerformanceRule"
+        "TimeslotPerformanceTimeOfDayPricingRulesView.validationIssues"
        ],
        "bindsTo": "TimeslotPerformanceTimeOfDayPricingRulesView",
        "operation": "listTimeslotPerformanceTime",
@@ -1500,9 +1609,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected timeslot performance time-of-day",
        "bindsTo": "TimeslotPerformanceTimeOfDayPricingRulesView",
        "columns": [
-        "TimeslotPerformanceTimeOfDayPricingRulesView.overlappingTimeRanges",
-        "TimeslotPerformanceTimeOfDayPricingRulesView.missingTimeslotRate",
-        "TimeslotPerformanceTimeOfDayPricingRulesView.conflictingPerformanceRule"
+        "TimeslotPerformanceTimeOfDayPricingRulesView.validationIssues"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Supported Contexts”, “Museum Admission”, “Concert”.",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 33 §Detect"
@@ -1528,15 +1635,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "TimeslotPerformanceTimeOfDayPricingRulesView.overlappingTimeRanges",
-    "TimeslotPerformanceTimeOfDayPricingRulesView.missingTimeslotRate",
-    "TimeslotPerformanceTimeOfDayPricingRulesView.conflictingPerformanceRule"
+    "TimeslotPerformanceTimeOfDayPricingRulesView.validationIssues"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-066"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-066",
+   "workshopBoard": "wireframes/WS96 Pricing   Revenue Management Board 2.dc.html#adm-066"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 33. 3 of 3 labels bound to a contract property; 17 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1589,13 +1695,23 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "ADM-058"
    ],
    "inferred": false,
-   "notes": "**Reached from ADM-058, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+   "notes": "**Reached from ADM-058, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-058",
+     "trigger": "Pricing Rule Command Center",
+     "carries": [
+      "ruleId"
+     ],
+     "provenance": "derived — ADM-058 declares entryState.params ruleId and ADM-067 holds ruleId, so an edge into it carries them"
+    }
+   ]
   },
   "density": "compact",
+  "purposeNote": "For any commercial transaction, TICVAI can deterministically resolve and explain exactly why a specific rate was selected. Board 2 — Final Screen Register",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Identify; Show) and no metric row",
   "purpose": "Define how TICVAI decides the final applicable rate when multiple pricing rules match. This is the critical control screen for Board 2. Board 1 established what commercial prices exist. Board 2 determines which commercial rate applies to a transaction.",
-  "purposeNote": "For any commercial transaction, TICVAI can deterministically resolve and explain exactly why a specific rate was selected. Board 2 — Final Screen Register",
   "layout": {
    "template": "split",
    "regions": [
@@ -1607,12 +1723,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every pricing rule priority",
        "columns": [
-        "PricingRulePriorityConflictResolutionTestingView.samePriorityMatches",
-        "PricingRulePriorityConflictResolutionTestingView.contradictoryRates",
-        "PricingRulePriorityConflictResolutionTestingView.circularFallback",
-        "PricingRulePriorityConflictResolutionTestingView.unreachableRule",
-        "PricingRulePriorityConflictResolutionTestingView.missingFallback",
-        "PricingRulePriorityConflictResolutionTestingView.overlappingTimeDateConditions"
+        "PricingRulePriorityConflictResolutionTestingView.validationIssues"
        ],
        "bindsTo": "PricingRulePriorityConflictResolutionTestingView",
        "operation": "listPricingRulePriority",
@@ -1629,15 +1740,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected pricing rule priority",
        "bindsTo": "PricingRulePriorityConflictResolutionTestingView",
        "columns": [
-        "PricingRulePriorityConflictResolutionTestingView.samePriorityMatches",
-        "PricingRulePriorityConflictResolutionTestingView.contradictoryRates",
-        "PricingRulePriorityConflictResolutionTestingView.circularFallback",
-        "PricingRulePriorityConflictResolutionTestingView.unreachableRule",
-        "PricingRulePriorityConflictResolutionTestingView.missingFallback",
-        "PricingRulePriorityConflictResolutionTestingView.overlappingTimeDateConditions"
+        "PricingRulePriorityConflictResolutionTestingView.validationIssues"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Standard Rate”, “Inputs”, “Input”, “Candidate Rates”, “Resolved Rate”, “Reason”.",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 34 §Identify"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Test Rule",
+       "operation": "testPricingRule",
+       "provenance": "contract catalogue.yaml POST /pricing-rule/{ruleId}/test (decided 29 September, readiness close-out)"
       }
      ]
     }
@@ -1656,22 +1774,36 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Pricing Rule Priority, Conflict Resolution & Testing",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPricingRule",
+    "contract": "catalogue",
+    "purpose": "The pricing rules to pick one to test",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "testPricingRule",
+    "contract": "catalogue",
+    "purpose": "Test one pricing rule against a sample booking, on demand",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "preloaded": [
-    "PricingRulePriorityConflictResolutionTestingView.samePriorityMatches",
-    "PricingRulePriorityConflictResolutionTestingView.contradictoryRates",
-    "PricingRulePriorityConflictResolutionTestingView.circularFallback",
-    "PricingRulePriorityConflictResolutionTestingView.unreachableRule",
-    "PricingRulePriorityConflictResolutionTestingView.missingFallback",
-    "PricingRulePriorityConflictResolutionTestingView.overlappingTimeDateConditions"
+    "PricingRulePriorityConflictResolutionTestingView.validationIssues"
+   ],
+   "params": [
+    {
+     "name": "ruleId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-067"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-067",
+   "workshopBoard": "wireframes/WS96 Pricing   Revenue Management Board 2.dc.html#adm-067"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 34. 6 of 6 labels bound to a contract property; 6 of 102 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1716,9 +1848,40 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "isOverride",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ChannelBasedPricingRulesView"
+  "responds": "Page"
  },
  "listCustomerSegmentProfile": {
   "method": "GET",
@@ -1729,9 +1892,45 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "dimension",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "segmentSource",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CustomerSegmentProfilePricingRulesView"
+  "responds": "Page"
  },
  "listEffectiveDateSeason": {
   "method": "GET",
@@ -1742,9 +1941,45 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "dateRuleType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "visitFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "visitTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "EffectiveDateSeasonDayBasedPricingRulesView"
+  "responds": "Page"
  },
  "listLocationVenueEvent": {
   "method": "GET",
@@ -1755,9 +1990,35 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "contextLevel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "contextRefId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "LocationVenueEventPricingRulesView"
+  "responds": "Page"
  },
  "listMembershipLoyaltyPricing": {
   "method": "GET",
@@ -1768,9 +2029,35 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "dimension",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "MembershipLoyaltyPricingRulesView"
+  "responds": "Page"
  },
  "listPricingRule": {
   "method": "GET",
@@ -1781,9 +2068,45 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "ruleType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueLocation",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PricingRuleCommandCenterView"
+  "responds": "Page"
  },
  "listPricingRulePriority": {
   "method": "GET",
@@ -1794,9 +2117,75 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "ruleType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "hasConflict",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "membershipId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "residency",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "quantity",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "time",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PricingRulePriorityConflictResolutionTestingView"
+  "responds": "Page"
  },
  "listQuantityGroupVolume": {
   "method": "GET",
@@ -1807,9 +2196,35 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "quantityModel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "groupType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "QuantityGroupVolumePricingRulesView"
+  "responds": "Page"
  },
  "listResidencyNationalityMarket": {
   "method": "GET",
@@ -1820,9 +2235,35 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "eligibilityBasis",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ResidencyNationalityMarketPricingRulesView"
+  "responds": "Page"
  },
  "listTimeslotPerformanceTime": {
   "method": "GET",
@@ -1833,9 +2274,48 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "timeOfDayBand",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "TimeslotPerformanceTimeOfDayPricingRulesView"
+  "responds": "Page"
+ },
+ "testPricingRule": {
+  "method": "POST",
+  "path": "/pricing-rule/{ruleId}/test",
+  "contract": "catalogue",
+  "summary": "Test one pricing rule against a sample booking, on demand",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "PricingRuleTestInput",
+  "responds": "PricingRuleTestResult"
  }
 }
 ```
@@ -1853,20 +2333,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "description": "**What Channel-Based Pricing Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "channel": {
-    "type": "string",
-    "description": "Channel"
+    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel",
+    "description": "Channel (Supported Channels, p.29)"
    },
    "product": {
     "type": "string",
     "description": "Product"
    },
    "priceList": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "type": "string",
     "description": "Price List"
    },
    "rate": {
-    "type": "number",
-    "description": "Rate"
+    "type": "string",
+    "description": "Rate: code of the rate, e.g. Trade Adult"
    },
    "market": {
     "type": "string",
@@ -1876,22 +2356,46 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Venue"
    },
-   "effectiveDates": {
-    "type": "string",
-    "description": "Effective Dates"
-   },
    "priority": {
-    "type": "string",
-    "description": "Priority"
+    "type": "integer",
+    "description": "Priority within the configurable pricing hierarchy (MoM 1 Sep §4.4): the lower number wins"
    },
-   "relationshipWithSalesChannelManagement": {
+   "ruleId": {
     "type": "string",
-    "description": "Relationship with Sales Channel Management"
+    "description": "Rule ID"
    },
-   "startDate": {
+   "ruleName": {
     "type": "string",
-    "format": "date-time",
-    "description": "Start Date"
+    "description": "Rule Name"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "isOverride": {
+    "type": "boolean",
+    "description": "Channel Override (pp.29-30): a controlled, time-boxed override of the channel's normal rate"
+   },
+   "overrideReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Reason, required for an override"
+   },
+   "fallbackRate": {
+    "type": "string",
+    "nullable": true,
+    "description": "Fallback Rate once the override ends"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, active, disabled or expired"
    }
   }
  },
@@ -1901,93 +2405,81 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Customer Segment & Profile Pricing Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "customerType": {
-    "type": "string",
-    "description": "Customer Type"
-   },
-   "customerSegment": {
-    "type": "string",
-    "description": "Customer Segment"
-   },
-   "accountType": {
-    "type": "string",
-    "description": "Account Type"
-   },
-   "crmSegment": {
-    "type": "string",
-    "description": "CRM Segment"
-   },
-   "vipStatus": {
-    "type": "string",
-    "description": "VIP Status"
-   },
-   "corporateCustomer": {
-    "type": "string",
-    "description": "Corporate Customer"
-   },
-   "employeeStaff": {
-    "type": "string",
-    "description": "Employee/Staff"
-   },
-   "partnerCustomer": {
-    "type": "string",
-    "description": "Partner Customer"
-   },
-   "guestRegisteredUser": {
-    "type": "string",
-    "description": "Guest/Registered User"
-   },
-   "crm": {
-    "type": "string",
-    "description": "CRM"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "b2bPartner": {
-    "type": "string",
-    "description": "B2B Partner"
-   },
-   "corporateAccount": {
-    "type": "string",
-    "description": "Corporate Account"
-   },
-   "customerProfile": {
-    "type": "string",
-    "description": "Customer Profile"
-   },
    "ruleName": {
     "type": "string",
     "description": "Rule Name"
    },
    "segment": {
     "type": "string",
-    "description": "Segment"
+    "description": "Segment: the value the dimension must equal, e.g. VIP"
    },
    "applicableProducts": {
-    "type": "string",
-    "description": "Applicable Products"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Applicable Products: product ids or product category codes"
    },
    "priceList": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price List"
+    "type": "string",
+    "description": "Price List: the list whose rate the rule selects"
    },
    "rate": {
-    "type": "number",
-    "description": "Rate"
+    "type": "string",
+    "description": "Rate: code of the rate used when the rule matches, e.g. VIP Adult"
    },
    "priority": {
-    "type": "string",
-    "description": "Priority"
-   },
-   "effectiveDates": {
-    "type": "string",
-    "description": "Effective Dates"
+    "type": "integer",
+    "description": "Priority within the configurable pricing hierarchy (MoM 1 Sep §4.4): the lower number wins"
    },
    "status": {
     "type": "string",
-    "description": "Status"
+    "description": "Status: draft, active, disabled or expired"
+   },
+   "ruleId": {
+    "type": "string",
+    "description": "Rule ID"
+   },
+   "dimension": {
+    "type": "string",
+    "enum": [
+     "customerType",
+     "customerSegment",
+     "accountType",
+     "crmSegment",
+     "vipStatus",
+     "corporateCustomer",
+     "employeeStaff",
+     "partnerCustomer",
+     "guestRegisteredUser"
+    ],
+    "description": "Supported Dimension (p.25) the rule tests"
+   },
+   "segmentSource": {
+    "type": "string",
+    "enum": [
+     "crm",
+     "membership",
+     "b2bPartner",
+     "corporateAccount",
+     "customerProfile"
+    ],
+    "description": "Customer Segment Source (p.26) the segment is read from"
+   },
+   "fallbackRate": {
+    "type": "string",
+    "description": "Fallback (p.26): rate used when the customer no longer qualifies; the standard rate by default (decided 29 September, readiness close-out)"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
    }
   }
  },
@@ -1999,58 +2491,129 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "effectiveFrom": {
     "type": "string",
+    "format": "date",
     "description": "Effective From"
    },
    "effectiveTo": {
     "type": "string",
-    "description": "Effective To"
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
    },
    "salesStart": {
     "type": "string",
-    "description": "Sales Start"
+    "format": "date-time",
+    "nullable": true,
+    "description": "Sales Start: purchases from this moment get the rule"
    },
    "salesEnd": {
     "type": "string",
-    "description": "Sales End"
-   },
-   "visitDateRange": {
-    "type": "string",
     "format": "date-time",
-    "description": "Visit Date Range"
+    "nullable": true,
+    "description": "Sales End"
    },
    "season": {
     "type": "string",
-    "description": "Season"
+    "nullable": true,
+    "description": "Season name, e.g. Low, Regular, Peak (Seasonal Pricing, p.33)"
    },
-   "holidayPeriod": {
+   "ruleId": {
     "type": "string",
-    "format": "date-time",
-    "description": "Holiday Period"
+    "description": "Rule ID"
    },
-   "eventPeriod": {
+   "ruleName": {
     "type": "string",
-    "format": "date-time",
-    "description": "Event Period"
+    "description": "Rule Name"
    },
-   "publicHolidays": {
+   "dateRuleType": {
     "type": "string",
-    "description": "Public Holidays"
+    "enum": [
+     "effectivePeriod",
+     "season",
+     "dayOfWeek",
+     "holidayPeriod",
+     "eventPeriod",
+     "publicHoliday",
+     "schoolHoliday",
+     "specialDate",
+     "blackoutDate",
+     "peakDate"
+    ],
+    "description": "Kind of date rule (Effective Dating and Calendar Rules, pp.32-33)"
    },
-   "schoolHolidays": {
+   "visitFrom": {
     "type": "string",
-    "description": "School Holidays"
+    "format": "date",
+    "description": "Visit Date Range start",
+    "nullable": true
    },
-   "specialDates": {
+   "visitTo": {
     "type": "string",
-    "description": "Special Dates"
+    "format": "date",
+    "description": "Visit Date Range end",
+    "nullable": true
    },
-   "blackoutDates": {
-    "type": "string",
-    "description": "Blackout Dates"
+   "daysOfWeek": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "mon",
+      "tue",
+      "wed",
+      "thu",
+      "fri",
+      "sat",
+      "sun"
+     ]
+    },
+    "description": "Day-of-Week Pricing (p.33); empty for every day"
    },
-   "peakDates": {
+   "specificDates": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "date"
+    },
+    "description": "Special, blackout, peak or holiday dates the rule covers"
+   },
+   "product": {
     "type": "string",
-    "description": "Peak Dates"
+    "description": "Product"
+   },
+   "priceList": {
+    "type": "string",
+    "description": "Price List"
+   },
+   "rate": {
+    "type": "string",
+    "description": "Rate code"
+   },
+   "priority": {
+    "type": "integer",
+    "description": "Priority within the configurable pricing hierarchy (MoM 1 Sep §4.4): the lower number wins"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, active, disabled or expired"
+   },
+   "validationIssues": {
+    "type": "array",
+    "description": "Overlap Detection (p.33), e.g. Peak Season and Public Holiday overlap with different rates",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "overlappingRules"
+       ]
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
    }
   }
  },
@@ -2060,85 +2623,74 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Location, Venue & Event Pricing Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "country": {
-    "type": "string",
-    "description": "Country"
-   },
-   "city": {
-    "type": "string",
-    "description": "City"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "attraction": {
-    "type": "string",
-    "description": "Attraction"
-   },
-   "location": {
-    "type": "string",
-    "description": "Location"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "performance": {
-    "type": "string",
-    "description": "Performance"
-   },
-   "zone": {
-    "type": "string",
-    "description": "Zone"
-   },
-   "experience": {
-    "type": "string",
-    "description": "Experience"
-   },
-   "popUpVenue": {
-    "type": "string",
-    "description": "Pop-up Venue"
-   },
-   "exhibition": {
-    "type": "string",
-    "description": "Exhibition"
-   },
-   "seasonalSite": {
-    "type": "string",
-    "description": "Seasonal Site"
-   },
-   "temporaryEventLocation": {
-    "type": "string",
-    "description": "Temporary Event Location"
-   },
-   "globalRateAed250": {
-    "type": "number",
-    "description": "Global Rate → AED 250"
-   },
-   "dubaiVenueAed275": {
-    "type": "string",
-    "description": "Dubai Venue → AED 275"
-   },
-   "specialEventAed320": {
-    "type": "string",
-    "description": "Special Event → AED 320"
-   },
    "product": {
     "type": "string",
     "description": "Product"
    },
    "rate": {
-    "type": "number",
-    "description": "Rate"
-   },
-   "effectiveDates": {
     "type": "string",
-    "description": "Effective Dates"
+    "description": "Rate: code of the rate used in this context"
    },
    "priority": {
+    "type": "integer",
+    "description": "Priority within the configurable pricing hierarchy (MoM 1 Sep §4.4): the lower number wins"
+   },
+   "ruleId": {
     "type": "string",
-    "description": "Priority"
+    "description": "Rule ID"
+   },
+   "ruleName": {
+    "type": "string",
+    "description": "Rule Name"
+   },
+   "contextLevel": {
+    "type": "string",
+    "enum": [
+     "country",
+     "city",
+     "venue",
+     "attraction",
+     "location",
+     "event",
+     "performance",
+     "zone",
+     "experience"
+    ],
+    "description": "Pricing Context (p.30) the rule is keyed on"
+   },
+   "contextRefId": {
+    "type": "string",
+    "description": "The country, city, venue, attraction, location, event, performance, zone or experience"
+   },
+   "temporaryLocationType": {
+    "type": "string",
+    "enum": [
+     "popUpVenue",
+     "exhibition",
+     "seasonalSite",
+     "temporaryEventLocation"
+    ],
+    "description": "Temporary Location Pricing (p.30); empty for a permanent location",
+    "nullable": true
+   },
+   "priceList": {
+    "type": "string",
+    "description": "Price List"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, active, disabled or expired"
    }
   }
  },
@@ -2148,69 +2700,130 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Membership & Loyalty Pricing Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "membershipProduct": {
+   "ruleId": {
     "type": "string",
-    "description": "Membership Product"
+    "description": "Rule ID"
    },
-   "membershipStatus": {
+   "ruleName": {
     "type": "string",
-    "description": "Membership Status"
+    "description": "Rule Name"
    },
-   "membershipTier": {
+   "conditions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "dimension": {
+       "type": "string",
+       "enum": [
+        "membershipProduct",
+        "membershipStatus",
+        "membershipTier",
+        "annualPassType",
+        "membershipLevel",
+        "loyaltyTier",
+        "loyaltyProgram",
+        "pointsBand",
+        "customerStatus"
+       ]
+      },
+      "value": {
+       "type": "string",
+       "description": "e.g. active, Gold, Platinum"
+      }
+     }
+    },
+    "description": "Conditions, all of which must hold (Membership = Active AND Tier = Gold)"
+   },
+   "priceList": {
     "type": "string",
-    "description": "Membership Tier"
+    "description": "Price List"
    },
-   "annualPassType": {
+   "rate": {
     "type": "string",
-    "description": "Annual Pass Type"
+    "description": "Rate: code of the rate used when the rule matches, e.g. Gold Member Rate"
    },
-   "membershipLevel": {
+   "benefitScope": {
     "type": "string",
-    "description": "Membership Level"
+    "enum": [
+     "memberOnly",
+     "memberPlusOneGuest",
+     "memberPlusFamily",
+     "selectedQuantity"
+    ],
+    "description": "Member + Guest Rules (p.27): who in the booking receives the member rate"
    },
-   "activeSuspendedStatus": {
+   "benefitQuantity": {
     "type": "integer",
-    "description": "Active/Suspended Status"
+    "nullable": true,
+    "description": "Number of tickets at the member rate when benefitScope is selectedQuantity"
    },
-   "loyaltyTier": {
-    "type": "string",
-    "description": "Loyalty Tier"
-   },
-   "loyaltyProgram": {
-    "type": "string",
-    "description": "Loyalty Program"
-   },
-   "pointsBand": {
-    "type": "string",
-    "description": "Points Band"
-   },
-   "customerStatus": {
-    "type": "string",
-    "description": "Customer Status"
-   },
-   "memberOnly": {
-    "type": "string",
-    "description": "Member Only"
-   },
-   "member1Guest": {
-    "type": "string",
-    "description": "Member + 1 Guest"
-   },
-   "memberFamily": {
-    "type": "string",
-    "description": "Member + Family"
-   },
-   "selectedQuantity": {
+   "priority": {
     "type": "integer",
-    "description": "Selected Quantity"
+    "description": "Priority within the configurable pricing hierarchy (MoM 1 Sep §4.4): the lower number wins"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, active, disabled or expired"
+   },
+   "validationIssues": {
+    "type": "array",
+    "description": "Validation (p.27)",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "inactiveMembership",
+        "expiredMembership",
+        "missingTierRate",
+        "conflictingLoyaltyMemberRates"
+       ]
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
    }
   }
  },
- "PricingRuleCommandCenterView": {
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PricingRuleCommandCenterSummary": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What Pricing Rule Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Pricing Rule Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
   "properties": {
    "activePricingRules": {
     "type": "integer",
@@ -2257,8 +2870,120 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Rule Conflicts"
    },
    "rulesExpiringSoon": {
+    "type": "integer",
+    "description": "Rules Expiring Soon: active rules whose effective-to date falls within the next 30 days (decided 29 September, readiness close-out)"
+   }
+  }
+ },
+ "PricingRuleCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Pricing Rule Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ruleId": {
     "type": "string",
-    "description": "Rules Expiring Soon"
+    "description": "Rule ID"
+   },
+   "ruleName": {
+    "type": "string",
+    "description": "Rule Name"
+   },
+   "ruleType": {
+    "type": "string",
+    "enum": [
+     "customerSegment",
+     "membership",
+     "loyalty",
+     "residency",
+     "nationality",
+     "channel",
+     "location",
+     "quantity",
+     "group",
+     "seasonal",
+     "dayOfWeek",
+     "timeslot",
+     "event",
+     "corporateB2b",
+     "custom"
+    ],
+    "description": "Rule Type (the pack's Rule Types list, pp.24-25)"
+   },
+   "priceList": {
+    "type": "string",
+    "description": "Price List: the name of the price list whose rate this rule selects"
+   },
+   "productScope": {
+    "type": "string",
+    "description": "Product Scope: the products or product categories the rule covers"
+   },
+   "customerScope": {
+    "type": "string",
+    "description": "Customer Scope: the customer segment, membership or partner the rule covers"
+   },
+   "channel": {
+    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel",
+    "description": "Channel the rule is limited to; empty for all channels"
+   },
+   "venueLocation": {
+    "type": "string",
+    "description": "Venue/Location"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "Effective To; empty for open-ended"
+   },
+   "priority": {
+    "type": "integer",
+    "description": "Priority within the configurable pricing hierarchy (MoM 1 Sep §4.4): the lower number wins"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, active, disabled or expired"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI Capability (p.25): e.g. three rules may return different prices for the same Adult ticket on Saturday through B2C; advisory"
+   }
+  }
+ },
+ "PricingRulePriorityConflictResolutionTestingView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Pricing Rule Priority, Conflict Resolution & Testing displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "priority": {
+    "type": "integer",
+    "description": "Priority within the configurable pricing hierarchy (MoM 1 Sep §4.4): the lower number wins"
+   },
+   "specificity": {
+    "type": "integer",
+    "description": "Specificity: number of conditions the rule tests; breaks ties within a priority"
+   },
+   "fallbackBehavior": {
+    "type": "string",
+    "enum": [
+     "useStandardRate",
+     "useNextMatchingRule",
+     "blockSale"
+    ],
+    "description": "Fallback Behavior when the rule matches but its rate is unavailable"
    },
    "ruleId": {
     "type": "string",
@@ -2270,263 +2995,234 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "ruleType": {
     "type": "string",
+    "enum": [
+     "customerSegment",
+     "membership",
+     "loyalty",
+     "residency",
+     "nationality",
+     "channel",
+     "location",
+     "quantity",
+     "group",
+     "seasonal",
+     "dayOfWeek",
+     "timeslot",
+     "event",
+     "corporateB2b",
+     "custom"
+    ],
     "description": "Rule Type"
    },
-   "priceList": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price List"
-   },
-   "productScope": {
+   "hierarchyLevel": {
     "type": "string",
-    "description": "Product Scope"
+    "enum": [
+     "contractPartner",
+     "customerMember",
+     "eventPerformance",
+     "venueLocation",
+     "channel",
+     "quantityGroup",
+     "seasonDate",
+     "standardRate"
+    ],
+    "description": "Rule Resolution level (p.35): Contract/Partner -> Customer/Member -> Event/Performance -> Venue/Location -> Channel -> Quantity/Group -> Season/Date -> Standard Rate; the order is configurable"
    },
-   "customerScope": {
+   "onMatch": {
     "type": "string",
-    "description": "Customer Scope"
+    "enum": [
+     "stopProcessing",
+     "continueProcessing"
+    ],
+    "description": "Stop or Continue Processing once this rule matches"
    },
-   "channel": {
+   "overrideAllowed": {
+    "type": "boolean",
+    "description": "Override Allowed"
+   },
+   "validationIssues": {
+    "type": "array",
+    "description": "Conflict Detection (p.35)",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "samePriorityMatches",
+        "contradictoryRates",
+        "circularFallback",
+        "unreachableRule",
+        "missingFallback",
+        "overlappingTimeDateConditions"
+       ]
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "simulationOutcome": {
     "type": "string",
-    "description": "Channel"
+    "enum": [
+     "selected",
+     "matched",
+     "rejected",
+     "notMatched"
+    ],
+    "description": "Pricing Rule Simulator result for this rule; empty when no simulator parameters were sent",
+    "nullable": true
    },
-   "venueLocation": {
+   "candidateRate": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Candidate rate the rule would give in the simulated context (Gold Member - AED 190)"
+   },
+   "outcomeReason": {
     "type": "string",
-    "description": "Venue/Location"
-   },
-   "effectiveFrom": {
-    "type": "string",
-    "description": "Effective From"
-   },
-   "effectiveTo": {
-    "type": "string",
-    "description": "Effective To"
-   },
-   "priority": {
-    "type": "string",
-    "description": "Priority"
-   },
-   "status": {
-    "type": "integer",
-    "description": "Status"
-   },
-   "owner": {
-    "type": "string",
-    "description": "Owner"
-   },
-   "customerSegment": {
-    "type": "string",
-    "description": "Customer Segment"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "loyalty": {
-    "type": "string",
-    "description": "Loyalty"
-   },
-   "residency": {
-    "type": "string",
-    "description": "Residency"
-   },
-   "nationality": {
-    "type": "string",
-    "description": "Nationality"
-   },
-   "location": {
-    "type": "string",
-    "description": "Location"
-   },
-   "quantity": {
-    "type": "integer",
-    "description": "Quantity"
-   },
-   "group": {
-    "type": "string",
-    "description": "Group"
-   },
-   "seasonal": {
-    "type": "string",
-    "description": "Seasonal"
-   },
-   "dayOfWeek": {
-    "type": "string",
-    "description": "Day-of-Week"
-   },
-   "timeslot": {
-    "type": "string",
-    "description": "Timeslot"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "corporateB2b": {
-    "type": "string",
-    "description": "Corporate/B2B"
-   },
-   "custom": {
-    "type": "string",
-    "description": "Custom"
-   },
-   "testRule": {
-    "type": "string",
-    "description": "Test Rule"
+    "nullable": true,
+    "description": "Why it was selected or rejected, e.g. member pricing priority exceeds resident, day and standard pricing"
    }
   }
  },
- "PricingRulePriorityConflictResolutionTestingView": {
+ "PricingRuleTestInput": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What Pricing Rule Priority, Conflict Resolution & Testing displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — request only; a dry run stores nothing",
+  "description": "The sample booking `testPricingRule` prices (decided 29 September, readiness close-out). The inputs are the ones `listPricingRulePriority` filters its test rows by.",
+  "required": [
+   "productId",
+   "channel",
+   "date"
+  ],
   "properties": {
-   "priority": {
+   "productId": {
     "type": "string",
-    "description": "Priority"
+    "format": "uuid"
    },
-   "specificity": {
+   "variantId": {
     "type": "string",
-    "description": "Specificity"
+    "format": "uuid",
+    "nullable": true
    },
-   "stopProcessing": {
+   "venueId": {
     "type": "string",
-    "description": "Stop Processing"
-   },
-   "continueProcessing": {
-    "type": "string",
-    "description": "Continue Processing"
-   },
-   "fallbackBehavior": {
-    "type": "string",
-    "description": "Fallback Behavior"
-   },
-   "samePriorityMatches": {
-    "type": "string",
-    "description": "Same-priority matches"
-   },
-   "contradictoryRates": {
-    "type": "string",
-    "description": "Contradictory rates"
-   },
-   "circularFallback": {
-    "type": "string",
-    "description": "Circular fallback"
-   },
-   "unreachableRule": {
-    "type": "string",
-    "description": "Unreachable rule"
-   },
-   "missingFallback": {
-    "type": "string",
-    "description": "Missing fallback"
-   },
-   "overlappingTimeDateConditions": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Overlapping time/date conditions"
-   },
-   "customer": {
-    "type": "string",
-    "description": "Customer"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "residency": {
-    "type": "string",
-    "description": "Residency"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "quantity": {
-    "type": "integer",
-    "description": "Quantity"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
+    "format": "uuid",
+    "nullable": true,
+    "description": "Absent means the product's own venue."
    },
    "channel": {
-    "type": "string",
-    "description": "Channel"
+    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
    },
    "date": {
     "type": "string",
-    "format": "date-time",
-    "description": "Date"
+    "format": "date",
+    "description": "Visit or event date."
    },
-   "timeslot": {
+   "time": {
     "type": "string",
-    "description": "Timeslot"
+    "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+    "nullable": true,
+    "description": "Visit time or timeslot start, venue local."
    },
-   "customerGoldMember": {
+   "customerSegment": {
     "type": "string",
-    "description": "Customer: Gold Member"
+    "nullable": true
    },
-   "residencyUae": {
+   "customerId": {
     "type": "string",
-    "description": "Residency: UAE"
+    "format": "uuid",
+    "nullable": true
    },
-   "productAdultAdmission": {
+   "membershipId": {
     "type": "string",
-    "description": "Product: Adult Admission"
+    "format": "uuid",
+    "nullable": true
    },
-   "channelB2c": {
+   "residency": {
     "type": "string",
-    "description": "Channel: B2C"
+    "nullable": true
    },
-   "venueDubai": {
+   "quantity": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 500,
+    "default": 1
+   }
+  }
+ },
+ "PricingRuleTestResult": {
+  "type": "object",
+  "x-ticvai-persistence": "none — response only; a dry run stores nothing",
+  "description": "What `testPricingRule` returns. `matched` answers the question the button asks; the rest is the calculation the checkout would run.",
+  "required": [
+   "ruleId",
+   "matched",
+   "basePrice",
+   "finalPrice"
+  ],
+  "properties": {
+   "ruleId": {
+    "type": "string"
+   },
+   "matched": {
+    "type": "boolean",
+    "description": "Whether the tested rule's conditions match the sample booking."
+   },
+   "notMatchedReasons": {
+    "type": "array",
+    "description": "The conditions that failed when `matched` is false, e.g. `channel not in rule`.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "appliedByPriority": {
+    "type": "boolean",
+    "description": "Matched and actually applied after priority and conflict resolution; a matching rule can still lose to a higher-priority one."
+   },
+   "basePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "finalPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "rulesApplied": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "ruleId": {
+       "type": "string"
+      },
+      "ruleName": {
+       "type": "string"
+      },
+      "priority": {
+       "type": "integer"
+      },
+      "adjustment": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "applied": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "calculationPath": {
+    "type": "array",
+    "description": "Each step from base price to final price, in order, in words.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "testedAt": {
     "type": "string",
-    "description": "Venue: Dubai"
-   },
-   "dateSaturday": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date: Saturday"
-   },
-   "time1800": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Time: 18:00"
-   },
-   "standardAdultAed250": {
-    "type": "string",
-    "description": "Standard Adult — AED 250"
-   },
-   "uaeResidentAed220": {
-    "type": "string",
-    "description": "UAE Resident — AED 220"
-   },
-   "saturdayPeakAed280": {
-    "type": "string",
-    "description": "Saturday Peak — AED 280"
-   },
-   "goldMemberAed190": {
-    "type": "string",
-    "description": "Gold Member — AED 190"
-   },
-   "backendScreen": {
-    "type": "string",
-    "description": "# Backend Screen"
-   },
-   "channelBasedPricingRulesChannelPricing": {
-    "type": "string",
-    "description": "Channel-Based Pricing Rules Channel pricing"
-   },
-   "whatTaxApplies": {
-    "type": "string",
-    "description": "“What tax applies?”"
-   },
-   "whatServiceFeeApplies": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "“What service fee applies?”"
-   },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "amount?"
+    "format": "date-time"
    }
   }
  },
@@ -2536,65 +3232,123 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Quantity, Group & Volume Pricing Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "minimumQuantity": {
-    "type": "integer",
-    "description": "Minimum Quantity"
-   },
-   "quantityBands": {
-    "type": "integer",
-    "description": "Quantity Bands"
-   },
-   "groupSize": {
-    "type": "string",
-    "description": "Group Size"
-   },
-   "volumeThreshold": {
-    "type": "integer",
-    "description": "Volume Threshold"
-   },
-   "buyXRate": {
-    "type": "number",
-    "description": "Buy-X Rate"
-   },
-   "perPersonGroupRate": {
-    "type": "number",
-    "description": "Per-Person Group Rate"
-   },
    "groupMinimum": {
-    "type": "string",
-    "description": "Group Minimum"
+    "type": "integer",
+    "nullable": true,
+    "description": "Group Minimum: smallest party the group rate applies to"
    },
    "maximumGroupSize": {
-    "type": "string",
+    "type": "integer",
+    "nullable": true,
     "description": "Maximum Group Size"
    },
    "groupType": {
     "type": "string",
-    "description": "Group Type"
+    "enum": [
+     "school",
+     "corporate",
+     "tour",
+     "family",
+     "b2b",
+     "custom"
+    ],
+    "description": "Group Type (p.31)",
+    "nullable": true
    },
-   "school": {
+   "ruleId": {
     "type": "string",
-    "description": "School"
+    "description": "Rule ID"
    },
-   "corporate": {
+   "ruleName": {
     "type": "string",
-    "description": "Corporate"
+    "description": "Rule Name"
    },
-   "tour": {
+   "quantityModel": {
     "type": "string",
-    "description": "Tour"
+    "enum": [
+     "minimumQuantity",
+     "quantityBands",
+     "groupSize",
+     "volumeThreshold",
+     "buyXRate",
+     "perPersonGroupRate"
+    ],
+    "description": "Quantity Model (p.31)"
    },
-   "family": {
+   "product": {
     "type": "string",
-    "description": "Family"
+    "description": "Product or product family the rule covers"
    },
-   "b2b": {
+   "priceList": {
     "type": "string",
-    "description": "B2B"
+    "description": "Price List"
    },
-   "custom": {
+   "bands": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "minQuantity": {
+       "type": "integer"
+      },
+      "maxQuantity": {
+       "type": "integer",
+       "nullable": true
+      },
+      "rate": {
+       "type": "string",
+       "description": "Rate code for the band"
+      }
+     }
+    },
+    "description": "Tiered Rate Matrix (p.32): 1-9, 10-24, 25-49, 50+ each with its rate; the last band has no maximum"
+   },
+   "quantityBasis": {
     "type": "string",
-    "description": "Custom"
+    "enum": [
+     "perProduct",
+     "perProductFamily",
+     "perOrder",
+     "perGroupBooking",
+     "cumulativePartnerVolume"
+    ],
+    "description": "Mixed Products (p.32): what quantity is counted; cumulativePartnerVolume counts a partner's sales over its agreement period (MoM 1 Sep §4.3)"
+   },
+   "complimentary": {
+    "type": "object",
+    "nullable": true,
+    "description": "Complimentary Logic (p.32): freeQuantity complimentary per paidQuantity paid; empty for none",
+    "properties": {
+     "freeQuantity": {
+      "type": "integer"
+     },
+     "paidQuantity": {
+      "type": "integer"
+     },
+     "label": {
+      "type": "string",
+      "description": "e.g. coordinator"
+     }
+    }
+   },
+   "priority": {
+    "type": "integer",
+    "description": "Priority within the configurable pricing hierarchy (MoM 1 Sep §4.4): the lower number wins"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, active, disabled or expired"
    }
   }
  },
@@ -2604,57 +3358,83 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Residency, Nationality & Market Pricing Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "residency": {
+   "ruleId": {
     "type": "string",
-    "description": "Residency"
+    "description": "Rule ID"
    },
-   "nationality": {
+   "ruleName": {
     "type": "string",
-    "description": "Nationality"
+    "description": "Rule Name"
    },
-   "country": {
+   "marketLabel": {
     "type": "string",
-    "description": "Country"
+    "description": "Market pricing label, e.g. UAE Resident, GCC Resident, International Visitor"
    },
-   "market": {
+   "eligibilityBasis": {
     "type": "string",
-    "description": "Market"
+    "enum": [
+     "residency",
+     "nationality",
+     "country",
+     "market",
+     "region",
+     "customerAddress",
+     "verifiedId",
+     "governmentId"
+    ],
+    "description": "Eligibility Input (pp.27-28) the rule tests"
    },
-   "region": {
-    "type": "string",
-    "description": "Region"
+   "eligibleValues": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Values that qualify, e.g. ISO country codes AE, SA, or market codes"
    },
-   "customerAddress": {
-    "type": "string",
-    "description": "Customer Address"
+   "verificationRequired": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "customerDeclaration",
+      "accountProfile",
+      "idUpload",
+      "governmentIdentityVerification",
+      "staffVerification"
+     ]
+    },
+    "description": "Verification Requirements (p.28) that must be satisfied; empty means none"
    },
-   "verifiedId": {
+   "priceList": {
     "type": "string",
-    "description": "Verified ID"
+    "description": "Price List"
    },
-   "governmentIdIntegrationWhereApplicable": {
+   "rate": {
     "type": "string",
-    "description": "Government ID Integration where applicable"
+    "description": "Rate used when eligible, e.g. UAE Resident Adult"
    },
-   "customerDeclaration": {
+   "fallbackRate": {
     "type": "string",
-    "description": "Customer Declaration"
+    "description": "Fallback (p.28): rate used when eligibility cannot be verified; the Non-Resident rate by default (decided 29 September, readiness close-out)"
    },
-   "accountProfile": {
-    "type": "string",
-    "description": "Account Profile"
+   "priority": {
+    "type": "integer",
+    "description": "Priority within the configurable pricing hierarchy (MoM 1 Sep §4.4): the lower number wins"
    },
-   "idUpload": {
+   "effectiveFrom": {
     "type": "string",
-    "description": "ID Upload"
+    "format": "date",
+    "description": "Effective From"
    },
-   "governmentIdentityVerification": {
+   "effectiveTo": {
     "type": "string",
-    "description": "Government/Identity Verification"
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
    },
-   "staffVerification": {
+   "status": {
     "type": "string",
-    "description": "Staff Verification"
+    "description": "Status: draft, active, disabled or expired"
    }
   }
  },
@@ -2666,62 +3446,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "timeslot": {
     "type": "string",
-    "description": "Timeslot"
+    "nullable": true,
+    "description": "Timeslot the rule is limited to; empty for any"
    },
    "performance": {
     "type": "string",
-    "description": "Performance"
-   },
-   "startTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Start Time"
-   },
-   "arrivalWindow": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Arrival Window"
-   },
-   "session": {
-    "type": "string",
-    "description": "Session"
+    "nullable": true,
+    "description": "Performance the rule is limited to (Matinee, Evening, Final Performance); empty for any"
    },
    "timeOfDayBand": {
     "type": "string",
-    "format": "date-time",
-    "description": "Time-of-Day Band"
-   },
-   "peak": {
-    "type": "string",
-    "description": "Peak"
-   },
-   "standard": {
-    "type": "string",
-    "description": "Standard"
-   },
-   "offPeak": {
-    "type": "string",
-    "description": "Off-Peak"
-   },
-   "lateEntry": {
-    "type": "string",
-    "description": "Late Entry"
-   },
-   "earlyEntry": {
-    "type": "string",
-    "description": "Early Entry"
-   },
-   "matineeAed350": {
-    "type": "string",
-    "description": "Matinee → AED 350"
-   },
-   "eveningAed450": {
-    "type": "string",
-    "description": "Evening → AED 450"
-   },
-   "finalPerformanceAed550": {
-    "type": "string",
-    "description": "Final Performance → AED 550"
+    "enum": [
+     "peak",
+     "standard",
+     "offPeak",
+     "lateEntry",
+     "earlyEntry"
+    ],
+    "description": "Time-of-Day Band (Peak/Off-Peak, p.34)",
+    "nullable": true
    },
    "product": {
     "type": "string",
@@ -2729,41 +3472,84 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "event": {
     "type": "string",
+    "nullable": true,
     "description": "Event"
    },
    "priceList": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "type": "string",
     "description": "Price List"
    },
    "rate": {
-    "type": "number",
-    "description": "Rate"
-   },
-   "timeRange": {
     "type": "string",
-    "format": "date-time",
-    "description": "Time Range"
-   },
-   "effectiveDates": {
-    "type": "string",
-    "description": "Effective Dates"
+    "description": "Rate code"
    },
    "priority": {
-    "type": "string",
-    "description": "Priority"
+    "type": "integer",
+    "description": "Priority within the configurable pricing hierarchy (MoM 1 Sep §4.4): the lower number wins"
    },
-   "overlappingTimeRanges": {
+   "ruleId": {
     "type": "string",
-    "format": "date-time",
-    "description": "Overlapping time ranges"
+    "description": "Rule ID"
    },
-   "missingTimeslotRate": {
-    "type": "number",
-    "description": "Missing timeslot rate"
-   },
-   "conflictingPerformanceRule": {
+   "ruleName": {
     "type": "string",
-    "description": "Conflicting performance rule"
+    "description": "Rule Name"
+   },
+   "timeBasis": {
+    "type": "string",
+    "enum": [
+     "timeslotStart",
+     "performanceStart",
+     "arrivalWindow"
+    ],
+    "description": "Which time the range is tested against (Supported Contexts, p.33)"
+   },
+   "timeFrom": {
+    "type": "string",
+    "nullable": true,
+    "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+    "description": "Time Range start, local HH:mm (09:00)"
+   },
+   "timeTo": {
+    "type": "string",
+    "nullable": true,
+    "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+    "description": "Time Range end, local HH:mm, exclusive (12:00)"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, active, disabled or expired"
+   },
+   "validationIssues": {
+    "type": "array",
+    "description": "Validation (p.34)",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "overlappingTimeRanges",
+        "missingTimeslotRate",
+        "conflictingPerformanceRule"
+       ]
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
    }
   }
  }

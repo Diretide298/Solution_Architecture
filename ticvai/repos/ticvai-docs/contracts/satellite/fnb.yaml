@@ -961,7 +961,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: printOrderLabel
       x-ticvai-consumed-by:
@@ -998,7 +998,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: sendOrderNotification
       summary: Tell the guest where their order is
@@ -1261,10 +1261,10 @@ paths:
               properties:
                 ticketId:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                 lineId:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                   nullable: true
                 recordedAt:
                   type: string
@@ -1373,7 +1373,7 @@ paths:
                   nullable: true
                 ticketId:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                   nullable: true
                   description: The ticket it happened on, where there was one.
                 durationMinutes:
@@ -1512,7 +1512,7 @@ paths:
       description: The F&B order (`FnbOrder.id`), which is what this closes — not a sales order.
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: markOrderCollected
       x-ticvai-consumed-by:
@@ -1693,7 +1693,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     put:
       operationId: setServiceStage
       x-ticvai-consumed-by:
@@ -1764,7 +1764,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: notifyServer
       x-ticvai-consumed-by:
@@ -1819,7 +1819,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: transferOrderItems
       x-ticvai-consumed-by:
@@ -1855,12 +1855,12 @@ paths:
               properties:
                 toVisitId:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                 lineIds:
                   type: array
                   items:
                     type: string
-                    pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                    format: uuid
                     description: An order line (`FnbOrder.lines[].id`).
                 recordedAt:
                   type: string
@@ -1995,7 +1995,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: enterCountLine
       x-ticvai-consumed-by:
@@ -2083,7 +2083,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: requestRecount
       x-ticvai-consumed-by:
@@ -2304,7 +2304,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: fireCourse
       x-ticvai-consumed-by:
@@ -2375,7 +2375,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: holdCourse
       x-ticvai-consumed-by:
@@ -2454,7 +2454,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: refireItem
       x-ticvai-consumed-by:
@@ -2493,7 +2493,7 @@ paths:
               properties:
                 lineId:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                   description: '`KitchenTicket.lines[].lineId`. The refire is a new line carrying `refireOfLineId`.'
                 reason:
                   $ref: '#/components/schemas/RefireReason'
@@ -2526,7 +2526,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: recallKitchenTicket
       x-ticvai-consumed-by:
@@ -2652,7 +2652,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: moveTableVisit
       x-ticvai-consumed-by:
@@ -2748,7 +2748,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     put:
       operationId: reassignServer
       x-ticvai-consumed-by:
@@ -2808,7 +2808,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: compItem
       x-ticvai-consumed-by:
@@ -2853,7 +2853,7 @@ paths:
               properties:
                 orderLineId:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                   description: An order line (`FnbOrder.lines[].id`).
                 recordedAt:
                   type: string
@@ -3384,7 +3384,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: transferTableVisit
       x-ticvai-consumed-by:
@@ -3510,7 +3510,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: requestBill
       x-ticvai-consumed-by:
@@ -4141,7 +4141,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: recordOrderHandover
       x-ticvai-consumed-by:
@@ -4594,7 +4594,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: getGuestOrderStatus
       x-ticvai-consumed-by:
@@ -4642,7 +4642,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: getGuestBill
       x-ticvai-consumed-by:
@@ -5110,7 +5110,7 @@ paths:
         in: query
         schema:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
       - name: status
         in: query
         schema:
@@ -5218,7 +5218,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: acceptFnbOrder
       x-ticvai-consumed-by:
@@ -5293,7 +5293,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: cancelFnbOrder
       x-ticvai-consumed-by:
@@ -5399,7 +5399,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: getFnbOrder
       x-ticvai-consumed-by:
@@ -5463,7 +5463,7 @@ paths:
                   type: array
                   items:
                     type: string
-                    pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                    format: uuid
       responses:
         '412':
           $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
@@ -5637,7 +5637,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: getTableVisit
       x-ticvai-consumed-by:
@@ -5735,7 +5735,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: mergeTableVisits
       x-ticvai-consumed-by:
@@ -5767,7 +5767,7 @@ paths:
               properties:
                 sourceVisitId:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
       responses:
         '200':
           headers:
@@ -5797,7 +5797,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: getBill
       x-ticvai-consumed-by:
@@ -5832,7 +5832,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: splitBill
       x-ticvai-consumed-by:
@@ -5904,7 +5904,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: closeTableVisit
       x-ticvai-consumed-by:
@@ -6115,7 +6115,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     put:
       operationId: setKitchenTicketStatus
       x-ticvai-consumed-by:
@@ -6161,7 +6161,7 @@ paths:
                   type: array
                   items:
                     type: string
-                    pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                    format: uuid
                   description: Advance specific lines. Omit for the whole ticket.
                 stationId:
                   type: string
@@ -6198,7 +6198,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: prioritiseKitchenTicket
       x-ticvai-consumed-by:
@@ -6494,7 +6494,7 @@ paths:
               properties:
                 id:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                 lines:
                   type: array
                   minItems: 1
@@ -8036,7 +8036,7 @@ components:
           nullable: true
         ticketId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         kind:
           type: string
@@ -8656,7 +8656,7 @@ components:
           readOnly: true
         tableVisitId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           readOnly: true
         deposit:
@@ -8947,7 +8947,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         locationId:
           type: string
           format: uuid
@@ -8965,7 +8965,7 @@ components:
             '
         visitId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: 'The table visit this session orders onto, where the location is a table. Absent
             for a cabana or a seat, which have no visit concept — the order stands alone.
@@ -8996,7 +8996,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         outletId:
           type: string
           format: uuid
@@ -9009,7 +9009,7 @@ components:
           type: string
         visitId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: 'The table visit this session orders onto. An existing open visit is joined rather
             than duplicated — a guest seated by a server and then ordering by app is one party, one bill.
 
@@ -9036,7 +9036,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         menuItemId:
           type: string
           format: uuid
@@ -9151,7 +9151,7 @@ components:
           readOnly: true
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           readOnly: true
           x-ticvai-column: service_order_id
           description: The guest order this fulfils (`FnbOrder.id`). Set by the server from the order it arrives with.
@@ -9216,10 +9216,10 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         locationSessionId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: 'From `claimLocationSession`. Where the order is going. Required for delivery to a table, seat, cabana or named
             location. Absent for collection, where the outlet is named instead.
@@ -9666,7 +9666,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         menuItemId:
           type: string
           format: uuid
@@ -9715,7 +9715,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         outletId:
           type: string
           format: uuid
@@ -9723,7 +9723,7 @@ components:
           $ref: '#/components/schemas/ServiceMode'
         tableVisitId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: Required for table service. Absent for quick service.
         lines:
@@ -9733,7 +9733,7 @@ components:
             $ref: '#/components/schemas/CreateFnbOrderLine'
         salesOrderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: The `orders.sales_order` this F&B order fulfils (SD-046, 29 September). A POS sale sends
             the order it took payment on; the commercial order is the sales order and this is its fulfilment.
@@ -9755,7 +9755,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         orderNumber:
           type: string
         outletId:
@@ -9765,7 +9765,7 @@ components:
           $ref: '#/components/schemas/ServiceMode'
         tableVisitId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         status:
           $ref: '#/components/schemas/FnbOrderStatus'
@@ -9784,12 +9784,12 @@ components:
                   $ref: ../shared/common.yaml#/components/schemas/Money
         salesOrderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           x-ticvai-references: orders.sales_order
           description: >
-            **Retyped 29 September (SD-046)**: `orders.sales_order.id` is a ULID, so a uuid here could never
-            join. **Taken from their `fnb.order`, 20 September.** We carried outlet, table visit and
+            **Retyped 29 September (SD-046)**, and `format: uuid` since ADR-0056 (30 September): every id is
+            a uuid, so this joins `orders.sales_order.id`. **Taken from their `fnb.order`, 20 September.** We carried outlet, table visit and
             kitchen ticket on an F&B order and nothing joining it to what was actually sold, so
             an F&B line could not be reconciled to the order that paid for it.
         updatedAt:
@@ -9805,7 +9805,7 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
         kitchenTicketId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         kitchenTickets:
           type: array
@@ -9900,7 +9900,7 @@ components:
             $ref: '#/components/schemas/TableStatus'
           visitId:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
             nullable: true
           covers:
             type: integer
@@ -9944,7 +9944,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         tableId:
           type: string
           format: uuid
@@ -9975,7 +9975,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         tableId:
           type: string
           format: uuid
@@ -10008,13 +10008,13 @@ components:
             $ref: '#/components/schemas/FnbOrder'
         mergedIntoVisitId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         mergedFromVisitIds:
           type: array
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         runningTotal:
           $ref: ../shared/common.yaml#/components/schemas/Money
         gratuity:
@@ -10213,10 +10213,10 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: The F&B order the ticket was created from on acceptance (`FnbOrder.id`).
         orderNumber:
           type: string
@@ -10270,7 +10270,7 @@ components:
             properties:
               lineId:
                 type: string
-                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                format: uuid
               name:
                 type: string
               quantity:
@@ -10288,7 +10288,7 @@ components:
                   $ref: '#/components/schemas/AllergenCode'
               refireOfLineId:
                 type: string
-                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                format: uuid
                 nullable: true
                 readOnly: true
                 description: '**Set on a refire.** The line it remakes, which stays — food cost counts both,
@@ -10474,7 +10474,7 @@ components:
             - outcomeNotForServiceMode
           occupyingVisitId:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
             description: The visit on the table. `tableOccupied`, `targetTableOccupied`, `tableHasOpenVisit`.
           suggestedOperation:
             type: string
@@ -10510,7 +10510,7 @@ components:
             description: '`lineInPreparation`, `lineServed`, `linesUnserved`: the lines concerned.'
             items:
               type: string
-              pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+              format: uuid
           currentStatus:
             type: string
             description: '`illegalStatusTransition`, `reservationNotSeatable`, `runNotInProgress`: the
@@ -10752,7 +10752,7 @@ components:
       properties:
         ticketId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         orderNumber:
           type: string
         guestName:
@@ -10836,7 +10836,7 @@ components:
       properties:
         countId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         reopenedLineIds:
           type: array
           items:

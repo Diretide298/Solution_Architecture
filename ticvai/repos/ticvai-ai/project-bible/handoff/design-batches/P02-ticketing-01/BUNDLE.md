@@ -1239,8 +1239,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID of the line. `lineIds` everywhere in this contract are these."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7 of the line. `lineIds` everywhere in this contract are these."
    },
    "variantId": {
     "type": "string",
@@ -1269,13 +1269,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "maxItems": 50,
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     },
     "description": "Seated products only, as `seating.Seat.id`. Not available offline. **At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel** (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); **at most 10 per sale on staff and POS** (audit R080 (c)), across all the lines of one order for one performance. `createOrder` refuses more with 422 `seatLimitExceeded` (problem type `seat-limit-exceeded`)."
    },
    "resourceHoldId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant. `createOrder` converts the hold into a `ResourceBooking` without releasing it. Not available offline."
    },
@@ -1510,7 +1510,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderNumber": {
     "type": "string"
@@ -1973,7 +1973,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "venueId": {
     "type": "string",
@@ -2010,7 +2010,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "convertedOrderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    }
   }
@@ -2029,18 +2029,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "ticketIds": {
     "type": "array",
     "description": "The entitlements offered — `Entitlement.id` values, since a ticket is an entitlement. Each points at `access.entitlement`.",
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     }
    },
    "fromSubjectId": {

@@ -259,7 +259,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listAiCapabilityMaturity",
        "notes": "**Starting, learning, established, learned** (AI functions review): where each answer stands, what it is based on and what the next stage needs. A `promotionReady` alert links from the row.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     }
@@ -306,7 +306,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "ai",
     "purpose": "Where each AI answer stands on the way to learned",
     "trigger": "onLoad",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "wireframe": {
@@ -1392,7 +1392,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "AiEffectivePolicy.conflicts",
        "operation": "getEffectiveAiPolicy",
        "notes": "**Each conflict and the more restrictive result it resolved to** (18 September minutes, M18-01; AIC-161). A plan step that fails the owning module's limit (a price above the configured maximum) is shown as governance-blocked and is never applied.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     }
@@ -1455,7 +1455,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "component": "confirmDialog",
     "trigger": "Revoke AI policy exception",
     "body": "**Names the exception and what the capability falls back to** once it is revoked: the stricter policy applies at once to every scope the exception covered.",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "_platform": {

@@ -1059,10 +1059,25 @@ def main() -> int:
                 return cand
         return None
 
+    # **A contract that names its key gets that key and no surrogate** (ADR-0058, 30 September).
+    # `kernel.inbox` is keyed by `(consumer, event_id)` because that pair *is* the de-duplication
+    # rule; an extra `id` beside it is a second identity nothing reads. `x-ticvai-primary-key` on
+    # the persisted schema lists the properties, and `derive-ddl` emits the constraint.
+    _declared_keys = set()
+    for _sname, _body in all_schemas.items():
+        if not isinstance(_body, dict) or not isinstance(_body.get("x-ticvai-primary-key"), list):
+            continue
+        _tag = persistence_of(_body)
+        if isinstance(_tag, str) and "." in _tag:
+            _declared_keys.add(_tag.split("+")[0].strip())
+
     _real = {t for t in existing if "." in t and ":" not in t}
     _synth = 0
     for _t in sorted(_real):
         _row = existing[_t]
+        if _t in _declared_keys:
+            existing[_t] = [c for c in _row if c.get("synthesised") != "surrogate key"]
+            continue
         if not _row or _own_key(_t, [c["column"] for c in _row]):
             continue
         _row.insert(0, {
@@ -1086,7 +1101,7 @@ def main() -> int:
     # `catalogue.entitlement_template` is the definition a product is sold against.
     # `access.entitlement` is the row a guest actually holds — added 18 August precisely because
     # five artefacts referred to a thing that did not exist. `access.yaml` says `ticketId` is
-    # "a ULID, stable for the life of the ticket and independent of the media carrying it", and a
+    # "a UUIDv7, stable for the life of the ticket and independent of the media carrying it", and a
     # template has no such life.
     #
     # **A scan event pointing at the template says every guest holding that product was scanned.**

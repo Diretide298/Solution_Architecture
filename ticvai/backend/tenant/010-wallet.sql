@@ -206,9 +206,9 @@ CREATE TABLE IF NOT EXISTS wallet.exit_settlement (
     method                            text CONSTRAINT exit_settlement_method_chk CHECK (method IN ('card', 'cash', 'storedCard', 'originalPayment')),
     amount                            numeric(18,4) NOT NULL,
     balance_before                    numeric(18,4),
-    payment_id                        text,
-    refund_id                         text,
-    wallet_transaction_id             text,
+    payment_id                        uuid,
+    refund_id                         uuid,
+    wallet_transaction_id             uuid,
     reason                            text,
     settled_by_principal_id           uuid,
     settled_at                        timestamptz NOT NULL,
@@ -269,7 +269,7 @@ CREATE TABLE IF NOT EXISTS wallet.gift_card_product (
 CREATE TABLE IF NOT EXISTS wallet.hold (
     wallet_hold_id                    uuid NOT NULL,
     wallet_id                         uuid NOT NULL,
-    order_id                          text,
+    order_id                          uuid,
     payment_id                        uuid,
     wallet_hold_amount                numeric(18,4) NOT NULL,
     currency_code                     text NOT NULL CONSTRAINT hold_currency_code_chk CHECK (char_length(currency_code) <= 10),
@@ -409,13 +409,13 @@ CREATE TABLE IF NOT EXISTS wallet.wallet (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.wallet_transaction (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     wallet_id                         uuid,
     wallet_hold_id                    uuid,
     kind                              text NOT NULL CONSTRAINT wallet_transaction_kind_chk CHECK (kind IN ('topUp', 'spend', 'refund', 'adjustment', 'bonus', 'expiry', 'transfer')),
     amount                            numeric(18,4) NOT NULL,
     balance_after                     numeric(18,4) NOT NULL,
-    order_id                          text,
+    order_id                          uuid,
     venue_id                          uuid,
     reason                            text,
     principal_id                      uuid,

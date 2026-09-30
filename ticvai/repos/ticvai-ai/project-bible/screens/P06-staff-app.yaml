@@ -4321,19 +4321,19 @@ screens:
     contract: inventory
     purpose: Parts reserved for the task (M17-02)
     trigger: onAction
-    provenance: decided 17 September, M17-02 (P29)
+    provenance: decided 17 September, M17-02 (the 29 September pass)
   - operationId: createStockReservation
     contract: inventory
     purpose: Reserve parts for the task (M17-02)
     trigger: onAction
-    provenance: decided 17 September, M17-02 (P29)
+    provenance: decided 17 September, M17-02 (the 29 September pass)
     invalidates:
     - listStockReservations
   - operationId: releaseStockReservation
     contract: inventory
     purpose: Give reserved parts back (M17-02)
     trigger: onAction
-    provenance: decided 17 September, M17-02 (P29)
+    provenance: decided 17 September, M17-02 (the 29 September pass)
     invalidates:
     - listStockReservations
   - operationId: getWorkOrder

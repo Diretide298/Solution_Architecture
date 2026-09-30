@@ -37,6 +37,25 @@
   "requestBody": "ApprovalDelegation",
   "responds": "ApprovalDelegation"
  },
+ "escalateApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests/{requestId}/escalate",
+  "contract": "approvals",
+  "summary": "Move it up a level",
+  "permission": "APPROVAL_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalRequest"
+ },
  "getApprovalAnalytics": {
   "method": "GET",
   "path": "/approval-analytics",
@@ -73,6 +92,60 @@
   "parameters": [],
   "requestBody": null,
   "responds": "ApprovalDelegation"
+ },
+ "listApprovalRequests": {
+  "method": "GET",
+  "path": "/approval-requests",
+  "contract": "approvals",
+  "summary": "Requests awaiting a decision, or already decided",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "assignedToMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "raisedByMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "breachingWithinMinutes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "sort",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listDelegations": {
   "method": "GET",

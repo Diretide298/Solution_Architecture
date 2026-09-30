@@ -1,6 +1,6 @@
 # WS70 — Unified BI Reporting and AI Analytics Platform board 9
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 23 operations · 45 schemas · 5 permissions**
 
 Platform P16 Venue Analytics · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `AI_APPROVE, AI_CONFIGURE, AI_USE, REPORT_MANAGE, REPORT_VIEW_VENUE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ANL-051` | AI Analytics Command Center | listDetail | 0 | 0 | — |
-| `ANL-052` | Ask TICVAI — Natural Language Analytics | listDetail | 0 | 0 | — |
-| `ANL-053` | AI-Generated Dashboard Studio | listDetail | 0 | 0 | — |
-| `ANL-054` | AI Report Generator | listDetail | 0 | 0 | — |
-| `ANL-055` | Anomaly Detection Center | listDetail | 0 | 0 | — |
-| `ANL-056` | Root-Cause Analysis Explorer | listDetail | 0 | 0 | — |
-| `ANL-057` | Forecasting & Predictive Analytics Studio | configEditor | 0 | 0 | — |
-| `ANL-058` | AI Recommendation & Next-Best-Action Center | listDetail | 0 | 0 | — |
-| `ANL-059` | AI Insight History, Evidence & Explainability | configEditor | 0 | 0 | — |
-| `ANL-060` | AI Analytics Governance & Model Control | listDetail | 0 | 0 | — |
+| `ANL-051` | AI Analytics Command Center | listDetail | 1 | 0 | — |
+| `ANL-052` | Ask TICVAI — Natural Language Analytics | listDetail | 2 | 0 | — |
+| `ANL-053` | AI-Generated Dashboard Studio | listDetail | 1 | 0 | — |
+| `ANL-054` | AI Report Generator | listDetail | 1 | 0 | — |
+| `ANL-055` | Anomaly Detection Center | listDetail | 4 | 0 | — |
+| `ANL-056` | Root-Cause Analysis Explorer | listDetail | 3 | 0 | — |
+| `ANL-057` | Forecasting & Predictive Analytics Studio | configEditor | 5 | 0 | — |
+| `ANL-058` | AI Recommendation & Next-Best-Action Center | listDetail | 2 | 0 | — |
+| `ANL-059` | AI Insight History, Evidence & Explainability | configEditor | 3 | 0 | — |
+| `ANL-060` | AI Analytics Governance & Model Control | listDetail | 8 | 0 | — |
 
 ## Thin screens in this batch
 
-**ANL-051, ANL-052, ANL-053, ANL-054, ANL-055, ANL-056, ANL-058, ANL-060 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ANL-051, ANL-052, ANL-053, ANL-054, ANL-055, ANL-056, ANL-058 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS ai.answer_feedback (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.approval_request_score (
     id                                uuid PRIMARY KEY,
-    approval_request_id               text NOT NULL,
+    approval_request_id               uuid NOT NULL,
     trigger                           text CONSTRAINT approval_request_score_trigger_chk CHECK (trigger IN ('submitted', 'resubmitted', 'slaTick', 'escalated')),
     risk_score                        integer NOT NULL,
     risk_band                         text NOT NULL CONSTRAINT approval_request_score_risk_band_chk CHECK (risk_band IN ('low', 'medium', 'high', 'critical')),
@@ -278,19 +278,12 @@ CREATE TABLE IF NOT EXISTS ai.chunk_embedding (
     parent_chunk_id                   uuid,
     content                           text,
     embedding_model                   text NOT NULL,
-    dense                             text,
-    sparse                            jsonb,
+    collection_alias                  text NOT NULL CONSTRAINT chunk_embedding_collection_alias_chk CHECK (char_length(collection_alias) <= 200),
+    point_id                          uuid NOT NULL,
     token_count                       integer,
     content_hash                      text,
+    indexed_at                        timestamptz,
     created_at                        timestamptz
-);
-
--- Maps a Qdrant point id back to its document and scope. The join between the two stores Hangs
--- off: reaches ai.decision_record through its keys; references ai.knowledge_document. Reached by:
--- 6 operations read it and 0 write it; 3 tables reference it.
-CREATE TABLE IF NOT EXISTS ai.chunk_ref (
-    id                                uuid PRIMARY KEY NOT NULL,
-    document_id                       uuid NOT NULL
 );
 
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
@@ -689,6 +682,15 @@ CREATE TABLE IF NOT EXISTS ai.history_observation (
     scope_path                        ltree NOT NULL
 );
 
+-- Holds 3 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS ai.inbox (
+    consumer                          text NOT NULL CONSTRAINT inbox_consumer_chk CHECK (char_length(consumer) <= 200),
+    event_id                          uuid NOT NULL,
+    processed_at                      timestamptz NOT NULL,
+    CONSTRAINT inbox_pkey PRIMARY KEY (consumer, event_id)
+) PARTITION BY RANGE (event_id);
+
 -- Holds 16 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS ai.incident (
@@ -839,7 +841,7 @@ CREATE TABLE IF NOT EXISTS ai.knowledge_collection (
 
 -- Source, status and chunk count. The text and its vectors live in Qdrant Hangs off: reaches
 -- ai.decision_record through its keys; references ai.knowledge_collection, ai.knowledge_document.
--- Reached by: 4 operations read it and 1 write it; 4 tables reference it.
+-- Reached by: 4 operations read it and 1 write it; 3 tables reference it.
 CREATE TABLE IF NOT EXISTS ai.knowledge_document (
     id                                uuid PRIMARY KEY,
     collection_id                     uuid,

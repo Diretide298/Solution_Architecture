@@ -12,7 +12,7 @@ emittedBy:
 - voidOrder
 payload:
 - field: orderId
-  type: string
+  type: uuid
 - field: lines
   type: array
   notes: productId, quantity, amount — what was on the order when it was voided

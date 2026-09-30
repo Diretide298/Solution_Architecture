@@ -1,6 +1,6 @@
 # WS11 — Access Control board 11
 
-**10 screens · 17 operations · 17 schemas · 5 permissions**
+**10 screens · 18 operations · 23 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -60,13 +60,13 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-244` | Access Security & Fraud Command Center | listDetail | 3 | 2 | — |
+| `BO-244` | Access Security & Fraud Command Center | listDetail | 4 | 2 | — |
 | `BO-245` | Fraud Detection Rule & Signal Library | listDetail | 2 | 0 | — |
 | `BO-246` | Credential Sharing & Concurrent Usage Detection | listDetail | 2 | 1 | — |
 | `BO-247` | Unified Identity & Credential Lock Manager | listDetail | 3 | 2 | — |
 | `BO-248` | Biometric & Identity Integrity Monitoring | listDetail | 4 | 2 | — |
 | `BO-249` | Relationship & Companion Fraud Monitoring | configEditor | 2 | 1 | — |
-| `BO-250` | Access Risk Scoring & Decision Engine | listDetail | 2 | 1 | — |
+| `BO-250` | Access Risk Scoring & Decision Engine | listDetail | 3 | 1 | — |
 | `BO-251` | Real-Time Security Response & Playbook Builder | listDetail | 1 | 0 | — |
 | `BO-252` | Security Investigation & Evidence Workspace | listDetail | 1 | 0 | — |
 | `BO-253` | Security Analytics, AI Detection & Governance | listDetail | 2 | 1 | — |

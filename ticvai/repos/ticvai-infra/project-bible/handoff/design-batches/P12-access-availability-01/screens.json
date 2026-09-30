@@ -16,12 +16,18 @@
    "isEntryPoint": true,
    "inferred": true,
    "exitTo": [
+    "ANL-001",
+    "BO-001",
+    "CMS-001",
     "SUP-002",
     "SUP-003",
     "SUP-004",
-    "BO-001",
-    "CMS-001",
-    "ANL-001"
+    "SUP-005",
+    "SUP-006",
+    "SUP-007",
+    "SUP-008",
+    "SUP-009",
+    "SUP-019"
    ],
    "transitions": [
     {
@@ -53,6 +59,36 @@
      "to": "ANL-001",
      "trigger": "Executive Command Center",
      "provenance": "structural — SUP-001 is P12's home screen and its exits are its launcher"
+    },
+    {
+     "to": "SUP-005",
+     "trigger": "Live Chat Workspace",
+     "provenance": "derived — SUP-005 declares entryState.params caseId, conversationId and SUP-001 holds none of them, so the edge carries nothing and SUP-005 opens cold"
+    },
+    {
+     "to": "SUP-006",
+     "trigger": "Knowledge Base Search",
+     "provenance": "derived — SUP-006 declares entryState.params bannerId, pageId, policyKind, version and SUP-001 holds none of them, so the edge carries nothing and SUP-006 opens cold"
+    },
+    {
+     "to": "SUP-008",
+     "trigger": "Agent Performance & SLA View",
+     "provenance": "derived — SUP-008 declares entryState.params conversationId, reportId and SUP-001 holds none of them, so the edge carries nothing and SUP-008 opens cold"
+    },
+    {
+     "to": "SUP-007",
+     "trigger": "Canned Response Management",
+     "provenance": "structural — SUP-001 is P12's home screen and its exits are its launcher"
+    },
+    {
+     "to": "SUP-009",
+     "trigger": "Customer Service Command Center",
+     "provenance": "structural — SUP-001 is P12's home screen and its exits are its launcher"
+    },
+    {
+     "to": "SUP-019",
+     "trigger": "Contact Center Operations Command Center",
+     "provenance": "structural — SUP-001 is P12's home screen and its exits are its launcher"
     }
    ]
   },
@@ -61,13 +97,6 @@
   "pattern": "listDetail",
   "patternReason": "`listActiveSessions` reads the population and `getCurrentSession` reads one of them — list, select, act",
   "purpose": "Get someone into venue management, fast, on a device that may be shared, and resolve the session the back office, the CMS and analytics all read.",
-  "gaps": [
-   {
-    "operation": "getGuestSession",
-    "why": "**3 declared operations reach no component on this screen**: getGuestSession, listMfaMethods, listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -76,8 +105,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listActiveSessions",
+       "notes": "Sends `?venueId=` to `listActiveSessions`.",
+       "provenance": "contract identity.yaml GET /auth/sessions"
+      },
+      {
+       "kind": "textField",
+       "label": "Principal id",
+       "operation": "listActiveSessions",
+       "notes": "Sends `?principalId=` to `listActiveSessions`.",
+       "provenance": "contract identity.yaml GET /auth/sessions"
+      },
+      {
+       "kind": "textField",
+       "label": "Workstation id",
+       "operation": "listActiveSessions",
+       "notes": "Sends `?workstationId=` to `listActiveSessions`.",
+       "provenance": "contract identity.yaml GET /auth/sessions"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every agent login",
+       "label": "Every active session",
        "bindsTo": "ActiveSession",
        "columns": [
         "ActiveSession.sessionId",
@@ -95,6 +145,38 @@
        ],
        "operation": "listActiveSessions",
        "provenance": "contract identity.yaml GET /auth/sessions"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every MFA method",
+       "bindsTo": "MfaMethod",
+       "columns": [
+        "MfaMethod.id",
+        "MfaMethod.kind",
+        "MfaMethod.label",
+        "MfaMethod.maskedTarget",
+        "MfaMethod.isActive",
+        "MfaMethod.isPrimary",
+        "MfaMethod.enrolledAt",
+        "MfaMethod.lastUsedAt"
+       ],
+       "operation": "listMfaMethods",
+       "provenance": "contract identity.yaml GET /auth/mfa/methods"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every SSO provider",
+       "bindsTo": "SsoProvider",
+       "columns": [
+        "SsoProvider.id",
+        "SsoProvider.displayName",
+        "SsoProvider.protocol",
+        "SsoProvider.iconAssetRef",
+        "SsoProvider.isEnforced",
+        "SsoProvider.scopePath"
+       ],
+       "operation": "listSsoProviders",
+       "provenance": "contract identity.yaml GET /auth/sso/providers"
       }
      ]
     },
@@ -104,7 +186,31 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected agent login",
+       "label": "The selected active session",
+       "bindsTo": "ActiveSession",
+       "columns": [
+        "ActiveSession.status",
+        "ActiveSession.sessionId",
+        "ActiveSession.principalId",
+        "ActiveSession.principalName",
+        "ActiveSession.roleId",
+        "ActiveSession.roleName",
+        "ActiveSession.workstationId",
+        "ActiveSession.workstationName",
+        "ActiveSession.venueId",
+        "ActiveSession.ipAddress",
+        "ActiveSession.deviceInfo",
+        "ActiveSession.hasOpenShift",
+        "ActiveSession.mfaSatisfied",
+        "ActiveSession.startedAt",
+        "ActiveSession.lastSeenAt"
+       ],
+       "operation": "listActiveSessions",
+       "provenance": "contract identity.yaml GET /auth/sessions"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The session",
        "bindsTo": "Session",
        "columns": [
         "Session.sessionId",
@@ -135,14 +241,35 @@
        "provenance": "contract identity.yaml POST /auth/login"
       },
       {
+       "kind": "textField",
+       "label": "Authentication code",
+       "operation": "verifyMfaChallenge",
+       "notes": "Shown only in the mfaRequired state, after `login`, for the authenticator-app code or the emailed code (decided 28 September, audit R135, R126 (5)).",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaChallenge",
+       "notes": "Completes sign-in; the session is usable only after it. Five wrong codes lock step-up (429 step-up-locked, audit R126 (6)).",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Email me a code instead",
+       "operation": "createMfaChallenge",
+       "notes": "The fallback: a new challenge with the email method (`emailOtp`) instead of the authenticator app (decided 28 September, audit R126 (5)).",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge"
+      },
+      {
        "kind": "destructiveButton",
-       "label": "Force",
+       "label": "Force logout",
        "operation": "forceLogout",
        "provenance": "contract identity.yaml POST /auth/sessions/{sessionId}/force-logout"
       },
       {
        "kind": "destructiveButton",
-       "label": "Revoke",
+       "label": "Revoke all sessions",
        "operation": "revokeAllSessions",
        "provenance": "contract identity.yaml POST /auth/sessions/revoke-all"
       }
@@ -154,31 +281,66 @@
    {
     "id": "confirmForceLogout",
     "component": "confirmDialog",
-    "trigger": "Force",
-    "body": "**Names what `forceLogout` changes and what it leaves alone**, in the consequence rather than the verb. A agent login this affects should be identified in the dialog, not just counted.",
+    "trigger": "Force logout",
+    "body": "**Names what `forceLogout` changes and what it leaves alone**, in the consequence rather than the verb. A agent login this affects should be identified in the dialog, not just counted. **Collects what `forceLogout` sends before it is called.** Required: `reason`.",
     "provenance": "contract identity.yaml POST /auth/sessions/{sessionId}/force-logout"
    },
    {
     "id": "confirmRevokeAllSessions",
     "component": "confirmDialog",
-    "trigger": "Revoke",
-    "body": "**Names what `revokeAllSessions` changes and what it leaves alone**, in the consequence rather than the verb. A agent login this affects should be identified in the dialog, not just counted.",
+    "trigger": "Revoke all sessions",
+    "body": "**Names what `revokeAllSessions` changes and what it leaves alone**, in the consequence rather than the verb. A agent login this affects should be identified in the dialog, not just counted. **Collects what `revokeAllSessions` sends before it is called.** Required: `reason`, `stepUpToken`. Optional: `venueId`, `excludeSelf`.",
     "provenance": "contract identity.yaml POST /auth/sessions/revoke-all"
+   },
+   {
+    "id": "formLogin",
+    "component": "modal",
+    "trigger": "Login",
+    "body": "**Collects what `login` sends before it is called.** Required: `username`, `credential`, `workstationId`. Optional: `method`, `deviceFingerprint`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "LoginRequest",
+    "confirm": {
+     "label": "Login",
+     "operation": "login"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "username",
+      "credential",
+      "workstationId",
+      "method",
+      "deviceFingerprint"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /auth/login"
    }
   ],
   "states": {
    "loading": "The agent login list.",
    "error": "Could not load. Names which read failed and leaves the agent login untouched.",
-   "emptyFirstRun": "No agent login yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the agent login are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No agent login yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on venueId, principalId, workstationId and the agent login are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `SESSION_FORCE_LOGOUT`, which `listActiveSessions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "mfaRequired": "**Signed in, not yet through.** The principal holds a permission that requires MFA (ROLE_MANAGE, LEDGER_APPROVE, any platform-staff permission, or one the tenant added), so after `login` the screen calls `createMfaChallenge` and asks for the authenticator code; `verifyMfaChallenge` completes the sign-in. **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy's lockout minutes and the screen says so. A principal with no enrolled method is sent to enrol first (decided 28 September, audit R135, R126)."
   },
   "apis": [
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "Second factor after login when the principal holds a permission in mfaRequiredForPermissions; action `signIn`, the primary method (authenticator app), or the email method as the fallback (decided 28 September, audit R135, R126 (5))",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "verifyMfaChallenge",
+    "contract": "identity",
+    "purpose": "Completes sign-in with the code; the session is usable only after it. Five wrong codes lock step-up (audit R126 (6))",
+    "trigger": "onAction"
+   },
    {
     "operationId": "login",
     "contract": "identity",
     "purpose": "from page inventory",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "forceLogout",
@@ -193,12 +355,6 @@
     "operationId": "getCurrentSession",
     "contract": "identity",
     "purpose": "Current session and effective permissions",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getGuestSession",
-    "contract": "identity",
-    "purpose": "Read the current guest session",
     "trigger": "onLoad"
    },
    {
@@ -230,14 +386,19 @@
    }
   ],
   "entryState": {
-   "params": [],
+   "params": [
+    {
+     "name": "challengeId",
+     "from": "navigation"
+    }
+   ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "Session.sessionId",
-    "Session.principalId",
-    "Session.roleId",
-    "Session.displayName",
-    "Session.scope"
+    "ActiveSession.status",
+    "ActiveSession.sessionId",
+    "ActiveSession.principalId",
+    "ActiveSession.principalName",
+    "ActiveSession.roleId"
    ]
   },
   "wireframe": {
@@ -287,35 +448,13 @@
    ],
    "inferred": true,
    "exitTo": [
-    "SUP-001",
-    "SUP-002",
-    "SUP-004"
+    "SUP-001"
    ],
    "transitions": [
     {
      "to": "SUP-001",
      "trigger": "Agent Login",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry them"
-    },
-    {
-     "to": "SUP-002",
-     "trigger": "Agent Dashboard",
-     "carries": [
-      "caseId"
-     ],
-     "provenance": "derived — SUP-002 declares entryState.params caseId, so an edge into it must carry them"
-    },
-    {
-     "to": "SUP-004",
-     "trigger": "Conversation Queue",
-     "carries": [
-      "caseId",
-      "conversationId"
-     ],
-     "provenance": "derived — SUP-004 declares entryState.params caseId, conversationId, so an edge into it must carry them"
+     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-003 holds none of them, so the edge carries nothing and SUP-001 opens cold"
     }
    ]
   },
@@ -327,13 +466,6 @@
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`setAgentAvailability`) and no read of a population — it is settings, not a list",
   "purpose": "Change how availability behaves here, and see which level the current value came from.",
-  "gaps": [
-   {
-    "operation": "setAgentAvailability",
-    "why": "**`setAgentAvailability` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
-    "source": "contract marketing-crm.yaml PUT /agent-availability"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -343,7 +475,7 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save agent availability",
        "operation": "setAgentAvailability",
        "provenance": "contract marketing-crm.yaml PUT /agent-availability"
       }
@@ -353,11 +485,23 @@
      "name": "contentBody",
      "components": [
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setAgentAvailability"
+       "kind": "selectField",
+       "label": "State",
+       "operation": "setAgentAvailability",
+       "notes": "Required.",
+       "provenance": "contract marketing-crm.yaml PUT /agent-availability"
+      },
+      {
+       "kind": "numberField",
+       "label": "Max concurrent",
+       "operation": "setAgentAvailability",
+       "provenance": "contract marketing-crm.yaml PUT /agent-availability"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Queue ids",
+       "operation": "setAgentAvailability",
+       "provenance": "contract marketing-crm.yaml PUT /agent-availability"
       }
      ]
     }
@@ -366,8 +510,8 @@
   "states": {
    "loading": "The saved availability routing settings.",
    "error": "Could not load. Names which read failed and leaves the availability routing settings untouched.",
-   "emptyFirstRun": "No availability routing settings configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No availability routing settings configured. The form opens empty and `setAgentAvailability` saves the first one; it says what the platform does in the meantime.",
+   "emptyNoAccess": "Shown when the caller lacks `CASE_MANAGE`, which `setAgentAvailability` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {

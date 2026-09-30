@@ -228,7 +228,7 @@ BEGIN
 END
 $$;
 
--- **1008 tables: 570 scoped by `scope_path`, 80 by `venue_id`, 152 through the parent that owns them, 27 by subject, 178 to the tenant root only, 0 with no policy.**
+-- **1009 tables: 570 scoped by `scope_path`, 80 by `venue_id`, 151 through the parent that owns them, 27 by subject, 180 to the tenant root only, 0 with no policy.**
 -- A table with no policy is listed at the end of this file with the reason. It is not
 -- claimed to be reference data: for most of them that is a scoping decision nobody has
 -- made yet, and they stay readable by every connection to this database until it is.
@@ -906,7 +906,6 @@ SELECT platform.apply_parent_rls('ai.blueprint_decision'::regclass, 'blueprint_i
 SELECT platform.apply_parent_rls('ai.case_action'::regclass, 'case_id', 'ai.risk_case'::regclass, 'id');
 SELECT platform.apply_parent_rls('ai.case_evidence'::regclass, 'case_id', 'ai.risk_case'::regclass, 'id');
 SELECT platform.apply_parent_rls('ai.chunk_embedding'::regclass, 'document_id', 'ai.knowledge_document'::regclass, 'id');
-SELECT platform.apply_parent_rls('ai.chunk_ref'::regclass, 'document_id', 'ai.knowledge_document'::regclass, 'id');
 SELECT platform.apply_parent_rls('ai.index_source'::regclass, 'collection_id', 'ai.knowledge_collection'::regclass, 'id');
 SELECT platform.apply_parent_rls('ai.message'::regclass, 'conversation_id', 'ai.conversation'::regclass, 'id');
 SELECT platform.apply_parent_rls('approvals.decision'::regclass, 'request_id', 'approvals.request'::regclass, 'id');
@@ -1087,6 +1086,7 @@ SELECT platform.apply_subject_rls('wallet.wallet'::regclass);
 -- reached only through their owning service's role; this policy is the floor.
 SELECT platform.apply_tenant_rls('access.access_change'::regclass);  -- was: only nullable references (order_id -> orders.sales_order)
 SELECT platform.apply_tenant_rls('ai.config_source'::regclass);  -- was: several protected owners (session_id -> ai.config_session, asset_id -> assets.media_asset); which one owns the row is not decided
+SELECT platform.apply_tenant_rls('ai.inbox'::regclass);  -- was: no scope column and no declared owner
 SELECT platform.apply_tenant_rls('approvals.accreditation_badge'::regclass);  -- was: no scope column and no declared owner
 SELECT platform.apply_tenant_rls('approvals.step_up_policy'::regclass);  -- was: no scope column and no declared owner
 SELECT platform.apply_tenant_rls('assets.media_collection_member'::regclass);  -- was: no scope column and no declared owner
@@ -1135,6 +1135,7 @@ SELECT platform.apply_tenant_rls('inventory.serialised_item'::regclass);  -- was
 SELECT platform.apply_tenant_rls('inventory.stock_batch'::regclass);  -- was: several protected owners (item_id -> inventory.item, location_id -> inventory.location); which one owns the row is not decided
 SELECT platform.apply_tenant_rls('inventory.stock_reservation'::regclass);  -- was: no scope column and no declared owner
 SELECT platform.apply_tenant_rls('inventory.supplier_contract'::regclass);  -- was: no scope column and no declared owner
+SELECT platform.apply_tenant_rls('kernel.inbox'::regclass);  -- was: no scope column and no declared owner
 SELECT platform.apply_tenant_rls('ledger.inter_entity_obligation'::regclass);  -- was: only nullable references (entitlement_id -> access.entitlement, order_id -> orders.sales_order)
 SELECT platform.apply_tenant_rls('ledger.recognition_schedule'::regclass);  -- was: only nullable references (deferred_account_id -> ledger.account, recognised_account_id -> ledger.account, breakage_account_id -> ledger.account)
 SELECT platform.apply_tenant_rls('ledger.tax_code'::regclass);  -- was: only nullable references (account_id -> ledger.account)

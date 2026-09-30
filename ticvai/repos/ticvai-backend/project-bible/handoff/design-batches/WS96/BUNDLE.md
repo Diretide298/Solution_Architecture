@@ -1,6 +1,6 @@
 # WS96 — Rental Management board 9
 
-**10 screens · 17 operations · 20 schemas · 7 permissions**
+**10 screens · 26 operations · 29 schemas · 9 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 7 permissions apply here:
-  `ASSET_MANAGE, ASSET_VIEW, INSPECTION_SUBMIT, MAINTENANCE_EXECUTE, WORK_ORDER_MANAGE, WORK_ORDER_VERIFY, WORK_ORDER_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 9 permissions apply here:
+  `ASSET_MANAGE, ASSET_VIEW, INSPECTION_SUBMIT, MAINTENANCE_EXECUTE, PROCUREMENT_REQUEST, PRODUCT_VIEW, WORK_ORDER_MANAGE, WORK_ORDER_VERIFY, WORK_ORDER_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -63,9 +63,9 @@ convincingly. It is never a caption.
 | `BO-574` | Maintenance Command Center | commandCentre | 2 | 0 | — |
 | `BO-575` | Maintenance Rule & Service Plan Configuration | configEditor | 3 | 0 | — |
 | `BO-576` | Maintenance Calendar & Scheduling | configEditor | 2 | 0 | — |
-| `BO-577` | Maintenance Work Order | listDetail | 5 | 0 | — |
+| `BO-577` | Maintenance Work Order | listDetail | 11 | 0 | — |
 | `BO-578` | Technician Repair Workspace | listDetail | 3 | 0 | — |
-| `BO-579` | Parts, Cost & Maintenance Expense Tracking | listDetail | 1 | 0 | — |
+| `BO-579` | Parts, Cost & Maintenance Expense Tracking | listDetail | 4 | 0 | — |
 | `BO-580` | Asset Maintenance History & Lifecycle | listDetail | 1 | 0 | — |
 | `BO-581` | Return-to-Service Inspection & Approval | listDetail | 2 | 0 | — |
 | `BO-582` | Asset Retirement, Write-Off & Replacement Recommendation | listDetail | 2 | 0 | — |
@@ -73,7 +73,7 @@ convincingly. It is never a caption.
 
 ## Thin screens in this batch
 
-**BO-578, BO-579, BO-580, BO-581, BO-582, BO-583 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-578, BO-580, BO-581, BO-582, BO-583 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -549,6 +549,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "fields",
      "components": [
       {
+       "kind": "calendarView",
+       "label": "Calendar",
+       "operation": "getDueMaintenance",
+       "notes": "Maintenance falling due, by day, week or month; a task opens a work order. Day, week, month and agenda views; the day starts at the venue's `calendarDayStartHour`. Sends the visible window as `from`/`to` and the category filter as `categoryId`.",
+       "provenance": "decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)"
+      },
+      {
        "kind": "selectField",
        "label": "Asset",
        "provenance": "pack Rental_Management.pdf, page 111 §Configure"
@@ -726,6 +733,103 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "impliedBy": "createWorkOrder"
       }
      ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Priority and how it was set",
+       "bindsTo": "WorkOrder",
+       "columns": [
+        "WorkOrder.priority",
+        "WorkOrder.priorityScore",
+        "WorkOrder.prioritySource",
+        "WorkOrder.faultAssessment",
+        "WorkOrder.requiredQualificationCodes"
+       ],
+       "operation": "getWorkOrder",
+       "notes": "**The score and its source side by side** (decided 17 September, M17-01): *scored* (the venue policy), *asset override* or *manual*, so a supervisor sees why a fault is urgent.",
+       "provenance": "contract maintenance.yaml WorkOrder.priorityScore"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Suggested technicians",
+       "bindsTo": "WorkOrderAssigneeSuggestion",
+       "columns": [
+        "WorkOrderAssigneeSuggestion.rank",
+        "WorkOrderAssigneeSuggestion.name",
+        "WorkOrderAssigneeSuggestion.hasAllQualifications",
+        "WorkOrderAssigneeSuggestion.missingQualificationCodes",
+        "WorkOrderAssigneeSuggestion.onShift",
+        "WorkOrderAssigneeSuggestion.openWorkOrderCount"
+       ],
+       "operation": "suggestWorkOrderAssignee",
+       "notes": "**Smart assignment, confirmed by the maintenance head** (decided 17 September, M17-13). The ranking assigns nothing; *Assign* on a row sends its principal with `updateWorkOrder`.",
+       "provenance": "contract maintenance.yaml GET /work-orders/{workOrderId}/assignee-suggestions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Assign suggested technician",
+       "operation": "updateWorkOrder",
+       "notes": "Sends the chosen row's `principalId` as `assignedToPrincipalId` (M17-13).",
+       "provenance": "contract maintenance.yaml PATCH /work-orders/{workOrderId}"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Vendor requests",
+       "bindsTo": "VendorServiceRequest",
+       "columns": [
+        "VendorServiceRequest.supplierId",
+        "VendorServiceRequest.scope",
+        "VendorServiceRequest.status",
+        "VendorServiceRequest.vendorReference",
+        "VendorServiceRequest.quotedCost",
+        "VendorServiceRequest.scheduledVisitAt"
+       ],
+       "operation": "listVendorServiceRequests",
+       "notes": "Outside vendors engaged on this work order (decided 17 September, M17-13).",
+       "provenance": "contract maintenance.yaml GET /vendor-service-requests"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request a vendor",
+       "operation": "createVendorServiceRequest",
+       "provenance": "contract maintenance.yaml POST /vendor-service-requests"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Update vendor request",
+       "operation": "updateVendorServiceRequest",
+       "provenance": "contract maintenance.yaml PATCH /vendor-service-requests/{vendorServiceRequestId}"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "How fault priority is scored",
+       "bindsTo": "WorkOrderPriorityPolicy",
+       "columns": [
+        "WorkOrderPriorityPolicy.weights",
+        "WorkOrderPriorityPolicy.bands",
+        "WorkOrderPriorityPolicy.updatedAt"
+       ],
+       "operation": "getWorkOrderPriorityPolicy",
+       "notes": "**The venue's weights and bands** (decided 17 September, M17-01): safety, guest operations, revenue and asset criticality, summing to 100.",
+       "provenance": "contract maintenance.yaml GET /work-order-priority-policy"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save priority scoring",
+       "operation": "setWorkOrderPriorityPolicy",
+       "provenance": "contract maintenance.yaml PUT /work-order-priority-policy"
+      }
+     ]
     }
    ]
   },
@@ -737,6 +841,57 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "getWorkOrderPriorityPolicy",
+    "contract": "maintenance",
+    "purpose": "The venue's priority weights and bands (M17-01)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-01 (the 29 September pass)"
+   },
+   {
+    "operationId": "setWorkOrderPriorityPolicy",
+    "contract": "maintenance",
+    "purpose": "Change the priority weights and bands (M17-01)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-01 (the 29 September pass)",
+    "invalidates": [
+     "getWorkOrderPriorityPolicy"
+    ]
+   },
+   {
+    "operationId": "suggestWorkOrderAssignee",
+    "contract": "maintenance",
+    "purpose": "Technicians ranked by skill, shift and load (M17-13)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-13 (the 29 September pass)"
+   },
+   {
+    "operationId": "listVendorServiceRequests",
+    "contract": "maintenance",
+    "purpose": "Outside vendors on this work order (M17-13)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-13 (the 29 September pass)"
+   },
+   {
+    "operationId": "createVendorServiceRequest",
+    "contract": "maintenance",
+    "purpose": "Engage an outside vendor (M17-13)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-13 (the 29 September pass)",
+    "invalidates": [
+     "listVendorServiceRequests"
+    ]
+   },
+   {
+    "operationId": "updateVendorServiceRequest",
+    "contract": "maintenance",
+    "purpose": "Move a vendor request along (M17-13)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-13 (the 29 September pass)",
+    "invalidates": [
+     "listVendorServiceRequests"
+    ]
+   },
    {
     "operationId": "listWorkOrders",
     "contract": "maintenance",
@@ -790,6 +945,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "params": [
     {
      "name": "workOrderId",
+     "from": "navigation"
+    },
+    {
+     "name": "vendorServiceRequestId",
      "from": "navigation"
     }
    ]
@@ -1035,6 +1194,41 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "impliedBy": "recordWorkOrderParts"
       }
      ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Parts reserved for this work order",
+       "bindsTo": "InventoryStockReservation",
+       "columns": [
+        "InventoryStockReservation.itemId",
+        "InventoryStockReservation.locationId",
+        "InventoryStockReservation.quantity",
+        "InventoryStockReservation.status",
+        "InventoryStockReservation.expiresAt"
+       ],
+       "operation": "listStockReservations",
+       "notes": "**Reserved in the general inventory, not a maintenance stock** (decided 17 September, M17-02). Sends `?sourceType=workOrder&sourceId=` the work order. Recording parts issues from the reservation first.",
+       "provenance": "contract inventory.yaml GET /stock-reservations"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reserve parts",
+       "operation": "createStockReservation",
+       "notes": "Refused when free stock at the location is short, naming the part (M17-02).",
+       "provenance": "contract inventory.yaml POST /stock-reservations"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Release reservation",
+       "operation": "releaseStockReservation",
+       "notes": "Gives unused reserved parts back, e.g. when the job is cancelled.",
+       "provenance": "contract inventory.yaml POST /stock-reservations/{stockReservationId}/release"
+      }
+     ]
     }
    ]
   },
@@ -1046,6 +1240,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "listStockReservations",
+    "contract": "inventory",
+    "purpose": "Parts reserved for the work order (M17-02)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-02 (the 29 September pass)"
+   },
+   {
+    "operationId": "createStockReservation",
+    "contract": "inventory",
+    "purpose": "Reserve parts for the work order (M17-02)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-02 (the 29 September pass)",
+    "invalidates": [
+     "listStockReservations"
+    ]
+   },
+   {
+    "operationId": "releaseStockReservation",
+    "contract": "inventory",
+    "purpose": "Give reserved parts back (M17-02)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-02 (the 29 September pass)",
+    "invalidates": [
+     "listStockReservations"
+    ]
+   },
    {
     "operationId": "recordWorkOrderParts",
     "contract": "maintenance",
@@ -1064,6 +1285,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "params": [
     {
      "name": "workOrderId",
+     "from": "navigation"
+    },
+    {
+     "name": "stockReservationId",
      "from": "navigation"
     }
    ]
@@ -1711,6 +1936,44 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "MaintenancePlan",
   "responds": "MaintenancePlan"
  },
+ "createStockReservation": {
+  "method": "POST",
+  "path": "/stock-reservations",
+  "contract": "inventory",
+  "summary": "Reserve stock for a work order or another need",
+  "permission": "PROCUREMENT_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "InventoryStockReservation",
+  "responds": "InventoryStockReservation"
+ },
+ "createVendorServiceRequest": {
+  "method": "POST",
+  "path": "/vendor-service-requests",
+  "contract": "maintenance",
+  "summary": "Engage an outside vendor on a work order",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VendorServiceRequest",
+  "responds": "VendorServiceRequest"
+ },
  "createWorkOrder": {
   "method": "POST",
   "path": "/work-orders",
@@ -1773,6 +2036,21 @@ Method, path, parameters, request and response for every operation these screens
     "name": "withinDays",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -1791,6 +2069,19 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "WorkOrderDetail"
  },
+ "getWorkOrderPriorityPolicy": {
+  "method": "GET",
+  "path": "/work-order-priority-policy",
+  "contract": "maintenance",
+  "summary": "Read how a fault's priority is scored",
+  "permission": "WORK_ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WorkOrderPriorityPolicy"
+ },
  "listMaintenancePlans": {
   "method": "GET",
   "path": "/maintenance-plans",
@@ -1801,6 +2092,79 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listStockReservations": {
+  "method": "GET",
+  "path": "/stock-reservations",
+  "contract": "inventory",
+  "summary": "Soft holds on stock",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "sourceType",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "sourceId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listVendorServiceRequests": {
+  "method": "GET",
+  "path": "/vendor-service-requests",
+  "contract": "maintenance",
+  "summary": "Requests sent to outside vendors",
+  "permission": "WORK_ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "workOrderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "supplierId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -1847,6 +2211,21 @@ Method, path, parameters, request and response for every operation these screens
    },
    {
     "name": "overdueOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
     "in": "query",
     "required": null
    },
@@ -1902,6 +2281,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "WorkOrder"
  },
+ "releaseStockReservation": {
+  "method": "POST",
+  "path": "/stock-reservations/{stockReservationId}/release",
+  "contract": "inventory",
+  "summary": "Give reserved stock back",
+  "permission": "PROCUREMENT_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "InventoryStockReservation"
+ },
  "setAssetStatus": {
   "method": "PUT",
   "path": "/assets/{assetId}/status",
@@ -1920,6 +2318,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "SetAssetStatusRequest",
   "responds": "AssetStatusResult"
+ },
+ "setWorkOrderPriorityPolicy": {
+  "method": "PUT",
+  "path": "/work-order-priority-policy",
+  "contract": "maintenance",
+  "summary": "Set how a fault's priority is scored",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WorkOrderPriorityPolicy",
+  "responds": "WorkOrderPriorityPolicy"
  },
  "startWorkOrder": {
   "method": "POST",
@@ -1959,6 +2376,30 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "SubmitInspectionRequest",
   "responds": "InspectionResult"
  },
+ "suggestWorkOrderAssignee": {
+  "method": "GET",
+  "path": "/work-orders/{workOrderId}/assignee-suggestions",
+  "contract": "maintenance",
+  "summary": "Who should take this work order, ranked",
+  "permission": "WORK_ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "updateMaintenancePlan": {
   "method": "PATCH",
   "path": "/maintenance-plans/{planId}",
@@ -1977,6 +2418,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "MaintenancePlan"
+ },
+ "updateVendorServiceRequest": {
+  "method": "PATCH",
+  "path": "/vendor-service-requests/{vendorServiceRequestId}",
+  "contract": "maintenance",
+  "summary": "Move a vendor request along",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "VendorServiceRequest"
  },
  "updateWorkOrder": {
   "method": "PATCH",
@@ -2154,6 +2614,47 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "low"
   ]
  },
+ "AssetHistoryEntry": {
+  "x-ticvai-persistence": "none — union view over work orders, inspections, incidents and asset status changes",
+  "type": "object",
+  "description": "**Every kind has a source.** `workOrder` is a work-order row, `inspection` an inspection, `incident` an incident, `statusChange` a `maintenance.asset_status_change` row. `partReplaced` is a completed work order whose `resolutionCode` is `partReplaced`, and `planCompleted` a completed work order with a `sourcePlanId` — both read from `maintenance.work_order`, not stored twice.\n",
+  "required": [
+   "kind",
+   "occurredAt",
+   "summary"
+  ],
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "workOrder",
+     "inspection",
+     "incident",
+     "statusChange",
+     "partReplaced",
+     "planCompleted"
+    ]
+   },
+   "referenceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The source row's id: a work order, inspection or incident, or an `asset_status_change` id. A uuid, as every id is (ADR-0056).\n"
+   },
+   "summary": {
+    "type": "string"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "AssetStatus": {
   "type": "string",
   "enum": [
@@ -2195,7 +2696,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "workOrderId": {
       "type": "string",
-      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "format": "uuid",
       "nullable": true
      }
     }
@@ -2209,13 +2710,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "id",
    "title",
    "venueId",
-   "priority",
    "recordedAt"
   ],
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "title": {
     "type": "string",
@@ -2246,7 +2746,23 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "default": "corrective"
    },
    "priority": {
-    "$ref": "#/components/schemas/WorkOrderPriority"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/WorkOrderPriority"
+     }
+    ],
+    "description": "**Optional since 29 September** (M17-01). Sent, it is `manual` and wins. Absent, the asset's `priorityOverride` applies, and failing that the venue's `WorkOrderPriorityPolicy` scores the fault.\n"
+   },
+   "faultAssessment": {
+    "$ref": "#/components/schemas/WorkOrderFaultAssessment"
+   },
+   "requiredQualificationCodes": {
+    "type": "array",
+    "maxItems": 10,
+    "items": {
+     "type": "string"
+    },
+    "description": "Skills the job needs, as qualification codes; `suggestWorkOrderAssignee` ranks by them (M17-13)."
    },
    "categoryId": {
     "type": "string",
@@ -2326,7 +2842,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "workOrderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    }
   }
@@ -2345,7 +2861,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "templateId": {
     "type": "string",
@@ -2413,7 +2929,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "inspectionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "templateItemId": {
     "type": "string",
@@ -2493,7 +3009,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "type": "array",
       "items": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+       "format": "uuid"
       }
      },
      "productsSuspended": {
@@ -2509,6 +3025,71 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "nullable": true
      }
     }
+   }
+  }
+ },
+ "InventoryStockReservation": {
+  "type": "object",
+  "x-ticvai-persistence": "inventory.stock_reservation",
+  "description": "**Taken from the backend workbook, 20 September.** Temporarily reserves stock for an order or operational requirement so it cannot be allocated elsewhere.",
+  "required": [
+   "itemId",
+   "locationId",
+   "quantity",
+   "sourceType",
+   "sourceId",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "itemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "quantity": {
+    "type": "number",
+    "exclusiveMinimum": 0
+   },
+   "sourceType": {
+    "$ref": "#/components/schemas/StockReservationSourceType"
+   },
+   "sourceId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The id of what the stock is reserved for: a work order, a rental agreement or an order. A uuid, as every id is (ADR-0056); it was text from 29 September to 30 September because a work order id was then 26-character text (M17-02)."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "consumed",
+     "released",
+     "expired"
+    ],
+    "readOnly": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "releasedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
    }
   }
  },
@@ -2602,6 +3183,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -2653,7 +3263,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "inspectionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "Required for return to service where the asset demands it."
    },
@@ -2666,6 +3276,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "date-time"
    }
   }
+ },
+ "StockReservationSourceType": {
+  "type": "string",
+  "enum": [
+   "workOrder",
+   "rentalAgreement",
+   "order",
+   "transfer",
+   "other"
+  ],
+  "description": "What a stock reservation is for (decided 17 September, M17-02; `rentalAgreement` is the existing use from `rental.agreement_item`)."
  },
  "SubmitInspectionRequest": {
   "x-ticvai-persistence": "maintenance.inspection + maintenance.inspection_item",
@@ -2680,7 +3301,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "templateId": {
     "type": "string",
@@ -2734,6 +3355,97 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "date-time"
    }
   }
+ },
+ "VendorServiceRequest": {
+  "x-ticvai-persistence": "maintenance.vendor_service_request",
+  "type": "object",
+  "description": "**An outside vendor engaged on a work order** (decided 17 September, M17-13). The supplier is an `inventory.supplier`.\n",
+  "required": [
+   "workOrderId",
+   "supplierId",
+   "scope"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "workOrderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "supplierId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scope": {
+    "type": "string",
+    "maxLength": 2000,
+    "description": "What the vendor is asked to do."
+   },
+   "status": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/VendorServiceRequestStatus"
+     }
+    ],
+    "default": "draft"
+   },
+   "vendorReference": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "quotedCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "finalCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "scheduledVisitAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "raisedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   }
+  }
+ },
+ "VendorServiceRequestStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "sent",
+   "accepted",
+   "scheduled",
+   "completed",
+   "cancelled"
+  ]
  },
  "WorkOrder": {
   "x-ticvai-persistence": "maintenance.work_order",
@@ -2791,7 +3503,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "workOrderNumber": {
     "type": "string",
@@ -2822,6 +3534,34 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "priority": {
     "$ref": "#/components/schemas/WorkOrderPriority"
+   },
+   "priorityScore": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The score the venue's policy gave the fault when raised; null when a person or the asset set the priority (M17-01)."
+   },
+   "prioritySource": {
+    "type": "string",
+    "enum": [
+     "scored",
+     "assetOverride",
+     "manual"
+    ],
+    "readOnly": true,
+    "description": "Where `priority` came from (M17-01). A change through `updateWorkOrder` makes it `manual`."
+   },
+   "faultAssessment": {
+    "$ref": "#/components/schemas/WorkOrderFaultAssessment"
+   },
+   "requiredQualificationCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Skills the job needs (M17-13)."
    },
    "kind": {
     "$ref": "#/components/schemas/WorkOrderKind"
@@ -2881,12 +3621,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "sourceInspectionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "sourceIncidentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "createdAt": {
@@ -2909,6 +3649,43 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "WorkOrderAssigneeSuggestion": {
+  "x-ticvai-persistence": "none — computed on read",
+  "type": "object",
+  "required": [
+   "principalId",
+   "rank"
+  ],
+  "properties": {
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "rank": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "hasAllQualifications": {
+    "type": "boolean"
+   },
+   "missingQualificationCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "onShift": {
+    "type": "boolean",
+    "description": "On shift now or before the work order is due."
+   },
+   "openWorkOrderCount": {
+    "type": "integer"
+   }
+  }
+ },
  "WorkOrderAttachment": {
   "type": "object",
   "x-ticvai-persistence": "maintenance.work_order_attachment",
@@ -2925,7 +3702,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "workOrderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "kind": {
     "type": "string",
@@ -3036,6 +3813,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
         "quantity": {
          "type": "number"
         },
+        "reservedQuantity": {
+         "type": "number",
+         "description": "Still reserved for this work order and not yet issued (M17-02)."
+        },
         "cost": {
          "$ref": "../shared/common.yaml#/components/schemas/Money"
         }
@@ -3108,7 +3889,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "supersededByWorkOrderId": {
       "type": "string",
-      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "format": "uuid",
       "nullable": true,
       "description": "Set by `cancelWorkOrder` where the reason is `superseded`."
      },
@@ -3135,7 +3916,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "duplicateOfWorkOrderId": {
       "type": "string",
-      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "format": "uuid",
       "nullable": true,
       "description": "Set by `closeWorkOrder` where the outcome is `duplicate`."
      },
@@ -3152,6 +3933,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     }
    }
   ]
+ },
+ "WorkOrderFaultAssessment": {
+  "x-ticvai-persistence": "none — columns on maintenance.work_order",
+  "type": "object",
+  "description": "What the person raising a fault says about it, which the priority score reads (M17-01).",
+  "properties": {
+   "safetyRisk": {
+    "type": "boolean",
+    "default": false
+   },
+   "guestImpact": {
+    "type": "string",
+    "enum": [
+     "none",
+     "degraded",
+     "closed"
+    ],
+    "default": "none"
+   }
+  }
  },
  "WorkOrderKind": {
   "type": "string",
@@ -3172,6 +3973,92 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "urgent",
    "emergency"
   ]
+ },
+ "WorkOrderPriorityPolicy": {
+  "x-ticvai-persistence": "maintenance.priority_scoring_model",
+  "type": "object",
+  "description": "**How a corrective fault's priority is scored** (decided 17 September, M17-01). One per venue. The score is 0 to 100: each weight times its factor, where safety is the fault's `faultAssessment.safetyRisk`, guest operations is `faultAssessment.guestImpact` (and whether the asset has a linked access point), revenue is whether the asset has linked products, and criticality is the asset's `criticality`. The band the score falls in is the priority. **An asset's `priorityOverride` wins over the score**, and a priority a person sets wins over both.\n",
+  "required": [
+   "weights",
+   "bands"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "weights": {
+    "type": "object",
+    "required": [
+     "safety",
+     "guestOperations",
+     "revenue",
+     "criticality"
+    ],
+    "properties": {
+     "safety": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "guestOperations": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "revenue": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "criticality": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     }
+    }
+   },
+   "bands": {
+    "type": "array",
+    "minItems": 1,
+    "maxItems": 5,
+    "description": "Highest first. A score at or above `minScore` takes `priority`.",
+    "items": {
+     "type": "object",
+     "required": [
+      "minScore",
+      "priority"
+     ],
+     "properties": {
+      "minScore": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 100
+      },
+      "priority": {
+       "$ref": "#/components/schemas/WorkOrderPriority"
+      }
+     }
+    }
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "nullable": true
+   }
+  }
  },
  "WorkOrderStatus": {
   "type": "string",

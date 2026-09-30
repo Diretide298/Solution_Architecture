@@ -2682,7 +2682,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: getResourceHold
       x-ticvai-consumed-by:
@@ -2752,7 +2752,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: extendResourceHold
       x-ticvai-consumed-by:
@@ -2982,7 +2982,7 @@ paths:
         raised `open` and answered by the resource manager; it changes no booking by itself (a replacement
         is a new `bookResource`, a maintenance request is a `maintenance` work order raised from it).
 
-        The client sends the `id` (a ULID) so a request raised offline on a device is not duplicated on
+        The client sends the `id` (a UUIDv7) so a request raised offline on a device is not duplicated on
         sync; the same `id` again returns the existing request. `bookingId` or `resourceId` is required
         except for `scheduleClarification` and `other`.
 
@@ -3312,8 +3312,8 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: Client-generated ULID, so a request raised offline is not duplicated on sync.
+          format: uuid
+          description: Client-generated UUIDv7, so a request raised offline is not duplicated on sync.
         kind:
           $ref: '#/components/schemas/ResourceRequestKind'
         bookingId:
@@ -3349,7 +3349,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         kind:
           $ref: '#/components/schemas/ResourceRequestKind'
         bookingId:
@@ -3625,8 +3625,8 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: Client-generated ULID, as a seat hold's.
+          format: uuid
+          description: Client-generated UUIDv7, as a seat hold's.
         mapId:
           type: string
           format: uuid
@@ -3680,7 +3680,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         mapId:
           type: string
           format: uuid
@@ -4707,7 +4707,7 @@ components:
           $ref: '#/components/schemas/ResourceBookingStatus'
         holdId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: 'The `ResourceHold` this booking was converted from, where a guest picked the
             resource on a venue map (rev 3 REV3-15). Null for a staff booking or an allocation.

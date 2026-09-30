@@ -1,6 +1,6 @@
 # WS135 — Marketing CRM Configuration Reference v1.0 board 1
 
-**10 screens · 19 operations · 22 schemas · 8 permissions**
+**10 screens · 21 operations · 28 schemas · 8 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -65,7 +65,7 @@ convincingly. It is never a caption.
 | `BO-736` | Guest Master Configuration | listDetail | 3 | 0 | — |
 | `BO-737` | Customer 360 Profile | listDetail | 2 | 0 | — |
 | `BO-738` | Activity Timeline | listDetail | 3 | 0 | — |
-| `BO-739` | Contact & Preferences | listDetail | 1 | 0 | — |
+| `BO-739` | Contact & Preferences | listDetail | 3 | 0 | — |
 | `BO-740` | Family & Guardians | listDetail | 2 | 0 | — |
 | `BO-741` | Corporate & Groups | listDetail | 2 | 0 | — |
 | `BO-742` | Commerce & Documents | listDetail | 1 | 0 | — |
@@ -73,4 +73,4 @@ convincingly. It is never a caption.
 
 ## Thin screens in this batch
 
-**BO-734, BO-736, BO-737, BO-738, BO-739, BO-740, BO-741, BO-742, BO-743 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-734, BO-736, BO-737, BO-738, BO-740, BO-741, BO-742, BO-743 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

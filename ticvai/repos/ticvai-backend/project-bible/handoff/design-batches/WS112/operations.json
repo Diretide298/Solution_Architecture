@@ -19,7 +19,7 @@
   "summary": "Who this change would affect, and how",
   "permission": "ACCREDITATION_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -38,7 +38,7 @@
   "summary": "Define which zones, on which dates, at which times",
   "permission": "ACCREDITATION_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -57,7 +57,7 @@
   "summary": "Suspend, reactivate, revoke or expire an accreditation",
   "permission": "ACCREDITATION_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -76,7 +76,7 @@
   "summary": "Assign profiles, and any exception on top",
   "permission": "ACCREDITATION_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {

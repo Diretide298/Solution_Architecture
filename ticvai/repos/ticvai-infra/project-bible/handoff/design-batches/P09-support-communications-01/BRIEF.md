@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 4 permissions apply here:
   `ANNOUNCEMENT_PUBLISH, PLATFORM_RELEASE_MANAGE, PLATFORM_RELEASE_VIEW, WORKFORCE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **1 of these operations work offline**: listAnnouncements
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,5 +60,5 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-035` | Support & Escalation Console | listDetail | 2 | 0 | — |
-| `ADM-036` | Platform Notification Broadcast | listDetail | 4 | 0 | — |
+| `ADM-035` | Support & Escalation Console | listDetail | 2 | 1 | — |
+| `ADM-036` | Platform Notification Broadcast | listDetail | 4 | 2 | — |

@@ -167,7 +167,7 @@ CREATE TABLE IF NOT EXISTS promotions.coupon_code (
     valid_from                        timestamptz,
     valid_to                          timestamptz,
     redeemed_at                       timestamptz,
-    redeemed_order_id                 text,
+    redeemed_order_id                 uuid,
     scope_path                        ltree NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
 );
@@ -381,7 +381,7 @@ CREATE TABLE IF NOT EXISTS promotions.recommendation_outcome (
     recommendation_id                 uuid NOT NULL,
     outcome                           text NOT NULL CONSTRAINT recommendation_outcome_outcome_chk CHECK (outcome IN ('shown', 'clicked', 'accepted', 'dismissed', 'expired')),
     at                                timestamptz,
-    order_id                          text,
+    order_id                          uuid,
     attributed_gross_amount           numeric(18,4),
     is_holdout                        boolean DEFAULT false,
     scope_path                        ltree NOT NULL,

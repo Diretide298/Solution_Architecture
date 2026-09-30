@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS pii.subject (
     preferred_language                char(2),
     is_erased                         boolean NOT NULL,
     erased_at                         timestamptz,
-    erasure_request_id                char(26),
+    erasure_request_id                uuid,
     created_at                        timestamptz NOT NULL,
     updated_at                        timestamptz NOT NULL
 );
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS pii.subject (
 CREATE TABLE IF NOT EXISTS pii.subject_biometric (
     id                                uuid PRIMARY KEY NOT NULL,
     subject_id                        uuid NOT NULL,
-    entitlement_id                    text NOT NULL,
+    entitlement_id                    uuid NOT NULL,
     kind                              text NOT NULL CONSTRAINT subject_biometric_kind_chk CHECK (kind IN ('facePass', 'faceTag')),
     retention_anchor                  text,
     source                            text NOT NULL CONSTRAINT subject_biometric_source_chk CHECK (source IN ('guestApp', 'ticketCounter', 'annualPassCounter', 'entryGate')),

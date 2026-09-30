@@ -1,6 +1,6 @@
 # WS85 — Game and Ride board 8
 
-**9 screens · 7 operations · 8 schemas · 4 permissions**
+**9 screens · 7 operations · 10 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -1684,6 +1684,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -2211,6 +2216,78 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ]
    }
   }
+ },
+ "WalletTransaction": {
+  "x-ticvai-persistence": "wallet.wallet_transaction",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "amount",
+   "balanceAfter",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "walletId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "wallet.wallet",
+    "description": "The wallet this movement is on (SD-027, 29 September). A shared wallet has many subjects, so the subject alone cannot say which balance moved."
+   },
+   "walletHoldId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "wallet.hold",
+    "description": "The hold a spend settled, where it came through `holdWalletFunds`."
+   },
+   "kind": {
+    "$ref": "#/components/schemas/WalletTransactionKind"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "balanceAfter": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "orderId": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "WalletTransactionKind": {
+  "type": "string",
+  "enum": [
+   "topUp",
+   "spend",
+   "refund",
+   "adjustment",
+   "bonus",
+   "expiry",
+   "transfer"
+  ]
  }
 }
 ```

@@ -18,6 +18,44 @@
   "requestBody": null,
   "responds": "CrossRegionEntitlement"
  },
+ "createMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge",
+  "contract": "identity",
+  "summary": "Second factor at staff sign-in, and step-up for a sensitive action",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "endPodiumShift": {
+  "method": "POST",
+  "path": "/podium-shifts/{shiftId}/end",
+  "contract": "access",
+  "summary": "End an operator shift on a podium",
+  "permission": "TURNSTILE_MODE_SET",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessPodiumShift"
+ },
  "getAccessPoint": {
   "method": "GET",
   "path": "/access-points/{accessPointId}",
@@ -70,19 +108,6 @@
   "requestBody": null,
   "responds": "Shift"
  },
- "getGuestSession": {
-  "method": "GET",
-  "path": "/auth/guest/session",
-  "contract": "identity",
-  "summary": "Read the current guest session",
-  "permission": null,
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "GuestSession"
- },
  "getOfflinePackage": {
   "method": "GET",
   "path": "/access/offline-package",
@@ -93,6 +118,16 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "workstation",
   "parameters": [
+   {
+    "name": "sinceVersion",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "validFrom",
     "in": "query",
@@ -256,6 +291,16 @@
     "required": null
    },
    {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "resolved",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -388,6 +433,25 @@
   "requestBody": null,
   "responds": "AccessPoint"
  },
+ "startPodiumShift": {
+  "method": "POST",
+  "path": "/podiums/{podiumId}/shifts",
+  "contract": "access",
+  "summary": "Start an operator shift on a podium",
+  "permission": "TURNSTILE_MODE_SET",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessPodiumShift"
+ },
  "syncOrders": {
   "method": "POST",
   "path": "/sync/orders",
@@ -397,7 +461,13 @@
   "offlineCapable": false,
   "conflictPolicy": "append",
   "scopeLevel": "workstation",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "OrderSyncResult"
  },
@@ -410,7 +480,13 @@
   "offlineCapable": false,
   "conflictPolicy": "append",
   "scopeLevel": "workstation",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ScanSyncResult"
  },
@@ -451,5 +527,48 @@
   ],
   "requestBody": null,
   "responds": "ValidationResult"
+ },
+ "verifyAccreditationCredential": {
+  "method": "GET",
+  "path": "/accreditation-credentials/verify",
+  "contract": "accreditation",
+  "summary": "Who holds this credential, and where may they go",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "identifier",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "zoneId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationCredentialVerification"
+ },
+ "verifyMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge/{challengeId}/verify",
+  "contract": "identity",
+  "summary": "Complete a sign-in or step-up challenge",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  }
 }

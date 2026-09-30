@@ -1,6 +1,6 @@
 # WS13 — Approval Workflows and Governance board 1
 
-**10 screens · 8 operations · 10 schemas · 3 permissions**
+**10 screens · 9 operations · 16 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -63,9 +63,9 @@ convincingly. It is never a caption.
 | `BO-364` | Approval Command Center Dashboard | listDetail | 2 | 0 | — |
 | `BO-365` | My Approval Inbox | listDetail | 1 | 0 | — |
 | `BO-366` | Team / Shared Approval Queue | listDetail | 1 | 0 | — |
-| `BO-367` | Approval Request Detail | listDetail | 2 | 0 | — |
-| `BO-368` | AI Decision Support | listDetail | 1 | 0 | — |
-| `BO-369` | High Priority & Risk Queue | listDetail | 1 | 0 | — |
+| `BO-367` | Approval Request Detail | listDetail | 3 | 0 | — |
+| `BO-368` | AI Decision Support | listDetail | 2 | 0 | — |
+| `BO-369` | High Priority & Risk Queue | listDetail | 2 | 0 | — |
 | `BO-370` | Escalated Approval Center | listDetail | 2 | 0 | — |
 | `BO-371` | Completed Approval History | listDetail | 1 | 0 | — |
 | `BO-372` | Approval SLA & Workload Monitor | commandCentre | 2 | 0 | — |
@@ -142,7 +142,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-367",
      "trigger": "Approval Request Detail",
-     "provenance": "structural — pack board 1 wiring, 9 September 2026"
+     "provenance": "structural — pack board 1 wiring, 9 September 2026",
+     "carries": [
+      "approvalRequestId"
+     ]
     },
     {
      "to": "BO-368",
@@ -152,7 +155,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-369",
      "trigger": "High Priority & Risk Queue",
-     "provenance": "structural — pack board 1 wiring, 9 September 2026"
+     "provenance": "structural — pack board 1 wiring, 9 September 2026",
+     "carries": [
+      "approvalRequestId"
+     ]
     },
     {
      "to": "BO-370",
@@ -692,6 +698,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "getApprovalRecord",
      "getApprovalAnalytics"
     ]
+   },
+   {
+    "operationId": "getApprovalRequestScore",
+    "contract": "ai",
+    "purpose": "Risk band, priority and suggested escalation for the request, as context only (no approve/reject suggestion)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -704,6 +717,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "params": [
     {
      "name": "requestId",
+     "from": "navigation"
+    },
+    {
+     "name": "approvalRequestId",
      "from": "navigation"
     }
    ]
@@ -818,6 +835,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "What the rules say",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listApprovalRequests",
+    "contract": "approvals",
+    "purpose": "Requests with their AI context (aiAssessment: risk, priority, escalation suggestion) for the reviewer; context only",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -910,6 +934,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "derived": true,
        "impliedBy": "listApprovalRequests",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getApprovalRequestScore",
+       "notes": "One record, read-only."
       }
      ]
     }
@@ -929,6 +959,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "High priority and risk",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getApprovalRequestScore",
+    "contract": "ai",
+    "purpose": "Risk band, priority and suggested escalation for the request, as context only (no approve/reject suggestion)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -937,6 +974,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS30 Approval Workflows and Governance Board 1.dc.html#bo-369"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 0 of 5 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "approvalRequestId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1583,6 +1628,19 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "ApprovalAnalytics"
  },
+ "getApprovalRequestScore": {
+  "method": "GET",
+  "path": "/approval-requests/{approvalRequestId}/score",
+  "contract": "ai",
+  "summary": "The latest context score of an approval request",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiApprovalRequestScore"
+ },
  "listApprovalRequests": {
   "method": "GET",
   "path": "/approval-requests",
@@ -1615,6 +1673,11 @@ Method, path, parameters, request and response for every operation these screens
    },
    {
     "name": "breachingWithinMinutes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "sort",
     "in": "query",
     "required": null
    },
@@ -1732,6 +1795,118 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AiApprovalRequestScore": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.approval_request_score",
+  "description": "**Context for an approval reviewer** (11.1.73..75): risk, priority and a suggested escalation for one pending request, the latest per request. **There is no approve or reject field, by design** (minutes of 8 September: AI in approvals never recommends or influences approve or reject).",
+  "required": [
+   "approvalRequestId",
+   "riskScore",
+   "riskBand",
+   "priorityScore",
+   "escalationSuggestion"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "approvals.request"
+   },
+   "trigger": {
+    "type": "string",
+    "enum": [
+     "submitted",
+     "resubmitted",
+     "slaTick",
+     "escalated"
+    ]
+   },
+   "riskScore": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100
+   },
+   "riskBand": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
+    "description": "Design 5.6: a risk score and band, never a probability."
+   },
+   "priorityScore": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "description": "For ordering work in an inbox; higher first."
+   },
+   "escalationSuggestion": {
+    "type": "object",
+    "required": [
+     "action"
+    ],
+    "properties": {
+     "action": {
+      "type": "string",
+      "enum": [
+       "escalate",
+       "addBackupApprover",
+       "none"
+      ]
+     },
+     "reason": {
+      "type": "string",
+      "nullable": true
+     }
+    },
+    "description": "A suggestion for an SLA problem, carried out if at all by a person or the tenant's SLA policy."
+   },
+   "signals": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "description": "e.g. `amountAboveRequesterNorm`, `requesterEntityRisk`, `outOfHours`, `irreversibleAction`, `slaDueSoon`, `stepBreachRate`, `approverUnavailable`."
+      },
+      "contribution": {
+       "type": "number"
+      },
+      "detail": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "basis": {
+    "$ref": "#/components/schemas/SuggestionBasis"
+   },
+   "decisionRecordId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scoredAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
  "ApprovalAnalytics": {
   "type": "object",
   "x-ticvai-persistence": "none — aggregated from approvals.request",
@@ -2051,6 +2226,84 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "aiAssessment": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.",
+    "properties": {
+     "riskScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "riskBand": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high",
+       "critical"
+      ]
+     },
+     "priorityScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "escalationSuggestion": {
+      "type": "object",
+      "description": "A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.",
+      "properties": {
+       "action": {
+        "type": "string",
+        "enum": [
+         "escalate",
+         "addBackupApprover",
+         "none"
+        ]
+       },
+       "reason": {
+        "type": "string",
+        "nullable": true
+       }
+      }
+     },
+     "signals": {
+      "type": "array",
+      "maxItems": 10,
+      "description": "The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.",
+      "items": {
+       "type": "object",
+       "properties": {
+        "code": {
+         "type": "string"
+        },
+        "contribution": {
+         "type": "number"
+        },
+        "detail": {
+         "type": "string",
+         "nullable": true
+        }
+       }
+      }
+     },
+     "scoreId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."
+     },
+     "decisionRecordId": {
+      "type": "string",
+      "description": "The ai decision record, for the audit of what the AI said and why."
+     },
+     "assessedAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
    }
   }
  },
@@ -2142,7 +2395,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "riskScoreAbove": {
     "type": "number",
     "nullable": true,
-    "description": "11.1.12. **Nothing supplies this yet** — risk scoring is parked with the model-dependent AI. The field exists so adding the engine later is configuration rather than a schema change.\n"
+    "description": "11.1.12. **Not matched against the AI risk score** (29 September, build pass, group G2). The AI assessment on a request (`ApprovalRequest.aiAssessment`, from `ai.scoreApprovalRequest`) is context for the reviewer only (MoM 8 September: AI never influences approve or reject), and routing a request to more approvers because of it would be influence. A rule with this set matches only a `riskScore` the requesting contract passes in `attributes` from its own deterministic rules (a payment's rule score, for example). Using the AI score here needs the client to say so.\n"
    },
    "condition": {
     "type": "string",
@@ -2205,6 +2458,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "nullable": true,
     "description": "11.1.53. An unanswered request eventually stops waiting."
+   },
+   "externalProviderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "11.1.65 (29 September). **This level is decided in an external workflow system** (`ApprovalExternalProvider`) rather than by a person in TICVAI. `approverRoleIds` stay required: they are who decides if the provider does not answer in time and its `onTimeout` is `fallBackToRoles`.\n"
    }
   }
  },
@@ -2223,6 +2482,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "cancelled"
   ]
  },
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -2239,6 +2527,114 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "hasMore": {
     "type": "boolean"
+   }
+  }
+ },
+ "SlaEscalationBottleneckMonitorView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over approvals.workflow_instance, whose SLA and reminder timestamps it lists (data model for the agreed operations, 29 September)",
+  "description": "**What SLA, Escalation & Bottleneck Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "workflow": {
+    "type": "string",
+    "description": "Workflow"
+   },
+   "instance": {
+    "type": "string",
+    "description": "Instance"
+   },
+   "currentStep": {
+    "type": "string",
+    "description": "Current Step"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "started": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Started"
+   },
+   "target": {
+    "type": "string",
+    "format": "date-time",
+    "description": "SLA deadline"
+   },
+   "timeRemaining": {
+    "type": "integer",
+    "description": "Minutes until breach; negative once breached"
+   },
+   "risk": {
+    "type": "string",
+    "description": "Risk"
+   },
+   "escalationLevel": {
+    "type": "string",
+    "description": "Escalation Level"
+   },
+   "firstReminder": {
+    "type": "string",
+    "format": "date-time",
+    "description": "First Reminder"
+   },
+   "secondReminder": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Second Reminder"
+   },
+   "managerEscalation": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Manager Escalation"
+   },
+   "executiveEscalation": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Executive Escalation"
+   },
+   "finalOutcome": {
+    "type": "string",
+    "description": "Final Outcome"
+   }
+  },
+  "required": [
+   "instance"
+  ]
+ },
+ "SlaEscalationBottleneckMonitorViewSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none - aggregate computed at read time over the rows the page lists",
+  "description": "The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).",
+  "properties": {
+   "withinSla": {
+    "type": "integer",
+    "description": "Within SLA"
+   },
+   "atRisk": {
+    "type": "integer",
+    "description": "At Risk"
+   },
+   "breached": {
+    "type": "integer",
+    "description": "Breached"
+   },
+   "escalated": {
+    "type": "integer",
+    "description": "Escalated"
+   },
+   "averageProcessingTime": {
+    "type": "integer",
+    "description": "Minutes"
+   },
+   "averageApprovalTime": {
+    "type": "integer",
+    "description": "Minutes"
+   },
+   "longestWaitingStep": {
+    "type": "string",
+    "description": "Longest Waiting Step"
    }
   }
  },
@@ -2333,6 +2729,157 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   },
   "required": [
    "code"
+  ]
+ },
+ "SuggestionBasis": {
+  "type": "string",
+  "description": "**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n",
+  "enum": [
+   "heuristic",
+   "statistical",
+   "model",
+   "hybrid",
+   "manual"
+  ]
+ },
+ "WorkflowInstanceMonitorProcessTimelineView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over approvals.workflow_instance and approvals.workflow_step_execution (data model for the agreed operations, 29 September)",
+  "description": "**What Workflow Instance Monitor & Process Timeline displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "workflowInstance": {
+    "type": "string",
+    "description": "Workflow Instance"
+   },
+   "workflowName": {
+    "type": "string",
+    "description": "Workflow Name"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version"
+   },
+   "sourceModule": {
+    "type": "string",
+    "description": "Source Module"
+   },
+   "businessObject": {
+    "type": "string",
+    "description": "Business Object"
+   },
+   "initiatedBy": {
+    "type": "string",
+    "description": "Initiated By"
+   },
+   "startTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Start Time"
+   },
+   "currentStatus": {
+    "type": "string",
+    "enum": [
+     "running",
+     "waitingApproval",
+     "waitingTask",
+     "waitingSystem",
+     "escalated",
+     "failed",
+     "completed",
+     "cancelled"
+    ],
+    "description": "Current Status"
+   },
+   "currentStep": {
+    "type": "string",
+    "description": "Current Step"
+   },
+   "sla": {
+    "type": "string",
+    "description": "SLA"
+   },
+   "step": {
+    "type": "string",
+    "description": "Step"
+   },
+   "type": {
+    "type": "string",
+    "description": "Type"
+   },
+   "started": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Started"
+   },
+   "completed": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Completed"
+   },
+   "assignedTo": {
+    "type": "string",
+    "description": "Assigned To"
+   },
+   "input": {
+    "type": "string",
+    "description": "Input"
+   },
+   "output": {
+    "type": "string",
+    "description": "Output"
+   },
+   "decision": {
+    "type": "string",
+    "description": "Decision"
+   },
+   "duration": {
+    "type": "integer",
+    "description": "Seconds"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status"
+   },
+   "ruleEvaluations": {
+    "type": "integer",
+    "description": "Rule evaluations"
+   },
+   "assignments": {
+    "type": "integer",
+    "description": "Assignments"
+   },
+   "approvals": {
+    "type": "integer",
+    "description": "Approvals"
+   },
+   "rejections": {
+    "type": "integer",
+    "description": "Rejections"
+   },
+   "escalations": {
+    "type": "integer",
+    "description": "Escalations"
+   },
+   "notifications": {
+    "type": "integer",
+    "description": "Notifications"
+   },
+   "apiCalls": {
+    "type": "integer",
+    "description": "API calls"
+   },
+   "systemActions": {
+    "type": "integer",
+    "description": "System actions"
+   },
+   "errors": {
+    "type": "integer",
+    "description": "Errors"
+   }
+  },
+  "required": [
+   "workflowInstance"
   ]
  }
 }

@@ -1,6 +1,6 @@
 # P09-infrastructure-resilienc-01 — P09 · Infrastructure & Resilience
 
-**4 screens · 11 operations · 10 schemas · 2 permissions**
+**4 screens · 11 operations · 11 schemas · 2 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 2 permissions apply here:
   `PLATFORM_CELL_MANAGE, PLATFORM_CELL_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,10 +60,10 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-014` | Auto-Scaling Configuration | listDetail | 8 | 1 | — |
-| `ADM-030` | Infrastructure Sizing & Scaling Policy | listDetail | 9 | 1 | — |
-| `ADM-033` | Backup & DR Status | listDetail | 8 | 1 | — |
-| `ADM-034` | Archival Job Monitor | listDetail | 8 | 1 | — |
+| `ADM-014` | Auto-Scaling Configuration | listDetail | 8 | 3 | — |
+| `ADM-030` | Infrastructure Sizing & Scaling Policy | listDetail | 9 | 4 | — |
+| `ADM-033` | Backup & DR Status | listDetail | 8 | 3 | — |
+| `ADM-034` | Archival Job Monitor | listDetail | 8 | 3 | — |
 
 ---
 
@@ -102,27 +101,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-014 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-014 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-003",
      "trigger": "Cross-Tenant Health Dashboard",
      "carries": [
-      "cellId",
-      "rightId"
+      "cellId"
      ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId and ADM-014 holds cellId, so an edge into it carries them"
     }
    ]
   },
@@ -134,13 +126,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listCellJobs` reads the population and `getCellCapacity` reads one of them — list, select, act",
   "purpose": "Change how auto-scaling behaves here, and see which level the current value came from.",
-  "gaps": [
-   {
-    "operation": "getCell",
-    "why": "**3 declared operations reach no component on this screen**: getCell, getCellHealth, getScalingPolicy. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -150,7 +135,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every auto-scaling",
+       "label": "Every cell job",
        "bindsTo": "CellJob",
        "columns": [
         "CellJob.id",
@@ -173,7 +158,80 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected auto-scaling",
+       "label": "The selected cell job",
+       "bindsTo": "CellJob",
+       "columns": [
+        "CellJob.id",
+        "CellJob.kind",
+        "CellJob.status",
+        "CellJob.progressPercent",
+        "CellJob.message",
+        "CellJob.error",
+        "CellJob.scheduledFor",
+        "CellJob.completedAt"
+       ],
+       "operation": "listCellJobs",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/jobs"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cell",
+       "bindsTo": "CellDetail",
+       "columns": [
+        "CellDetail.id",
+        "CellDetail.name",
+        "CellDetail.kind",
+        "CellDetail.clusterId",
+        "CellDetail.isReachable",
+        "CellDetail.lastContactAt",
+        "CellDetail.licenceExpiresAt",
+        "CellDetail.participatesInCrossCell",
+        "CellDetail.regionId",
+        "CellDetail.regionName",
+        "CellDetail.countryCode",
+        "CellDetail.tier",
+        "CellDetail.status",
+        "CellDetail.cloudProvider",
+        "CellDetail.cloudRegion",
+        "CellDetail.apiEndpoint"
+       ],
+       "operation": "getCell",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cell health",
+       "bindsTo": "CellHealth",
+       "columns": [
+        "CellHealth.isHealthy",
+        "CellHealth.isSchemaBehind",
+        "CellHealth.databaseStatus",
+        "CellHealth.replicationLagSeconds",
+        "CellHealth.lastBackupAt",
+        "CellHealth.lastRestoreDrillAt",
+        "CellHealth.checkedAt"
+       ],
+       "operation": "getCellHealth",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/health"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The scaling policy",
+       "bindsTo": "ScalingPolicy",
+       "columns": [
+        "ScalingPolicy.id",
+        "ScalingPolicy.service",
+        "ScalingPolicy.replicaFloor",
+        "ScalingPolicy.replicaCeiling",
+        "ScalingPolicy.targetUtilisationPct",
+        "ScalingPolicy.scaleStepPct"
+       ],
+       "operation": "getScalingPolicy",
+       "provenance": "contract platform-ops.yaml GET /scaling-policies"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cell capacity",
        "bindsTo": "CellCapacity",
        "columns": [
         "CellCapacity.kind",
@@ -195,19 +253,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "destructiveButton",
-       "label": "Cancel",
+       "label": "Cancel decommission",
        "operation": "cancelDecommission",
        "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
       },
       {
        "kind": "secondaryButton",
-       "label": "Decommission",
+       "label": "Decommission cell",
        "operation": "decommissionCell",
        "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save cell tier",
        "operation": "updateCellTier",
        "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
       }
@@ -219,17 +277,52 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmCancelDecommission",
     "component": "confirmDialog",
-    "trigger": "Cancel",
-    "body": "**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather than the verb. A auto-scaling this affects should be identified in the dialog, not just counted.",
+    "trigger": "Cancel decommission",
+    "body": "**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather than the verb. A auto-scaling this affects should be identified in the dialog, not just counted. **Collects what `cancelDecommission` sends before it is called.** Required: `reason`.",
     "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
+   },
+   {
+    "id": "formDecommissionCell",
+    "component": "modal",
+    "trigger": "Decommission cell",
+    "body": "**Collects what `decommissionCell` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Decommission cell",
+     "operation": "decommissionCell"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
+   },
+   {
+    "id": "formUpdateCellTier",
+    "component": "modal",
+    "trigger": "Save cell tier",
+    "body": "**Collects what `updateCellTier` sends before it is called.** Required: `tier`. Optional: `scheduledFor`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save cell tier",
+     "operation": "updateCellTier"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "tier",
+      "scheduledFor"
+     ]
+    },
+    "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
    }
   ],
   "states": {
    "loading": "The auto-scaling list.",
    "error": "Could not load. Names which read failed and leaves the auto-scaling untouched.",
-   "emptyFirstRun": "No auto-scaling yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the auto-scaling are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No auto-scaling yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listCellJobs` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellCapacity` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -299,11 +392,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `cellId`.",
    "preloaded": [
-    "CellCapacity.kind",
-    "CellCapacity.tenantCount",
-    "CellCapacity.isConstrained",
-    "CellCapacity.constrainedDimension",
-    "CellCapacity.dimensions"
+    "CellJob.id",
+    "CellJob.kind",
+    "CellJob.status",
+    "CellJob.progressPercent",
+    "CellJob.message"
    ]
   },
   "wireframe": {
@@ -363,27 +456,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-030 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-030 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-003",
      "trigger": "Cross-Tenant Health Dashboard",
      "carries": [
-      "cellId",
-      "rightId"
+      "cellId"
      ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId and ADM-030 holds cellId, so an edge into it carries them"
     }
    ]
   },
@@ -395,13 +481,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listCellJobs` reads the population and `getCellCapacity` reads one of them — list, select, act",
   "purpose": "See infrastructure sizing & scaling policy for this venue.",
-  "gaps": [
-   {
-    "operation": "getCell",
-    "why": "**3 declared operations reach no component on this screen**: getCell, getCellHealth, getScalingPolicy. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -411,7 +490,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every infrastructure sizing scaling",
+       "label": "Every cell job",
        "bindsTo": "CellJob",
        "columns": [
         "CellJob.id",
@@ -434,7 +513,80 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected infrastructure sizing scaling",
+       "label": "The selected cell job",
+       "bindsTo": "CellJob",
+       "columns": [
+        "CellJob.id",
+        "CellJob.kind",
+        "CellJob.status",
+        "CellJob.progressPercent",
+        "CellJob.message",
+        "CellJob.error",
+        "CellJob.scheduledFor",
+        "CellJob.completedAt"
+       ],
+       "operation": "listCellJobs",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/jobs"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cell",
+       "bindsTo": "CellDetail",
+       "columns": [
+        "CellDetail.id",
+        "CellDetail.name",
+        "CellDetail.kind",
+        "CellDetail.clusterId",
+        "CellDetail.isReachable",
+        "CellDetail.lastContactAt",
+        "CellDetail.licenceExpiresAt",
+        "CellDetail.participatesInCrossCell",
+        "CellDetail.regionId",
+        "CellDetail.regionName",
+        "CellDetail.countryCode",
+        "CellDetail.tier",
+        "CellDetail.status",
+        "CellDetail.cloudProvider",
+        "CellDetail.cloudRegion",
+        "CellDetail.apiEndpoint"
+       ],
+       "operation": "getCell",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cell health",
+       "bindsTo": "CellHealth",
+       "columns": [
+        "CellHealth.isHealthy",
+        "CellHealth.isSchemaBehind",
+        "CellHealth.databaseStatus",
+        "CellHealth.replicationLagSeconds",
+        "CellHealth.lastBackupAt",
+        "CellHealth.lastRestoreDrillAt",
+        "CellHealth.checkedAt"
+       ],
+       "operation": "getCellHealth",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/health"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The scaling policy",
+       "bindsTo": "ScalingPolicy",
+       "columns": [
+        "ScalingPolicy.id",
+        "ScalingPolicy.service",
+        "ScalingPolicy.replicaFloor",
+        "ScalingPolicy.replicaCeiling",
+        "ScalingPolicy.targetUtilisationPct",
+        "ScalingPolicy.scaleStepPct"
+       ],
+       "operation": "getScalingPolicy",
+       "provenance": "contract platform-ops.yaml GET /scaling-policies"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cell capacity",
        "bindsTo": "CellCapacity",
        "columns": [
         "CellCapacity.kind",
@@ -456,25 +608,25 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "destructiveButton",
-       "label": "Cancel",
+       "label": "Cancel decommission",
        "operation": "cancelDecommission",
        "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
       },
       {
        "kind": "secondaryButton",
-       "label": "Decommission",
+       "label": "Decommission cell",
        "operation": "decommissionCell",
        "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save cell tier",
        "operation": "updateCellTier",
        "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save scaling policy",
        "operation": "setScalingPolicy",
        "provenance": "contract platform-ops.yaml PUT /scaling-policies"
       }
@@ -486,17 +638,75 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmCancelDecommission",
     "component": "confirmDialog",
-    "trigger": "Cancel",
-    "body": "**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather than the verb. A infrastructure sizing scaling this affects should be identified in the dialog, not just counted.",
+    "trigger": "Cancel decommission",
+    "body": "**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather than the verb. A infrastructure sizing scaling this affects should be identified in the dialog, not just counted. **Collects what `cancelDecommission` sends before it is called.** Required: `reason`.",
     "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
+   },
+   {
+    "id": "formDecommissionCell",
+    "component": "modal",
+    "trigger": "Decommission cell",
+    "body": "**Collects what `decommissionCell` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Decommission cell",
+     "operation": "decommissionCell"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
+   },
+   {
+    "id": "formUpdateCellTier",
+    "component": "modal",
+    "trigger": "Save cell tier",
+    "body": "**Collects what `updateCellTier` sends before it is called.** Required: `tier`. Optional: `scheduledFor`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save cell tier",
+     "operation": "updateCellTier"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "tier",
+      "scheduledFor"
+     ]
+    },
+    "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
+   },
+   {
+    "id": "formSetScalingPolicy",
+    "component": "modal",
+    "trigger": "Save scaling policy",
+    "body": "**Collects what `setScalingPolicy` sends before it is called.** Required: `id`. Optional: `service`, `replicaFloor`, `replicaCeiling`, `targetUtilisationPct`, `scaleStepPct`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ScalingPolicy",
+    "confirm": {
+     "label": "Save scaling policy",
+     "operation": "setScalingPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "service",
+      "replicaFloor",
+      "replicaCeiling",
+      "targetUtilisationPct",
+      "scaleStepPct"
+     ]
+    },
+    "provenance": "contract platform-ops.yaml PUT /scaling-policies"
    }
   ],
   "states": {
    "loading": "The infrastructure sizing scaling list.",
    "error": "Could not load. Names which read failed and leaves the infrastructure sizing scaling untouched.",
-   "emptyFirstRun": "No infrastructure sizing scaling yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the infrastructure sizing scaling are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No infrastructure sizing scaling yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listCellJobs` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellCapacity` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -575,11 +785,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `cellId`.",
    "preloaded": [
-    "CellCapacity.kind",
-    "CellCapacity.tenantCount",
-    "CellCapacity.isConstrained",
-    "CellCapacity.constrainedDimension",
-    "CellCapacity.dimensions"
+    "CellJob.id",
+    "CellJob.kind",
+    "CellJob.status",
+    "CellJob.progressPercent",
+    "CellJob.message"
    ]
   },
   "wireframe": {
@@ -639,27 +849,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-033 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-033 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-003",
      "trigger": "Cross-Tenant Health Dashboard",
      "carries": [
-      "cellId",
-      "rightId"
+      "cellId"
      ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId and ADM-033 holds cellId, so an edge into it carries them"
     }
    ]
   },
@@ -668,13 +871,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listCellJobs` reads the population and `getCellHealth` reads one of them — list, select, act",
   "purpose": "See backup & dr status for this venue.",
-  "gaps": [
-   {
-    "operation": "getCell",
-    "why": "**3 declared operations reach no component on this screen**: getCell, getCellCapacity, listBackupRuns. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -684,7 +880,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every backup status",
+       "label": "Every cell job",
        "bindsTo": "CellJob",
        "columns": [
         "CellJob.id",
@@ -698,6 +894,23 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listCellJobs",
        "provenance": "contract subscription.yaml GET /cells/{cellId}/jobs"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every backup run",
+       "bindsTo": "BackupRun",
+       "columns": [
+        "BackupRun.id",
+        "BackupRun.scope",
+        "BackupRun.startedAt",
+        "BackupRun.completedAt",
+        "BackupRun.state",
+        "BackupRun.sizeBytes",
+        "BackupRun.restoreTestedAt",
+        "BackupRun.error"
+       ],
+       "operation": "listBackupRuns",
+       "provenance": "contract platform-ops.yaml GET /backup-runs"
       }
      ]
     },
@@ -707,7 +920,65 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected backup status",
+       "label": "The selected cell job",
+       "bindsTo": "CellJob",
+       "columns": [
+        "CellJob.id",
+        "CellJob.kind",
+        "CellJob.status",
+        "CellJob.progressPercent",
+        "CellJob.message",
+        "CellJob.error",
+        "CellJob.scheduledFor",
+        "CellJob.completedAt"
+       ],
+       "operation": "listCellJobs",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/jobs"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cell",
+       "bindsTo": "CellDetail",
+       "columns": [
+        "CellDetail.id",
+        "CellDetail.name",
+        "CellDetail.kind",
+        "CellDetail.clusterId",
+        "CellDetail.isReachable",
+        "CellDetail.lastContactAt",
+        "CellDetail.licenceExpiresAt",
+        "CellDetail.participatesInCrossCell",
+        "CellDetail.regionId",
+        "CellDetail.regionName",
+        "CellDetail.countryCode",
+        "CellDetail.tier",
+        "CellDetail.status",
+        "CellDetail.cloudProvider",
+        "CellDetail.cloudRegion",
+        "CellDetail.apiEndpoint"
+       ],
+       "operation": "getCell",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cell capacity",
+       "bindsTo": "CellCapacity",
+       "columns": [
+        "CellCapacity.kind",
+        "CellCapacity.tenantCount",
+        "CellCapacity.isConstrained",
+        "CellCapacity.constrainedDimension",
+        "CellCapacity.dimensions",
+        "CellCapacity.forecastBreachAt",
+        "CellCapacity.measuredAt"
+       ],
+       "operation": "getCellCapacity",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/capacity"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cell health",
        "bindsTo": "CellHealth",
        "columns": [
         "CellHealth.isHealthy",
@@ -729,19 +1000,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "destructiveButton",
-       "label": "Cancel",
+       "label": "Cancel decommission",
        "operation": "cancelDecommission",
        "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
       },
       {
        "kind": "secondaryButton",
-       "label": "Decommission",
+       "label": "Decommission cell",
        "operation": "decommissionCell",
        "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save cell tier",
        "operation": "updateCellTier",
        "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
       }
@@ -753,17 +1024,52 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmCancelDecommission",
     "component": "confirmDialog",
-    "trigger": "Cancel",
-    "body": "**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather than the verb. A backup status this affects should be identified in the dialog, not just counted.",
+    "trigger": "Cancel decommission",
+    "body": "**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather than the verb. A backup status this affects should be identified in the dialog, not just counted. **Collects what `cancelDecommission` sends before it is called.** Required: `reason`.",
     "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
+   },
+   {
+    "id": "formDecommissionCell",
+    "component": "modal",
+    "trigger": "Decommission cell",
+    "body": "**Collects what `decommissionCell` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Decommission cell",
+     "operation": "decommissionCell"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
+   },
+   {
+    "id": "formUpdateCellTier",
+    "component": "modal",
+    "trigger": "Save cell tier",
+    "body": "**Collects what `updateCellTier` sends before it is called.** Required: `tier`. Optional: `scheduledFor`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save cell tier",
+     "operation": "updateCellTier"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "tier",
+      "scheduledFor"
+     ]
+    },
+    "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
    }
   ],
   "states": {
    "loading": "The backup status list.",
    "error": "Could not load. Names which read failed and leaves the backup status untouched.",
-   "emptyFirstRun": "No backup status yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the backup status are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No backup status yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listCellJobs` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellHealth` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -833,11 +1139,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `cellId`.",
    "preloaded": [
-    "CellHealth.isHealthy",
-    "CellHealth.isSchemaBehind",
-    "CellHealth.databaseStatus",
-    "CellHealth.replicationLagSeconds",
-    "CellHealth.lastBackupAt"
+    "CellJob.id",
+    "CellJob.kind",
+    "CellJob.status",
+    "CellJob.progressPercent",
+    "CellJob.message"
    ]
   },
   "wireframe": {
@@ -897,27 +1203,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-034 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-034 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-003",
      "trigger": "Cross-Tenant Health Dashboard",
      "carries": [
-      "cellId",
-      "rightId"
+      "cellId"
      ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId and ADM-034 holds cellId, so an edge into it carries them"
     }
    ]
   },
@@ -929,13 +1228,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listCellJobs` reads the population and `getCell` reads one of them — list, select, act",
   "purpose": "Find archival job monitor for this venue.",
-  "gaps": [
-   {
-    "operation": "getCellCapacity",
-    "why": "**3 declared operations reach no component on this screen**: getCellCapacity, getCellHealth, listArchivalJobs. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -945,7 +1237,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every archival job",
+       "label": "Every cell job",
        "bindsTo": "CellJob",
        "columns": [
         "CellJob.id",
@@ -959,6 +1251,23 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listCellJobs",
        "provenance": "contract subscription.yaml GET /cells/{cellId}/jobs"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every archival job",
+       "bindsTo": "ArchivalJob",
+       "columns": [
+        "ArchivalJob.id",
+        "ArchivalJob.policyName",
+        "ArchivalJob.targetTable",
+        "ArchivalJob.rowsArchived",
+        "ArchivalJob.rowsPurged",
+        "ArchivalJob.state",
+        "ArchivalJob.runAt",
+        "ArchivalJob.error"
+       ],
+       "operation": "listArchivalJobs",
+       "provenance": "contract platform-ops.yaml GET /archival-jobs"
       }
      ]
     },
@@ -968,7 +1277,56 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected archival job",
+       "label": "The selected cell job",
+       "bindsTo": "CellJob",
+       "columns": [
+        "CellJob.id",
+        "CellJob.kind",
+        "CellJob.status",
+        "CellJob.progressPercent",
+        "CellJob.message",
+        "CellJob.error",
+        "CellJob.scheduledFor",
+        "CellJob.completedAt"
+       ],
+       "operation": "listCellJobs",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/jobs"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cell capacity",
+       "bindsTo": "CellCapacity",
+       "columns": [
+        "CellCapacity.kind",
+        "CellCapacity.tenantCount",
+        "CellCapacity.isConstrained",
+        "CellCapacity.constrainedDimension",
+        "CellCapacity.dimensions",
+        "CellCapacity.forecastBreachAt",
+        "CellCapacity.measuredAt"
+       ],
+       "operation": "getCellCapacity",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/capacity"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cell health",
+       "bindsTo": "CellHealth",
+       "columns": [
+        "CellHealth.isHealthy",
+        "CellHealth.isSchemaBehind",
+        "CellHealth.databaseStatus",
+        "CellHealth.replicationLagSeconds",
+        "CellHealth.lastBackupAt",
+        "CellHealth.lastRestoreDrillAt",
+        "CellHealth.checkedAt"
+       ],
+       "operation": "getCellHealth",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/health"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cell",
        "bindsTo": "CellDetail",
        "columns": [
         "CellDetail.id",
@@ -999,19 +1357,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "destructiveButton",
-       "label": "Cancel",
+       "label": "Cancel decommission",
        "operation": "cancelDecommission",
        "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
       },
       {
        "kind": "secondaryButton",
-       "label": "Decommission",
+       "label": "Decommission cell",
        "operation": "decommissionCell",
        "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save cell tier",
        "operation": "updateCellTier",
        "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
       }
@@ -1023,17 +1381,52 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmCancelDecommission",
     "component": "confirmDialog",
-    "trigger": "Cancel",
-    "body": "**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather than the verb. A archival job this affects should be identified in the dialog, not just counted.",
+    "trigger": "Cancel decommission",
+    "body": "**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather than the verb. A archival job this affects should be identified in the dialog, not just counted. **Collects what `cancelDecommission` sends before it is called.** Required: `reason`.",
     "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
+   },
+   {
+    "id": "formDecommissionCell",
+    "component": "modal",
+    "trigger": "Decommission cell",
+    "body": "**Collects what `decommissionCell` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Decommission cell",
+     "operation": "decommissionCell"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
+   },
+   {
+    "id": "formUpdateCellTier",
+    "component": "modal",
+    "trigger": "Save cell tier",
+    "body": "**Collects what `updateCellTier` sends before it is called.** Required: `tier`. Optional: `scheduledFor`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save cell tier",
+     "operation": "updateCellTier"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "tier",
+      "scheduledFor"
+     ]
+    },
+    "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
    }
   ],
   "states": {
    "loading": "The archival job list.",
    "error": "Could not load. Names which read failed and leaves the archival job untouched.",
-   "emptyFirstRun": "No archival job yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the archival job are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No archival job yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listCellJobs` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listCellJobs` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1103,11 +1496,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `cellId`.",
    "preloaded": [
-    "CellDetail.id",
-    "CellDetail.name",
-    "CellDetail.kind",
-    "CellDetail.clusterId",
-    "CellDetail.isReachable"
+    "CellJob.id",
+    "CellJob.kind",
+    "CellJob.status",
+    "CellJob.progressPercent",
+    "CellJob.message"
    ]
   },
   "wireframe": {
@@ -1304,7 +1697,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "region",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ScalingPolicy",
   "responds": "ScalingPolicy"
  },
@@ -1467,7 +1866,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "isReachable": {
     "type": "boolean",
     "default": true,
-    "description": "False for `onPremise`. The Control Plane holds the record for licensing and support and **cannot reach the installation** — it may sit behind a firewall with no inbound route. Every operation assuming reachability must handle absence rather than timing out, and a cell that has not called home for a month is not necessarily broken.\n"
+    "description": "False for `onPremiseIsolated`, true for `onPremiseConnected` (ADR-0046). When false, the Control Plane holds the record for licensing and support and **cannot reach the installation** — it may sit behind a firewall with no inbound route. Every operation assuming reachability must handle absence rather than timing out, and a cell that has not called home for a month is not necessarily broken.\n"
    },
    "lastContactAt": {
     "type": "string",
@@ -1484,7 +1883,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "participatesInCrossCell": {
     "type": "boolean",
     "default": true,
-    "description": "False by default for `onPremise`. Redeeming a pass issued elsewhere requires reaching the issuing cell at that moment, and an on-premise site may not be able to. Exclusion is the honest default; local-then-reconcile carries a double-redemption risk that needs a decision rather than an assumption.\n"
+    "description": "False by default for `onPremiseIsolated`, available for `onPremiseConnected` (ADR-0046). Redeeming a pass issued elsewhere requires reaching the issuing cell at that moment, and an on-premise site may not be able to. Exclusion is the honest default; local-then-reconcile carries a double-redemption risk that needs a decision rather than an assumption.\n"
    },
    "regionId": {
     "type": "string",
@@ -1750,13 +2149,23 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "CellKind": {
   "type": "string",
-  "description": "Four deployment models (ADR-0017). `shared` is the default; the others exist because a client asked or a law requires it.\n\n\n**`burst` added 31 August.** An environment stood up for one on-sale and torn down after (CF-162 scenario c). **It is not a jurisdiction and it is not permanent** — it holds a catalogue snapshot, three services of sixteen, and 17 tables of 380.\n\n**The other four are places data lives. This one is a place data passes through**, which is why it has its own lifecycle and a reconciliation obligation the others do not.",
+  "description": "Two deployment locations (ADR-0017, amended by ADR-0046). `shared` is the default; the others exist because a client asked or a law requires it.\n\n**On-premise is two configurations, not one (ADR-0046).** `onPremiseIsolated` keeps no channel to TICVAI — updates are pull-initiated or physically delivered, licensing is a signed file, support is blind. `onPremiseConnected` keeps an outbound control channel and is reachable, updatable and licensable in the ordinary way. The channel carries control traffic only and no natural person (ADR-0043); **AI inference is data, not control**, so connectivity alone does not grant the assistant.\n\nThere is no `hybrid`. The RFP's third model is answered by `onPremiseConnected`; a genuine split workload has never been asked for and would be a new decision.\n\n\n**`burst` added 31 August.** An environment stood up for one on-sale and torn down after (CF-162 scenario c). **It is not a jurisdiction and it is not permanent** — it holds a catalogue snapshot, three services of sixteen, and 17 tables of 380.\n\n**The other four are places data lives. This one is a place data passes through**, which is why it has its own lifecycle and a reconciliation obligation the others do not.",
   "enum": [
    "shared",
    "dedicated",
-   "onPremise",
+   "onPremiseIsolated",
+   "onPremiseConnected",
    "controlPlane",
    "burst"
+  ]
+ },
+ "CellTier": {
+  "type": "string",
+  "enum": [
+   "shared",
+   "dedicated",
+   "isolated",
+   "clientHosted"
   ]
  },
  "Page": {

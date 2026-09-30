@@ -49,7 +49,12 @@ if ENV["MODE"] == "status"
   puts "retitles: #{subjects.size}" if subjects.any?
   exit unless apply
 
-  author = User.find_by(login: ENV["AUTHOR"] || "admin") || User.where(admin: true).first
+  # Everything these scripts write is authored by Chinmay Parab, never by whichever account happens to be the
+  # instance admin: on 30 September tickets made with the old "admin, else the first admin" fallback showed up
+  # under Sameer Shinde, who is not on the project. AUTHOR (a login or an email) overrides; nothing falls back.
+  author = (ENV["AUTHOR"] && (User.find_by(login: ENV["AUTHOR"]) || User.find_by(mail: ENV["AUTHOR"]))) ||
+           User.active.detect { |u| u.name == "Chinmay Parab" }
+  abort("author not found: no active user named Chinmay Parab; run with AUTHOR=<his login>") unless author
   WorkPackage.transaction do
     rewrite.each { |i, t| WorkPackage.where(id: i).update_all(description: t, updated_at: now) }
     subjects.each { |i, s| WorkPackage.where(id: i, project_id: PROJECT_ID).update_all(subject: s, updated_at: now) }

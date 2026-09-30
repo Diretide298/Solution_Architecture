@@ -11,10 +11,10 @@ emittedBy:
 - validateAccess
 payload:
 - field: scanId
-  type: string
-  notes: ULID. The idempotency key for every consumer
+  type: uuid
+  notes: UUIDv7. The idempotency key for every consumer
 - field: entitlementId
-  type: string
+  type: uuid
 - field: venueId
   type: uuid
 - field: accessPointId

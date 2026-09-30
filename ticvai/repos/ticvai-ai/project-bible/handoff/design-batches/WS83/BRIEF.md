@@ -1,6 +1,6 @@
 # WS83 — Game and Ride board 6
 
-**10 screens · 9 operations · 7 schemas · 5 permissions**
+**10 screens · 9 operations · 8 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

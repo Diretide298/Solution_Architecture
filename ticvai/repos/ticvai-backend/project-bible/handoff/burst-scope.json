@@ -8,7 +8,7 @@
   "operations": 34,
   "ofTotalOperations": 2660,
   "tables": 63,
-  "ofTotalTables": 1091
+  "ofTotalTables": 1093
  },
  "routing": {
   "note": "**Normal traffic and sale traffic are separate systems running concurrently.** The burst environment carries the on-sale and nothing else; everything a venue does that day continues in the shared cell. **They meet once, afterwards, at reconciliation.**",
@@ -18,7 +18,7 @@
     "target": "shared cell",
     "services": 17,
     "operations": 2626,
-    "tables": 1091,
+    "tables": 1093,
     "exampleLoad": "stadium, routine Saturday: 60,000 guests x 14 requests = 48.5 RPS",
     "description": "**Everything except the sale.** Admission, food, retail, stock, staff back-office, reporting. Runs whether or not a sale is happening."
    },
@@ -401,7 +401,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "**Written in the same transaction as the state change, by the platform, not by an operation.** That is what makes it exactly-once **Hangs off**: reaches `platform.scope` through its keys. **Reached by**: 3 operations rea"
+   "note": "**Written in the same transaction as the state change, by the platform, not by an operation.** That is what makes it exactly-once **Hangs off**: reaches `platform.scope` through its keys; references `catalogue.event`, `p"
   },
   {
    "table": "promotions.promotion",
@@ -725,7 +725,7 @@
   {
    "table": "ledger.journal_line",
    "schema": "ledger",
-   "columns": 8,
+   "columns": 9,
    "burstOperations": 1,
    "written": true,
    "contention": null,

@@ -5,35 +5,69 @@
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Bulk, Group & Assisted Upgrade Operations displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "byType": {
+   "bulkAction": {
     "type": "string",
     "enum": [
-     "order",
-     "reservation",
-     "group",
-     "event",
-     "performance",
-     "ticketType",
-     "seatSection",
-     "customerSegment"
+     "upgradeAll",
+     "upgradeSelected",
+     "convertProduct",
+     "changePersonType",
+     "applyComplimentaryUpgrade",
+     "applyFixedUpgrade",
+     "moveToAlternativePerformance"
     ],
-    "description": "Vocabulary listed under Select by."
+    "description": "Bulk action previewed"
    },
-   "changePersonType": {
-    "type": "string",
-    "description": "Change Person Type"
+   "selectedCount": {
+    "type": "integer",
+    "description": "Tickets selected"
    },
-   "selected150Tickets": {
-    "type": "string",
-    "description": "Selected: 150 Tickets"
+   "eligibleCount": {
+    "type": "integer",
+    "description": "Tickets eligible"
    },
-   "eligible142": {
-    "type": "string",
-    "description": "Eligible: 142"
+   "notEligibleCount": {
+    "type": "integer",
+    "description": "Tickets not eligible"
    },
-   "notEligible8": {
+   "ineligibilityReasons": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Reasons with counts, e.g. already used, expired, target unavailable"
+   },
+   "totalOriginalEligibleValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Total original eligible value"
+   },
+   "totalTargetValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Total target value"
+   },
+   "totalUpgradeDifference": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Total upgrade difference"
+   },
+   "fees": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fees"
+   },
+   "taxes": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Taxes"
+   },
+   "finalCollectionOrRefund": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Final collection or refund requirement"
+   },
+   "partialProcessing": {
     "type": "string",
-    "description": "Not Eligible: 8"
+    "enum": [
+     "processEligibleExcludeFailures",
+     "failEntireBatch"
+    ],
+    "description": "Partial processing policy"
    }
   }
  },
@@ -43,133 +77,126 @@
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Person-Type, Product & Entitlement Conversion Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "childAdult": {
+   "conversionType": {
     "type": "string",
-    "description": "Child → Adult"
+    "enum": [
+     "childAdult",
+     "juniorAdult",
+     "seniorAdult",
+     "residentTourist",
+     "standardMember",
+     "customPersonTypes"
+    ],
+    "description": "Person-type conversion."
    },
-   "juniorAdult": {
+   "entitlementTreatment": {
     "type": "string",
-    "description": "Junior → Adult"
+    "enum": [
+     "retained",
+     "replaced",
+     "added",
+     "removed",
+     "alreadyConsumed"
+    ],
+    "description": "What happens to each entitlement on conversion."
    },
-   "seniorAdult": {
-    "type": "string",
-    "description": "Senior → Adult"
+   "targetRequirements": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "age",
+      "residency",
+      "corporateAssociation",
+      "identityVerification",
+      "otherEligibilityRules"
+     ]
+    },
+    "description": "What the target product may require."
    },
-   "residentTourist": {
+   "sourceProduct": {
     "type": "string",
-    "description": "Resident → Tourist"
+    "description": "Source product"
    },
-   "standardMember": {
+   "targetProduct": {
     "type": "string",
-    "description": "Standard → Member"
-   },
-   "customPersonTypes": {
-    "type": "string",
-    "description": "Custom Person Types"
-   },
-   "differenceCalculatedThroughArea10": {
-    "type": "string",
-    "description": "Difference calculated through Area 10"
-   },
-   "andIdentify": {
-    "type": "string",
-    "description": "and identify"
-   },
-   "retained": {
-    "type": "string",
-    "description": "Retained"
-   },
-   "replaced": {
-    "type": "string",
-    "description": "Replaced"
-   },
-   "added": {
-    "type": "string",
-    "description": "Added"
-   },
-   "removed": {
-    "type": "string",
-    "description": "Removed"
-   },
-   "alreadyConsumed": {
-    "type": "string",
-    "description": "Already Consumed"
-   },
-   "age": {
-    "type": "string",
-    "description": "Age"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "residency": {
-    "type": "string",
-    "description": "Residency"
-   },
-   "corporateAssociation": {
-    "type": "string",
-    "description": "Corporate Association"
-   },
-   "identityVerification": {
-    "type": "string",
-    "description": "Identity Verification"
-   },
-   "otherEligibilityRules": {
-    "type": "string",
-    "description": "Other eligibility rules"
+    "description": "Target product"
    }
   }
  },
  "ProRataResidualValueEntitlementCreditConfigurationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; lands in the pro-rata columns of `orders.upgrade_rule` (DM5, 29 September)",
   "description": "**What Pro-Rata, Residual Value & Entitlement Credit Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "multiDayPasses": {
-    "type": "string",
-    "description": "Multi-Day Passes"
+   "appliesTo": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "multiDayPasses",
+      "memberships",
+      "annualPasses",
+      "multiAttractionProducts",
+      "packages",
+      "storedEntitlements"
+     ]
+    },
+    "description": "Products this policy applies to"
    },
-   "memberships": {
+   "proRataMethod": {
     "type": "string",
-    "description": "Memberships"
+    "enum": [
+     "timeBased",
+     "usageBased",
+     "valueBased",
+     "entitlementBased",
+     "fixedCredit"
+    ],
+    "description": "Remaining days over original days; remaining uses over total uses; remaining commercial value; value of unconsumed benefits; or a configured fixed amount"
    },
-   "annualPasses": {
-    "type": "string",
-    "description": "Annual Passes"
-   },
-   "multiAttractionProducts": {
-    "type": "string",
-    "description": "Multi-Attraction Products"
-   },
-   "packages": {
-    "type": "string",
-    "description": "Packages"
-   },
-   "storedEntitlements": {
-    "type": "string",
-    "description": "Stored Entitlements"
-   },
-   "remainingDaysOriginalDays": {
-    "type": "string",
-    "description": "Remaining Days / Original Days"
-   },
-   "remainingUsesTotalUses": {
-    "type": "string",
-    "description": "Remaining Uses / Total Uses"
-   },
-   "remainingCommercialValue": {
-    "type": "string",
-    "description": "Remaining Commercial Value"
-   },
-   "valueOfUnconsumedBenefits": {
-    "type": "string",
-    "description": "Value of unconsumed benefits"
-   },
-   "configuredCommercialAmount": {
+   "fixedCreditAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Configured commercial amount"
+    "description": "For fixedCredit: the configured amount"
+   },
+   "maximumCreditPercent": {
+    "type": "number",
+    "description": "Maximum credit, percent of the original value"
+   },
+   "minimumUpgradeAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Minimum upgrade amount"
+   },
+   "creditExpiryDays": {
+    "type": "integer",
+    "description": "Days the credit stays usable"
+   },
+   "nonCreditableComponents": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Components that earn no credit"
+   },
+   "excludeFees": {
+    "type": "boolean",
+    "description": "Fees are not credited"
+   },
+   "taxTreatment": {
+    "type": "string",
+    "description": "How tax on the credit is treated"
+   },
+   "negativeDifferenceTreatment": {
+    "type": "string",
+    "enum": [
+     "noRefund",
+     "refundDifference",
+     "walletCredit",
+     "voucherCredit",
+     "supervisorApproval"
+    ],
+    "description": "When the target is worth less than the credit. No package default: the venue chooses when it enables downgrades"
    }
   }
  },
@@ -179,49 +206,73 @@
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Pro-Rata, Residual Value & Entitlement Credit Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "multiDayPasses": {
-    "type": "string",
-    "description": "Multi-Day Passes"
+   "appliesTo": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "multiDayPasses",
+      "memberships",
+      "annualPasses",
+      "multiAttractionProducts",
+      "packages",
+      "storedEntitlements"
+     ]
+    },
+    "description": "Products this policy applies to"
    },
-   "memberships": {
+   "proRataMethod": {
     "type": "string",
-    "description": "Memberships"
+    "enum": [
+     "timeBased",
+     "usageBased",
+     "valueBased",
+     "entitlementBased",
+     "fixedCredit"
+    ],
+    "description": "Remaining days over original days; remaining uses over total uses; remaining commercial value; value of unconsumed benefits; or a configured fixed amount"
    },
-   "annualPasses": {
-    "type": "string",
-    "description": "Annual Passes"
-   },
-   "multiAttractionProducts": {
-    "type": "string",
-    "description": "Multi-Attraction Products"
-   },
-   "packages": {
-    "type": "string",
-    "description": "Packages"
-   },
-   "storedEntitlements": {
-    "type": "string",
-    "description": "Stored Entitlements"
-   },
-   "remainingDaysOriginalDays": {
-    "type": "string",
-    "description": "Remaining Days / Original Days"
-   },
-   "remainingUsesTotalUses": {
-    "type": "string",
-    "description": "Remaining Uses / Total Uses"
-   },
-   "remainingCommercialValue": {
-    "type": "string",
-    "description": "Remaining Commercial Value"
-   },
-   "valueOfUnconsumedBenefits": {
-    "type": "string",
-    "description": "Value of unconsumed benefits"
-   },
-   "configuredCommercialAmount": {
+   "fixedCreditAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Configured commercial amount"
+    "description": "For fixedCredit: the configured amount"
+   },
+   "maximumCreditPercent": {
+    "type": "number",
+    "description": "Maximum credit, percent of the original value"
+   },
+   "minimumUpgradeAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Minimum upgrade amount"
+   },
+   "creditExpiryDays": {
+    "type": "integer",
+    "description": "Days the credit stays usable"
+   },
+   "nonCreditableComponents": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Components that earn no credit"
+   },
+   "excludeFees": {
+    "type": "boolean",
+    "description": "Fees are not credited"
+   },
+   "taxTreatment": {
+    "type": "string",
+    "description": "How tax on the credit is treated"
+   },
+   "negativeDifferenceTreatment": {
+    "type": "string",
+    "enum": [
+     "noRefund",
+     "refundDifference",
+     "walletCredit",
+     "voucherCredit",
+     "supervisorApproval"
+    ],
+    "description": "When the target is worth less than the credit. No package default: the venue chooses when it enables downgrades"
    }
   }
  },
@@ -293,7 +344,15 @@
    },
    "transactionType": {
     "type": "string",
-    "description": "Transaction Type"
+    "enum": [
+     "upgrade",
+     "downgrade",
+     "exchange",
+     "conversion",
+     "personTypeConversion",
+     "productConversion"
+    ],
+    "description": "Transaction type"
    },
    "venue": {
     "type": "string",
@@ -323,39 +382,93 @@
    "owner": {
     "type": "string",
     "description": "Owner"
-   },
-   "standardPremium": {
-    "type": "string",
-    "description": "Standard → Premium"
-   },
-   "premiumStandard": {
-    "type": "string",
-    "description": "Premium → Standard"
-   },
-   "eventAEventB": {
-    "type": "string",
-    "description": "Event A → Event B"
-   },
-   "dayTicketAnnualPass": {
-    "type": "string",
-    "description": "Day Ticket → Annual Pass"
-   },
-   "childAdult": {
-    "type": "string",
-    "description": "Child → Adult"
-   },
-   "generalAdmissionCombinationTicket": {
-    "type": "string",
-    "description": "General Admission → Combination Ticket"
    }
   }
  },
  "UpgradeConversionPathBuilderInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; lands in `orders.upgrade_rule` (DM5, 29 September)",
   "description": "**What Upgrade & Conversion Path Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
-  "properties": {}
+  "properties": {
+   "pathName": {
+    "type": "string",
+    "description": "Path name"
+   },
+   "pathCode": {
+    "type": "string",
+    "description": "Path code"
+   },
+   "sourceProduct": {
+    "type": "string",
+    "description": "Source product"
+   },
+   "targetProduct": {
+    "type": "string",
+    "description": "Target product"
+   },
+   "transactionType": {
+    "type": "string",
+    "enum": [
+     "upgrade",
+     "downgrade",
+     "exchange",
+     "conversion",
+     "personTypeConversion",
+     "productConversion"
+    ],
+    "description": "Transaction type"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective from"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective to"
+   },
+   "allowedChannels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Allowed channels"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer segment"
+   },
+   "active": {
+    "type": "boolean",
+    "description": "Whether the path is in use"
+   },
+   "direction": {
+    "type": "string",
+    "enum": [
+     "oneWay",
+     "bidirectional"
+    ],
+    "description": "One-way, or bidirectional where commercially permitted"
+   },
+   "chainedUpgradeAllowed": {
+    "type": "boolean",
+    "description": "Whether this path may chain into a further upgrade (Standard to Premium to VIP)"
+   }
+  }
  },
  "UpgradeConversionPathBuilderView": {
   "type": "object",
@@ -363,8 +476,82 @@
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Upgrade & Conversion Path Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "note": {
-    "type": "string"
+   "pathName": {
+    "type": "string",
+    "description": "Path name"
+   },
+   "pathCode": {
+    "type": "string",
+    "description": "Path code"
+   },
+   "sourceProduct": {
+    "type": "string",
+    "description": "Source product"
+   },
+   "targetProduct": {
+    "type": "string",
+    "description": "Target product"
+   },
+   "transactionType": {
+    "type": "string",
+    "enum": [
+     "upgrade",
+     "downgrade",
+     "exchange",
+     "conversion",
+     "personTypeConversion",
+     "productConversion"
+    ],
+    "description": "Transaction type"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective from"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective to"
+   },
+   "allowedChannels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Allowed channels"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer segment"
+   },
+   "active": {
+    "type": "boolean",
+    "description": "Whether the path is in use"
+   },
+   "direction": {
+    "type": "string",
+    "enum": [
+     "oneWay",
+     "bidirectional"
+    ],
+    "description": "One-way, or bidirectional where commercially permitted"
+   },
+   "chainedUpgradeAllowed": {
+    "type": "boolean",
+    "description": "Whether this path may chain into a further upgrade (Standard to Premium to VIP)"
    }
   }
  },
@@ -452,42 +639,6 @@
     "type": "string",
     "description": "Usage Status"
    },
-   "valid": {
-    "type": "string",
-    "description": "Valid"
-   },
-   "unused": {
-    "type": "string",
-    "description": "Unused"
-   },
-   "partiallyUsed": {
-    "type": "string",
-    "description": "Partially Used"
-   },
-   "used": {
-    "type": "string",
-    "description": "Used"
-   },
-   "expired": {
-    "type": "integer",
-    "description": "Expired"
-   },
-   "cancelled": {
-    "type": "integer",
-    "description": "Cancelled"
-   },
-   "suspended": {
-    "type": "string",
-    "description": "Suspended"
-   },
-   "vipUpgradeEligible": {
-    "type": "string",
-    "description": "VIP Upgrade Eligible"
-   },
-   "vipUpgradeNotAvailable": {
-    "type": "string",
-    "description": "VIP Upgrade Not Available"
-   },
    "previousUpgrade": {
     "type": "string",
     "description": "Previous Upgrade"
@@ -500,30 +651,33 @@
     "type": "string",
     "description": "Redemption History"
    },
-   "withReason": {
+   "eligibleTicketStatuses": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "valid",
+      "unused",
+      "partiallyUsed",
+      "expired",
+      "cancelled",
+      "suspended"
+     ]
+    },
+    "description": "Ticket statuses from which the upgrade is allowed."
+   },
+   "ineligibilityReason": {
     "type": "string",
-    "description": "with reason"
+    "description": "Why a ticket is not eligible, shown to staff and guest"
    }
   }
  },
  "UpgradeExecutionCredentialRegenerationChannelControlInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; the execution lands in `orders.upgrade`, the credential treatment and channels come from `orders.upgrade_rule` (DM5, 29 September)",
   "description": "**What Upgrade Execution, Credential Regeneration & Channel Controls submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "regenerateQr": {
-    "type": "string",
-    "description": "Regenerate QR"
-   },
-   "invalidateOldQr": {
-    "type": "string",
-    "description": "Invalidate Old QR"
-   },
-   "preserveExistingCredential": {
-    "type": "string",
-    "description": "Preserve Existing Credential"
-   },
    "newEntitlement": {
     "type": "integer",
     "description": "New Entitlement"
@@ -549,80 +703,47 @@
     "type": "string",
     "description": "Old Credential Invalidation"
    },
-   "b2cSelfService": {
+   "credentialTreatment": {
     "type": "string",
-    "description": "B2C Self-Service"
+    "enum": [
+     "regenerateQr",
+     "invalidateOldQr",
+     "preserveExistingCredential"
+    ],
+    "description": "What happens to the credential."
    },
-   "mobileApp": {
-    "type": "string",
-    "description": "Mobile App"
+   "availableChannels": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "b2cSelfService",
+      "mobileApp",
+      "pos",
+      "callCenter",
+      "boxOffice",
+      "kiosk",
+      "b2b",
+      "reseller",
+      "api"
+     ]
+    },
+    "description": "Channels the upgrade is available through. The guest app and web are included (MoM 1 Sep)."
    },
-   "pos": {
-    "type": "string",
-    "description": "POS"
-   },
-   "callCenter": {
-    "type": "string",
-    "description": "Call Center"
-   },
-   "boxOffice": {
-    "type": "string",
-    "description": "Box Office"
-   },
-   "kiosk": {
-    "type": "string",
-    "description": "Kiosk"
-   },
-   "b2b": {
-    "type": "string",
-    "description": "B2B"
-   },
-   "reseller": {
-    "type": "string",
-    "description": "Reseller"
-   },
-   "api": {
-    "type": "string",
-    "description": "API"
-   },
-   "standardPremiumOnly": {
-    "type": "string",
-    "description": "Standard → Premium only"
-   },
-   "allAuthorizedPaths": {
-    "type": "string",
-    "description": "All authorized paths"
-   },
-   "updatedTicket": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Updated Ticket"
-   },
-   "updatedReceipt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Updated Receipt"
-   },
-   "updatedInvoice": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Updated Invoice"
-   },
-   "confirmationEmail": {
-    "type": "string",
-    "description": "Confirmation Email"
-   },
-   "smsWhatsappWhereConfigured": {
-    "type": "string",
-    "description": "SMS/WhatsApp where configured"
-   },
-   "walletPassUpdate": {
-    "type": "string",
-    "description": "Wallet Pass Update"
-   },
-   "entitlementStatesInconsistent": {
-    "type": "string",
-    "description": "entitlement states inconsistent"
+   "generatedDocuments": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "updatedTicket",
+      "updatedReceipt",
+      "updatedInvoice",
+      "confirmationEmail",
+      "smsWhatsapp",
+      "walletPassUpdate"
+     ]
+    },
+    "description": "What execution produces."
    }
   }
  },
@@ -632,18 +753,6 @@
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Upgrade Execution, Credential Regeneration & Channel Controls displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "regenerateQr": {
-    "type": "string",
-    "description": "Regenerate QR"
-   },
-   "invalidateOldQr": {
-    "type": "string",
-    "description": "Invalidate Old QR"
-   },
-   "preserveExistingCredential": {
-    "type": "string",
-    "description": "Preserve Existing Credential"
-   },
    "newEntitlement": {
     "type": "integer",
     "description": "New Entitlement"
@@ -669,80 +778,47 @@
     "type": "string",
     "description": "Old Credential Invalidation"
    },
-   "b2cSelfService": {
+   "credentialTreatment": {
     "type": "string",
-    "description": "B2C Self-Service"
+    "enum": [
+     "regenerateQr",
+     "invalidateOldQr",
+     "preserveExistingCredential"
+    ],
+    "description": "What happens to the credential."
    },
-   "mobileApp": {
-    "type": "string",
-    "description": "Mobile App"
+   "availableChannels": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "b2cSelfService",
+      "mobileApp",
+      "pos",
+      "callCenter",
+      "boxOffice",
+      "kiosk",
+      "b2b",
+      "reseller",
+      "api"
+     ]
+    },
+    "description": "Channels the upgrade is available through. The guest app and web are included (MoM 1 Sep)."
    },
-   "pos": {
-    "type": "string",
-    "description": "POS"
-   },
-   "callCenter": {
-    "type": "string",
-    "description": "Call Center"
-   },
-   "boxOffice": {
-    "type": "string",
-    "description": "Box Office"
-   },
-   "kiosk": {
-    "type": "string",
-    "description": "Kiosk"
-   },
-   "b2b": {
-    "type": "string",
-    "description": "B2B"
-   },
-   "reseller": {
-    "type": "string",
-    "description": "Reseller"
-   },
-   "api": {
-    "type": "string",
-    "description": "API"
-   },
-   "standardPremiumOnly": {
-    "type": "string",
-    "description": "Standard → Premium only"
-   },
-   "allAuthorizedPaths": {
-    "type": "string",
-    "description": "All authorized paths"
-   },
-   "updatedTicket": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Updated Ticket"
-   },
-   "updatedReceipt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Updated Receipt"
-   },
-   "updatedInvoice": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Updated Invoice"
-   },
-   "confirmationEmail": {
-    "type": "string",
-    "description": "Confirmation Email"
-   },
-   "smsWhatsappWhereConfigured": {
-    "type": "string",
-    "description": "SMS/WhatsApp where configured"
-   },
-   "walletPassUpdate": {
-    "type": "string",
-    "description": "Wallet Pass Update"
-   },
-   "entitlementStatesInconsistent": {
-    "type": "string",
-    "description": "entitlement states inconsistent"
+   "generatedDocuments": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "updatedTicket",
+      "updatedReceipt",
+      "updatedInvoice",
+      "confirmationEmail",
+      "smsWhatsapp",
+      "walletPassUpdate"
+     ]
+    },
+    "description": "What execution produces."
    }
   }
  },
@@ -752,73 +828,12 @@
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Upgrade Financial Treatment & Price Difference Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "basedOnRemainingValidity": {
-    "type": "string",
-    "description": "Based on remaining validity"
-   },
-   "basedOnRemainingEntitlement": {
-    "type": "string",
-    "description": "Based on remaining entitlement"
-   },
-   "customerPaysFullTargetPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Customer pays full target price"
-   },
-   "currentSellingPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Current Selling Price"
-   },
-   "originalDatePrice": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Original-Date Price"
-   },
-   "upgradeSpecificRate": {
-    "type": "number",
-    "description": "Upgrade-Specific Rate"
-   },
-   "contractedRate": {
-    "type": "number",
-    "description": "Contracted Rate"
-   },
-   "membershipRate": {
-    "type": "number",
-    "description": "Membership Rate"
-   },
-   "fixedUpgradePrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed Upgrade Price"
-   },
-   "thisIsImportant": {
-    "type": "string",
-    "description": "This is important"
-   },
-   "configuredRate": {
-    "type": "number",
-    "description": "configured rate?"
-   },
-   "promotion": {
-    "type": "string",
-    "description": "Promotion"
-   },
-   "membershipDiscount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Membership Discount"
-   },
-   "voucher": {
-    "type": "string",
-    "description": "Voucher"
-   },
-   "corporateDiscount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Corporate Discount"
-   },
    "targetPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Target Price"
    },
    "credit": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Credit"
    },
    "priceDifference": {
@@ -830,20 +845,67 @@
     "description": "Discount"
    },
    "fees": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Fees"
    },
    "tax": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Tax"
    },
    "rounding": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Rounding"
    },
    "finalAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Final Amount"
+   },
+   "priceSource": {
+    "type": "string",
+    "enum": [
+     "currentSellingPrice",
+     "originalDatePrice",
+     "upgradeSpecificRate",
+     "contractedRate",
+     "membershipRate",
+     "fixedUpgradePrice"
+    ],
+    "description": "Price the target is valued at."
+   },
+   "carryForwardDiscounts": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "promotion",
+      "membershipDiscount",
+      "voucher",
+      "corporateDiscount"
+     ]
+    },
+    "description": "Existing discounts carried into the upgrade."
+   },
+   "financialMethod": {
+    "type": "string",
+    "enum": [
+     "fullDifference",
+     "fixedUpgradeFee",
+     "percentageUpgrade",
+     "proRata",
+     "creditBased",
+     "noCredit",
+     "complimentary"
+    ],
+    "description": "Financial method: target price less eligible original value; a fixed fee; a percentage of target; pro-rata on remaining validity; original value as credit; no credit; or complimentary where authorised"
+   },
+   "dynamicPriceTreatment": {
+    "type": "string",
+    "enum": [
+     "currentDynamicPrice",
+     "protectedUpgradeRate",
+     "configuredRate"
+    ],
+    "description": "When the target is dynamically priced, which rate the upgrade uses"
    }
   }
  },
@@ -930,42 +992,6 @@
     "type": "string",
     "description": "Status"
    },
-   "withEachTransactionLinked": {
-    "type": "string",
-    "description": "with each transaction linked"
-   },
-   "eligibilityOverride": {
-    "type": "string",
-    "description": "Eligibility Override"
-   },
-   "financialOverride": {
-    "type": "string",
-    "description": "Financial Override"
-   },
-   "expiredTicketException": {
-    "type": "integer",
-    "description": "Expired Ticket Exception"
-   },
-   "manualCredit": {
-    "type": "string",
-    "description": "Manual Credit"
-   },
-   "complimentaryUpgrade": {
-    "type": "string",
-    "description": "Complimentary Upgrade"
-   },
-   "failedCredentialUpdate": {
-    "type": "integer",
-    "description": "Failed Credential Update"
-   },
-   "failedPaymentReconciliation": {
-    "type": "integer",
-    "description": "Failed Payment Reconciliation"
-   },
-   "channelSynchronizationFailure": {
-    "type": "string",
-    "description": "Channel Synchronization Failure"
-   },
    "reason": {
     "type": "string",
     "description": "Reason"
@@ -991,21 +1017,19 @@
     "format": "date-time",
     "description": "Timestamp"
    },
-   "relationships": {
+   "exceptionType": {
     "type": "string",
-    "description": "relationships"
-   },
-   "controls": {
-    "type": "string",
-    "description": "controls"
-   },
-   "architectureForExample": {
-    "type": "string",
-    "description": "architecture—for example"
-   },
-   "eventAEventB": {
-    "type": "string",
-    "description": "Event A → Event B"
+    "enum": [
+     "eligibilityOverride",
+     "financialOverride",
+     "expiredTicketException",
+     "manualCredit",
+     "complimentaryUpgrade",
+     "failedCredentialUpdate",
+     "failedPaymentReconciliation",
+     "channelSynchronizationFailure"
+    ],
+    "description": "Exception or override."
    }
   }
  },
@@ -1015,51 +1039,9 @@
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Upgrade Timing, Usage & Ticket Status Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "beforeFirstUse": {
-    "type": "string",
-    "description": "Before First Use"
-   },
-   "afterFirstUse": {
-    "type": "string",
-    "description": "After First Use"
-   },
    "partiallyConsumed": {
     "type": "string",
     "description": "Partially Consumed"
-   },
-   "beforeVisit": {
-    "type": "string",
-    "description": "Before Visit"
-   },
-   "duringVisit": {
-    "type": "string",
-    "description": "During Visit"
-   },
-   "afterVisit": {
-    "type": "string",
-    "description": "After Visit"
-   },
-   "beforeExpiry": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Before Expiry"
-   },
-   "gracePeriod": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Grace Period"
-   },
-   "exampleAttractionUpgrade": {
-    "type": "string",
-    "description": "Example — Attraction Upgrade"
-   },
-   "andAlreadyVisitedAttractionA": {
-    "type": "string",
-    "description": "and already visited Attraction A"
-   },
-   "product": {
-    "type": "string",
-    "description": "product"
    },
    "usedAdmissions": {
     "type": "string",
@@ -1081,34 +1063,39 @@
     "type": "string",
     "description": "Remaining Benefits"
    },
-   "invalidate": {
-    "type": "string",
-    "description": "Invalidate"
-   },
-   "supersede": {
-    "type": "string",
-    "description": "Supersede"
-   },
-   "retainForHistory": {
-    "type": "string",
-    "description": "Retain for History"
-   },
-   "partiallyRetainEntitlement": {
-    "type": "string",
-    "description": "Partially Retain Entitlement"
-   },
    "neverEligible": {
     "type": "string",
     "description": "Never Eligible"
    },
-   "eligibleWithinGracePeriod": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Eligible Within Grace Period"
-   },
    "supervisorExceptionAllowed": {
     "type": "boolean",
     "description": "Supervisor Exception Allowed"
+   },
+   "permittedWindows": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "beforeFirstUse",
+      "afterFirstUse",
+      "beforeVisit",
+      "duringVisit",
+      "afterVisit",
+      "beforeExpiry",
+      "gracePeriod"
+     ]
+    },
+    "description": "When the upgrade is allowed."
+   },
+   "originalTicketTreatment": {
+    "type": "string",
+    "enum": [
+     "invalidate",
+     "supersede",
+     "retainForHistory",
+     "partiallyRetainEntitlement"
+    ],
+    "description": "What happens to the original ticket."
    }
   }
  }

@@ -465,6 +465,13 @@
      "slot": "fields",
      "components": [
       {
+       "kind": "calendarView",
+       "label": "Calendar",
+       "operation": "getDueMaintenance",
+       "notes": "Maintenance falling due, by day, week or month; a task opens a work order. Day, week, month and agenda views; the day starts at the venue's `calendarDayStartHour`. Sends the visible window as `from`/`to` and the category filter as `categoryId`.",
+       "provenance": "decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)"
+      },
+      {
        "kind": "selectField",
        "label": "Asset",
        "provenance": "pack Rental_Management.pdf, page 111 §Configure"
@@ -642,6 +649,103 @@
        "impliedBy": "createWorkOrder"
       }
      ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Priority and how it was set",
+       "bindsTo": "WorkOrder",
+       "columns": [
+        "WorkOrder.priority",
+        "WorkOrder.priorityScore",
+        "WorkOrder.prioritySource",
+        "WorkOrder.faultAssessment",
+        "WorkOrder.requiredQualificationCodes"
+       ],
+       "operation": "getWorkOrder",
+       "notes": "**The score and its source side by side** (decided 17 September, M17-01): *scored* (the venue policy), *asset override* or *manual*, so a supervisor sees why a fault is urgent.",
+       "provenance": "contract maintenance.yaml WorkOrder.priorityScore"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Suggested technicians",
+       "bindsTo": "WorkOrderAssigneeSuggestion",
+       "columns": [
+        "WorkOrderAssigneeSuggestion.rank",
+        "WorkOrderAssigneeSuggestion.name",
+        "WorkOrderAssigneeSuggestion.hasAllQualifications",
+        "WorkOrderAssigneeSuggestion.missingQualificationCodes",
+        "WorkOrderAssigneeSuggestion.onShift",
+        "WorkOrderAssigneeSuggestion.openWorkOrderCount"
+       ],
+       "operation": "suggestWorkOrderAssignee",
+       "notes": "**Smart assignment, confirmed by the maintenance head** (decided 17 September, M17-13). The ranking assigns nothing; *Assign* on a row sends its principal with `updateWorkOrder`.",
+       "provenance": "contract maintenance.yaml GET /work-orders/{workOrderId}/assignee-suggestions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Assign suggested technician",
+       "operation": "updateWorkOrder",
+       "notes": "Sends the chosen row's `principalId` as `assignedToPrincipalId` (M17-13).",
+       "provenance": "contract maintenance.yaml PATCH /work-orders/{workOrderId}"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Vendor requests",
+       "bindsTo": "VendorServiceRequest",
+       "columns": [
+        "VendorServiceRequest.supplierId",
+        "VendorServiceRequest.scope",
+        "VendorServiceRequest.status",
+        "VendorServiceRequest.vendorReference",
+        "VendorServiceRequest.quotedCost",
+        "VendorServiceRequest.scheduledVisitAt"
+       ],
+       "operation": "listVendorServiceRequests",
+       "notes": "Outside vendors engaged on this work order (decided 17 September, M17-13).",
+       "provenance": "contract maintenance.yaml GET /vendor-service-requests"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request a vendor",
+       "operation": "createVendorServiceRequest",
+       "provenance": "contract maintenance.yaml POST /vendor-service-requests"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Update vendor request",
+       "operation": "updateVendorServiceRequest",
+       "provenance": "contract maintenance.yaml PATCH /vendor-service-requests/{vendorServiceRequestId}"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "How fault priority is scored",
+       "bindsTo": "WorkOrderPriorityPolicy",
+       "columns": [
+        "WorkOrderPriorityPolicy.weights",
+        "WorkOrderPriorityPolicy.bands",
+        "WorkOrderPriorityPolicy.updatedAt"
+       ],
+       "operation": "getWorkOrderPriorityPolicy",
+       "notes": "**The venue's weights and bands** (decided 17 September, M17-01): safety, guest operations, revenue and asset criticality, summing to 100.",
+       "provenance": "contract maintenance.yaml GET /work-order-priority-policy"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save priority scoring",
+       "operation": "setWorkOrderPriorityPolicy",
+       "provenance": "contract maintenance.yaml PUT /work-order-priority-policy"
+      }
+     ]
     }
    ]
   },
@@ -653,6 +757,57 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "getWorkOrderPriorityPolicy",
+    "contract": "maintenance",
+    "purpose": "The venue's priority weights and bands (M17-01)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-01 (the 29 September pass)"
+   },
+   {
+    "operationId": "setWorkOrderPriorityPolicy",
+    "contract": "maintenance",
+    "purpose": "Change the priority weights and bands (M17-01)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-01 (the 29 September pass)",
+    "invalidates": [
+     "getWorkOrderPriorityPolicy"
+    ]
+   },
+   {
+    "operationId": "suggestWorkOrderAssignee",
+    "contract": "maintenance",
+    "purpose": "Technicians ranked by skill, shift and load (M17-13)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-13 (the 29 September pass)"
+   },
+   {
+    "operationId": "listVendorServiceRequests",
+    "contract": "maintenance",
+    "purpose": "Outside vendors on this work order (M17-13)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-13 (the 29 September pass)"
+   },
+   {
+    "operationId": "createVendorServiceRequest",
+    "contract": "maintenance",
+    "purpose": "Engage an outside vendor (M17-13)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-13 (the 29 September pass)",
+    "invalidates": [
+     "listVendorServiceRequests"
+    ]
+   },
+   {
+    "operationId": "updateVendorServiceRequest",
+    "contract": "maintenance",
+    "purpose": "Move a vendor request along (M17-13)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-13 (the 29 September pass)",
+    "invalidates": [
+     "listVendorServiceRequests"
+    ]
+   },
    {
     "operationId": "listWorkOrders",
     "contract": "maintenance",
@@ -706,6 +861,10 @@
    "params": [
     {
      "name": "workOrderId",
+     "from": "navigation"
+    },
+    {
+     "name": "vendorServiceRequestId",
      "from": "navigation"
     }
    ]
@@ -951,6 +1110,41 @@
        "impliedBy": "recordWorkOrderParts"
       }
      ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Parts reserved for this work order",
+       "bindsTo": "InventoryStockReservation",
+       "columns": [
+        "InventoryStockReservation.itemId",
+        "InventoryStockReservation.locationId",
+        "InventoryStockReservation.quantity",
+        "InventoryStockReservation.status",
+        "InventoryStockReservation.expiresAt"
+       ],
+       "operation": "listStockReservations",
+       "notes": "**Reserved in the general inventory, not a maintenance stock** (decided 17 September, M17-02). Sends `?sourceType=workOrder&sourceId=` the work order. Recording parts issues from the reservation first.",
+       "provenance": "contract inventory.yaml GET /stock-reservations"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reserve parts",
+       "operation": "createStockReservation",
+       "notes": "Refused when free stock at the location is short, naming the part (M17-02).",
+       "provenance": "contract inventory.yaml POST /stock-reservations"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Release reservation",
+       "operation": "releaseStockReservation",
+       "notes": "Gives unused reserved parts back, e.g. when the job is cancelled.",
+       "provenance": "contract inventory.yaml POST /stock-reservations/{stockReservationId}/release"
+      }
+     ]
     }
    ]
   },
@@ -962,6 +1156,33 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "listStockReservations",
+    "contract": "inventory",
+    "purpose": "Parts reserved for the work order (M17-02)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-02 (the 29 September pass)"
+   },
+   {
+    "operationId": "createStockReservation",
+    "contract": "inventory",
+    "purpose": "Reserve parts for the work order (M17-02)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-02 (the 29 September pass)",
+    "invalidates": [
+     "listStockReservations"
+    ]
+   },
+   {
+    "operationId": "releaseStockReservation",
+    "contract": "inventory",
+    "purpose": "Give reserved parts back (M17-02)",
+    "trigger": "onAction",
+    "provenance": "decided 17 September, M17-02 (the 29 September pass)",
+    "invalidates": [
+     "listStockReservations"
+    ]
+   },
    {
     "operationId": "recordWorkOrderParts",
     "contract": "maintenance",
@@ -980,6 +1201,10 @@
    "params": [
     {
      "name": "workOrderId",
+     "from": "navigation"
+    },
+    {
+     "name": "stockReservationId",
      "from": "navigation"
     }
    ]

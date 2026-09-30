@@ -1,6 +1,6 @@
 # WS163 — Resource Management Configuration board 9
 
-**10 screens · 16 operations · 31 schemas · 8 permissions**
+**10 screens · 16 operations · 34 schemas · 8 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -73,4 +73,4 @@ convincingly. It is never a caption.
 
 ## Thin screens in this batch
 
-**BO-933, BO-934, BO-936, BO-939, BO-940, BO-942 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-933, BO-936, BO-939, BO-940, BO-942 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

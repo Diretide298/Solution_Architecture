@@ -46,9 +46,23 @@ the referencing column on its own.
 
 **Object names follow naming-and-style 6.1**: `<table>_<columns>_idx` for an index,
 `<table>_<column>_chk` for a check, `<table>_scope` for an RLS policy, and `<table>_<column>_fkey`
-(the name Postgres itself gives) for a foreign key. The one 6.1 name not followed is the
-partition's `<table>_v<venue_number>`: nothing in the package defines a venue number, so
-`ensure_venue_partition` still names a partition after the venue's uuid.
+(the name Postgres itself gives) for a foreign key. A monthly partition is `<table>_p<YYYYMM>` and
+the catch-all `<table>_default`. **6.1's venue partition `<table>_v<venue_number>` is not emitted**:
+ADR-0056 (30 September) defers venue list partitioning, so no table partitions by venue.
+
+**ADR-0056 and ADR-0058, accepted 30 September**, are carried as rules, not lists:
+
+  * **One id type.** Every key named `id` or `*_id` is `uuid`, and so is every declared reference
+    to one (new ids are UUIDv7). A human code used as a key (`games.card.card_code`) is not an id.
+  * **Range partitioning by month** for a table whose contract schema is marked
+    `x-ticvai-append-only: <time property>`, which has that column and no inbound foreign key. Its
+    key becomes `(<key>, <time column>)`; 930-partitioning.sql creates the partitions.
+  * **Composite venue keys** where a child and its parent both carry a NOT NULL `venue_id`: the
+    reference is `(venue_id, x) -> parent (venue_id, id)` against a parent `UNIQUE (venue_id, id)`.
+  * **A key the contract names** (`x-ticvai-primary-key`, `kernel.inbox`'s `(consumer, event_id)`).
+
+Vectors are not here: they live in each tenant's Qdrant collection (decided 30 September), and
+`ai.chunk_embedding` holds only the reference to the point.
 
 **Contract enums, maxLength and defaults are carried** as a `<table>_<column>_chk` CHECK and a
 column DEFAULT (storage-design.md, "Enum agreement": the database holds the same values as the
@@ -515,42 +529,94 @@ CREATE POLICY scope_scope ON platform.scope
     WITH CHECK (platform.in_scope(path));
 """
 
-PARTITION_HEAD = """-- The venue partitioning mechanism (ADR-0005, ADR-0044).
+PARTITION_HEAD = """-- Partitioning (ADR-0056, accepted 30 September 2026; amends ADR-0044).
 -- **Derived by tools/derive-ddl.py. Do not hand-edit.**
 --
--- ADR-0044, signed off 18 September 2026: a table whose `venue_id` is NOT NULL partitions by list
--- on it, carries `venue_id` as the leading column of its primary key, and every foreign key into
--- it is composite. **What lives here is the mechanism; the tables declare their own partitioning
--- where they are created.**
+-- **Release 1 partitions by time, not by venue.** The tables that grow, grow with time: scans,
+-- the outbox and its dead letters, the audit trail, journal lines, message dispatches and the
+-- consumer inboxes. The rule is read from the schema, like every other rule in this generator: a
+-- contract schema marked `x-ticvai-append-only: <time property>`, whose table has that column and
+-- no inbound foreign key, is created `PARTITION BY RANGE` on the column, with the column in its
+-- primary key. **Those tables declare their partitioning where they are created** (`010-<schema>.sql`);
+-- what lives here is each one's DEFAULT partition and the monthly partitions ahead of today.
 --
--- **Every partitioned table needs a DEFAULT partition.** Misconfiguration should be loud rather
--- than silently lossy — an insert for an unprovisioned venue lands somewhere it can be found.
+-- **Nothing points at a partitioned table**, which is part of the rule rather than a coincidence:
+-- a foreign key into it would have to carry the time column too. Retention (ADR-0047) detaches
+-- and archives a whole month instead of deleting rows.
 --
--- **One thing from the old baseline is deliberately not carried: the `platform.scope_level` enum.**
--- It existed so a `venue_id` column could not resolve to a workstation, paired with a composite
--- foreign key in a `V0003a__scope-typing.sql` that is not part of this generation. Every
--- `scope_level` column here is `text`; where its contract declares the enum, the column carries a
--- `<table>_<column>_chk` CHECK with the contract's values, like every other contract enum. That a
--- `venue_id` resolves to a venue and not a workstation is still the application's to check.
+-- **The inboxes partition on `event_id`, not on `processed_at`.** Their key is `(consumer,
+-- event_id)` because that pair is the de-duplication rule (ADR-0058), and Postgres requires the
+-- partition column in every unique key; a key that also carried `processed_at` would let a
+-- redelivery insert a second row. The event id is a UUIDv7 (ADR-0056), whose first 48 bits are its
+-- millisecond timestamp, so a month is the range between two UUIDv7 floors.
 --
--- **Partitions are named `<table>_<venue uuid hex>`, not naming-and-style 6.1's
--- `<table>_v<venue_number>`.** Nothing in the package defines or allocates a venue number, so
--- there is nothing to derive the 6.1 name from; that is a decision to make, not a rename.
-CREATE OR REPLACE FUNCTION platform.ensure_venue_partition(target regclass, venue_id uuid)
+-- **Every partitioned table has a DEFAULT partition.** Misconfiguration should be loud rather than
+-- silently lossy: a row for a month nobody created (an offline scan from before the first
+-- partition, a clock years out) lands somewhere it can be found, and the job that creates the next
+-- month fails on it instead of dropping it.
+--
+-- **Venue list partitioning is deferred, not cancelled** (ADR-0056 section 3). `venue_id NOT NULL`
+-- stays where it is and no table gains a `venue_id` column for it. Where a child and its parent both
+-- carry a NOT NULL `venue_id`, the foreign key between them is composite `(venue_id, <key>)` against a
+-- parent `UNIQUE (venue_id, id)` (900-foreign-keys.sql), which keeps most of ADR-0044's cross-venue
+-- guarantee; venue isolation on reads is row-level security (920-row-level-security.sql). Revisit:
+-- a tenant with more than 100 venues, or one venue that needs its own vacuum or archive.
+
+-- The smallest UUIDv7 minted at or after `ts`: its 48-bit millisecond timestamp and zeros after.
+-- uuid comparison is bytewise, so every UUIDv7 from that millisecond on sorts at or above it.
+CREATE OR REPLACE FUNCTION platform.uuidv7_floor(ts timestamptz)
+    RETURNS uuid
+    LANGUAGE sql
+    IMMUTABLE
+    PARALLEL SAFE
+AS $$
+    SELECT (substr(h, 1, 8) || '-' || substr(h, 9, 4) || '-0000-0000-000000000000')::uuid
+      FROM (SELECT lpad(to_hex(floor(extract(epoch FROM ts) * 1000)::bigint), 12, '0') AS h) x;
+$$;
+
+-- Creates `<table>_p<YYYYMM>` for the month containing `month_start`, if it is missing. The bounds
+-- follow the partition column's type: timestamps for a time column, UUIDv7 floors for a uuid.
+CREATE OR REPLACE FUNCTION platform.ensure_month_partition(target regclass, month_start date)
     RETURNS void
     LANGUAGE plpgsql
 AS $$
 DECLARE
-    part_name text;
-    parent_name text := target::text;
+    schema_name text := split_part(target::text, '.', 1);
+    part_name text := split_part(replace(target::text, '"', ''), '.', 2) || '_p'
+                      || to_char(date_trunc('month', month_start), 'YYYYMM');
+    key_type text;
+    lo timestamptz := date_trunc('month', month_start);
+    hi timestamptz := date_trunc('month', month_start) + interval '1 month';
 BEGIN
-    part_name := replace(split_part(parent_name, '.', 2) || '_' ||
-                         replace(venue_id::text, '-', ''), '.', '_');
-    IF to_regclass(format('%I.%I', split_part(parent_name, '.', 1), part_name)) IS NOT NULL THEN
+    IF to_regclass(format('%I.%I', schema_name, part_name)) IS NOT NULL THEN
         RETURN;
     END IF;
-    EXECUTE format('CREATE TABLE %I.%I PARTITION OF %s FOR VALUES IN (%L)',
-                   split_part(parent_name, '.', 1), part_name, target, venue_id);
+    SELECT format_type(a.atttypid, a.atttypmod) INTO key_type
+      FROM pg_partitioned_table p
+      JOIN pg_attribute a ON a.attrelid = p.partrelid AND a.attnum = p.partattrs[0]
+     WHERE p.partrelid = target;
+    IF key_type = 'uuid' THEN
+        EXECUTE format('CREATE TABLE %I.%I PARTITION OF %s FOR VALUES FROM (%L) TO (%L)',
+                       schema_name, part_name, target,
+                       platform.uuidv7_floor(lo), platform.uuidv7_floor(hi));
+    ELSE
+        EXECUTE format('CREATE TABLE %I.%I PARTITION OF %s FOR VALUES FROM (%L) TO (%L)',
+                       schema_name, part_name, target, lo, hi);
+    END IF;
+END
+$$;
+
+-- This month and `months_ahead` after it. The kernel's partition job (MIG-PARTITIONS) calls this
+-- daily with 3; the calls at the end of this file give a new tenant database the same horizon.
+CREATE OR REPLACE FUNCTION platform.ensure_month_partitions(target regclass, months_ahead integer)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+    FOR i IN 0..months_ahead LOOP
+        PERFORM platform.ensure_month_partition(
+            target, (date_trunc('month', now()) + make_interval(months => i))::date);
+    END LOOP;
 END
 $$;
 """
@@ -672,12 +738,32 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
     return "\n".join(body) + "\n"
 
 
-def partition_file(tables: list) -> str:
-    lines = [PARTITION_HEAD, "",
-             f"-- **{len(tables)} tables qualify today** — a NOT NULL `venue_id` in the schema "
-             "reference.\n-- Listed rather than counted, because ADR-0044's rule is checkable and "
-             "the list is how.\n"]
-    lines += [f"--   {t}" for t in tables]
+def partition_file(partitioned: dict, declined: list) -> str:
+    """The DEFAULT partition of every range-partitioned table, then this month and three ahead.
+
+    `partitioned` maps a table to its partition column; `declined` is `(table, why)` for a table
+    whose contract says append-only and which the rule still refused."""
+    def qual(t: str) -> str:
+        s, n = t.split(".", 1)
+        return f"{q(s)}.{q(n)}"
+
+    lines = [PARTITION_HEAD,
+             f"-- **{len(partitioned)} tables are range-partitioned by month** — append-only in "
+             "their contract,\n-- with the time column present and no inbound foreign key. "
+             "Listed rather than counted, because\n-- the rule is checkable and the list is how.",
+             ""]
+    lines += [f"--   {t:<34} on {c}" for t, c in sorted(partitioned.items())]
+    if declined:
+        lines += ["", "-- Marked append-only in the contract and not partitioned, with the reason:"]
+        lines += [f"--   {t}  -- {why}" for t, why in sorted(declined)]
+    lines += ["", "-- DEFAULT partitions: a row for a month nobody created is kept, and found."]
+    for t in sorted(partitioned):
+        s, n = t.split(".", 1)
+        lines.append(f"CREATE TABLE IF NOT EXISTS {q(s)}.{q(n + '_default')} "
+                     f"PARTITION OF {qual(t)} DEFAULT;")
+    lines += ["", "-- This month and the next three (ADR-0056); the partition job keeps the horizon."]
+    lines += [f"SELECT platform.ensure_month_partitions('{qual(t)}'::regclass, 3);"
+              for t in sorted(partitioned)]
     return "\n".join(lines) + "\n"
 
 RESERVED = {"table", "order", "user", "group", "check", "default", "references", "primary",
@@ -754,7 +840,69 @@ def load_contract_props() -> dict:
         for name, schema in ((doc.get("components") or {}).get("schemas") or {}).items():
             for prop, spec in props_of(doc, schema).items():
                 found[f"{mod}.{name}.{prop}"] = spec
+            # **Schema-level marks, and the item schema behind an array property** (ADR-0056). A
+            # table derived from `JournalEntry.lines[]` takes its marks from `JournalLine`, the
+            # schema the array's items are, because that is where the contract describes the row.
+            if isinstance(schema, dict):
+                SCHEMA_MARKS[f"{mod}.{name}"] = {k: v for k, v in schema.items()
+                                                 if str(k).startswith("x-ticvai-")}
+                for prop, spec in props_of(doc, schema).items():
+                    if isinstance(spec, dict) and spec.get("type") == "array":
+                        ref = str((spec.get("items") or {}).get("$ref") or "")
+                        if ref.startswith("#/components/schemas/"):
+                            ITEM_SCHEMA[f"{mod}.{name}.{prop}"] = f"{mod}.{ref.rsplit('/', 1)[-1]}"
     return found
+
+
+# `module.Schema` -> its `x-ticvai-*` keys, and `module.Schema.arrayProp` -> `module.ItemSchema`.
+# Filled by `load_contract_props`, read by `table_marks`.
+SCHEMA_MARKS: dict = {}
+ITEM_SCHEMA: dict = {}
+
+
+def table_marks(cols: dict, tables) -> dict:
+    """What the contract schema a table is derived from says about the table as a whole.
+
+    **A table is found from its columns' `source`**, which names `module.Schema.property` or
+    `module.Parent.array[].property` — so a table with no persistence tag of its own
+    (`platform.audit_record`) or one derived from an array (`ledger.journal_line`) resolves too.
+    Returns `table -> {"append_only": column, "primary_key": [columns], "schema": name}`, with
+    property names already turned into this table's column names."""
+    out = {}
+    for t in tables:
+        votes: dict = defaultdict(int)
+        for c in cols.get(t, []):
+            src = str(c.get("source") or "")
+            m = re.match(r"^([\w-]+)\.(\w+)\.(\w+)\[\]\.\w+$", src)
+            if m:
+                key = ITEM_SCHEMA.get(f"{m.group(1)}.{m.group(2)}.{m.group(3)}")
+                if key:
+                    votes[key] += 1
+                continue
+            m = re.match(r"^([\w-]+)\.(\w+)\.\w+$", src)
+            if m:
+                votes[f"{m.group(1)}.{m.group(2)}"] += 1
+        if not votes:
+            continue
+        schema = max(sorted(votes), key=lambda k: votes[k])
+        marks = SCHEMA_MARKS.get(schema) or {}
+
+        def column_of(prop):
+            for c in cols.get(t, []):
+                if str(c.get("source") or "").rsplit(".", 1)[-1] == prop:
+                    return c["column"]
+            return None
+
+        entry = {"schema": schema}
+        ao = marks.get("x-ticvai-append-only")
+        if isinstance(ao, str) and ao.strip():
+            entry["append_only"] = column_of(ao.strip()) or f"?{ao.strip()}"
+        pk = marks.get("x-ticvai-primary-key")
+        if isinstance(pk, list) and pk:
+            entry["primary_key"] = [column_of(str(p)) or f"?{p}" for p in pk]
+        if len(entry) > 1:
+            out[t] = entry
+    return out
 
 
 def column_rules(short: str, col: str, typ: str, spec: dict) -> str:
@@ -801,6 +949,10 @@ def pg_type(t: str | None) -> str:
 
 
 
+# `table -> [columns]` from `x-ticvai-primary-key`, filled in `main` before any key is asked for.
+DECLARED_PK: dict = {}
+
+
 def key_of(table: str, cols: dict) -> str | None:
     """The column a foreign key should point at.
 
@@ -815,6 +967,12 @@ def key_of(table: str, cols: dict) -> str | None:
     names = [c["column"] for c in cols.get(table, [])]
     if not names:
         return None
+    # **A key the contract names wins** (`x-ticvai-primary-key`, ADR-0058). One column is the key a
+    # foreign key can point at; several (`kernel.inbox`'s `(consumer, event_id)`) are a key nothing
+    # references by a single column, so there is no single answer to give.
+    declared = DECLARED_PK.get(table)
+    if declared:
+        return declared[0] if len(declared) == 1 else None
     if "id" in names:
         return "id"
     stem = table.split(".", 1)[1]
@@ -930,6 +1088,102 @@ def main() -> int:
         if tgt in contract_props and "x-ticvai-unique" not in contract_props[tgt]:
             contract_props[tgt] = {**contract_props[tgt], "x-ticvai-unique": lvl}
 
+    # ---- ADR-0056 and ADR-0058, accepted 30 September ---------------------------------------
+    # **What the contract schema says about a table as a whole**: a named key
+    # (`x-ticvai-primary-key`) and whether its rows are only ever appended
+    # (`x-ticvai-append-only: <time property>`).
+    marks = table_marks(cols, real)
+    DECLARED_PK.clear()
+    DECLARED_PK.update({t: m["primary_key"] for t, m in marks.items()
+                        if m.get("primary_key") and not any(c.startswith("?")
+                                                            for c in m["primary_key"])})
+
+    # **One id type** (ADR-0056 section 1). The package held text and uuid keys side by side, so
+    # `platform.outbox.aggregate_id` could not hold an order id and 285 references joined a text
+    # column to a uuid one. **Every key named `id` or `*_id` is `uuid`, and every reference to one
+    # is too** — new ids are UUIDv7. A key that is a human code (`games.card.card_code`) is not an
+    # id and stays text: a person types it, and ADR-0056 keeps human codes apart from ids.
+    #
+    # A declared reference takes its target key's type, because Postgres refuses a foreign key
+    # between two types. A convention takes it only where the target's key was converted here —
+    # it held the same text as that key until today — and only when its name does not say it
+    # holds somebody else's identifier (`provider_*`, `external_*`, `partner_*`).
+    TEXTY = {"text", "jsonb", "char(26)", "varchar"}
+
+    def id_like(c: str) -> bool:
+        return c == "id" or c.endswith("_id")
+
+    key_type_before: dict = {}
+    for t in real:
+        k = key_of(t, cols)
+        if k:
+            spec = next((c for c in cols[t] if c["column"] == k), {})
+            key_type_before[t] = pg_type(spec.get("type"))
+    converted_keys = {t for t, ty in key_type_before.items()
+                      if ty in TEXTY and id_like(key_of(t, cols))}
+
+    def key_type(t: str) -> str | None:
+        if t not in key_type_before:
+            return None
+        return "uuid" if t in converted_keys else key_type_before[t]
+
+    EXTERNAL = ("provider_", "external_", "partner_")
+
+    def id_type(t: str, c: dict, typ: str) -> str:
+        """The column's type once ADR-0056's one-id-type rule has been applied."""
+        col = c["column"]
+        if typ not in TEXTY:
+            return typ
+        if t in converted_keys and col == key_of(t, cols):
+            return "uuid"
+        if col in (DECLARED_PK.get(t) or []) and id_like(col):
+            return "uuid"
+        ref = c.get("references")
+        if not ref or ref not in real or key_type(ref) != "uuid":
+            return typ
+        if c.get("enforced") == "yes":
+            return "uuid"
+        if ref in converted_keys and id_like(col) and not col.startswith(EXTERNAL):
+            return "uuid"
+        return typ
+
+    # **Which tables partition by month** (ADR-0056 section 2): append-only in the contract, with
+    # the time column present, and nothing pointing at them. The last condition is checked rather
+    # than assumed, because a foreign key into a partitioned table would have to carry the time
+    # column, and that is a different design.
+    inbound: dict = defaultdict(set)
+    for t in real:
+        for c in cols[t]:
+            ref = c.get("references")
+            if (ref in real and c.get("enforced") == "yes" and key_of(ref, cols)
+                    and area(t.split(".")[0]) == area(ref.split(".")[0])):
+                inbound[ref].add(f"{t}.{c['column']}")
+    partitioned: dict = {}
+    declined: list = []
+    for t, m in sorted(marks.items()):
+        col = m.get("append_only")
+        if not col:
+            continue
+        if col.startswith("?"):
+            declined.append((t, f"the contract names {col[1:]}, which is not a column of the table"))
+        elif area(t.split(".")[0]) != "tenant":
+            declined.append((t, "not in the tenant template"))
+        elif inbound.get(t):
+            declined.append((t, "referenced by " + ", ".join(sorted(inbound[t]))))
+        else:
+            partitioned[t] = col
+
+    # **Composite keys where venue_id already exists** (ADR-0056 section 3). A declared reference
+    # between two tables that both carry a NOT NULL `venue_id` becomes `(venue_id, <column>) ->
+    # parent (venue_id, <key>)`, so a row can only point at a parent in its own venue. The parent
+    # gains `UNIQUE (venue_id, <key>)`; no table gains a column.
+    def venue_nn(t: str) -> bool:
+        return any(c["column"] == "venue_id" and c.get("required") == "yes" for c in cols.get(t, []))
+
+    composite_parents: set = set()
+    n_composite = 0
+    n_id_converted = 0
+
     # **One name per index per schema.** naming-and-style 6.1's `<table>_<columns>_idx` can make
     # the same string from two tables (`a_b` + `c`, `a` + `b_c`), and `CREATE INDEX IF NOT EXISTS`
     # would quietly skip the second. A clash is made unique with a hash of the table and column.
@@ -971,6 +1225,14 @@ def main() -> int:
             # **A table with no key is not a table Postgres will let anything reference**, which is
             # how four constraints came to point at a column that is not unique.
             tkey = key_of(t, cols)
+            # **A partitioned table's key carries its partition column** (Postgres requires it), and a
+            # key the contract names with several columns is a table constraint rather than a column's.
+            part_col = partitioned.get(t)
+            declared_pk = DECLARED_PK.get(t)
+            inline_pk = not (part_col or (declared_pk and len(declared_pk) > 1))
+            pk_cols = list(declared_pk or ([tkey] if tkey else []))
+            if part_col and part_col not in pk_cols:
+                pk_cols.append(part_col)
             for c in cols[t]:
                 col = c["column"]
                 # A column that exists only to point at a refused pseudo-table (`attributes_id`
@@ -980,6 +1242,10 @@ def main() -> int:
                         and not VALID_TABLE.match(str(_ref))):
                     continue
                 typ = pg_type(c.get("type"))
+                one_type = id_type(t, c, typ)
+                if one_type != typ:
+                    n_id_converted += 1
+                    typ = one_type
                 # **`scope_path` is an ltree** (ADR-0011, naming-and-style 5.3). Until 24 September it
                 # came through as the contract's `string`, so 515 tables stored text and `in_scope`
                 # cast every row to ltree at query time, which no index can serve.
@@ -999,9 +1265,9 @@ def main() -> int:
                 # were. Until 26 September 252 of the 263 tables under `apply_scope_rls` declared it
                 # nullable anyway. A tenant-level row is stored at the tenant root path
                 # (naming-and-style 5.3), not at null.
-                if col == "scope_path":
+                if col == "scope_path" or col == part_col:
                     nn = " NOT NULL"
-                pk = " PRIMARY KEY" if col == tkey else ""
+                pk = " PRIMARY KEY" if inline_pk and col == tkey else ""
                 # **Contract enums, maxLength and defaults become a CHECK and a DEFAULT.** Not on
                 # a path column: its contract type is a string and its column is an ltree.
                 rules = "" if is_path else column_rules(
@@ -1025,6 +1291,17 @@ def main() -> int:
                         stmt = (f"ALTER TABLE {q(schema)}.{q(short)} ADD CONSTRAINT "
                                 f"{obj_name(short, col, suffix='fkey')} FOREIGN KEY ({q(col)}) "
                                 f"REFERENCES {q(tgt_s)}.{q(tgt_t)}({q(tgt_key)});")
+                        # **Composite where both ends already carry a NOT NULL venue_id** (ADR-0056
+                        # section 3): the child cannot point at a parent in another venue.
+                        if (col != "venue_id" and ref != t and tgt_key != "venue_id"
+                                and area(schema) == "tenant" and area(tgt_s) == "tenant"
+                                and venue_nn(t) and venue_nn(ref)):
+                            stmt = (f"ALTER TABLE {q(schema)}.{q(short)} ADD CONSTRAINT "
+                                    f"{obj_name(short, 'venue_id', col, suffix='fkey')} FOREIGN KEY "
+                                    f"(venue_id, {q(col)}) REFERENCES {q(tgt_s)}.{q(tgt_t)}"
+                                    f"(venue_id, {q(tgt_key)});")
+                            composite_parents.add(ref)
+                            n_composite += 1
                         if area(schema) != area(tgt_s):
                             # **Postgres has no cross-database foreign key.** The split ADR-0039
                             # makes turns 21 declared references into application-level rules, and
@@ -1093,10 +1370,12 @@ def main() -> int:
                 n_idx += 1
             # **The relay's queue is the unpublished rows** (system-design review SD-030, 29 September).
             # Its only index was the GiST one on `scope_path`, so every poll scanned the table.
+            # ADR-0058: each poll is `WHERE published_at IS NULL ORDER BY created_at, id ... FOR UPDATE
+            # SKIP LOCKED`, so the index is on both, and holds only the rows still to publish.
             if t == "platform.outbox" and {"published_at", "created_at"} <= set(names):
                 idx_lines.append((schema,
-                    "-- the relay polls unpublished rows oldest first (SD-030)\n"
-                    "CREATE INDEX IF NOT EXISTS outbox_unpublished_idx ON platform.outbox (created_at) "
+                    "-- the relay polls unpublished rows oldest first (SD-030, ADR-0058)\n"
+                    "CREATE INDEX IF NOT EXISTS outbox_unpublished_idx ON platform.outbox (created_at, id) "
                     "WHERE published_at IS NULL;"))
                 n_idx += 1
             # **The scope tree's own path, GiST-indexed** as 001-extensions says it is: every venue
@@ -1139,6 +1418,9 @@ def main() -> int:
                                         if level == "venue" else "not a recognised level"))
                     continue
                 keycols = lead + [col]
+                # A unique index on a partitioned table must include the partition column.
+                if part_col and part_col not in keycols:
+                    keycols.append(part_col)
                 where = "" if c.get("required") == "yes" else f" WHERE {q(col)} IS NOT NULL"
                 uname = obj_name(short, *keycols, suffix="uniq")
                 idx_lines.append((schema,
@@ -1147,14 +1429,30 @@ def main() -> int:
                     f"({', '.join(q(k) for k in keycols)}){where};"))
                 n_uniq += 1
 
+            if not inline_pk and pk_cols:
+                body.append(f"    CONSTRAINT {obj_name(short, suffix='pkey')} PRIMARY KEY "
+                            f"({', '.join(q(k) for k in pk_cols)})")
             out.append(",\n".join(body))
-            out.append(");")
+            # ADR-0056: range-partitioned by month; the partitions are in 930-partitioning.sql.
+            out.append(f") PARTITION BY RANGE ({q(part_col)});" if part_col else ");")
             out.append("")
             n_tables += 1
         files[f"{area(schema)}/010-{schema}.sql"] = "\n".join(out) + "\n"
 
     for db in (CONTROL, "tenant"):
         mine = sorted(line for s, line in fk_lines if area(s) == db)
+        # **The parents of a composite key first** (ADR-0056): a foreign key on `(venue_id, x)`
+        # needs a unique constraint on the same pair in the parent before it can be created.
+        uniq = sorted(
+            f"ALTER TABLE {q(p.split('.')[0])}.{q(p.split('.')[1])} ADD CONSTRAINT "
+            f"{obj_name(p.split('.')[1], 'venue_id', key_of(p, cols), suffix='uniq')} "
+            f"UNIQUE (venue_id, {q(key_of(p, cols))});"
+            for p in composite_parents if area(p.split(".")[0]) == db)
+        if uniq:
+            mine = (["-- Parents of a composite venue key (ADR-0056): UNIQUE (venue_id, <key>).",
+                     "-- A child and its parent that both carry a NOT NULL venue_id are joined on "
+                     "both columns,", "-- so a row cannot point at a parent in another venue."]
+                    + uniq + ["", "-- The references."] + mine)
         files[f"{db}/900-foreign-keys.sql"] = "\n".join([
             f"-- Declared references inside the {db} database, applied after every table exists.",
             "-- **Separate file because the schemas cannot be ordered so every reference precedes",
@@ -1320,12 +1618,9 @@ def main() -> int:
             shared={t: c for t, c in shared_scope.items() if t in mine},
             by_subject=smine, tenant_only=tmine)
 
-    # **The venue partition mechanism** (ADR-0005, ADR-0044). The helper only; the tables that use
-    # it declare their own partitioning where they are created.
-    partitioned = sorted(t for t in real if area(t.split(".")[0]) == "tenant"
-                         and any(c["column"] == "venue_id" and c.get("required") == "yes"
-                                 for c in cols[t]))
-    files["tenant/930-partitioning.sql"] = partition_file(partitioned)
+    # **Range partitioning by month** (ADR-0056). The tables declare `PARTITION BY RANGE` where they
+    # are created; this file holds each one's DEFAULT partition and the months ahead.
+    files["tenant/930-partitioning.sql"] = partition_file(partitioned, declined)
 
     files["provision-tenant.sh"] = PROVISION
 
@@ -1364,6 +1659,11 @@ def main() -> int:
         print(f"  {len(no_unique)} uniqueness rule(s) the contract marks but the DDL cannot key:")
         for u in no_unique:
             print(f"     {u}")
+    print(f"  ADR-0056: {n_id_converted} id column(s) made uuid ({len(converted_keys)} keys) · "
+          f"{len(partitioned)} table(s) range-partitioned by month · {n_composite} composite venue "
+          f"foreign key(s) onto {len(composite_parents)} parent(s)")
+    for t, why in declined:
+        print(f"     append-only but not partitioned: {t} -- {why}")
     print(f"  row-level security: {len(scoped)} by scope_path · {len(venue_only)} carry venue_id · "
           f"{len(by_parent)} through their owner · {n_subject_rls[0]} by subject · "
           f"{n_tenant_rls[0]} tenant root only · "

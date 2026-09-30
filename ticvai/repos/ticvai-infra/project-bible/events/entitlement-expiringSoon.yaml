@@ -11,19 +11,19 @@ emittedWhen: The daily expiry-notice run finds an entitlement in `issued` or `pa
   per entitlement per validTo
 payload:
 - field: entitlementId
-  type: string
+  type: uuid
 - field: templateId
   type: uuid
 - field: productId
   type: uuid
 - field: orderId
-  type: string
+  type: uuid
 - field: subjectId
   type: uuid
   notes: The holder. What a campaign or message trigger addresses; the message itself is resolved by marketing
     from the guest record, never carried here
 - field: membershipId
-  type: string
+  type: uuid
   required: false
   notes: Set when the entitlement belongs to a membership, so a membership renewal journey and a pass reminder
     are not both sent

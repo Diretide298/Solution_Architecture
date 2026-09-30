@@ -59,7 +59,7 @@ Board 2C. **Retire a season, reprice a category, change a tax class across two h
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -164,7 +164,7 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateInventoryItemRequest`
 
@@ -256,7 +256,7 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | itemId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `InventoryKitDefinition`
 
@@ -311,7 +311,7 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | itemId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -399,14 +399,14 @@ Receipt increments stock and creates the accrual the invoice will later match ag
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateGoodsReceiptRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| purchaseOrderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes |  |
+| purchaseOrderId | string (uuid) | yes |  |
 | locationId | string (uuid) | yes |  |
 | deliveryNoteReference | string |  | (max length 128) |
 | lines | array of object | yes | (min items 1) |
@@ -422,13 +422,13 @@ Receipt increments stock and creates the accrual the invoice will later match ag
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes |  |
 | receiptNumber | string | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152), e.g. (read-only) |
-| purchaseOrderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| purchaseOrderId | string (uuid) | yes |  |
 | locationId | string (uuid) | yes |  |
 | deliveryNoteReference | string |  | (nullable) |
 | lines | array of object | yes |  |
-| lines[].lineId | string |  | One batch or expiry line of the receipt. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| lines[].lineId | string (uuid) |  | One batch or expiry line of the receipt. (read-only) |
 | lines[].itemId | string (uuid) |  |  |
 | lines[].itemName | string |  |  |
 | lines[].orderedQuantity | number |  |  |
@@ -481,15 +481,15 @@ Quality failure, damage, wrong item, expiry too near. Reverses the stock increme
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| receiptId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| receiptId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | lines | array of object | yes | (min items 1) |
-| lines[].lineId | string | yes | GoodsReceipt.lines[].lineId, the batch or expiry line rejected (audit R171). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| lines[].lineId | string (uuid) | yes | GoodsReceipt.lines[].lineId, the batch or expiry line rejected (audit R171). |
 | lines[].quantity | number | yes | (min 0) |
 | reason | enum (damaged, wrongItem, qualityFailure, shortDated, overDelivery, other) | yes | other requires note (decided 28 September, audit R222). |
 | note | string |  | Required, at least 3 characters, when reason is other (audit R222). (max length 1000) |
@@ -498,13 +498,13 @@ Quality failure, damage, wrong item, expiry too near. Reverses the stock increme
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes |  |
 | receiptNumber | string | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152), e.g. (read-only) |
-| purchaseOrderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| purchaseOrderId | string (uuid) | yes |  |
 | locationId | string (uuid) | yes |  |
 | deliveryNoteReference | string |  | (nullable) |
 | lines | array of object | yes |  |
-| lines[].lineId | string |  | One batch or expiry line of the receipt. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| lines[].lineId | string (uuid) |  | One batch or expiry line of the receipt. (read-only) |
 | lines[].itemId | string (uuid) |  |  |
 | lines[].itemName | string |  |  |
 | lines[].orderedQuantity | number |  |  |
@@ -542,14 +542,14 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes |  |
+| id | uuid | yes |  |
 | receipt_number | text | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152), e.g. |
-| purchase_order_id | text | yes |  |
+| purchase_order_id | uuid | yes |  |
 | location_id | uuid | yes |  |
 | delivery_note_reference | text | no |  |
 | net_value_amount | numeric(18,4) | no |  |
 | received_by_principal_id | uuid | yes |  |
-| journal_entry_id | text | no | The accrual the supplier invoice will later match against. |
+| journal_entry_id | uuid | no | The accrual the supplier invoice will later match against. |
 | created_at | timestamptz | yes |  |
 | recorded_at | timestamptz | no |  |
 | synced_at | timestamptz | no |  |
@@ -558,8 +558,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| goods_receipt_id | text | yes | The parent row. |
-| line_id | text | no | One batch or expiry line of the receipt. |
+| goods_receipt_id | uuid | yes | The parent row. |
+| line_id | uuid | no | One batch or expiry line of the receipt. |
 | item_id | uuid | no |  |
 | item_name | text | no |  |
 | ordered_quantity | numeric | no |  |
@@ -616,7 +616,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes |  |
+| id | uuid | yes |  |
 | item_id | uuid | yes |  |
 | location_id | uuid | yes |  |
 | kind | text | yes |  |
@@ -631,7 +631,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | principal_id | uuid | yes |  |
 | source_type | text | no | What generated it — an order, a count, a transfer. |
 | source_id | text | no |  |
-| journal_entry_id | text | no |  |
+| journal_entry_id | uuid | no |  |
 | created_at | timestamptz | yes |  |
 
 ### `inventory.serialised_item`

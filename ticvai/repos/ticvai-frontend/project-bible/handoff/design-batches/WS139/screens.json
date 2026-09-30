@@ -1088,6 +1088,19 @@
        "derived": true,
        "impliedBy": "listJourneys",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "decideAiInsight",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "decideAiInsight"
       }
      ]
     }
@@ -1106,6 +1119,27 @@
     "contract": "marketing-crm",
     "purpose": "Automated journeys",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listMarketingRecommendations",
+    "contract": "ai",
+    "purpose": "AI recommendations on this campaign or journey, with expected impact and evidence",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "decideAiInsight",
+    "contract": "ai",
+    "purpose": "Accept, reject or mark a campaign or journey recommendation actioned",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "requestSuggestion",
+    "contract": "ai",
+    "purpose": "Send-time suggestion (kind sendTime): best hour and channel per recipient",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1114,6 +1148,14 @@
    "workshopBoard": "wireframes/WS74 Marketing CRM Configuration Reference v1.0 Board 5.dc.html#bo-782"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 28. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "insightId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

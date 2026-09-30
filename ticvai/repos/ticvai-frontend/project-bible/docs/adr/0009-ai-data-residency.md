@@ -1,6 +1,6 @@
 # ADR-0009: AI Data Residency
 
-**Status:** Accepted
+**Status:** Accepted · section 2 amended by [ADR-0049](0049-vectors-live-in-qdrant-one-collection-per-tenant.md), 30 September 2026: Qdrant on every tier, one collection per tenant with a collection-scoped token; the shared tier no longer uses pgvector
 **Date:** 13 August 2026
 **Closes:** CF-20
 **Supersedes:** the working assumption that UAE law mandates domestic AI data storage
@@ -58,6 +58,10 @@ Article 22/23 transfer requiring a documented mechanism.
 
 ### 2. Qdrant is selected, deployed in-cell
 
+> **Amended 30 September 2026 by ADR-0049.** Qdrant on **every** tier, shared included: self-hosted
+> in Azure UAE North (3-node HA), a single node on-premise, one collection per tenant with a token that
+> reaches only that collection. The `pgvector` default for the shared tier below no longer holds.
+
 The abstraction with a `pgvector` fallback stays, but the residency objection dissolves:
 a self-hosted vector store inside the cell is in-jurisdiction by construction. The choice
 returns to being a technical one.
@@ -102,7 +106,7 @@ Designing to them costs nothing extra and removes a procurement objection.
 | Inference endpoint becomes a cell attribute | Alongside database and vector store placement |
 | A new compliance artefact is required | Transfer register per tenant, with mechanism and risk assessment |
 | DIFC-located tenants carry an extra regime | Regulation 10 on autonomous systems, enforced from January 2026 |
-| Shared-tier tenants use `pgvector` | Dedicated and isolated tiers use Qdrant in-cell |
+| Shared-tier tenants use `pgvector` | Dedicated and isolated tiers use Qdrant in-cell (amended by ADR-0049: Qdrant on every tier, a collection per tenant) |
 
 ### New finding — biometric data
 

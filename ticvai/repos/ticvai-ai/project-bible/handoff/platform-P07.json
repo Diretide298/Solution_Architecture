@@ -39,19 +39,19 @@
    "operations": 8
   },
   {
-   "contract": "cross-region",
-   "operations": 2
-  },
-  {
    "contract": "orders",
    "operations": 2
   },
   {
-   "contract": "shift",
-   "operations": 1
+   "contract": "cross-region",
+   "operations": 2
   },
   {
    "contract": "accreditation",
+   "operations": 1
+  },
+  {
+   "contract": "shift",
    "operations": 1
   }
  ],

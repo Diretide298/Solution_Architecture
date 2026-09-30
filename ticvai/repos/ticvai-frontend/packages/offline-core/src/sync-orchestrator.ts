@@ -115,7 +115,7 @@ export class SyncOrchestrator {
     this.stopped = false;
 
     // Anything left in-flight belongs to a crashed or killed process. Safe to
-    // replay because the server deduplicates on the entry ULID.
+    // replay because the server deduplicates on the entry id.
     const recovered = await this.outbox.recoverInFlight();
     if (recovered > 0) {
       await this.refreshCounts();

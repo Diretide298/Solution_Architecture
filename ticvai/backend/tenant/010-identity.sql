@@ -244,7 +244,7 @@ CREATE TABLE IF NOT EXISTS identity.membership_history (
     is_benefits_restricted            boolean,
     is_renewal_allowed                boolean,
     is_credential_disabled            boolean,
-    approval_request_id               text,
+    approval_request_id               uuid,
     ends_episode_history_id           uuid
 );
 
@@ -347,7 +347,7 @@ CREATE TABLE IF NOT EXISTS identity.permission (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS identity.platform_staff_grant (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     operator_principal_id             uuid NOT NULL,
     operator_display_name             text,
     permissions                       text[] NOT NULL,

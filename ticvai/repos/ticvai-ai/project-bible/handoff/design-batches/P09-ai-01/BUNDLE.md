@@ -233,14 +233,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listAiProviders",
        "notes": "**One managed provider by default (AI-D02)**, with a small and a stronger model per agent task; a second provider or a tenant key only where TICVAI enabled it (AI-D14). `taskKeys` binds a provider to named agent tasks (M21-03). **Fitness warnings are shown, never blocking** (M21-09): a model below a task's floor is underpowered, one far above its ceiling is overpowered.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       },
       {
        "kind": "banner",
        "label": "Model fit warning",
        "operation": "setAiProvider",
        "notes": "Shown after `setAiProvider` returns `fitnessWarnings`: names the task, the score and the band.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     },
@@ -426,7 +426,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "id": "formOpenPlatformStaffGrant",
     "component": "modal",
     "trigger": "Open access grant",
-    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only; `AI_CONFIGURE` and `SCOPE_VIEW` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client UUIDv7), `permissions` (tenant permissions only; `AI_CONFIGURE` and `SCOPE_VIEW` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Open access grant",
      "operation": "openPlatformStaffGrant"
@@ -1599,7 +1599,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "operatorPrincipalId": {
     "type": "string",

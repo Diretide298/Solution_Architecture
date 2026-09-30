@@ -1,4 +1,123 @@
 {
+ "AgentWorkloadAvailabilityWorkforceControlView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over marketing.agent_service_profile (new), marketing.agent_availability, marketing.case, marketing.conversation, marketing.service_queue (new) and workforce.shift",
+  "description": "One agent's live status and workload. Rates are over the period since the agent's current shift started, or the venue's current day when no shift is rostered.",
+  "required": [
+   "principalId",
+   "agentName",
+   "status",
+   "activeCases"
+  ],
+  "properties": {
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "agentName": {
+    "type": "string",
+    "description": "The agent's display name."
+   },
+   "team": {
+    "type": "string",
+    "nullable": true
+   },
+   "skills": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "languages": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "available",
+     "busy",
+     "onCall",
+     "chatting",
+     "afterCallWork",
+     "break",
+     "training",
+     "offline"
+    ]
+   },
+   "activeCases": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "chats": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Conversations the agent holds now."
+   },
+   "calls": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Voice conversations in progress (0 or 1)."
+   },
+   "queues": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "queueId",
+      "queueName"
+     ],
+     "properties": {
+      "queueId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "queueName": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "slaRiskCases": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "The agent's open cases at risk or breached."
+   },
+   "averageHandleSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "resolutionRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true,
+    "description": "Cases resolved over cases handled."
+   },
+   "utilization": {
+    "type": "number",
+    "minimum": 0,
+    "description": "Active cases and conversations over `maxConcurrentCases`; above 1 means overloaded."
+   },
+   "workloadBand": {
+    "type": "string",
+    "enum": [
+     "available",
+     "normal",
+     "overloaded"
+    ],
+    "description": "`overloaded` at utilization 0.9 or above, `available` below 0.5."
+   },
+   "availabilityExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
  "ApprovalKind": {
   "type": "string",
   "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n",
@@ -143,8 +262,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a ULID."
+    "format": "uuid",
+    "description": "Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7."
    },
    "caseNumber": {
     "type": "string",
@@ -371,7 +490,7 @@
    },
    "caseId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "kind": {
     "type": "string",
@@ -431,7 +550,7 @@
   "properties": {
    "caseId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "caseNumber": {
     "type": "string"
@@ -703,7 +822,7 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "subjectId": {
     "type": "string",
@@ -759,6 +878,122 @@
     "type": "string",
     "format": "date-time",
     "description": "Device time the case was raised. The server stamps `Case.syncedAt` on arrival."
+   }
+  }
+ },
+ "EscalationCriticalCaseMonitorView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over marketing.case, marketing.case_escalation (new, one row per escalateCase call) and the related order in orders",
+  "description": "One open escalated case, as of its latest escalation.",
+  "required": [
+   "caseId",
+   "caseNumber",
+   "reason",
+   "escalationType",
+   "priority",
+   "escalatedAt",
+   "status"
+  ],
+  "properties": {
+   "caseId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "caseNumber": {
+    "type": "string"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "customerName": {
+    "type": "string",
+    "nullable": true,
+    "description": "Resolved from `pii.subject`; null unless the caller holds `GUEST_VIEW_PII`."
+   },
+   "reason": {
+    "type": "string",
+    "description": "The reason given to `escalateCase`, or `SLA breached` for an automatic escalation."
+   },
+   "reasonCategory": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "slaRisk",
+     "customerComplaint",
+     "repeatedContact",
+     "highValue",
+     "refundException",
+     "operationalFailure",
+     "systemFailure",
+     "legalCompliance",
+     "vipCustomer",
+     "supervisorRequested",
+     "other"
+    ]
+   },
+   "escalationType": {
+    "type": "string",
+    "enum": [
+     "vip",
+     "financial",
+     "eventDay",
+     "management",
+     "technical",
+     "other"
+    ],
+    "description": "`vip` for a VIP-tier customer, `financial` for a refund or high-value order, `eventDay` when the case's event is today, `management` when escalated to a manager, `technical` for a technical category; the first that applies, in that order."
+   },
+   "priority": {
+    "$ref": "#/components/schemas/CasePriority"
+   },
+   "transactionValue": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "The related order's total, when the case has one."
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "eventName": {
+    "type": "string",
+    "nullable": true
+   },
+   "assignedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "escalatedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "escalatedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "escalationCount": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "slaDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isSlaBreached": {
+    "type": "boolean"
+   },
+   "status": {
+    "$ref": "#/components/schemas/CaseStatus"
    }
   }
  },
@@ -869,8 +1104,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID; equals the `Idempotency-Key` header."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7; equals the `Idempotency-Key` header."
    },
    "scopePath": {
     "type": "string",
@@ -879,18 +1114,18 @@
    },
    "caseId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "Required for `fullRefund`, `partialRefund`, `feeWaiver`, `upgrade` and `discount`."
    },
    "lineIds": {
     "type": "array",
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     }
    },
    "requestType": {
@@ -1055,6 +1290,57 @@
     "nullable": true,
     "maxLength": 1000,
     "description": "AI-derived and labelled as such; cites a recorded policy or says none applies."
+   }
+  }
+ },
+ "ServiceQueue": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.service_queue",
+  "description": "**A customer-service queue** (e.g. `eventDaySupport`). Cases (`Case.queueId`), routing rules (`queueId`, `fallbackQueueId`) and agents (`AgentAvailability.queueIds`) name it; `listContact` and `listAgentWorkloadAvailability` report per queue. Maintained by `setServiceQueueDefinition`, read by `listServiceQueues` (decided 29 September, writers pass). (decided 29 September, data model for the agreed operations)\n",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 60
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 150
+   },
+   "overflowWaitSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "The queue's overflow threshold; a case waiting longer marks the queue `critical`."
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },

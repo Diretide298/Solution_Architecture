@@ -257,7 +257,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: submitApprovalRequest
       x-ticvai-audience:
@@ -403,7 +403,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: decideApprovalRequest
       x-ticvai-consumed-by:
@@ -523,7 +523,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: withdrawApprovalRequest
       x-ticvai-consumed-by:
@@ -581,7 +581,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: escalateApprovalRequest
       x-ticvai-consumed-by:
@@ -638,7 +638,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: resubmitApprovalRequest
       x-ticvai-consumed-by:
@@ -2585,7 +2585,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+        format: uuid
     post:
       operationId: signApprovalDecision
       x-ticvai-consumed-by:
@@ -2643,7 +2643,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+        format: uuid
     get:
       operationId: getApprovalRecord
       x-ticvai-consumed-by:
@@ -2943,7 +2943,7 @@ paths:
         required: false
         schema:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -2967,7 +2967,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: resolveApprovedActionExecution
       x-ticvai-consumed-by:
@@ -3298,7 +3298,7 @@ paths:
         required: false
         schema:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
       - name: status
         in: query
         required: false
@@ -3334,7 +3334,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: recordExternalApprovalDecision
       x-ticvai-api-scope: core.write
@@ -3584,7 +3584,7 @@ components:
           - escalate
         assigneeId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: Required for investigate and escalate
         note:
           type: string
@@ -3604,10 +3604,10 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         approvalRequestId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         sourceModule:
           type: string
           description: The contract that owns and executes the action
@@ -4095,7 +4095,7 @@ components:
           format: uuid
         requestId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         providerId:
           type: string
           format: uuid
@@ -4603,7 +4603,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         kind:
           $ref: '#/components/schemas/ApprovalKind'
         subjectContract:
@@ -5003,7 +5003,7 @@ components:
             - cancelled
           requestId:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
             description: 'The request the refusal is about. With `openRequestExists`, the open request
               already raised for this subject.
 
@@ -7527,7 +7527,7 @@ components:
           nullable: true
         approvalRequestId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: The `approvals.request` that authorised publication
         rolloutScope:
@@ -7810,7 +7810,7 @@ components:
           nullable: true
         approvalRequestId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         inputPayload:
           type: object

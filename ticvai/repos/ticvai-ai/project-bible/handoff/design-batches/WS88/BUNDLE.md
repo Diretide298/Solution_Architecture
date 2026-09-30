@@ -1,6 +1,6 @@
 # WS88 — Rental Management board 1
 
-**10 screens · 16 operations · 13 schemas · 5 permissions**
+**10 screens · 16 operations · 14 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -1895,7 +1895,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Define a category and its defaults",
   "permission": "RENTAL_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {
@@ -1914,7 +1914,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Define a rental product",
   "permission": "RENTAL_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1946,7 +1946,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Load a client's rental items and inventory at onboarding",
   "permission": "RENTAL_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -2081,7 +2081,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Move a product through draft, review, approval and activation",
   "permission": "RENTAL_APPROVE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -2100,7 +2100,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "The agreement, waiver and signature a rental needs",
   "permission": "RENTAL_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -2119,7 +2119,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Minimum, maximum, increment, extension and turnaround",
   "permission": "RENTAL_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -2138,7 +2138,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Pooled, serialised or hybrid",
   "permission": "RENTAL_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -2157,7 +2157,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Who may rent it, how many, and what must happen at the counter",
   "permission": "RENTAL_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -2176,7 +2176,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Where it can be collected, and where it can be returned",
   "permission": "RENTAL_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -2195,7 +2195,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Change a rental product",
   "permission": "RENTAL_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -2214,7 +2214,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "What is still missing before this can be sold",
   "permission": "RENTAL_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -2235,6 +2235,61 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AuditRecord": {
+  "x-ticvai-append-only": "occurredAt",
+  "type": "object",
+  "x-ticvai-persistence": "platform.audit_record",
+  "description": "26 September, pull audit R198. **One row of the platform audit trail, as `listAuditRecords` returns it.** It was a free-form object, so nothing said what an audit row carries. These are the fields the operation already filters on — who, where, on which workstation, what action, on what, and when — and nothing more. Written by the operations that audit themselves; never edited and never deleted.\n",
+  "required": [
+   "id",
+   "action",
+   "occurredAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Who acted."
+   },
+   "orgUnitId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The scope node the action happened in."
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The workstation it was done from, where there was one."
+   },
+   "action": {
+    "type": "string",
+    "description": "What was done, as the writing operation names it."
+   },
+   "subjectRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "**The thing acted on** — a profile, a shift, an order. The same value the `subjectRef` filter matches.\n"
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "When. The list is ordered by this, most recent first."
+   },
+   "platformStaffGrantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Set when a TICVAI platform operator acted, naming the grant they acted under** (`identity.openPlatformStaffGrant`; decided 28 September, audit R098). Null for the tenant's own staff. Every platform action in a tenant carries one, so the tenant can see all of them.\n"
+   }
+  }
+ },
  "MembershipProductValidationApprovalPublicationVersioInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,

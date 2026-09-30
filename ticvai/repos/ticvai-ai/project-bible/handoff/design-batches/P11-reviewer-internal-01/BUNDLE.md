@@ -1,6 +1,6 @@
 # P11-reviewer-internal-01 — P11 · Reviewer (Internal)
 
-**3 screens · 3 operations · 7 schemas · 2 permissions**
+**3 screens · 6 operations · 4 schemas · 2 permissions**
 
 Platform P11 Accreditation Web · ships as **ticvai-control** ·
 public audience · web ·
@@ -48,10 +48,9 @@ convincingly. It is never a caption.
 ## Rules that are not style preferences
 
 - **Every control that can be refused must be gated.** 2 permissions apply here:
-  `APPROVAL_DECIDE, APPROVAL_VIEW`. A control nobody can use must say so,
+  `ACCREDITATION_APPROVE, ACCREDITATION_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -62,7 +61,7 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `ACC-006` | Reviewer Queue | approvalInbox | 1 | 0 | — |
-| `ACC-007` | Reviewer Application Detail | approvalInbox | 2 | 2 | — |
+| `ACC-007` | Reviewer Application Detail | approvalInbox | 4 | 2 | — |
 | `ACC-008` | Credential Register | listDetail | 1 | 1 | — |
 
 ---
@@ -84,10 +83,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "purpose": "Work the queue of applications waiting on a decision, oldest-due first, and approve the straightforward ones without opening them.\n",
   "apis": [
    {
-    "operationId": "listApprovalRequests",
-    "contract": "approvals",
-    "purpose": "Accreditation applications awaiting a decision",
-    "trigger": "onLoad"
+    "operationId": "listAccreditationApplications",
+    "contract": "accreditation",
+    "purpose": "Applications awaiting review, oldest first",
+    "trigger": "onLoad",
+    "provenance": "readiness close-out, 29 September 2026"
    }
   ],
   "gaps": [
@@ -193,17 +193,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "ACC-007",
      "trigger": "Reviewer Application Detail",
      "carries": [
-      "requestId"
+      "documentId"
      ],
-     "provenance": "derived — ACC-007 declares entryState.params requestId, so an edge into it must carry them"
+     "provenance": "derived — ACC-007 declares entryState.params applicationId, documentId and ACC-006 holds documentId, so an edge into it carries them"
     },
     {
      "to": "ACC-008",
      "trigger": "Credential Register",
-     "carries": [
-      "programmeId"
-     ],
-     "provenance": "derived — ACC-008 declares entryState.params programmeId, so an edge into it must carry them"
+     "provenance": "derived — ACC-008 declares entryState.params  and ACC-006 holds none of them, so the edge carries nothing and ACC-008 opens cold"
     }
    ]
   },
@@ -256,20 +253,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "purpose": "Everything the decision needs about one application, in one place, so the reviewer does not open another screen to decide.\n",
   "apis": [
    {
-    "operationId": "listApprovalRequests",
-    "contract": "approvals",
-    "purpose": "The application under review",
-    "trigger": "onLoad"
+    "operationId": "decideAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "Approve, reject or return for information",
+    "trigger": "onAction",
+    "provenance": "readiness close-out, 29 September 2026"
    },
    {
-    "operationId": "decideApprovalRequest",
-    "contract": "approvals",
-    "purpose": "Approve or refuse, with a reason",
+    "operationId": "getAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "The application under review",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAccreditationDocuments",
+    "contract": "accreditation",
+    "purpose": "The application's documents (applicationId), each with its state",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "verifyAccreditationDocument",
+    "contract": "accreditation",
+    "purpose": "Verify or refuse each document",
     "trigger": "onAction",
-    "invalidates": [
-     "listApprovalRequests",
-     "listAccreditationBadges"
-    ]
+    "provenance": "build, 29 September 2026"
    }
   ],
   "gaps": [
@@ -352,8 +361,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "entryState": {
    "params": [
     {
-     "name": "requestId",
+     "name": "applicationId",
      "from": "ACC-006"
+    },
+    {
+     "name": "documentId",
+     "from": "navigation"
     }
    ],
    "preloaded": [
@@ -375,25 +388,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "transitions": [
     {
-     "to": "ACC-005",
-     "trigger": "The badge is issued",
-     "provenance": "flow F23 step 2→3"
-    },
-    {
      "to": "ACC-006",
      "trigger": "Reviewer Queue",
-     "carries": [
-      "programmeId"
-     ],
-     "provenance": "derived — ACC-006 declares entryState.params programmeId, so an edge into it must carry them"
+     "provenance": "derived — ACC-006 declares entryState.params  and ACC-007 holds none of them, so the edge carries nothing and ACC-006 opens cold"
     },
     {
      "to": "ACC-008",
      "trigger": "Credential Register",
+     "provenance": "derived — ACC-008 declares entryState.params  and ACC-007 holds none of them, so the edge carries nothing and ACC-008 opens cold"
+    },
+    {
+     "to": "ACC-005",
+     "trigger": "The badge is issued",
+     "provenance": "flow F23 step 2→3",
      "carries": [
-      "programmeId"
-     ],
-     "provenance": "derived — ACC-008 declares entryState.params programmeId, so an edge into it must carry them"
+      "holderId"
+     ]
     }
    ]
   },
@@ -447,10 +457,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "purposeNote": "**Rewritten 9 September.** The purpose read *\"Get a guest into the app, fast, on a device that may be shared\"*, which is a login screen's purpose on a credential register. Found independently by Claude Design on the drawn frame and by this pass.\n",
   "apis": [
    {
-    "operationId": "listAccreditationBadges",
-    "contract": "approvals",
-    "purpose": "Credentials issued for this programme",
-    "trigger": "onLoad"
+    "operationId": "listAccreditationCredentials",
+    "contract": "accreditation",
+    "purpose": "Every credential issued, with its validity",
+    "trigger": "onLoad",
+    "provenance": "readiness close-out, 29 September 2026"
    }
   ],
   "gaps": [
@@ -574,18 +585,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ACC-006",
      "trigger": "Reviewer Queue",
-     "carries": [
-      "programmeId"
-     ],
-     "provenance": "derived — ACC-006 declares entryState.params programmeId, so an edge into it must carry them"
+     "provenance": "derived — ACC-006 declares entryState.params  and ACC-008 holds none of them, so the edge carries nothing and ACC-006 opens cold"
     },
     {
      "to": "ACC-007",
      "trigger": "Reviewer Application Detail",
-     "carries": [
-      "requestId"
-     ],
-     "provenance": "derived — ACC-007 declares entryState.params requestId, so an edge into it must carry them"
+     "provenance": "derived — ACC-007 declares entryState.params applicationId, documentId and ACC-008 holds none of them, so the edge carries nothing and ACC-007 opens cold"
     }
    ]
   },
@@ -636,13 +641,13 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
- "decideApprovalRequest": {
+ "decideAccreditationApplication": {
   "method": "POST",
-  "path": "/approval-requests/{requestId}/decide",
-  "contract": "approvals",
-  "summary": "Approve or reject",
-  "permission": "APPROVAL_DECIDE",
-  "offlineCapable": false,
+  "path": "/accreditation-applications/{applicationId}/decide",
+  "contract": "accreditation",
+  "summary": "Approve, reject, return for more, or escalate",
+  "permission": "ACCREDITATION_APPROVE",
+  "offlineCapable": null,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
@@ -653,38 +658,33 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "ApprovalRequest"
+  "responds": "AccreditationApplication"
  },
- "listAccreditationBadges": {
+ "getAccreditationApplication": {
   "method": "GET",
-  "path": "/accreditation-badges",
-  "contract": "approvals",
-  "summary": "Badges issued and their state",
-  "permission": "APPROVAL_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
+  "path": "/accreditation-applications/{applicationId}",
+  "contract": "accreditation",
+  "summary": "One application, with where each requirement stands",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "AccreditationBadge"
+  "responds": "AccreditationApplication"
  },
- "listApprovalRequests": {
+ "listAccreditationApplications": {
   "method": "GET",
-  "path": "/approval-requests",
-  "contract": "approvals",
-  "summary": "Requests awaiting a decision, or already decided",
-  "permission": "APPROVAL_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
+  "path": "/accreditation-applications",
+  "contract": "accreditation",
+  "summary": "Applications, by state and programme",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "assignedToMe",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "raisedByMe",
+    "name": "programmeId",
     "in": "query",
     "required": null
    },
@@ -694,12 +694,70 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    },
    {
-    "name": "kind",
+    "name": "applicantType",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationApplication"
+ },
+ "listAccreditationCredentials": {
+  "method": "GET",
+  "path": "/accreditation-credentials",
+  "contract": "accreditation",
+  "summary": "Badges and digital credentials issued",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "holderId",
     "in": "query",
     "required": null
    },
    {
-    "name": "breachingWithinMinutes",
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationCredential"
+ },
+ "listAccreditationDocuments": {
+  "method": "GET",
+  "path": "/accreditation-documents",
+  "contract": "accreditation",
+  "summary": "Documents supplied, by holder, application, requirement or state",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "applicationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "holderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "requirementCode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "expiringWithinDays",
     "in": "query",
     "required": null
    },
@@ -716,6 +774,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "verifyAccreditationDocument": {
+  "method": "POST",
+  "path": "/accreditation-documents/{documentId}/verify",
+  "contract": "accreditation",
+  "summary": "Accept or refuse a submitted document",
+  "permission": "ACCREDITATION_APPROVE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationDocument"
  }
 }
 ```
@@ -726,321 +803,307 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
- "AccreditationBadge": {
+ "AccreditationApplication": {
   "type": "object",
-  "x-ticvai-persistence": "approvals.accreditation_badge",
-  "description": "**Drafted 4 September.** The credential an approved application produces. **Its lifetime is not the approval's** - a badge is revoked, lost or expires while the decision that authorised it still stands.",
+  "x-ticvai-persistence": "accreditation.application",
+  "description": "Board 1.3. **Usually submitted by an organisation on behalf of its people.**",
   "required": [
-   "id"
+   "programmeId"
   ],
   "properties": {
    "id": {
     "type": "string",
     "format": "uuid"
    },
-   "approvalRequestId": {
+   "reference": {
+    "type": "string"
+   },
+   "programmeId": {
     "type": "string",
     "format": "uuid"
    },
-   "holderName": {
+   "categoryCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "applicantType": {
     "type": "string"
    },
-   "zones": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Where this badge admits, which is the whole point of it."
+   "submittedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
    },
-   "state": {
+   "organisationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "subject": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Name, date of birth, nationality, contact — shaped by the requirements matrix."
+   },
+   "requirementStatus": {
+    "type": "array",
+    "readOnly": true,
+    "items": {
+     "type": "object",
+     "properties": {
+      "requirementCode": {
+       "type": "string"
+      },
+      "satisfied": {
+       "type": "boolean"
+      },
+      "documentId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "status": {
     "type": "string",
     "enum": [
-     "issued",
-     "collected",
-     "suspended",
-     "revoked",
+     "draft",
+     "submitted",
+     "underReview",
+     "informationRequested",
+     "approved",
+     "rejected",
+     "withdrawn",
      "expired"
     ]
+   },
+   "decisionReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "missingRequirements": {
+    "type": "array",
+    "readOnly": true,
+    "description": "The requirement codes a reviewer returned the application for, or rejected it over — what the applicant must change before resubmitting",
+    "items": {
+     "type": "string"
+    }
+   },
+   "decisionDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a decision is due — the approvals request's SLA. **A date, not a queue position**"
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "renewsHolderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "12.1.37. Set by `renewAccreditation`; approval extends this holder rather than creating one"
+   },
+   "resubmissionOfApplicationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "12.1.33. The rejected application this one resubmits, so the rejection stays in the record"
+   },
+   "resubmissionNote": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true,
+    "readOnly": true,
+    "description": "What the applicant changed, from `resubmitAccreditationApplication`"
+   },
+   "submittedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "AccreditationCredential": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.credential",
+  "description": "Board 4. **Not the accreditation** — reissuing one re-vets nobody.",
+  "required": [
+   "holderId",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "printedBadge",
+     "mobileCredential",
+     "qr",
+     "nfcCard",
+     "rfidCard",
+     "wristband"
+    ]
+   },
+   "symbology": {
+    "type": "string",
+    "nullable": true,
+    "description": "12.1.22. **How `encodedIdentifier` is carried**, so a reader and a badge renderer agree: `qr` for a QR credential and the default for a `mobileCredential`, a barcode where a printed badge carries one, `nfcNdef` or `rfidEpc` for an encoded card, `none` where nothing is encoded.\n",
+    "enum": [
+     "qr",
+     "dataMatrix",
+     "pdf417",
+     "aztec",
+     "code128",
+     "nfcNdef",
+     "rfidEpc",
+     "none"
+    ]
+   },
+   "serialNumber": {
+    "type": "string",
+    "nullable": true
+   },
+   "encodedIdentifier": {
+    "type": "string",
+    "nullable": true
+   },
+   "badgeTemplateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
    },
    "issuedAt": {
     "type": "string",
     "format": "date-time"
    },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "revokedReason": {
-    "type": "string"
-   }
-  }
- },
- "ApprovalDecision": {
-  "type": "object",
-  "x-ticvai-persistence": "approvals.decision",
-  "required": [
-   "level",
-   "principalId",
-   "decision",
-   "decidedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
-   },
-   "level": {
-    "type": "integer"
-   },
-   "principalId": {
+   "issuedBy": {
     "type": "string",
     "format": "uuid"
    },
-   "displayName": {
-    "type": "string"
-   },
-   "isDelegate": {
-    "type": "boolean"
-   },
-   "delegatedFrom": {
+   "activatedAt": {
     "type": "string",
-    "format": "uuid",
+    "format": "date-time",
     "nullable": true
-   },
-   "decision": {
-    "type": "string",
-    "enum": [
-     "approve",
-     "reject"
-    ]
-   },
-   "comment": {
-    "type": "string",
-    "nullable": true
-   },
-   "reason": {
-    "type": "string",
-    "nullable": true
-   },
-   "usedMfa": {
-    "type": "boolean"
-   },
-   "signatureRef": {
-    "type": "string",
-    "nullable": true
-   },
-   "decidedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "ApprovalKind": {
-  "type": "string",
-  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n",
-  "enum": [
-   "refund",
-   "priceOverride",
-   "discountOverride",
-   "complimentaryTicket",
-   "membershipCancellation",
-   "accessPermissionChange",
-   "configurationChange",
-   "aiRecommendation",
-   "shiftVariance",
-   "releasePromotion",
-   "requisition",
-   "stockWriteOff",
-   "journalEntry",
-   "periodReopen",
-   "tenantMigration"
-  ]
- },
- "ApprovalMode": {
-  "type": "string",
-  "description": "11.1.43–11.1.46. **Sequential** asks one at a time, **parallel** asks everyone at once, **consensus** needs all of them, **majority** needs more than half.\nParallel and consensus differ in when it completes: parallel completes on the first approval, consensus waits for all. Conflating them is how a four-eyes rule turns into a one-eye rule.\n",
-  "enum": [
-   "sequential",
-   "parallel",
-   "consensus",
-   "majority"
-  ]
- },
- "ApprovalRequest": {
-  "type": "object",
-  "x-ticvai-persistence": "approvals.request",
-  "required": [
-   "id",
-   "kind",
-   "status",
-   "requestedByPrincipalId",
-   "requestedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string"
-   },
-   "kind": {
-    "$ref": "#/components/schemas/ApprovalKind"
-   },
-   "rerouteOnNoApprover": {
-    "type": "boolean",
-    "default": true,
-    "description": "BL-154. **An approver on leave is an approval that waits for them to come back.** Reroutes to the next in the chain rather than stalling — `workforce` already knows who is on leave, and an approval queue nobody is watching is the thing that stops a venue.\n"
-   },
-   "outOfOfficeDelegateId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "allowEmailApproval": {
-    "type": "boolean",
-    "default": false,
-    "description": "**Approving from an email link with no second factor is the weakest path in the system**, so it is off by default and available only below a configured value.\n"
-   },
-   "reopenedFrom": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "**Reopening a decided approval creates a new one that points back.** Editing a decision in place destroys the record of what was originally approved, which is the only thing an audit wants.\n"
    },
    "status": {
-    "$ref": "#/components/schemas/ApprovalStatus"
+    "type": "string",
+    "enum": [
+     "pendingPrint",
+     "issued",
+     "active",
+     "lost",
+     "replaced",
+     "revoked",
+     "expired"
+    ]
    },
-   "subjectContract": {
-    "type": "string"
+   "replacesCredentialId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
    },
-   "subjectType": {
-    "type": "string"
-   },
-   "subjectId": {
-    "type": "string"
+   "replacementCount": {
+    "type": "integer",
+    "default": 0
    },
    "scopePath": {
     "type": "string"
-   },
-   "summary": {
-    "type": "string"
-   },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "justification": {
-    "type": "string",
-    "nullable": true
-   },
-   "requestedByPrincipalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "matrixVersion": {
-    "type": "integer"
-   },
-   "mode": {
-    "$ref": "#/components/schemas/ApprovalMode"
-   },
-   "currentLevel": {
-    "type": "integer"
-   },
-   "totalLevels": {
-    "type": "integer"
-   },
-   "pendingApprovers": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "principalId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "displayName": {
-       "type": "string"
-      },
-      "isDelegate": {
-       "type": "boolean"
-      }
-     }
-    }
-   },
-   "decisions": {
-    "type": "array",
-    "description": "Every decision at every level, in order. **Immutable once the request completes** (11.1.56) — an approval is evidence, and amending one is a different fact.\n",
-    "items": {
-     "$ref": "#/components/schemas/ApprovalDecision"
-    }
-   },
-   "escalations": {
-    "type": "array",
-    "description": "11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n",
-    "items": {
-     "type": "object",
-     "properties": {
-      "at": {
-       "type": "string",
-       "format": "date-time"
-      },
-      "reason": {
-       "type": "string"
-      },
-      "fromLevel": {
-       "type": "integer"
-      },
-      "toLevel": {
-       "type": "integer"
-      },
-      "wasAutomatic": {
-       "type": "boolean"
-      }
-     }
-    }
-   },
-   "resubmittedFromId": {
-    "type": "string",
-    "nullable": true
-   },
-   "reopenedFromId": {
-    "type": "string",
-    "nullable": true
-   },
-   "slaDueAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "slaBreached": {
-    "type": "boolean"
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "requestedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "completedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
    }
   }
  },
- "ApprovalStatus": {
-  "type": "string",
-  "enum": [
-   "draft",
-   "pending",
-   "escalated",
-   "approved",
-   "rejected",
-   "withdrawn",
-   "expired",
-   "cancelled"
-  ]
+ "AccreditationDocument": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.document",
+  "description": "Board 2.5. **Submitted against a named requirement, not into a folder.**",
+  "required": [
+   "requirementCode",
+   "assetId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "applicationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "requirementCode": {
+    "type": "string"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "submittedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "submitted",
+     "verified",
+     "rejected",
+     "expired"
+    ]
+   },
+   "verifiedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "verifiedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "rejectionReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "**An insurance certificate valid until March accredits somebody until March**, whatever the programme says.\n"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
  },
  "Page": {
   "type": "object",

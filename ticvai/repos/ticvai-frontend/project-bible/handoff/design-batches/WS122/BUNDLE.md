@@ -450,14 +450,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "primaryButton",
        "label": "Save approval matrix",
        "operation": "setApprovalMatrix",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       },
       {
        "kind": "secondaryButton",
        "label": "Test a routing",
        "operation": "evaluateApprovalRequirement",
        "notes": "Evaluates a sample AI action (kind `aiRecommendation`, amount, scope) against the matrix and shows who would approve it.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     },
@@ -470,7 +470,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Approval matrix for AI actions",
        "operation": "listApprovalMatrices",
        "notes": "**AI actions route through the shared approval matrix** (18 September minutes, M18-02), kind `aiRecommendation`: an approver is authorised up to a limit and anything above it escalates.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     }
@@ -510,7 +510,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "approvals",
     "purpose": "The matrices AI actions route through",
     "trigger": "onLoad",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "operationId": "setApprovalMatrix",
@@ -520,14 +520,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listApprovalMatrices"
     ],
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "operationId": "evaluateApprovalRequirement",
     "contract": "approvals",
     "purpose": "Who would approve this AI action",
     "trigger": "onAction",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "wireframe": {
@@ -553,7 +553,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       "thresholds"
      ]
     },
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "_platform": {
@@ -804,13 +804,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Approval condition for this action",
        "operation": "evaluateApprovalRequirement",
        "notes": "**Conditional authority** (M18-02): the approver's limit for this kind and amount, and whether the action is within it or must escalate.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       },
       {
        "kind": "dataTable",
        "label": "Threshold ranges",
        "operation": "listApprovalMatrices",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     }
@@ -843,14 +843,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "approvals",
     "purpose": "Whether this action is within the approver's limit",
     "trigger": "onLoad",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "operationId": "listApprovalMatrices",
     "contract": "approvals",
     "purpose": "The threshold ranges",
     "trigger": "onLoad",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "wireframe": {
@@ -1157,7 +1157,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Delegations in force",
        "operation": "listApprovalDelegations",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     },
@@ -1169,20 +1169,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "secondaryButton",
        "label": "Escalate",
        "operation": "escalateApprovalRequest",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       },
       {
        "kind": "secondaryButton",
        "label": "Delegate",
        "operation": "createApprovalDelegation",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       },
       {
        "kind": "secondaryButton",
        "label": "Save approval SLA",
        "operation": "setApprovalSlaPolicy",
        "notes": "Escalation, delegation and SLA apply to AI actions as to any approval (M18-02).",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     }
@@ -1215,14 +1215,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "approvals",
     "purpose": "Who is acting for whom",
     "trigger": "onLoad",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "operationId": "escalateApprovalRequest",
     "contract": "approvals",
     "purpose": "Send an AI action to the next level",
     "trigger": "onAction",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "operationId": "createApprovalDelegation",
@@ -1232,14 +1232,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listApprovalDelegations"
     ],
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "operationId": "setApprovalSlaPolicy",
     "contract": "approvals",
     "purpose": "The SLA and its escalation",
     "trigger": "onAction",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "wireframe": {
@@ -1395,26 +1395,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "secondaryButton",
        "label": "Pause",
        "operation": "pauseActionPlan",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       },
       {
        "kind": "secondaryButton",
        "label": "Resume",
        "operation": "resumeActionPlan",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       },
       {
        "kind": "destructiveButton",
        "label": "Cancel plan",
        "operation": "cancelActionPlan",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       },
       {
        "kind": "destructiveButton",
        "label": "Roll back",
        "operation": "rollbackActionPlan",
        "notes": "**Rollback on partial failure** (21 September minutes, M21-12): plans the compensating steps in reverse dependency order, for approval like any plan.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     }
@@ -1461,7 +1461,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "ai",
     "purpose": "Plan the rollback of a partly executed plan",
     "trigger": "onAction",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "entryState": {
@@ -1492,14 +1492,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "component": "confirmDialog",
     "trigger": "Cancel plan",
     "body": "**Names the plan, the steps already executed and what stays applied**: cancelling stops the remaining steps; it does not undo the executed ones (that is Roll back).",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "id": "confirmRollbackActionPlan",
     "component": "confirmDialog",
     "trigger": "Roll back",
     "body": "**Names each executed step and its compensation**, and that the rollback plan goes for approval before it runs.",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "_platform": {

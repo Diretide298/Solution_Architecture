@@ -1,4 +1,23 @@
 {
+ "createMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge",
+  "contract": "identity",
+  "summary": "Second factor at staff sign-in, and step-up for a sensitive action",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "createPrincipal": {
   "method": "POST",
   "path": "/principals",
@@ -37,6 +56,25 @@
   "requestBody": null,
   "responds": "Role"
  },
+ "enrolMfaMethod": {
+  "method": "POST",
+  "path": "/auth/mfa/methods",
+  "contract": "identity",
+  "summary": "Enrol an MFA method",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MfaEnrolment"
+ },
  "forceLogout": {
   "method": "POST",
   "path": "/auth/sessions/{sessionId}/force-logout",
@@ -74,19 +112,6 @@
   "requestBody": null,
   "responds": "Session"
  },
- "getGuestSession": {
-  "method": "GET",
-  "path": "/auth/guest/session",
-  "contract": "identity",
-  "summary": "Read the current guest session",
-  "permission": null,
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "GuestSession"
- },
  "getPrincipal": {
   "method": "GET",
   "path": "/principals/{principalId}",
@@ -117,6 +142,11 @@
    },
    {
     "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "workstationId",
     "in": "query",
     "required": null
    },
@@ -237,6 +267,25 @@
   "requestBody": "LoginRequest",
   "responds": "LoginResponse"
  },
+ "removeMfaMethod": {
+  "method": "DELETE",
+  "path": "/auth/mfa/methods/{methodId}",
+  "contract": "identity",
+  "summary": "Remove an MFA method",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "revokeAllSessions": {
   "method": "POST",
   "path": "/auth/sessions/revoke-all",
@@ -274,5 +323,43 @@
   ],
   "requestBody": null,
   "responds": "Principal"
+ },
+ "verifyMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge/{challengeId}/verify",
+  "contract": "identity",
+  "summary": "Complete a sign-in or step-up challenge",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "verifyMfaEnrolment": {
+  "method": "POST",
+  "path": "/auth/mfa/methods/{methodId}",
+  "contract": "identity",
+  "summary": "Complete enrolment",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MfaMethod"
  }
 }

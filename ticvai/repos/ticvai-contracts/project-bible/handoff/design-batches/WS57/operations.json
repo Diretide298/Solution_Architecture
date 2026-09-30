@@ -8,7 +8,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ChannelCreationProfileConfigurationInput",
   "responds": "ChannelCreationProfileConfigurationView"
  },
@@ -21,9 +27,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ruleLevel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ChannelSalesRulesLimitsRestrictionsView"
+  "responds": "Page"
  },
  "listChannelSaleSchedule": {
   "method": "GET",
@@ -34,9 +66,45 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ChannelSalesScheduleAvailabilityWindowsView"
+  "responds": "Page"
  },
  "listCustomerEligibilityRule": {
   "method": "GET",
@@ -47,9 +115,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dimension",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CustomerEligibilityRulesByChannelView"
+  "responds": "Page"
  },
  "listInventoryCapacityChannel": {
   "method": "GET",
@@ -60,9 +154,45 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "allocationType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "InventoryCapacityChannelAllocationView"
+  "responds": "Page"
  },
  "listSaleChannel": {
   "method": "GET",
@@ -73,9 +203,45 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "channelType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brand",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "SalesChannelCommandCenterView"
+  "responds": "Page"
  },
  "publishChannelReadinessValidation": {
   "method": "PUT",
@@ -86,7 +252,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ChannelPublicationReadinessAiValidationInput",
   "responds": "ChannelPublicationReadinessAiValidationView"
  },
@@ -99,7 +271,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ChannelFeesPaymentFulfillmentConfigurationInput",
   "responds": "ChannelFeesPaymentFulfillmentConfigurationView"
  },
@@ -112,9 +290,34 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ChannelPricingCommercialProfileAssignmentInput",
   "responds": "ChannelPricingCommercialProfileAssignmentView"
+ },
+ "setChannelSalesRule": {
+  "method": "PUT",
+  "path": "/channel-sales-rules/{ruleId}",
+  "contract": "catalogue",
+  "summary": "Create or replace a channel sales window, limit or eligibility rule",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ChannelSalesRule",
+  "responds": "ChannelSalesRule"
  },
  "setProductCatalogue": {
   "method": "PUT",
@@ -125,7 +328,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ProductCatalogueAssignmentInput",
   "responds": "ProductCatalogueAssignmentView"
  }

@@ -267,15 +267,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "client-verified",
+   "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-011",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
-    "match": "exact",
-    "view": "Account → All screens → Wave 2 → Wallet overview"
-   }
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "rev": "Mobile App v4, 29 September 2026",
+    "match": "none",
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-011.html, and #GST-011 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Wallet overview (exact)."
+   },
+   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -647,16 +648,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "client-verified",
+   "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-015",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
-    "match": "exact",
-    "view": "Account → All screens → Wave 2 → Memberships; billing in \"Also built, not in the plan\" → Membership billing (#billing)",
-    "differences": "Prototype splits the screen in two (benefits and delegation vs billing statement and dunning retries)."
-   }
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "rev": "Mobile App v4, 29 September 2026",
+    "match": "none",
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-015.html, and #GST-015 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Memberships; billing in \"Also built, not in the plan\" → Membership billing (#billing) (exact). What v2 did differently: Prototype splits the screen in two (benefits and delegation vs billing statement and dunning retries)."
+   },
+   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
@@ -889,15 +890,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "wireframe": {
    "status": "notStarted",
-   "provenance": "client-verified",
+   "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-036",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
-    "match": "exact",
-    "view": "Account → All screens → Wave 2 → Loyalty & rewards"
-   }
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "rev": "Mobile App v4, 29 September 2026",
+    "match": "none",
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-036.html, and #GST-036 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Loyalty & rewards (exact)."
+   },
+   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the operations this screen declares (4 then; evaluatePromotions removed 27 September), not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -2188,8 +2190,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "entitlementId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "The `access.Entitlement.id` this membership is — a ULID, like every entitlement id."
+    "format": "uuid",
+    "description": "The `access.Entitlement.id` this membership is — a UUIDv7, like every entitlement id."
    },
    "productId": {
     "type": "string",
@@ -2537,7 +2539,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "paymentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "dunningCaseId": {
@@ -2571,7 +2573,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "subjectId": {
     "type": "string",
@@ -3462,12 +3464,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "paymentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "refundId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "walletTransactionId": {

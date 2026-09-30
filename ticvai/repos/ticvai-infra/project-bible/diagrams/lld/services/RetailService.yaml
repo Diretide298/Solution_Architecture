@@ -2,6 +2,7 @@ id: LLD-RetailService
 title: RetailService — 25 operations, 13 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
+deployable: operations
 index: diagrams/hld/02-services.yaml
 why: Merchandise, wallets and gift cards. Modest at 25 operations, and separate because **it is licensed
   separately** — a venue can run ticketing with no shop.

@@ -34,7 +34,7 @@ there does not.
       quickstart                running locally in under an hour
       naming-and-style          one concept, one name, every layer
       api-conventions           contract rules and TICVAI extensions
-      backend-patterns          C# / .NET 8
+      backend-patterns          C# / .NET 10
       frontend-patterns         TypeScript / React / React Native
       data-and-storage          SQL, migrations, partitioning, RLS
       config-and-secrets        key vault per cell, build-time vs runtime

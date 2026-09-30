@@ -10,6 +10,16 @@
   "scopeLevel": "workstation",
   "parameters": [
    {
+    "name": "sinceVersion",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": "validFrom",
     "in": "query",
     "required": true

@@ -2400,8 +2400,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a ULID."
+    "format": "uuid",
+    "description": "Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7."
    },
    "caseNumber": {
     "type": "string",
@@ -2923,7 +2923,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "subjectId": {
     "type": "string",
@@ -3256,7 +3256,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "locationId": {
     "type": "string",
@@ -3276,7 +3276,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "visitId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The table visit this session orders onto, where the location is a table. Absent for a cabana or a seat, which have no visit concept — the order stands alone.\n"
    },
@@ -3687,7 +3687,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "subjectId": {
     "type": "string",

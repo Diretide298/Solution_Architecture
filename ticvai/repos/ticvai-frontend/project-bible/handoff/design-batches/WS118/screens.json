@@ -179,7 +179,7 @@
        ],
        "operation": "getAiVenueSettings",
        "notes": "**What every AI answer stands on before the venue has history** (29 September, AI functions review). Collected at onboarding, here or by the configuration assistant in conversation.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     },
@@ -191,7 +191,7 @@
        "kind": "primaryButton",
        "label": "Save venue AI profile",
        "operation": "setAiVenueSettings",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     }
@@ -224,7 +224,7 @@
     "contract": "ai",
     "purpose": "The venue AI profile the baselines use",
     "trigger": "onLoad",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "operationId": "setAiVenueSettings",
@@ -234,7 +234,7 @@
     "invalidates": [
      "getAiVenueSettings"
     ],
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "wireframe": {
@@ -281,7 +281,7 @@
       "staffProductivity"
      ]
     },
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "_platform": {

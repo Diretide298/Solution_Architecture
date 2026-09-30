@@ -1,6 +1,6 @@
 # WS21 — B2B, Reseller & OTA Partner Management board 1
 
-**10 screens · 10 operations · 13 schemas · 2 permissions**
+**10 screens · 16 operations · 25 schemas · 3 permissions**
 
 Platform P10 Partner Web · ships as **ticvai-control** ·
 partner audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `PLATFORM_CELL_MANAGE, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `PARTNER_MANAGE, PLATFORM_CELL_MANAGE, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,14 +60,14 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `PTR-022` | Partner Management Command Center | commandCentre | 1 | 0 | — |
+| `PTR-022` | Partner Management Command Center | commandCentre | 2 | 0 | — |
 | `PTR-023` | Partner Profile & Organization Setup | configEditor | 1 | 0 | — |
-| `PTR-024` | Partner Onboarding & Application Workflow | configEditor | 1 | 0 | — |
-| `PTR-025` | Partner Contacts & User Administration | configEditor | 1 | 0 | — |
-| `PTR-026` | Territory, Market & Distribution Rights | configEditor | 1 | 0 | — |
+| `PTR-024` | Partner Onboarding & Application Workflow | configEditor | 2 | 1 | — |
+| `PTR-025` | Partner Contacts & User Administration | configEditor | 3 | 2 | — |
+| `PTR-026` | Territory, Market & Distribution Rights | configEditor | 2 | 1 | — |
 | `PTR-027` | Partner Brand, Venue & Business Scope Assignment | listDetail | 1 | 0 | — |
 | `PTR-028` | Partner Documentation & Compliance Repository | configEditor | 1 | 0 | — |
-| `PTR-029` | Partner Access, Roles & Permission Profile | configEditor | 1 | 0 | — |
+| `PTR-029` | Partner Access, Roles & Permission Profile | configEditor | 2 | 1 | — |
 | `PTR-030` | Partner Approval, Status & Lifecycle Management | configEditor | 1 | 0 | — |
 | `PTR-031` | Partner 360° Profile, Readiness & AI Review | listDetail | 1 | 0 | — |
 

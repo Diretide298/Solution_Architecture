@@ -52,7 +52,10 @@
     {
      "to": "ANL-021",
      "trigger": "Dashboard Library",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026"
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "carries": [
+      "dashboardId"
+     ]
     },
     {
      "to": "ANL-031",
@@ -72,47 +75,81 @@
     {
      "to": "ANL-002",
      "trigger": "Sales, Revenue & Channel",
-     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher",
+     "carries": [
+      "dashboardId",
+      "reportId"
+     ]
     },
     {
      "to": "ANL-003",
      "trigger": "Operational Performance",
-     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher",
+     "carries": [
+      "dashboardId",
+      "reportId"
+     ]
     },
     {
      "to": "ANL-004",
      "trigger": "Product Performance",
-     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher",
+     "carries": [
+      "dashboardId",
+      "reportId"
+     ]
     },
     {
      "to": "ANL-005",
      "trigger": "Cost, Margin & Profitability",
-     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher",
+     "carries": [
+      "dashboardId",
+      "reportId"
+     ]
     },
     {
      "to": "ANL-006",
      "trigger": "Inventory & Waste Intelligence",
-     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher",
+     "carries": [
+      "dashboardId",
+      "reportId"
+     ]
     },
     {
      "to": "ANL-007",
      "trigger": "Guest & Conversion Intelligence",
-     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher",
+     "carries": [
+      "dashboardId",
+      "reportId"
+     ]
     },
     {
      "to": "ANL-008",
      "trigger": "Demand Forecasting",
-     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher",
+     "carries": [
+      "dashboardId"
+     ]
     },
     {
      "to": "ANL-009",
      "trigger": "AI Assistant & Action Center",
-     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher",
+     "carries": [
+      "alertId",
+      "reportId"
+     ]
     },
     {
      "to": "ANL-010",
      "trigger": "Suggestions & Advice",
-     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher",
+     "carries": [
+      "suggestionId"
+     ]
     },
     {
      "to": "ANL-012",
@@ -142,7 +179,10 @@
     {
      "to": "ANL-017",
      "trigger": "Customer, Membership & Loyalty Pulse",
-     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher",
+     "carries": [
+      "dashboardId"
+     ]
     },
     {
      "to": "ANL-018",
@@ -174,8 +214,43 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listAlerts",
+       "notes": "Sends `?status=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Severity",
+       "operation": "listAlerts",
+       "notes": "Sends `?severity=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Workstation id",
+       "operation": "listAlerts",
+       "notes": "Sends `?workstationId=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Shift id",
+       "operation": "listAlerts",
+       "notes": "Sends `?shiftId=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Item id",
+       "operation": "listAlerts",
+       "notes": "Sends `?itemId=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every executive",
+       "label": "Every alert",
        "bindsTo": "Alert",
        "columns": [
         "Alert.id",
@@ -193,6 +268,17 @@
        ],
        "operation": "listAlerts",
        "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Domain",
+       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "chart",
+       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -202,7 +288,43 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected executive",
+       "label": "The selected alert",
+       "bindsTo": "Alert",
+       "columns": [
+        "Alert.id",
+        "Alert.ruleId",
+        "Alert.ruleName",
+        "Alert.metric",
+        "Alert.raisedAt",
+        "Alert.severity",
+        "Alert.status",
+        "Alert.observedValue",
+        "Alert.threshold",
+        "Alert.scopePath",
+        "Alert.workstationId",
+        "Alert.shiftId",
+        "Alert.itemId",
+        "Alert.acknowledgedByPrincipalId",
+        "Alert.acknowledgedAt",
+        "Alert.acknowledgementNote"
+       ],
+       "operation": "listAlerts",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The command centre",
+       "bindsTo": "CommandCentre",
+       "columns": [
+        "CommandCentre.modules",
+        "CommandCentre.resolvedAt"
+       ],
+       "operation": "getCommandCentre",
+       "provenance": "contract reporting.yaml GET /command-centre"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The dashboard data",
        "bindsTo": "DashboardData",
        "columns": [
         "DashboardData.tileData"
@@ -218,32 +340,15 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Request",
+       "label": "Request suggestion",
        "operation": "requestSuggestion",
        "provenance": "contract ai.yaml POST /ai/suggestions"
       },
       {
        "kind": "secondaryButton",
-       "label": "Run",
+       "label": "Run report",
        "operation": "runReport",
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "multiSelect",
-       "label": "Domain",
-       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "chart",
-       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -257,6 +362,13 @@
    "emptyNoAccess": "You do not have reporting permission at this scope. **Sections you cannot see are not shown** rather than greyed out."
   },
   "apis": [
+   {
+    "operationId": "getCommandCentre",
+    "contract": "reporting",
+    "purpose": "The modules this login is entitled to, and each module's dashboards",
+    "trigger": "onLoad",
+    "provenance": "command-centre decision, 22 September 2026"
+   },
    {
     "operationId": "getDashboard",
     "contract": "reporting",
@@ -286,6 +398,19 @@
     "invalidates": [
      "listAlerts"
     ]
+   },
+   {
+    "operationId": "recordDashboardView",
+    "contract": "reporting",
+    "purpose": "Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it.",
+    "trigger": "background"
+   },
+   {
+    "operationId": "listAiInsights",
+    "contract": "ai",
+    "purpose": "Insights and anomalies",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -310,7 +435,11 @@
    ],
    "coldEntry": "**A bookmarked dashboard is the normal way in** — a manager opens the same view every Monday. The domain and the window come from the link where it carries them, and from the last view where it does not.",
    "preloaded": [
-    "DashboardData.tileData"
+    "Alert.id",
+    "Alert.ruleId",
+    "Alert.ruleName",
+    "Alert.metric",
+    "Alert.raisedAt"
    ]
   },
   "wireframe": {
@@ -328,6 +457,50 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 3 §The system shall display"
+   }
+  ],
+  "overlays": [
+   {
+    "id": "formRequestSuggestion",
+    "component": "modal",
+    "trigger": "Request suggestion",
+    "body": "**Collects what `requestSuggestion` sends before it is called.** Required: `kind`. Optional: `subjectRef`, `horizon`, `context`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Request suggestion",
+     "operation": "requestSuggestion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "subjectRef",
+      "horizon",
+      "context"
+     ]
+    },
+    "provenance": "contract ai.yaml POST /ai/suggestions"
+   },
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
    }
   ],
   "_platform": {
@@ -380,11 +553,9 @@
      "trigger": "Executive Command Center",
      "carries": [
       "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
+      "reportId"
      ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-002 holds dashboardId, reportId, so an edge into it carries them"
     }
    ]
   },
@@ -406,32 +577,14 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected sales revenue channel",
+       "label": "The dashboard data",
        "bindsTo": "DashboardData",
        "columns": [
         "DashboardData.tileData"
        ],
        "operation": "getDashboard",
        "provenance": "contract reporting.yaml GET /dashboards/{dashboardId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Run",
-       "operation": "runReport",
-       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+      },
       {
        "kind": "multiSelect",
        "label": "Domain",
@@ -442,6 +595,18 @@
        "kind": "chart",
        "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
        "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Run report",
+       "operation": "runReport",
+       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
       }
      ]
     }
@@ -466,6 +631,12 @@
     "contract": "reporting",
     "purpose": "Run a report",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "recordDashboardView",
+    "contract": "reporting",
+    "purpose": "Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it.",
+    "trigger": "background"
    }
   ],
   "entryState": {
@@ -499,6 +670,30 @@
    "derivedFrom": "wireframes/Retail Board 6.dc.html#ret-6l"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   }
+  ],
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -549,11 +744,9 @@
      "trigger": "Executive Command Center",
      "carries": [
       "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
+      "reportId"
      ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-003 holds dashboardId, reportId, so an edge into it carries them"
     }
    ]
   },
@@ -571,13 +764,6 @@
   "pattern": "listDetail",
   "patternReason": "`listAlerts` reads the population and `getDashboard` reads one of them — list, select, act",
   "purpose": "Operational Performance — across F&B, retail, ticketing and frontline, filtered by domain.",
-  "gaps": [
-   {
-    "operation": "listDevices",
-    "why": "**2 declared operations reach no component on this screen**: listDevices, listPrincipals. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -586,8 +772,43 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listAlerts",
+       "notes": "Sends `?status=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Severity",
+       "operation": "listAlerts",
+       "notes": "Sends `?severity=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Workstation id",
+       "operation": "listAlerts",
+       "notes": "Sends `?workstationId=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Shift id",
+       "operation": "listAlerts",
+       "notes": "Sends `?shiftId=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Item id",
+       "operation": "listAlerts",
+       "notes": "Sends `?itemId=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every operational performance",
+       "label": "Every alert",
        "bindsTo": "Alert",
        "columns": [
         "Alert.id",
@@ -605,6 +826,56 @@
        ],
        "operation": "listAlerts",
        "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every registered device",
+       "bindsTo": "RegisteredDevice",
+       "columns": [
+        "RegisteredDevice.id",
+        "RegisteredDevice.kind",
+        "RegisteredDevice.driver",
+        "RegisteredDevice.identifier",
+        "RegisteredDevice.workstationId",
+        "RegisteredDevice.model",
+        "RegisteredDevice.pushToken",
+        "RegisteredDevice.pushPlatform",
+        "RegisteredDevice.pushFailureCount",
+        "RegisteredDevice.offlineScope",
+        "RegisteredDevice.firmwareVersion",
+        "RegisteredDevice.isRequired"
+       ],
+       "operation": "listDevices",
+       "provenance": "contract tenancy.yaml GET /devices"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every principal",
+       "bindsTo": "Principal",
+       "columns": [
+        "Principal.id",
+        "Principal.username",
+        "Principal.displayName",
+        "Principal.isActive",
+        "Principal.validFrom",
+        "Principal.validTo",
+        "Principal.primaryRoleId",
+        "Principal.roles",
+        "Principal.lastLoginAt"
+       ],
+       "operation": "listPrincipals",
+       "provenance": "contract identity.yaml GET /principals"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Domain",
+       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "chart",
+       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -614,7 +885,32 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected operational performance",
+       "label": "The selected alert",
+       "bindsTo": "Alert",
+       "columns": [
+        "Alert.id",
+        "Alert.ruleId",
+        "Alert.ruleName",
+        "Alert.metric",
+        "Alert.raisedAt",
+        "Alert.severity",
+        "Alert.status",
+        "Alert.observedValue",
+        "Alert.threshold",
+        "Alert.scopePath",
+        "Alert.workstationId",
+        "Alert.shiftId",
+        "Alert.itemId",
+        "Alert.acknowledgedByPrincipalId",
+        "Alert.acknowledgedAt",
+        "Alert.acknowledgementNote"
+       ],
+       "operation": "listAlerts",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The dashboard data",
        "bindsTo": "DashboardData",
        "columns": [
         "DashboardData.tileData"
@@ -630,26 +926,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Run",
+       "label": "Run report",
        "operation": "runReport",
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "multiSelect",
-       "label": "Domain",
-       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "chart",
-       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -695,6 +974,12 @@
     "contract": "identity",
     "purpose": "List principals",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordDashboardView",
+    "contract": "reporting",
+    "purpose": "Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it.",
+    "trigger": "background"
    }
   ],
   "entryState": {
@@ -719,7 +1004,11 @@
    ],
    "coldEntry": "**A bookmarked dashboard is the normal way in** — a manager opens the same view every Monday. The domain and the window come from the link where it carries them, and from the last view where it does not.",
    "preloaded": [
-    "DashboardData.tileData"
+    "Alert.id",
+    "Alert.ruleId",
+    "Alert.ruleName",
+    "Alert.metric",
+    "Alert.raisedAt"
    ]
   },
   "wireframe": {
@@ -731,6 +1020,30 @@
    "derivedFrom": "wireframes/POS Board 6.dc.html#pos-6b"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   }
+  ],
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -779,20 +1092,22 @@
    "notes": "**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
     {
-     "to": "ANL-006",
-     "trigger": "Inventory & Waste Intelligence",
-     "provenance": "flow F82 step 3→4"
-    },
-    {
      "to": "ANL-001",
      "trigger": "Executive Command Center",
      "carries": [
       "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
+      "reportId"
      ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-004 holds dashboardId, reportId, so an edge into it carries them"
+    },
+    {
+     "to": "ANL-006",
+     "trigger": "Inventory & Waste Intelligence",
+     "provenance": "flow F82 step 3→4",
+     "carries": [
+      "dashboardId",
+      "reportId"
+     ]
     }
    ]
   },
@@ -813,8 +1128,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listProducts",
+       "notes": "Sends `?venueId=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listProducts",
+       "notes": "Sends `?kind=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is sellable",
+       "operation": "listProducts",
+       "notes": "Sends `?isSellable=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every product performance",
+       "label": "Every product",
        "bindsTo": "Product",
        "columns": [
         "Product.id",
@@ -832,6 +1168,17 @@
        ],
        "operation": "listProducts",
        "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Domain",
+       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "chart",
+       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -841,7 +1188,32 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected product performance",
+       "label": "The selected product",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo",
+        "Product.categoryId",
+        "Product.lifecycleState",
+        "Product.isSellable",
+        "Product.isStockTracked"
+       ],
+       "operation": "listProducts",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The dashboard data",
        "bindsTo": "DashboardData",
        "columns": [
         "DashboardData.tileData"
@@ -857,26 +1229,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Run",
+       "label": "Run report",
        "operation": "runReport",
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "multiSelect",
-       "label": "Domain",
-       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "chart",
-       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -910,6 +1265,12 @@
     "contract": "catalogue",
     "purpose": "List products",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordDashboardView",
+    "contract": "reporting",
+    "purpose": "Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it.",
+    "trigger": "background"
    }
   ],
   "entryState": {
@@ -934,7 +1295,11 @@
    ],
    "coldEntry": "**A bookmarked dashboard is the normal way in** — a manager opens the same view every Monday. The domain and the window come from the link where it carries them, and from the last view where it does not.",
    "preloaded": [
-    "DashboardData.tileData"
+    "Product.id",
+    "Product.code",
+    "Product.name",
+    "Product.description",
+    "Product.kind"
    ]
   },
   "wireframe": {
@@ -946,6 +1311,30 @@
    "derivedFrom": "wireframes/Retail Board 6.dc.html#ret-6c"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   }
+  ],
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -993,21 +1382,23 @@
    "notes": "**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
     {
-     "to": "ANL-007",
-     "trigger": "Guest & Conversion Intelligence",
-     "provenance": "flow F82 step 1→2",
-     "operation": "getStockValuation"
-    },
-    {
      "to": "ANL-001",
      "trigger": "Executive Command Center",
      "carries": [
       "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
+      "reportId"
      ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-005 holds dashboardId, reportId, so an edge into it carries them"
+    },
+    {
+     "to": "ANL-007",
+     "trigger": "Guest & Conversion Intelligence",
+     "provenance": "flow F82 step 1→2",
+     "operation": "getStockValuation",
+     "carries": [
+      "dashboardId",
+      "reportId"
+     ]
     }
    ]
   },
@@ -1020,13 +1411,6 @@
   "pattern": "statusTracker",
   "patternReason": "`getDashboard` reads one record and nothing reads a population — the screen is about that one thing",
   "purpose": "Cost, Margin & Profitability — across F&B, retail, ticketing and frontline, filtered by domain.",
-  "gaps": [
-   {
-    "operation": "getStockValuation",
-    "why": "**1 declared operation reach no component on this screen**: getStockValuation. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "detail",
    "regions": [
@@ -1036,32 +1420,27 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected cost margin profitability",
+       "label": "The dashboard data",
        "bindsTo": "DashboardData",
        "columns": [
         "DashboardData.tileData"
        ],
        "operation": "getDashboard",
        "provenance": "contract reporting.yaml GET /dashboards/{dashboardId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
+      },
       {
-       "kind": "primaryButton",
-       "label": "Run",
-       "operation": "runReport",
-       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+       "kind": "detailPanel",
+       "label": "The stock valuation",
+       "bindsTo": "StockValuation",
+       "columns": [
+        "StockValuation.asAt",
+        "StockValuation.total",
+        "StockValuation.byLocation",
+        "StockValuation.byCategory"
+       ],
+       "operation": "getStockValuation",
+       "provenance": "contract inventory.yaml GET /stock/valuation"
+      },
       {
        "kind": "multiSelect",
        "label": "Domain",
@@ -1072,6 +1451,18 @@
        "kind": "chart",
        "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
        "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Run report",
+       "operation": "runReport",
+       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
       }
      ]
     }
@@ -1102,6 +1493,12 @@
     "contract": "inventory",
     "purpose": "Stock value by location and category",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordDashboardView",
+    "contract": "reporting",
+    "purpose": "Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it.",
+    "trigger": "background"
    }
   ],
   "entryState": {
@@ -1135,6 +1532,30 @@
    "derivedFrom": "wireframes/Retail Board 6.dc.html#ret-6f"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   }
+  ],
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -1186,11 +1607,9 @@
      "trigger": "Executive Command Center",
      "carries": [
       "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
+      "reportId"
      ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-006 holds dashboardId, reportId, so an edge into it carries them"
     },
     {
      "to": "BO-058",
@@ -1198,7 +1617,10 @@
      "provenance": "flow F82 step 4→5",
      "operation": "listExpiringBatches",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "reportId"
+     ]
     }
    ]
   },
@@ -1211,13 +1633,6 @@
   "pattern": "listDetail",
   "patternReason": "`listExpiringBatches` reads the population and `getDashboard` reads one of them — list, select, act",
   "purpose": "Inventory & Waste Intelligence — across F&B, retail, ticketing and frontline, filtered by domain.",
-  "gaps": [
-   {
-    "operation": "getCountVariance",
-    "why": "**1 declared operation reach no component on this screen**: getCountVariance. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1226,8 +1641,15 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "numberField",
+       "label": "Within days",
+       "operation": "listExpiringBatches",
+       "notes": "Sends `?withinDays=` to `listExpiringBatches`.",
+       "provenance": "contract inventory.yaml GET /stock-batches/expiring"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every inventory waste intelligence",
+       "label": "Every stock batch",
        "bindsTo": "StockBatch",
        "columns": [
         "StockBatch.id",
@@ -1243,6 +1665,17 @@
        ],
        "operation": "listExpiringBatches",
        "provenance": "contract inventory.yaml GET /stock-batches/expiring"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Domain",
+       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "chart",
+       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1252,7 +1685,39 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected inventory waste intelligence",
+       "label": "The selected stock batch",
+       "bindsTo": "StockBatch",
+       "columns": [
+        "StockBatch.id",
+        "StockBatch.itemId",
+        "StockBatch.locationId",
+        "StockBatch.batchCode",
+        "StockBatch.lotNumber",
+        "StockBatch.quantity",
+        "StockBatch.receivedAt",
+        "StockBatch.expiresAt",
+        "StockBatch.supplierId",
+        "StockBatch.status"
+       ],
+       "operation": "listExpiringBatches",
+       "provenance": "contract inventory.yaml GET /stock-batches/expiring"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The count variance",
+       "bindsTo": "CountVariance",
+       "columns": [
+        "CountVariance.countId",
+        "CountVariance.totalVarianceValue",
+        "CountVariance.exceptionCount",
+        "CountVariance.lines"
+       ],
+       "operation": "getCountVariance",
+       "provenance": "contract inventory.yaml GET /stock-counts/{countId}/variance"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The dashboard data",
        "bindsTo": "DashboardData",
        "columns": [
         "DashboardData.tileData"
@@ -1268,26 +1733,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Run",
+       "label": "Run report",
        "operation": "runReport",
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "multiSelect",
-       "label": "Domain",
-       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "chart",
-       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1327,6 +1775,19 @@
     "contract": "inventory",
     "purpose": "What is about to go out of date",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordDashboardView",
+    "contract": "reporting",
+    "purpose": "Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it.",
+    "trigger": "background"
+   },
+   {
+    "operationId": "requestSuggestion",
+    "contract": "ai",
+    "purpose": "Waste-risk suggestion (kind wasteRisk): items at risk with a recommended action",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1355,7 +1816,11 @@
    ],
    "coldEntry": "**A bookmarked dashboard is the normal way in** — a manager opens the same view every Monday. The domain and the window come from the link where it carries them, and from the last view where it does not.",
    "preloaded": [
-    "DashboardData.tileData"
+    "StockBatch.id",
+    "StockBatch.itemId",
+    "StockBatch.locationId",
+    "StockBatch.batchCode",
+    "StockBatch.lotNumber"
    ]
   },
   "wireframe": {
@@ -1367,6 +1832,30 @@
    "derivedFrom": "wireframes/Retail Board 6.dc.html#ret-6d"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   }
+  ],
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -1415,20 +1904,22 @@
    "notes": "**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
     {
-     "to": "ANL-004",
-     "trigger": "Product Performance",
-     "provenance": "flow F82 step 2→3"
-    },
-    {
      "to": "ANL-001",
      "trigger": "Executive Command Center",
      "carries": [
       "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
+      "reportId"
      ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-007 holds dashboardId, reportId, so an edge into it carries them"
+    },
+    {
+     "to": "ANL-004",
+     "trigger": "Product Performance",
+     "provenance": "flow F82 step 2→3",
+     "carries": [
+      "dashboardId",
+      "reportId"
+     ]
     }
    ]
   },
@@ -1448,8 +1939,15 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "searchField",
+       "label": "Search",
+       "operation": "listSegments",
+       "notes": "Sends `?search=` to `listSegments`.",
+       "provenance": "contract marketing-crm.yaml GET /segments"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every guest conversion intelligence",
+       "label": "Every segment",
        "bindsTo": "Segment",
        "columns": [
         "Segment.name",
@@ -1464,6 +1962,17 @@
        ],
        "operation": "listSegments",
        "provenance": "contract marketing-crm.yaml GET /segments"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Domain",
+       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "chart",
+       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1473,7 +1982,25 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected guest conversion intelligence",
+       "label": "The selected segment",
+       "bindsTo": "Segment",
+       "columns": [
+        "Segment.name",
+        "Segment.description",
+        "Segment.venueId",
+        "Segment.match",
+        "Segment.criteria",
+        "Segment.excludeSegmentIds",
+        "Segment.id",
+        "Segment.lastEvaluatedSize",
+        "Segment.lastEvaluatedAt"
+       ],
+       "operation": "listSegments",
+       "provenance": "contract marketing-crm.yaml GET /segments"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The dashboard data",
        "bindsTo": "DashboardData",
        "columns": [
         "DashboardData.tileData"
@@ -1489,38 +2016,21 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Run",
+       "label": "Run report",
        "operation": "runReport",
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create segment",
        "operation": "createSegment",
        "provenance": "contract marketing-crm.yaml POST /segments"
       },
       {
        "kind": "secondaryButton",
-       "label": "Preview",
+       "label": "Preview segment",
        "operation": "previewSegment",
        "provenance": "contract marketing-crm.yaml POST /segments/{segmentId}/preview"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "multiSelect",
-       "label": "Domain",
-       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "chart",
-       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1572,6 +2082,12 @@
     "invalidates": [
      "listSegments"
     ]
+   },
+   {
+    "operationId": "recordDashboardView",
+    "contract": "reporting",
+    "purpose": "Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it.",
+    "trigger": "background"
    }
   ],
   "entryState": {
@@ -1600,7 +2116,11 @@
    ],
    "coldEntry": "**A bookmarked dashboard is the normal way in** — a manager opens the same view every Monday. The domain and the window come from the link where it carries them, and from the last view where it does not. A segment opened from the list.",
    "preloaded": [
-    "DashboardData.tileData"
+    "Segment.name",
+    "Segment.description",
+    "Segment.venueId",
+    "Segment.match",
+    "Segment.criteria"
    ]
   },
   "wireframe": {
@@ -1612,6 +2132,53 @@
    "derivedFrom": "wireframes/Retail Board 6.dc.html#ret-6e"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   },
+   {
+    "id": "formCreateSegment",
+    "component": "modal",
+    "trigger": "Create segment",
+    "body": "**Collects what `createSegment` sends before it is called.** Required: `name`, `criteria`. Optional: `description`, `venueId`, `match`, `excludeSegmentIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateSegmentRequest",
+    "confirm": {
+     "label": "Create segment",
+     "operation": "createSegment"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "criteria",
+      "description",
+      "venueId",
+      "match",
+      "excludeSegmentIds"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /segments"
+   }
+  ],
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -1662,11 +2229,9 @@
      "trigger": "Executive Command Center",
      "carries": [
       "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
+      "reportId"
      ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-008 holds dashboardId, reportId, so an edge into it carries them"
     }
    ]
   },
@@ -1688,32 +2253,14 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected demand forecasting",
+       "label": "The dashboard data",
        "bindsTo": "DashboardData",
        "columns": [
         "DashboardData.tileData"
        ],
        "operation": "getDashboard",
        "provenance": "contract reporting.yaml GET /dashboards/{dashboardId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Ask",
-       "operation": "askReportingQuestion",
-       "provenance": "contract reporting.yaml POST /reports/ask"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+      },
       {
        "kind": "multiSelect",
        "label": "Domain",
@@ -1724,6 +2271,18 @@
        "kind": "chart",
        "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
        "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Ask reporting question",
+       "operation": "askReportingQuestion",
+       "provenance": "contract reporting.yaml POST /reports/ask"
       }
      ]
     }
@@ -1748,6 +2307,19 @@
     "contract": "reporting",
     "purpose": "Read a dashboard with tile data",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordDashboardView",
+    "contract": "reporting",
+    "purpose": "Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it.",
+    "trigger": "background"
+   },
+   {
+    "operationId": "getForecast",
+    "contract": "ai",
+    "purpose": "Forecast values",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1777,6 +2349,27 @@
    "derivedFrom": "wireframes/Retail Board 6.dc.html#ret-6g"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAskReportingQuestion",
+    "component": "modal",
+    "trigger": "Ask reporting question",
+    "body": "**Collects what `askReportingQuestion` sends before it is called.** Required: `question`. Optional: `conversationId`, `venueId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Ask reporting question",
+     "operation": "askReportingQuestion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "question",
+      "conversationId",
+      "venueId"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/ask"
+   }
+  ],
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -1826,19 +2419,19 @@
      "to": "ANL-001",
      "trigger": "Executive Command Center",
      "carries": [
-      "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
+      "reportId"
      ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-009 holds reportId, so an edge into it carries them"
     },
     {
      "to": "BO-010",
      "trigger": "Promotions & Coupons",
      "provenance": "flow F77 step 3→4",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "reportId"
+     ]
     }
    ]
   },
@@ -1855,13 +2448,6 @@
   "pattern": "approvalInbox",
   "patternReason": "`decideProposedAction` decides items that `listAlerts` queues — every row is waiting for a person, so the empty state is success",
   "purpose": "AI Assistant & Action Center — across F&B, retail, ticketing and frontline, filtered by domain.",
-  "gaps": [
-   {
-    "operation": "listOrders",
-    "why": "**2 declared operations reach no component on this screen**: listOrders, listProposedActions. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1869,6 +2455,41 @@
      "name": "contentBody",
      "slot": "queue",
      "components": [
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listAlerts",
+       "notes": "Sends `?status=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Severity",
+       "operation": "listAlerts",
+       "notes": "Sends `?severity=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Workstation id",
+       "operation": "listAlerts",
+       "notes": "Sends `?workstationId=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Shift id",
+       "operation": "listAlerts",
+       "notes": "Sends `?shiftId=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Item id",
+       "operation": "listAlerts",
+       "notes": "Sends `?itemId=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
       {
        "kind": "dataTable",
        "label": "Waiting for a decision",
@@ -1889,6 +2510,58 @@
        ],
        "operation": "listAlerts",
        "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every order",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount",
+        "OrderSummary.principalId",
+        "OrderSummary.holdLabel",
+        "OrderSummary.heldUntil"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every proposed action",
+       "bindsTo": "ProposedAction",
+       "columns": [
+        "ProposedAction.id",
+        "ProposedAction.interactionId",
+        "ProposedAction.kind",
+        "ProposedAction.targetContract",
+        "ProposedAction.targetOperation",
+        "ProposedAction.payload",
+        "ProposedAction.summary",
+        "ProposedAction.status",
+        "ProposedAction.approvalLevel",
+        "ProposedAction.decidedByPrincipalId",
+        "ProposedAction.decisionReason",
+        "ProposedAction.proposedAt"
+       ],
+       "operation": "listProposedActions",
+       "notes": "**What a caller sees follows who may decide** (decided 28 September, audit R213 (3)): with `AI_APPROVE`, every open proposal at the scope; with `AI_USE` only, the caller's own proposals, which are the level 1 ones they may approve themselves.",
+       "provenance": "contract ai.yaml GET /proposed-actions"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Domain",
+       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "chart",
+       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1898,7 +2571,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected assistant action",
+       "label": "The selected alert",
        "bindsTo": "Alert",
        "columns": [
         "Alert.id",
@@ -1925,50 +2598,34 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Ask",
+       "label": "Ask reporting question",
        "operation": "askReportingQuestion",
        "provenance": "contract reporting.yaml POST /reports/ask"
       },
       {
        "kind": "secondaryButton",
-       "label": "Acknowledge",
+       "label": "Acknowledge alert",
        "operation": "acknowledgeAlert",
        "provenance": "contract reporting.yaml POST /alerts/{alertId}/acknowledge"
       },
       {
        "kind": "secondaryButton",
-       "label": "Run",
+       "label": "Run report",
        "operation": "runReport",
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save alert rule",
        "operation": "setAlertRule",
        "provenance": "contract reporting.yaml PUT /alert-rules"
       },
       {
        "kind": "secondaryButton",
-       "label": "Decide",
+       "label": "Decide proposed action",
        "operation": "decideProposedAction",
+       "notes": "Guarded as the contract is (decided 28 September, audit R213 (3)): offered on the caller's own level 1 proposals with `AI_USE`; on a level 2 proposal, or somebody else's, only with `AI_APPROVE`, and never on a level 2 proposal the caller prompted. Hidden rather than disabled where the rule already says no.",
        "provenance": "contract ai.yaml POST /proposed-actions/{actionId}/decide"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "multiSelect",
-       "label": "Domain",
-       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "chart",
-       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -2033,17 +2690,24 @@
    {
     "operationId": "listProposedActions",
     "contract": "ai",
-    "purpose": "What the assistant has proposed and nobody has decided",
+    "purpose": "What the assistant has proposed and nobody has decided — all of them with AI_APPROVE, the caller's own with AI_USE (audit R213 (3))",
     "trigger": "onLoad"
    },
    {
     "operationId": "decideProposedAction",
     "contract": "ai",
-    "purpose": "Approve or reject a proposal",
+    "purpose": "Approve or reject a proposal — own level 1 with AI_USE, level 2 or another's with AI_APPROVE, never one's own level 2 (audit R213 (3))",
     "trigger": "onAction",
     "invalidates": [
      "listAlerts"
     ]
+   },
+   {
+    "operationId": "getActionPlan",
+    "contract": "ai",
+    "purpose": "A plan with its steps",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -2068,6 +2732,10 @@
     {
      "name": "actionId",
      "from": "deepLink"
+    },
+    {
+     "name": "planId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A bookmarked dashboard is the normal way in** — a manager opens the same view every Monday. The domain and the window come from the link where it carries them, and from the last view where it does not. A proposed action opened from the queue or an alert.",
@@ -2088,6 +2756,114 @@
    "derivedFrom": "wireframes/POS Board 6.dc.html#pos-6e"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAskReportingQuestion",
+    "component": "modal",
+    "trigger": "Ask reporting question",
+    "body": "**Collects what `askReportingQuestion` sends before it is called.** Required: `question`. Optional: `conversationId`, `venueId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Ask reporting question",
+     "operation": "askReportingQuestion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "question",
+      "conversationId",
+      "venueId"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/ask"
+   },
+   {
+    "id": "formAcknowledgeAlert",
+    "component": "modal",
+    "trigger": "Acknowledge alert",
+    "body": "**Collects what `acknowledgeAlert` sends before it is called.** Nothing in the body is required. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Acknowledge alert",
+     "operation": "acknowledgeAlert"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "note"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /alerts/{alertId}/acknowledge"
+   },
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   },
+   {
+    "id": "formSetAlertRule",
+    "component": "modal",
+    "trigger": "Save alert rule",
+    "body": "**Collects what `setAlertRule` sends before it is called.** Required: `id`, `name`, `metric`, `comparator`, `threshold`, `severity`, `isActive`, `scopePath`. Optional: `thresholdUpper`, `windowMinutes`, `deliverTo`, `recipientRoleIds`, `cooldownMinutes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AlertRule",
+    "confirm": {
+     "label": "Save alert rule",
+     "operation": "setAlertRule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "name",
+      "metric",
+      "comparator",
+      "threshold",
+      "severity",
+      "isActive",
+      "scopePath",
+      "thresholdUpper",
+      "windowMinutes",
+      "deliverTo",
+      "recipientRoleIds",
+      "cooldownMinutes"
+     ]
+    },
+    "provenance": "contract reporting.yaml PUT /alert-rules"
+   },
+   {
+    "id": "formDecideProposedAction",
+    "component": "modal",
+    "trigger": "Decide proposed action",
+    "body": "**Collects what `decideProposedAction` sends before it is called.** Required: `decision`. Optional: `reason` (asked for on a rejection). A refusal is a 403 named by its rule and shown as such (decided 28 September, audit R213 (3)): `approval-level-requires-manager` (level 2 needs a manager holding `AI_APPROVE`), `approver-is-requester` (a level 2 proposal cannot be approved by whoever prompted it), `not-own-proposal` (somebody else's level 1 proposal needs `AI_APPROVE`). An expired or already decided proposal is a 409. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Decide proposed action",
+     "operation": "decideProposedAction"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "decision",
+      "reason"
+     ]
+    },
+    "provenance": "contract ai.yaml POST /proposed-actions/{actionId}/decide"
+   }
+  ],
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -2128,7 +2904,8 @@
     "ANL-001"
    ],
    "exitTo": [
-    "ANL-001"
+    "ANL-001",
+    "ANL-071"
    ],
    "inferred": false,
    "notes": "**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
@@ -2136,13 +2913,12 @@
     {
      "to": "ANL-001",
      "trigger": "Executive Command Center",
-     "carries": [
-      "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
-     ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-010 holds none of them, so the edge carries nothing and ANL-001 opens cold"
+    },
+    {
+     "to": "ANL-071",
+     "trigger": "AI maturity",
+     "provenance": "29 September pass (group A) — the stage badge links to the maturity page"
     }
    ]
   },
@@ -2154,13 +2930,6 @@
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`requestSuggestion`, `recordSuggestionOutcome`) and no read of a population — it is settings, not a list",
   "purpose": "Every open suggestion, what it is based on, and whether the venue took it.",
-  "gaps": [
-   {
-    "operation": "requestSuggestion",
-    "why": "**`requestSuggestion` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
-    "source": "contract ai.yaml POST /ai/suggestions"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -2170,13 +2939,13 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Request",
+       "label": "Request suggestion",
        "operation": "requestSuggestion",
        "provenance": "contract ai.yaml POST /ai/suggestions"
       },
       {
        "kind": "secondaryButton",
-       "label": "Record",
+       "label": "Record suggestion outcome",
        "operation": "recordSuggestionOutcome",
        "provenance": "contract ai.yaml POST /ai/suggestions/{suggestionId}/outcome"
       }
@@ -2194,8 +2963,9 @@
       {
        "kind": "cardList",
        "bindsTo": "Suggestion[]",
-       "notes": "**The basis is on the card, not behind a tap.** A manager must see that today’s answer is a margin rule and next quarter’s is a model — the same screen, a different basis.",
-       "provenance": "carried from the previous definition"
+       "notes": "**The basis and the stage are on the card, not behind a tap.** Every answer shows a \"Based on\" chip (*your venue profile, UAE calendar, weather, 23 days of your sales*) and a stage badge: Starting, Learning, Established or Trained on your data (29 September, AI functions review). \"Limited historical data\" while the starting pattern carries more than half the weight. Never a bare percentage.",
+       "provenance": "carried from the previous definition",
+       "operation": "requestSuggestion"
       },
       {
        "kind": "detailPanel",
@@ -2212,6 +2982,38 @@
        "label": "Do something else",
        "notes": "**Records the outcome either way.** A rejected suggestion is the case the current rule got wrong, which is exactly what a model is trained to beat.",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "requestSuggestion",
+       "notes": "Required.",
+       "provenance": "contract ai.yaml POST /ai/suggestions"
+      },
+      {
+       "kind": "textField",
+       "label": "Subject ref",
+       "operation": "requestSuggestion",
+       "provenance": "contract ai.yaml POST /ai/suggestions"
+      },
+      {
+       "kind": "textField",
+       "label": "Horizon",
+       "operation": "requestSuggestion",
+       "provenance": "contract ai.yaml POST /ai/suggestions"
+      },
+      {
+       "kind": "textField",
+       "label": "Context",
+       "operation": "requestSuggestion",
+       "provenance": "contract ai.yaml POST /ai/suggestions"
+      },
+      {
+       "kind": "banner",
+       "label": "Missing setting",
+       "operation": "requestSuggestion",
+       "notes": "Shown only on a 422 `missing-setting`: names the setting (a current cost, a par level, the venue AI profile) and links to the screen that sets it. Little history is never this banner.",
+       "provenance": "29 September pass (group A)"
       }
      ]
     }
@@ -2220,8 +3022,9 @@
   "states": {
    "loading": "Open suggestions, newest first, grouped by kind.",
    "error": "Could not load. **Trading is unaffected** — this advises and does not act.",
-   "emptyFirstRun": "**A venue with no history has nothing to suggest from**, and the screen says so rather than showing a rule dressed as advice. Names when there will be enough data.",
-   "emptyNoAccess": "You do not have AI permission at this venue."
+   "emptyFirstRun": "**No suggestions asked for yet.** Every kind answers from day one, from the venue AI profile and the starting pattern for the venue type, and says so; the stage badge shows how much of the answer is the venue's own data. The action asks for the first one.",
+   "emptyNoAccess": "You do not have AI permission at this venue.",
+   "emptyNoResults": "No suggestion of this kind. Names the kind filter and offers to clear it."
   },
   "apis": [
    {
@@ -2260,6 +3063,33 @@
    "derivedFrom": "wireframes/POS Board 6.dc.html#pos-6f"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRecordSuggestionOutcome",
+    "component": "modal",
+    "trigger": "Record suggestion outcome",
+    "body": "**Collects what `recordSuggestionOutcome` sends before it is called.** Required: `id`, `suggestionId`, `decision`. Optional: `actualValue`, `decidedByPrincipalId`, `decidedAt`, `realisedOutcome`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SuggestionOutcome",
+    "confirm": {
+     "label": "Record suggestion outcome",
+     "operation": "recordSuggestionOutcome"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "suggestionId",
+      "decision",
+      "actualValue",
+      "decidedByPrincipalId",
+      "decidedAt",
+      "realisedOutcome",
+      "note"
+     ]
+    },
+    "provenance": "contract ai.yaml POST /ai/suggestions/{suggestionId}/outcome"
+   }
+  ],
   "_platform": {
    "code": "P16",
    "formFactor": "web",

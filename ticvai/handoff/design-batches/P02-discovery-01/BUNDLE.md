@@ -106,7 +106,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-002",
      "trigger": "Clears the search",
-     "provenance": "decided 29 September 2026 (P29), MOB-1"
+     "provenance": "decided 29 September 2026, MOB-1"
     },
     {
      "to": "GST-004",
@@ -114,7 +114,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "productId"
      ],
-     "provenance": "decided 29 September 2026 (P29), MOB-1, MOB-4"
+     "provenance": "decided 29 September 2026, MOB-1, MOB-4"
     }
    ]
   },
@@ -214,9 +214,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "prototype": {
     "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-29",
+    "verified": "2026-09-30",
     "match": "exact",
-    "view": "Explore tab → search"
+    "view": "Explore tab → search (\"coaster\")"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",

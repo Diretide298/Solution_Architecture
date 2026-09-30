@@ -1,4 +1,23 @@
 {
+ "actOnPartnerApplicationReview": {
+  "method": "POST",
+  "path": "/partner-applications/{applicationId}/review-actions",
+  "contract": "subscription",
+  "summary": "Move a partner application through its departmental review",
+  "permission": "PARTNER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PartnerApplicationReviewAction",
+  "responds": "PartnerApplication"
+ },
  "approvePartnerStatuLifecycle": {
   "method": "PUT",
   "path": "/partner-statu-lifecycle",
@@ -8,9 +27,34 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PartnerApprovalStatusLifecycleManagementInput",
   "responds": "PartnerApprovalStatusLifecycleManagementView"
+ },
+ "createPartnerUser": {
+  "method": "POST",
+  "path": "/partners/{partnerId}/users",
+  "contract": "subscription",
+  "summary": "Add a user to a partner branch",
+  "permission": "PARTNER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PartnerUser",
+  "responds": "PartnerUser"
  },
  "listPartner": {
   "method": "GET",
@@ -43,7 +87,116 @@
     "required": false
    },
    {
+    "name": "risk",
+    "in": "query",
+    "required": false
+   },
+   {
     "name": "integrationType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partnerType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "territory",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "agreementStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "creditStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPartner2": {
+  "method": "GET",
+  "path": "/partner-2",
+  "contract": "subscription",
+  "summary": "Partner Operations Command Center",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "market",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partnerType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "accountManager",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "operationalStatus",
     "in": "query",
     "required": false
    },
@@ -51,10 +204,20 @@
     "name": "risk",
     "in": "query",
     "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "PartnerManagementCommandCenterView"
+  "responds": "Page"
  },
  "listPartnerAccessRole": {
   "method": "GET",
@@ -65,9 +228,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "capability",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "grantType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PartnerAccessRolesPermissionProfileView"
+  "responds": "Page"
  },
  "listPartnerContactUser": {
   "method": "GET",
@@ -78,9 +267,45 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "contactType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "hasUserAccount",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PartnerContactsUserAdministrationView"
+  "responds": "Page"
  },
  "listPartnerDocumentationCompliance": {
   "method": "GET",
@@ -91,9 +316,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "documentType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "verificationStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "expiringWithinDays",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PartnerDocumentationComplianceRepositoryView"
+  "responds": "Page"
  },
  "listPartnerOnboardingApplication": {
   "method": "GET",
@@ -104,9 +360,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "stage",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "requestedPartnerType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PartnerOnboardingApplicationWorkflowView"
+  "responds": "Page"
  },
  "listPartnerProfileReadiness": {
   "method": "GET",
@@ -117,9 +404,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "Partner360ProfileReadinessAiReviewView"
+  "responds": "Page"
  },
  "listTerritoryMarketDistribution": {
   "method": "GET",
@@ -130,9 +443,45 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "market",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "distributionMethod",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "exclusivity",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "TerritoryMarketDistributionRightsView"
+  "responds": "Page"
  },
  "setPartnerBrandVenue": {
   "method": "PUT",
@@ -143,9 +492,72 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PartnerBrandVenueBusinessScopeAssignmentInput",
   "responds": "PartnerBrandVenueBusinessScopeAssignmentView"
+ },
+ "setPartnerCapabilityGrants": {
+  "method": "PUT",
+  "path": "/partners/{partnerId}/capability-grants",
+  "contract": "subscription",
+  "summary": "Replace the capability ceiling of a partner",
+  "permission": "PARTNER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setPartnerContact": {
+  "method": "PUT",
+  "path": "/partner-contacts",
+  "contract": "subscription",
+  "summary": "Create, edit, disable, enable or revoke a partner contact",
+  "permission": "PARTNER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PartnerContactInput",
+  "responds": "PartnerContact"
+ },
+ "setPartnerDistributionRights": {
+  "method": "PUT",
+  "path": "/partners/{partnerId}/distribution-rights",
+  "contract": "subscription",
+  "summary": "Replace a partner's territory, market and distribution rights",
+  "permission": "PARTNER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "setPartnerProfileOrganization": {
   "method": "PUT",
@@ -156,7 +568,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PartnerProfileOrganizationSetupInput",
   "responds": "PartnerProfileOrganizationSetupView"
  }

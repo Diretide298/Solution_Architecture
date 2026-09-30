@@ -1,4 +1,239 @@
 {
+ "Asset": {
+  "x-ticvai-persistence": "maintenance.asset",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateAssetRequest"
+   },
+   {
+    "type": "object",
+    "x-ticvai-retired-columns": [
+     "is_maintenance_overdue",
+     "document_refs"
+    ],
+    "required": [
+     "id",
+     "status"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "resourceId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "1.2.x. **Where this asset is also bookable.** An AV rig is an asset to maintain and a resource to allocate, and they are the same object seen from two sides.\n**`resources` owns the calendar and this owns the condition.** An asset out of service makes its resource unbookable, which is one link rather than two models of availability.\n"
+     },
+     "deviceId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "BL-160. **Where this asset is also a registered device.** A turnstile is an asset to maintain and a device to operate, and — exactly as with `resourceId` above — they are the same object seen from two sides.\n**Nothing joined them before this.** A turnstile controller reporting `needsAttention` could not raise a work order against itself, and an engineer closing one had no way back to the device whose firmware caused it.\n**Null for most assets and for most devices.** A chiller is not a device and a signature pad is not on the asset register; the link is sparse, and it lives here rather than on `platform.device` because `platform` is the foundation tier and a foreign key pointing from it into `maintenance` would invert the tiers — every cell running a spine would carry a column for a satellite it may not deploy.\n"
+     },
+     "acquisitionCost": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "acquiredOn": {
+      "type": "string",
+      "format": "date",
+      "nullable": true
+     },
+     "depreciation": {
+      "type": "object",
+      "nullable": true,
+      "description": "**Recorded here and posted by `finance`.** Depreciation is an accounting act and the asset register is where the useful life is actually known — an engineer knows a chiller lasts fifteen years and an accountant knows what to do about it.\n",
+      "properties": {
+       "method": {
+        "type": "string",
+        "enum": [
+         "straightLine",
+         "reducingBalance",
+         "unitsOfProduction",
+         "none"
+        ]
+       },
+       "usefulLifeMonths": {
+        "type": "integer"
+       },
+       "residualValue": {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       },
+       "accumulatedDepreciation": {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      }
+     },
+     "retiredOn": {
+      "type": "string",
+      "format": "date",
+      "nullable": true,
+      "description": "**Retirement is not deletion.** A work order from three years ago still names this asset, and an inspection record with no asset is an inspection of nothing.\n"
+     },
+     "disposalProceeds": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "status": {
+      "$ref": "#/components/schemas/AssetStatus"
+     },
+     "statusReason": {
+      "type": "string",
+      "nullable": true
+     },
+     "openWorkOrderCount": {
+      "type": "integer",
+      "readOnly": true,
+      "x-ticvai-derived": "onWrite",
+      "description": "Work orders on this asset whose status is `open`, `assigned`, `inProgress`, `paused` or `awaitingParts` — the same set `AssetDetail.openWorkOrders` returns. **Maintained on write**: `createWorkOrder` and every transition into or out of that set (complete, cancel, close, reject back to open) adjust it in the same transaction as the work-order row.\n"
+     },
+     "nextMaintenanceDueAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "x-ticvai-derived": "onWrite",
+      "description": "The earliest `nextDueAt` among this asset's active maintenance plans; null when none has one. **Maintained on write**: recomputed whenever one of those plans is created, amended, suspended or has its `nextDueAt` moved by a completed work order. `listAssets?maintenanceDue` filters on this column against the clock.\n"
+     },
+     "isMaintenanceOverdue": {
+      "type": "boolean",
+      "readOnly": true,
+      "x-ticvai-persisted": false,
+      "x-ticvai-derived": "onRead",
+      "description": "`nextMaintenanceDueAt` is in the past at the moment of the read. **Computed on read and not stored** — it depends on the clock, so a stored copy is stale the minute after it is written.\n"
+     },
+     "lastInspectionAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "x-ticvai-derived": "onWrite",
+      "description": "`performedAt` of the latest inspection submitted against this asset. **Maintained on write** by `submitInspection`, in the same transaction as the inspection row; an inspection synced late with an earlier `performedAt` does not move it back.\n"
+     },
+     "usageCounter": {
+      "type": "number",
+      "nullable": true,
+      "description": "Cycles, hours or kilometres. Drives usage-based maintenance."
+     }
+    }
+   }
+  ]
+ },
+ "AssetStatus": {
+  "type": "string",
+  "enum": [
+   "inService",
+   "outOfService",
+   "underMaintenance",
+   "awaitingParts",
+   "retired",
+   "disposed"
+  ]
+ },
+ "CreateAssetRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "assetTag",
+   "name",
+   "venueId",
+   "criticality"
+  ],
+  "properties": {
+   "assetTag": {
+    "type": "string",
+    "maxLength": 64,
+    "x-ticvai-unique": "venue",
+    "description": "**Unique per venue** (decided 28 September, audit R108). Two assets in one venue never share a tag; `createAsset` refuses a duplicate with `409` `duplicate-code`. Two venues may each have an `A-001`.\n"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationDescription": {
+    "type": "string",
+    "maxLength": 500
+   },
+   "criticality": {
+    "$ref": "#/components/schemas/AssetCriticality"
+   },
+   "priorityOverride": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/WorkOrderPriority"
+     }
+    ],
+    "nullable": true,
+    "description": "**\"If this device goes down, raise this priority\"** (decided 17 September, M17-01). A corrective work order raised on this asset takes this priority instead of the score. Null means the score decides.\n"
+   },
+   "manufacturer": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "model": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "serialNumber": {
+    "type": "string",
+    "maxLength": 128
+   },
+   "commissionedAt": {
+    "type": "string",
+    "format": "date"
+   },
+   "warrantyExpiresAt": {
+    "type": "string",
+    "format": "date"
+   },
+   "supplierId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "linkedProductIds": {
+    "type": "array",
+    "description": "Products this asset delivers. A fault here can stop them selling.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "linkedAccessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Access point this asset controls. Out of service blocks it."
+   },
+   "requiresInspectionToReturn": {
+    "type": "boolean",
+    "default": false,
+    "description": "True means a completed inspection is required before return to service. A technician cannot simply declare a ride safe.\n"
+   },
+   "documents": {
+    "type": "array",
+    "description": "Manuals, procedures, certificates, each with its name and kind. Stored one row per document in `maintenance.asset_document`, which is where `AssetDetail.documents` reads them from.\n",
+    "items": {
+     "$ref": "#/components/schemas/AssetDocumentInput"
+    }
+   },
+   "documentRefs": {
+    "type": "array",
+    "x-ticvai-persisted": false,
+    "description": "**The refs alone, kept for callers that predate `documents`.** Each ref sent here is stored as an `asset_document` row with no name and no kind. Returned as the refs of `documents`, computed on read — there is no second copy to fall out of step.\n",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
  "LocalisedText": {
   "x-ticvai-persistence": "none — jsonb column",
   "type": "object",

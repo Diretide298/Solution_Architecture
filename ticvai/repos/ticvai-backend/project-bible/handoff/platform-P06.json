@@ -112,15 +112,15 @@
    "operations": 4
   },
   {
-   "contract": "tenancy",
-   "operations": 2
-  },
-  {
    "contract": "venue-map",
    "operations": 2
   },
   {
    "contract": "retail",
+   "operations": 2
+  },
+  {
+   "contract": "tenancy",
    "operations": 2
   },
   {

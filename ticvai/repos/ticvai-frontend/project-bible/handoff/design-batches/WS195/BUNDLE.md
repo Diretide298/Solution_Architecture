@@ -1,6 +1,6 @@
 # WS195 — Wallet Configuration Backend Structure v1.0 board 10
 
-**10 screens · 19 operations · 19 schemas · 7 permissions**
+**10 screens · 21 operations · 23 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -64,7 +64,7 @@ convincingly. It is never a caption.
 | `BO-1174` | Wallet API Catalogue & Endpoint Configuration | configEditor | 1 | 0 | — |
 | `BO-1175` | Integration Profile & System Mapping | configEditor | 2 | 0 | — |
 | `BO-1176` | Wallet Events, Webhooks & Notification Orchestration | configEditor | 2 | 0 | — |
-| `BO-1177` | API Security, Access & Integration Permissions | configEditor | 2 | 0 | — |
+| `BO-1177` | API Security, Access & Integration Permissions | configEditor | 4 | 0 | — |
 | `BO-1178` | Synchronization, Retry & Resilience Configuration | configEditor | 1 | 0 | — |
 | `BO-1179` | Integration Monitoring & Exception Workbench | listDetail | 8 | 1 | — |
 | `BO-1180` | Wallet Configuration Governance & Version Control | listDetail | 1 | 0 | — |
@@ -1195,6 +1195,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "fields",
      "components": [
       {
+       "kind": "banner",
+       "label": "Production access",
+       "bindsTo": "ProductionAccessRequest",
+       "operation": "listProductionAccessRequests",
+       "notes": "**Where production access stands** (M17-06): sandbox only, requested (pending), approved (a production client issued by TICVAI) or rejected with the reason. Production keys only after certification; a sandbox key is never promoted.",
+       "provenance": "decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)"
+      },
+      {
        "kind": "selectField",
        "label": "Integration identity",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Configure"
@@ -1217,6 +1225,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "selectField",
        "label": "API scope",
+       "operation": "listApiScopes",
+       "notes": "Module scopes (`{module}.read`/`{module}.write`) from `listApiScopes`, grouped by module (M17-05, applied 30 September); no scope opens a catalogue write (M17-04).",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 120 §Configure"
       },
       {
@@ -1327,6 +1337,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
   "apis": [
+   {
+    "operationId": "listApiScopes",
+    "contract": "public-api",
+    "purpose": "Scopes to choose from, by module",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)"
+   },
+   {
+    "operationId": "listProductionAccessRequests",
+    "contract": "public-api",
+    "purpose": "Where production access stands for these clients",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)"
+   },
    {
     "operationId": "listAccessPolicies",
     "contract": "identity",
@@ -2439,6 +2463,64 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "ApiClient"
  },
+ "listApiScopes": {
+  "method": "GET",
+  "path": "/api-scopes",
+  "contract": "public-api",
+  "summary": "The scope catalogue, one read and one write scope per module",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "module",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listProductionAccessRequests": {
+  "method": "GET",
+  "path": "/production-access-requests",
+  "contract": "public-api",
+  "summary": "Production access requests, pending first",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listWalletDisputes": {
   "method": "GET",
   "path": "/wallet-disputes",
@@ -2497,7 +2579,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Validate and publish the wallet configuration as a version",
   "permission": "WALLET_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {
@@ -2573,9 +2655,14 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Where a wallet may be used, on what, and when it may not",
   "permission": "WALLET_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -2599,6 +2686,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "WalletIntegrationMapping",
@@ -2611,9 +2703,14 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Velocity, behaviour and what happens when a rule trips",
   "permission": "WALLET_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -2744,7 +2841,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "AccessPolicy": {
   "type": "object",
   "x-ticvai-persistence": "identity.access_policy",
-  "description": "3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n",
+  "description": "3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). The package has two: this one, and the access contract's `AccessDynamicPolicy` (`access.dynamic_policy`). **This one governs who may do what in the software**: a principal's permissions on operations and screens (`permissions` names them), narrowed or extended by who, where, when and on what device, and decided by `evaluateAccess`. **`AccessDynamicPolicy` governs who may pass which gate**: a guest's, holder's or employee's admission at an access point, decided in the gate's validation with results such as `requireId` or `requireSupervisor` that mean nothing to a permission check. A staff member's badge opening a staff door is a gate decision (access); the same staff member approving a refund is a permission decision (here). The overlap that remains is listed in the build readiness open items rather than merged in this pass.\n",
   "required": [
    "code",
    "name",
@@ -2892,10 +2989,41 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "scopes": {
     "type": "array",
-    "description": "**Resolved against the tenant's licence at token issue** (13.3.24). A scope granted here and not licensed there produces no token — and the refusal is at issue rather than at call time, so an integrator finds out in testing.\n",
+    "description": "**Resolved against the tenant's licence at token issue** (13.3.24). A scope granted here and not licensed there produces no token — and the refusal is at issue rather than at call time, so an integrator finds out in testing. **Module scopes** (17 September minutes, M17-05): `{module}.read` or `{module}.write`, one of `listApiScopes`.\n",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[a-zA-Z]+\\.(read|write)$"
     }
+   },
+   "issuedBy": {
+    "type": "string",
+    "enum": [
+     "partner",
+     "ticvai"
+    ],
+    "readOnly": true,
+    "description": "Who generated the key (M17-06): a developer for a sandbox key, TICVAI for a production key issued on an approved `requestProductionAccess`.\n"
+   },
+   "certificationListingId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "control.integration_listing",
+    "description": "For a production client, the certified integration it was issued against."
+   },
+   "credentialTtlDays": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 730,
+    "nullable": true,
+    "description": "Key lifetime. Default 365 for production, 90 for sandbox (M17-06, configurable expiry)."
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the key stops working unless rotated. No token is issued after it."
    },
    "allowedTenantIds": {
     "type": "array",
@@ -2907,7 +3035,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "ipAllowList": {
     "type": "array",
-    "description": "13.1.38. Optional, and the strongest control available where an integrator has fixed egress.",
+    "description": "13.1.38. **Required on a production client** (17 September minutes, M17-07: endpoints are protected by IP allow-listing, not left open to the internet); optional in the sandbox. CIDR ranges. Checked at token issue and on every call.\n",
     "items": {
      "type": "string"
     }
@@ -2927,6 +3055,53 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true,
     "readOnly": true,
     "description": "**A credential unused for a year is a credential nobody will notice being stolen.**\n"
+   }
+  }
+ },
+ "ApiScope": {
+  "type": "object",
+  "x-ticvai-persistence": "none — generated at release from x-ticvai-api-scope on each partner-callable operation",
+  "description": "**One module scope** (17 September minutes, M17-05): `{module}.read` or `{module}.write`, and the operations it opens.\n**A write scope never opens a catalogue write** (M17-04): `ticketing.write` opens carts, orders and holds for a partner or developer client, and no product, price list, price, channel capacity, lifecycle or alternative-code write, since those operations are not partner-callable and carry no `x-ticvai-api-scope`. Only a platform-staff `ApiLicence.catalogueWriteException` opens one, for one named client.\n",
+  "required": [
+   "scope",
+   "module",
+   "access"
+  ],
+  "properties": {
+   "scope": {
+    "type": "string",
+    "description": "e.g. `ticketing.read`."
+   },
+   "module": {
+    "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+   },
+   "access": {
+    "type": "string",
+    "enum": [
+     "read",
+     "write"
+    ]
+   },
+   "description": {
+    "type": "string"
+   },
+   "operations": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "contract": {
+       "type": "string"
+      },
+      "operationId": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "licensed": {
+    "type": "boolean",
+    "description": "Whether the caller's tenant licenses the module (`ApiLicence.licensedModules`)."
    }
   }
  },
@@ -3185,6 +3360,84 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "aiAssessment": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.",
+    "properties": {
+     "riskScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "riskBand": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high",
+       "critical"
+      ]
+     },
+     "priorityScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "escalationSuggestion": {
+      "type": "object",
+      "description": "A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.",
+      "properties": {
+       "action": {
+        "type": "string",
+        "enum": [
+         "escalate",
+         "addBackupApprover",
+         "none"
+        ]
+       },
+       "reason": {
+        "type": "string",
+        "nullable": true
+       }
+      }
+     },
+     "signals": {
+      "type": "array",
+      "maxItems": 10,
+      "description": "The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.",
+      "items": {
+       "type": "object",
+       "properties": {
+        "code": {
+         "type": "string"
+        },
+        "contribution": {
+         "type": "number"
+        },
+        "detail": {
+         "type": "string",
+         "nullable": true
+        }
+       }
+      }
+     },
+     "scoreId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."
+     },
+     "decisionRecordId": {
+      "type": "string",
+      "description": "The ai decision record, for the audit of what the AI said and why."
+     },
+     "assessedAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
    }
   }
  },
@@ -3218,7 +3471,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "kind": {
     "$ref": "#/components/schemas/ApprovalKind"
@@ -3257,6 +3510,123 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "boolean",
     "default": false,
     "description": "True saves the request at `draft` without routing it; `submitApprovalRequest` sends it later (decided 28 September, audit R129).\n"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ProductionAccessRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "control.production_access_request",
+  "description": "**A developer's request for production keys** (17 September minutes, M17-06): sandbox, then certification, then production.\n",
+  "required": [
+   "id",
+   "developerId",
+   "sandboxClientId",
+   "listingId",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "developerId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "sandboxClientId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "control.api_client"
+   },
+   "listingId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "control.integration_listing"
+   },
+   "scopes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "allowedTenantIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "ipAllowList": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "approved",
+     "rejected",
+     "withdrawn"
+    ],
+    "readOnly": true
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "productionClientId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "control.api_client"
+   },
+   "requestedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -3667,8 +4037,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
         "deviceChange",
         "dormantThenLarge",
         "repeatedFailure",
-        "refundPattern"
-       ]
+        "refundPattern",
+        "accountSharing",
+        "duplicateTransaction",
+        "aiRiskScore"
+       ],
+       "description": "4.3.32 (29 September, build pass). **`accountSharing`**: one wallet or credential used from more devices or places at once than one person can be (`threshold` concurrent devices within `windowMinutes`). **`duplicateTransaction`**: the same amount at the same acceptance point within `windowMinutes` (`threshold` repeats). **`aiRiskScore`**: the score the `ai` risk engine returns for the wallet operation (`scoreTransactionRisk`, rules first and statistical baselines as history builds, ai-system-design 3.10); `threshold` is the score at or above which the rule acts. The wallet keeps its own rules and actions; the AI finding and its case are the `ai` contract's (`listRiskAlerts`)."
       },
       "threshold": {
        "type": "number"
@@ -3920,6 +4294,64 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "WebhookEventType": {
+  "type": "string",
+  "description": "**The webhook event catalogue: every event a subscription may name** (29 September, build pass). Each value is the `name` of an event in `events/` — `aggregate.pastTenseFact`, published through `platform.outbox` by exactly one context. A name is added here in the same change that adds its event file, and never before.\n**Added 29 September**, each closing a requirement that had the webhook mechanism and nothing to subscribe to:\n| Events | Publisher | Requirement | |---|---|---| | `device.statusChanged`, `device.tamperDetected`, `device.enrolmentChanged`, `device.firmwareReleased`, `device.firmwareRolloutCompleted` | tenancy | 16.9.56 | | `accreditation.applicationDecided`, `accreditation.holderStatusChanged`, `accreditation.credentialIssued`, `accreditation.renewalDue` | accreditation | 12.1.53 | | `approval.requested`, `approval.escalated`, `approval.stepCompleted`, `approval.expired` | approvals | 11.1.64, 11.1.66 | | `seat.held`, `seat.released`, `seat.blocked`, `seatMap.published` | seating | 21.13.4 | | `consent.deviceConsentRecorded`, `consent.deviceConsentClaimed` | marketing | 2.6.65 | | `order.chargebackRecorded` | orders | 8.3.11 to 8.3.15 (a tenant's own finance or fraud tooling) | | `entitlement.expiringSoon` | access | 5.5.30 (a tenant's own CRM) | | `apiClient.anomalyDetected` | public-api | 17 September minutes M17-07 (added 30 September with its event file) |\n**Published and deliberately not offered** (29 September, build pass, group G2): `identity.credentialResetRequested` and `identity.loginRecorded` are security signals, and a stream of them to an outside receiver is a map of which accounts are under attack; `storefront.sessionEvent` is high-volume fraud telemetry, not a business fact a receiver acts on.\n",
+  "enum": [
+   "access.validated",
+   "accreditation.applicationDecided",
+   "accreditation.credentialIssued",
+   "accreditation.holderStatusChanged",
+   "accreditation.renewalDue",
+   "ai.ceilingApproaching",
+   "apiClient.anomalyDetected",
+   "approval.escalated",
+   "approval.expired",
+   "approval.granted",
+   "approval.rejected",
+   "approval.requested",
+   "approval.stepCompleted",
+   "assets.documentIndexed",
+   "cart.abandoned",
+   "catalogue.productPublished",
+   "consent.deviceConsentClaimed",
+   "consent.deviceConsentRecorded",
+   "conversation.handedOver",
+   "device.enrolmentChanged",
+   "device.firmwareReleased",
+   "device.firmwareRolloutCompleted",
+   "device.statusChanged",
+   "device.tamperDetected",
+   "entitlement.expiringSoon",
+   "entitlement.issued",
+   "entitlement.statusChanged",
+   "fnb.menuPublished",
+   "fnb.orderReady",
+   "inventory.purchaseOrderReceived",
+   "ledger.journalPosted",
+   "ledger.periodClosed",
+   "maintenance.assetReturnedToService",
+   "maintenance.templatePublished",
+   "maintenance.workOrderCompleted",
+   "marketing.caseClosed",
+   "order.chargebackRecorded",
+   "order.completed",
+   "order.paid",
+   "order.refunded",
+   "performance.cancelled",
+   "reporting.definitionPublished",
+   "retail.merchandisePublished",
+   "seat.blocked",
+   "seat.held",
+   "seat.released",
+   "seat.sold",
+   "seatMap.published",
+   "shift.closed",
+   "stock.depleted",
+   "tenant.suspended",
+   "whitelabel.contentPublished"
+  ]
+ },
  "WebhookSubscription": {
   "type": "object",
   "x-ticvai-persistence": "control.webhook_subscription",
@@ -3946,9 +4378,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "eventTypes": {
     "type": "array",
-    "description": "**Filtered at subscription, not at delivery.** A subscriber taking every event and discarding 99% is a subscriber the platform pays to talk to.\n",
+    "description": "**Filtered at subscription, not at delivery.** A subscriber taking every event and discarding 99% is a subscriber the platform pays to talk to. Each entry is a name from the webhook event catalogue (`WebhookEventType`).\n",
     "items": {
-     "type": "string"
+     "$ref": "#/components/schemas/WebhookEventType"
     }
    },
    "filters": {

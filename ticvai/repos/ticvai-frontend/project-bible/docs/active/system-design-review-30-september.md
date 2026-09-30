@@ -336,7 +336,7 @@ Also Block A–critical from other areas: SD-007, 008, 023, 026, 032, 034, 046, 
 | Venue isolation | RLS now, **time partitioning first**, venue partitioning later | Pruning where growth is; no composite-FK retrofit | Venue-level vacuum and archive deferred | ADR-0044's cost is mostly in the 74 added columns |
 | Contention | Row lock held for one statement, SKIP LOCKED; guarded decrement for capacity | Correct without a retry storm | Throughput ceiling per hot row; a sweeper for expired holds | ADR-0031/0037 reasoning is sound; finish it |
 | Idempotency | Postgres record in the same transaction, Redis as cache | Survives Redis loss | One insert per write | Payments cannot rely on a cache |
-| Events | Outbox + Service Bus (sessions per aggregate) + inbox | Ordering per aggregate, managed DLQ, in-region | Azure lock-in behind an interface; an on-premise profile needs another broker | Kafka is more machinery than 10–200 tenants need |
+| Events | Outbox + the broker (RabbitMQ or Kafka, client's choice; ordering key per aggregate) + inbox | Ordering per aggregate, dead letters drained to `platform.dead_letter`, in-region | Broker behind the kernel interface; RabbitMQ is needed on-premise anyway | Kafka is more machinery than 10–200 tenants need; recommended only for replayable streams. *(Updated 30 September: Service Bus ruled out, ADR-0057.)* |
 | Availability reads at burst | Cached counters for browse, primary check at hold | The primary survives the sale | Up to 2 s stale "available" | A lie on the browse page is recoverable; a lie at the hold is not |
 | POS | Local-first (ADR-0013) | Offline is the only path, so it is always tested | About 2.2× build effort; the offline-core epic is missing | Required by requirements and venue reality |
 | AI | Rules first, per-tenant models on evidence | Value in week 1; no confident wrong numbers | Slower visible "AI" | Right for new tenants with no history |
@@ -384,7 +384,7 @@ Also Block A–critical from other areas: SD-007, 008, 023, 026, 032, 034, 046, 
 | ADR | Decides | Finding |
 |---|---|---|
 | Deployment shape | Modular monolith, 4–5 deployables, module rules, cross-schema read views and write policy | SD-001, SD-002 |
-| Messaging | Azure Service Bus, topics, sessions, DLQ; relay per tenant DB; inbox | SD-032, SD-031 |
+| Messaging | The broker (RabbitMQ or Kafka, client's choice; RabbitMQ recommended), ordering key per aggregate, dead letters; relay per region with a loop per tenant DB; inbox | SD-032, SD-031 |
 | Partitioning amendment (0044) | Time-range first; PK shape frozen before MIG | SD-010 |
 | Availability, HA, DR | SLO per tier, zone-redundant HA, PITR, restore drills, DR option | SD-045 |
 | AI baseline | Accept the AI design; write 0049 and 0051 now, 0050/0052–0054 in Block A; re-cut Block A AI scope | SD-060, SD-062 |
@@ -444,7 +444,7 @@ SD-036 outbound webhooks. SD-037 weather and ID-verification vendors. SD-041 bur
 
 - Whether the starter repository's kernel (`Money`, `Ulid`, `ITenantContext`, `IIdempotencyStore`, `SqlMigrationRunner`, per `audit/ticvai/STEPS.md` S002) already implements idempotency persistence, scope setting, outbox or error handling.
 - Actual latency, throughput and contention figures: `tools/bench.py` results are not in the package, and `sizing.json` says `rpsPerReplica` is a hypothesis.
-- Azure specifics: which Postgres SKU and HA mode, which models UAE North offers, and Service Bus availability.
+- Azure specifics: which Postgres SKU and HA mode, which models UAE North offers, and whether a managed RabbitMQ (or Kafka endpoint) is available there.
 - Payment-provider capabilities (3DS flow, terminal ECR protocol) until the sandboxes arrive.
 - Legal points: the UAE e-invoicing dates and the biometric retention floor (both flagged make-or-break in the contracts).
 - Where biometric templates are held (vendor or platform): stated nowhere.

@@ -1,6 +1,6 @@
 # WS33 — Order   Reservation Management board 3
 
-**10 screens · 19 operations · 22 schemas · 7 permissions**
+**10 screens · 21 operations · 25 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -60,7 +60,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-324` | Payment & Order Financial Command Center | listDetail | 1 | 0 | — |
+| `BO-324` | Payment & Order Financial Command Center | listDetail | 3 | 0 | — |
 | `BO-325` | Order Payment Detail & Transaction Ledger | listDetail | 1 | 1 | — |
 | `BO-326` | Multi-Payment, Split Tender & Payment Allocation Configuration | configEditor | 2 | 0 | — |
 | `BO-327` | Deposit, Partial Payment & Outstanding Balance Management | listDetail | 5 | 1 | — |

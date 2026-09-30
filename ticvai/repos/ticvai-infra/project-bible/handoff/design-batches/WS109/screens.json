@@ -710,6 +710,13 @@
     "invalidates": [
      "getAccreditationHolder"
     ]
+   },
+   {
+    "operationId": "listAccreditationDocuments",
+    "contract": "accreditation",
+    "purpose": "Documents stored, by holder or application",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -832,6 +839,13 @@
     "invalidates": [
      "getAccreditationHolder"
     ]
+   },
+   {
+    "operationId": "listAccreditationDocuments",
+    "contract": "accreditation",
+    "purpose": "The queue: status=submitted, oldest first",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {

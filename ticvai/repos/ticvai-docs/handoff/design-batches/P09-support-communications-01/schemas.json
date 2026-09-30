@@ -49,6 +49,21 @@
    "requiresAcknowledgement": {
     "type": "boolean"
    },
+   "deliveryChannels": {
+    "type": "array",
+    "description": "How it reaches people (29 September, build, 18.1.5). `inApp` always; `push` to the targeted people's registered staff phones (tenancy `RegisteredDevice`, kind `mobileHandset`). `emergency` is sent by both whatever is set here.\n",
+    "items": {
+     "type": "string",
+     "enum": [
+      "inApp",
+      "push"
+     ]
+    },
+    "default": [
+     "inApp",
+     "push"
+    ]
+   },
    "expiresAt": {
     "type": "string",
     "format": "date-time",

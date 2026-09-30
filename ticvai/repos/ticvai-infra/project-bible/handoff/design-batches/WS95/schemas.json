@@ -160,7 +160,7 @@
      },
      "workOrderId": {
       "type": "string",
-      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "format": "uuid",
       "nullable": true
      }
     }
@@ -598,7 +598,7 @@
    },
    "inspectionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "Required for return to service where the asset demands it."
    },

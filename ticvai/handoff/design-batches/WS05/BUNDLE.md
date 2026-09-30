@@ -2140,7 +2140,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "entitlementId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The credential the Face Pass belongs to"
    },
@@ -2371,7 +2371,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "policyId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "Absent creates a retention rule"
    },
    "venueId": {
@@ -2629,8 +2629,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "profileId": {
     "type": "string",
-    "description": "The profile row's key (access.biometric_profile.id, a ULID); absent creates one (decided 29 September, writers pass)",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "description": "The profile row's key (access.biometric_profile.id, a UUIDv7); absent creates one (decided 29 September, writers pass)",
+    "format": "uuid"
    },
    "selectType": {
     "type": "string",
@@ -2843,7 +2843,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "profileId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "Absent creates a threshold profile"
    },
    "venueId": {
@@ -3130,7 +3130,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "profileId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "Absent creates a Face Tag profile"
    },
    "venueId": {

@@ -41,15 +41,17 @@ Read these when the work calls for them, not before:
 
 In one session, a document already read does not need reading again.
 
-The kernel those documents name is here: `Money` and `Ulid` (Domain), `ITenantContext`,
+The kernel those documents name is here: `Money` and `Id` (Domain), `ITenantContext`,
 `ICurrentPrincipal` and `IIdempotencyStore` (Application), `SqlMigrationRunner` (Infrastructure).
-`Directory.Build.props` treats warnings as errors and bans server-local time.
+`Directory.Build.props` treats warnings as errors and bans server-local time and `Guid.NewGuid()`.
 
 ## Hard rules
 
 - A failed operation returns `Result.Failure(new Error(code, message))`; exceptions are for the unexpected.
   Errors leave the API as `application/problem+json` (see `ExceptionHandlingMiddleware`).
 - Timestamps are UTC `DateTimeOffset`. Never `DateTime.Now`.
+- Every id is a `uuid` (`Guid`). A new one is a UUIDv7 from `Id.New()`; an id a device sent keeps its value.
+  Human codes people read or type (order numbers, ticket codes) are separate columns, not ids.
 - No secrets or connection strings in source. `appsettings.json` keeps them empty.
 - Every data path is scoped by `ITenantContext`.
 - A contract comes first: build what the ADAM contract says - status codes, error codes, field names.

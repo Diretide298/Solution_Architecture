@@ -1,0 +1,221 @@
+{
+ "prototype": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+ "plan": "tools/capture-plans/guest-mobile-v4.json",
+ "captured": [
+  {
+   "id": "GST-001",
+   "name": "Home",
+   "view": "Home tab (Summit Peaks, after the intro)",
+   "proof": [
+    "Open now",
+    "Live map, ride waits and alerts",
+    "Start planning"
+   ],
+   "file": "img/gst-001.jpg",
+   "bytes": 82031
+  },
+  {
+   "id": "GST-002",
+   "name": "Explore",
+   "view": "Explore tab",
+   "proof": [
+    "Rides",
+    "Dining",
+    "Shows",
+    "Shops",
+    "Summit Coaster",
+    "Junior Circuit"
+   ],
+   "file": "img/gst-002.jpg",
+   "bytes": 62995
+  },
+  {
+   "id": "GST-063",
+   "name": "Explore – Search Results",
+   "view": "Explore tab → search (\"coaster\")",
+   "proof": [
+    "Summit Coaster"
+   ],
+   "file": "img/gst-063.png",
+   "bytes": 158634
+  },
+  {
+   "id": "GST-003",
+   "name": "Buy Tickets",
+   "view": "Buy tickets (the centre tab)",
+   "proof": [
+    "Dated day pass",
+    "Meal combo + admission",
+    "Book now"
+   ],
+   "file": "img/gst-003.jpg",
+   "bytes": 71496
+  },
+  {
+   "id": "GST-004",
+   "name": "Item Detail",
+   "view": "Explore → Summit Coaster (Item detail)",
+   "proof": [
+    "Summit Coaster",
+    "Skip the queue with Fast Track",
+    "Where it is"
+   ],
+   "file": "img/gst-004.jpg",
+   "bytes": 65018
+  },
+  {
+   "id": "GST-006",
+   "name": "Item Detail – Event / Exhibition",
+   "view": "Explore → Shows → Night of Nine → More info (Item detail, an event)",
+   "proof": [
+    "Night of Nine",
+    "Sat 3 Oct",
+    "Event entry by time slot",
+    "Choose an entry time"
+   ],
+   "file": "img/gst-006.png",
+   "bytes": 217128
+  },
+  {
+   "id": "GST-007",
+   "name": "Select Date & Time",
+   "view": "Buy tickets → Timed entry → Book now (step 1: date, then entry window)",
+   "proof": [
+    "Step 1 of 4",
+    "When will you arrive?",
+    "Entry window",
+    "12:00 – 15:00"
+   ],
+   "file": "img/gst-007.png",
+   "bytes": 54571
+  },
+  {
+   "id": "GST-008",
+   "name": "Tickets & Add-ons",
+   "view": "Buy tickets → Dated day pass → Book now → Fri 2 Oct (step 2: tickets; add-ons are step 3)",
+   "proof": [
+    "Step 2 of 5",
+    "Choose your ticket",
+    "Two-day flexible",
+    "AED 900"
+   ],
+   "file": "img/gst-008.png",
+   "bytes": 97221
+  },
+  {
+   "id": "GST-049",
+   "name": "Interactive Seat Selection",
+   "view": "Union Arena → Buy tickets → Direct seat map → 2D plan → section 104 (← Whole map)",
+   "proof": [
+    "Direct seat map",
+    "Whole map",
+    "Section 104",
+    "Premium · AED 245"
+   ],
+   "file": "img/gst-049.png",
+   "bytes": 62705
+  },
+  {
+   "id": "GST-041",
+   "name": "Checkout Entry",
+   "view": "Cart (header basket, after a booking is added to the cart)",
+   "proof": [
+    "Your cart",
+    "Dated day pass",
+    "Fri 2 Oct",
+    "Pay AED 900"
+   ],
+   "file": "img/gst-041.jpg",
+   "bytes": 55117
+  },
+  {
+   "id": "GST-012",
+   "name": "My Tickets",
+   "view": "Tickets tab",
+   "proof": [
+    "Scan a ticket",
+    "Show QR",
+    "Single day · 2 adults, 1 child"
+   ],
+   "file": "img/gst-012.jpg",
+   "bytes": 74325
+  },
+  {
+   "id": "GST-051",
+   "name": "Plan",
+   "view": "Plan tab (Plan your visit · 1 of 6)",
+   "proof": [
+    "Plan your visit · 1 of 6",
+    "Who is joining the trip?",
+    "Next"
+   ],
+   "file": "img/gst-051.png",
+   "bytes": 126315
+  },
+  {
+   "id": "GST-053",
+   "name": "Your Plan",
+   "view": "Plan tab → the six questions → Make my plan (Your plan)",
+   "proof": [
+    "Your plan",
+    "Change answers",
+    "Day 1",
+    "Book this plan"
+   ],
+   "file": "img/gst-053.png",
+   "bytes": 112562
+  },
+  {
+   "id": "GST-054",
+   "name": "AI Planner",
+   "view": "Ask Sahli (the assistant chat; v4 has no plan-specific chat)",
+   "proof": [
+    "Sahli",
+    "Online · answers in seconds",
+    "How do we skip the long queues on our plan?",
+    "See live waits"
+   ],
+   "file": "img/gst-054.png",
+   "bytes": 44917
+  },
+  {
+   "id": "GST-038",
+   "name": "At the Venue",
+   "view": "Home → You're at Summit Peaks (At the venue · live, Map view)",
+   "proof": [
+    "At the venue · live",
+    "Shortest wait right now",
+    "Waits",
+    "Services"
+   ],
+   "file": "img/gst-038.png",
+   "bytes": 100583
+  },
+  {
+   "id": "GST-021",
+   "name": "Interactive Map",
+   "view": "At the venue → Map (the venue map, scrolled to the map and nearest-place filters)",
+   "proof": [
+    "Nearest toilets",
+    "Nearest food",
+    "Nearest rides",
+    "Alerts"
+   ],
+   "file": "img/gst-021.png",
+   "bytes": 94077
+  },
+  {
+   "id": "GST-022",
+   "name": "Attraction Wait Times",
+   "view": "At the venue → Waits",
+   "proof": [
+    "Cloudline Gondola",
+    "Join queue",
+    "Canyon Rapids"
+   ],
+   "file": "img/gst-022.png",
+   "bytes": 124551
+  }
+ ],
+ "missing": []
+}

@@ -1219,20 +1219,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "selectField",
        "label": "View: day, week or month",
        "notes": "**Every calendar has day, week and month views, and the day view is broken into hours from the venue's day start hour** (17 September minutes, M17-03). Built on the shared calendar view (`calendarView`, to be added to the component library); until then a timeline per view.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       },
       {
        "kind": "multiSelect",
        "label": "Category",
        "notes": "**Filtered by category, so a team sees only what is theirs** (M17-03).",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       },
       {
        "kind": "calendarView",
        "label": "Calendar",
        "operation": "listMerchantAccounts",
        "notes": "Entries of the view in force, placed by date and hour.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     },
@@ -2052,11 +2052,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "entitlementId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "arisingAmount": {
     "allOf": [
@@ -2492,7 +2492,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "paymentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "amount": {

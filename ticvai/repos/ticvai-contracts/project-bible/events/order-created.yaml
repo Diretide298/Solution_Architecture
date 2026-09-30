@@ -13,7 +13,7 @@ emittedBy:
 - orders.syncOrders
 payload:
 - field: orderId
-  type: string
+  type: uuid
 - field: venueId
   type: uuid
 - field: channel

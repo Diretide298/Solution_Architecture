@@ -1,6 +1,6 @@
 # WS141 — Marketing CRM Configuration Reference v1.0 board 7
 
-**10 screens · 18 operations · 20 schemas · 4 permissions**
+**10 screens · 19 operations · 25 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `AI_CONFIGURE, CASE_MANAGE, CASE_VIEW, GUEST_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `AI_CONFIGURE, AI_USE, CASE_MANAGE, CASE_VIEW, GUEST_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -64,7 +64,7 @@ convincingly. It is never a caption.
 | `BO-795` | Unified Inbox | listDetail | 2 | 0 | — |
 | `BO-796` | Guest Conversation 360 | listDetail | 2 | 0 | — |
 | `BO-797` | AI Chatbot Configuration | listDetail | 1 | 0 | — |
-| `BO-798` | Intent & Knowledge Management | listDetail | 1 | 0 | — |
+| `BO-798` | Intent & Knowledge Management | listDetail | 2 | 0 | — |
 | `BO-799` | Agent Workspace | listDetail | 4 | 0 | — |
 | `BO-800` | Routing & Queue Management | listDetail | 5 | 1 | — |
 | `BO-801` | Sales & Service Actions | listDetail | 1 | 0 | — |
@@ -737,6 +737,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Intent and knowledge",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listKnowledgeGaps",
+    "contract": "ai",
+    "purpose": "Questions the assistant could not answer",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1778,6 +1785,45 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
+ "listKnowledgeGaps": {
+  "method": "GET",
+  "path": "/knowledge-gaps",
+  "contract": "ai",
+  "summary": "Questions the assistant could not answer",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "audience",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listQualityAgentEvaluation": {
   "method": "GET",
   "path": "/quality-agent-evaluation",
@@ -2077,6 +2123,125 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AgentWorkloadAvailabilityWorkforceControlView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over marketing.agent_service_profile (new), marketing.agent_availability, marketing.case, marketing.conversation, marketing.service_queue (new) and workforce.shift",
+  "description": "One agent's live status and workload. Rates are over the period since the agent's current shift started, or the venue's current day when no shift is rostered.",
+  "required": [
+   "principalId",
+   "agentName",
+   "status",
+   "activeCases"
+  ],
+  "properties": {
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "agentName": {
+    "type": "string",
+    "description": "The agent's display name."
+   },
+   "team": {
+    "type": "string",
+    "nullable": true
+   },
+   "skills": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "languages": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "available",
+     "busy",
+     "onCall",
+     "chatting",
+     "afterCallWork",
+     "break",
+     "training",
+     "offline"
+    ]
+   },
+   "activeCases": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "chats": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Conversations the agent holds now."
+   },
+   "calls": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Voice conversations in progress (0 or 1)."
+   },
+   "queues": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "queueId",
+      "queueName"
+     ],
+     "properties": {
+      "queueId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "queueName": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "slaRiskCases": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "The agent's open cases at risk or breached."
+   },
+   "averageHandleSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "resolutionRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true,
+    "description": "Cases resolved over cases handled."
+   },
+   "utilization": {
+    "type": "number",
+    "minimum": 0,
+    "description": "Active cases and conversations over `maxConcurrentCases`; above 1 means overloaded."
+   },
+   "workloadBand": {
+    "type": "string",
+    "enum": [
+     "available",
+     "normal",
+     "overloaded"
+    ],
+    "description": "`overloaded` at utilization 0.9 or above, `available` below 0.5."
+   },
+   "availabilityExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
  "AiCustomerServiceCopilotKnowledgeWorkspaceInput": {
   "type": "object",
   "x-ticvai-persistence": "marketing.service_copilot_config",
@@ -2268,6 +2433,93 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "AiKnowledgeGap": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.knowledge_gap",
+  "description": "**A question the assistant could not answer**, grouped so the content owner gets a task, not a log (AIC-061, AIC-062). Also written for an analytics question outside the semantic model (design 5.7).",
+  "required": [
+   "question",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "question": {
+    "type": "string",
+    "description": "The normalised question."
+   },
+   "examples": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Up to ten phrasings as asked, with personal data masked."
+   },
+   "occurrences": {
+    "type": "integer",
+    "minimum": 1,
+    "readOnly": true
+   },
+   "audience": {
+    "type": "string",
+    "enum": [
+     "staff",
+     "guest"
+    ]
+   },
+   "locale": {
+    "type": "string",
+    "nullable": true
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "knowledge",
+     "analytics"
+    ]
+   },
+   "suggestedCollectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.knowledge_collection"
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "assigned",
+     "answered",
+     "dismissed"
+    ]
+   },
+   "resolvedDocumentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.knowledge_document"
+   },
+   "lastAskedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
  "CallDisposition": {
   "type": "object",
   "description": "BL-082. **A conversation could be closed and nothing recorded why it ended** — information, no sale, sale successful. **That is the measure a contact centre runs on**, and its absence makes every conversation look identical in a report.\n",
@@ -2325,8 +2577,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a ULID."
+    "format": "uuid",
+    "description": "Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7."
    },
    "caseNumber": {
     "type": "string",
@@ -2441,6 +2693,66 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "nullable": true
+   }
+  }
+ },
+ "CaseCategory": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.case_category",
+  "description": "**The venue's case taxonomy**: categories and, under them, subcategories (`parentCategoryId`). `Case.categoryId` and the routing rules' `match.categoryIds` point here; `createCaseClassificationIntelligent` recommends one. Maintained by `setCaseCategoryDefinition`, read by `listCaseCategories` (decided 29 September, writers pass). (decided 29 September, data model for the agreed operations)\n",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 60
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 150
+   },
+   "parentCategoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Set on a subcategory; null on a top-level category."
+   },
+   "defaultPriority": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CasePriority"
+     }
+    ],
+    "nullable": true,
+    "description": "The priority a case in this category starts at before routing factors apply."
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -3142,8 +3454,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID; equals the `Idempotency-Key` header."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7; equals the `Idempotency-Key` header."
    },
    "scopePath": {
     "type": "string",
@@ -3159,18 +3471,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "caseId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "Required with `execute`; the action is recorded on this case."
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "lineIds": {
     "type": "array",
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     },
     "description": "Omit for the whole order."
    },
@@ -3260,7 +3572,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "order": {
     "type": "string",
@@ -3439,6 +3751,237 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "QualityManagementAgentEvaluationView": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.quality_evaluation",
+  "description": "One quality evaluation of one interaction (pack 10.2.7). Resolution time and SLA outcome are read from the case, not entered.",
+  "required": [
+   "id",
+   "agentPrincipalId",
+   "sourceType",
+   "evaluatedBy",
+   "status",
+   "criteria"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "agentPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "evaluatorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The caller who scored it; null while only the AI has."
+   },
+   "sourceType": {
+    "type": "string",
+    "enum": [
+     "call",
+     "chat",
+     "email",
+     "whatsapp",
+     "case",
+     "complaint"
+    ]
+   },
+   "caseId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "conversationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "evaluatedBy": {
+    "type": "string",
+    "enum": [
+     "human",
+     "ai"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "scored",
+     "acknowledged"
+    ]
+   },
+   "criteria": {
+    "type": "array",
+    "maxItems": 30,
+    "items": {
+     "type": "object",
+     "required": [
+      "criterion",
+      "score",
+      "maxScore"
+     ],
+     "properties": {
+      "criterion": {
+       "type": "string",
+       "maxLength": 60,
+       "description": "The tenant's criterion code; the pack's defaults are `greeting`, `customerVerification`, `understanding`, `accuracy`, `policyCompliance`, `communicationQuality`, `empathy`, `resolution`, `documentation`, `closing`."
+      },
+      "score": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "maxScore": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "comment": {
+       "type": "string",
+       "maxLength": 1000,
+       "nullable": true
+      }
+     }
+    }
+   },
+   "criticalFailures": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "incorrectRefund",
+      "privacyViolation",
+      "unauthorisedCompensation",
+      "incorrectTicketInformation",
+      "securityVerificationFailure",
+      "other"
+     ]
+    }
+   },
+   "overallScore": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Criteria score as a percentage; 0 when any critical failure is recorded."
+   },
+   "aiFindings": {
+    "type": "array",
+    "readOnly": true,
+    "items": {
+     "type": "object",
+     "required": [
+      "area",
+      "finding"
+     ],
+     "properties": {
+      "area": {
+       "type": "string",
+       "enum": [
+        "policyAdherence",
+        "requiredStatements",
+        "tone",
+        "accuracy",
+        "resolutionQuality",
+        "missingCaseDocumentation"
+       ]
+      },
+      "finding": {
+       "type": "string",
+       "maxLength": 500
+      },
+      "confidence": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      }
+     }
+    }
+   },
+   "feedback": {
+    "type": "string",
+    "maxLength": 2000,
+    "nullable": true
+   },
+   "coachingActions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "type"
+     ],
+     "properties": {
+      "type": {
+       "type": "string",
+       "enum": [
+        "productTraining",
+        "policyTraining",
+        "communicationCoaching",
+        "systemTraining"
+       ]
+      },
+      "note": {
+       "type": "string",
+       "maxLength": 500,
+       "nullable": true
+      },
+      "dueAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "completedAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "resolutionSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "readOnly": true
+   },
+   "slaMet": {
+    "type": "boolean",
+    "nullable": true,
+    "readOnly": true
+   },
+   "agentComment": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "acknowledgedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "evaluatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "ServiceQueue": {
   "type": "object",
   "x-ticvai-persistence": "marketing.service_queue",
@@ -3487,6 +4030,127 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "readOnly": true
+   }
+  }
+ },
+ "UnifiedInteractionCommunicationHistoryView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over marketing.case_message, marketing.conversation_message, marketing.conversation (telephony), marketing.message_dispatch and marketing.kiosk_assist_session",
+  "description": "One interaction on the timeline. `social` and `whatsapp` appear only where that channel is integrated.",
+  "required": [
+   "id",
+   "occurredAt",
+   "channel",
+   "direction",
+   "actorKind",
+   "source",
+   "recordId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "description": "Stable across pages; the source and record id combined."
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "channel": {
+    "type": "string",
+    "enum": [
+     "email",
+     "phone",
+     "liveChat",
+     "whatsapp",
+     "sms",
+     "webForm",
+     "mobileApp",
+     "b2cPortal",
+     "social",
+     "posFrontDesk",
+     "internalNote",
+     "automatedNotification"
+    ]
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The guest; the name is resolved on screen through `getGuestProfile` under GUEST_VIEW_PII."
+   },
+   "actorKind": {
+    "type": "string",
+    "enum": [
+     "guest",
+     "agent",
+     "system",
+     "ai"
+    ]
+   },
+   "actorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "direction": {
+    "type": "string",
+    "enum": [
+     "inbound",
+     "outbound",
+     "internal"
+    ]
+   },
+   "subject": {
+    "type": "string",
+    "nullable": true
+   },
+   "excerpt": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "relatedCaseId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "relatedOrderId": {
+    "type": "string",
+    "nullable": true
+   },
+   "relatedTicketId": {
+    "type": "string",
+    "nullable": true
+   },
+   "attachmentRefs": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "sentiment": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "positive",
+     "neutral",
+     "negative"
+    ],
+    "description": "Where sentiment analysis is enabled; AI-derived."
+   },
+   "source": {
+    "type": "string",
+    "enum": [
+     "caseMessage",
+     "conversationMessage",
+     "call",
+     "messageDispatch",
+     "kioskAssist"
+    ]
+   },
+   "recordId": {
+    "type": "string",
+    "description": "The row in the source table."
    }
   }
  }

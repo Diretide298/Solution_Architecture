@@ -1,1 +1,367 @@
-{}
+{
+ "cancelInvoice": {
+  "method": "POST",
+  "path": "/invoices/{invoiceId}/cancel",
+  "contract": "subscription",
+  "summary": "Cancel or credit an invoice",
+  "permission": "PLATFORM_BILLING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "disputeInvoice": {
+  "method": "POST",
+  "path": "/invoices/{invoiceId}/dispute",
+  "contract": "subscription",
+  "summary": "Raise a dispute",
+  "permission": "PLATFORM_BILLING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "generateInvoice": {
+  "method": "POST",
+  "path": "/tenants/{tenantId}/invoices",
+  "contract": "subscription",
+  "summary": "Generate an invoice for a period",
+  "permission": "PLATFORM_BILLING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SubscriptionInvoice"
+ },
+ "getBillingReconciliation": {
+  "method": "GET",
+  "path": "/billing-reconciliation",
+  "contract": "subscription",
+  "summary": "Metered consumption against what was invoiced",
+  "permission": "PLATFORM_BILLING_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": "tenantId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "BillingReconciliation"
+ },
+ "getPlanRecommendations": {
+  "method": "GET",
+  "path": "/plan-recommendations",
+  "contract": "subscription",
+  "summary": "Which plan, module or pack would fit this tenant better, and what it would cost or save",
+  "permission": "PLATFORM_BILLING_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": "tenantId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "horizonMonths",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "issueCreditNote": {
+  "method": "POST",
+  "path": "/invoices/{invoiceId}/credit-notes",
+  "contract": "subscription",
+  "summary": "Issue a credit note against a tenant invoice, in full or in part",
+  "permission": "PLATFORM_BILLING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "IssueCreditNoteRequest",
+  "responds": "SubscriptionCreditNote"
+ },
+ "listCreditNotes": {
+  "method": "GET",
+  "path": "/tenants/{tenantId}/credit-notes",
+  "contract": "subscription",
+  "summary": "List a tenant's credit notes",
+  "permission": "PLATFORM_BILLING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "invoiceId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listRenewalAuto": {
+  "method": "GET",
+  "path": "/renewal-auto",
+  "contract": "subscription",
+  "summary": "Renewal Operations & Auto-Renewal Management",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "renewalStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "membershipProduct",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "tier",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "autoRenew",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "expiringFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "expiringTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listSubscriptionInvoices": {
+  "method": "GET",
+  "path": "/tenants/{tenantId}/invoices",
+  "contract": "subscription",
+  "summary": "List subscription invoices",
+  "permission": "PLATFORM_BILLING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "previewSubscriptionChange": {
+  "method": "POST",
+  "path": "/tenants/{tenantId}/subscription/preview",
+  "contract": "subscription",
+  "summary": "Preview the effect of a plan change",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SetSubscriptionRequest",
+  "responds": "SubscriptionPreview"
+ },
+ "recordInvoicePayment": {
+  "method": "POST",
+  "path": "/invoices/{invoiceId}/payment",
+  "contract": "subscription",
+  "summary": "Record payment against an invoice",
+  "permission": "PLATFORM_BILLING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setRenewalAutoMembership": {
+  "method": "PUT",
+  "path": "/renewal-auto-membership",
+  "contract": "subscription",
+  "summary": "Renewal, Auto-Renewal & Membership Continuity Configuration",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RenewalAutoRenewalMembershipContinuityConfigurationInput",
+  "responds": "RenewalAutoRenewalMembershipContinuityConfigurationView"
+ },
+ "setSubscription": {
+  "method": "PUT",
+  "path": "/tenants/{tenantId}/subscription",
+  "contract": "subscription",
+  "summary": "Assign or change a subscription",
+  "permission": "PLATFORM_TENANT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SetSubscriptionRequest",
+  "responds": "Subscription"
+ },
+ "settleAiUsage": {
+  "method": "POST",
+  "path": "/ai-usage/settle",
+  "contract": "subscription",
+  "summary": "Turn metered AI interactions into a billable usage record",
+  "permission": "PLATFORM_BILLING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "simulateCommercialPackage": {
+  "method": "POST",
+  "path": "/package-simulations",
+  "contract": "subscription",
+  "summary": "What this package would cost, and what it would provision",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PackageSimulationRequest",
+  "responds": "PackageSimulation"
+ }
+}

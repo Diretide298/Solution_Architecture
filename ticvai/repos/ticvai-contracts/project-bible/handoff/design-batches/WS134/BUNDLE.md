@@ -1,6 +1,6 @@
 # WS134 — F&B Backend Structure Module Sample Reference v1.0 board 1
 
-**7 screens · 11 operations · 15 schemas · 5 permissions**
+**7 screens · 11 operations · 22 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -1153,6 +1153,16 @@ Method, path, parameters, request and response for every operation these screens
     "name": "compareTo",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "interval",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -1303,6 +1313,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "FnbReservationPolicy",
@@ -1318,6 +1333,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -1341,6 +1361,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "OutletTemplateInput",
@@ -1356,6 +1381,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -1379,6 +1409,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "TableDefinition",
@@ -1393,6 +1428,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AllergenCode": {
+  "type": "string",
+  "description": "**The fourteen declarable allergens, as one closed list.** Every allergen field in this contract uses it — the menu claim, the ticket line, a substitution's delta, a modifier option, the label on a bag — so a declared set and an actual set compare without anybody normalising case or synonyms. It was the `Allergen.contains` enum; the other fields were free text.\n",
+  "enum": [
+   "gluten",
+   "crustaceans",
+   "eggs",
+   "fish",
+   "peanuts",
+   "soybeans",
+   "milk",
+   "nuts",
+   "celery",
+   "mustard",
+   "sesame",
+   "sulphites",
+   "lupin",
+   "molluscs"
+  ]
+ },
  "CoursingPolicy": {
   "type": "string",
   "description": "How a ticket's courses are fired. `fireAndForget` sends every course at once, which is no coursing; `holdAndFire` waits for a server to call each course; `timed` fires on a clock; `phased` staggers by course. **One vocabulary for the ticket (`KitchenTicket.coursing`) and the outlet default (`CourseRules.defaultCoursing`)** — the default said `none` for `fireAndForget` and had no `delayed` until 26 September, so a default could not be copied onto the field it defaults.\n",
@@ -1568,6 +1623,170 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "KitchenTicket": {
+  "x-ticvai-persistence": "fnb.kitchen_ticket + fnb.kitchen_ticket_line",
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "outletId",
+   "status",
+   "lines",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The F&B order the ticket was created from on acceptance (`FnbOrder.id`)."
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "tableLabel": {
+    "type": "string",
+    "nullable": true
+   },
+   "serviceMode": {
+    "$ref": "#/components/schemas/ServiceMode"
+   },
+   "coursing": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CoursingPolicy"
+     }
+    ],
+    "nullable": true,
+    "description": "BL-131. **Starters before mains is the entire job of a kitchen pass**, and the model fired everything at once.\n`holdAndFire` waits for a server to call it; `timed` fires on a clock; `phased` staggers by course. **Without this a table gets its dessert while eating its starter.**\n"
+   },
+   "buzzerCode": {
+    "type": "string",
+    "nullable": true,
+    "description": "BL-128. **The pager number handed to a guest at a counter.** Recorded against the order so a lost buzzer is a lookup rather than an argument.\n"
+   },
+   "status": {
+    "$ref": "#/components/schemas/KitchenTicketStatus"
+   },
+   "priority": {
+    "type": "integer",
+    "description": "Higher fires sooner. Raised by Fast Pass or supervisor override."
+   },
+   "prioritisedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "prioritiseReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "lineId",
+      "name",
+      "quantity",
+      "status"
+     ],
+     "properties": {
+      "lineId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "integer"
+      },
+      "modifiers": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "note": {
+       "type": "string",
+       "nullable": true
+      },
+      "allergens": {
+       "type": "array",
+       "items": {
+        "$ref": "#/components/schemas/AllergenCode"
+       }
+      },
+      "refireOfLineId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true,
+       "readOnly": true,
+       "description": "**Set on a refire.** The line it remakes, which stays — food cost counts both, the bill counts one (`refireItem`)."
+      },
+      "refireReason": {
+       "allOf": [
+        {
+         "$ref": "#/components/schemas/RefireReason"
+        }
+       ],
+       "nullable": true,
+       "readOnly": true
+      },
+      "isChargeable": {
+       "type": "boolean",
+       "nullable": true,
+       "readOnly": true,
+       "description": "A refire's `chargeable` flag. Null on a line that is not a refire."
+      },
+      "course": {
+       "type": "integer",
+       "nullable": true
+      },
+      "stationId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "status": {
+       "$ref": "#/components/schemas/KitchenTicketStatus"
+      }
+     }
+    }
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "targetReadyAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "elapsedSeconds": {
+    "type": "integer"
+   }
+  }
+ },
+ "KitchenTicketStatus": {
+  "type": "string",
+  "enum": [
+   "received",
+   "preparing",
+   "ready",
+   "served",
+   "recalled",
+   "cancelled"
+  ]
+ },
  "KpiValue": {
   "type": "object",
   "description": "BI board 10.3. **Value, target, variance, direction and freshness in one read.**",
@@ -1578,6 +1797,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "code": {
     "type": "string"
+   },
+   "bucketStart": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise."
+   },
+   "groupKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked."
    },
    "name": {
     "type": "string"
@@ -1635,6 +1865,128 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "stale": {
     "type": "boolean",
     "description": "**True when the pipeline behind it has not refreshed.** A number nobody flagged as stale is a number somebody will act on.\n"
+   }
+  }
+ },
+ "Menu": {
+  "x-ticvai-persistence": "fnb.menu",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "outletId",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "availability": {
+    "$ref": "#/components/schemas/MenuAvailability"
+   },
+   "sections": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/MenuSection"
+    }
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "publishedVersion": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `MenuVersion.version` live now. Null for a menu never published."
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   }
+  }
+ },
+ "MenuAvailability": {
+  "x-ticvai-persistence": "none — embedded in menu",
+  "type": "object",
+  "description": "When this menu is in force. Absent means always. Days, times and dates are all read in the Region's time zone, not UTC.",
+  "properties": {
+   "daysOfWeek": {
+    "type": "array",
+    "items": {
+     "type": "integer",
+     "minimum": 0,
+     "maximum": 6
+    }
+   },
+   "startTime": {
+    "type": "string",
+    "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+    "description": "Wall-clock time, in the Region's time zone."
+   },
+   "endTime": {
+    "type": "string",
+    "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+    "description": "Wall-clock time, in the Region's time zone."
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "Calendar day, in the Region's time zone, not UTC."
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "Calendar day, in the Region's time zone, not UTC."
+   }
+  }
+ },
+ "MenuSection": {
+  "x-ticvai-persistence": "fnb.menu_section",
+  "type": "object",
+  "required": [
+   "code",
+   "name",
+   "sortOrder"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "sortOrder": {
+    "type": "integer"
+   },
+   "items": {
+    "type": "array",
+    "description": "The section's items, in sale-board order. An item's membership is `MenuItem.menuSectionId`.",
+    "items": {
+     "$ref": "#/components/schemas/MenuItem"
+    }
    }
   }
  },
@@ -1928,6 +2280,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "boolean"
    }
   }
+ },
+ "RefireReason": {
+  "type": "string",
+  "description": "Why a line was made again (`refireItem`). The reasons are the data.",
+  "enum": [
+   "overcooked",
+   "undercooked",
+   "wrongItem",
+   "dropped",
+   "cold",
+   "allergyRisk",
+   "guestChangedMind",
+   "lateAdd"
+  ]
  },
  "SectionLayout": {
   "type": "object",

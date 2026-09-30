@@ -13,6 +13,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "GroupDiscountExceptionApprovalWorkflowInput",
@@ -253,6 +258,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "GroupBooking360HandoverWorkspaceInput",
@@ -268,6 +278,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -291,6 +306,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "GroupPackageExperienceBuilderInput",
@@ -310,6 +330,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "GroupQuotationBuilderProposalGenerationInput",
@@ -325,6 +350,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

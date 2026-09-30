@@ -14,11 +14,11 @@ payload:
   type: uuid
   notes: '`PaymentAttempt.id`. The idempotency key for every consumer'
 - field: orderId
-  type: string
+  type: uuid
   required: false
   notes: Null only where the attempt was not against an order
 - field: paymentId
-  type: string
+  type: uuid
   required: false
   notes: Null for an attempt declined before a payment was recorded
 - field: amount

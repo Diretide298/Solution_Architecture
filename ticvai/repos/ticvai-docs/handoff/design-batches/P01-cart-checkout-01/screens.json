@@ -60,7 +60,7 @@
     {
      "to": "WEB-012",
      "trigger": "Guest code proved or signed in: straight to payment (details skipped)",
-     "provenance": "decided 29 September 2026 (P29), W1",
+     "provenance": "decided 29 September 2026, W1",
      "carries": [
       "orderId",
       "paymentId"
@@ -178,7 +178,7 @@
        ],
        "operation": "getPublishedBookingFlow",
        "notes": "The steps of the published flow in their `sortOrder`, this one (cart) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
-       "provenance": "decided 29 September 2026 (P29), W12; CMS-103 Booking Flows"
+       "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       }
      ]
     },
@@ -456,7 +456,7 @@
     "contract": "white-label",
     "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), W12"
+    "provenance": "decided 29 September 2026, W12"
    }
   ],
   "entryState": {
@@ -584,7 +584,7 @@
     {
      "to": "WEB-012",
      "trigger": "Skipped: nothing to ask (guest code proved, or signed in, and no attendee forms)",
-     "provenance": "decided 29 September 2026 (P29), W1"
+     "provenance": "decided 29 September 2026, W1"
     },
     {
      "to": "WEB-010",
@@ -690,7 +690,7 @@
        ],
        "operation": "getPublishedBookingFlow",
        "notes": "The steps of the published flow in their `sortOrder`, this one (details) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
-       "provenance": "decided 29 September 2026 (P29), W12; CMS-103 Booking Flows"
+       "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       }
      ]
     },
@@ -1056,7 +1056,7 @@
     "contract": "white-label",
     "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), W12"
+    "provenance": "decided 29 September 2026, W12"
    }
   ],
   "entryState": {
@@ -1249,21 +1249,21 @@
        ],
        "operation": "getPublishedBookingFlow",
        "notes": "The steps of the published flow in their `sortOrder`, this one (payment) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
-       "provenance": "decided 29 September 2026 (P29), W12; CMS-103 Booking Flows"
+       "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       },
       {
        "kind": "consentBlock",
        "label": "Terms and conditions",
        "operation": "createOrder",
        "notes": "After the code the guest goes straight to the T&Cs tick and completes (W1).",
-       "provenance": "decided 29 September 2026 (P29), W1"
+       "provenance": "decided 29 September 2026, W1"
       },
       {
        "kind": "toggle",
        "label": "Send me offers and news",
        "operation": "createOrder",
        "notes": "Marketing opt-in beside the T&Cs, **never pre-ticked** (M18-15): `marketingConsents[]` on the order, bound to the verified contact.",
-       "provenance": "decided 29 September 2026 (P29), M18-15"
+       "provenance": "decided 29 September 2026, M18-15"
       }
      ]
     },
@@ -1347,7 +1347,7 @@
     "contract": "white-label",
     "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), W12"
+    "provenance": "decided 29 September 2026, W12"
    }
   ],
   "entryState": {

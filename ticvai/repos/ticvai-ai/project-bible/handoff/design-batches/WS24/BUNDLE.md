@@ -1,6 +1,6 @@
 # WS24 — Communication & Notification Platform Services board 1
 
-**10 screens · 10 operations · 12 schemas · 2 permissions**
+**10 screens · 11 operations · 19 schemas · 4 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `MARKETING_MANAGE, MARKETING_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `AI_USE, GUEST_VIEW, MARKETING_MANAGE, MARKETING_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -70,7 +69,7 @@ convincingly. It is never a caption.
 | `ADM-044` | Consent, Preference & Communication Policy Enforcement | listDetail | 1 | 0 | — |
 | `ADM-045` | Delivery Queue, Failure & Retry Management | listDetail | 1 | 0 | — |
 | `ADM-046` | Provider Health, Usage & Cost Monitoring | listDetail | 1 | 0 | — |
-| `ADM-047` | AI Delivery Optimization & Communication Platform Diagnostics | listDetail | 1 | 0 | — |
+| `ADM-047` | AI Delivery Optimization & Communication Platform Diagnostics | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch
 
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-038 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-039",
@@ -186,10 +182,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Platform administrators can understand communication volume, delivery health, provider performance and operational exceptions from one centralized workspace.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide administrators and technical/operations teams with a centralized view of the health and activity of TICVAI's communication infrastructure. This is not a marketing dashboard.",
-  "purposeNote": "Platform administrators can understand communication volume, delivery health, provider performance and operational exceptions from one centralized workspace.",
   "layout": {
    "template": "split",
    "regions": [
@@ -201,18 +197,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every communication service",
        "columns": [
-        "CommunicationServiceCommandCenterView.messagesProcessedToday",
-        "CommunicationServiceCommandCenterView.emailSent",
-        "CommunicationServiceCommandCenterView.smsSent",
-        "CommunicationServiceCommandCenterView.whatsappSent",
-        "CommunicationServiceCommandCenterView.pushNotifications",
-        "CommunicationServiceCommandCenterView.inAppNotifications",
+        "CommunicationServiceCommandCenterView.messagesProcessed",
+        "CommunicationServiceCommandCenterView.byChannel[].sent",
         "CommunicationServiceCommandCenterView.delivered",
         "CommunicationServiceCommandCenterView.failed",
         "CommunicationServiceCommandCenterView.pending",
         "CommunicationServiceCommandCenterView.retrying",
-        "CommunicationServiceCommandCenterView.averageDeliveryTime",
-        "CommunicationServiceCommandCenterView.providerAvailability"
+        "CommunicationServiceCommandCenterView.averageDeliverySeconds",
+        "CommunicationServiceCommandCenterView.providerAvailabilityRate",
+        "CommunicationServiceCommandCenterView.byChannel[].channel"
        ],
        "bindsTo": "CommunicationServiceCommandCenterView",
        "operation": "listCommunicationService",
@@ -229,18 +222,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected communication service",
        "bindsTo": "CommunicationServiceCommandCenterView",
        "columns": [
-        "CommunicationServiceCommandCenterView.messagesProcessedToday",
-        "CommunicationServiceCommandCenterView.emailSent",
-        "CommunicationServiceCommandCenterView.smsSent",
-        "CommunicationServiceCommandCenterView.whatsappSent",
-        "CommunicationServiceCommandCenterView.pushNotifications",
-        "CommunicationServiceCommandCenterView.inAppNotifications",
+        "CommunicationServiceCommandCenterView.messagesProcessed",
+        "CommunicationServiceCommandCenterView.byChannel[].sent",
         "CommunicationServiceCommandCenterView.delivered",
         "CommunicationServiceCommandCenterView.failed",
         "CommunicationServiceCommandCenterView.pending",
         "CommunicationServiceCommandCenterView.retrying",
-        "CommunicationServiceCommandCenterView.averageDeliveryTime",
-        "CommunicationServiceCommandCenterView.providerAvailability"
+        "CommunicationServiceCommandCenterView.averageDeliverySeconds",
+        "CommunicationServiceCommandCenterView.providerAvailabilityRate",
+        "CommunicationServiceCommandCenterView.byChannel[].channel"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Module Activity”, “Channel Provider Health”, “Health”, “WhatsAp Warni”.",
        "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 4 §Display"
@@ -266,18 +256,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "CommunicationServiceCommandCenterView.messagesProcessedToday",
-    "CommunicationServiceCommandCenterView.emailSent",
-    "CommunicationServiceCommandCenterView.smsSent",
-    "CommunicationServiceCommandCenterView.whatsappSent",
-    "CommunicationServiceCommandCenterView.pushNotifications",
-    "CommunicationServiceCommandCenterView.inAppNotifications"
+    "CommunicationServiceCommandCenterView.messagesProcessed",
+    "CommunicationServiceCommandCenterView.byChannel[].sent"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-038"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-038",
+   "workshopBoard": "wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-038"
   },
   "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 4. 12 of 12 labels bound to a contract property; 12 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -341,15 +328,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized administrators can configure and test multiple communication providers without requiring individual TICVAI modules to maintain direct provider integrations.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure the external/internal services used by TICVAI to deliver communications.",
-  "purposeNote": "Authorized administrators can configure and test multiple communication providers without requiring individual TICVAI modules to maintain direct provider integrations.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Test Connection, Send Test Message, Validate Credentials, Test Webhook, Verify Delivery Receipt. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Communication & Notification Platform Services_Reference.pdf, page 6 §Actions"
+    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Legal Entity, Test Connection, Send Test Message, Validate Credentials, Test Webhook, Verify Delivery Receipt. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Communication & Notification Platform Services_Reference.pdf, page 6 §Allow different providers by"
    }
   ],
   "layout": {
@@ -397,6 +384,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Legal Entity",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 6 §Allow different providers by"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Test Connection",
        "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 6 §Actions"
       },
@@ -435,18 +427,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setChannelProvider",
     "contract": "marketing-crm",
     "purpose": "Channel & Provider Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setChannelProvider"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-039"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-039",
+   "workshopBoard": "wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-039"
   },
-  "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 6. 0 of 0 labels bound to a contract property; 11 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 6. 0 of 0 labels bound to a contract property; 12 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -508,10 +498,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Every outbound communication uses a verified and appropriately governed sender identity for the applicable brand, channel and region.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Configure/reference) and no display directory — it is settings, not a population",
   "purpose": "Manage the identities from which TICVAI communications are sent.",
-  "purposeNote": "Every outbound communication uses a verified and appropriately governed sender identity for the applicable brand, channel and region.",
   "layout": {
    "template": "form",
    "regions": [
@@ -640,16 +630,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setSenderIdentityDomain",
     "contract": "marketing-crm",
     "purpose": "Sender Identity, Domain & Brand Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setSenderIdentityDomain"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-040"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-040",
+   "workshopBoard": "wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-040"
   },
   "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 19 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -713,10 +701,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Operational modules can use governed reusable communication templates without embedding message content directly in application code.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Maintain centralized system/transactional communication templates used by TICVAI operational modules. This screen must not replace CRM's marketing template builder.",
-  "purposeNote": "Operational modules can use governed reusable communication templates without embedding message content directly in application code.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Attachments where applicable. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Communication & Notification Platform Services_Reference.pdf, page 9 §Support"
+   }
+  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -770,6 +765,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 9 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Attachments where applicable",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 9 §Support"
+      }
+     ]
     }
    ]
   },
@@ -790,9 +796,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-041"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-041",
+   "workshopBoard": "wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-041"
   },
-  "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 9 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 10 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -854,14 +861,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "appropriate operational notification according to centrally configured rules.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Map TICVAI business events to the operational communications they should generate. This is the core of the event-driven communication architecture.",
-  "purposeNote": "appropriate operational notification according to centrally configured rules.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Customer, Channel, Membership, Booking Type. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Product, Venue, Customer, Channel, Transaction Status, Membership, Booking Type. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Communication & Notification Platform Services_Reference.pdf, page 11 §Allow conditions based on"
    },
    {
@@ -884,12 +891,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Product",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 11 §Allow conditions based on"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Event",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 11 §Allow conditions based on"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Venue",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 11 §Allow conditions based on"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Customer",
        "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 11 §Allow conditions based on"
       },
       {
        "kind": "secondaryButton",
        "label": "Channel",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 11 §Allow conditions based on"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Transaction Status",
        "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 11 §Allow conditions based on"
       },
       {
@@ -927,9 +954,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "BusinessEventNotificationTriggerMappingView.t30Days",
-    "BusinessEventNotificationTriggerMappingView.t7Days",
-    "BusinessEventNotificationTriggerMappingView.t1Day",
     "BusinessEventNotificationTriggerMappingView.eventId",
     "BusinessEventNotificationTriggerMappingView.sourceModule"
    ]
@@ -937,9 +961,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-042"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-042",
+   "workshopBoard": "wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-042"
   },
-  "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 4 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 8 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1001,10 +1026,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Communication requests are dynamically routed according to priority, availability, consent, provider health and configured fallback rules.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure based on; Configure) and no display directory — it is settings, not a population",
   "purpose": "Determine how TICVAI delivers a message after a communication requirement has been created.",
-  "purposeNote": "Communication requests are dynamically routed according to priority, availability, consent, provider health and configured fallback rules.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1103,7 +1128,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-043"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-043",
+   "workshopBoard": "wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-043"
   },
   "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 13. 0 of 0 labels bound to a contract property; 14 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1167,10 +1193,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "No communication is delivered without passing the applicable centralized consent, preference and communication-policy evaluation.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Create a central enforcement layer ensuring communications respect the appropriate communication rules.",
-  "purposeNote": "No communication is delivered without passing the applicable centralized consent, preference and communication-policy evaluation.",
   "gaps": [
    {
     "operation": null,
@@ -1226,7 +1252,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-044"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-044",
+   "workshopBoard": "wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-044"
   },
   "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 0 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1290,10 +1317,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Failed communications can be identified, diagnosed, retried and resolved without losing the original business-event context.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide technical/operations teams with visibility into communications currently being processed or failing.",
-  "purposeNote": "Failed communications can be identified, diagnosed, retried and resolved without losing the original business-event context.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1305,14 +1332,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every delivery queue failure",
        "columns": [
-        "DeliveryQueueFailureRetryManagementView.pending",
-        "DeliveryQueueFailureRetryManagementView.processing",
-        "DeliveryQueueFailureRetryManagementView.sent",
-        "DeliveryQueueFailureRetryManagementView.delivered",
-        "DeliveryQueueFailureRetryManagementView.failed",
-        "DeliveryQueueFailureRetryManagementView.retrying",
-        "DeliveryQueueFailureRetryManagementView.deadLettered",
-        "DeliveryQueueFailureRetryManagementView.cancelled",
+        "DeliveryQueueFailureRetryManagementView.status",
         "DeliveryQueueFailureRetryManagementView.communicationId",
         "DeliveryQueueFailureRetryManagementView.sourceModule",
         "DeliveryQueueFailureRetryManagementView.businessEvent",
@@ -1321,7 +1341,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "DeliveryQueueFailureRetryManagementView.template",
         "DeliveryQueueFailureRetryManagementView.provider",
         "DeliveryQueueFailureRetryManagementView.priority",
-        "DeliveryQueueFailureRetryManagementView.created",
+        "DeliveryQueueFailureRetryManagementView.createdAt",
         "DeliveryQueueFailureRetryManagementView.status",
         "DeliveryQueueFailureRetryManagementView.attempts"
        ],
@@ -1340,14 +1360,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected delivery queue failure",
        "bindsTo": "DeliveryQueueFailureRetryManagementView",
        "columns": [
-        "DeliveryQueueFailureRetryManagementView.pending",
-        "DeliveryQueueFailureRetryManagementView.processing",
-        "DeliveryQueueFailureRetryManagementView.sent",
-        "DeliveryQueueFailureRetryManagementView.delivered",
-        "DeliveryQueueFailureRetryManagementView.failed",
-        "DeliveryQueueFailureRetryManagementView.retrying",
-        "DeliveryQueueFailureRetryManagementView.deadLettered",
-        "DeliveryQueueFailureRetryManagementView.cancelled",
+        "DeliveryQueueFailureRetryManagementView.status",
         "DeliveryQueueFailureRetryManagementView.communicationId",
         "DeliveryQueueFailureRetryManagementView.sourceModule",
         "DeliveryQueueFailureRetryManagementView.businessEvent",
@@ -1356,7 +1369,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "DeliveryQueueFailureRetryManagementView.template",
         "DeliveryQueueFailureRetryManagementView.provider",
         "DeliveryQueueFailureRetryManagementView.priority",
-        "DeliveryQueueFailureRetryManagementView.created",
+        "DeliveryQueueFailureRetryManagementView.createdAt",
         "DeliveryQueueFailureRetryManagementView.status",
         "DeliveryQueueFailureRetryManagementView.attempts"
        ],
@@ -1384,18 +1397,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "DeliveryQueueFailureRetryManagementView.pending",
-    "DeliveryQueueFailureRetryManagementView.processing",
-    "DeliveryQueueFailureRetryManagementView.sent",
-    "DeliveryQueueFailureRetryManagementView.delivered",
-    "DeliveryQueueFailureRetryManagementView.failed",
-    "DeliveryQueueFailureRetryManagementView.retrying"
+    "DeliveryQueueFailureRetryManagementView.status"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-045"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-045",
+   "workshopBoard": "wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-045"
   },
   "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 16. 19 of 19 labels bound to a contract property; 19 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1459,10 +1468,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Management can understand provider reliability, usage and communication cost across the TICVAI platform.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Monitor the operational and commercial performance of communication providers.",
-  "purposeNote": "Management can understand provider reliability, usage and communication cost across the TICVAI platform.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1503,11 +1512,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "ProviderHealthUsageCostMonitoringView.volume",
         "ProviderHealthUsageCostMonitoringView.successRate",
         "ProviderHealthUsageCostMonitoringView.failureRate",
-        "ProviderHealthUsageCostMonitoringView.deliveryTime",
-        "ProviderHealthUsageCostMonitoringView.apiLatency",
-        "ProviderHealthUsageCostMonitoringView.availability",
+        "ProviderHealthUsageCostMonitoringView.averageDeliverySeconds",
+        "ProviderHealthUsageCostMonitoringView.averageApiLatencySeconds",
+        "ProviderHealthUsageCostMonitoringView.availabilityRate",
         "ProviderHealthUsageCostMonitoringView.retries",
-        "ProviderHealthUsageCostMonitoringView.fallbackUsage",
+        "ProviderHealthUsageCostMonitoringView.fallbackCount",
         "ProviderHealthUsageCostMonitoringView.cost",
         "ProviderHealthUsageCostMonitoringView.costPerMessage"
        ],
@@ -1529,11 +1538,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "ProviderHealthUsageCostMonitoringView.volume",
         "ProviderHealthUsageCostMonitoringView.successRate",
         "ProviderHealthUsageCostMonitoringView.failureRate",
-        "ProviderHealthUsageCostMonitoringView.deliveryTime",
-        "ProviderHealthUsageCostMonitoringView.apiLatency",
-        "ProviderHealthUsageCostMonitoringView.availability",
+        "ProviderHealthUsageCostMonitoringView.averageDeliverySeconds",
+        "ProviderHealthUsageCostMonitoringView.averageApiLatencySeconds",
+        "ProviderHealthUsageCostMonitoringView.availabilityRate",
         "ProviderHealthUsageCostMonitoringView.retries",
-        "ProviderHealthUsageCostMonitoringView.fallbackUsage",
+        "ProviderHealthUsageCostMonitoringView.fallbackCount",
         "ProviderHealthUsageCostMonitoringView.cost",
         "ProviderHealthUsageCostMonitoringView.costPerMessage"
        ],
@@ -1564,15 +1573,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "ProviderHealthUsageCostMonitoringView.volume",
     "ProviderHealthUsageCostMonitoringView.successRate",
     "ProviderHealthUsageCostMonitoringView.failureRate",
-    "ProviderHealthUsageCostMonitoringView.deliveryTime",
-    "ProviderHealthUsageCostMonitoringView.apiLatency",
-    "ProviderHealthUsageCostMonitoringView.availability"
+    "ProviderHealthUsageCostMonitoringView.averageDeliverySeconds",
+    "ProviderHealthUsageCostMonitoringView.averageApiLatencySeconds",
+    "ProviderHealthUsageCostMonitoringView.availabilityRate"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-046"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-046",
+   "workshopBoard": "wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-046"
   },
   "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 18. 10 of 17 labels bound to a contract property; 17 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1628,10 +1638,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from ADM-038, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "reliability, scalability and cost without interfering with CRM's ownership of customer marketing strategy. Board 1 — Final Screen Register",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Analyze) and no metric row",
   "purpose": "Provide an AI intelligence layer focused specifically on communication infrastructure performance, not CRM marketing strategy.",
-  "purposeNote": "reliability, scalability and cost without interfering with CRM's ownership of customer marketing strategy. Board 1 — Final Screen Register",
   "layout": {
    "template": "split",
    "regions": [
@@ -1643,18 +1653,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every delivery optimization communication",
        "columns": [
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.businessEvents",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.channels",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.providers",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.queues",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.failures",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.retries",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.latency",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.delivery",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.cost",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.recipientPreferences",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.regionalPerformance",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.historicalPatterns"
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.healthSummary",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.incidents[]",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.failureGroups[]",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.recommendations[]",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.forecasts[]",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.automatedActions[]"
        ],
        "bindsTo": "AiDeliveryOptimizationCommunicationPlatformDiagnostiView",
        "operation": "listDeliveryCommunicationPlatform",
@@ -1671,18 +1675,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected delivery optimization communication",
        "bindsTo": "AiDeliveryOptimizationCommunicationPlatformDiagnostiView",
        "columns": [
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.businessEvents",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.channels",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.providers",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.queues",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.failures",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.retries",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.latency",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.delivery",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.cost",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.recipientPreferences",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.regionalPerformance",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.historicalPatterns"
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.healthSummary",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.incidents[]",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.failureGroups[]",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.recommendations[]",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.forecasts[]",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.automatedActions[]"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Administrators can ask”, “Potential Provider Incident”, “Automation Governance”, “Backend Screen Primary Responsibility”, “Platform communication”, “Marketing & CRM owns”.",
        "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 19 §Analyze"
@@ -1704,22 +1702,23 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "marketing-crm",
     "purpose": "AI Delivery Optimization & Communication Platform Diagnostics",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "requestSuggestion",
+    "contract": "ai",
+    "purpose": "Send-time suggestion (kind sendTime): best hour and channel per recipient",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
-   "preloaded": [
-    "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.businessEvents",
-    "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.channels",
-    "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.providers",
-    "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.queues",
-    "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.failures",
-    "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.retries"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-047"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-047",
+   "workshopBoard": "wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-047"
   },
   "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 19. 12 of 12 labels bound to a contract property; 12 of 79 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1764,9 +1763,35 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "sourceModule",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "BusinessEventNotificationTriggerMappingView"
+  "responds": "Page"
  },
  "listCommunicationService": {
   "method": "GET",
@@ -1777,7 +1802,28 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "CommunicationServiceCommandCenterView"
  },
@@ -1786,13 +1832,54 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/consent-preference-communication",
   "contract": "marketing-crm",
   "summary": "Consent, Preference & Communication Policy Enforcement",
-  "permission": "MARKETING_VIEW",
+  "permission": "GUEST_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "decision",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "messageClass",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ConsentPreferenceCommunicationPolicyEnforcementView"
+  "responds": "Page"
  },
  "listDeliveryCommunicationPlatform": {
   "method": "GET",
@@ -1803,7 +1890,33 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "AiDeliveryOptimizationCommunicationPlatformDiagnostiView"
  },
@@ -1816,9 +1929,70 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "sourceModule",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "businessEvent",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "providerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priority",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "failureCategory",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "DeliveryQueueFailureRetryManagementView"
+  "responds": "Page"
  },
  "listProviderHealthUsage": {
   "method": "GET",
@@ -1831,22 +2005,27 @@ Method, path, parameters, request and response for every operation these screens
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": "channel",
     "in": "query",
     "required": false
    },
    {
-    "name": "provider",
+    "name": "providerId",
     "in": "query",
     "required": false
    },
    {
-    "name": "brand",
+    "name": "brandId",
     "in": "query",
     "required": false
    },
    {
-    "name": "venue",
+    "name": "venueId",
     "in": "query",
     "required": false
    },
@@ -1861,7 +2040,22 @@ Method, path, parameters, request and response for every operation these screens
     "required": false
    },
    {
-    "name": "messageType",
+    "name": "messageClass",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
     "in": "query",
     "required": false
    }
@@ -1878,9 +2072,40 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brandId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priorityClass",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "RoutingPriorityThrottlingFallbackRulesView"
+  "responds": "Page"
  },
  "listSystemTransactionalTemplate": {
   "method": "GET",
@@ -1891,9 +2116,74 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "ownership",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "sourceModule",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "businessEvent",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brandId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "language",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "SystemTransactionalTemplateRegistryView"
+  "responds": "Page"
+ },
+ "requestSuggestion": {
+  "method": "POST",
+  "path": "/ai/suggestions",
+  "contract": "ai",
+  "summary": "Ask for an answer, however it is currently produced",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Suggestion"
  },
  "setChannelProvider": {
   "method": "PUT",
@@ -1904,7 +2194,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ChannelProviderConfigurationInput",
   "responds": "ChannelProviderConfigurationView"
  },
@@ -1917,7 +2213,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "SenderIdentityDomainBrandConfigurationInput",
   "responds": "SenderIdentityDomainBrandConfigurationView"
  }
@@ -1932,1218 +2234,1909 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
  "AiDeliveryOptimizationCommunicationPlatformDiagnostiView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What AI Delivery Optimization & Communication Platform Diagnostics displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over ai.suggestion, marketing.message_dispatch, marketing.message_dispatch_attempt (new), marketing.communication_provider (new)",
+  "description": "AI findings over the communication platform for the window; empty arrays when AI processing is off.",
+  "required": [
+   "generatedAt",
+   "incidents",
+   "recommendations"
+  ],
   "properties": {
-   "businessEvents": {
+   "generatedAt": {
     "type": "string",
-    "description": "Business Events"
+    "format": "date-time"
    },
-   "channels": {
+   "healthSummary": {
+    "type": "string"
+   },
+   "incidents": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "title",
+      "detectedAt"
+     ],
+     "properties": {
+      "title": {
+       "type": "string"
+      },
+      "channel": {
+       "$ref": "#/components/schemas/MessageChannel"
+      },
+      "providerId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "country": {
+       "type": "string",
+       "pattern": "^[A-Z]{2}$"
+      },
+      "messageClass": {
+       "type": "string",
+       "enum": [
+        "transactional",
+        "operational",
+        "service",
+        "marketing"
+       ]
+      },
+      "sourceModule": {
+       "type": "string",
+       "enum": [
+        "crm",
+        "ticketing",
+        "membership",
+        "waiver",
+        "groupSales",
+        "customerService",
+        "finance",
+        "wallet",
+        "resourceManagement",
+        "accessControl",
+        "other"
+       ]
+      },
+      "baselineFailureRate": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      },
+      "currentFailureRate": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      },
+      "affectedMessages": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "failoverAvailable": {
+       "type": "boolean"
+      },
+      "probableRootCause": {
+       "type": "string"
+      },
+      "detectedAt": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
+   },
+   "failureGroups": {
+    "type": "array",
+    "description": "Failures grouped by probable root cause.",
+    "items": {
+     "type": "object",
+     "required": [
+      "probableRootCause",
+      "count"
+     ],
+     "properties": {
+      "probableRootCause": {
+       "type": "string"
+      },
+      "failureCategory": {
+       "type": "string",
+       "enum": [
+        "providerUnavailable",
+        "invalidAddress",
+        "invalidMobile",
+        "rateLimited",
+        "authenticationError",
+        "templateRejected",
+        "timeout",
+        "consentBlock",
+        "unknownError"
+       ]
+      },
+      "providerId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "channel": {
+       "$ref": "#/components/schemas/MessageChannel"
+      },
+      "count": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "firstSeenAt": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
+   },
+   "recommendations": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "summary"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "routing",
+        "cost",
+        "senderAnomaly"
+       ]
+      },
+      "summary": {
+       "type": "string"
+      },
+      "evidence": {
+       "type": "string"
+      },
+      "estimatedMonthlySaving": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "status": {
+       "type": "string",
+       "enum": [
+        "proposed",
+        "applied",
+        "dismissed"
+       ]
+      }
+     }
+    }
+   },
+   "forecasts": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "driver",
+      "date",
+      "forecastVolume"
+     ],
+     "properties": {
+      "driver": {
+       "type": "string",
+       "enum": [
+        "majorEvent",
+        "ticketRelease",
+        "membershipRenewal",
+        "groupArrival",
+        "waiverDeadline"
+       ]
+      },
+      "referenceId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "channel": {
+       "$ref": "#/components/schemas/MessageChannel"
+      },
+      "date": {
+       "type": "string",
+       "format": "date"
+      },
+      "forecastVolume": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "capacitySufficient": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "automatedActions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "action",
+      "takenAt"
+     ],
+     "properties": {
+      "action": {
+       "type": "string",
+       "enum": [
+        "providerFailover",
+        "queueScaling",
+        "retryAdjustment",
+        "operationalAlert"
+       ]
+      },
+      "summary": {
+       "type": "string"
+      },
+      "takenAt": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
+   }
+  }
+ },
+ "AiMaturity": {
+  "type": "object",
+  "x-ticvai-persistence": "none — embedded as jsonb on ai.suggestion and ai.forecast_version",
+  "description": "**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn). The customer sees a stage badge and a \"Based on\" chip, never a bare percentage (design 5.6), and \"Limited historical data\" while the starting pattern carries more than half the weight.",
+  "required": [
+   "stage",
+   "basedOn"
+  ],
+  "properties": {
+   "stage": {
     "type": "string",
-    "description": "Channels"
+    "enum": [
+     "starting",
+     "learning",
+     "established",
+     "learned"
+    ],
+    "description": "`starting`: the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, weather). `learning`: own data carries short-range patterns (about 4 weeks). `established`: own level and trend lead, the baseline fills gaps such as a holiday not yet seen (about 3 months, or at once with 12+ months imported). `learned`: a model trained on this tenant's data, promoted by an admin (AI-D16)."
    },
-   "providers": {
+   "basedOn": {
     "type": "string",
-    "description": "Providers"
+    "description": "The \"Based on\" line, in words, e.g. *Based on: your venue profile, UAE calendar, weather, 23 days of your sales*. Always present."
    },
-   "queues": {
-    "type": "string",
-    "description": "Queues"
+   "sources": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "source"
+     ],
+     "properties": {
+      "source": {
+       "type": "string",
+       "enum": [
+        "venueSettings",
+        "startingPattern",
+        "calendar",
+        "weather",
+        "bookingsOnHand",
+        "ownHistory",
+        "importedHistory",
+        "configuration",
+        "trainedModel"
+       ]
+      },
+      "detail": {
+       "type": "string",
+       "nullable": true,
+       "description": "e.g. *23 days*, *water park pattern v3*, *Eid al-Adha 2027*."
+      },
+      "observations": {
+       "type": "integer",
+       "nullable": true
+      }
+     }
+    }
    },
-   "failures": {
-    "type": "string",
-    "description": "Failures"
+   "ownDataShare": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "description": "The weight own data carries, `n / (k + n)`. Below 0.5 the answer is marked \"Limited historical data\"."
    },
-   "retries": {
-    "type": "integer",
-    "description": "Retries"
+   "limitedHistory": {
+    "type": "boolean"
    },
-   "latency": {
-    "type": "string",
-    "description": "Latency"
-   },
-   "delivery": {
-    "type": "string",
-    "description": "Delivery"
-   },
-   "cost": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Cost"
-   },
-   "recipientPreferences": {
-    "type": "string",
-    "description": "Recipient preferences"
-   },
-   "regionalPerformance": {
-    "type": "string",
-    "description": "Regional performance"
-   },
-   "historicalPatterns": {
-    "type": "string",
-    "description": "Historical patterns"
-   },
-   "whyDidCommunicationCostIncrease": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "“Why did communication cost increase?”"
-   },
-   "majorEvents": {
-    "type": "string",
-    "description": "Major Events"
-   },
-   "ticketReleases": {
-    "type": "string",
-    "description": "Ticket Releases"
-   },
-   "membershipRenewals": {
-    "type": "string",
-    "description": "Membership Renewals"
-   },
-   "groupArrivals": {
-    "type": "string",
-    "description": "Group Arrivals"
-   },
-   "waiverDeadlines": {
-    "type": "string",
-    "description": "Waiver Deadlines"
-   },
-   "providerFailover": {
-    "type": "string",
-    "description": "Provider Failover"
-   },
-   "queueScaling": {
-    "type": "string",
-    "description": "Queue Scaling"
-   },
-   "operationalAlerting": {
-    "type": "string",
-    "description": "Operational Alerting"
-   },
-   "health": {
-    "type": "string",
-    "description": "health"
-   },
-   "consentPreferenceCommunicationPolicy": {
-    "type": "string",
-    "description": "Consent, Preference & Communication Policy"
-   },
-   "guardianConsentIsIncomplete": {
-    "type": "string",
-    "description": "“Guardian consent is incomplete.”"
+   "nextStage": {
+    "type": "object",
+    "nullable": true,
+    "description": "What the next stage needs, e.g. *8 more Saturdays of sales*, or *an admin promotion*.",
+    "properties": {
+     "stage": {
+      "type": "string",
+      "enum": [
+       "learning",
+       "established",
+       "learned"
+      ]
+     },
+     "needs": {
+      "type": "string"
+     },
+     "expectedBy": {
+      "type": "string",
+      "format": "date",
+      "nullable": true
+     }
+    }
    }
   }
  },
  "BusinessEventNotificationTriggerMappingView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Business Event & Notification Trigger Mapping displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.business_event (new), marketing.message_trigger, marketing.message_trigger_condition (new), marketing.message_template",
+  "description": "One registered business event and the communications mapped to it; also the body of setBusinessEventMapping (readOnly fields are ignored on write).\n",
+  "required": [
+   "eventId",
+   "eventType",
+   "sourceModule",
+   "priority",
+   "status",
+   "communications"
+  ],
   "properties": {
-   "t30Days": {
-    "type": "string",
-    "description": "T−30 days"
-   },
-   "t7Days": {
-    "type": "string",
-    "description": "T−7 days"
-   },
-   "t1Day": {
-    "type": "string",
-    "description": "T−1 day"
-   },
    "eventId": {
     "type": "string",
-    "description": "Event ID"
-   },
-   "sourceModule": {
-    "type": "string",
-    "description": "Source Module"
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The event registry entry."
    },
    "eventType": {
     "type": "string",
-    "description": "Event Type"
+    "description": "Registered event name, e.g. TicketIssued, MembershipExpiring."
    },
-   "payload": {
+   "sourceModule": {
     "type": "string",
-    "description": "Payload"
+    "enum": [
+     "crm",
+     "ticketing",
+     "membership",
+     "waiver",
+     "groupSales",
+     "customerService",
+     "finance",
+     "wallet",
+     "resourceManagement",
+     "accessControl",
+     "other"
+    ]
+   },
+   "eventState": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The precise state that fires it (e.g. scanned, not merely sold)."
+   },
+   "payloadFields": {
+    "type": "array",
+    "readOnly": true,
+    "description": "Fields the event carries, available to templates as variables.",
+    "items": {
+     "type": "string"
+    }
    },
    "priority": {
     "type": "string",
-    "description": "Priority"
+    "enum": [
+     "P1",
+     "P2",
+     "P3",
+     "P4"
+    ]
    },
    "status": {
     "type": "string",
-    "description": "Status"
+    "enum": [
+     "active",
+     "inactive"
+    ]
    },
-   "validEmailEmailPermitted": {
-    "type": "string",
-    "description": "Valid email + Email permitted"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "brand": {
-    "type": "string",
-    "description": "Brand"
-   },
-   "customer": {
-    "type": "string",
-    "description": "Customer"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "time": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Time"
-   },
-   "transactionStatus": {
-    "type": "string",
-    "description": "Transaction Status"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "bookingType": {
-    "type": "string",
-    "description": "Booking Type"
-   },
-   "ownedWithinCrm": {
-    "type": "string",
-    "description": "owned within CRM"
+   "communications": {
+    "type": "array",
+    "description": "One entry per mapped message (message_trigger row); several entries make a multi-channel or scheduled trigger.",
+    "items": {
+     "type": "object",
+     "required": [
+      "channel",
+      "templateId",
+      "offsetMinutes",
+      "isActive"
+     ],
+     "properties": {
+      "triggerId": {
+       "type": "string",
+       "format": "uuid",
+       "description": "Present on an existing mapping; omit to create one."
+      },
+      "channel": {
+       "$ref": "#/components/schemas/MessageChannel"
+      },
+      "templateId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "templateName": {
+       "type": "string",
+       "readOnly": true
+      },
+      "offsetMinutes": {
+       "type": "integer",
+       "description": "0 = immediately; negative = before the anchor (T-30 days = -43200)."
+      },
+      "anchor": {
+       "type": "string",
+       "enum": [
+        "eventTime",
+        "performanceStart",
+        "visitEnd"
+       ]
+      },
+      "conditions": {
+       "type": "array",
+       "description": "All must hold (e.g. customer has a valid email and email is permitted; event within 24 hours).",
+       "items": {
+        "type": "object",
+        "required": [
+         "dimension",
+         "operator"
+        ],
+        "properties": {
+         "dimension": {
+          "type": "string",
+          "enum": [
+           "product",
+           "event",
+           "venue",
+           "brand",
+           "customer",
+           "channel",
+           "time",
+           "transactionStatus",
+           "membership",
+           "bookingType"
+          ]
+         },
+         "operator": {
+          "type": "string",
+          "enum": [
+           "equals",
+           "notEquals",
+           "in",
+           "withinMinutes",
+           "isValid",
+           "isPermitted"
+          ]
+         },
+         "value": {
+          "type": "string"
+         }
+        }
+       }
+      },
+      "isActive": {
+       "type": "boolean"
+      }
+     }
+    }
    }
   }
  },
  "ChannelProviderConfigurationInput": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is control.api_client at 4%, so this is not an update to anything the package stores today and no new table has been decided",
-  "description": "**What Channel & Provider Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *For each provider* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.",
+  "x-ticvai-persistence": "marketing.communication_provider",
+  "x-ticvai-record-definition": "For each provider",
+  "description": "One delivery provider on one channel (the pack's \"For each provider\" record). Rate limits, timeout and the retry policy apply to every message routed through it; routing between providers is `listRoutingPriorityThrottling`.\n",
+  "required": [
+   "providerName",
+   "channel",
+   "account",
+   "environment",
+   "credentialsSecretRef",
+   "role",
+   "status"
+  ],
   "properties": {
-   "email": {
+   "id": {
     "type": "string",
-    "description": "Email"
+    "format": "uuid",
+    "readOnly": true
    },
-   "sms": {
+   "scopePath": {
     "type": "string",
-    "description": "SMS"
-   },
-   "whatsapp": {
-    "type": "string",
-    "description": "WhatsApp"
-   },
-   "mobilePush": {
-    "type": "string",
-    "description": "Mobile Push"
-   },
-   "inAppNotification": {
-    "type": "string",
-    "description": "In-App Notification"
-   },
-   "futureSupportedChannels": {
-    "type": "string",
-    "description": "Future supported channels"
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
    },
    "providerName": {
     "type": "string",
-    "description": "Provider Name"
+    "maxLength": 120
    },
    "channel": {
-    "type": "string",
-    "description": "Channel"
+    "$ref": "#/components/schemas/MessageChannel"
    },
    "account": {
     "type": "string",
-    "description": "Account"
-   },
-   "region": {
-    "type": "string",
-    "description": "Region"
+    "maxLength": 200,
+    "description": "The account or sub-account identifier at the provider."
    },
    "environment": {
     "type": "string",
-    "description": "Environment"
-   },
-   "credentialsSecretReference": {
-    "type": "string",
-    "description": "Credentials/Secret Reference"
-   },
-   "apiConfiguration": {
-    "type": "string",
-    "description": "API Configuration"
-   },
-   "webhookConfiguration": {
-    "type": "string",
-    "description": "Webhook Configuration"
-   },
-   "rateLimits": {
-    "type": "number",
-    "description": "Rate Limits"
-   },
-   "timeout": {
-    "type": "string",
-    "description": "Timeout"
-   },
-   "priority": {
-    "type": "string",
-    "description": "Priority"
-   },
-   "status": {
-    "type": "string",
-    "description": "Status"
-   },
-   "exposedDirectlyInTheUi": {
-    "type": "string",
-    "description": "exposed directly in the UI"
-   },
-   "providerAPrimary": {
-    "type": "string",
-    "description": "Provider A — Primary"
-   },
-   "providerBFallback": {
-    "type": "string",
-    "description": "Provider B — Fallback"
-   },
-   "country": {
-    "type": "string",
-    "description": "Country"
-   },
-   "brand": {
-    "type": "string",
-    "description": "Brand"
-   },
-   "legalEntity": {
-    "type": "string",
-    "description": "Legal Entity"
-   },
-   "testConnection": {
-    "type": "string",
-    "description": "Test Connection"
-   },
-   "testWebhook": {
-    "type": "string",
-    "description": "Test Webhook"
-   }
-  },
-  "x-ticvai-record-definition": "For each provider"
- },
- "ChannelProviderConfigurationView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Channel & Provider Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "email": {
-    "type": "string",
-    "description": "Email"
-   },
-   "sms": {
-    "type": "string",
-    "description": "SMS"
-   },
-   "whatsapp": {
-    "type": "string",
-    "description": "WhatsApp"
-   },
-   "mobilePush": {
-    "type": "string",
-    "description": "Mobile Push"
-   },
-   "inAppNotification": {
-    "type": "string",
-    "description": "In-App Notification"
-   },
-   "futureSupportedChannels": {
-    "type": "string",
-    "description": "Future supported channels"
-   },
-   "providerName": {
-    "type": "string",
-    "description": "Provider Name"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "account": {
-    "type": "string",
-    "description": "Account"
+    "enum": [
+     "production",
+     "sandbox"
+    ]
    },
    "region": {
     "type": "string",
-    "description": "Region"
-   },
-   "environment": {
-    "type": "string",
-    "description": "Environment"
-   },
-   "credentialsSecretReference": {
-    "type": "string",
-    "description": "Credentials/Secret Reference"
-   },
-   "apiConfiguration": {
-    "type": "string",
-    "description": "API Configuration"
-   },
-   "webhookConfiguration": {
-    "type": "string",
-    "description": "Webhook Configuration"
-   },
-   "rateLimits": {
-    "type": "number",
-    "description": "Rate Limits"
-   },
-   "timeout": {
-    "type": "string",
-    "description": "Timeout"
-   },
-   "priority": {
-    "type": "string",
-    "description": "Priority"
-   },
-   "status": {
-    "type": "string",
-    "description": "Status"
-   },
-   "exposedDirectlyInTheUi": {
-    "type": "string",
-    "description": "exposed directly in the UI"
-   },
-   "providerAPrimary": {
-    "type": "string",
-    "description": "Provider A — Primary"
-   },
-   "providerBFallback": {
-    "type": "string",
-    "description": "Provider B — Fallback"
+    "description": "Provider data region (e.g. eu-west, me-central); also a routing selector."
    },
    "country": {
     "type": "string",
-    "description": "Country"
+    "pattern": "^[A-Z]{2}$",
+    "description": "ISO 3166-1 alpha-2; set when this provider serves one country only."
    },
-   "brand": {
+   "brandId": {
     "type": "string",
-    "description": "Brand"
+    "format": "uuid",
+    "description": "Set when this provider serves one brand only."
    },
-   "legalEntity": {
+   "legalEntityId": {
     "type": "string",
-    "description": "Legal Entity"
+    "format": "uuid",
+    "description": "Set when this provider serves one legal entity only."
    },
-   "testConnection": {
+   "credentialsSecretRef": {
     "type": "string",
-    "description": "Test Connection"
+    "description": "Reference into the secret store; the secret itself is never sent, stored or shown."
    },
-   "testWebhook": {
+   "apiConfiguration": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Non-secret API settings (base URL, API version, provider-specific options)."
+   },
+   "webhookConfiguration": {
+    "type": "object",
+    "properties": {
+     "callbackUrl": {
+      "type": "string",
+      "format": "uri"
+     },
+     "signingSecretRef": {
+      "type": "string",
+      "description": "Reference into the secret store for the webhook signing key."
+     }
+    }
+   },
+   "rateLimitPerSecond": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "rateLimitPerMinute": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "timeoutSeconds": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "retryPolicy": {
+    "type": "object",
+    "description": "Waits between attempts, then what happens when they are spent (e.g. 1 min, 5 min, then fallback provider).",
+    "required": [
+     "waitsSeconds",
+     "onExhausted"
+    ],
+    "properties": {
+     "waitsSeconds": {
+      "type": "array",
+      "maxItems": 10,
+      "items": {
+       "type": "integer",
+       "minimum": 0
+      }
+     },
+     "onExhausted": {
+      "type": "string",
+      "enum": [
+       "fallbackProvider",
+       "deadLetter"
+      ]
+     }
+    }
+   },
+   "role": {
     "type": "string",
-    "description": "Test Webhook"
+    "enum": [
+     "primary",
+     "secondary",
+     "emergencyFallback"
+    ]
+   },
+   "priority": {
+    "type": "integer",
+    "minimum": 1,
+    "description": "Order among providers with the same role and selectors; 1 is tried first."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "standby",
+     "degraded",
+     "suspended",
+     "disabled"
+    ]
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
+ },
+ "ChannelProviderConfigurationView": {
+  "x-ticvai-persistence": "none — the marketing.communication_provider row plus its latest verification",
+  "description": "The stored provider record and the outcome of the checks run on save.",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/ChannelProviderConfigurationInput"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "lastVerification": {
+      "type": "object",
+      "readOnly": true,
+      "properties": {
+       "checkedAt": {
+        "type": "string",
+        "format": "date-time"
+       },
+       "credentialsValid": {
+        "type": "boolean"
+       },
+       "connectionOk": {
+        "type": "boolean"
+       },
+       "webhookOk": {
+        "type": "boolean"
+       },
+       "deliveryReceiptOk": {
+        "type": "boolean"
+       },
+       "message": {
+        "type": "string"
+       }
+      }
+     }
+    }
+   }
+  ]
  },
  "CommunicationServiceCommandCenterView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Communication Service Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.message_dispatch, marketing.message_dispatch_attempt (new), marketing.communication_provider (new)",
+  "description": "Platform KPIs and breakdowns for the communication service over the requested window. Counts are messages (one dispatch = one message on one channel), not recipients.\n",
+  "required": [
+   "windowFrom",
+   "windowTo",
+   "messagesProcessed",
+   "byChannel",
+   "byModule"
+  ],
   "properties": {
-   "messagesProcessedToday": {
+   "windowFrom": {
     "type": "string",
-    "description": "Messages Processed Today"
+    "format": "date-time"
    },
-   "emailSent": {
+   "windowTo": {
     "type": "string",
-    "description": "Email Sent"
+    "format": "date-time"
    },
-   "smsSent": {
-    "type": "string",
-    "description": "SMS Sent"
-   },
-   "whatsappSent": {
-    "type": "string",
-    "description": "WhatsApp Sent"
-   },
-   "pushNotifications": {
+   "messagesProcessed": {
     "type": "integer",
-    "description": "Push Notifications"
-   },
-   "inAppNotifications": {
-    "type": "integer",
-    "description": "In-App Notifications"
+    "minimum": 0,
+    "description": "Messages accepted by the service in the window (the pack's \"Messages Processed Today\")."
    },
    "delivered": {
-    "type": "string",
-    "description": "Delivered"
+    "type": "integer",
+    "minimum": 0
    },
    "failed": {
     "type": "integer",
-    "description": "Failed"
+    "minimum": 0
    },
    "pending": {
     "type": "integer",
-    "description": "Pending"
+    "minimum": 0
    },
    "retrying": {
-    "type": "string",
-    "description": "Retrying"
-   },
-   "averageDeliveryTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Average Delivery Time"
-   },
-   "providerAvailability": {
-    "type": "string",
-    "description": "Provider Availability"
-   },
-   "showCommunicationVolumeOriginatingFrom": {
     "type": "integer",
-    "description": "Show communication volume originating from"
+    "minimum": 0
    },
-   "crm": {
-    "type": "string",
-    "description": "CRM"
-   },
-   "ticketing": {
-    "type": "string",
-    "description": "Ticketing"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "waiver": {
-    "type": "string",
-    "description": "Waiver"
-   },
-   "groupSales": {
-    "type": "string",
-    "description": "Group Sales"
-   },
-   "customerService": {
-    "type": "string",
-    "description": "Customer Service"
-   },
-   "finance": {
-    "type": "string",
-    "description": "Finance"
-   },
-   "wallet": {
-    "type": "string",
-    "description": "Wallet"
-   },
-   "resourceManagement": {
-    "type": "string",
-    "description": "Resource Management"
-   },
-   "accessControl": {
-    "type": "string",
-    "description": "Access Control"
-   },
-   "otherTicvaiServices": {
-    "type": "string",
-    "description": "Other TICVAI Services"
-   },
-   "eSCy": {
-    "type": "string",
-    "description": "e s cy"
-   },
-   "providerC31k97924s": {
+   "averageDeliverySeconds": {
     "type": "number",
-    "description": "Provider C 31K 97.9% 2.4s"
+    "minimum": 0,
+    "description": "Mean time from acceptance to provider-confirmed delivery, in (fractional) seconds."
    },
-   "pNg": {
-    "type": "string",
-    "description": "p ng"
-   },
-   "push110k99806s": {
+   "providerAvailabilityRate": {
     "type": "number",
-    "description": "Push 110K 99.8% 0.6s"
+    "minimum": 0,
+    "maximum": 1,
+    "description": "Share of the window the active providers were reachable, weighted by volume."
+   },
+   "byChannel": {
+    "type": "array",
+    "description": "Sent volume and health per channel, one row per provider on it (the pack's channel tiles and Channel Health table).",
+    "items": {
+     "type": "object",
+     "required": [
+      "channel",
+      "sent"
+     ],
+     "properties": {
+      "channel": {
+       "$ref": "#/components/schemas/MessageChannel"
+      },
+      "providerId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "providerName": {
+       "type": "string"
+      },
+      "sent": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "successRate": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      },
+      "averageLatencySeconds": {
+       "type": "number",
+       "minimum": 0
+      },
+      "health": {
+       "type": "string",
+       "enum": [
+        "healthy",
+        "warning",
+        "critical"
+       ]
+      }
+     }
+    }
+   },
+   "byModule": {
+    "type": "array",
+    "description": "Volume originating from each TICVAI module.",
+    "items": {
+     "type": "object",
+     "required": [
+      "module",
+      "volume"
+     ],
+     "properties": {
+      "module": {
+       "type": "string",
+       "enum": [
+        "crm",
+        "ticketing",
+        "membership",
+        "waiver",
+        "groupSales",
+        "customerService",
+        "finance",
+        "wallet",
+        "resourceManagement",
+        "accessControl",
+        "other"
+       ]
+      },
+      "volume": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "successRate": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      },
+      "averageLatencySeconds": {
+       "type": "number",
+       "minimum": 0
+      },
+      "health": {
+       "type": "string",
+       "enum": [
+        "healthy",
+        "warning",
+        "critical"
+       ]
+      }
+     }
+    }
+   },
+   "alerts": {
+    "type": "array",
+    "description": "Live operational alerts (failure-rate spikes, queued backlogs, providers near their rate limit).",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "severity",
+      "message",
+      "raisedAt"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "failureRateSpike",
+        "queueBacklog",
+        "rateLimitApproaching",
+        "providerDegraded",
+        "other"
+       ]
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "info",
+        "warning",
+        "critical"
+       ]
+      },
+      "message": {
+       "type": "string"
+      },
+      "channel": {
+       "$ref": "#/components/schemas/MessageChannel"
+      },
+      "providerId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "raisedAt": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
+   },
+   "aiHealthSummary": {
+    "type": "string",
+    "description": "AI-written plain-language summary of platform health; absent when AI processing is off for the tenant."
    }
   }
  },
+ "ConsentDecision": {
+  "type": "string",
+  "enum": [
+   "granted",
+   "withdrawn",
+   "notAsked"
+  ]
+ },
  "ConsentPreferenceCommunicationPolicyEnforcementView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Consent, Preference & Communication Policy Enforcement displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "marketing.communication_policy_decision",
+  "description": "One policy evaluation of one communication, with the inputs as they stood when it was evaluated. Append-only evidence; retained per the tenant's retention policy (ADR-0047). **Job note:** written by the dispatch worker behind `sendTransactionalMessage` and campaign sends (`launchCampaign`) as it evaluates each message, never by an operation of its own (decided 29 September, writers pass; DM6).\n",
+  "required": [
+   "id",
+   "communicationId",
+   "subjectId",
+   "messageClass",
+   "channel",
+   "decision",
+   "evaluatedAt"
+  ],
   "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "communicationId": {
+    "type": "string",
+    "description": "marketing.message_dispatch id."
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "messageClass": {
+    "type": "string",
+    "enum": [
+     "transactional",
+     "operational",
+     "service",
+     "marketing"
+    ]
+   },
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
    "marketingConsent": {
-    "type": "boolean",
-    "description": "Marketing Consent"
+    "$ref": "#/components/schemas/ConsentDecision"
    },
    "emailPreference": {
-    "type": "string",
-    "description": "Email Preference"
+    "type": "boolean"
    },
    "smsPreference": {
-    "type": "string",
-    "description": "SMS Preference"
+    "type": "boolean"
    },
    "whatsappPreference": {
-    "type": "string",
-    "description": "WhatsApp Preference"
+    "type": "boolean"
    },
    "pushPreference": {
-    "type": "string",
-    "description": "Push Preference"
+    "type": "boolean"
    },
    "language": {
     "type": "string",
-    "description": "Language"
+    "description": "Preferred language (BCP 47) used to pick the template language."
    },
-   "optOut": {
-    "type": "string",
-    "description": "Opt-Out"
-   },
-   "suppression": {
-    "type": "string",
-    "description": "Suppression"
-   },
-   "contactRestrictions": {
-    "type": "string",
-    "description": "Contact Restrictions"
-   },
-   "transactional": {
-    "type": "string",
-    "description": "Transactional"
-   },
-   "operational": {
-    "type": "string",
-    "description": "Operational"
-   },
-   "service": {
-    "type": "string",
-    "description": "Service"
-   },
-   "marketing": {
-    "type": "string",
-    "description": "Marketing"
-   },
-   "unsubscribed": {
-    "type": "string",
-    "description": "Unsubscribed"
-   },
-   "invalidEmail": {
-    "type": "string",
-    "description": "Invalid Email"
-   },
-   "invalidMobile": {
-    "type": "string",
-    "description": "Invalid Mobile"
-   },
-   "hardBounce": {
-    "type": "string",
-    "description": "Hard Bounce"
-   },
-   "complaint": {
-    "type": "string",
-    "description": "Complaint"
-   },
-   "administrativeSuppression": {
-    "type": "string",
-    "description": "Administrative Suppression"
-   },
-   "allowed": {
+   "contactRestricted": {
     "type": "boolean",
-    "description": "Allowed"
+    "description": "A contact restriction (e.g. do-not-contact, legal hold) applied."
    },
-   "blocked": {
+   "jurisdiction": {
     "type": "string",
-    "description": "Blocked"
+    "pattern": "^[A-Z]{2}$",
+    "description": "Country whose policy was applied."
    },
-   "rerouted": {
+   "suppressionReason": {
     "type": "string",
-    "description": "Rerouted"
+    "enum": [
+     "unsubscribed",
+     "invalidEmail",
+     "invalidMobile",
+     "hardBounce",
+     "complaint",
+     "administrative"
+    ]
    },
-   "suppressed": {
+   "decision": {
     "type": "string",
-    "description": "Suppressed"
+    "enum": [
+     "allowed",
+     "blocked",
+     "rerouted",
+     "suppressed"
+    ]
+   },
+   "reasons": {
+    "type": "array",
+    "description": "Why the decision was reached; empty when allowed with nothing notable.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "noMarketingConsent",
+      "channelPreferenceOff",
+      "optedOut",
+      "suppressed",
+      "contactRestricted",
+      "jurisdictionPolicy",
+      "channelUnavailable"
+     ]
+    }
+   },
+   "reroutedToChannel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "evaluatedAt": {
+    "type": "string",
+    "format": "date-time"
    }
   }
  },
  "DeliveryQueueFailureRetryManagementView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Delivery Queue, Failure & Retry Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.message_dispatch, marketing.message_dispatch_attempt (new), marketing.message_template, marketing.communication_provider (new)",
+  "description": "One communication in the delivery queue and where it stands.",
+  "required": [
+   "communicationId",
+   "channel",
+   "status",
+   "attempts",
+   "createdAt"
+  ],
   "properties": {
-   "pending": {
-    "type": "integer",
-    "description": "Pending"
-   },
-   "processing": {
-    "type": "string",
-    "description": "Processing"
-   },
-   "sent": {
-    "type": "string",
-    "description": "Sent"
-   },
-   "delivered": {
-    "type": "string",
-    "description": "Delivered"
-   },
-   "failed": {
-    "type": "integer",
-    "description": "Failed"
-   },
-   "retrying": {
-    "type": "string",
-    "description": "Retrying"
-   },
-   "deadLettered": {
-    "type": "string",
-    "description": "Dead-Lettered"
-   },
-   "cancelled": {
-    "type": "integer",
-    "description": "Cancelled"
-   },
    "communicationId": {
     "type": "string",
-    "description": "Communication ID"
+    "description": "marketing.message_dispatch id."
    },
    "sourceModule": {
     "type": "string",
-    "description": "Source Module"
+    "enum": [
+     "crm",
+     "ticketing",
+     "membership",
+     "waiver",
+     "groupSales",
+     "customerService",
+     "finance",
+     "wallet",
+     "resourceManagement",
+     "accessControl",
+     "other"
+    ]
    },
    "businessEvent": {
     "type": "string",
-    "description": "Business Event"
+    "description": "The originating event type, e.g. TicketIssued."
+   },
+   "businessEventId": {
+    "type": "string",
+    "description": "The originating event instance, kept so a failed message can be replayed with its context."
    },
    "recipient": {
     "type": "string",
-    "description": "Recipient"
+    "description": "Address or number, masked (e.g. j***@example.com) unless the caller holds GUEST_VIEW_PII."
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
    },
    "channel": {
-    "type": "string",
-    "description": "Channel"
+    "$ref": "#/components/schemas/MessageChannel"
    },
    "template": {
-    "type": "string",
-    "description": "Template"
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "code": {
+      "type": "string"
+     },
+     "name": {
+      "type": "string"
+     }
+    }
    },
    "provider": {
-    "type": "string",
-    "description": "Provider"
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "name": {
+      "type": "string"
+     }
+    }
    },
    "priority": {
     "type": "string",
-    "description": "Priority"
-   },
-   "created": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Created"
+    "enum": [
+     "P1",
+     "P2",
+     "P3",
+     "P4"
+    ]
    },
    "status": {
-    "type": "integer",
-    "description": "Status"
+    "type": "string",
+    "enum": [
+     "pending",
+     "processing",
+     "sent",
+     "delivered",
+     "failed",
+     "retrying",
+     "deadLettered",
+     "cancelled"
+    ]
    },
    "attempts": {
     "type": "integer",
-    "description": "Attempts"
+    "minimum": 0
    },
-   "reroute": {
+   "lastFailureCategory": {
     "type": "string",
-    "description": "Reroute"
+    "enum": [
+     "providerUnavailable",
+     "invalidAddress",
+     "invalidMobile",
+     "rateLimited",
+     "authenticationError",
+     "templateRejected",
+     "timeout",
+     "consentBlock",
+     "unknownError"
+    ]
    },
-   "changeProvider": {
-    "type": "string",
-    "description": "Change Provider"
+   "lastFailureMessage": {
+    "type": "string"
    },
-   "inspectFailure": {
+   "nextAttemptAt": {
     "type": "string",
-    "description": "Inspect Failure"
+    "format": "date-time"
    },
-   "replayEventWhereSafe": {
+   "createdAt": {
     "type": "string",
-    "description": "Replay Event where safe"
+    "format": "date-time"
+   },
+   "sentAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
    }
   }
  },
  "ProviderHealthUsageCostMonitoringView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Provider Health, Usage & Cost Monitoring displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.message_dispatch, marketing.message_dispatch_attempt (new), marketing.communication_provider (new)",
+  "description": "Provider reliability, usage and cost for the window and filters.",
+  "required": [
+   "windowFrom",
+   "windowTo",
+   "volume",
+   "providers"
+  ],
   "properties": {
+   "windowFrom": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "windowTo": {
+    "type": "string",
+    "format": "date-time"
+   },
    "volume": {
     "type": "integer",
-    "description": "Volume"
+    "minimum": 0
    },
    "successRate": {
     "type": "number",
-    "description": "Success Rate"
+    "minimum": 0,
+    "maximum": 1
    },
    "failureRate": {
     "type": "number",
-    "description": "Failure Rate"
+    "minimum": 0,
+    "maximum": 1
    },
-   "deliveryTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Delivery Time"
+   "averageDeliverySeconds": {
+    "type": "number",
+    "minimum": 0
    },
-   "apiLatency": {
-    "type": "string",
-    "description": "API Latency"
+   "averageApiLatencySeconds": {
+    "type": "number",
+    "minimum": 0
    },
-   "availability": {
-    "type": "string",
-    "description": "Availability"
+   "availabilityRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1
    },
    "retries": {
     "type": "integer",
-    "description": "Retries"
+    "minimum": 0
    },
-   "fallbackUsage": {
-    "type": "string",
-    "description": "Fallback Usage"
+   "fallbackCount": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Messages delivered through a fallback provider or channel."
    },
    "cost": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Cost"
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "costPerMessage": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Cost per Message"
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
-   "erSDelivery1k": {
-    "type": "string",
-    "description": "er s Delivery 1K"
+   "providers": {
+    "type": "array",
+    "description": "Provider comparison.",
+    "items": {
+     "type": "object",
+     "required": [
+      "providerId",
+      "channel",
+      "volume"
+     ],
+     "properties": {
+      "providerId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "providerName": {
+       "type": "string"
+      },
+      "channel": {
+       "$ref": "#/components/schemas/MessageChannel"
+      },
+      "volume": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "successRate": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      },
+      "averageDeliverySeconds": {
+       "type": "number",
+       "minimum": 0
+      },
+      "costPerThousand": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "health": {
+       "type": "string",
+       "enum": [
+        "healthy",
+        "warning",
+        "critical"
+       ]
+      }
+     }
+    }
    },
-   "ng": {
-    "type": "string",
-    "description": "ng"
+   "breakdown": {
+    "type": "array",
+    "description": "Usage and cost per value of the groupBy dimension.",
+    "items": {
+     "type": "object",
+     "required": [
+      "key",
+      "volume"
+     ],
+     "properties": {
+      "key": {
+       "type": "string",
+       "description": "The dimension value's id or code."
+      },
+      "label": {
+       "type": "string"
+      },
+      "volume": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "cost": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
    },
-   "tenant": {
-    "type": "string",
-    "description": "Tenant"
+   "alerts": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "message",
+      "raisedAt"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "budgetThreshold",
+        "successRateBelowTarget",
+        "latencyAboveTarget",
+        "slaBreach"
+       ]
+      },
+      "message": {
+       "type": "string"
+      },
+      "channel": {
+       "$ref": "#/components/schemas/MessageChannel"
+      },
+      "providerId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "raisedAt": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
    },
-   "event": {
-    "type": "string",
-    "description": "Event"
+   "slaTargets": {
+    "type": "array",
+    "description": "Contractual provider targets, only where configured.",
+    "items": {
+     "type": "object",
+     "required": [
+      "providerId",
+      "metric",
+      "target"
+     ],
+     "properties": {
+      "providerId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "metric": {
+       "type": "string",
+       "enum": [
+        "successRate",
+        "availabilityRate",
+        "averageDeliverySeconds"
+       ]
+      },
+      "target": {
+       "type": "number"
+      },
+      "observed": {
+       "type": "number"
+      },
+      "met": {
+       "type": "boolean"
+      }
+     }
+    }
    },
-   "businessUnit": {
-    "type": "string",
-    "description": "Business Unit"
-   },
-   "trackContractualProviderTargetsWhereConfigured": {
-    "type": "string",
-    "description": "Track contractual/provider targets where configured"
+   "aiRecommendations": {
+    "type": "array",
+    "description": "Advisory provider changes on cost/performance trade-offs.",
+    "items": {
+     "type": "string"
+    }
    }
   }
  },
  "RoutingPriorityThrottlingFallbackRulesView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Routing, Priority, Throttling & Fallback Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "marketing.communication_routing_rule",
+  "description": "One routing rule, read by listRoutingPriorityThrottling and written by setCommunicationRoutingRule. Unset selectors match anything; a rule with more selectors set is more specific.\n",
+  "required": [
+   "id",
+   "channel",
+   "providers",
+   "isActive"
+  ],
   "properties": {
-   "channel": {
+   "id": {
     "type": "string",
-    "description": "Channel"
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
    },
    "country": {
     "type": "string",
-    "description": "Country"
+    "pattern": "^[A-Z]{2}$"
    },
-   "brand": {
+   "brandId": {
     "type": "string",
-    "description": "Brand"
+    "format": "uuid"
    },
-   "provider": {
+   "messageClass": {
     "type": "string",
-    "description": "Provider"
+    "enum": [
+     "transactional",
+     "operational",
+     "service",
+     "marketing"
+    ]
    },
-   "messageType": {
+   "priorityClass": {
     "type": "string",
-    "description": "Message Type"
-   },
-   "priority": {
-    "type": "string",
-    "description": "Priority"
+    "enum": [
+     "P1",
+     "P2",
+     "P3",
+     "P4"
+    ]
    },
    "recipientType": {
     "type": "string",
-    "description": "Recipient Type"
+    "enum": [
+     "customer",
+     "partner",
+     "employee"
+    ]
    },
-   "cost": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Cost"
+   "providers": {
+    "type": "array",
+    "description": "Tried in order; a provider below minimum health is skipped.",
+    "items": {
+     "type": "object",
+     "required": [
+      "providerId",
+      "role"
+     ],
+     "properties": {
+      "providerId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "providerName": {
+       "type": "string",
+       "readOnly": true
+      },
+      "role": {
+       "type": "string",
+       "enum": [
+        "primary",
+        "secondary",
+        "emergencyFallback"
+       ]
+      }
+     }
+    }
    },
-   "providerHealth": {
+   "skipUnhealthyProviders": {
+    "type": "boolean",
+    "description": "Route past providers whose health is degraded or worse."
+   },
+   "costAware": {
+    "type": "boolean",
+    "description": "Among providers meeting the service and compliance rules, prefer the cheapest."
+   },
+   "channelFallback": {
+    "type": "array",
+    "description": "Alternate channels, in order, when delivery on this channel fails; used only where consent and preferences permit.",
+    "items": {
+     "$ref": "#/components/schemas/MessageChannel"
+    }
+   },
+   "throttle": {
+    "type": "object",
+    "properties": {
+     "messagesPerSecond": {
+      "type": "integer",
+      "minimum": 1
+     },
+     "messagesPerMinute": {
+      "type": "integer",
+      "minimum": 1
+     },
+     "brandMessagesPerMinute": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Cap across every rule for the same brand."
+     },
+     "eventMessagesPerMinute": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Cap per originating business event."
+     }
+    }
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "updatedAt": {
     "type": "string",
-    "description": "Provider Health"
-   },
-   "p1Critical": {
-    "type": "string",
-    "description": "P1 — Critical"
-   },
-   "p2High": {
-    "type": "string",
-    "description": "P2 — High"
-   },
-   "paymentIssueEventDayNotification": {
-    "type": "string",
-    "description": "Payment issue, event-day notification"
-   },
-   "p3Normal": {
-    "type": "string",
-    "description": "P3 — Normal"
-   },
-   "ticketConfirmationWaiverReminder": {
-    "type": "string",
-    "description": "Ticket confirmation, waiver reminder"
-   },
-   "p4Bulk": {
-    "type": "string",
-    "description": "P4 — Bulk"
-   },
-   "nonUrgentHighVolumeCommunication": {
-    "type": "integer",
-    "description": "Non-urgent high-volume communication"
-   },
-   "primaryProviderA": {
-    "type": "string",
-    "description": "Primary → Provider A"
-   },
-   "messagesPerSecond": {
-    "type": "string",
-    "description": "Messages per second"
-   },
-   "messagesPerMinute": {
-    "type": "string",
-    "description": "Messages per minute"
-   },
-   "providerLimit": {
-    "type": "integer",
-    "description": "Provider limit"
-   },
-   "brandLimit": {
-    "type": "integer",
-    "description": "Brand limit"
-   },
-   "eventLimit": {
-    "type": "integer",
-    "description": "Event limit"
-   },
-   "complianceRules": {
-    "type": "string",
-    "description": "compliance rules"
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
  "SenderIdentityDomainBrandConfigurationInput": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is control.api_client at 6%, so this is not an update to anything the package stores today and no new table has been decided",
-  "description": "**What Sender Identity, Domain & Brand Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "x-ticvai-persistence": "marketing.sender_identity",
+  "description": "One identity TICVAI sends from, bound to one brand. Fields apply by channel: email uses sendingDomain/fromName/fromAddress/replyTo; sms uses senderId/country/approvedUses; whatsapp uses businessAccount/phoneNumber/country; push uses application/platform/environment.\n",
+  "required": [
+   "channel",
+   "brandId",
+   "providerId",
+   "status"
+  ],
   "properties": {
-   "sendingDomain": {
+   "id": {
     "type": "string",
-    "description": "Sending Domain"
+    "format": "uuid",
+    "readOnly": true
    },
-   "fromName": {
+   "scopePath": {
     "type": "string",
-    "description": "From Name"
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
    },
-   "fromAddress": {
-    "type": "string",
-    "description": "From Address"
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
    },
-   "replyTo": {
+   "brandId": {
     "type": "string",
-    "description": "Reply-To"
+    "format": "uuid"
    },
-   "brand": {
+   "legalEntityId": {
     "type": "string",
-    "description": "Brand"
-   },
-   "legalEntity": {
-    "type": "string",
-    "description": "Legal Entity"
+    "format": "uuid"
    },
    "region": {
-    "type": "string",
-    "description": "Region"
-   },
-   "senderId": {
-    "type": "string",
-    "description": "Sender ID"
+    "type": "string"
    },
    "country": {
     "type": "string",
-    "description": "Country"
+    "pattern": "^[A-Z]{2}$",
+    "description": "ISO 3166-1 alpha-2 (required for sms and whatsapp)."
    },
-   "approvedUse": {
-    "type": "integer",
-    "description": "Approved Use"
-   },
-   "provider": {
+   "providerId": {
     "type": "string",
-    "description": "Provider"
+    "format": "uuid",
+    "description": "The marketing.communication_provider row this identity is registered with."
    },
-   "status": {
+   "sendingDomain": {
     "type": "string",
-    "description": "Status"
+    "maxLength": 253
    },
-   "application": {
+   "fromName": {
     "type": "string",
-    "description": "Application"
+    "maxLength": 120
    },
-   "platform": {
+   "fromAddress": {
     "type": "string",
-    "description": "Platform"
+    "format": "email"
    },
-   "environment": {
+   "replyTo": {
     "type": "string",
-    "description": "Environment"
+    "format": "email"
+   },
+   "senderId": {
+    "type": "string",
+    "maxLength": 15,
+    "description": "Alphanumeric or numeric SMS sender ID as registered in the country."
+   },
+   "approvedUses": {
+    "type": "array",
+    "description": "Communication classes this sender may carry.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "transactional",
+      "operational",
+      "service",
+      "marketing"
+     ]
+    }
    },
    "businessAccount": {
     "type": "string",
-    "description": "Business Account"
+    "description": "WhatsApp business account identifier at the provider."
    },
    "phoneNumber": {
     "type": "string",
-    "description": "Phone Number"
+    "pattern": "^\\+[1-9][0-9]{6,14}$",
+    "description": "E.164."
    },
-   "verificationStatus": {
+   "application": {
     "type": "string",
-    "description": "Verification Status"
+    "description": "Push application identifier (bundle id / package name)."
    },
-   "approvedTemplates": {
-    "type": "integer",
-    "description": "Approved Templates"
+   "platform": {
+    "type": "string",
+    "enum": [
+     "ios",
+     "android",
+     "web"
+    ]
+   },
+   "environment": {
+    "type": "string",
+    "enum": [
+     "production",
+     "sandbox"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pendingVerification",
+     "verified",
+     "active",
+     "suspended",
+     "expired"
+    ],
+    "description": "Set by verification except `active` and `suspended`, which a caller may request."
+   },
+   "approvedTemplateIds": {
+    "type": "array",
+    "readOnly": true,
+    "description": "WhatsApp templates the provider has approved for this number (marketing.message_template ids).",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
  "SenderIdentityDomainBrandConfigurationView": {
+  "x-ticvai-persistence": "none — the marketing.sender_identity row plus its verification timestamps",
+  "description": "The stored sender identity and when it was last verified.",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/SenderIdentityDomainBrandConfigurationInput"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "verifiedAt": {
+      "type": "string",
+      "format": "date-time",
+      "readOnly": true
+     },
+     "verificationExpiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "readOnly": true
+     }
+    }
+   }
+  ]
+ },
+ "Suggestion": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Sender Identity, Domain & Brand Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "ai.suggestion",
+  "description": "One answer to one question, with its reasoning and its confidence. **Built 24 August so that machine learning can be swapped in without touching a screen.**\n**A suggestion is never an action.** It proposes; `ProposedAction` and its approval path decide. A model that can order stock is a model that will order stock wrongly at three in the morning.\n**`inputs` is recorded, not just referenced.** A suggestion that cannot be reproduced cannot be defended to a finance controller asking why the system said to order four hundred.\n",
+  "required": [
+   "id",
+   "kind",
+   "basis",
+   "maturity",
+   "producedAt"
+  ],
   "properties": {
-   "sendingDomain": {
+   "id": {
     "type": "string",
-    "description": "Sending Domain"
+    "format": "uuid"
    },
-   "fromName": {
+   "kind": {
+    "$ref": "#/components/schemas/SuggestionKind"
+   },
+   "basis": {
+    "$ref": "#/components/schemas/SuggestionBasis"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "subjectRef": {
     "type": "string",
-    "description": "From Name"
+    "nullable": true,
+    "description": "What it is about — a product, an outlet, an item, a party."
    },
-   "fromAddress": {
+   "value": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "The suggestion itself. Shape depends on `kind`."
+   },
+   "confidence": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 1,
+    "description": "**Null for a heuristic and that is honest.** A rule has no confidence — dressing one up with 0.85 is the fastest way to make a manager trust a number that means nothing.\n"
+   },
+   "explanation": {
     "type": "string",
-    "description": "From Address"
+    "description": "**Plain words, always present, whatever the basis.** *Because covers are up 12% on this day last year* — a suggestion a manager cannot explain to their own boss is a suggestion they will not action.\n"
    },
-   "replyTo": {
+   "inputs": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "What went in. **Recorded so the answer can be reproduced** — and so that when a model replaces the rule, the two can be run against the same inputs and compared.\n"
+   },
+   "producerRef": {
     "type": "string",
-    "description": "Reply-To"
+    "description": "The rule name or the model id and version. **A model version is part of the record**: *the model said so* is not an answer to *which model, when*.\n"
    },
-   "brand": {
+   "maturity": {
+    "$ref": "#/components/schemas/AiMaturity"
+   },
+   "producedAt": {
     "type": "string",
-    "description": "Brand"
+    "format": "date-time"
    },
-   "legalEntity": {
+   "expiresAt": {
     "type": "string",
-    "description": "Legal Entity"
-   },
-   "region": {
-    "type": "string",
-    "description": "Region"
-   },
-   "senderId": {
-    "type": "string",
-    "description": "Sender ID"
-   },
-   "country": {
-    "type": "string",
-    "description": "Country"
-   },
-   "approvedUse": {
-    "type": "integer",
-    "description": "Approved Use"
-   },
-   "provider": {
-    "type": "string",
-    "description": "Provider"
-   },
-   "status": {
-    "type": "string",
-    "description": "Status"
-   },
-   "application": {
-    "type": "string",
-    "description": "Application"
-   },
-   "platform": {
-    "type": "string",
-    "description": "Platform"
-   },
-   "environment": {
-    "type": "string",
-    "description": "Environment"
-   },
-   "businessAccount": {
-    "type": "string",
-    "description": "Business Account"
-   },
-   "phoneNumber": {
-    "type": "string",
-    "description": "Phone Number"
-   },
-   "verificationStatus": {
-    "type": "string",
-    "description": "Verification Status"
-   },
-   "approvedTemplates": {
-    "type": "integer",
-    "description": "Approved Templates"
+    "format": "date-time",
+    "nullable": true,
+    "description": "**A demand forecast for Saturday is worthless on Sunday.** An expired suggestion is hidden rather than shown stale.\n"
    }
   }
  },
+ "SuggestionBasis": {
+  "type": "string",
+  "description": "**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n",
+  "enum": [
+   "heuristic",
+   "statistical",
+   "model",
+   "hybrid",
+   "manual"
+  ]
+ },
+ "SuggestionKind": {
+  "type": "string",
+  "description": "What is being suggested. **A closed set, and the reason it is closed is the swap.** Every entry here is a question a venue asks that a model could answer better than a rule — and each one starts as a heuristic and becomes a model when there is data.\n**Six of these were drawn as their own endpoints on the client F&B boards** — `suggestPrice`, `simulateScenario`, `simulateSlaPolicy`, `suggestRequisition`, `suggestReplenishment`, `publishDemandPlan`. **Building six endpoints means six places to change when a model changes**, and the model will change more often than the venue's question does.\n**What each kind is based on, and when the venue's own data takes over. Proposed, client to correct (decided 28 September, audit R213; re-read 29 September, AI functions review).** The figure after each rule is **the point where own data takes over from the baseline, not a refusal**: below it the kind answers from the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, the weather) with `maturity.stage` `starting`, and between it and about three months it blends the two (`learning`). The day-one baseline per kind: `replenishment`, `requisition`, `prepPlan`, `staffing`, `demandForecast` and `scenario` from the baseline forecast (typical attendance from the venue AI settings x the venue-type month curve x the calendar x weather, bookings on hand as a floor); `menuEngineering` ranked by margin with popularity marked learning; `slaTarget` a standard default; `waitTime` people ahead / configured capacity; `upsell` the relationship map and business priority; `segmentation` known guest attributes; `anomaly` the venue's configured thresholds and actual against the forecast's low end; `sendTime` the channel's typical hour; `wasteRisk` shelf life and par against the forecast; `queueBalancing` configured capacity per queue. Only a missing setting refuses (422 `AiMissingSettingProblem`).\n- `price`: unit cost plus the category's target margin, held inside the price band. Minimum: a current cost, no history.\n- `replenishment`: par level minus on-hand plus expected use over the supplier lead time. Minimum: 14 days of stock movements.\n- `requisition`: the next service's prep-plan ingredient needs minus kitchen stock. Minimum: 14 days of sales.\n- `demandForecast`: the average of the same weekday over the last 8 weeks, adjusted by admissions already booked. Minimum: 8 weeks of sales.\n- `prepPlan`: forecast covers for the service times each item's share of the last 4 same weekdays. Minimum: 4 weeks of sales.\n- `menuEngineering`: each item placed by popularity against margin, over 90 days. Minimum: 90 days of sales.\n- `staffing`: forecast demand divided by the role's standard covers per staff hour. Minimum: 8 weeks of sales (the forecast it rests on).\n- `slaTarget`: the 80th percentile of actual times over the last 30 days. Minimum: 30 days of timed events.\n- `waitTime`: people ahead divided by the throughput of the last 30 minutes. Minimum: 30 minutes of throughput today.\n- `upsell`: the item most often bought with the basket's items over 90 days. Minimum: 90 days of orders.\n- `segmentation`: recency, frequency and spend scores over 12 months. Minimum: 90 days of orders.\n- `anomaly`: a value outside three standard deviations of the same weekday over 8 weeks. Minimum: 8 weeks of the measure.\n- `scenario`: the demand forecast re-run with the stated changes. Minimum: as `demandForecast`.\n- `sendTime` (added 29 September): per recipient, the hour inside `context.sendWindow` in which they have most often opened or clicked over the last 90 days (marketing-crm attribution touches), and where `context.channel` is `best`, the consented channel with the highest engagement. A recipient with fewer than three touches gets their segment's modal hour, and one with none the window's start. Asked with `subjectRef` a segment id or `context.subjectIds` (at most 10,000). `value` is `{recommendations: [{subjectId, sendAt, channel, basisTouches}]}`. Minimum: 90 days of message touches at the scope.\n- `wasteRisk` (added 29 September): per item at an outlet or store location, planned production and stock on hand minus forecast demand over the item's shelf life, plus batches expiring inside the horizon (`inventory.listExpiringBatches`). `value` is `{items: [{itemRef, quantityAtRisk, valueAtCost, expiresAt, recommendedAction (reducePrep, promote, transfer, useInRecipe), transferTo}]}`. Minimum: 14 days of recorded waste and of sales.\n- `queueBalancing` (added 29 September): per queue or attraction at `subjectRef` (a venue) over `horizon`, the forecast wait (the `queue` forecast definition) against throughput capacity, a recommended virtual-queue return-slot allocation by queue type, and guest redirection from over-used to under-used attractions. `value` is `{queues: [{queueId, forecastWaitMinutes, capacityPerHour, returnSlotsPerInterval, redirectTo}]}`. Minimum: 14 days of queue readings.\n- `itinerary` (added 29 September, MOB-6, guest-allowed): refines a `venue-map` visit plan the guest owns. `subjectRef` is the plan id; `value` is `{planId, baseVersion, changes, rationale}`, applied with `updateVisitPlan` as the guest. Minimum: none; the rules plan is the baseline.\n",
+  "enum": [
+   "price",
+   "replenishment",
+   "requisition",
+   "demandForecast",
+   "prepPlan",
+   "menuEngineering",
+   "staffing",
+   "slaTarget",
+   "waitTime",
+   "upsell",
+   "segmentation",
+   "anomaly",
+   "scenario",
+   "sendTime",
+   "wasteRisk",
+   "queueBalancing",
+   "itinerary"
+  ]
+ },
  "SystemTransactionalTemplateRegistryView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What System Transactional Template Registry displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.message_template, marketing.message_template_version (new), marketing.message_trigger",
+  "description": "One version of one template on one channel and language, with its content and variables.",
+  "required": [
+   "templateId",
+   "code",
+   "name",
+   "channel",
+   "language",
+   "version",
+   "status",
+   "ownership"
+  ],
   "properties": {
-   "ticketConfirmation": {
-    "type": "string",
-    "description": "Ticket Confirmation"
-   },
-   "ticketResend": {
-    "type": "string",
-    "description": "Ticket Resend"
-   },
-   "eventReminder": {
-    "type": "string",
-    "description": "Event Reminder"
-   },
-   "eventRescheduled": {
-    "type": "string",
-    "description": "Event Rescheduled"
-   },
-   "eventCancelled": {
-    "type": "string",
-    "description": "Event Cancelled"
-   },
-   "paymentSuccessful": {
-    "type": "string",
-    "description": "Payment Successful"
-   },
-   "paymentFailed": {
-    "type": "integer",
-    "description": "Payment Failed"
-   },
-   "membershipActivated": {
-    "type": "string",
-    "description": "Membership Activated"
-   },
-   "membershipExpiring": {
-    "type": "string",
-    "description": "Membership Expiring"
-   },
-   "waiverRequired": {
-    "type": "boolean",
-    "description": "Waiver Required"
-   },
-   "guardianConsentRequired": {
-    "type": "boolean",
-    "description": "Guardian Consent Required"
-   },
-   "waiverReminder": {
-    "type": "string",
-    "description": "Waiver Reminder"
-   },
-   "groupBookingConfirmed": {
-    "type": "string",
-    "description": "Group Booking Confirmed"
-   },
-   "depositDue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Deposit Due"
-   },
    "templateId": {
     "type": "string",
-    "description": "Template ID"
+    "format": "uuid",
+    "description": "marketing.message_template id."
    },
-   "templateName": {
+   "code": {
     "type": "string",
-    "description": "Template Name"
+    "description": "The human template ID (e.g. TICKET_CONFIRMATION)."
+   },
+   "name": {
+    "type": "string"
    },
    "businessEvent": {
     "type": "string",
-    "description": "Business Event"
+    "description": "The registered business event this template answers (e.g. TicketIssued)."
    },
    "sourceModule": {
     "type": "string",
-    "description": "Source Module"
+    "enum": [
+     "crm",
+     "ticketing",
+     "membership",
+     "waiver",
+     "groupSales",
+     "customerService",
+     "finance",
+     "wallet",
+     "resourceManagement",
+     "accessControl",
+     "other"
+    ]
    },
    "channel": {
-    "type": "string",
-    "description": "Channel"
+    "$ref": "#/components/schemas/MessageChannel"
    },
-   "brand": {
+   "brandId": {
     "type": "string",
-    "description": "Brand"
+    "format": "uuid"
    },
    "language": {
     "type": "string",
-    "description": "Language"
+    "description": "BCP 47 tag."
    },
    "version": {
-    "type": "string",
-    "description": "Version"
+    "type": "integer",
+    "minimum": 1
    },
    "status": {
     "type": "string",
-    "description": "Status"
+    "enum": [
+     "draft",
+     "published",
+     "archived"
+    ]
+   },
+   "ownership": {
+    "type": "string",
+    "enum": [
+     "platform",
+     "crm"
+    ],
+    "description": "platform = transactional template owned here; crm = marketing template owned by CRM."
    },
    "subject": {
-    "type": "string",
-    "description": "Subject"
+    "type": "string"
    },
    "header": {
-    "type": "string",
-    "description": "Header"
+    "type": "string"
    },
    "body": {
-    "type": "string",
-    "description": "Body"
+    "type": "string"
    },
    "footer": {
-    "type": "string",
-    "description": "Footer"
+    "type": "string"
    },
-   "cta": {
-    "type": "string",
-    "description": "CTA"
+   "ctaLabel": {
+    "type": "string"
    },
-   "attachmentsWhereApplicable": {
+   "ctaUrl": {
     "type": "string",
-    "description": "Attachments where applicable"
+    "description": "May contain variables, e.g. {{TicketLink}}."
    },
-   "transactionalTemplatePlatform": {
-    "type": "string",
-    "description": "Transactional Template — Platform"
+   "attachmentKinds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "ticketPdf",
+      "invoicePdf",
+      "walletPass",
+      "calendarInvite",
+      "waiverPdf"
+     ]
+    }
    },
-   "marketingTemplateCrm": {
+   "variables": {
+    "type": "array",
+    "description": "Dynamic variables the content uses (e.g. CustomerName, OrderNumber, EventDate, AmountDue).",
+    "items": {
+     "type": "string"
+    }
+   },
+   "publishedAt": {
     "type": "string",
-    "description": "Marketing Template — CRM"
+    "format": "date-time"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time"
    }
   }
  }

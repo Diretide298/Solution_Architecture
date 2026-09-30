@@ -1,4 +1,4 @@
--- control — 79 tables
+-- control — 80 tables
 -- **Derived. Do not hand-edit.**
 
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
@@ -520,6 +520,17 @@ CREATE TABLE IF NOT EXISTS control.onboarding_application (
     provisioned_tenant_id             uuid
 );
 
+-- Holds 6 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
+CREATE TABLE IF NOT EXISTS control.outbox_relay (
+    cell_tenant_id                    uuid PRIMARY KEY NOT NULL,
+    holder                            text NOT NULL CONSTRAINT outbox_relay_holder_chk CHECK (char_length(holder) <= 200),
+    lease_expires_at                  timestamptz NOT NULL,
+    acquired_at                       timestamptz,
+    renewed_at                        timestamptz,
+    last_polled_at                    timestamptz
+);
+
 -- Holds 28 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS control.partner (
@@ -585,7 +596,7 @@ CREATE TABLE IF NOT EXISTS control.partner_agreement (
     valid_from                        date NOT NULL,
     valid_to                          date,
     expiry_alert_days                 integer DEFAULT 30,
-    approval_request_id               text,
+    approval_request_id               uuid,
     notes                             text,
     agreement_name                    text,
     agreement_type                    text,
@@ -672,7 +683,7 @@ CREATE TABLE IF NOT EXISTS control.partner_application (
     status                            text NOT NULL DEFAULT 'submitted' CONSTRAINT partner_application_status_chk CHECK (status IN ('submitted', 'inReview', 'moreInformationRequested', 'approved', 'rejected', 'withdrawn')),
     submitted_at                      timestamptz NOT NULL,
     sla_due_at                        timestamptz,
-    approval_request_id               text,
+    approval_request_id               uuid,
     scope_path                        ltree NOT NULL,
     created_at                        timestamptz,
     updated_at                        timestamptz
@@ -794,7 +805,7 @@ CREATE TABLE IF NOT EXISTS control.partner_change_request (
     status                            text NOT NULL DEFAULT 'requested' CONSTRAINT partner_change_request_status_chk CHECK (status IN ('requested', 'pendingApproval', 'approved', 'rejected', 'processed')),
     requested_by_principal_id         uuid,
     approved_by_principal_id          uuid,
-    approval_request_id               text,
+    approval_request_id               uuid,
     refund_id                         uuid,
     requested_at                      timestamptz NOT NULL,
     target_performance_id             uuid,
@@ -820,7 +831,7 @@ CREATE TABLE IF NOT EXISTS control.partner_commercial_exception (
     effective_to                      date,
     requested_by_principal_id         uuid,
     status                            text NOT NULL DEFAULT 'pendingApproval' CONSTRAINT partner_commercial_exception_status_chk CHECK (status IN ('pendingApproval', 'approved', 'rejected', 'returned', 'expired')),
-    approval_request_id               text,
+    approval_request_id               uuid,
     scope_path                        ltree NOT NULL,
     created_at                        timestamptz,
     updated_at                        timestamptz
@@ -1011,7 +1022,7 @@ CREATE TABLE IF NOT EXISTS control.partner_rate (
     margin_floor                      numeric(18,4),
     is_manual_override_allowed        boolean DEFAULT false,
     approval_threshold                numeric(18,4),
-    approval_request_id               text,
+    approval_request_id               uuid,
     scope_path                        ltree NOT NULL,
     created_at                        timestamptz,
     updated_at                        timestamptz
@@ -1119,7 +1130,7 @@ CREATE TABLE IF NOT EXISTS control.partner_status_history (
     restricted_markets                text[],
     effective_from                    timestamptz NOT NULL,
     requested_by_principal_id         uuid,
-    approval_request_id               text,
+    approval_request_id               uuid,
     scope_path                        ltree NOT NULL,
     created_at                        timestamptz
 );
@@ -1416,7 +1427,7 @@ CREATE TABLE IF NOT EXISTS control.url_redirect (
 
 -- What a tenant consumed, which is what an invoice is computed from
 CREATE TABLE IF NOT EXISTS control.usage_record (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     metric                            text NOT NULL CONSTRAINT usage_record_metric_chk CHECK (metric IN ('venues', 'workstations', 'activeUsers', 'devices', 'brandedApps', 'aiTokens', 'apiCalls', 'storageGb', 'transactions', 'guestProfiles')),
     quantity                          numeric(18,4) NOT NULL,
     venue_id                          uuid,

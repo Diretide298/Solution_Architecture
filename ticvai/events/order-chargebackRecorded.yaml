@@ -14,8 +14,8 @@ emittedBy:
 - respondToChargeback
 payload:
 - field: chargebackEventId
-  type: string
-  notes: ULID minted in the writing transaction. With `stage`, what makes a delivery a duplicate
+  type: uuid
+  notes: UUIDv7 minted in the writing transaction. With `stage`, what makes a delivery a duplicate
 - field: chargebackId
   type: uuid
 - field: stage
@@ -26,9 +26,9 @@ payload:
   required: false
   notes: won, lost, accepted or expired. Null at stage received
 - field: paymentId
-  type: string
+  type: uuid
 - field: orderId
-  type: string
+  type: uuid
   required: false
   notes: The order the payment settled. Null for a payment with no order (a wallet top-up)
 - field: subjectId

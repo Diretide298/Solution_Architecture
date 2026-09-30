@@ -1,6 +1,6 @@
 # WS55 — Rules  Workflow  Approval   Automation Engine board 1
 
-**10 screens · 10 operations · 17 schemas · 2 permissions**
+**10 screens · 12 operations · 19 schemas · 3 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `APPROVAL_REQUEST, APPROVAL_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -65,8 +64,8 @@ convincingly. It is never a caption.
 | `ADM-239` | Visual Business Rule Builder | listDetail | 1 | 0 | — |
 | `ADM-240` | Conditions, Decision Logic & Decision Tables | listDetail | 1 | 0 | — |
 | `ADM-241` | Visual Workflow Designer | configEditor | 1 | 0 | — |
-| `ADM-242` | Approval Matrix & Multi-Level Approval Configuration | configEditor | 1 | 0 | — |
-| `ADM-243` | Roles, Authority, Delegation & Approval Limits | configEditor | 1 | 0 | — |
+| `ADM-242` | Approval Matrix & Multi-Level Approval Configuration | configEditor | 2 | 0 | — |
+| `ADM-243` | Roles, Authority, Delegation & Approval Limits | configEditor | 3 | 0 | — |
 | `ADM-244` | SLA, Escalation, Reminder & Timeout Rules | configEditor | 1 | 0 | — |
 | `ADM-245` | Trigger, Action & Cross-Module Orchestration Configuration | configEditor | 1 | 0 | — |
 | `ADM-246` | Workflow Testing, Simulation & Impact Analysis | listDetail | 1 | 0 | — |
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-238 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-239",
@@ -186,10 +182,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can locate, understand and govern all TICVAI rules and workflows from one centralized workspace.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each configuration should show) — counts over a population, then the population",
   "purpose": "Provide administrators with a centralized portfolio of all business rules, workflows, approvals and automations configured across TICVAI.",
-  "purposeNote": "Administrators can locate, understand and govern all TICVAI rules and workflows from one centralized workspace.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -201,61 +197,61 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "metricTile",
        "label": "Active Rules",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 5 §Display",
-       "bindsTo": "RulesWorkflowCommandCenterView.activeRules"
+       "bindsTo": "RulesWorkflowCommandCenterViewSummary.activeRules"
       },
       {
        "kind": "metricTile",
        "label": "Active Workflows",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 5 §Display",
-       "bindsTo": "RulesWorkflowCommandCenterView.activeWorkflows"
+       "bindsTo": "RulesWorkflowCommandCenterViewSummary.activeWorkflows"
       },
       {
        "kind": "metricTile",
        "label": "Approval Workflows",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 5 §Display",
-       "bindsTo": "RulesWorkflowCommandCenterView.approvalWorkflows"
+       "bindsTo": "RulesWorkflowCommandCenterViewSummary.approvalWorkflows"
       },
       {
        "kind": "metricTile",
        "label": "Draft Configurations",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 5 §Display",
-       "bindsTo": "RulesWorkflowCommandCenterView.draftConfigurations"
+       "bindsTo": "RulesWorkflowCommandCenterViewSummary.draftConfigurations"
       },
       {
        "kind": "metricTile",
        "label": "Pending Approval",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 5 §Display",
-       "bindsTo": "RulesWorkflowCommandCenterView.pendingApproval"
+       "bindsTo": "RulesWorkflowCommandCenterViewSummary.pendingApproval"
       },
       {
        "kind": "metricTile",
        "label": "Scheduled Changes",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 5 §Display",
-       "bindsTo": "RulesWorkflowCommandCenterView.scheduledChanges"
+       "bindsTo": "RulesWorkflowCommandCenterViewSummary.scheduledChanges"
       },
       {
        "kind": "metricTile",
        "label": "Rules With Errors",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 5 §Display",
-       "bindsTo": "RulesWorkflowCommandCenterView.rulesWithErrors"
+       "bindsTo": "RulesWorkflowCommandCenterViewSummary.rulesWithErrors"
       },
       {
        "kind": "metricTile",
        "label": "Workflows With Warnings",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 5 §Display",
-       "bindsTo": "RulesWorkflowCommandCenterView.workflowsWithWarnings"
+       "bindsTo": "RulesWorkflowCommandCenterViewSummary.workflowsWithWarnings"
       },
       {
        "kind": "metricTile",
        "label": "Recently Modified",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 5 §Display",
-       "bindsTo": "RulesWorkflowCommandCenterView.recentlyModified"
+       "bindsTo": "RulesWorkflowCommandCenterViewSummary.recentlyModified"
       },
       {
        "kind": "metricTile",
        "label": "Modules Covered",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 5 §Display",
-       "bindsTo": "RulesWorkflowCommandCenterView.modulesCovered"
+       "bindsTo": "RulesWorkflowCommandCenterViewSummary.modulesCovered"
       }
      ]
     },
@@ -331,7 +327,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-238"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-238",
+   "workshopBoard": "wireframes/WS136 Rules  Workflow  Approval   Automation Engine Board 1.dc.html#adm-238"
   },
   "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 5. 21 of 21 labels bound to a contract property; 22 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -395,10 +392,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized administrators can configure deterministic business decisions using governed",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Allow administrators to create business rules without software development.",
-  "purposeNote": "Authorized administrators can configure deterministic business decisions using governed",
   "gaps": [
    {
     "operation": null,
@@ -451,16 +448,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setVisualBusinessRule",
     "contract": "approvals",
     "purpose": "Visual Business Rule Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setVisualBusinessRule"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-239"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-239",
+   "workshopBoard": "wireframes/WS136 Rules  Workflow  Approval   Automation Engine Board 1.dc.html#adm-239"
   },
   "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 6. 0 of 0 labels bound to a contract property; 0 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -524,10 +519,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Complex business decisions can be modeled predictably, tested and reused without creating contradictory or ambiguous outcomes.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure advanced decision logic where simple IF/THEN rules are insufficient.",
-  "purposeNote": "Complex business decisions can be modeled predictably, tested and reused without creating contradictory or ambiguous outcomes.",
   "gaps": [
    {
     "operation": null,
@@ -573,17 +568,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "ConditionsDecisionLogicDecisionTablesView.anyCancelledAutoApprove",
-    "ConditionsDecisionLogicDecisionTablesView.aed251",
-    "ConditionsDecisionLogicDecisionTablesView.manager",
-    "ConditionsDecisionLogicDecisionTablesView.priority",
-    "ConditionsDecisionLogicDecisionTablesView.sequence"
+    "ConditionsDecisionLogicDecisionTablesView.resolutionStrategy"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-240"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-240",
+   "workshopBoard": "wireframes/WS136 Rules  Workflow  Approval   Automation Engine Board 1.dc.html#adm-240"
   },
   "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 0 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -647,10 +639,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can visually design governed end-to-end business processes including decisions, approvals, tasks and system actions.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Allow administrators to visually design complete business processes.",
-  "purposeNote": "Administrators can visually design governed end-to-end business processes including decisions, approvals, tasks and system actions.",
   "layout": {
    "template": "form",
    "regions": [
@@ -724,35 +716,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setVisualWorkflow",
     "contract": "approvals",
     "purpose": "Visual Workflow Designer",
-    "trigger": "onAction",
-    "invalidates": [
-     "setVisualWorkflow"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-241"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-241",
+   "workshopBoard": "wireframes/WS136 Rules  Workflow  Approval   Automation Engine Board 1.dc.html#adm-241"
   },
   "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 8 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Visual Workflow Designer declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 13"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 13"
-   }
-  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -808,16 +781,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-238",
      "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F164 step 8→9",
-     "operation": "approveMatrixMultiLevel"
+     "provenance": "flow F164 step 8→9"
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "and configured authority rules.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure when approvals are required and who must approve.",
-  "purposeNote": "and configured authority rules.",
   "gaps": [
    {
     "operation": null,
@@ -915,19 +887,28 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "apis": [
    {
-    "operationId": "approveMatrixMultiLevel",
+    "operationId": "listApprovalMatrices",
     "contract": "approvals",
-    "purpose": "Approval Matrix & Multi-Level Approval Configuration",
+    "purpose": "The approval matrices in force",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, readiness close-out (QA wiring note)"
+   },
+   {
+    "operationId": "setApprovalMatrix",
+    "contract": "approvals",
+    "purpose": "Save the approval matrix and its levels",
     "trigger": "onAction",
+    "provenance": "decided 29 September, readiness close-out (QA wiring note)",
     "invalidates": [
-     "approveMatrixMultiLevel"
+     "listApprovalMatrices"
     ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-242"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-242",
+   "workshopBoard": "wireframes/WS136 Rules  Workflow  Approval   Automation Engine Board 1.dc.html#adm-242"
   },
   "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 13 of 50 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -985,16 +966,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-238",
      "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F164 step 10→11",
-     "operation": "approveRoleAuthorityDelegation"
+     "provenance": "flow F164 step 10→11"
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Every approval is routed only to an authorized approver with valid authority for that transaction and organizational scope.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Define by; Capture) and no display directory — it is settings, not a population",
   "purpose": "Define who has authority to perform or approve specific actions. This should work with TICVAI RBAC/PBAC rather than replace it.",
-  "purposeNote": "Every approval is routed only to an authorized approver with valid authority for that transaction and organizational scope.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Event operations. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 13 §Support temporary authority for"
+   }
+  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1080,8 +1067,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Approve",
-       "provenance": "contract operation approveRoleAuthorityDelegation"
+       "label": "Event operations",
+       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 13 §Support temporary authority for"
       }
      ]
     }
@@ -1095,21 +1082,37 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "apis": [
    {
-    "operationId": "approveRoleAuthorityDelegation",
+    "operationId": "listApprovalDelegations",
     "contract": "approvals",
-    "purpose": "Roles, Authority, Delegation & Approval Limits",
+    "purpose": "Delegations in force",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, readiness close-out (QA wiring note)"
+   },
+   {
+    "operationId": "createApprovalDelegation",
+    "contract": "approvals",
+    "purpose": "Delegate approval authority for a period",
     "trigger": "onAction",
+    "provenance": "decided 29 September, readiness close-out (QA wiring note)",
     "invalidates": [
-     "approveRoleAuthorityDelegation"
+     "listApprovalDelegations"
     ]
+   },
+   {
+    "operationId": "setApprovalMatrix",
+    "contract": "approvals",
+    "purpose": "Set role authority and approval limits",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, readiness close-out (QA wiring note)"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-243"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-243",
+   "workshopBoard": "wireframes/WS136 Rules  Workflow  Approval   Automation Engine Board 1.dc.html#adm-243"
   },
-  "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 13. 0 of 0 labels bound to a contract property; 14 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 13. 0 of 0 labels bound to a contract property; 15 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1171,10 +1174,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Every time-sensitive workflow can automatically remind, escalate or safely handle overdue activities according to configurable SLA policies.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Define how workflows behave when people or systems do not act within the expected time.",
-  "purposeNote": "Every time-sensitive workflow can automatically remind, escalate or safely handle overdue activities according to configurable SLA policies.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Venue Calendar. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 14 §Support"
+   }
+  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1208,6 +1218,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 14 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Venue Calendar",
+       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 14 §Support"
+      }
+     ]
     }
    ]
   },
@@ -1228,9 +1249,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-244"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-244",
+   "workshopBoard": "wireframes/WS136 Rules  Workflow  Approval   Automation Engine Board 1.dc.html#adm-244"
   },
-  "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 5 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 6 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1292,14 +1314,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Workflows can securely orchestrate approved actions across TICVAI modules while preserving module ownership, authorization and transactional integrity.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Define what starts a workflow and what TICVAI services may be called during execution.",
-  "purposeNote": "Workflows can securely orchestrate approved actions across TICVAI modules while preserving module ownership, authorization and transactional integrity.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 11 actions on this screen and the screen declares 1 operation.** Unserved: Create Approval, Create Task, Update Status, Apply Hold, Release Hold, Create Notification, Execute Refund, Update Allocation …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 13 actions on this screen and the screen declares 1 operation.** Unserved: Create Approval, Create Task, Update Status, Apply Hold, Release Hold, Create Notification, Generate Document, Execute Refund …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 16 §Actions can include"
    }
   ],
@@ -1373,12 +1395,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       },
       {
        "kind": "secondaryButton",
-       "label": "Execute Refund",
+       "label": "Generate Document",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 16 §Actions can include"
       },
       {
        "kind": "secondaryButton",
-       "label": "Update Allocation",
+       "label": "Execute Refund",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 16 §Actions can include"
       }
      ]
@@ -1396,18 +1418,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setTriggerActionCross",
     "contract": "approvals",
     "purpose": "Trigger, Action & Cross-Module Orchestration Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setTriggerActionCross"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-245"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-245",
+   "workshopBoard": "wireframes/WS136 Rules  Workflow  Approval   Automation Engine Board 1.dc.html#adm-245"
   },
-  "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 16 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 18 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1469,14 +1489,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "No workflow needs to be tested for the first time in production; administrators can simulate logic, routing and expected impact safely before publication.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Allow administrators to test rules and workflows before they affect live operations. This is a critical screen.",
-  "purposeNote": "No workflow needs to be tested for the first time in production; administrators can simulate logic, routing and expected impact safely before publication.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Manual Test Case, Scenario Simulation, Batch Test. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Manual Test Case, Sample Transaction, Historical Replay, Scenario Simulation, Batch Test. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 18 §Support"
    }
   ],
@@ -1540,6 +1560,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       },
       {
        "kind": "secondaryButton",
+       "label": "Sample Transaction",
+       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 18 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Historical Replay",
+       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 18 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Scenario Simulation",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 18 §Support"
       },
@@ -1564,10 +1594,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "simulateWorkflowTestingImpact",
     "contract": "approvals",
     "purpose": "Workflow Testing, Simulation & Impact Analysis",
-    "trigger": "onAction",
-    "invalidates": [
-     "simulateWorkflowTestingImpact"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1583,9 +1610,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-246"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-246",
+   "workshopBoard": "wireframes/WS136 Rules  Workflow  Approval   Automation Engine Board 1.dc.html#adm-246"
   },
-  "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 18. 8 of 8 labels bound to a contract property; 11 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 18. 8 of 8 labels bound to a contract property; 13 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1639,14 +1667,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from ADM-238, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Only tested, approved and version-controlled rules/workflows can become active, with complete auditability and controlled rollback/suspension capability. Board 1 — Final Screen Register",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Control how rules and workflows move safely from configuration into production. Board 1 configured the rules and workflows. Board 2 is the live operational layer where TICVAI executes, monitors, manages, troubleshoots, analyzes, and optimizes those workflows across the entire platform.",
-  "purposeNote": "Only tested, approved and version-controlled rules/workflows can become active, with complete auditability and controlled rollback/suspension capability. Board 1 — Final Screen Register",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Publish Now, Schedule. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Publish Now, Schedule, Selected Tenant, Selected Venue, Selected Brand. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 19 §Support"
    }
   ],
@@ -1660,9 +1688,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "dataTable",
        "label": "Every versioning governance approval",
-       "columns": [
-        "VersioningGovernanceApprovalPublicationView.v11V20"
-       ],
        "bindsTo": "VersioningGovernanceApprovalPublicationView",
        "operation": "approveVersioningGovernance",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 19 §Show"
@@ -1677,9 +1702,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "detailPanel",
        "label": "The selected versioning governance approval",
        "bindsTo": "VersioningGovernanceApprovalPublicationView",
-       "columns": [
-        "VersioningGovernanceApprovalPublicationView.v11V20"
-       ],
        "notes": "The pack groups this record's detail under its own headings: “Refund Approval”, “Highlight changes to”, “Draft”, “Rollback”, “Kill Switch”, “Record”.",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 19 §Show"
       }
@@ -1698,6 +1720,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "secondaryButton",
        "label": "Schedule",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 19 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected Tenant",
+       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 19 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected Venue",
+       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 19 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected Brand",
+       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 19 §Support"
       }
      ]
     }
@@ -1715,23 +1752,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "approveVersioningGovernance",
     "contract": "approvals",
     "purpose": "Versioning, Governance, Approval & Publication",
-    "trigger": "onAction",
-    "invalidates": [
-     "approveVersioningGovernance"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
-   "preloaded": [
-    "VersioningGovernanceApprovalPublicationView.v11V20"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-247"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-247",
+   "workshopBoard": "wireframes/WS136 Rules  Workflow  Approval   Automation Engine Board 1.dc.html#adm-247"
   },
-  "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 19. 1 of 1 labels bound to a contract property; 12 of 103 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 19. 1 of 1 labels bound to a contract property; 15 of 103 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1765,44 +1798,80 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
- "approveMatrixMultiLevel": {
-  "method": "PUT",
-  "path": "/matrix-multi-level",
-  "contract": "approvals",
-  "summary": "Approval Matrix & Multi-Level Approval Configuration",
-  "permission": "APPROVAL_REQUEST",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": "ApprovalMatrixMultiLevelApprovalConfigurationInput",
-  "responds": "ApprovalMatrixMultiLevelApprovalConfigurationView"
- },
- "approveRoleAuthorityDelegation": {
-  "method": "PUT",
-  "path": "/role-authority-delegation",
-  "contract": "approvals",
-  "summary": "Roles, Authority, Delegation & Approval Limits",
-  "permission": "APPROVAL_REQUEST",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": "RolesAuthorityDelegationApprovalLimitsInput",
-  "responds": "RolesAuthorityDelegationApprovalLimitsView"
- },
  "approveVersioningGovernance": {
   "method": "PUT",
   "path": "/versioning-governance",
   "contract": "approvals",
   "summary": "Versioning, Governance, Approval & Publication",
-  "permission": "APPROVAL_REQUEST",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VersioningGovernanceApprovalPublicationInput",
+  "responds": "VersioningGovernanceApprovalPublicationView"
+ },
+ "createApprovalDelegation": {
+  "method": "POST",
+  "path": "/delegations",
+  "contract": "approvals",
+  "summary": "Delegate approval authority",
+  "permission": "APPROVAL_DECIDE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApprovalDelegation",
+  "responds": "ApprovalDelegation"
+ },
+ "listApprovalDelegations": {
+  "method": "GET",
+  "path": "/delegations",
+  "contract": "approvals",
+  "summary": "Who is standing in for whom",
+  "permission": "APPROVAL_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [],
-  "requestBody": "VersioningGovernanceApprovalPublicationInput",
-  "responds": "VersioningGovernanceApprovalPublicationView"
+  "requestBody": null,
+  "responds": "ApprovalDelegation"
+ },
+ "listApprovalMatrices": {
+  "method": "GET",
+  "path": "/approval-matrices",
+  "contract": "approvals",
+  "summary": "What requires approval here",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "effective",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalMatrix"
  },
  "listConditionDecisionLogic": {
   "method": "GET",
@@ -1826,9 +1895,35 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "type",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "sourceModule",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "RulesWorkflowCommandCenterView"
+  "responds": "Page"
  },
  "listSlaEscalationReminder": {
   "method": "GET",
@@ -1843,16 +1938,41 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "SlaEscalationReminderTimeoutRulesView"
  },
+ "setApprovalMatrix": {
+  "method": "PUT",
+  "path": "/approval-matrices",
+  "contract": "approvals",
+  "summary": "Configure what requires approval",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApprovalMatrix",
+  "responds": "ApprovalMatrix"
+ },
  "setTriggerActionCross": {
   "method": "PUT",
   "path": "/trigger-action-cross",
   "contract": "approvals",
   "summary": "Trigger, Action & Cross-Module Orchestration Configuration",
-  "permission": "APPROVAL_REQUEST",
+  "permission": "APPROVAL_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "TriggerActionCrossModuleOrchestrationConfigurationInput",
   "responds": "TriggerActionCrossModuleOrchestrationConfigurationView"
  },
@@ -1861,11 +1981,17 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/visual-business-rule",
   "contract": "approvals",
   "summary": "Visual Business Rule Builder",
-  "permission": "APPROVAL_REQUEST",
+  "permission": "APPROVAL_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "VisualBusinessRuleBuilderInput",
   "responds": "VisualBusinessRuleBuilderView"
  },
@@ -1874,11 +2000,17 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/visual-workflow",
   "contract": "approvals",
   "summary": "Visual Workflow Designer",
-  "permission": "APPROVAL_REQUEST",
+  "permission": "APPROVAL_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "VisualWorkflowDesignerInput",
   "responds": "VisualWorkflowDesignerView"
  },
@@ -1887,11 +2019,17 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/workflow-testing-impact",
   "contract": "approvals",
   "summary": "Workflow Testing, Simulation & Impact Analysis",
-  "permission": "APPROVAL_REQUEST",
+  "permission": "APPROVAL_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "WorkflowTestingSimulationImpactAnalysisInput",
   "responds": "WorkflowTestingSimulationImpactAnalysisView"
  }
@@ -1904,543 +2042,390 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
- "ApprovalMatrixMultiLevelApprovalConfigurationInput": {
+ "ApprovalDelegation": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is approvals.request at 3%, so this is not an update to anything the package stores today and no new table has been decided",
-  "description": "**What Approval Matrix & Multi-Level Approval Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "x-ticvai-persistence": "approvals.delegation",
+  "required": [
+   "delegatorPrincipalId",
+   "delegatePrincipalId",
+   "from",
+   "to"
+  ],
   "properties": {
-   "singleApproval": {
+   "id": {
     "type": "string",
-    "description": "Single Approval"
+    "format": "uuid",
+    "readOnly": true
    },
-   "sequentialApproval": {
+   "delegatorPrincipalId": {
     "type": "string",
-    "description": "Sequential Approval"
+    "format": "uuid",
+    "description": "A principal id (`identity.Principal.id`). This contract stores the id only; the name to show, and the people to pick from, come from `identity.listPrincipals` and `identity.getPrincipal`.\n"
    },
-   "parallelApproval": {
+   "delegatePrincipalId": {
     "type": "string",
-    "description": "Parallel Approval"
+    "format": "uuid",
+    "description": "A principal id, resolved to a name the same way as `delegatorPrincipalId`."
    },
-   "anyOneApproval": {
+   "kinds": {
+    "type": "array",
+    "description": "Absent means everything the delegator may approve.",
+    "items": {
+     "$ref": "#/components/schemas/ApprovalKind"
+    }
+   },
+   "maxAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "A delegate may be given less authority than the delegator, never more."
+   },
+   "from": {
     "type": "string",
-    "description": "Any-One Approval"
+    "format": "date-time"
    },
-   "conditionalApproval": {
+   "to": {
     "type": "string",
-    "description": "Conditional Approval"
+    "format": "date-time",
+    "description": "**Required.** An open-ended delegation is an approver who quietly stopped approving and a delegate who does not know they still hold it.\n"
    },
-   "multiLevelApproval": {
+   "reason": {
+    "type": "string"
+   },
+   "isActive": {
+    "type": "boolean",
+    "readOnly": true
+   },
+   "scopePath": {
     "type": "string",
-    "description": "Multi-Level Approval"
-   },
-   "exampleDiscount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Example — Discount"
-   },
-   "commercialDirectorCfo": {
-    "type": "string",
-    "description": "Commercial Director + CFO"
-   },
-   "exampleProcurement": {
-    "type": "string",
-    "description": "Example — Procurement"
-   },
-   "aed10k50k": {
-    "type": "string",
-    "description": "AED 10K–50K"
-   },
-   "departmentHeadFinance": {
-    "type": "string",
-    "description": "Department Head → Finance"
-   },
-   "aed50k100k": {
-    "type": "string",
-    "description": "AED 50K–100K"
-   },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Amount"
-   },
-   "percentage": {
-    "type": "number",
-    "description": "Percentage"
-   },
-   "module": {
-    "type": "string",
-    "description": "Module"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "department": {
-    "type": "string",
-    "description": "Department"
-   },
-   "customerType": {
-    "type": "string",
-    "description": "Customer Type"
-   },
-   "risk": {
-    "type": "string",
-    "description": "Risk"
-   },
-   "exceptionType": {
-    "type": "string",
-    "description": "Exception Type"
-   },
-   "legalEntity": {
-    "type": "string",
-    "description": "Legal Entity"
-   },
-   "sequentialParallel": {
-    "type": "string",
-    "description": "Sequential/Parallel"
-   },
-   "minimumApprovals": {
-    "type": "string",
-    "description": "Minimum Approvals"
-   },
-   "rejectionBehavior": {
-    "type": "string",
-    "description": "Rejection Behavior"
-   },
-   "requestChanges": {
-    "type": "string",
-    "description": "Request Changes"
-   },
-   "delegate": {
-    "type": "string",
-    "description": "Delegate"
-   },
-   "reassign": {
-    "type": "string",
-    "description": "Reassign"
-   },
-   "skipConditions": {
-    "type": "string",
-    "description": "Skip Conditions"
-   },
-   "approveAed18000": {
-    "type": "string",
-    "description": "“Approve AED 18,000?”"
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
    }
   }
  },
- "ApprovalMatrixMultiLevelApprovalConfigurationView": {
+ "ApprovalKind": {
+  "type": "string",
+  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n",
+  "enum": [
+   "refund",
+   "priceOverride",
+   "discountOverride",
+   "complimentaryTicket",
+   "membershipCancellation",
+   "accessPermissionChange",
+   "configurationChange",
+   "aiRecommendation",
+   "releasePromotion",
+   "requisition",
+   "stockWriteOff",
+   "journalEntry",
+   "periodClose",
+   "periodReopen",
+   "purchaseOrderCancel",
+   "purchaseOrderShortClose",
+   "tenantMigration",
+   "productChange",
+   "pricingChange"
+  ]
+ },
+ "ApprovalMatrix": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over approvals state, assembled at read time from tables that already exist",
-  "description": "**What Approval Matrix & Multi-Level Approval Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "approvals.matrix",
+  "required": [
+   "kind",
+   "scopeLevel",
+   "rules"
+  ],
   "properties": {
-   "singleApproval": {
+   "id": {
     "type": "string",
-    "description": "Single Approval"
+    "format": "uuid",
+    "readOnly": true
    },
-   "sequentialApproval": {
+   "kind": {
+    "$ref": "#/components/schemas/ApprovalKind"
+   },
+   "scopeLevel": {
     "type": "string",
-    "description": "Sequential Approval"
+    "enum": [
+     "tenant",
+     "region",
+     "venue"
+    ]
    },
-   "parallelApproval": {
+   "scopePath": {
     "type": "string",
-    "description": "Parallel Approval"
+    "readOnly": true
    },
-   "anyOneApproval": {
+   "version": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "11.1.80. **A request is decided by the rules it was raised under.** Changing the matrix mid-flight would mean an approver answering a question that changed while they read it.\n**(`kind`, `scopePath`, `version`) is unique**, and a stored version is never edited: a request's `matrixVersion` names exactly one rule set (decided 28 September, audit R129 (2)).\n"
+   },
+   "rules": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ApprovalRule"
+    }
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ApprovalRule": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.rule",
+  "required": [
+   "order",
+   "approverRoleIds",
+   "mode"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "Any-One Approval"
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
    },
-   "conditionalApproval": {
-    "type": "string",
-    "description": "Conditional Approval"
+   "order": {
+    "type": "integer",
+    "description": "**First match wins.** Explicit ordering is what makes a matrix reviewable — an unordered set of overlapping rules is one nobody can reason about.\n"
    },
-   "multiLevelApproval": {
-    "type": "string",
-    "description": "Multi-Level Approval"
+   "minAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
-   "exampleDiscount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Example — Discount"
+   "maxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
-   "noApproval": {
-    "type": "string",
-    "description": "No Approval (the pack shows 10.01–15%)"
-   },
-   "salesManager": {
-    "type": "string",
-    "description": "Sales Manager (the pack shows 15.01–20%)"
-   },
-   "commercialDirectorCfo": {
-    "type": "string",
-    "description": "Commercial Director + CFO"
-   },
-   "exampleProcurement": {
-    "type": "string",
-    "description": "Example — Procurement"
-   },
-   "aed10k50k": {
-    "type": "string",
-    "description": "AED 10K–50K"
-   },
-   "departmentHeadFinance": {
-    "type": "string",
-    "description": "Department Head → Finance"
-   },
-   "aed50k100k": {
-    "type": "string",
-    "description": "AED 50K–100K"
-   },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Amount"
-   },
-   "percentage": {
+   "riskScoreAbove": {
     "type": "number",
-    "description": "Percentage"
+    "nullable": true,
+    "description": "11.1.12. **Not matched against the AI risk score** (29 September, build pass, group G2). The AI assessment on a request (`ApprovalRequest.aiAssessment`, from `ai.scoreApprovalRequest`) is context for the reviewer only (MoM 8 September: AI never influences approve or reject), and routing a request to more approvers because of it would be influence. A rule with this set matches only a `riskScore` the requesting contract passes in `attributes` from its own deterministic rules (a payment's rule score, for example). Using the AI score here needs the client to say so.\n"
    },
-   "module": {
+   "condition": {
     "type": "string",
-    "description": "Module"
+    "nullable": true,
+    "description": "11.1.13. Evaluated against the attributes the caller supplied.\n\n**No condition language is defined yet** (pull audit R104, 26 September): the grammar, the attributes it may name and how two conditions are compared for `unreachableRule` are an open decision, not something to infer from this field.\n"
    },
-   "product": {
-    "type": "string",
-    "description": "Product"
+   "approverRoleIds": {
+    "type": "array",
+    "minItems": 1,
+    "description": "Role ids from `identity.listRoles` (`Role.id`), which is where an editor gets the names to show and pick from. This contract stores the ids only.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
    },
-   "venue": {
+   "approverScopeLevel": {
     "type": "string",
-    "description": "Venue"
+    "enum": [
+     "venue",
+     "department",
+     "region",
+     "tenant"
+    ],
+    "description": "11.1.39. Which organisational level the approver must sit at."
    },
-   "department": {
-    "type": "string",
-    "description": "Department"
+   "mode": {
+    "$ref": "#/components/schemas/ApprovalMode"
    },
-   "customerType": {
-    "type": "string",
-    "description": "Customer Type"
+   "levels": {
+    "type": "integer",
+    "default": 1,
+    "description": "11.1.3. Multi-level chains ask each level in turn."
    },
-   "risk": {
-    "type": "string",
-    "description": "Risk"
+   "requiresMfa": {
+    "type": "boolean",
+    "default": false
    },
-   "exceptionType": {
-    "type": "string",
-    "description": "Exception Type"
+   "requiresSignature": {
+    "type": "boolean",
+    "default": false
    },
-   "legalEntity": {
-    "type": "string",
-    "description": "Legal Entity"
+   "slaMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "11.1.14. Null means no SLA, which is different from a long one."
    },
-   "sequentialParallel": {
-    "type": "string",
-    "description": "Sequential/Parallel"
+   "escalateAfterMinutes": {
+    "type": "integer",
+    "nullable": true
    },
-   "minimumApprovals": {
-    "type": "string",
-    "description": "Minimum Approvals"
+   "escalateToRoleIds": {
+    "type": "array",
+    "description": "Role ids from `identity.listRoles`, as `approverRoleIds`.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
    },
-   "rejectionBehavior": {
-    "type": "string",
-    "description": "Rejection Behavior"
+   "expiresAfterMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "11.1.53. An unanswered request eventually stops waiting."
    },
-   "requestChanges": {
+   "externalProviderId": {
     "type": "string",
-    "description": "Request Changes"
-   },
-   "delegate": {
-    "type": "string",
-    "description": "Delegate"
-   },
-   "reassign": {
-    "type": "string",
-    "description": "Reassign"
-   },
-   "skipConditions": {
-    "type": "string",
-    "description": "Skip Conditions"
-   },
-   "approveAed18000": {
-    "type": "string",
-    "description": "“Approve AED 18,000?”"
+    "format": "uuid",
+    "nullable": true,
+    "description": "11.1.65 (29 September). **This level is decided in an external workflow system** (`ApprovalExternalProvider`) rather than by a person in TICVAI. `approverRoleIds` stay required: they are who decides if the provider does not answer in time and its `onTimeout` is `fallBackToRoles`.\n"
    }
   }
  },
  "ConditionsDecisionLogicDecisionTablesView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over approvals state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over approvals.decision_table and decision_table_row (schema DecisionTable) (data model for the agreed operations, 29 September)",
   "description": "**What Conditions, Decision Logic & Decision Tables displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "anyCancelledAutoApprove": {
+   "name": {
     "type": "string",
-    "description": "Any Cancelled Auto Approve (the pack shows 250, AED 251–)"
+    "description": "Name"
    },
-   "aed251": {
+   "decisionTableId": {
     "type": "string",
-    "description": "AED 251–"
+    "description": "Decision table or condition set identifier"
    },
-   "manager": {
+   "resolutionStrategy": {
     "type": "string",
-    "description": "Manager +"
+    "enum": [
+     "priority",
+     "sequence",
+     "specificity"
+    ],
+    "description": "How to choose when multiple rules apply"
    },
-   "priority": {
+   "onMatch": {
     "type": "string",
-    "description": "Priority"
+    "enum": [
+     "stopProcessing",
+     "continueEvaluation"
+    ],
+    "description": "Whether evaluation stops at the first match"
    },
-   "sequence": {
-    "type": "string",
-    "description": "Sequence"
-   },
-   "specificity": {
-    "type": "string",
-    "description": "Specificity"
-   },
-   "stopProcessing": {
-    "type": "string",
-    "description": "Stop Processing"
-   },
-   "continueEvaluation": {
-    "type": "string",
-    "description": "Continue Evaluation"
-   },
-   "contradictoryRules": {
-    "type": "string",
-    "description": "Contradictory Rules"
-   },
-   "overlappingConditions": {
-    "type": "string",
-    "description": "Overlapping Conditions"
-   },
-   "unreachableOutcomes": {
-    "type": "string",
-    "description": "Unreachable Outcomes"
-   },
-   "circularLogic": {
-    "type": "string",
-    "description": "Circular Logic"
-   },
-   "missingOutcomes": {
-    "type": "string",
-    "description": "Missing Outcomes"
+   "conflicts": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "contradictoryRules",
+      "overlappingConditions",
+      "unreachableOutcomes",
+      "circularLogic",
+      "missingOutcomes"
+     ]
+    },
+    "description": "Conflicts detected in this decision logic (read-only)"
    }
-  }
+  },
+  "required": [
+   "decisionTableId",
+   "name"
+  ]
  },
- "RolesAuthorityDelegationApprovalLimitsInput": {
+ "Page": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is approvals.decision at 4%, so this is not an update to anything the package stores today and no new table has been decided",
-  "description": "**What Roles, Authority, Delegation & Approval Limits submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "required": [
+   "items",
+   "hasMore"
+  ],
   "properties": {
-   "user": {
-    "type": "string",
-    "description": "User"
+   "items": {
+    "type": "array",
+    "items": {}
    },
-   "role": {
-    "type": "string",
-    "description": "Role"
+   "nextCursor": {
+    "type": "string"
    },
-   "position": {
-    "type": "string",
-    "description": "Position"
-   },
-   "department": {
-    "type": "string",
-    "description": "Department"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "businessUnit": {
-    "type": "string",
-    "description": "Business Unit"
-   },
-   "legalEntity": {
-    "type": "string",
-    "description": "Legal Entity"
-   },
-   "region": {
-    "type": "string",
-    "description": "Region"
-   },
-   "delegator": {
-    "type": "string",
-    "description": "Delegator"
-   },
-   "delegate": {
-    "type": "string",
-    "description": "Delegate"
-   },
-   "scope": {
-    "type": "string",
-    "description": "Scope"
-   },
-   "start": {
-    "type": "string",
-    "description": "Start"
-   },
-   "end": {
-    "type": "string",
-    "description": "End"
-   },
-   "reason": {
-    "type": "string",
-    "description": "Reason"
-   },
-   "leave": {
-    "type": "string",
-    "description": "Leave"
-   },
-   "travel": {
-    "type": "string",
-    "description": "Travel"
-   },
-   "vacancy": {
-    "type": "string",
-    "description": "Vacancy"
-   },
-   "eventOperations": {
-    "type": "string",
-    "description": "Event operations"
-   },
-   "requesterCannotApproveOwnRequest": {
-    "type": "string",
-    "description": "Requester cannot approve own request"
-   },
-   "userActive": {
-    "type": "integer",
-    "description": "User active"
-   },
-   "requiredRole": {
-    "type": "string",
-    "description": "Required role"
-   },
-   "authorityAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Authority amount"
-   },
-   "businessScope": {
-    "type": "string",
-    "description": "Business scope"
-   },
-   "delegationValidity": {
-    "type": "string",
-    "description": "Delegation validity"
-   }
-  }
- },
- "RolesAuthorityDelegationApprovalLimitsView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over approvals state, assembled at read time from tables that already exist",
-  "description": "**What Roles, Authority, Delegation & Approval Limits displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "user": {
-    "type": "string",
-    "description": "User"
-   },
-   "role": {
-    "type": "string",
-    "description": "Role"
-   },
-   "position": {
-    "type": "string",
-    "description": "Position"
-   },
-   "department": {
-    "type": "string",
-    "description": "Department"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "businessUnit": {
-    "type": "string",
-    "description": "Business Unit"
-   },
-   "legalEntity": {
-    "type": "string",
-    "description": "Legal Entity"
-   },
-   "region": {
-    "type": "string",
-    "description": "Region"
-   },
-   "delegator": {
-    "type": "string",
-    "description": "Delegator"
-   },
-   "delegate": {
-    "type": "string",
-    "description": "Delegate"
-   },
-   "scope": {
-    "type": "string",
-    "description": "Scope"
-   },
-   "start": {
-    "type": "string",
-    "description": "Start"
-   },
-   "end": {
-    "type": "string",
-    "description": "End"
-   },
-   "reason": {
-    "type": "string",
-    "description": "Reason"
-   },
-   "leave": {
-    "type": "string",
-    "description": "Leave"
-   },
-   "travel": {
-    "type": "string",
-    "description": "Travel"
-   },
-   "vacancy": {
-    "type": "string",
-    "description": "Vacancy"
-   },
-   "eventOperations": {
-    "type": "string",
-    "description": "Event operations"
-   },
-   "requesterCannotApproveOwnRequest": {
-    "type": "string",
-    "description": "Requester cannot approve own request"
-   },
-   "userActive": {
-    "type": "integer",
-    "description": "User active"
-   },
-   "requiredRole": {
-    "type": "string",
-    "description": "Required role"
-   },
-   "authorityAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Authority amount"
-   },
-   "businessScope": {
-    "type": "string",
-    "description": "Business scope"
-   },
-   "delegationValidity": {
-    "type": "string",
-    "description": "Delegation validity"
+   "hasMore": {
+    "type": "boolean"
    }
   }
  },
  "RulesWorkflowCommandCenterView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over approvals state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over approvals.workflow_definition, workflow_version, business_rule, decision_table, automation, matrix and rule; one row per configuration (data model for the agreed operations, 29 September)",
   "description": "**What Rules & Workflow Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ruleWorkflowId": {
+    "type": "string",
+    "description": "Rule/Workflow ID"
+   },
+   "name": {
+    "type": "string",
+    "description": "Name"
+   },
+   "type": {
+    "type": "string",
+    "enum": [
+     "businessRule",
+     "approvalWorkflow",
+     "operationalWorkflow",
+     "decisionRule",
+     "validationRule",
+     "escalationRule",
+     "automation",
+     "crossModuleWorkflow"
+    ],
+    "description": "Kind of configuration"
+   },
+   "sourceModule": {
+    "type": "string",
+    "description": "Source Module"
+   },
+   "businessProcess": {
+    "type": "string",
+    "description": "Business Process"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "effectiveDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective Date"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "testing",
+     "review",
+     "pendingApproval",
+     "approved",
+     "scheduled",
+     "active",
+     "suspended",
+     "retired"
+    ],
+    "description": "Lifecycle status"
+   },
+   "lastModified": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last Modified"
+   },
+   "usage": {
+    "type": "string",
+    "description": "Usage"
+   }
+  },
+  "required": [
+   "ruleWorkflowId"
+  ]
+ },
+ "RulesWorkflowCommandCenterViewSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none - aggregate computed at read time over the rows the page lists",
+  "description": "The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).",
   "properties": {
    "activeRules": {
     "type": "integer",
@@ -2475,166 +2460,62 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Workflows With Warnings"
    },
    "recentlyModified": {
-    "type": "string",
-    "description": "Recently Modified"
+    "type": "integer",
+    "description": "Configurations modified in the recent period"
    },
    "modulesCovered": {
-    "type": "string",
-    "description": "Modules Covered"
-   },
-   "ruleWorkflowId": {
-    "type": "string",
-    "description": "Rule/Workflow ID"
-   },
-   "name": {
-    "type": "string",
-    "description": "Name"
-   },
-   "type": {
-    "type": "string",
-    "description": "Type"
-   },
-   "sourceModule": {
-    "type": "string",
-    "description": "Source Module"
-   },
-   "businessProcess": {
-    "type": "string",
-    "description": "Business Process"
-   },
-   "version": {
-    "type": "string",
-    "description": "Version"
-   },
-   "owner": {
-    "type": "string",
-    "description": "Owner"
-   },
-   "effectiveDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Effective Date"
-   },
-   "status": {
     "type": "integer",
-    "description": "Status"
-   },
-   "lastModified": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Last Modified"
-   },
-   "usage": {
-    "type": "string",
-    "description": "Usage"
-   },
-   "businessRule": {
-    "type": "string",
-    "description": "Business Rule"
-   },
-   "approvalWorkflow": {
-    "type": "string",
-    "description": "Approval Workflow"
-   },
-   "operationalWorkflow": {
-    "type": "string",
-    "description": "Operational Workflow"
-   },
-   "decisionRule": {
-    "type": "string",
-    "description": "Decision Rule"
-   },
-   "validationRule": {
-    "type": "string",
-    "description": "Validation Rule"
-   },
-   "escalationRule": {
-    "type": "string",
-    "description": "Escalation Rule"
-   },
-   "automation": {
-    "type": "string",
-    "description": "Automation"
-   },
-   "crossModuleWorkflow": {
-    "type": "string",
-    "description": "Cross-Module Workflow"
-   },
-   "suspendedRetired": {
-    "type": "string",
-    "description": "Suspended → Retired"
+    "description": "Number of modules using configured rules and workflows"
    }
   }
  },
  "SlaEscalationReminderTimeoutRulesView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over approvals state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over approvals.sla_policy (schema ApprovalSlaPolicy), including its reminder-percentage columns (data model for the agreed operations, 29 September)",
   "description": "**What SLA, Escalation, Reminder & Timeout Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "responseSla": {
+   "code": {
     "type": "string",
-    "description": "Response SLA"
+    "description": "Policy code, the same key setApprovalSlaPolicy upserts by"
    },
-   "approvalSla": {
+   "slaType": {
     "type": "string",
-    "description": "Approval SLA"
+    "enum": [
+     "responseSla",
+     "approvalSla",
+     "taskSla",
+     "resolutionSla",
+     "systemActionTimeout"
+    ],
+    "description": "Which clock this policy governs"
    },
-   "taskSla": {
+   "calendarBasis": {
     "type": "string",
-    "description": "Task SLA"
+    "enum": [
+     "calendarHours",
+     "businessHours",
+     "workingDays",
+     "venueCalendar",
+     "holidayCalendar"
+    ],
+    "description": "How elapsed time is counted"
    },
-   "resolutionSla": {
-    "type": "string",
-    "description": "Resolution SLA"
-   },
-   "systemActionTimeout": {
-    "type": "string",
-    "description": "System Action Timeout"
-   },
-   "target4Hours": {
-    "type": "string",
-    "description": "Target: 4 hours"
-   },
-   "at50": {
-    "type": "number",
-    "description": "At 50%"
-   },
-   "at75": {
-    "type": "number",
-    "description": "At 75%"
-   },
-   "at100": {
-    "type": "number",
-    "description": "At 100%"
-   },
-   "calendarHours": {
-    "type": "string",
-    "description": "Calendar Hours"
-   },
-   "businessHours": {
-    "type": "string",
-    "description": "Business Hours"
-   },
-   "workingDays": {
-    "type": "string",
-    "description": "Working Days"
-   },
-   "venueCalendar": {
-    "type": "string",
-    "description": "Venue Calendar"
-   },
-   "holidayCalendar": {
-    "type": "string",
-    "description": "Holiday Calendar"
-   },
-   "reassign": {
-    "type": "string",
-    "description": "Reassign"
-   },
-   "raisePriority": {
-    "type": "string",
-    "description": "Raise Priority"
+   "escalationActions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "notify",
+      "reassign",
+      "escalate",
+      "addApprover",
+      "createTask",
+      "raisePriority",
+      "triggerBackupWorkflow"
+     ]
+    },
+    "description": "What happens on escalation"
    },
    "channelsType": {
     "type": "string",
@@ -2645,186 +2526,187 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "smsWhereAppropriate"
     ],
     "description": "Vocabulary listed under Reminder Channels."
+   },
+   "targetMinutes": {
+    "type": "integer",
+    "description": "SLA target in minutes"
+   },
+   "onBreach": {
+    "type": "string",
+    "enum": [
+     "notifyOnly",
+     "escalate",
+     "autoApprove",
+     "autoReject"
+    ],
+    "description": "Outcome at breach; auto outcomes only where explicitly permitted"
+   },
+   "autoActionAllowed": {
+    "type": "boolean",
+    "description": "Auto-approve or auto-reject on breach is explicitly permitted; default false"
+   },
+   "firstReminderAtPercent": {
+    "type": "integer",
+    "description": "Percent of target at which the first reminder goes"
+   },
+   "secondReminderAtPercent": {
+    "type": "integer",
+    "description": "Percent of target at which the second reminder goes"
+   },
+   "escalateAtPercent": {
+    "type": "integer",
+    "description": "Percent of target at which the request escalates"
    }
-  }
+  },
+  "required": [
+   "code"
+  ]
  },
  "TriggerActionCrossModuleOrchestrationConfigurationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; writes approvals.workflow_trigger (schema WorkflowTrigger) (data model for the agreed operations, 29 September)",
   "description": "**What Trigger, Action & Cross-Module Orchestration Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "authorizedUserStartsWorkflow": {
+   "triggerType": {
     "type": "string",
-    "description": "Authorized user starts workflow"
+    "enum": [
+     "event",
+     "dataCondition",
+     "schedule",
+     "manual"
+    ],
+    "description": "What starts the workflow"
    },
-   "executeRefund": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Execute Refund"
-   },
-   "callApprovedApi": {
+   "workflowId": {
     "type": "string",
-    "description": "Call Approved API"
+    "description": "Workflow this trigger and action set belongs to"
    },
-   "callApprovedService": {
-    "type": "string",
-    "description": "Call Approved Service"
+   "allowedActions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "createApproval",
+      "createTask",
+      "updateStatus",
+      "applyHold",
+      "releaseHold",
+      "createNotification",
+      "generateDocument",
+      "executeRefund",
+      "updateAllocation",
+      "activateMembership",
+      "suspendPartner",
+      "callApprovedApi",
+      "callApprovedService",
+      "startSubWorkflow"
+     ]
+    },
+    "description": "Actions this workflow may call"
    },
-   "startSubWorkflow": {
+   "onFailure": {
     "type": "string",
-    "description": "Start Sub-Workflow"
+    "enum": [
+     "retry",
+     "rollback",
+     "compensate",
+     "exceptionQueue",
+     "humanIntervention"
+    ],
+    "description": "What happens when an action fails"
    },
-   "workflowAuthority": {
+   "triggerDefinition": {
     "type": "string",
-    "description": "Workflow Authority"
+    "description": "Event name, data condition (e.g. Balance > Limit) or schedule"
    },
-   "userSystemAuthority": {
-    "type": "string",
-    "description": "User/System Authority"
-   },
-   "modulePolicy": {
-    "type": "string",
-    "description": "Module Policy"
-   },
-   "businessRule": {
-    "type": "string",
-    "description": "Business Rule"
-   },
-   "rollbackWhereSupported": {
-    "type": "string",
-    "description": "Rollback where supported"
-   },
-   "compensationAction": {
-    "type": "string",
-    "description": "Compensation Action"
-   },
-   "exceptionQueue": {
-    "type": "string",
-    "description": "Exception Queue"
-   },
-   "humanIntervention": {
-    "type": "string",
-    "description": "Human Intervention"
-   },
-   "refunds": {
-    "type": "string",
-    "description": "Refunds"
-   },
-   "orders": {
-    "type": "string",
-    "description": "Orders"
-   },
-   "payments": {
-    "type": "string",
-    "description": "Payments"
-   },
-   "approvals": {
-    "type": "string",
-    "description": "Approvals"
-   },
-   "tickets": {
-    "type": "string",
-    "description": "Tickets"
+   "maxRetries": {
+    "type": "integer",
+    "description": "Retries before the failure handling applies"
    }
-  }
+  },
+  "required": [
+   "workflowId",
+   "triggerType"
+  ]
  },
  "TriggerActionCrossModuleOrchestrationConfigurationView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over approvals state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over approvals.workflow_trigger (schema WorkflowTrigger) (data model for the agreed operations, 29 September)",
   "description": "**What Trigger, Action & Cross-Module Orchestration Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "authorizedUserStartsWorkflow": {
+   "triggerType": {
     "type": "string",
-    "description": "Authorized user starts workflow"
+    "enum": [
+     "event",
+     "dataCondition",
+     "schedule",
+     "manual"
+    ],
+    "description": "What starts the workflow"
    },
-   "executeRefund": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Execute Refund"
-   },
-   "callApprovedApi": {
+   "workflowId": {
     "type": "string",
-    "description": "Call Approved API"
+    "description": "Workflow this trigger and action set belongs to"
    },
-   "callApprovedService": {
-    "type": "string",
-    "description": "Call Approved Service"
+   "allowedActions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "createApproval",
+      "createTask",
+      "updateStatus",
+      "applyHold",
+      "releaseHold",
+      "createNotification",
+      "generateDocument",
+      "executeRefund",
+      "updateAllocation",
+      "activateMembership",
+      "suspendPartner",
+      "callApprovedApi",
+      "callApprovedService",
+      "startSubWorkflow"
+     ]
+    },
+    "description": "Actions this workflow may call"
    },
-   "startSubWorkflow": {
+   "onFailure": {
     "type": "string",
-    "description": "Start Sub-Workflow"
+    "enum": [
+     "retry",
+     "rollback",
+     "compensate",
+     "exceptionQueue",
+     "humanIntervention"
+    ],
+    "description": "What happens when an action fails"
    },
-   "workflowAuthority": {
+   "triggerDefinition": {
     "type": "string",
-    "description": "Workflow Authority"
+    "description": "Event name, data condition (e.g. Balance > Limit) or schedule"
    },
-   "userSystemAuthority": {
-    "type": "string",
-    "description": "User/System Authority"
-   },
-   "modulePolicy": {
-    "type": "string",
-    "description": "Module Policy"
-   },
-   "businessRule": {
-    "type": "string",
-    "description": "Business Rule"
-   },
-   "rollbackWhereSupported": {
-    "type": "string",
-    "description": "Rollback where supported"
-   },
-   "compensationAction": {
-    "type": "string",
-    "description": "Compensation Action"
-   },
-   "exceptionQueue": {
-    "type": "string",
-    "description": "Exception Queue"
-   },
-   "humanIntervention": {
-    "type": "string",
-    "description": "Human Intervention"
-   },
-   "refunds": {
-    "type": "string",
-    "description": "Refunds"
-   },
-   "orders": {
-    "type": "string",
-    "description": "Orders"
-   },
-   "payments": {
-    "type": "string",
-    "description": "Payments"
-   },
-   "approvals": {
-    "type": "string",
-    "description": "Approvals"
-   },
-   "tickets": {
-    "type": "string",
-    "description": "Tickets"
+   "maxRetries": {
+    "type": "integer",
+    "description": "Retries before the failure handling applies"
    }
-  }
+  },
+  "required": [
+   "workflowId",
+   "triggerType"
+  ]
  },
  "VersioningGovernanceApprovalPublicationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; writes approvals.workflow_version and raises an approvals.request for publication (data model for the agreed operations, 29 September)",
   "description": "**What Versioning, Governance, Approval & Publication submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "v10Retired": {
+   "workflowId": {
     "type": "string",
-    "description": "v1.0 — Retired"
-   },
-   "v11Active": {
-    "type": "integer",
-    "description": "v1.1 — Active"
-   },
-   "v20Draft": {
-    "type": "string",
-    "description": "v2.0 — Draft"
+    "description": "Rule or workflow the version belongs to"
    },
    "version": {
     "type": "string",
@@ -2861,60 +2743,38 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "approval": {
     "type": "string",
-    "description": "Approval"
+    "description": "Approval request id for this version"
    },
-   "conditions": {
-    "type": "string",
-    "description": "Conditions"
+   "changedAreas": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "conditions",
+      "thresholds",
+      "approvers",
+      "actions",
+      "sla",
+      "escalation",
+      "integrations"
+     ]
+    },
+    "description": "Areas that differ from the compared version (read-only)"
    },
-   "thresholds": {
+   "rolloutScope": {
     "type": "string",
-    "description": "Thresholds"
-   },
-   "approvers": {
-    "type": "string",
-    "description": "Approvers"
-   },
-   "actions": {
-    "type": "string",
-    "description": "Actions"
-   },
-   "sla": {
-    "type": "string",
-    "description": "SLA"
-   },
-   "escalation": {
-    "type": "string",
-    "description": "Escalation"
-   },
-   "integrations": {
-    "type": "string",
-    "description": "Integrations"
-   },
-   "selectedTenant": {
-    "type": "string",
-    "description": "Selected Tenant"
-   },
-   "selectedVenue": {
-    "type": "string",
-    "description": "Selected Venue"
-   },
-   "selectedBrand": {
-    "type": "string",
-    "description": "Selected Brand"
-   },
-   "controlledRollout": {
-    "type": "string",
-    "description": "Controlled Rollout"
-   },
-   "technicallySafe": {
-    "type": "string",
-    "description": "technically safe"
+    "enum": [
+     "allScopes",
+     "selectedTenant",
+     "selectedVenue",
+     "selectedBrand",
+     "controlledRollout"
+    ],
+    "description": "Where the version is published"
    },
    "whoCreated": {
     "type": "string",
-    "format": "date-time",
-    "description": "Who created"
+    "description": "User who created the version"
    },
    "whoChanged": {
     "type": "string",
@@ -2936,29 +2796,48 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "What changed"
    },
-   "businessTransaction": {
+   "lifecycleStatus": {
     "type": "string",
-    "description": "business transaction"
+    "enum": [
+     "draft",
+     "tested",
+     "businessReview",
+     "technicalValidation",
+     "approval",
+     "scheduled",
+     "active",
+     "suspended",
+     "retired"
+    ],
+    "description": "Version lifecycle status"
+   },
+   "scopeIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Tenant, venue or brand ids for a selected rollout"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Scheduled activation; absent means publish now"
    }
-  }
+  },
+  "required": [
+   "workflowId",
+   "version"
+  ]
  },
  "VersioningGovernanceApprovalPublicationView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over approvals state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over approvals.workflow_version (schema WorkflowVersion) (data model for the agreed operations, 29 September)",
   "description": "**What Versioning, Governance, Approval & Publication displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "v10Retired": {
+   "workflowId": {
     "type": "string",
-    "description": "v1.0 — Retired"
-   },
-   "v11Active": {
-    "type": "integer",
-    "description": "v1.1 — Active"
-   },
-   "v20Draft": {
-    "type": "string",
-    "description": "v2.0 — Draft"
+    "description": "Rule or workflow the version belongs to"
    },
    "version": {
     "type": "string",
@@ -2995,64 +2874,38 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "approval": {
     "type": "string",
-    "description": "Approval"
+    "description": "Approval request id for this version"
    },
-   "v11V20": {
-    "type": "string",
-    "description": "v1.1 ↔ v2.0"
+   "changedAreas": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "conditions",
+      "thresholds",
+      "approvers",
+      "actions",
+      "sla",
+      "escalation",
+      "integrations"
+     ]
+    },
+    "description": "Areas that differ from the compared version (read-only)"
    },
-   "conditions": {
+   "rolloutScope": {
     "type": "string",
-    "description": "Conditions"
-   },
-   "thresholds": {
-    "type": "string",
-    "description": "Thresholds"
-   },
-   "approvers": {
-    "type": "string",
-    "description": "Approvers"
-   },
-   "actions": {
-    "type": "string",
-    "description": "Actions"
-   },
-   "sla": {
-    "type": "string",
-    "description": "SLA"
-   },
-   "escalation": {
-    "type": "string",
-    "description": "Escalation"
-   },
-   "integrations": {
-    "type": "string",
-    "description": "Integrations"
-   },
-   "selectedTenant": {
-    "type": "string",
-    "description": "Selected Tenant"
-   },
-   "selectedVenue": {
-    "type": "string",
-    "description": "Selected Venue"
-   },
-   "selectedBrand": {
-    "type": "string",
-    "description": "Selected Brand"
-   },
-   "controlledRollout": {
-    "type": "string",
-    "description": "Controlled Rollout"
-   },
-   "technicallySafe": {
-    "type": "string",
-    "description": "technically safe"
+    "enum": [
+     "allScopes",
+     "selectedTenant",
+     "selectedVenue",
+     "selectedBrand",
+     "controlledRollout"
+    ],
+    "description": "Where the version is published"
    },
    "whoCreated": {
     "type": "string",
-    "format": "date-time",
-    "description": "Who created"
+    "description": "User who created the version"
    },
    "whoChanged": {
     "type": "string",
@@ -3074,157 +2927,205 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "What changed"
    },
-   "businessTransaction": {
+   "lifecycleStatus": {
     "type": "string",
-    "description": "business transaction"
+    "enum": [
+     "draft",
+     "tested",
+     "businessReview",
+     "technicalValidation",
+     "approval",
+     "scheduled",
+     "active",
+     "suspended",
+     "retired"
+    ],
+    "description": "Version lifecycle status"
+   },
+   "scopeIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Tenant, venue or brand ids for a selected rollout"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Scheduled activation; absent means publish now"
    }
-  }
+  },
+  "required": [
+   "workflowId",
+   "version"
+  ]
  },
  "VisualBusinessRuleBuilderInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; writes approvals.business_rule (schema BusinessRule) (data model for the agreed operations, 29 September)",
   "description": "**What Visual Business Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "equals": {
+   "outcome": {
     "type": "string",
-    "description": "Equals"
+    "enum": [
+     "allow",
+     "reject",
+     "requireApproval",
+     "requireAdditionalInformation",
+     "applyHold",
+     "createTask",
+     "generateAlert",
+     "startWorkflow",
+     "executeApprovedAction"
+    ],
+    "description": "THEN outcome when the conditions match"
    },
-   "notEquals": {
+   "businessObjectField": {
     "type": "string",
-    "description": "Not Equals"
+    "description": "Governed field from a registered module, e.g. Refund.Amount"
    },
-   "inList": {
+   "name": {
     "type": "string",
-    "description": "In List"
+    "description": "Rule name"
    },
-   "exists": {
+   "operator": {
     "type": "string",
-    "description": "Exists"
+    "enum": [
+     "equals",
+     "notEquals",
+     "greaterThan",
+     "lessThan",
+     "between",
+     "contains",
+     "inList",
+     "exists",
+     "doesNotExist",
+     "beforeAfter",
+     "percentageThreshold",
+     "boolean"
+    ],
+    "description": "Comparison operator of the condition"
    },
-   "doesNotExist": {
+   "ruleId": {
     "type": "string",
-    "description": "Does Not Exist"
+    "description": "Rule identifier; absent on input to create a new rule"
    },
-   "beforeAfter": {
+   "value": {
     "type": "string",
-    "description": "Before/After"
+    "description": "Comparison value"
    },
-   "percentageThreshold": {
-    "type": "integer",
-    "description": "Percentage Threshold"
-   },
-   "boolean": {
+   "explanation": {
     "type": "string",
-    "description": "Boolean"
-   },
-   "cancelled": {
-    "type": "integer",
-    "description": "cancelled"
+    "description": "Plain-language rule explanation"
    }
-  }
+  },
+  "required": [
+   "name",
+   "businessObjectField",
+   "operator",
+   "outcome"
+  ]
  },
  "VisualBusinessRuleBuilderView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over approvals state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over approvals.business_rule, the row setVisualBusinessRule writes (data model for the agreed operations, 29 September)",
   "description": "**What Visual Business Rule Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "equals": {
+   "outcome": {
     "type": "string",
-    "description": "Equals"
+    "enum": [
+     "allow",
+     "reject",
+     "requireApproval",
+     "requireAdditionalInformation",
+     "applyHold",
+     "createTask",
+     "generateAlert",
+     "startWorkflow",
+     "executeApprovedAction"
+    ],
+    "description": "THEN outcome when the conditions match"
    },
-   "notEquals": {
+   "businessObjectField": {
     "type": "string",
-    "description": "Not Equals"
+    "description": "Governed field from a registered module, e.g. Refund.Amount"
    },
-   "inList": {
+   "name": {
     "type": "string",
-    "description": "In List"
+    "description": "Rule name"
    },
-   "exists": {
+   "operator": {
     "type": "string",
-    "description": "Exists"
+    "enum": [
+     "equals",
+     "notEquals",
+     "greaterThan",
+     "lessThan",
+     "between",
+     "contains",
+     "inList",
+     "exists",
+     "doesNotExist",
+     "beforeAfter",
+     "percentageThreshold",
+     "boolean"
+    ],
+    "description": "Comparison operator of the condition"
    },
-   "doesNotExist": {
+   "ruleId": {
     "type": "string",
-    "description": "Does Not Exist"
+    "description": "Rule identifier; absent on input to create a new rule"
    },
-   "beforeAfter": {
+   "value": {
     "type": "string",
-    "description": "Before/After"
+    "description": "Comparison value"
    },
-   "percentageThreshold": {
-    "type": "integer",
-    "description": "Percentage Threshold"
-   },
-   "boolean": {
+   "explanation": {
     "type": "string",
-    "description": "Boolean"
-   },
-   "cancelled": {
-    "type": "integer",
-    "description": "cancelled"
+    "description": "Plain-language rule explanation"
    }
-  }
+  },
+  "required": [
+   "name",
+   "businessObjectField",
+   "operator",
+   "outcome"
+  ]
  },
  "VisualWorkflowDesignerInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is approvals.decision at 4%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; writes approvals.workflow_definition and a draft approvals.workflow_version (data model for the agreed operations, 29 September)",
   "description": "**What Visual Workflow Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "start": {
+   "definition": {
     "type": "string",
-    "description": "Start"
+    "description": "The workflow graph (nodes and connections) as a JSON document"
    },
-   "task": {
-    "type": "string",
-    "description": "Task"
-   },
-   "decision": {
-    "type": "string",
-    "description": "Decision"
-   },
-   "approval": {
-    "type": "string",
-    "description": "Approval"
-   },
-   "systemAction": {
-    "type": "string",
-    "description": "System Action"
-   },
-   "notification": {
-    "type": "string",
-    "description": "Notification"
-   },
-   "wait": {
-    "type": "string",
-    "description": "Wait"
-   },
-   "timer": {
-    "type": "string",
-    "description": "Timer"
-   },
-   "parallelBranch": {
-    "type": "string",
-    "description": "Parallel Branch"
-   },
-   "escalation": {
-    "type": "string",
-    "description": "Escalation"
-   },
-   "subWorkflow": {
-    "type": "string",
-    "description": "Sub-Workflow"
-   },
-   "end": {
-    "type": "string",
-    "description": "End"
-   },
-   "yesNo": {
-    "type": "string",
-    "description": "↙ YES ↘ NO"
+   "nodeTypes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "start",
+      "trigger",
+      "task",
+      "decision",
+      "approval",
+      "systemAction",
+      "notification",
+      "wait",
+      "timer",
+      "parallelBranch",
+      "merge",
+      "escalation",
+      "subWorkflow",
+      "end"
+     ]
+    },
+    "description": "Node kinds used in this workflow"
    },
    "workflowName": {
     "type": "string",
@@ -3250,89 +3151,76 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Priority"
    },
-   "effectiveDates": {
+   "effectiveFrom": {
     "type": "string",
     "description": "Effective Dates"
    },
-   "deadEnds": {
-    "type": "string",
-    "description": "Dead Ends"
+   "validationIssues": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "deadEnds",
+      "missingOutcomes",
+      "circularLoops",
+      "missingAssignee",
+      "invalidActions"
+     ]
+    },
+    "description": "Design problems the designer found (read-only)"
    },
-   "missingOutcomes": {
+   "workflowId": {
     "type": "string",
-    "description": "Missing Outcomes"
+    "description": "Workflow identifier; absent on input to create a new workflow"
    },
-   "circularLoops": {
+   "trigger": {
     "type": "string",
-    "description": "Circular Loops"
+    "description": "What starts the workflow"
    },
-   "missingAssignee": {
+   "effectiveTo": {
     "type": "string",
-    "description": "Missing Assignee"
-   },
-   "invalidActions": {
-    "type": "string",
-    "description": "Invalid Actions"
+    "format": "date-time",
+    "description": "Effective to"
    }
-  }
+  },
+  "required": [
+   "workflowName",
+   "module",
+   "definition"
+  ]
  },
  "VisualWorkflowDesignerView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over approvals state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over approvals.workflow_definition and its draft approvals.workflow_version (data model for the agreed operations, 29 September)",
   "description": "**What Visual Workflow Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "start": {
+   "definition": {
     "type": "string",
-    "description": "Start"
+    "description": "The workflow graph (nodes and connections) as a JSON document"
    },
-   "task": {
-    "type": "string",
-    "description": "Task"
-   },
-   "decision": {
-    "type": "string",
-    "description": "Decision"
-   },
-   "approval": {
-    "type": "string",
-    "description": "Approval"
-   },
-   "systemAction": {
-    "type": "string",
-    "description": "System Action"
-   },
-   "notification": {
-    "type": "string",
-    "description": "Notification"
-   },
-   "wait": {
-    "type": "string",
-    "description": "Wait"
-   },
-   "timer": {
-    "type": "string",
-    "description": "Timer"
-   },
-   "parallelBranch": {
-    "type": "string",
-    "description": "Parallel Branch"
-   },
-   "escalation": {
-    "type": "string",
-    "description": "Escalation"
-   },
-   "subWorkflow": {
-    "type": "string",
-    "description": "Sub-Workflow"
-   },
-   "end": {
-    "type": "string",
-    "description": "End"
-   },
-   "yesNo": {
-    "type": "string",
-    "description": "↙ YES ↘ NO"
+   "nodeTypes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "start",
+      "trigger",
+      "task",
+      "decision",
+      "approval",
+      "systemAction",
+      "notification",
+      "wait",
+      "timer",
+      "parallelBranch",
+      "merge",
+      "escalation",
+      "subWorkflow",
+      "end"
+     ]
+    },
+    "description": "Node kinds used in this workflow"
    },
    "workflowName": {
     "type": "string",
@@ -3358,124 +3246,120 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Priority"
    },
-   "effectiveDates": {
+   "effectiveFrom": {
     "type": "string",
     "description": "Effective Dates"
    },
-   "deadEnds": {
-    "type": "string",
-    "description": "Dead Ends"
+   "validationIssues": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "deadEnds",
+      "missingOutcomes",
+      "circularLoops",
+      "missingAssignee",
+      "invalidActions"
+     ]
+    },
+    "description": "Design problems the designer found (read-only)"
    },
-   "missingOutcomes": {
+   "workflowId": {
     "type": "string",
-    "description": "Missing Outcomes"
+    "description": "Workflow identifier; absent on input to create a new workflow"
    },
-   "circularLoops": {
+   "trigger": {
     "type": "string",
-    "description": "Circular Loops"
+    "description": "What starts the workflow"
    },
-   "missingAssignee": {
+   "effectiveTo": {
     "type": "string",
-    "description": "Missing Assignee"
-   },
-   "invalidActions": {
-    "type": "string",
-    "description": "Invalid Actions"
+    "format": "date-time",
+    "description": "Effective to"
    }
-  }
+  },
+  "required": [
+   "workflowName",
+   "module",
+   "definition"
+  ]
  },
  "WorkflowTestingSimulationImpactAnalysisInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; the outcome is recorded as approvals.workflow_version test results (data model for the agreed operations, 29 September)",
   "description": "**What Workflow Testing, Simulation & Impact Analysis submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "manualTestCase": {
+   "workflowId": {
     "type": "string",
-    "description": "Manual Test Case"
+    "description": "Workflow under test"
    },
-   "sampleTransaction": {
+   "testMode": {
     "type": "string",
-    "description": "Sample Transaction"
+    "enum": [
+     "manualTestCase",
+     "sampleTransaction",
+     "historicalReplay",
+     "scenarioSimulation",
+     "batchTest"
+    ],
+    "description": "How the workflow is tested"
    },
-   "historicalReplay": {
+   "version": {
     "type": "string",
-    "description": "Historical Replay"
+    "description": "Version under test"
    },
-   "scenarioSimulation": {
+   "compareWithVersion": {
     "type": "string",
-    "description": "Scenario Simulation"
+    "description": "Existing version to compare against for regression"
    },
-   "batchTest": {
+   "inputPayload": {
     "type": "string",
-    "description": "Batch Test"
+    "description": "Sample transaction as a JSON document, for manual and sample tests"
    },
-   "refundAed1500": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Refund: AED 1,500"
-   },
-   "customerGold": {
+   "replayFrom": {
     "type": "string",
-    "description": "Customer: Gold"
+    "format": "date",
+    "description": "Historical replay start"
    },
-   "eventActive": {
-    "type": "integer",
-    "description": "Event: Active"
-   },
-   "reasonCustomerRequest": {
+   "replayTo": {
     "type": "string",
-    "description": "Reason: Customer Request"
+    "format": "date",
+    "description": "Historical replay end"
    }
-  }
+  },
+  "required": [
+   "workflowId",
+   "testMode"
+  ]
  },
  "WorkflowTestingSimulationImpactAnalysisView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over approvals state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — computed by simulation over approvals.workflow_version and the rules it calls; never executes actions (data model for the agreed operations, 29 September)",
   "description": "**What Workflow Testing, Simulation & Impact Analysis displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "manualTestCase": {
+   "workflowId": {
     "type": "string",
-    "description": "Manual Test Case"
+    "description": "Workflow under test"
    },
-   "sampleTransaction": {
+   "testMode": {
     "type": "string",
-    "description": "Sample Transaction"
-   },
-   "historicalReplay": {
-    "type": "string",
-    "description": "Historical Replay"
-   },
-   "scenarioSimulation": {
-    "type": "string",
-    "description": "Scenario Simulation"
-   },
-   "batchTest": {
-    "type": "string",
-    "description": "Batch Test"
-   },
-   "refundAed1500": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Refund: AED 1,500"
-   },
-   "customerGold": {
-    "type": "string",
-    "description": "Customer: Gold"
-   },
-   "eventActive": {
-    "type": "integer",
-    "description": "Event: Active"
-   },
-   "reasonCustomerRequest": {
-    "type": "string",
-    "description": "Reason: Customer Request"
+    "enum": [
+     "manualTestCase",
+     "sampleTransaction",
+     "historicalReplay",
+     "scenarioSimulation",
+     "batchTest"
+    ],
+    "description": "How the workflow is tested"
    },
    "rulesEvaluated": {
-    "type": "string",
+    "type": "integer",
     "description": "Rules Evaluated"
    },
    "conditionsMatched": {
-    "type": "string",
+    "type": "integer",
     "description": "Conditions Matched"
    },
    "decisions": {
@@ -3501,8 +3385,34 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "expectedOutcome": {
     "type": "string",
     "description": "Expected Outcome"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version under test"
+   },
+   "compareWithVersion": {
+    "type": "string",
+    "description": "Existing version to compare against for regression"
+   },
+   "inputPayload": {
+    "type": "string",
+    "description": "Sample transaction as a JSON document, for manual and sample tests"
+   },
+   "replayFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Historical replay start"
+   },
+   "replayTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Historical replay end"
    }
-  }
+  },
+  "required": [
+   "workflowId",
+   "testMode"
+  ]
  }
 }
 ```

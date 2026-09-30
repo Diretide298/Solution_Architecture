@@ -1,12 +1,36 @@
 # ADR-0044: Which tables partition by venue
 
-**Status:** Accepted — signed off by Chinmay, 18 September 2026. **The full rule, not the six-table
+**Status:** Accepted · amended by [ADR-0056](0056-one-id-type-and-time-partitioning-before-the-first-migration.md), 30 September 2026: **venue partitioning is deferred, not cancelled.** Release 1 range-partitions the time-driven tables by month, and adds composite foreign keys only where `venue_id` already exists. Originally signed off by Chinmay, 18 September 2026. **The full rule, not the six-table
 subset**: `venue_id NOT NULL` implies `PARTITION BY LIST (venue_id)`, a leading `venue_id` in the
 primary key, and composite foreign keys into it. The 74 columns are in scope. `backend/tenant/930-partitioning.sql`
 is written against this.
 **Date:** 8 September 2026
-**Amends:** [ADR-0005](0005-venue-isolation-by-partitioning-not-separate-databases.md) — it decided *that* venues are isolated by list partitioning and never said which tables
+**Amends:** [ADR-0005](0005-venue-isolation-by-partitioning-not-separate-databases.md) (itself amended by ADR-0056) — it decided *that* venues are isolated by list partitioning and never said which tables
 **Depends on:** [ADR-0038](0038-cell-is-a-region-database-per-tenant.md), amended by ADR-0040 on instance count, which does not touch what a tenant database is — partitioning happens inside it, which ADR-0038 settled
+
+---
+
+## Amended 30 September 2026 by ADR-0056
+
+**Deferred, not cancelled.** The rule below is still the rule for when venue partitioning comes. What
+changed is when:
+
+- **Release 1 does not list-partition by venue.** `venue_id NOT NULL` stays where it is; the 74 extra
+  `venue_id` columns are not added now.
+- **Composite foreign keys are added now only where the child already carries `venue_id`** (25 tables);
+  the parent gains `UNIQUE (venue_id, id)`. That keeps most of this ADR's cross-venue guarantee.
+- **The tables that grow with time are range-partitioned by month first** (`access.scan_event`,
+  `platform.outbox`, `platform.dead_letter`, `platform.audit_record`, `ledger.journal_line`,
+  `marketing.message_dispatch`, and `kernel.inbox`).
+- **Why:** the growth is in time, not venues, and composite keys on 85 tables touch every query in 17
+  modules. Checked against the skills matrix, where PostgreSQL ratings top out at 3, that is the riskier
+  path for this team.
+- **Revisit trigger:** a tenant with more than 100 venues, or one venue that needs its own vacuum or
+  archive. Each tenant has its own database, so the later move is a table rewrite in one tenant's
+  maintenance window.
+
+The status line's reference to `930-partitioning.sql` is out of date until the DDL is regenerated
+under ADR-0056.
 
 ---
 

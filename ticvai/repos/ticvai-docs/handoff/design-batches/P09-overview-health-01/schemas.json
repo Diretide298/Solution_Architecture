@@ -1,7 +1,234 @@
 {
+ "AiActionPlanDetail": {
+  "type": "object",
+  "x-ticvai-persistence": "none — ai.action_plan with its ai.action_step rows",
+  "description": "A plan with its steps in DAG order.",
+  "required": [
+   "plan",
+   "steps"
+  ],
+  "properties": {
+   "plan": {
+    "$ref": "#/components/schemas/AiActionPlan"
+   },
+   "steps": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiActionStep"
+    }
+   }
+  }
+ },
+ "AiDecisionRecord": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.decision_record",
+  "description": "**The standard record for every governed decision** (design 3.9, C12; AIC-193..209): a recommendation summary, a risk assessment, a forecast publication, a plan step, an assistant answer at significant depth, a governance block, a Help me choose suggestion. **Append-only; corrections are annotations; hash-chained per tenant** so tampering is detectable (AIC-203, AIC-204). **AI log database** (design 2.4): append-only, partitioned by month, one Postgres database per tenant on the regional AI log server. The table name stays `ai.<table>`; which server holds it is a deployment matter, not a contract one.",
+  "required": [
+   "traceId",
+   "capabilityKey",
+   "outcome",
+   "recordHash"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "traceId": {
+    "type": "string"
+   },
+   "capabilityKey": {
+    "type": "string"
+   },
+   "task": {
+    "type": "string",
+    "nullable": true
+   },
+   "subjectKind": {
+    "type": "string",
+    "nullable": true
+   },
+   "subjectRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "inputsRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "Where the inputs are kept (Blob or `ai.activity`), never the prompt text itself."
+   },
+   "evidence": {
+    "$ref": "#/components/schemas/AiEvidenceItemList"
+   },
+   "producer": {
+    "type": "string",
+    "nullable": true
+   },
+   "modelVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "promptTemplateVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "featureSetVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "knowledgeVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "ruleVersions": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true
+   },
+   "governanceOutcome": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AiGovernanceOutcome"
+     }
+    ],
+    "nullable": true
+   },
+   "policyVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "approvals": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "Approval requests and their decisions."
+   },
+   "humanDecision": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "Override or intervention, where a person changed the outcome."
+   },
+   "executionResult": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true
+   },
+   "outcomeRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "The business outcome it links to (an order, a published version, a closed case)."
+   },
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "answered",
+     "refused",
+     "allowed",
+     "blocked",
+     "executed",
+     "failed",
+     "approvedThenFailed",
+     "published",
+     "suggested"
+    ],
+    "description": "`approvedThenFailed` is kept distinct from `executed` (design 1.2 Audit)."
+   },
+   "annotations": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "byPrincipalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "note": {
+       "type": "string"
+      }
+     }
+    },
+    "readOnly": true,
+    "description": "Corrections, appended; the original fields are never edited."
+   },
+   "previousHash": {
+    "type": "string",
+    "readOnly": true
+   },
+   "recordHash": {
+    "type": "string",
+    "readOnly": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiDecisionTrace": {
+  "type": "object",
+  "x-ticvai-persistence": "none — ai.decision_record with the rows it references",
+  "description": "**The full trace of one decision** (ADM-540..546): record, evidence, candidates and rules, model and runtime, governance and approvals, execution and business outcome. Depth is gated by permission (AIC-195).",
+  "required": [
+   "record"
+  ],
+  "properties": {
+   "record": {
+    "$ref": "#/components/schemas/AiDecisionRecord"
+   },
+   "depth": {
+    "type": "string",
+    "enum": [
+     "business",
+     "governance",
+     "technical"
+    ]
+   },
+   "explanation": {
+    "type": "string",
+    "description": "Built from structured evidence, never a model's chain of thought (AIC-192)."
+   },
+   "activity": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiInteraction"
+    },
+    "description": "The model calls behind it (`technical` depth)."
+   },
+   "plan": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AiActionPlanDetail"
+     }
+    ],
+    "nullable": true
+   },
+   "interventions": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiIntervention"
+    }
+   },
+   "chainVerified": {
+    "type": "boolean",
+    "description": "The hash chain around this record verifies."
+   }
+  }
+ },
  "AiInteraction": {
   "type": "object",
-  "x-ticvai-persistence": "ai.interaction",
+  "x-ticvai-persistence": "ai.activity",
   "required": [
    "id",
    "principalId",
@@ -55,10 +282,7 @@
     "type": "string"
    },
    "sources": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/AiSource"
-    }
+    "$ref": "#/components/schemas/AiSourceList"
    },
    "outcome": {
     "type": "string",
@@ -86,10 +310,14 @@
    "completionTokens": {
     "type": "integer"
    },
-   "costMinor": {
-    "type": "integer",
-    "description": "In the region's base currency",
-    "minor units": null
+   "cost": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "x-ticvai-column": "cost_amount",
+    "description": "What the call cost at the provider. **Money like every other amount** (naming-and-style 5.1) — it replaces an integer `costMinor` that carried no currency or scale, which AED and OMR read differently.\n"
    },
    "latencyMs": {
     "type": "integer"
@@ -101,9 +329,104 @@
    "traceId": {
     "type": "string"
    },
+   "decisionRecordId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `ai.decision_record` this call belongs to, where it was part of a governed decision (AI design 2.3, 3.9). Null for a call audited by this row alone."
+   },
+   "cacheLayer": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "guardrail",
+     "semantic",
+     "exact",
+     "negative",
+     "analytics"
+    ],
+    "description": "Which cache answered, where one did (AI design 3.6). Null for a model call."
+   },
    "createdAt": {
     "type": "string",
     "format": "date-time"
+   }
+  }
+ },
+ "AiIntervention": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.intervention",
+  "description": "**A person stepping in** (AIC-187, ADM-535, ADM-536): an override, pause, resume, stop, retry or rollback, with the original AI decision and the human one side by side.",
+  "required": [
+   "kind",
+   "targetKind",
+   "targetRef"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "override",
+     "pause",
+     "resume",
+     "cancel",
+     "retry",
+     "rollback",
+     "capabilityPause",
+     "capabilityResume"
+    ]
+   },
+   "targetKind": {
+    "type": "string",
+    "enum": [
+     "plan",
+     "step",
+     "decision",
+     "capability"
+    ]
+   },
+   "targetRef": {
+    "type": "string"
+   },
+   "decisionRecordId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "originalDecision": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true
+   },
+   "humanDecision": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 2000
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
    }
   }
  },
@@ -114,41 +437,18 @@
    "gemini",
    "anthropic",
    "azureOpenai",
-   "localLlm"
-  ]
+   "localLlm",
+   "openaiCompatible"
+  ],
+  "description": "`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n"
  },
- "AiSource": {
-  "type": "object",
-  "x-ticvai-persistence": "none — embedded in the interaction",
-  "description": "What the answer was grounded in (8.3.70). **An answer with no sources is a guess**, and the interface should show it as one.\n",
-  "properties": {
-   "kind": {
-    "type": "string",
-    "enum": [
-     "document",
-     "product",
-     "entitlement",
-     "report",
-     "record"
-    ]
-   },
-   "id": {
-    "type": "string"
-   },
-   "title": {
-    "type": "string"
-   },
-   "collectionId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "excerpt": {
-    "type": "string"
-   },
-   "relevance": {
-    "type": "number"
-   }
+ "AiSourceList": {
+  "type": "array",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "**The sources an answer was grounded in, stored with the answer** (8.3.70). One `jsonb` column on the row that carries it — `ai.message.sources` and `ai.activity.sources` — because the grounding audit reads the list as it was when the answer was given, and a source is never queried on its own.\n",
+  "items": {
+   "$ref": "#/components/schemas/AiSource"
   }
  },
  "Cell": {
@@ -184,7 +484,7 @@
    "isReachable": {
     "type": "boolean",
     "default": true,
-    "description": "False for `onPremise`. The Control Plane holds the record for licensing and support and **cannot reach the installation** — it may sit behind a firewall with no inbound route. Every operation assuming reachability must handle absence rather than timing out, and a cell that has not called home for a month is not necessarily broken.\n"
+    "description": "False for `onPremiseIsolated`, true for `onPremiseConnected` (ADR-0046). When false, the Control Plane holds the record for licensing and support and **cannot reach the installation** — it may sit behind a firewall with no inbound route. Every operation assuming reachability must handle absence rather than timing out, and a cell that has not called home for a month is not necessarily broken.\n"
    },
    "lastContactAt": {
     "type": "string",
@@ -201,7 +501,7 @@
    "participatesInCrossCell": {
     "type": "boolean",
     "default": true,
-    "description": "False by default for `onPremise`. Redeeming a pass issued elsewhere requires reaching the issuing cell at that moment, and an on-premise site may not be able to. Exclusion is the honest default; local-then-reconcile carries a double-redemption risk that needs a decision rather than an assumption.\n"
+    "description": "False by default for `onPremiseIsolated`, available for `onPremiseConnected` (ADR-0046). Redeeming a pass issued elsewhere requires reaching the issuing cell at that moment, and an on-premise site may not be able to. Exclusion is the honest default; local-then-reconcile carries a double-redemption risk that needs a decision rather than an assumption.\n"
    },
    "regionId": {
     "type": "string",
@@ -467,11 +767,12 @@
  },
  "CellKind": {
   "type": "string",
-  "description": "Four deployment models (ADR-0017). `shared` is the default; the others exist because a client asked or a law requires it.\n\n\n**`burst` added 31 August.** An environment stood up for one on-sale and torn down after (CF-162 scenario c). **It is not a jurisdiction and it is not permanent** — it holds a catalogue snapshot, three services of sixteen, and 17 tables of 380.\n\n**The other four are places data lives. This one is a place data passes through**, which is why it has its own lifecycle and a reconciliation obligation the others do not.",
+  "description": "Two deployment locations (ADR-0017, amended by ADR-0046). `shared` is the default; the others exist because a client asked or a law requires it.\n\n**On-premise is two configurations, not one (ADR-0046).** `onPremiseIsolated` keeps no channel to TICVAI — updates are pull-initiated or physically delivered, licensing is a signed file, support is blind. `onPremiseConnected` keeps an outbound control channel and is reachable, updatable and licensable in the ordinary way. The channel carries control traffic only and no natural person (ADR-0043); **AI inference is data, not control**, so connectivity alone does not grant the assistant.\n\nThere is no `hybrid`. The RFP's third model is answered by `onPremiseConnected`; a genuine split workload has never been asked for and would be a new decision.\n\n\n**`burst` added 31 August.** An environment stood up for one on-sale and torn down after (CF-162 scenario c). **It is not a jurisdiction and it is not permanent** — it holds a catalogue snapshot, three services of sixteen, and 17 tables of 380.\n\n**The other four are places data lives. This one is a place data passes through**, which is why it has its own lifecycle and a reconciliation obligation the others do not.",
   "enum": [
    "shared",
    "dedicated",
-   "onPremise",
+   "onPremiseIsolated",
+   "onPremiseConnected",
    "controlPlane",
    "burst"
   ]
@@ -519,7 +820,7 @@
    },
    "rightId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "ticketId": {
     "type": "string"
@@ -600,7 +901,8 @@
    "limit": {
     "type": "integer",
     "nullable": true,
-    "description": "Null means unlimited."
+    "x-ticvai-column": "limit_value",
+    "description": "Null means unlimited. Stored as `limit_value` — `limit` is a reserved word, and `subscription.tier_allowance` already names the same figure `limit_value`."
    },
    "overageAllowed": {
     "type": "boolean",
@@ -663,8 +965,16 @@
    }
   }
  },
+ "EnvironmentKind": {
+  "type": "string",
+  "enum": [
+   "dev",
+   "staging",
+   "production"
+  ]
+ },
  "LicencePosition": {
-  "x-ticvai-persistence": "none — union of plan and add-ons",
+  "x-ticvai-persistence": "none — union of the tenant's plan (control.tenant.plan_id -> subscription.plan_module, subscription.plan_limit) and its add-ons (control.licence_add_on, control.licence_add_on_limit by tenant_id)",
   "type": "object",
   "required": [
    "tenantId",
@@ -720,6 +1030,42 @@
    }
   }
  },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -753,7 +1099,7 @@
   "properties": {
    "rightId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "ticketId": {
     "type": "string"
@@ -797,7 +1143,7 @@
   "x-ticvai-persistence": "control.rollout",
   "required": [
    "id",
-   "reinventoryHoldId",
+   "releaseId",
    "environment",
    "status",
    "startedAt"
@@ -807,7 +1153,7 @@
     "type": "string",
     "format": "uuid"
    },
-   "reinventoryHoldId": {
+   "releaseId": {
     "type": "string",
     "format": "uuid"
    },
@@ -853,11 +1199,18 @@
  "RolloutCell": {
   "type": "object",
   "x-ticvai-persistence": "control.rollout_cell",
+  "description": "One cell's state within one rollout. **`rolloutId` is the row's parent**: a cell takes part in many rollouts over its life, and `skipRolloutCell` addresses `/rollouts/{rolloutId}/cells/{cellId}`, so a row keyed on the cell alone cannot say which run it belongs to or be found by that path.\n\nA migration run's per-cell rows are the same fields under a different parent, and use `MigrationRunCell`.\n",
   "required": [
+   "rolloutId",
    "cellId",
    "status"
   ],
   "properties": {
+   "rolloutId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The rollout this row belongs to (`control.rollout`)."
+   },
    "cellId": {
     "type": "string",
     "format": "uuid"
@@ -930,6 +1283,18 @@
      }
     }
    }
+  ]
+ },
+ "RolloutStatus": {
+  "type": "string",
+  "enum": [
+   "queued",
+   "canary",
+   "rolling",
+   "paused",
+   "complete",
+   "failed",
+   "rolledBack"
   ]
  },
  "SsoGroupMapping": {
@@ -1026,7 +1391,7 @@
   }
  },
  "Subscription": {
-  "x-ticvai-persistence": "control.subscription",
+  "x-ticvai-persistence": "subscription.contract",
   "type": "object",
   "required": [
    "tenantId",
@@ -1074,6 +1439,26 @@
     "format": "date",
     "nullable": true
    },
+   "scheduledChange": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "description": "A downgrade waiting for the next renewal (decided 28 September, audit R214 (1)). Null when none is scheduled.",
+    "properties": {
+     "planId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "planVersion": {
+      "type": "string"
+     },
+     "effectiveFrom": {
+      "type": "string",
+      "format": "date",
+      "description": "Always the `renewsAt` it was scheduled against."
+     }
+    }
+   },
    "currentPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
@@ -1081,6 +1466,15 @@
     "type": "string"
    }
   }
+ },
+ "SuspensionMode": {
+  "type": "string",
+  "description": "Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets.\n",
+  "enum": [
+   "readOnly",
+   "noNewSales",
+   "fullLockout"
+  ]
  },
  "Tenant": {
   "x-ticvai-persistence": "control.tenant",
@@ -1113,6 +1507,38 @@
     "type": "string",
     "nullable": true
    },
+   "suspensionEffectiveAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."
+   },
+   "suspensionNoticeMessage": {
+    "$ref": "#/components/schemas/LocalisedText",
+    "description": "The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."
+   },
+   "terminationScheduledAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When `terminateTenant` started the retention window. Null when no termination is under way."
+   },
+   "terminationRetentionUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."
+   },
+   "terminationReason": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "terminationRequestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
    "planId": {
     "type": "string",
     "format": "uuid",
@@ -1128,8 +1554,21 @@
    "venueCount": {
     "type": "integer"
    },
+   "regionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"
+   },
    "billingEmail": {
     "type": "string"
+   },
+   "billingAddress": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "description": "Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."
    },
    "accountManagerPrincipalId": {
     "type": "string",
@@ -1172,6 +1611,16 @@
    }
   ]
  },
+ "TenantStatus": {
+  "type": "string",
+  "enum": [
+   "onboarding",
+   "active",
+   "suspended",
+   "terminating",
+   "terminated"
+  ]
+ },
  "UsageMetric": {
   "type": "string",
   "enum": [
@@ -1186,5 +1635,52 @@
    "transactions",
    "guestProfiles"
   ]
+ },
+ "WalletAllocation": {
+  "x-ticvai-persistence": "platform.wallet_authorisation",
+  "type": "object",
+  "required": [
+   "guestLinkId",
+   "mode",
+   "availableAmount"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "guestLinkId": {
+    "type": "string"
+   },
+   "mode": {
+    "type": "string",
+    "enum": [
+     "none",
+     "fixed",
+     "percentageOfBalance"
+    ]
+   },
+   "allocatedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "drawnAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "availableAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "lastToppedUpAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "allocationCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "description": "**The allocation is denominated in the home currency.** A ceiling set in AED does not become a different ceiling because the guest walked into a Saudi venue — converting the limit as well as the spend is how a policy silently loosens when a rate moves."
+   }
+  }
  }
 }

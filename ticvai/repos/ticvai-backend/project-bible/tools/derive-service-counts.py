@@ -113,9 +113,11 @@ def main():
 
     total_ops = sum(ops_by_service.values())
     note = D.get("note") or ""
-    want = ("How %d contracts and %d tables become %d deployable services."
+    # **30 September (ADR-0055): the services are modules, deployed as five units.** The count of
+    # units is read from the file's own `deployables`, so the sentence cannot drift from the map.
+    want = ("How %d contracts and %d tables become %d modules, deployed as %d units."
             % (len({c for sv in services.values() for c in (sv.get("contracts") or [])}),
-               len(tables), len(services)))
+               len(tables), len(services), len(D.get("deployables") or {})))
     if not note.startswith(want):
         tail = note.split(".", 1)[1] if "." in note else ""
         D["note"] = want + tail

@@ -10,10 +10,10 @@
 | **Schemas** | 122 |
 | **States** | 42 |
 | **Events** | 47 |
-| **Tables** | 138 |
+| **Tables** | 137 |
 | **Screens** | 195 |
 | **Flows** | 11 |
-| **Documents** | 46 |
+| **Documents** | 55 |
 | **Open conflicts** | 1 |
 
 ## Reached outside the contract
@@ -58,7 +58,7 @@
 | **Every model call leaves an audit record** — 17 operations write an `ai.interaction` (8.3.55). | yes | tools/check-package.py — a model-calling operation with no interaction fails |
 | **Only governed operations outside the domain may write to it** — 2 operations in other contracts write an `ai.*` table: ['askReportingQuestion', 'saveNaturalLanguageQuery']. Each is a governance record, not a bypass. | yes | tools/check-package.py allowlist, stated in ADR-0020 |
 
-**Storage tiers** — `postgres` 123 · `postgres-analytical` 5 · `qdrant` 1 · `redis` 9
+**Storage tiers** — `postgres` 122 · `postgres-analytical` 5 · `qdrant` 1 · `redis` 9
 
 ## Operations
 
@@ -314,9 +314,9 @@
 
 ## Storage
 
-**`postgres`** — 123
+**`postgres`** — 122
 
-`ai.action_plan` · `ai.action_step` · `ai.anomaly_detector` · `ai.answer_feedback` · `ai.approval_request_score` · `ai.assistant_profile` · `ai.blueprint` · `ai.blueprint_decision` · `ai.byok_enablement` · `ai.capability` · `ai.capability_maturity` · `ai.case_action` · `ai.case_evidence` · `ai.chunk_embedding` · `ai.chunk_ref` · `ai.config_session` · `ai.config_source` · `ai.control` · `ai.control_test` · `ai.decision_record` · `ai.entity_risk` · `ai.eval_run` · `ai.eval_suite` · `ai.evidence_package` · `ai.forecast_accuracy` · `ai.forecast_definition` · `ai.forecast_export` · `ai.forecast_point` · `ai.forecast_scenario` · `ai.forecast_version` · `ai.governance_alert` · `ai.governance_policy` · `ai.governance_policy_version` · `ai.guided_choice_suggestion` · `ai.history_import` · `ai.history_observation` · `ai.incident` · `ai.index_entry` · `ai.index_failure` · `ai.index_job` · `ai.index_source` · `ai.insight` · `ai.intervention` · `ai.knowledge_collection` · `ai.knowledge_document` · `ai.knowledge_gap` · `ai.layout_draft` · `ai.model` · `ai.operational_requirement` · `ai.policy` · `ai.policy_exception` · `ai.prompt_template` · `ai.proposed_action` · `ai.provider` · `ai.rec_decision` · `ai.rec_decline` · `ai.rec_event` · `ai.release` · `ai.risk_alert` · `ai.risk_assessment` · `ai.risk_case` · `ai.risk_edge` · `ai.risk_register` · `ai.risk_strategy` · `ai.signal_source` · `ai.tool` · `ai.training_run` · `ai.venue_settings` · `approvals.request` · `approvals.sla_policy` · `assets.media_asset` · `catalogue.channel_capacity` · `catalogue.entitlement_template` · `catalogue.event` · `catalogue.performance` · `catalogue.price` · `catalogue.price_list` · `catalogue.product` · `catalogue.variant_dimension` · `control.content_block` · `fnb.menu_item` · `fnb.production_plan` · `inventory.movement` · `inventory.stock_batch` · `maintenance.inspection_template` · `marketing.attribution_touch` · `marketing.audience_list` · `marketing.campaign` · `marketing.case` · `marketing.consent_record` · `marketing.guest_profile` · `marketing.loyalty_position` · `marketing.loyalty_programme` · `marketing.message_template` · `marketing.message_template_version` · `marketing.segment` · `marketing.segment_criterion` · `orders.order_line` · `platform.region_settings` · `platform.scope` · `promotions.promotion` · `queue.queue` · `queue.reading` · `reporting.report_definition` · `retail.merchandise` · `seating.accessible` · `seating.seat` · `seating.seat_category` · `seating.seat_map` · `seating.seating_rules` · `seating.section` · `seating.zone` · `venuemap.import_job` · `venuemap.map` · `venuemap.point` · `venuemap.visit_plan` · `venuemap.visit_plan_item` · `whitelabel.banner` · `whitelabel.content_page` · `whitelabel.faq_entry` · `whitelabel.homepage_section` · `whitelabel.policy` · `whitelabel.promo_block`
+`ai.action_plan` · `ai.action_step` · `ai.anomaly_detector` · `ai.answer_feedback` · `ai.approval_request_score` · `ai.assistant_profile` · `ai.blueprint` · `ai.blueprint_decision` · `ai.byok_enablement` · `ai.capability` · `ai.capability_maturity` · `ai.case_action` · `ai.case_evidence` · `ai.chunk_embedding` · `ai.config_session` · `ai.config_source` · `ai.control` · `ai.control_test` · `ai.decision_record` · `ai.entity_risk` · `ai.eval_run` · `ai.eval_suite` · `ai.evidence_package` · `ai.forecast_accuracy` · `ai.forecast_definition` · `ai.forecast_export` · `ai.forecast_point` · `ai.forecast_scenario` · `ai.forecast_version` · `ai.governance_alert` · `ai.governance_policy` · `ai.governance_policy_version` · `ai.guided_choice_suggestion` · `ai.history_import` · `ai.history_observation` · `ai.incident` · `ai.index_entry` · `ai.index_failure` · `ai.index_job` · `ai.index_source` · `ai.insight` · `ai.intervention` · `ai.knowledge_collection` · `ai.knowledge_document` · `ai.knowledge_gap` · `ai.layout_draft` · `ai.model` · `ai.operational_requirement` · `ai.policy` · `ai.policy_exception` · `ai.prompt_template` · `ai.proposed_action` · `ai.provider` · `ai.rec_decision` · `ai.rec_decline` · `ai.rec_event` · `ai.release` · `ai.risk_alert` · `ai.risk_assessment` · `ai.risk_case` · `ai.risk_edge` · `ai.risk_register` · `ai.risk_strategy` · `ai.signal_source` · `ai.tool` · `ai.training_run` · `ai.venue_settings` · `approvals.request` · `approvals.sla_policy` · `assets.media_asset` · `catalogue.channel_capacity` · `catalogue.entitlement_template` · `catalogue.event` · `catalogue.performance` · `catalogue.price` · `catalogue.price_list` · `catalogue.product` · `catalogue.variant_dimension` · `control.content_block` · `fnb.menu_item` · `fnb.production_plan` · `inventory.movement` · `inventory.stock_batch` · `maintenance.inspection_template` · `marketing.attribution_touch` · `marketing.audience_list` · `marketing.campaign` · `marketing.case` · `marketing.consent_record` · `marketing.guest_profile` · `marketing.loyalty_position` · `marketing.loyalty_programme` · `marketing.message_template` · `marketing.message_template_version` · `marketing.segment` · `marketing.segment_criterion` · `orders.order_line` · `platform.region_settings` · `platform.scope` · `promotions.promotion` · `queue.queue` · `queue.reading` · `reporting.report_definition` · `retail.merchandise` · `seating.accessible` · `seating.seat` · `seating.seat_category` · `seating.seat_map` · `seating.seating_rules` · `seating.section` · `seating.zone` · `venuemap.import_job` · `venuemap.map` · `venuemap.point` · `venuemap.visit_plan` · `venuemap.visit_plan_item` · `whitelabel.banner` · `whitelabel.content_page` · `whitelabel.faq_entry` · `whitelabel.homepage_section` · `whitelabel.policy` · `whitelabel.promo_block`
 
 **`postgres-analytical`** — 5
 
@@ -596,6 +596,7 @@
 | [Deep audit — ten invariants, run adversarially](..\docs\active\deep-audit-24-august.md) |  | 3 |
 | [Deployment architecture — four configurations, costed on AWS and GCP](..\docs\active\deployment-configs-costed.md) |  | 7 |
 | [Design pack coverage: the 40 "undrafted" PDFs](..\docs\active\design-pack-coverage.md) |  | 11 |
+| [TICVAI development plan](..\docs\active\development-plan.md) |  | 1 |
 | [Audit — the 3 September dump, its checks, and what trickles down](..\docs\active\dump-audit-3-september.md) |  | 2 |
 | [Full-layer audit — 20 August](..\docs\active\full-layer-audit-20aug.md) |  | 3 |
 | [TICVAI — Hierarchy, Data Segregation and Services](..\docs\active\hierarchy-segregation-services.md) |  | 1 |
@@ -616,16 +617,24 @@
 | [Viewer — what changed in the package on 20 August](..\docs\active\viewer-update-brief-20aug.md) |  | 1 |
 | [Workshop pack — what was done, and how to re-verify it](..\docs\active\workshop-pack-log.md) |  | 3 |
 | [ADR-0007: Hybrid repository topology](..\docs\adr\0007-hybrid-repository-topology.md) | Accepted | 1 |
-| [ADR-0020 — Where AI runs, and what it is isolated from](..\docs\adr\0020-ai-isolation-boundary.md) | Proposed · 17 August 2026 | 20 |
-| [ADR-0021 — Qdrant: one collection per embedding model, tenant is the shard, scope is the filter](..\docs\adr\0021-qdrant-partitioning.md) | Proposed · 17 August 2026 | 4 |
+| [ADR-0020 — Where AI runs, and what it is isolated from](..\docs\adr\0020-ai-isolation-boundary.md) | Accepted · 30 September 2026 · Chinmay Parab — amended by [A | 20 |
+| [ADR-0021 — Qdrant: one collection per embedding model, tenant is the shard, scope is the filter](..\docs\adr\0021-qdrant-partitioning.md) | Accepted in part · amended by [ADR-0049](0049-vectors-live-i | 4 |
 | [ADR-0023 — Personal data lives apart from the append-only ledger](..\docs\adr\0023-pii-separation.md) | Accepted · 17 August 2026, recording a decision already impl | 2 |
-| [ADR-0028: Sixteen services, and the data boundary decides where they split](..\docs\adr\0028-service-decomposition.md) | Accepted. The data topology reopened by CF-161 on 24 August  | 1 |
-| [ADR-0033: Every asynchronous handoff has an outbox and a place to fail](..\docs\adr\0033-outbox-and-dead-letters.md) | Accepted | 3 |
+| [ADR-0028: Seventeen modules, and the data boundary decides where they split](..\docs\adr\0028-service-decomposition.md) | Accepted · amended by [ADR-0055](0055-a-modular-monolith-dep | 1 |
+| [ADR-0033: Every asynchronous handoff has an outbox and a place to fail](..\docs\adr\0033-outbox-and-dead-letters.md) | Accepted · amended by [ADR-0058](0058-one-relay-per-region-a | 3 |
 | [ADR-0034: The cheapest AI call is the one that never reaches a provider](..\docs\adr\0034-ai-retrieval-and-cost.md) | Accepted | 6 |
 | [ADR-0046: On-premise has two configurations, and the difference is a control channel](..\docs\adr\0046-on-premise-has-two-configurations.md) | Accepted | 1 |
 | [ADR-0047: How long data is kept, and where it goes next](..\docs\adr\0047-how-long-data-is-kept-and-where-it-goes-next.md) | Accepted — the RPO floor decided 21 September; one number pe | 2 |
+| [ADR-0049: Vectors live in Qdrant from day one, one collection per tenant, each with its own token](..\docs\adr\0049-vectors-live-in-qdrant-one-collection-per-tenant.md) | Accepted · 30 September 2026 · Chinmay Parab | 2 |
+| [ADR-0050: One autonomy scale; the approval tier is not an autonomy level](..\docs\adr\0050-one-autonomy-scale.md) | Accepted · 30 September 2026 · Chinmay Parab — records AI-D0 | 1 |
+| [ADR-0051: Every AI function ships on a baseline and learns per tenant; a model goes live only on evidence](..\docs\adr\0051-ai-ships-on-a-baseline-and-learns-per-tenant.md) | Accepted · 30 September 2026 · Chinmay Parab | 5 |
+| [ADR-0055: A modular monolith, deployed as five units](..\docs\adr\0055-a-modular-monolith-deployed-as-five-units.md) | Accepted · 30 September 2026 · Chinmay Parab | 1 |
+| [ADR-0057: Events travel on RabbitMQ or Kafka, behind one kernel interface](..\docs\adr\0057-events-travel-on-rabbitmq-or-kafka.md) | Proposed · waiting on the client's choice between RabbitMQ a | 1 |
+| [ADR-0058: One relay per region reads every tenant's outbox, and every consumer has an inbox](..\docs\adr\0058-one-relay-per-region-and-an-inbox-per-tenant-database.md) | Accepted · 30 September 2026 · Chinmay Parab | 1 |
+| [ADR-0059: AI phasing against the six-month plan](..\docs\adr\0059-ai-phasing-against-the-six-month-plan.md) | Accepted · 30 September 2026 · Chinmay Parab | 6 |
 | [AI provider credentials — where the key lives and who can reach it](..\docs\architecture\ai-credentials.md) |  | 3 |
 | [TICVAI AI subsystem: system design](..\docs\architecture\ai-system-design.md) |  | 162 |
+| [Data Model](..\docs\architecture\data-model.md) |  | 1 |
 | [Architecture](..\docs\architecture\README.md) |  | 1 |
 
 ## Conflicts

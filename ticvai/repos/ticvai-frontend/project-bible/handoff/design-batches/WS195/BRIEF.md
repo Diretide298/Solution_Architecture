@@ -1,6 +1,6 @@
 # WS195 — Wallet Configuration Backend Structure v1.0 board 10
 
-**10 screens · 19 operations · 19 schemas · 7 permissions**
+**10 screens · 21 operations · 23 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -64,7 +64,7 @@ convincingly. It is never a caption.
 | `BO-1174` | Wallet API Catalogue & Endpoint Configuration | configEditor | 1 | 0 | — |
 | `BO-1175` | Integration Profile & System Mapping | configEditor | 2 | 0 | — |
 | `BO-1176` | Wallet Events, Webhooks & Notification Orchestration | configEditor | 2 | 0 | — |
-| `BO-1177` | API Security, Access & Integration Permissions | configEditor | 2 | 0 | — |
+| `BO-1177` | API Security, Access & Integration Permissions | configEditor | 4 | 0 | — |
 | `BO-1178` | Synchronization, Retry & Resilience Configuration | configEditor | 1 | 0 | — |
 | `BO-1179` | Integration Monitoring & Exception Workbench | listDetail | 8 | 1 | — |
 | `BO-1180` | Wallet Configuration Governance & Version Control | listDetail | 1 | 0 | — |

@@ -391,14 +391,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Venue",
        "operation": "searchAiDecisions",
        "notes": "Sent as `venueId` (18 September minutes, M18-03: searchable by venue).",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       },
       {
        "kind": "searchField",
        "label": "Customer",
        "operation": "searchAiDecisions",
        "notes": "Sent as `subjectRef`, the guest profile id (M18-03: searchable by customer).",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     }

@@ -1,6 +1,6 @@
 # WS24 — Communication & Notification Platform Services board 1
 
-**10 screens · 10 operations · 12 schemas · 2 permissions**
+**10 screens · 11 operations · 19 schemas · 4 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `MARKETING_MANAGE, MARKETING_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `AI_USE, GUEST_VIEW, MARKETING_MANAGE, MARKETING_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -70,7 +69,7 @@ convincingly. It is never a caption.
 | `ADM-044` | Consent, Preference & Communication Policy Enforcement | listDetail | 1 | 0 | — |
 | `ADM-045` | Delivery Queue, Failure & Retry Management | listDetail | 1 | 0 | — |
 | `ADM-046` | Provider Health, Usage & Cost Monitoring | listDetail | 1 | 0 | — |
-| `ADM-047` | AI Delivery Optimization & Communication Platform Diagnostics | listDetail | 1 | 0 | — |
+| `ADM-047` | AI Delivery Optimization & Communication Platform Diagnostics | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch
 

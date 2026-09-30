@@ -1,6 +1,6 @@
 # WS22 — B2B, Reseller & OTA Partner Management board 2
 
-**10 screens · 10 operations · 14 schemas · 2 permissions**
+**10 screens · 14 operations · 23 schemas · 4 permissions**
 
 Platform P10 Partner Web · ships as **ticvai-control** ·
 partner audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `PLATFORM_CELL_MANAGE, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `CREDIT_MANAGE, PARTNER_MANAGE, PLATFORM_CELL_MANAGE, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `PTR-032` | Commercial Agreement Command Center | commandCentre | 1 | 0 | — |
+| `PTR-032` | Commercial Agreement Command Center | commandCentre | 2 | 0 | — |
 | `PTR-033` | Agreement & Contract Terms Builder | configEditor | 1 | 0 | — |
 | `PTR-034` | Partner Rate & Net Pricing Configuration | configEditor | 1 | 0 | — |
-| `PTR-035` | Commission, Margin & Incentive Management | listDetail | 1 | 0 | — |
-| `PTR-036` | Credit Limit & Exposure Management | configEditor | 1 | 0 | — |
-| `PTR-037` | Deposit, Guarantee & Financial Security Management | listDetail | 1 | 0 | — |
+| `PTR-035` | Commission, Margin & Incentive Management | listDetail | 2 | 1 | — |
+| `PTR-036` | Credit Limit & Exposure Management | configEditor | 2 | 1 | — |
+| `PTR-037` | Deposit, Guarantee & Financial Security Management | listDetail | 2 | 1 | — |
 | `PTR-038` | Payment Terms, Billing & Account Configuration | listDetail | 1 | 0 | — |
-| `PTR-039` | Commercial Allocation, Quota & Commitment Management | listDetail | 1 | 0 | — |
+| `PTR-039` | Commercial Allocation, Quota & Commitment Management | listDetail | 2 | 1 | — |
 | `PTR-040` | Booking Limits, Commercial Exceptions & Approval | configEditor | 1 | 0 | — |
 | `PTR-041` | Commercial Agreement 360°, Health & AI Review | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**PTR-035, PTR-037, PTR-038, PTR-041 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**PTR-035, PTR-041 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

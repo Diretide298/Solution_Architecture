@@ -74,6 +74,119 @@ NEW_QUESTIONS = [
      "cost?", "d",
      "Forecasts run on sales history, bookings on hand and the calendar (holidays, Ramadan) without weather "
      "until you approve.", "Your commercial team"),
+    # 30 September: the two client-side prerequisites that were tickets on our board, and the event broker.
+    # (The Qdrant approval question was withdrawn the same day: approved by Chinmay on condition it is hosted
+    # on UAE servers - ADR-0049.)
+    # "Why only you" may be a WHY code or the sentence itself.
+    ("Accounts and people", "Design sign-off",
+     "Name one design reviewer who signs off each wireframe batch within 3 working days.",
+     "A name only you can give",
+     "Front-end screens are accepted only after that sign-off (decided 28 September).", "Your product owner"),
+    ("Accounts and people", "Payment sandboxes",
+     "Send Stripe and Network International sandbox credentials, and name the finance or payments owner, by a "
+     "date we agree together.",
+     "Accounts only you hold",
+     "Checkout's declined, unknown and reconcile paths cannot be tested without a sandbox.",
+     "Your finance / payments owner"),
+    ("Infrastructure", "Cloud event broker",
+     "Which broker should carry the platform's events in the cloud: RabbitMQ or Kafka? We need your answer before "
+     "12 October (the second week of the first sprint), so that the first purchase can be proven end to end by "
+     "23 October. Why it matters: every sale reaches ticketing, the ledger and stock through this broker, so it must "
+     "keep each order's events in sequence, set aside messages that fail, and run in the UAE. Our recommendation "
+     "is RabbitMQ, ideally as a managed service in the Azure UAE North region if one is available there: it fits "
+     "this workload, it is simpler to run, and venues that run on their own premises use RabbitMQ anyway. Kafka "
+     "is the better choice only if you want to replay the history of events from the broker itself.",
+     "A platform and running cost you choose",
+     "Everything is built behind one interface and tested on RabbitMQ, so either answer works; only the cloud "
+     "setup waits for your choice.",
+     "Your IT / infrastructure owner"),
+    # 30 September: hardware and vendors the requirements need and the hardware list or the answers so far do not
+    # name. Found by checking TICVAI_Hardware_Integration v1.0.xlsx against the dependency register and R117.
+    ("Hardware", "POS terminal",
+     "Which POS terminal will the cashiers use: make, model and operating system (Windows, Android or iPad)? Your "
+     "hardware list names the receipt printer, cash drawer, customer display and scanner, but not the terminal.",
+     "A device only you buy",
+     "The POS is built as an app that works offline and drives the printer, drawer and display through standard "
+     "drivers. We assume a Windows touch terminal (the HP cash drawer, display and scanner on your list suggest an HP "
+     "POS system); the operating system decides how those devices are driven, so we need it before the first sprint ends.",
+     "Your operations / IT team"),
+    ("Hardware", "Kitchen display",
+     "Which kitchen display screens and kitchen printers will the kitchens use? Your hardware list says \"decide later\", "
+     "and the kitchen display is in the first release.",
+     "A device only you buy",
+     "The kitchen display is built as a browser screen that runs on any wall-mounted touch screen or tablet, with "
+     "kitchen tickets also printable on an Epson-compatible printer.",
+     "Your F&B / operations team"),
+    ("Hardware", "Card payment terminals",
+     "Which card payment terminals will the POS and the kiosks use, and from which provider (Stripe Terminal, "
+     "Network International, or another)? They are not on your hardware list.",
+     "A device and a merchant contract only you hold",
+     "Card payments at the POS go through the payment provider's terminal, paired to one POS; the POS never sees a "
+     "card number. Until you name the terminal, testing uses the provider's simulator.",
+     "Your finance / payments owner"),
+    ("Hardware", "NFC and RFID media",
+     "Which NFC readers (your list says \"China\") and which wristband and card chip type (for example MIFARE "
+     "DESFire) will be used at gates and for cashless payments, and which device encodes the wristbands?",
+     "A device only you buy",
+     "Wristbands and cards are read by their unique id and a secured application on the chip; nothing of value is "
+     "stored on the chip itself. The exact chip type sets how the encoder is driven.",
+     "Your operations / IT team"),
+    ("Hardware", "Staff and flying POS devices",
+     "Will the staff app and the flying (handheld) POS run on the Chainway C66 handhelds on your list, or on other "
+     "phones or tablets?",
+     "A device only you buy",
+     "Both are built as one Android app for the Chainway C66, which also scans and prints over Bluetooth to the "
+     "Zebra printer.",
+     "Your operations team"),
+    ("Hardware", "Devices in the requirements but not on your hardware list",
+     "Your requirements include parking cameras and barriers, queue and occupancy sensors and beacons, game readers "
+     "and redemption terminals, electronic lockers and digital signage, but your hardware list names none of them. "
+     "Which are in scope, and which make and model for each?",
+     "A device only you buy",
+     "Each is built behind a standard device interface and connected when you name the device; until then they are "
+     "out of the first release.",
+     "Your operations / IT team"),
+    ("Suppliers", "Messaging providers",
+     "Which SMS gateway and which email sending service will deliver tickets, codes and receipts, and will you use "
+     "WhatsApp Business (whose account)?",
+     "An account only you hold",
+     "Tickets and one-time codes are sent through a provider adapter; development uses a test mailbox and a test SMS "
+     "sender. The first release needs the real SMS and email senders for guests to receive their tickets.",
+     "Your IT / marketing team"),
+    ("Suppliers", "Accounting system",
+     "Which accounting or ERP system receives the platform's financial postings (for example SAP or Oracle), and in "
+     "what format?",
+     "A system and a format only you hold",
+     "The ledger exports its journal as a file per day in a documented format; an adapter for your system is built "
+     "once you name it.",
+     "Your finance team"),
+    ("Suppliers", "UAE Pass",
+     "Is your organisation registered as a UAE Pass service provider, and who holds the credentials? Guests sign in "
+     "with UAE Pass as well as a one-time code and social sign-in.",
+     "An account only you hold",
+     "UAE Pass sign-in is built against its staging environment and switched on when your credentials arrive; the other "
+     "sign-in methods work without it.",
+     "Your IT team"),
+    ("Suppliers", "App stores and digital wallets",
+     "Which Apple and Google developer accounts will publish each venue's app, and who holds the Apple Wallet and "
+     "Google Wallet pass certificates?",
+     "An account only you hold",
+     "Apps are built and signed in our test accounts; publishing and wallet passes wait for yours.",
+     "Your IT / marketing team"),
+    ("Government", "Tourism authority reporting",
+     "Must the platform report visitor or sales figures to the Department of Economy and Tourism (Dubai) or the "
+     "Department of Culture and Tourism (Abu Dhabi), and if so which reports and with which credentials?",
+     "Law, a regulator or a third-party contract",
+     "No reporting to a tourism authority is built; the figures such a report needs are all in the reporting layer, "
+     "so a report can be added once the rules are known.",
+     "Your compliance / finance team"),
+    ("Suppliers", "Named third-party services",
+     "Your requirements name dynamic pricing (Digonex), city passes (Go City), locker systems (Gantner, Metra) and "
+     "third-party queue systems. Which of these do you use or plan to use?",
+     "A name, account or vendor only you hold",
+     "Pricing rules, passes, lockers and queues are built into the platform; an outside service is connected through an "
+     "adapter once you confirm it.",
+     "Your commercial / operations team"),
 ]
 
 # The questions sent before (readiness report of 29 September), written out in full. The default is read from
@@ -96,10 +209,6 @@ PRIOR_QUESTIONS = [
     ("Accounts and people", "Approved libraries",
      "Who on your side approves the list of third-party libraries each part of the platform may use, and any "
      "addition to it?", "b", "R038"),
-    ("Accounts and people", "Payment sandbox access",
-     "Who delivers access to the payment providers' test environments, and by when?", "b", "R065"),
-    ("Accounts and people", "Design reviewer",
-     "Who is the one design reviewer who signs off each wireframe batch within 3 working days?", "b", "R252"),
     ("Consumer law", "Price tests on live customers",
      "Are A/B price tests on live customers allowed, and with what notice? Not blocking: built as a venue "
      "setting that a person approves.", "a", None),

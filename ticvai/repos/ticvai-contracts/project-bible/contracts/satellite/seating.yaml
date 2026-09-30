@@ -1322,7 +1322,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: getSeatHold
       x-ticvai-consumed-by:
@@ -1404,7 +1404,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: extendSeatHold
       x-ticvai-consumed-by:
@@ -3690,7 +3690,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: '**Stable for the life of the seat.** Section, row and number are display labels
             that change on a refit; this does not. A ticket sold today must still resolve after a renumbering.
 
@@ -4371,7 +4371,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         performanceId:
           type: string
           format: uuid

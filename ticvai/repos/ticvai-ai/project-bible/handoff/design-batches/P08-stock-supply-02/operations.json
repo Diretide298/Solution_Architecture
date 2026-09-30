@@ -122,6 +122,16 @@
     "name": "compareTo",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "interval",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -410,6 +420,25 @@
   "requestBody": null,
   "responds": null
  },
+ "requestSuggestion": {
+  "method": "POST",
+  "path": "/ai/suggestions",
+  "contract": "ai",
+  "summary": "Ask for an answer, however it is currently produced",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Suggestion"
+ },
  "setItemAvailability": {
   "method": "PUT",
   "path": "/menu-items/{itemId}/availability",
@@ -420,6 +449,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -439,6 +473,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

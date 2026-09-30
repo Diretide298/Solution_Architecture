@@ -13,17 +13,22 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
   "responds": "SeatCategory"
  },
- "getRecommendations": {
+ "decideRecommendations": {
   "method": "POST",
-  "path": "/recommendations",
-  "contract": "promotions",
-  "summary": "What else this guest might want",
-  "permission": "PRODUCT_VIEW",
+  "path": "/recommendations/decide",
+  "contract": "ai",
+  "summary": "Fill a recommendation slot",
+  "permission": "AI_USE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -35,7 +40,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "AiRecommendationResult"
  },
  "listDemandBookingCurve": {
   "method": "GET",
@@ -84,6 +89,16 @@
    },
    {
     "name": "dateTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priceCategory",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "sectionCode",
     "in": "query",
     "required": false
    },
@@ -242,6 +257,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

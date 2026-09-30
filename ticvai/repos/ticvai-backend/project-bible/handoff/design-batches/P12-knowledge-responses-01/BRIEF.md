@@ -1,6 +1,6 @@
 # P12-knowledge-responses-01 — P12 · Knowledge & Responses
 
-**2 screens · 4 operations · 7 schemas · 4 permissions**
+**2 screens · 5 operations · 8 schemas · 5 permissions**
 
 Platform P12 Venue Support · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `AI_CONFIGURE, MARKETING_MANAGE, MARKETING_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `AI_CONFIGURE, AI_USE, MARKETING_MANAGE, MARKETING_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **1 of these operations work offline**: listFaqs
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,9 +60,9 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `SUP-006` | Knowledge Base Search | listDetail | 2 | 0 | — |
-| `SUP-007` | Canned Response Management | listDetail | 2 | 0 | — |
+| `SUP-006` | Knowledge Base Search | listDetail | 3 | 0 | — |
+| `SUP-007` | Canned Response Management | listDetail | 2 | 1 | — |
 
 ## Thin screens in this batch
 
-**SUP-006, SUP-007 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**SUP-006 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

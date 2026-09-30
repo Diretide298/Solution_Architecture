@@ -186,11 +186,11 @@
    "operations": 8
   },
   {
-   "contract": "white-label",
+   "contract": "wallet",
    "operations": 8
   },
   {
-   "contract": "wallet",
+   "contract": "white-label",
    "operations": 8
   },
   {
@@ -198,11 +198,11 @@
    "operations": 7
   },
   {
-   "contract": "finance",
+   "contract": "resources",
    "operations": 6
   },
   {
-   "contract": "resources",
+   "contract": "finance",
    "operations": 6
   },
   {
@@ -210,15 +210,15 @@
    "operations": 5
   },
   {
-   "contract": "retail",
-   "operations": 4
-  },
-  {
    "contract": "promotions",
    "operations": 4
   },
   {
    "contract": "seating",
+   "operations": 4
+  },
+  {
+   "contract": "retail",
    "operations": 4
   },
   {

@@ -57,8 +57,8 @@ CREATE TABLE IF NOT EXISTS orders.after_sale_policy_window (
 CREATE TABLE IF NOT EXISTS orders.after_sale_request (
     id                                uuid PRIMARY KEY NOT NULL,
     number                            text CONSTRAINT after_sale_request_number_chk CHECK (char_length(number) <= 50),
-    order_id                          text NOT NULL,
-    order_line_id                     text,
+    order_id                          uuid NOT NULL,
+    order_line_id                     uuid,
     reservation_id                    uuid,
     group_booking_id                  uuid,
     request_type                      text NOT NULL CONSTRAINT after_sale_request_request_type_chk CHECK (request_type IN ('orderAmendment', 'reservationAmendment', 'dateChange', 'timeslotChange', 'performanceChange', 'quantityChange', 'attendeeChange', 'seatChange', 'deliveryChange', 'cancellation', 'partialCancellation', 'void', 'reissue', 'serviceRecoveryException')),
@@ -140,7 +140,7 @@ CREATE TABLE IF NOT EXISTS orders.cart_line (
     recommendation_id                 uuid,
     table_reservation_id              uuid,
     seat_ids                          text[],
-    resource_hold_id                  text,
+    resource_hold_id                  uuid,
     attributes                        jsonb,
     parent_line_id                    uuid,
     override_price                    numeric(18,4),
@@ -148,7 +148,7 @@ CREATE TABLE IF NOT EXISTS orders.cart_line (
     fee_kind                          text CONSTRAINT cart_line_fee_kind_chk CHECK (fee_kind IN ('booking', 'transaction', 'service', 'delivery', 'convenience', 'cancellation')),
     unit_price                        numeric(18,4),
     line_total                        numeric(18,4),
-    inventory_hold_id                 text,
+    inventory_hold_id                 uuid,
     lease_expires_at                  timestamptz,
     is_available                      boolean,
     cart_id                           uuid NOT NULL
@@ -159,10 +159,10 @@ CREATE TABLE IF NOT EXISTS orders.cart_line (
 -- operations read it and 4 write it.
 CREATE TABLE IF NOT EXISTS orders.cash_count_line (
     id                                uuid PRIMARY KEY,
-    shift_id                          text NOT NULL,
+    shift_id                          uuid NOT NULL,
     deposit_box_id                    uuid,
     count_kind                        text CONSTRAINT cash_count_line_count_kind_chk CHECK (count_kind IN ('openingFloat', 'close', 'movement')),
-    cash_movement_id                  text,
+    cash_movement_id                  uuid,
     denomination_id                   uuid NOT NULL,
     counted_quantity                  integer NOT NULL,
     counted_value                     numeric(18,4),
@@ -174,13 +174,13 @@ CREATE TABLE IF NOT EXISTS orders.cash_count_line (
 -- Cash in or out of a drawer — a float, a pickup, a drop, a payout. Denominated, and the audit
 -- trail behind a shift variance
 CREATE TABLE IF NOT EXISTS orders.cash_movement (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     kind                              text NOT NULL CONSTRAINT cash_movement_kind_chk CHECK (kind IN ('openingFloat', 'lift', 'add')),
     amount                            numeric(18,4) NOT NULL,
     reference                         text CONSTRAINT cash_movement_reference_chk CHECK (char_length(reference) <= 64),
     reason                            text CONSTRAINT cash_movement_reason_chk CHECK (char_length(reason) <= 500),
     recorded_at                       timestamptz NOT NULL,
-    shift_id                          text NOT NULL,
+    shift_id                          uuid NOT NULL,
     deposit_box_id                    uuid,
     witness_principal_id              uuid,
     withdrawal_reason                 text,
@@ -193,7 +193,7 @@ CREATE TABLE IF NOT EXISTS orders.cash_movement (
 -- does not control, and a deadline missed is a case lost regardless of merit
 CREATE TABLE IF NOT EXISTS orders.chargeback (
     id                                uuid PRIMARY KEY NOT NULL,
-    payment_id                        text NOT NULL,
+    payment_id                        uuid NOT NULL,
     provider_id                       uuid,
     provider_case_reference           text,
     amount                            numeric(18,4) NOT NULL,
@@ -206,8 +206,8 @@ CREATE TABLE IF NOT EXISTS orders.chargeback (
     scheme_reason_code                text,
     notified_at                       timestamptz,
     assignee_principal_id             uuid,
-    debit_journal_entry_id            text,
-    outcome_journal_entry_id          text
+    debit_journal_entry_id            uuid,
+    outcome_journal_entry_id          uuid
 );
 
 -- One item of evidence assembled for a chargeback (29 September): the order, the scan that
@@ -237,7 +237,7 @@ CREATE TABLE IF NOT EXISTS orders.chargeback_investigation_log (
 -- orders.sales_order. Reached by: 3 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS orders.credit_override (
     b2b_credit_id                     uuid NOT NULL,
-    order_id                          text,
+    order_id                          uuid,
     amount                            numeric(18,4),
     authorised_by_principal_id        uuid,
     reason                            text,
@@ -249,7 +249,7 @@ CREATE TABLE IF NOT EXISTS orders.credit_override (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS orders.deposit (
     id                                uuid PRIMARY KEY,
-    order_id                          text NOT NULL,
+    order_id                          uuid NOT NULL,
     customer_id                       uuid,
     rental_agreement_id               uuid,
     table_reservation_id              uuid,
@@ -276,7 +276,7 @@ CREATE TABLE IF NOT EXISTS orders.deposit_box (
     cashier_name                      text,
     venue_id                          uuid NOT NULL,
     workstation_id                    uuid,
-    shift_id                          text,
+    shift_id                          uuid,
     status                            text CONSTRAINT deposit_box_status_chk CHECK (status IN ('allocated', 'open', 'suspended', 'closing', 'closed', 'reconciled')),
     opening_float                     numeric(18,4) NOT NULL,
     withdrawn_total                   numeric(18,4),
@@ -329,7 +329,7 @@ CREATE TABLE IF NOT EXISTS orders.deposit_policy (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS orders.discount (
     id                                uuid PRIMARY KEY,
-    order_id                          text NOT NULL,
+    order_id                          uuid NOT NULL,
     promotion_id                      uuid,
     coupon_code                       text CONSTRAINT discount_coupon_code_chk CHECK (char_length(coupon_code) <= 100),
     type                              text NOT NULL CONSTRAINT discount_type_chk CHECK (char_length(type) <= 30),
@@ -343,7 +343,7 @@ CREATE TABLE IF NOT EXISTS orders.discount (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS orders.external_reference_mapping (
     id                                uuid PRIMARY KEY NOT NULL,
-    order_id                          text NOT NULL,
+    order_id                          uuid NOT NULL,
     payment_id                        uuid,
     refund_id                         uuid,
     source_system                     text NOT NULL CONSTRAINT external_reference_mapping_source_system_chk CHECK (source_system IN ('paymentGateways', 'acquirers', 'banks', 'posTerminals', 'b2bPartners', 'resellers', 'otas', 'erp', 'financeSystems', 'walletProviders')),
@@ -396,7 +396,7 @@ CREATE TABLE IF NOT EXISTS orders.group_booking (
     quote_sent_at                     timestamptz,
     risk_assessment_sent_at           timestamptz,
     preferred_date                    date,
-    order_id                          text NOT NULL,
+    order_id                          uuid NOT NULL,
     leader_subject_id                 uuid NOT NULL,
     organisation_name                 text,
     expected_size                     integer NOT NULL,
@@ -714,7 +714,7 @@ CREATE TABLE IF NOT EXISTS orders.membership_migration (
     effective_timing                  text NOT NULL CONSTRAINT membership_migration_effective_timing_chk CHECK (effective_timing IN ('immediate', 'nextVisit', 'nextRenewal', 'endOfCurrentTerm')),
     pro_rata                          boolean,
     pro_rata_amount                   numeric(18,4),
-    order_id                          text,
+    order_id                          uuid,
     effective_at                      timestamptz,
     status                            text NOT NULL CONSTRAINT membership_migration_status_chk CHECK (status IN ('scheduled', 'applied')),
     created_at                        timestamptz
@@ -726,7 +726,7 @@ CREATE TABLE IF NOT EXISTS orders.membership_renewal (
     id                                uuid PRIMARY KEY,
     customer_membership_id            uuid NOT NULL,
     entitlement_template_id           uuid NOT NULL,
-    order_id                          text,
+    order_id                          uuid,
     type                              text NOT NULL CONSTRAINT membership_renewal_type_chk CHECK (char_length(type) <= 30),
     status                            text NOT NULL CONSTRAINT membership_renewal_status_chk CHECK (char_length(status) <= 30),
     previous_expiry_at                timestamptz,
@@ -740,8 +740,8 @@ CREATE TABLE IF NOT EXISTS orders.membership_renewal (
 -- reaches orders.sales_order through its keys; references identity.principal, orders.pos_shift,
 -- platform.workstation. Reached by: 1 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS orders.no_sale_event (
-    id                                text PRIMARY KEY NOT NULL,
-    shift_id                          text NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
+    shift_id                          uuid NOT NULL,
     workstation_id                    uuid,
     reason                            text NOT NULL,
     note                              text,
@@ -754,7 +754,7 @@ CREATE TABLE IF NOT EXISTS orders.no_sale_event (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS orders.order_event (
     id                                uuid PRIMARY KEY NOT NULL,
-    order_id                          text NOT NULL,
+    order_id                          uuid NOT NULL,
     reservation_id                    uuid,
     event_type                        text NOT NULL CONSTRAINT order_event_event_type_chk CHECK (char_length(event_type) <= 60),
     previous_state                    text CONSTRAINT order_event_previous_state_chk CHECK (char_length(previous_state) <= 40),
@@ -775,7 +775,7 @@ CREATE TABLE IF NOT EXISTS orders.order_event (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS orders.order_fee (
     id                                uuid PRIMARY KEY,
-    order_id                          text NOT NULL,
+    order_id                          uuid NOT NULL,
     rule_id                           uuid,
     payment_method_id                 uuid,
     name                              text NOT NULL CONSTRAINT order_fee_name_chk CHECK (char_length(name) <= 150),
@@ -790,15 +790,15 @@ CREATE TABLE IF NOT EXISTS orders.order_fee (
 -- One thing bought on one order, priced at the moment of sale. A price list changing afterwards
 -- does not change what somebody paid
 CREATE TABLE IF NOT EXISTS orders.order_line (
-    sales_order_id                    text NOT NULL,
-    id                                text PRIMARY KEY NOT NULL,
+    sales_order_id                    uuid NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     variant_id                        uuid NOT NULL,
     recommendation_id                 uuid,
     performance_id                    uuid,
     booked_window                     jsonb,
-    inventory_hold_id                 text,
+    inventory_hold_id                 uuid,
     seat_ids                          text[],
-    resource_hold_id                  text,
+    resource_hold_id                  uuid,
     attributes                        jsonb,
     quantity                          integer NOT NULL,
     quoted_unit_price                 numeric(18,4) NOT NULL,
@@ -818,7 +818,7 @@ CREATE TABLE IF NOT EXISTS orders.order_line (
 -- Holds 6 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS orders.order_line_discount (
-    order_line_id                     text NOT NULL,
+    order_line_id                     uuid NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL,
     promotion_id                      uuid,
     source                            text NOT NULL,
@@ -829,7 +829,7 @@ CREATE TABLE IF NOT EXISTS orders.order_line_discount (
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS orders.order_line_eligibility (
-    order_line_id                     text NOT NULL,
+    order_line_id                     uuid NOT NULL,
     age_band                          text,
     age_years                         integer,
     height_band_index                 integer,
@@ -842,8 +842,8 @@ CREATE TABLE IF NOT EXISTS orders.order_line_eligibility (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS orders.order_relationship (
     id                                uuid PRIMARY KEY NOT NULL,
-    order_id                          text NOT NULL,
-    related_order_id                  text NOT NULL,
+    order_id                          uuid NOT NULL,
+    related_order_id                  uuid NOT NULL,
     relationship_type                 text NOT NULL CONSTRAINT order_relationship_relationship_type_chk CHECK (relationship_type IN ('parentOrder', 'childOrder', 'mergedInto', 'replacementOrder', 'amendedFrom', 'convertedFrom', 'reissuedFrom')),
     split_basis                       text CONSTRAINT order_relationship_split_basis_chk CHECK (split_basis IN ('ticket', 'attendee', 'product', 'orderLine', 'paymentResponsibility', 'department', 'corporateCostCenter', 'customer')),
     amount                            numeric(18,4),
@@ -873,8 +873,8 @@ CREATE TABLE IF NOT EXISTS orders.order_source_channel (
 -- A tender against an order, with the rate it converted at fixed on the row (CF-37). A payment
 -- reconciled next month is reconciled at the rate of the day it was taken
 CREATE TABLE IF NOT EXISTS orders.payment (
-    id                                text PRIMARY KEY NOT NULL,
-    order_id                          text NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
+    order_id                          uuid NOT NULL,
     tender                            text NOT NULL CONSTRAINT payment_tender_chk CHECK (tender IN ('cash', 'card', 'wallet', 'voucher', 'bankTransfer', 'hotelCharge', 'installment', 'giftCard', 'complimentary')),
     tender_currency                   text,
     tender_amount                     numeric(18,4),
@@ -916,8 +916,8 @@ CREATE TABLE IF NOT EXISTS orders.payment_allocation_rule (
 -- orders.sales_order. Reached by: 9 operati
 CREATE TABLE IF NOT EXISTS orders.payment_link (
     id                                uuid PRIMARY KEY NOT NULL,
-    order_id                          text NOT NULL,
-    reservation_id                    text,
+    order_id                          uuid NOT NULL,
+    reservation_id                    uuid,
     token                             text NOT NULL,
     status                            text NOT NULL CONSTRAINT payment_link_status_chk CHECK (status IN ('issued', 'viewed', 'paid', 'expired', 'cancelled', 'superseded')),
     channel                           text CONSTRAINT payment_link_channel_chk CHECK (channel IN ('email', 'sms', 'whatsapp', 'printed')),
@@ -936,13 +936,13 @@ CREATE TABLE IF NOT EXISTS orders.payment_link (
 -- and 0 write it.
 CREATE TABLE IF NOT EXISTS orders.payment_tip (
     id                                uuid PRIMARY KEY NOT NULL,
-    payment_id                        text NOT NULL
+    payment_id                        uuid NOT NULL
 );
 
 -- A cash session at a workstation — opened with a float, closed with a count and a variance. Moved
 -- to OrderService on 24 August because all its data is in orders
 CREATE TABLE IF NOT EXISTS orders.pos_shift (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     workstation_id                    uuid NOT NULL,
     venue_id                          uuid NOT NULL,
     scope_path                        ltree NOT NULL,
@@ -971,7 +971,7 @@ CREATE TABLE IF NOT EXISTS orders.pos_shift (
 -- Holds 6 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS orders.pos_shift_approval (
-    pos_shift_id                      text NOT NULL,
+    pos_shift_id                      uuid NOT NULL,
     kind                              text NOT NULL,
     principal_id                      uuid NOT NULL,
     at                                timestamptz NOT NULL,
@@ -982,7 +982,7 @@ CREATE TABLE IF NOT EXISTS orders.pos_shift_approval (
 -- Holds 6 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS orders.pos_shift_incident (
-    pos_shift_id                      text NOT NULL,
+    pos_shift_id                      uuid NOT NULL,
     kind                              text,
     at                                timestamptz,
     principal_id                      uuid,
@@ -992,8 +992,8 @@ CREATE TABLE IF NOT EXISTS orders.pos_shift_incident (
 
 -- Money going back, always against a payment and never editing it. The ledger posts both
 CREATE TABLE IF NOT EXISTS orders.refund (
-    id                                text PRIMARY KEY NOT NULL,
-    order_id                          text NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
+    order_id                          uuid NOT NULL,
     batch_id                          uuid,
     fx_rate                           numeric(18,6),
     tax_reversal_entry_id             uuid,
@@ -1006,7 +1006,7 @@ CREATE TABLE IF NOT EXISTS orders.refund (
     requested_by_principal_id         uuid,
     secondary_principal_id            uuid,
     approved_by_principal_id          uuid,
-    ledger_entry_id                   text,
+    ledger_entry_id                   uuid,
     gateway_reference                 text,
     created_at                        timestamptz NOT NULL,
     completed_at                      timestamptz
@@ -1117,7 +1117,7 @@ CREATE TABLE IF NOT EXISTS orders.resale_fee_policy (
 -- that admits is always one the venue issued
 CREATE TABLE IF NOT EXISTS orders.resale_listing (
     id                                uuid PRIMARY KEY NOT NULL,
-    entitlement_id                    text NOT NULL,
+    entitlement_id                    uuid NOT NULL,
     seller_subject_id                 uuid NOT NULL,
     ask_price                         numeric(18,4) NOT NULL,
     price_cap_percent                 numeric(18,4),
@@ -1217,13 +1217,13 @@ CREATE TABLE IF NOT EXISTS orders.resale_settlement (
 
 -- A held place that is not yet a sale — a table, a cabana, a slot
 CREATE TABLE IF NOT EXISTS orders.reservation (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     venue_id                          uuid NOT NULL,
     subject_id                        uuid,
     status                            text NOT NULL CONSTRAINT reservation_status_chk CHECK (status IN ('held', 'converted', 'expired', 'cancelled')),
     expires_at                        timestamptz NOT NULL,
     created_at                        timestamptz NOT NULL,
-    converted_order_id                text
+    converted_order_id                uuid
 );
 
 -- Holds 20 columns. No description has been written for this table — the name is the only thing
@@ -1254,15 +1254,15 @@ CREATE TABLE IF NOT EXISTS orders.reservation_hold_policy (
 -- Holds 10 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS orders.reservation_line (
-    reservation_id                    text NOT NULL,
-    id                                text PRIMARY KEY NOT NULL,
+    reservation_id                    uuid NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     variant_id                        uuid NOT NULL,
     recommendation_id                 uuid,
     performance_id                    uuid,
     booked_window                     jsonb,
-    inventory_hold_id                 text,
+    inventory_hold_id                 uuid,
     seat_ids                          text[],
-    resource_hold_id                  text,
+    resource_hold_id                  uuid,
     attributes                        jsonb,
     quantity                          integer NOT NULL,
     quoted_unit_price                 numeric(18,4) NOT NULL,
@@ -1273,7 +1273,7 @@ CREATE TABLE IF NOT EXISTS orders.reservation_line (
 -- The sale. What was bought, by whom, through which channel, at what scope. Every payment, refund,
 -- entitlement and ledger posting reaches back to a row here
 CREATE TABLE IF NOT EXISTS orders.sales_order (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     order_number                      text,
     channel                           text NOT NULL,
     venue_id                          uuid NOT NULL,
@@ -1286,7 +1286,7 @@ CREATE TABLE IF NOT EXISTS orders.sales_order (
     total_price_variance              numeric(18,4),
     principal_id                      uuid,
     workstation_id                    uuid,
-    shift_id                          text,
+    shift_id                          uuid,
     subject_id                        uuid,
     hold_label                        text CONSTRAINT sales_order_hold_label_chk CHECK (char_length(hold_label) <= 60),
     held_until                        timestamptz,
@@ -1356,8 +1356,8 @@ CREATE TABLE IF NOT EXISTS orders.ticket_template_channel (
 
 -- A ticket moving between people. Claimed by whoever holds the link, which is why it expires
 CREATE TABLE IF NOT EXISTS orders.ticket_transfer (
-    id                                text PRIMARY KEY NOT NULL,
-    order_id                          text NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
+    order_id                          uuid NOT NULL,
     ticket_ids                        text[] NOT NULL,
     from_subject_id                   uuid,
     to_subject_id                     uuid,
@@ -1375,9 +1375,9 @@ CREATE TABLE IF NOT EXISTS orders.ticket_transfer (
 CREATE TABLE IF NOT EXISTS orders.upgrade (
     id                                uuid PRIMARY KEY,
     number                            text NOT NULL CONSTRAINT upgrade_number_chk CHECK (char_length(number) <= 50),
-    order_id                          text NOT NULL,
-    original_order_line_id            text NOT NULL,
-    new_order_line_id                 text,
+    order_id                          uuid NOT NULL,
+    original_order_line_id            uuid NOT NULL,
+    new_order_line_id                 uuid,
     rule_id                           uuid,
     original_amount                   numeric(18,4) NOT NULL,
     new_amount                        numeric(18,4) NOT NULL,
@@ -1448,7 +1448,7 @@ CREATE TABLE IF NOT EXISTS orders.upgrade_rule (
 -- reminder is not a reason to message somebody who said no
 CREATE TABLE IF NOT EXISTS orders.visit_reminder (
     id                                uuid PRIMARY KEY,
-    order_id                          text,
+    order_id                          uuid,
     subject_id                        uuid,
     is_enabled                        boolean NOT NULL,
     lead_time_minutes                 integer DEFAULT 1440,
@@ -1460,7 +1460,7 @@ CREATE TABLE IF NOT EXISTS orders.visit_reminder (
 -- pushed to is a screenshot with better rounding
 CREATE TABLE IF NOT EXISTS orders.wallet_pass (
     id                                uuid PRIMARY KEY NOT NULL,
-    entitlement_id                    text NOT NULL,
+    entitlement_id                    uuid NOT NULL,
     platform                          text NOT NULL CONSTRAINT wallet_pass_platform_chk CHECK (platform IN ('apple', 'google')),
     serial_number                     text NOT NULL,
     authentication_token              text,

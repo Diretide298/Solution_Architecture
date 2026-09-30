@@ -16,7 +16,7 @@
 | Access Control | AccessPoint, AdmissionRules, ScanEvent, Media |
 | Finance & Ledger | Account, JournalEntry, TaxCode, RecognitionSchedule |
 
-**Schema per module, database per tenant.** Each service connects with a role granted access only to its own schema — enforced by Postgres grants, not convention.
+**Schema per module, database per tenant.** A module owns its schemas and only the owner migrates them; other modules read them through views the owner publishes and write them only through the owner's in-process API (ADR-0055). **Postgres roles are per deployable** (`commerce`, `access`, `operations`, `ticvai-ai`, `workers`), not per schema: the AI role is read-only on the transactional schemas, and module boundaries inside a deployable are enforced by architecture tests and the lineage check, not by grants.
 
 Normally a microservice anti-pattern. Correct here because the tenancy decision outranks it, and because **order + payment + entitlement + ledger must be one transaction**.
 
@@ -53,9 +53,9 @@ Adding an attribute value auto-creates sellable variants (07 Aug §12).
 | Concern | Rule |
 |---|---|
 | Money | `numeric(18,4)` + explicit currency and scale. OMR is 3dp, AED 2dp |
-| IDs | ULID `char(26)` for edge-created entities; UUID for configuration; **never `bigserial` on a partitioned table** |
+| IDs | **One type: `uuid`, new ids UUIDv7** (ADR-0056), from the kernel's `Id.New()` online and the same generator in `offline-core` on edge devices; a human code (`order_number`, ticket code) where a person reads or types it; **never `bigserial` on a partitioned table** |
 | Scope | `scope_path ltree` + denormalised `venue_id`, `region_id`, `brand_id` |
-| Partitioning | List on `venue_id` for hot tables; partition key in the primary key |
+| Partitioning | Release 1: range by month on the append-only, time-driven tables with no inbound foreign key (ADR-0056); list on `venue_id` is deferred (ADR-0044, amended by ADR-0056); partition key in the primary key |
 | RLS | `ENABLE` **and** `FORCE` on every tenant-scoped table |
 | Timestamps | `timestamptz` UTC; `recorded_at` vs `synced_at` vs `created_at` distinguished |
 | Outbox | Publication atomic with the state change |

@@ -1,6 +1,6 @@
 # WS56 — Rules  Workflow  Approval   Automation Engine board 2
 
-**10 screens · 10 operations · 12 schemas · 2 permissions**
+**10 screens · 13 operations · 25 schemas · 5 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `APPROVAL_REQUEST, APPROVAL_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `APPROVAL_ACT, APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_VIEW, REPORT_VIEW_VENUE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -62,10 +61,10 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `ADM-248` | Workflow Operations Command Center | listDetail | 1 | 0 | — |
-| `ADM-249` | Unified Approval Inbox & Decision Workspace | listDetail | 1 | 0 | — |
-| `ADM-250` | Workflow Instance Monitor & Process Timeline | commandCentre | 1 | 0 | — |
-| `ADM-251` | Workflow Exception, Failure & Recovery Center | listDetail | 1 | 1 | — |
-| `ADM-252` | SLA, Escalation & Bottleneck Monitor | listDetail | 1 | 0 | — |
+| `ADM-249` | Unified Approval Inbox & Decision Workspace | listDetail | 3 | 0 | — |
+| `ADM-250` | Workflow Instance Monitor & Process Timeline | commandCentre | 2 | 1 | — |
+| `ADM-251` | Workflow Exception, Failure & Recovery Center | listDetail | 2 | 1 | — |
+| `ADM-252` | SLA, Escalation & Bottleneck Monitor | listDetail | 2 | 1 | — |
 | `ADM-253` | Automation Execution & Autonomous Action Monitor | listDetail | 1 | 0 | — |
 | `ADM-254` | Cross-Module Orchestration Monitor | listDetail | 1 | 0 | — |
 | `ADM-255` | Workflow Analytics & Process Performance | commandCentre | 1 | 0 | — |
@@ -74,4 +73,4 @@ convincingly. It is never a caption.
 
 ## Thin screens in this batch
 
-**ADM-248, ADM-249, ADM-252, ADM-253, ADM-254, ADM-256, ADM-257 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-249, ADM-253, ADM-254, ADM-256, ADM-257 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

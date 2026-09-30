@@ -1,6 +1,6 @@
 # WS109 — ACCREDITATION board 2
 
-**10 screens · 8 operations · 4 schemas · 4 permissions**
+**10 screens · 9 operations · 5 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -64,8 +64,8 @@ convincingly. It is never a caption.
 | `BO-626` | Accreditation Holder Profile | listDetail | 1 | 0 | — |
 | `BO-627` | Identity Details & Verification | listDetail | 1 | 0 | — |
 | `BO-628` | Photo Management | listDetail | 1 | 0 | — |
-| `BO-629` | Document Repository | listDetail | 1 | 0 | — |
-| `BO-630` | Document Verification Queue | listDetail | 1 | 0 | — |
+| `BO-629` | Document Repository | listDetail | 2 | 0 | — |
+| `BO-630` | Document Verification Queue | listDetail | 2 | 0 | — |
 | `BO-631` | Duplicate & Identity Conflict Detection | listDetail | 2 | 1 | — |
 | `BO-632` | Organization & Affiliation Management | listDetail | 1 | 0 | — |
 | `BO-633` | Profile Completeness & Compliance Monitor | listDetail | 1 | 0 | — |

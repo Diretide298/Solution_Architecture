@@ -3437,7 +3437,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "ruleId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "Absent creates a rule"
    },
    "venueId": {

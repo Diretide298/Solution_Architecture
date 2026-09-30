@@ -1,4 +1,23 @@
 {
+ "createInstalmentPlan": {
+  "method": "POST",
+  "path": "/instalment-plans",
+  "contract": "payments",
+  "summary": "Split an order's payment into scheduled instalments on a stored card",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PayInstalmentPlan"
+ },
  "getDepositPolicy": {
   "method": "GET",
   "path": "/deposit-policy",
@@ -116,6 +135,40 @@
   ],
   "requestBody": null,
   "responds": "FinancialTraceabilityControlAuditExplorerView"
+ },
+ "listInstalmentPlans": {
+  "method": "GET",
+  "path": "/instalment-plans",
+  "contract": "payments",
+  "summary": "Instalment plans and their schedules",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "orderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listOrderFinancialReconciliation": {
   "method": "GET",
@@ -396,7 +449,7 @@
   "summary": "Record a movement on a deposit",
   "permission": "PAYMENT_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "append",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -446,6 +499,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "DepositPolicy",
@@ -461,6 +519,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

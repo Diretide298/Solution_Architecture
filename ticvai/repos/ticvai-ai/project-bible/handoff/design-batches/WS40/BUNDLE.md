@@ -1,6 +1,6 @@
 # WS40 — Pricing   Revenue Management board 7
 
-**10 screens · 10 operations · 13 schemas · 2 permissions**
+**10 screens · 13 operations · 20 schemas · 5 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `AI_APPROVE, AI_CONFIGURE, PRICE_CONFIGURE, PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -66,15 +65,15 @@ convincingly. It is never a caption.
 | `ADM-110` | Scenario Modeling & What-If Analysis | listDetail | 1 | 0 | — |
 | `ADM-111` | A/B Pricing Experiment Studio | listDetail | 1 | 0 | — |
 | `ADM-112` | Revenue & Demand Impact Forecasting | commandCentre | 1 | 0 | — |
-| `ADM-113` | AI Recommendation Review & Decision Queue | listDetail | 1 | 0 | — |
-| `ADM-114` | Automation Policy & Autonomous Pricing Orchestrator | configEditor | 1 | 0 | — |
+| `ADM-113` | AI Recommendation Review & Decision Queue | listDetail | 2 | 0 | — |
+| `ADM-114` | Automation Policy & Autonomous Pricing Orchestrator | configEditor | 2 | 1 | — |
 | `ADM-115` | Live Dynamic Price Execution & Deployment Monitor | listDetail | 1 | 0 | — |
 | `ADM-116` | Dynamic Pricing Performance & Optimization Analytics | listDetail | 1 | 0 | — |
-| `ADM-117` | AI Learning, Model Performance & Optimization Feedback | listDetail | 1 | 0 | — |
+| `ADM-117` | AI Learning, Model Performance & Optimization Feedback | listDetail | 2 | 1 | — |
 
 ## Thin screens in this batch
 
-**ADM-111, ADM-113, ADM-117 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-111, ADM-117 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-108 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-109",
@@ -154,12 +150,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "operation": "listRevenue"
     },
     {
-     "to": "ADM-113",
-     "trigger": "Works in AI Recommendation Review & Decision Queue",
-     "provenance": "flow F149 step 9→10",
-     "operation": "listRevenue"
-    },
-    {
      "to": "ADM-114",
      "trigger": "Works in Automation Policy & Autonomous Pricing Orchestrator",
      "provenance": "flow F149 step 11→12",
@@ -182,14 +172,23 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "trigger": "Works in AI Learning, Model Performance & Optimization Feedback",
      "provenance": "flow F149 step 17→18",
      "operation": "listRevenue"
+    },
+    {
+     "to": "ADM-113",
+     "trigger": "Works in AI Recommendation Review & Decision Queue",
+     "provenance": "flow F149 step 9→10",
+     "operation": "listRevenue",
+     "carries": [
+      "recommendationId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Revenue teams can monitor and act on pricing optimization opportunities across the organization from one centralized workspace.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each row displays) — counts over a population, then the population",
   "purpose": "Provide Revenue Managers with the operational control center for all dynamic pricing simulations, AI recommendations, automated changes, experiments and revenue optimization activity.",
-  "purposeNote": "Revenue teams can monitor and act on pricing optimization opportunities across the organization from one centralized workspace.",
   "gaps": [
    {
     "operation": null,
@@ -214,67 +213,67 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "metricTile",
        "label": "Incremental Revenue Generated",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterView.incrementalRevenueGenerated"
+       "bindsTo": "RevenueOptimizationCommandCenterSummary.incrementalRevenueGenerated"
       },
       {
        "kind": "metricTile",
        "label": "Active Optimizations",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterView.activeOptimizations"
+       "bindsTo": "RevenueOptimizationCommandCenterSummary.activeOptimizations"
       },
       {
        "kind": "metricTile",
        "label": "Recommendations Awaiting Action",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterView.recommendationsAwaitingAction"
+       "bindsTo": "RevenueOptimizationCommandCenterSummary.recommendationsAwaitingAction"
       },
       {
        "kind": "metricTile",
        "label": "Pending Simulations",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterView.pendingSimulations"
+       "bindsTo": "RevenueOptimizationCommandCenterSummary.pendingSimulations"
       },
       {
        "kind": "metricTile",
        "label": "Auto-Executed Changes",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterView.autoExecutedChanges"
+       "bindsTo": "RevenueOptimizationCommandCenterSummary.autoExecutedChanges"
       },
       {
        "kind": "metricTile",
        "label": "Approval Required",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterView.approvalRequired"
+       "bindsTo": "RevenueOptimizationCommandCenterSummary.approvalRequired"
       },
       {
        "kind": "metricTile",
        "label": "Active A/B Tests",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterView.activeABTests"
+       "bindsTo": "RevenueOptimizationCommandCenterSummary.activeABTests"
       },
       {
        "kind": "metricTile",
        "label": "Pricing Exceptions",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterView.pricingExceptions"
+       "bindsTo": "RevenueOptimizationCommandCenterSummary.pricingExceptions"
       },
       {
        "kind": "metricTile",
        "label": "Revenue at Risk",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterView.revenueAtRisk"
+       "bindsTo": "RevenueOptimizationCommandCenterSummary.revenueAtRisk"
       },
       {
        "kind": "metricTile",
        "label": "Forecast Accuracy",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterView.forecastAccuracy"
+       "bindsTo": "RevenueOptimizationCommandCenterSummary.forecastAccuracy"
       },
       {
        "kind": "metricTile",
        "label": "Optimization Success Rate",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterView.optimizationSuccessRate"
+       "bindsTo": "RevenueOptimizationCommandCenterSummary.optimizationSuccessRate"
       }
      ]
     },
@@ -386,7 +385,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-108"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-108",
+   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-108"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 114. 23 of 23 labels bound to a contract property; 29 of 50 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -450,10 +450,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can safely evaluate a pricing recommendation or strategy against forecast commercial outcomes without modifying production prices.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Allow any proposed dynamic-pricing change to be tested before affecting live customers. This should become the sandbox of the Dynamic Pricing Engine.",
-  "purposeNote": "Authorized users can safely evaluate a pricing recommendation or strategy against forecast commercial outcomes without modifying production prices.",
   "gaps": [
    {
     "operation": null,
@@ -472,7 +472,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every pricing simulation",
        "columns": [
-        "PricingSimulationStudioView.simulationConfidence89",
+        "PricingSimulationStudioView.simulationConfidence",
         "PricingSimulationStudioView.dataVolume",
         "PricingSimulationStudioView.historicalSimilarity",
         "PricingSimulationStudioView.forecastConfidence",
@@ -494,7 +494,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected pricing simulation",
        "bindsTo": "PricingSimulationStudioView",
        "columns": [
-        "PricingSimulationStudioView.simulationConfidence89",
+        "PricingSimulationStudioView.simulationConfidence",
         "PricingSimulationStudioView.dataVolume",
         "PricingSimulationStudioView.historicalSimilarity",
         "PricingSimulationStudioView.forecastConfidence",
@@ -560,15 +560,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setPricing",
     "contract": "catalogue",
     "purpose": "Pricing Simulation Studio",
-    "trigger": "onAction",
-    "invalidates": [
-     "setPricing"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "preloaded": [
-    "PricingSimulationStudioView.simulationConfidence89",
+    "PricingSimulationStudioView.simulationConfidence",
     "PricingSimulationStudioView.dataVolume",
     "PricingSimulationStudioView.historicalSimilarity",
     "PricingSimulationStudioView.forecastConfidence",
@@ -579,7 +576,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-109"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-109",
+   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-109"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 115. 6 of 6 labels bound to a contract property; 20 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -643,14 +641,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Revenue teams can model alternative market and demand conditions and compare different pricing responses before implementation.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Scenario Modeling & What-If Analysis",
-  "purposeNote": "Revenue teams can model alternative market and demand conditions and compare different pricing responses before implementation.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Competitor Price Drop, Competitor Price Increase, Custom Scenario, Save, Duplicate, Compare, Submit for Review. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 11 actions on this screen and the screen declares 1 operation.** Unserved: Low Demand, Expected Demand, High Demand, Competitor Price Drop, Competitor Price Increase, Inventory Reduction, Custom Scenario, Save …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Support"
    },
    {
@@ -673,6 +671,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Low Demand",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Expected Demand",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "High Demand",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Competitor Price Drop",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Support"
       },
@@ -683,27 +696,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       },
       {
        "kind": "secondaryButton",
+       "label": "Inventory Reduction",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Custom Scenario",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Support"
       },
       {
        "kind": "secondaryButton",
        "label": "Save",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Allow users to"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Duplicate",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Allow users to"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Compare",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Allow users to"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Submit for Review",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Allow users to"
       }
      ]
@@ -731,19 +734,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "ScenarioModelingWhatIfAnalysisView.lowDemand",
-    "ScenarioModelingWhatIfAnalysisView.expectedDemand",
-    "ScenarioModelingWhatIfAnalysisView.highDemand",
-    "ScenarioModelingWhatIfAnalysisView.sellOut",
-    "ScenarioModelingWhatIfAnalysisView.competitorPriceDrop"
+    "ScenarioModelingWhatIfAnalysisView.scenarioTypes"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-110"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-110",
+   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-110"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 117. 0 of 0 labels bound to a contract property; 7 of 52 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 117. 0 of 0 labels bound to a contract property; 11 of 52 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -805,10 +805,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can execute controlled pricing experiments and determine statistically whether one strategy performs better than another.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Allow TICVAI to scientifically test different pricing strategies using controlled customer groups. This is essential because AI should learn from actual customer behavior, not only historical assumptions.",
-  "purposeNote": "Authorized users can execute controlled pricing experiments and determine statistically whether one strategy performs better than another.",
   "layout": {
    "template": "split",
    "regions": [
@@ -875,10 +875,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setPricingExperiment",
     "contract": "catalogue",
     "purpose": "A/B Pricing Experiment Studio",
-    "trigger": "onAction",
-    "invalidates": [
-     "setPricingExperiment"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -892,7 +889,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-111"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-111",
+   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-111"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 119. 4 of 4 labels bound to a contract property; 20 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -956,10 +954,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Approvers can clearly understand expected revenue, demand and customer consequences before authorizing a dynamic pricing action.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Forecast; Display) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Provide a dedicated commercial impact assessment before a dynamic-pricing action is approved or executed.",
-  "purposeNote": "Approvers can clearly understand expected revenue, demand and customer consequences before authorizing a dynamic pricing action.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -1041,18 +1039,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    }
   ],
   "entryState": {
-   "preloaded": [
-    "RevenueDemandImpactForecastingView.expectedRevenueAed245m",
-    "RevenueDemandImpactForecastingView.expectedDemand9800",
-    "RevenueDemandImpactForecastingView.expectedOccupancy91",
-    "RevenueDemandImpactForecastingView.expectedRevenueAed252m",
-    "RevenueDemandImpactForecastingView.expectedDemand9500"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-112"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-112",
+   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-112"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 120. 9 of 9 labels bound to a contract property; 9 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1116,10 +1109,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Every material AI recommendation can be reviewed, explained, simulated, approved, modified or rejected with complete traceability.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide the human decision workspace for recommendations produced by Board 6. This should be the Revenue Manager's inbox.",
-  "purposeNote": "Every material AI recommendation can be reviewed, explained, simulated, approved, modified or rejected with complete traceability.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1182,8 +1175,43 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "banner",
        "label": "Permissions this screen separates",
-       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Accept, Reject, Modify, Simulate Again, Schedule, Send for Approval. Each needs attaching to the control it gates, or the screen needs the control.",
+       "notes": "**The pack separates these permissions; since 29 September the decision buttons are `decidePricingRecommendation` (AI_APPROVE)** — earlier text: Accept, Reject, Modify, Simulate Again, Schedule, Send for Approval. Each needs attaching to the control it gates, or the screen needs the control.",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 122 §Authorized users can"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Accept",
+       "operation": "decidePricingRecommendation",
+       "notes": "Sends `decision: accept`.",
+       "provenance": "contract catalogue.yaml POST /recommendation-review-decision/{recommendationId}/decision (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Modify",
+       "operation": "decidePricingRecommendation",
+       "notes": "Sends `decision: modify`.",
+       "provenance": "contract catalogue.yaml POST /recommendation-review-decision/{recommendationId}/decision (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reject",
+       "operation": "decidePricingRecommendation",
+       "notes": "Sends `decision: reject`.",
+       "provenance": "contract catalogue.yaml POST /recommendation-review-decision/{recommendationId}/decision (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Schedule",
+       "operation": "decidePricingRecommendation",
+       "notes": "Sends `decision: schedule`.",
+       "provenance": "contract catalogue.yaml POST /recommendation-review-decision/{recommendationId}/decision (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Send for approval",
+       "operation": "decidePricingRecommendation",
+       "notes": "Sends `decision: sendForApproval`.",
+       "provenance": "contract catalogue.yaml POST /recommendation-review-decision/{recommendationId}/decision (decided 29 September, readiness close-out)"
       }
      ]
     }
@@ -1202,6 +1230,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "AI Recommendation Review & Decision Queue",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "decidePricingRecommendation",
+    "contract": "catalogue",
+    "purpose": "Record a human decision on an AI pricing recommendation",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1212,12 +1246,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "AiRecommendationReviewDecisionQueueView.currentPrice",
     "AiRecommendationReviewDecisionQueueView.recommendedPrice",
     "AiRecommendationReviewDecisionQueueView.change"
+   ],
+   "params": [
+    {
+     "name": "recommendationId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-113"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-113",
+   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-113"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 122. 11 of 11 labels bound to a contract property; 24 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1281,10 +1322,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "confidence, commercial guardrails and emergency safety controls.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Control when TICVAI is allowed to execute pricing changes automatically. Board 5 defines the strategy-level automation permission. This screen manages operational autonomous execution at scale.",
-  "purposeNote": "confidence, commercial guardrails and emergency safety controls.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1353,6 +1394,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 123 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save dynamic pricing guardrail policy",
+       "operation": "setDynamicPricingGuardrailPolicy",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**Guardrails and automation policy, one row per scope** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /dynamic-pricing-controls"
+      }
+     ]
     }
    ]
   },
@@ -1368,14 +1423,61 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Automation Policy & Autonomous Pricing Orchestrator",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setDynamicPricingGuardrailPolicy",
+    "contract": "catalogue",
+    "purpose": "Set the guardrails and automation level of dynamic pricing at one scope",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAutomationPolicyAutonomous"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-114"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-114",
+   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-114"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 123. 0 of 0 labels bound to a contract property; 12 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetDynamicPricingGuardrailPolicy",
+    "component": "modal",
+    "trigger": "Save dynamic pricing guardrail policy",
+    "body": "**Collects what `setDynamicPricingGuardrailPolicy` sends before it is called.** Required: `id`, `scopePath`, `scopeLevel`, `automationLevel`. Optional: `scopeId`, `absoluteMinimumPrice`, `absoluteMaximumPrice`, `minimumMarginPercent`, `maximumUpliftPercent`, `maximumReductionPercent`, `maximumSingleChangePercent`, `maximumDailyChangePercent`, `maximumWeeklyChangePercent`, `minimumChangeIntervalMinutes`, `maximumChangesPerDay`, `minimumInventory` and 21 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "DynamicPricingControl",
+    "confirm": {
+     "label": "Save dynamic pricing guardrail policy",
+     "operation": "setDynamicPricingGuardrailPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "scopeLevel",
+      "automationLevel",
+      "scopeId",
+      "absoluteMinimumPrice",
+      "absoluteMaximumPrice",
+      "minimumMarginPercent",
+      "maximumUpliftPercent",
+      "maximumReductionPercent",
+      "maximumSingleChangePercent",
+      "maximumDailyChangePercent",
+      "maximumWeeklyChangePercent",
+      "minimumChangeIntervalMinutes",
+      "maximumChangesPerDay",
+      "minimumInventory",
+      "maximumOccupancyTriggerPercent",
+      "protectedRateTypes"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /dynamic-pricing-controls"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1437,10 +1539,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Operations teams can monitor the real-time execution and distribution of dynamic prices across all applicable sales channels.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Each execution shows) and no metric row",
   "purpose": "Monitor pricing actions as they are executed across TICVAI's selling ecosystem.",
-  "purposeNote": "Operations teams can monitor the real-time execution and distribution of dynamic prices across all applicable sales channels.",
   "gaps": [
    {
     "operation": null,
@@ -1548,10 +1650,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "createLiveDynamicPrice",
     "contract": "catalogue",
     "purpose": "Live Dynamic Price Execution & Deployment Monitor",
-    "trigger": "onAction",
-    "invalidates": [
-     "createLiveDynamicPrice"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1567,7 +1666,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-115"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-115",
+   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-115"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 125. 10 of 11 labels bound to a contract property; 16 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1631,14 +1731,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "pricing strategies and AI recommendations.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Measure) and no metric row",
   "purpose": "Determine whether dynamic pricing actually improves TICVAI's commercial performance.",
-  "purposeNote": "pricing strategies and AI recommendations.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Strategy vs Strategy, Channel vs Channel. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Strategy vs Strategy, Venue vs Venue, Event vs Event, Channel vs Channel. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 126 §Support"
    }
   ],
@@ -1722,6 +1822,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       },
       {
        "kind": "secondaryButton",
+       "label": "Venue vs Venue",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 126 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Event vs Event",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 126 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Channel vs Channel",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 126 §Support"
       }
@@ -1757,9 +1867,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-116"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-116",
+   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-116"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 126. 18 of 18 labels bound to a contract property; 20 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 126. 18 of 18 labels bound to a contract property; 22 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1813,10 +1924,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from ADM-108, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "outcomes and provides governed feedback for improving future pricing intelligence. Board 7 — Final Screen Register # Backend Screen Core Responsibility 10.7. Revenue Optimization Command Center Optimization operations 1 # Backend Screen Core Responsibility 10.7. Pricing Simulation Studio Test proposed pricing 2 10.7. Commercial scenario",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Forecast; Track; Detect) and no metric row",
   "purpose": "Close the intelligence loop by comparing AI predictions and recommendations with actual commercial outcomes. This is what allows the system to improve over time.",
-  "purposeNote": "outcomes and provides governed feedback for improving future pricing intelligence. Board 7 — Final Screen Register # Backend Screen Core Responsibility 10.7. Revenue Optimization Command Center Optimization operations 1 # Backend Screen Core Responsibility 10.7. Pricing Simulation Studio Test proposed pricing 2 10.7. Commercial scenario",
   "layout": {
    "template": "split",
    "regions": [
@@ -1865,6 +1976,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 128 §Forecast"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save signal registry policy",
+       "operation": "setSignalRegistryPolicy",
+       "permission": "AI_CONFIGURE",
+       "notes": "**AI governance of signals and models** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /signal-registry"
+      }
+     ]
     }
    ]
   },
@@ -1881,6 +2006,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "AI Learning, Model Performance & Optimization Feedback",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setSignalRegistryPolicy",
+    "contract": "catalogue",
+    "purpose": "Register a signal or model and set how far AI may trust it",
+    "trigger": "onAction",
+    "invalidates": [
+     "listLearningModelPerformance"
+    ]
    }
   ],
   "entryState": {
@@ -1896,9 +2030,47 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-117"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-117",
+   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-117"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 128. 7 of 8 labels bound to a contract property; 8 of 96 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetSignalRegistryPolicy",
+    "component": "modal",
+    "trigger": "Save signal registry policy",
+    "body": "**Collects what `setSignalRegistryPolicy` sends before it is called.** Required: `id`, `scopePath`, `registryKind`, `name`, `trustLevel`. Optional: `category`, `provider`, `source`, `internalExternal`, `marketCode`, `refreshFrequency`, `aiUsePermissions`, `fallbackPolicy`, `status`, `ownerPrincipalId`, `purpose`, `deployedAt` and 5 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SignalRegistryEntry",
+    "confirm": {
+     "label": "Save signal registry policy",
+     "operation": "setSignalRegistryPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "registryKind",
+      "name",
+      "trustLevel",
+      "category",
+      "provider",
+      "source",
+      "internalExternal",
+      "marketCode",
+      "refreshFrequency",
+      "aiUsePermissions",
+      "fallbackPolicy",
+      "status",
+      "ownerPrincipalId",
+      "purpose",
+      "deployedAt",
+      "trainingWindow"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /signal-registry"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1941,9 +2113,34 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "LiveDynamicPriceExecutionDeploymentMonitorInput",
   "responds": "LiveDynamicPriceExecutionDeploymentMonitorView"
+ },
+ "decidePricingRecommendation": {
+  "method": "POST",
+  "path": "/recommendation-review-decision/{recommendationId}/decision",
+  "contract": "catalogue",
+  "summary": "Record a human decision on an AI pricing recommendation",
+  "permission": "AI_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PricingRecommendationDecisionInput",
+  "responds": "PricingRecommendationDecision"
  },
  "listAutomationPolicyAutonomous": {
   "method": "GET",
@@ -1954,9 +2151,40 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "automationLevel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "strategy",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "paused",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "AutomationPolicyAutonomousPricingOrchestratorView"
+  "responds": "Page"
  },
  "listDynamicPricingPerformance": {
   "method": "GET",
@@ -1967,9 +2195,60 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "level",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "market",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "compareBy",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "DynamicPricingPerformanceOptimizationAnalyticsView"
+  "responds": "Page"
  },
  "listLearningModelPerformance": {
   "method": "GET",
@@ -1980,9 +2259,60 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "modelName",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "eventType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "season",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "market",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "forecastHorizon",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "AiLearningModelPerformanceOptimizationFeedbackView"
+  "responds": "Page"
  },
  "listRecommendationReviewDecision": {
   "method": "GET",
@@ -1993,9 +2323,45 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "urgency",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "decision",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "governanceLevel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "AiRecommendationReviewDecisionQueueView"
+  "responds": "Page"
  },
  "listRevenue": {
   "method": "GET",
@@ -2006,9 +2372,40 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "automationMode",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "urgency",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "rankBy",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "RevenueOptimizationCommandCenterView"
+  "responds": "Page"
  },
  "listRevenueDemandImpact": {
   "method": "GET",
@@ -2019,9 +2416,40 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "recommendationId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "simulationId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "RevenueDemandImpactForecastingView"
+  "responds": "Page"
  },
  "listScenarioModelingWhat": {
   "method": "GET",
@@ -2032,9 +2460,54 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "scenarioType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ScenarioModelingWhatIfAnalysisView"
+  "responds": "Page"
+ },
+ "setDynamicPricingGuardrailPolicy": {
+  "method": "PUT",
+  "path": "/dynamic-pricing-controls",
+  "contract": "catalogue",
+  "summary": "Set the guardrails and automation level of dynamic pricing at one scope",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DynamicPricingControl",
+  "responds": "DynamicPricingControl"
  },
  "setPricing": {
   "method": "PUT",
@@ -2045,7 +2518,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PricingSimulationStudioInput",
   "responds": "PricingSimulationStudioView"
  },
@@ -2058,9 +2537,34 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ABPricingExperimentStudioInput",
   "responds": "ABPricingExperimentStudioView"
+ },
+ "setSignalRegistryPolicy": {
+  "method": "PUT",
+  "path": "/signal-registry",
+  "contract": "catalogue",
+  "summary": "Register a signal or model and set how far AI may trust it",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SignalRegistryEntry",
+  "responds": "SignalRegistryEntry"
  }
 }
 ```
@@ -2087,94 +2591,85 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "product": {
     "type": "string",
-    "description": "Product"
+    "description": "Product id"
    },
    "event": {
     "type": "string",
-    "description": "Event"
+    "description": "Event id",
+    "nullable": true
    },
    "performance": {
     "type": "string",
-    "description": "Performance"
+    "description": "Performance id",
+    "nullable": true
    },
    "channel": {
-    "type": "string",
+    "$ref": "#/components/schemas/Channel",
     "description": "Channel"
    },
    "customerSegment": {
     "type": "string",
-    "description": "Customer Segment"
+    "description": "Customer segment",
+    "nullable": true
    },
    "startDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "Start Date"
+    "description": "Start Date",
+    "format": "date"
    },
    "endDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "End Date"
-   },
-   "revenue78": {
-    "type": "number",
-    "description": "Revenue +7.8%"
-   },
-   "conversion12": {
-    "type": "number",
-    "description": "Conversion −1.2%"
-   },
-   "asp6": {
-    "type": "number",
-    "description": "ASP +6%"
-   },
-   "confidence96": {
-    "type": "number",
-    "description": "Confidence 96%"
-   },
-   "aAed250": {
-    "type": "string",
-    "description": "A — AED 250"
-   },
-   "bAed260": {
-    "type": "string",
-    "description": "B — AED 260"
-   },
-   "cAed270": {
-    "type": "string",
-    "description": "C — AED 270"
-   },
-   "selectType": {
-    "type": "string",
-    "enum": [
-     "revenue",
-     "conversion",
-     "averageSellingPrice",
-     "margin",
-     "sellThrough",
-     "occupancy",
-     "revenuePerVisitor"
-    ],
-    "description": "Vocabulary listed under Select."
+    "description": "End Date",
+    "format": "date"
    },
    "minimumPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Minimum Price"
+    "description": "Minimum Price no variant may go below"
    },
    "maximumPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Maximum Price"
+    "description": "Maximum Price no variant may exceed"
    },
-   "contractRates": {
-    "type": "string",
-    "description": "Contract Rates"
+   "variants": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "label": {
+       "type": "string",
+       "description": "Variant label (A = control)"
+      },
+      "price": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Variant price"
+      },
+      "trafficSharePercent": {
+       "type": "number",
+       "description": "Share of traffic, percent; variants sum to 100"
+      }
+     }
+    },
+    "description": "Variant Configuration: control plus 1-3 variants (decided 29 September, readiness close-out)"
    },
-   "membershipRates": {
-    "type": "string",
-    "description": "Membership Rates"
+   "successMetrics": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "revenue",
+      "conversion",
+      "averageSellingPrice",
+      "margin",
+      "sellThrough",
+      "occupancy",
+      "revenuePerVisitor"
+     ]
+    },
+    "description": "Success Metrics"
    },
-   "regulatoryRequirements": {
-    "type": "string",
-    "description": "Regulatory Requirements"
+   "targetConfidenceLevel": {
+    "type": "number",
+    "description": "Target confidence level, percent; default 95 (decided 29 September, readiness close-out)"
    }
   }
  },
@@ -2194,111 +2689,163 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "product": {
     "type": "string",
-    "description": "Product"
+    "description": "Product id"
    },
    "event": {
     "type": "string",
-    "description": "Event"
+    "description": "Event id",
+    "nullable": true
    },
    "performance": {
     "type": "string",
-    "description": "Performance"
+    "description": "Performance id",
+    "nullable": true
    },
    "channel": {
-    "type": "string",
+    "$ref": "#/components/schemas/Channel",
     "description": "Channel"
    },
    "customerSegment": {
     "type": "string",
-    "description": "Customer Segment"
+    "description": "Customer segment",
+    "nullable": true
    },
    "startDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "Start Date"
+    "description": "Start Date",
+    "format": "date"
    },
    "endDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "End Date"
-   },
-   "revenue78": {
-    "type": "number",
-    "description": "Revenue +7.8%"
-   },
-   "conversion12": {
-    "type": "number",
-    "description": "Conversion −1.2%"
-   },
-   "asp6": {
-    "type": "number",
-    "description": "ASP +6%"
-   },
-   "confidence96": {
-    "type": "number",
-    "description": "Confidence 96%"
-   },
-   "aAed250": {
-    "type": "string",
-    "description": "A — AED 250"
-   },
-   "bAed260": {
-    "type": "string",
-    "description": "B — AED 260"
-   },
-   "cAed270": {
-    "type": "string",
-    "description": "C — AED 270"
-   },
-   "selectType": {
-    "type": "string",
-    "enum": [
-     "revenue",
-     "conversion",
-     "averageSellingPrice",
-     "margin",
-     "sellThrough",
-     "occupancy",
-     "revenuePerVisitor"
-    ],
-    "description": "Vocabulary listed under Select."
+    "description": "End Date",
+    "format": "date"
    },
    "minimumPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Minimum Price"
+    "description": "Minimum Price no variant may go below"
    },
    "maximumPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Maximum Price"
-   },
-   "contractRates": {
-    "type": "string",
-    "description": "Contract Rates"
-   },
-   "membershipRates": {
-    "type": "string",
-    "description": "Membership Rates"
-   },
-   "regulatoryRequirements": {
-    "type": "string",
-    "description": "Regulatory Requirements"
+    "description": "Maximum Price no variant may exceed"
    },
    "sampleSize": {
-    "type": "string",
-    "description": "Sample Size"
+    "type": "integer",
+    "description": "Sample Size reached"
    },
    "confidenceLevel": {
-    "type": "string",
-    "description": "Confidence Level"
+    "type": "number",
+    "description": "Target Confidence Level; default 95 (decided 29 September, readiness close-out), percent"
    },
    "experimentDuration": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Experiment Duration"
+    "type": "integer",
+    "description": "Experiment Duration, days"
    },
    "statisticalSignificance": {
+    "type": "boolean",
+    "description": "Statistical Significance reached at the target confidence level"
+   },
+   "experimentId": {
     "type": "string",
-    "description": "Statistical Significance"
+    "description": "Experiment id"
+   },
+   "variants": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "label": {
+       "type": "string",
+       "description": "Variant label (A = control)"
+      },
+      "price": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Variant price"
+      },
+      "trafficSharePercent": {
+       "type": "number",
+       "description": "Share of traffic, percent; variants sum to 100"
+      }
+     }
+    },
+    "description": "Variant Configuration: control plus 1-3 variants (decided 29 September, readiness close-out)"
+   },
+   "successMetrics": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "revenue",
+      "conversion",
+      "averageSellingPrice",
+      "margin",
+      "sellThrough",
+      "occupancy",
+      "revenuePerVisitor"
+     ]
+    },
+    "description": "Success Metrics"
+   },
+   "guardrailChecks": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "check": {
+       "type": "string",
+       "enum": [
+        "minimumPrice",
+        "maximumPrice",
+        "contractRates",
+        "membershipRates",
+        "regulatoryRequirements"
+       ],
+       "description": "Guardrail"
+      },
+      "passed": {
+       "type": "boolean",
+       "description": "Pass / fail"
+      }
+     }
+    },
+    "description": "Guardrails the experiment must respect"
+   },
+   "variantResults": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "label": {
+       "type": "string",
+       "description": "Variant"
+      },
+      "revenueChangePercent": {
+       "type": "number",
+       "description": "Revenue change vs control, percent"
+      },
+      "conversionChangePercent": {
+       "type": "number",
+       "description": "Conversion change vs control, percent"
+      },
+      "aspChangePercent": {
+       "type": "number",
+       "description": "ASP change vs control, percent"
+      },
+      "confidence": {
+       "type": "number",
+       "description": "Statistical confidence, percent"
+      }
+     }
+    },
+    "description": "Results per variant"
+   },
+   "recommendedWinner": {
+    "type": "string",
+    "description": "Statistically preferred variant label, advisory",
+    "nullable": true
+   },
+   "experimentStage": {
+    "type": "string",
+    "description": "Stage: draft, pendingApproval, running, completed or stopped (decided 29 September, readiness close-out)"
    }
   }
  },
@@ -2309,104 +2856,146 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "description": "**What AI Learning, Model Performance & Optimization Feedback displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "forecastError": {
-    "type": "string",
-    "description": "Forecast Error (the pack shows +2.3%)"
-   },
-   "aed256m": {
-    "type": "string",
-    "description": "AED 2.56M"
+    "type": "number",
+    "description": "Mean forecast error (actual vs forecast demand), percent"
    },
    "demandForecastAccuracy": {
-    "type": "string",
-    "description": "Demand Forecast Accuracy"
+    "type": "number",
+    "description": "Demand Forecast Accuracy, percent"
    },
    "revenueForecastAccuracy": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue Forecast Accuracy"
+    "type": "number",
+    "description": "Revenue Forecast Accuracy, percent"
    },
    "elasticityAccuracy": {
     "type": "number",
-    "description": "Elasticity Accuracy"
+    "description": "Elasticity Accuracy, percent"
    },
    "recommendationSuccess": {
-    "type": "string",
-    "description": "Recommendation Success"
+    "type": "number",
+    "description": "Recommendation Success, percent"
    },
    "confidenceCalibration": {
-    "type": "string",
-    "description": "Confidence Calibration"
+    "type": "number",
+    "description": "Confidence Calibration: how closely stated confidence matched realised accuracy, percent"
    },
    "falsePositiveRate": {
     "type": "number",
-    "description": "False Positive Rate"
+    "description": "False Positive Rate, percent"
    },
    "revenueUplift": {
     "type": "number",
-    "description": "Revenue Uplift"
+    "description": "Revenue Uplift, percent"
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue",
+    "nullable": true
    },
    "product": {
     "type": "string",
-    "description": "Product"
+    "description": "Product",
+    "nullable": true
    },
    "eventType": {
     "type": "string",
-    "description": "Event Type"
+    "description": "Event type",
+    "nullable": true
    },
    "season": {
     "type": "string",
-    "description": "Season"
+    "description": "Season",
+    "nullable": true
    },
    "channel": {
-    "type": "string",
+    "$ref": "#/components/schemas/Channel",
     "description": "Channel"
    },
    "market": {
     "type": "string",
-    "description": "Market"
+    "description": "Market",
+    "nullable": true
    },
    "forecastHorizon": {
     "type": "string",
-    "description": "Forecast Horizon"
+    "description": "Forecast Horizon",
+    "enum": [
+     "intraday",
+     "tomorrow",
+     "days7",
+     "days30",
+     "eventHorizon",
+     "seasonalHorizon"
+    ]
    },
-   "high96": {
-    "type": "number",
-    "description": "High 96%"
-   },
-   "occupancyHigh98": {
-    "type": "integer",
-    "description": "Occupancy High 98%"
-   },
-   "weatherMedium87": {
-    "type": "number",
-    "description": "Weather Medium 87%"
-   },
-   "high91": {
-    "type": "number",
-    "description": "High 91%"
-   },
-   "competitorMedium82": {
-    "type": "number",
-    "description": "Competitor Medium 82%"
-   },
-   "configuredAndGoverned": {
+   "modelName": {
     "type": "string",
-    "description": "configured and governed"
+    "description": "Model name"
    },
-   "definesTheCommercialPriceStructures": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Defines the commercial price structures"
-   },
-   "calculatesTheFinalPayableAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Calculates the final payable amount"
-   },
-   "wouldFreezeForDevelopmentTeam": {
+   "modelVersion": {
     "type": "string",
-    "description": "would freeze for Development team"
+    "description": "Model version"
+   },
+   "lifecycleStage": {
+    "type": "string",
+    "description": "Model lifecycle: candidate, validation, approved, production, monitored or retired"
+   },
+   "accuracyChange30d": {
+    "type": "number",
+    "description": "Model Drift: accuracy change over the last 30 days, percent"
+   },
+   "signalEffectiveness": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "signal": {
+       "type": "string",
+       "enum": [
+        "internalSales",
+        "bookingVelocity",
+        "occupancy",
+        "historicalEvents",
+        "nearbyEvent",
+        "weather",
+        "marketTourism",
+        "competitor",
+        "priceElasticity",
+        "other"
+       ],
+       "description": "Signal"
+      },
+      "forecastContribution": {
+       "type": "string",
+       "enum": [
+        "low",
+        "medium",
+        "high"
+       ],
+       "description": "Forecast contribution"
+      },
+      "reliability": {
+       "type": "number",
+       "description": "Reliability, percent"
+      }
+     }
+    },
+    "description": "Signal Effectiveness"
+   },
+   "humanOverrideRate": {
+    "type": "number",
+    "description": "Share of AI recommendations modified by Revenue Managers, percent"
+   },
+   "overrideOutcomeDelta": {
+    "type": "number",
+    "description": "Revenue outcome of overridden vs unmodified recommendations, percent"
+   },
+   "optimizationSuggestions": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI Optimization Recommendations; adopting one requires governance. Advisory only: generated narrative never changes a price (decided 29 September, readiness close-out)"
    }
   }
  },
@@ -2418,7 +3007,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "recommendation": {
     "type": "string",
-    "description": "Recommendation"
+    "description": "Recommendation title"
    },
    "venue": {
     "type": "string",
@@ -2438,83 +3027,130 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "change": {
     "type": "number",
-    "description": "Change %"
+    "description": "Change %, percent"
    },
    "revenueOpportunity": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Revenue Opportunity"
    },
    "demandImpact": {
-    "type": "string",
-    "description": "Demand Impact"
+    "type": "number",
+    "description": "Demand Impact, percent"
    },
    "confidence": {
-    "type": "string",
-    "description": "Confidence"
+    "type": "number",
+    "description": "AI Confidence, percent"
    },
    "urgency": {
     "type": "string",
-    "description": "Urgency"
+    "description": "Urgency",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
    },
    "governanceLevel": {
     "type": "string",
-    "description": "Governance Level"
-   },
-   "fromBoard6": {
-    "type": "string",
-    "description": "from Board 6"
-   },
-   "fromBoard7": {
-    "type": "string",
-    "description": "from Board 7"
+    "description": "Governance Level: approval level required, from the configured approval matrix"
    },
    "simulationRevenueUplift": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Simulation Revenue Uplift (Board 7)"
+   },
+   "recommendationId": {
+    "type": "string",
+    "description": "Recommendation id"
+   },
+   "drivers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "signal": {
+       "type": "string",
+       "enum": [
+        "internalSales",
+        "bookingVelocity",
+        "occupancy",
+        "historicalEvents",
+        "nearbyEvent",
+        "weather",
+        "marketTourism",
+        "competitor",
+        "priceElasticity",
+        "other"
+       ],
+       "description": "Signal category behind the driver"
+      },
+      "direction": {
+       "type": "string",
+       "enum": [
+        "up",
+        "down"
+       ],
+       "description": "Whether the driver pushes the price up or down"
+      },
+      "explanation": {
+       "type": "string",
+       "description": "Business-language evidence, e.g. booking velocity 31% above forecast"
+      }
+     }
+    },
+    "description": "Primary drivers of the recommendation (pack's up/down driver list); explanatory, not literal model weights"
+   },
+   "guardrailsPassed": {
+    "type": "boolean",
+    "description": "Guardrails passed"
+   },
+   "decision": {
+    "type": "string",
+    "description": "Decision: pending, accepted, rejected, modified, scheduled or sentForApproval; every item starts pending"
+   },
+   "rejectionReason": {
+    "type": "string",
+    "description": "Rejection Reason",
+    "enum": [
+     "commercialJudgment",
+     "brandPositioning",
+     "customerSensitivity",
+     "eventStrategy",
+     "incorrectSignal",
+     "dataConcern",
+     "other"
+    ],
+    "nullable": true
+   },
+   "rejectionNote": {
+    "type": "string",
+    "description": "Free-text note, required when reason is other",
+    "nullable": true
+   },
+   "humanSelectedPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price the Revenue Manager chose when modifying"
+   },
+   "scheduledFor": {
+    "type": "string",
+    "description": "When a scheduled change should execute",
+    "format": "date-time",
+    "nullable": true
+   },
+   "decidedBy": {
+    "type": "string",
+    "description": "User who decided",
+    "nullable": true
+   },
+   "decidedAt": {
+    "type": "string",
+    "description": "When decided",
+    "format": "date-time",
+    "nullable": true
+   },
+   "actualRevenueResultPercent": {
     "type": "number",
-    "description": "Simulation Revenue Uplift (the pack shows +AED 73,400, 122 | Pag e)"
-   },
-   "accept": {
-    "type": "string",
-    "description": "Accept"
-   },
-   "modify": {
-    "type": "string",
-    "description": "Modify"
-   },
-   "simulateAgain": {
-    "type": "string",
-    "description": "Simulate Again"
-   },
-   "commercialJudgment": {
-    "type": "string",
-    "description": "Commercial Judgment"
-   },
-   "brandPositioning": {
-    "type": "string",
-    "description": "Brand Positioning"
-   },
-   "customerSensitivity": {
-    "type": "string",
-    "description": "Customer Sensitivity"
-   },
-   "eventStrategy": {
-    "type": "string",
-    "description": "Event Strategy"
-   },
-   "incorrectSignal": {
-    "type": "string",
-    "description": "Incorrect Signal"
-   },
-   "dataConcern": {
-    "type": "string",
-    "description": "Data Concern"
-   },
-   "theSystemRecordsTheModification": {
-    "type": "string",
-    "description": "The system records the modification"
-   },
-   "actualRevenueResult59": {
-    "type": "number",
-    "description": "Actual Revenue Result +5.9%"
+    "description": "Feedback Loop: actual revenue result after execution; empty until measured, percent"
    }
   }
  },
@@ -2530,97 +3166,390 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue",
+    "nullable": true
    },
    "product": {
     "type": "string",
-    "description": "Product"
+    "description": "Product",
+    "nullable": true
    },
    "event": {
     "type": "string",
-    "description": "Event"
+    "description": "Event",
+    "nullable": true
    },
    "strategy": {
     "type": "string",
-    "description": "Strategy"
+    "description": "Dynamic pricing strategy (Board 5)"
    },
    "channel": {
-    "type": "string",
+    "$ref": "#/components/schemas/Channel",
     "description": "Channel"
    },
    "market": {
     "type": "string",
-    "description": "Market"
+    "description": "Market",
+    "nullable": true
    },
-   "dateTime": {
+   "effectiveFrom": {
     "type": "string",
-    "format": "date-time",
-    "description": "Date/Time"
+    "description": "Effective from",
+    "format": "date-time"
    },
    "evaluationFrequency": {
-    "type": "string",
-    "description": "Evaluation Frequency"
+    "type": "integer",
+    "description": "Evaluation Frequency, minutes; default 60 (decided 29 September, readiness close-out)"
    },
    "executionFrequency": {
-    "type": "string",
-    "description": "Execution Frequency"
+    "type": "integer",
+    "description": "Execution Frequency, minutes; default 240 (decided 29 September, readiness close-out)"
    },
    "minimumTimeBetweenChanges": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Minimum Time Between Changes"
+    "type": "integer",
+    "description": "Minimum Time Between Changes, minutes; default 240 (decided 29 September, readiness close-out)"
    },
    "maximumChangesPerDay": {
-    "type": "string",
-    "description": "Maximum Changes per Day"
-   },
-   "aiRecommendsOnly": {
-    "type": "string",
-    "description": "AI recommends only"
-   },
-   "aiRecommendsHumanApproval": {
-    "type": "string",
-    "description": "AI recommends → human approval"
-   },
-   "guardrailsPassed": {
-    "type": "string",
-    "description": "Guardrails Passed"
-   },
-   "noProtectedRate": {
-    "type": "number",
-    "description": "No Protected Rate"
-   },
-   "forecastDataHealthy": {
-    "type": "string",
-    "description": "Forecast Data Healthy"
-   },
-   "dataQualityFalls": {
-    "type": "string",
-    "description": "Data Quality Falls"
-   },
-   "modelConfidenceDrops": {
-    "type": "string",
-    "description": "Model Confidence Drops"
-   },
-   "conversionDropsAbnormally": {
-    "type": "number",
-    "description": "Conversion Drops Abnormally"
-   },
-   "priceVolatilityExceedsThreshold": {
     "type": "integer",
-    "description": "Price Volatility Exceeds Threshold"
+    "description": "Maximum Changes per Day; default 3 (decided 29 September, readiness close-out)"
    },
-   "revenueFalls": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue Falls"
+   "requireGuardrailsPassed": {
+    "type": "boolean",
+    "description": "Auto-execute only if guardrails passed; always true, cannot be switched off"
    },
-   "integrationFails": {
+   "excludeProtectedRates": {
+    "type": "boolean",
+    "description": "Auto-execute only if no protected (contract/member) rate is affected; default true (decided 29 September, readiness close-out)"
+   },
+   "requireHealthyForecastData": {
+    "type": "boolean",
+    "description": "Auto-execute only if forecast data is healthy; default true (decided 29 September, readiness close-out)"
+   },
+   "policyId": {
     "type": "string",
-    "description": "Integration Fails"
+    "description": "Policy id"
    },
-   "withStrictPermissionControl": {
+   "effectiveTo": {
     "type": "string",
-    "description": "with strict permission control"
+    "description": "Effective to",
+    "format": "date-time",
+    "nullable": true
+   },
+   "automationLevel": {
+    "type": "string",
+    "description": "Automation Level; default advisory (decided 29 September, readiness close-out)",
+    "enum": [
+     "advisory",
+     "humanInTheLoop",
+     "conditionalAutonomous",
+     "autonomous"
+    ]
+   },
+   "maxAdjustmentPercent": {
+    "type": "number",
+    "description": "Auto-execute only if adjustment is at or below this, percent; default 5 (decided 29 September, readiness close-out)"
+   },
+   "minAiConfidence": {
+    "type": "number",
+    "description": "Auto-execute only if AI confidence is at or above this, percent; default 90 (decided 29 September, readiness close-out)"
+   },
+   "minRevenueUpliftPercent": {
+    "type": "number",
+    "description": "Auto-execute only if expected uplift is at or above this, percent; default 2 (decided 29 September, readiness close-out)"
+   },
+   "quietPeriodMinutes": {
+    "type": "integer",
+    "description": "Quiet Period: no automated change within this many minutes of event start; default 60 (decided 29 September, readiness close-out)"
+   },
+   "circuitBreakers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "trigger": {
+       "type": "string",
+       "enum": [
+        "dataQualityFalls",
+        "modelConfidenceDrops",
+        "conversionDropsAbnormally",
+        "priceVolatilityExceedsThreshold",
+        "revenueFalls",
+        "integrationFails"
+       ],
+       "description": "Circuit breaker"
+      },
+      "threshold": {
+       "type": "number",
+       "description": "Trigger threshold, in the trigger's unit"
+      },
+      "enabled": {
+       "type": "boolean",
+       "description": "Enabled; all enabled by default"
+      },
+      "tripped": {
+       "type": "boolean",
+       "description": "Currently tripped"
+      }
+     }
+    },
+    "description": "Circuit Breakers (decided 29 September, readiness close-out)"
+   },
+   "paused": {
+    "type": "boolean",
+    "description": "Paused by PAUSE ALL AUTONOMOUS PRICING or a tripped breaker"
+   }
+  }
+ },
+ "Channel": {
+  "type": "string",
+  "enum": [
+   "pos",
+   "kiosk",
+   "web",
+   "mobile",
+   "b2b",
+   "ota",
+   "callCentre"
+  ]
+ },
+ "DynamicPricingControl": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.dynamic_pricing_control",
+  "description": "**The limits and the autonomy of dynamic pricing at one scope** (29 September, data model DM3). Merges guardrails (ADM-093) and automation policy (ADM-094, ADM-113): both are per-scope controls a price change must pass, and they share the rate-of-change limits. The most specific scope wins; guardrails are re-checked at execution (`createLiveDynamicPrice`). `automationLevel` is the one vocabulary: the strategy screen's `monitor`/`recommend` read as `advisory`, `prepareChange` as `humanInTheLoop`, `autoExecuteWithinGuardrails` as `conditionalAutonomous`.",
+  "required": [
+   "id",
+   "scopePath",
+   "scopeLevel",
+   "automationLevel"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "scopeLevel": {
+    "type": "string",
+    "enum": [
+     "global",
+     "market",
+     "venue",
+     "strategy",
+     "product",
+     "event",
+     "performance",
+     "channel"
+    ]
+   },
+   "scopeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null at `global`."
+   },
+   "absoluteMinimumPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "absoluteMaximumPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "minimumMarginPercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "maximumUpliftPercent": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0
+   },
+   "maximumReductionPercent": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0
+   },
+   "maximumSingleChangePercent": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0
+   },
+   "maximumDailyChangePercent": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0
+   },
+   "maximumWeeklyChangePercent": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0
+   },
+   "minimumChangeIntervalMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "maximumChangesPerDay": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "minimumInventory": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "maximumOccupancyTriggerPercent": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 100
+   },
+   "protectedRateTypes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "contractRates",
+      "membershipRates",
+      "corporateRates",
+      "promotionalLockedRates",
+      "regulatoryPrices",
+      "complimentaryRates"
+     ]
+    }
+   },
+   "isFrozen": {
+    "type": "boolean",
+    "default": false
+   },
+   "isKillSwitchActive": {
+    "type": "boolean",
+    "default": false,
+    "description": "Stops every automatic change in scope at once."
+   },
+   "automationLevel": {
+    "type": "string",
+    "enum": [
+     "advisory",
+     "humanInTheLoop",
+     "conditionalAutonomous",
+     "autonomous"
+    ],
+    "default": "advisory"
+   },
+   "authorityTiers": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "`[{maxAdjustmentPercent, action, confidenceThreshold}]`."
+   },
+   "maxAdjustmentPercent": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0
+   },
+   "minAiConfidence": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 1
+   },
+   "minRevenueUpliftPercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "evaluationFrequencyMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 1
+   },
+   "executionFrequencyMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 1
+   },
+   "quietPeriodMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "noChangeWindows": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "`[{anchor, minutesBefore, minutesAfter, clockFrom, clockTo}]`."
+   },
+   "circuitBreakers": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "`[{trigger, threshold, enabled, tripped}]`."
+   },
+   "requireGuardrailsPassed": {
+    "type": "boolean",
+    "default": true
+   },
+   "excludeProtectedRates": {
+    "type": "boolean",
+    "default": true
+   },
+   "requireHealthyForecastData": {
+    "type": "boolean",
+    "default": true
+   },
+   "safeFailureBehavior": {
+    "type": "string",
+    "enum": [
+     "holdLastPrice",
+     "returnToBase",
+     "freeze",
+     "requestReview"
+    ],
+    "default": "holdLastPrice"
+   },
+   "activeOverride": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "`{user, reason, overridePrice, start, expiry, returnBehavior}`."
+   },
+   "isPaused": {
+    "type": "boolean",
+    "default": false
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -2636,34 +3565,34 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "revenueUplift": {
     "type": "number",
-    "description": "Revenue Uplift %"
+    "description": "Revenue Uplift, percent"
    },
    "marginUplift": {
     "type": "number",
-    "description": "Margin Uplift"
+    "description": "Margin Uplift, percent"
    },
    "averageSellingPrice": {
-    "type": "number",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Average Selling Price"
    },
    "conversion": {
     "type": "number",
-    "description": "Conversion"
+    "description": "Conversion, percent"
    },
    "attendance": {
     "type": "integer",
     "description": "Attendance"
    },
    "occupancy": {
-    "type": "integer",
-    "description": "Occupancy"
+    "type": "number",
+    "description": "Occupancy, percent"
    },
    "sellThrough": {
-    "type": "string",
-    "description": "Sell-Through"
+    "type": "number",
+    "description": "Sell-Through, percent"
    },
    "revenuePerAvailableCapacity": {
-    "type": "integer",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Revenue per Available Capacity"
    },
    "numberOfPriceChanges": {
@@ -2671,15 +3600,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Number of Price Changes"
    },
    "strategyRoi": {
-    "type": "string",
-    "description": "Strategy ROI"
+    "type": "number",
+    "description": "Strategy ROI, percent"
    },
    "recommendationsGenerated": {
-    "type": "string",
+    "type": "integer",
     "description": "Recommendations Generated"
    },
    "accepted": {
-    "type": "string",
+    "type": "integer",
     "description": "Accepted"
    },
    "rejected": {
@@ -2687,85 +3616,88 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Rejected"
    },
    "modified": {
-    "type": "string",
+    "type": "integer",
     "description": "Modified"
    },
    "autoExecuted": {
-    "type": "string",
+    "type": "integer",
     "description": "Auto-Executed"
    },
    "successful": {
-    "type": "string",
+    "type": "integer",
     "description": "Successful"
    },
    "negativeOutcome": {
-    "type": "string",
+    "type": "integer",
     "description": "Negative Outcome"
    },
-   "dynamicVsFixedPricing": {
+   "level": {
     "type": "string",
-    "description": "Dynamic vs Fixed Pricing"
+    "description": "Drilldown level of this row",
+    "enum": [
+     "market",
+     "venue",
+     "event",
+     "performance",
+     "product",
+     "priceCategory",
+     "channel"
+    ]
    },
-   "aiVsRules": {
+   "key": {
     "type": "string",
-    "description": "AI vs Rules"
+    "description": "Id of the market/venue/event/... at that level"
    },
-   "aiVsHuman": {
+   "label": {
     "type": "string",
-    "description": "AI vs Human"
+    "description": "Display name"
    },
-   "strategyVsStrategy": {
+   "comparisonGroup": {
     "type": "string",
-    "description": "Strategy vs Strategy"
+    "description": "Side of the comparison this row is, e.g. dynamic / fixed, AI / rules",
+    "nullable": true
    },
-   "venueVsVenue": {
-    "type": "string",
-    "description": "Venue vs Venue"
-   },
-   "eventVsEvent": {
-    "type": "string",
-    "description": "Event vs Event"
-   },
-   "channelVsChannel": {
-    "type": "string",
-    "description": "Channel vs Channel"
-   },
-   "currentVsPreviousPeriod": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Current vs Previous Period"
-   },
-   "revenue": {
+   "opportunityLost": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue (the pack shows +8.4%)"
+    "description": "Opportunity Lost: estimated revenue not captured through rejected recommendations (analytical estimate)"
    },
-   "asp": {
-    "type": "string",
-    "description": "ASP (the pack shows +6.2%)"
-   },
-   "margin": {
-    "type": "number",
-    "description": "Margin (the pack shows +9.7%)"
-   },
-   "with": {
-    "type": "string",
-    "description": "with"
-   },
-   "demand": {
-    "type": "string",
-    "description": "Demand"
-   },
-   "bookingVelocity": {
-    "type": "string",
-    "description": "Booking Velocity"
-   },
-   "movement": {
-    "type": "string",
-    "description": "movement"
-   },
-   "recommendationsWereRejected": {
-    "type": "string",
-    "description": "recommendations were rejected"
+   "priceTimeline": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "at": {
+       "type": "string",
+       "format": "date-time",
+       "description": "Moment of the price movement"
+      },
+      "price": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Price"
+      },
+      "demand": {
+       "type": "integer",
+       "description": "Demand"
+      },
+      "occupancy": {
+       "type": "number",
+       "description": "Occupancy, percent"
+      },
+      "conversion": {
+       "type": "number",
+       "description": "Conversion, percent"
+      },
+      "bookingVelocity": {
+       "type": "number",
+       "description": "Booking velocity vs forecast, percent"
+      },
+      "revenue": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Revenue"
+      }
+     }
+    },
+    "description": "Price Timeline overlay"
    }
   }
  },
@@ -2775,66 +3707,78 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Live Dynamic Price Execution & Deployment Monitor submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "timestamp": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Timestamp"
-   },
    "product": {
     "type": "string",
-    "description": "Product"
+    "description": "Product id"
    },
    "event": {
     "type": "string",
-    "description": "Event"
-   },
-   "previousPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Previous Price"
+    "description": "Event id",
+    "nullable": true
    },
    "newPrice": {
-    "type": "integer",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "New Price"
    },
    "strategy": {
     "type": "string",
-    "description": "Strategy"
+    "description": "Strategy id",
+    "nullable": true
    },
    "aiRecommendation": {
     "type": "string",
-    "description": "AI Recommendation"
+    "description": "Recommendation id",
+    "nullable": true
    },
    "approval": {
     "type": "string",
-    "description": "Approval"
+    "description": "Approval reference; required unless the automation policy permits automatic execution",
+    "nullable": true
    },
    "executionSource": {
     "type": "string",
-    "description": "Execution Source"
+    "description": "Execution Source",
+    "enum": [
+     "manual",
+     "humanApproved",
+     "scheduled",
+     "conditionalAutonomous",
+     "autonomous"
+    ]
    },
-   "status": {
+   "performance": {
     "type": "string",
-    "description": "Status"
+    "description": "Performance id",
+    "nullable": true
    },
-   "aed250Aed265": {
+   "trigger": {
     "type": "string",
-    "description": "AED 250 → AED 265"
+    "description": "Trigger",
+    "nullable": true
    },
-   "bookingVelocityOccupancy": {
-    "type": "integer",
-    "description": "Booking Velocity + Occupancy"
+   "channels": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "b2c",
+      "mobileApp",
+      "pos",
+      "kiosk",
+      "callCenter",
+      "b2b",
+      "reseller",
+      "ota",
+      "api"
+     ]
+    },
+    "description": "Channels to deploy to; default all channels the product is sold on (decided 29 September, readiness close-out)"
    },
-   "priceInconsistencyDetected": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price inconsistency detected"
-   },
-   "hold": {
+   "scheduledFor": {
     "type": "string",
-    "description": "Hold"
-   },
-   "revert": {
-    "type": "string",
-    "description": "Revert"
+    "description": "Execute at; empty = now",
+    "format": "date-time",
+    "nullable": true
    }
   }
  },
@@ -2846,100 +3790,271 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "timestamp": {
     "type": "string",
-    "format": "date-time",
-    "description": "Timestamp"
+    "description": "Timestamp",
+    "format": "date-time"
    },
    "product": {
     "type": "string",
-    "description": "Product"
+    "description": "Product id"
    },
    "event": {
     "type": "string",
-    "description": "Event"
+    "description": "Event id",
+    "nullable": true
    },
    "previousPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Previous Price"
    },
    "newPrice": {
-    "type": "integer",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "New Price"
    },
    "strategy": {
     "type": "string",
-    "description": "Strategy"
+    "description": "Strategy id",
+    "nullable": true
    },
    "aiRecommendation": {
     "type": "string",
-    "description": "AI Recommendation"
+    "description": "Recommendation id the change came from",
+    "nullable": true
    },
    "approval": {
     "type": "string",
-    "description": "Approval"
+    "description": "Approval reference; empty only for policy-permitted automatic execution",
+    "nullable": true
    },
    "executionSource": {
     "type": "string",
-    "description": "Execution Source"
+    "description": "Execution Source",
+    "enum": [
+     "manual",
+     "humanApproved",
+     "scheduled",
+     "conditionalAutonomous",
+     "autonomous"
+    ]
    },
    "status": {
     "type": "string",
-    "description": "Status"
+    "description": "Status: queued, processing, live, partial, failed or rolledBack"
    },
-   "aed250Aed265": {
+   "executionId": {
     "type": "string",
-    "description": "AED 250 → AED 265"
+    "description": "Execution id"
    },
-   "bookingVelocityOccupancy": {
-    "type": "integer",
-    "description": "Booking Velocity + Occupancy"
-   },
-   "b2c": {
+   "trigger": {
     "type": "string",
-    "description": "B2C"
+    "description": "Trigger, e.g. booking velocity + occupancy",
+    "nullable": true
    },
-   "mobileApp": {
+   "aiConfidence": {
+    "type": "number",
+    "description": "AI confidence at execution, percent"
+   },
+   "channelDeployments": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "channel": {
+       "type": "string",
+       "enum": [
+        "b2c",
+        "mobileApp",
+        "pos",
+        "kiosk",
+        "callCenter",
+        "b2b",
+        "reseller",
+        "ota",
+        "api"
+       ],
+       "description": "Channel"
+      },
+      "price": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Price live on the channel"
+      },
+      "consistent": {
+       "type": "boolean",
+       "description": "Channel shows the new price"
+      },
+      "deploymentStatus": {
+       "type": "string",
+       "description": "queued, processing, live, failed or rolledBack"
+      }
+     }
+    },
+    "description": "Channel Deployment"
+   },
+   "priceInconsistency": {
+    "type": "boolean",
+    "description": "Price inconsistency detected across channels"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PricingRecommendationDecision": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.pricing_recommendation_decision",
+  "description": "**One human decision on one AI pricing recommendation** (decided 29 September, readiness close-out). New table: the queue row `AiRecommendationReviewDecisionQueueView` reads its decision fields from here. Written once by `decidePricingRecommendation` and never edited; a changed mind is a new recommendation.\n",
+  "required": [
+   "id",
+   "recommendationId",
+   "decision",
+   "decidedByPrincipalId",
+   "decidedAt"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "Mobile App"
+    "format": "uuid",
+    "readOnly": true
    },
-   "pos": {
-    "type": "integer",
-    "description": "POS"
-   },
-   "kiosk": {
+   "recommendationId": {
     "type": "string",
-    "description": "Kiosk"
+    "format": "uuid",
+    "description": "A `catalogue.pricing_recommendation` (29 September, data model DM3)."
    },
-   "callCenter": {
+   "decision": {
     "type": "string",
-    "description": "Call Center"
+    "enum": [
+     "accept",
+     "modify",
+     "reject",
+     "schedule",
+     "sendForApproval"
+    ]
    },
-   "b2b": {
+   "rejectionReason": {
     "type": "string",
-    "description": "B2B"
+    "nullable": true,
+    "enum": [
+     "commercialJudgment",
+     "brandPositioning",
+     "customerSensitivity",
+     "eventStrategy",
+     "incorrectSignal",
+     "dataConcern",
+     "other",
+     null
+    ]
    },
-   "reseller": {
+   "rejectionNote": {
     "type": "string",
-    "description": "Reseller"
+    "nullable": true
    },
-   "ota": {
+   "recommendedPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "humanSelectedPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "scheduledFor": {
     "type": "string",
-    "description": "OTA"
+    "format": "date-time",
+    "nullable": true
    },
-   "apis": {
-    "type": "integer",
-    "description": "APIs"
-   },
-   "priceInconsistencyDetected": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price inconsistency detected"
-   },
-   "hold": {
+   "approvalRequestId": {
     "type": "string",
-    "description": "Hold"
+    "format": "uuid",
+    "nullable": true,
+    "description": "The approvals request opened by `sendForApproval`."
    },
-   "revert": {
+   "executionId": {
     "type": "string",
-    "description": "Revert"
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `createLiveDynamicPrice` execution that carried it out, once it has."
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true
+   }
+  }
+ },
+ "PricingRecommendationDecisionInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only",
+  "description": "What `decidePricingRecommendation` takes (decided 29 September, readiness close-out).",
+  "required": [
+   "decision"
+  ],
+  "properties": {
+   "decision": {
+    "type": "string",
+    "enum": [
+     "accept",
+     "modify",
+     "reject",
+     "schedule",
+     "sendForApproval"
+    ]
+   },
+   "rejectionReason": {
+    "type": "string",
+    "enum": [
+     "commercialJudgment",
+     "brandPositioning",
+     "customerSensitivity",
+     "eventStrategy",
+     "incorrectSignal",
+     "dataConcern",
+     "other"
+    ],
+    "description": "Required for reject."
+   },
+   "rejectionNote": {
+    "type": "string",
+    "maxLength": 2000
+   },
+   "humanSelectedPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Required for modify; must sit inside the strategy's guardrails."
+   },
+   "scheduledFor": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Required for schedule; in the future."
    }
   }
  },
@@ -2949,105 +4064,80 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Pricing Simulation Studio submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "manualPriceChange": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Manual Price Change"
-   },
-   "board5DynamicRule": {
+   "venue": {
     "type": "string",
-    "description": "Board 5 Dynamic Rule"
+    "description": "Scope: venue id",
+    "nullable": true
    },
-   "board6AiRecommendation": {
+   "product": {
     "type": "string",
-    "description": "Board 6 AI Recommendation"
+    "description": "Scope: product id",
+    "nullable": true
    },
-   "newDynamicStrategy": {
-    "type": "integer",
-    "description": "New Dynamic Strategy"
-   },
-   "existingStrategyModification": {
+   "event": {
     "type": "string",
-    "description": "Existing Strategy Modification"
+    "description": "Scope: event id",
+    "nullable": true
    },
-   "bulkPriceChange": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Bulk Price Change"
-   },
-   "selectType": {
+   "performance": {
     "type": "string",
+    "description": "Scope: performance id",
+    "nullable": true
+   },
+   "timeslot": {
+    "type": "string",
+    "description": "Scope: timeslot",
+    "nullable": true
+   },
+   "priceCategory": {
+    "type": "string",
+    "description": "Scope: price category",
+    "nullable": true
+   },
+   "channel": {
+    "$ref": "#/components/schemas/Channel",
+    "description": "Scope: channel"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Scope: customer segment",
+    "nullable": true
+   },
+   "dateFrom": {
+    "type": "string",
+    "description": "Scope: first date",
+    "format": "date"
+   },
+   "dateTo": {
+    "type": "string",
+    "description": "Scope: last date",
+    "format": "date"
+   },
+   "simulationSource": {
+    "type": "string",
+    "description": "Simulation Source",
     "enum": [
-     "venue",
-     "product",
-     "event",
-     "performance",
-     "timeslot",
-     "priceCategory",
-     "channel",
-     "customerSegment",
-     "dateRange"
-    ],
-    "description": "Vocabulary listed under Select."
+     "manualPriceChange",
+     "dynamicRule",
+     "aiRecommendation",
+     "newDynamicStrategy",
+     "strategyModification",
+     "bulkPriceChange"
+    ]
    },
-   "expectedDemand": {
+   "sourceReference": {
     "type": "string",
-    "description": "Expected Demand"
+    "description": "Id of the rule, recommendation or strategy the simulation came from",
+    "nullable": true
    },
-   "expectedConversion": {
-    "type": "number",
-    "description": "Expected Conversion"
-   },
-   "expectedAttendance": {
-    "type": "integer",
-    "description": "Expected Attendance"
-   },
-   "expectedOccupancy": {
-    "type": "integer",
-    "description": "Expected Occupancy"
-   },
-   "expectedRevenue": {
+   "proposedPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Expected Revenue"
+    "description": "Proposed price (single-price change)"
    },
-   "expectedMargin": {
+   "proposedAdjustmentPercent": {
     "type": "number",
-    "description": "Expected Margin"
-   },
-   "expectedSellThrough": {
-    "type": "string",
-    "description": "Expected Sell-Through"
-   },
-   "expectedSellOutTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Expected Sell-Out Time"
-   },
-   "averageSellingPrice": {
-    "type": "number",
-    "description": "Average Selling Price"
-   },
-   "commercialGuardrailPass": {
-    "type": "string",
-    "description": "Commercial Guardrail — PASS"
-   },
-   "contractProtectionPass": {
-    "type": "string",
-    "description": "Contract Protection — PASS"
-   },
-   "priceLadderPass": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price Ladder — PASS"
-   },
-   "approvalThresholdRevenueManager": {
-    "type": "integer",
-    "description": "Approval Threshold — Revenue Manager"
-   },
-   "startExperiment": {
-    "type": "string",
-    "description": "Start Experiment"
-   },
-   "discard": {
-    "type": "string",
-    "description": "Discard"
+    "description": "Proposed adjustment, percent (bulk change or strategy)",
+    "nullable": true
    }
   }
  },
@@ -3057,133 +4147,130 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Pricing Simulation Studio displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "manualPriceChange": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Manual Price Change"
-   },
-   "board5DynamicRule": {
-    "type": "string",
-    "description": "Board 5 Dynamic Rule"
-   },
-   "board6AiRecommendation": {
-    "type": "string",
-    "description": "Board 6 AI Recommendation"
-   },
-   "newDynamicStrategy": {
-    "type": "integer",
-    "description": "New Dynamic Strategy"
-   },
-   "existingStrategyModification": {
-    "type": "string",
-    "description": "Existing Strategy Modification"
-   },
-   "bulkPriceChange": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Bulk Price Change"
-   },
-   "selectType": {
-    "type": "string",
-    "enum": [
-     "venue",
-     "product",
-     "event",
-     "performance",
-     "timeslot",
-     "priceCategory",
-     "channel",
-     "customerSegment",
-     "dateRange"
-    ],
-    "description": "Vocabulary listed under Select."
-   },
    "expectedDemand": {
-    "type": "string",
+    "type": "integer",
     "description": "Expected Demand"
    },
    "expectedConversion": {
     "type": "number",
-    "description": "Expected Conversion"
+    "description": "Expected Conversion, percent"
    },
    "expectedAttendance": {
     "type": "integer",
     "description": "Expected Attendance"
    },
    "expectedOccupancy": {
-    "type": "integer",
-    "description": "Expected Occupancy"
+    "type": "number",
+    "description": "Expected Occupancy, percent"
    },
    "expectedRevenue": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Expected Revenue"
    },
    "expectedMargin": {
-    "type": "number",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Expected Margin"
    },
    "expectedSellThrough": {
-    "type": "string",
-    "description": "Expected Sell-Through"
+    "type": "number",
+    "description": "Expected Sell-Through, percent"
    },
    "expectedSellOutTime": {
     "type": "string",
+    "description": "Expected Sell-Out Time",
     "format": "date-time",
-    "description": "Expected Sell-Out Time"
+    "nullable": true
    },
    "averageSellingPrice": {
-    "type": "number",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Average Selling Price"
    },
-   "simulationConfidence89": {
+   "simulationConfidence": {
     "type": "number",
-    "description": "Simulation Confidence: 89%"
-   },
-   "basedOn": {
-    "type": "string",
-    "description": "based on"
+    "description": "Simulation Confidence, percent"
    },
    "dataVolume": {
     "type": "integer",
-    "description": "Data Volume"
+    "description": "Data Volume: transactions behind the simulation"
    },
    "historicalSimilarity": {
-    "type": "string",
-    "description": "Historical Similarity"
+    "type": "number",
+    "description": "Historical Similarity, percent"
    },
    "forecastConfidence": {
-    "type": "string",
-    "description": "Forecast Confidence"
+    "type": "number",
+    "description": "Forecast Confidence, percent"
    },
    "elasticityConfidence": {
     "type": "number",
-    "description": "Elasticity Confidence"
+    "description": "Elasticity Confidence, percent"
    },
    "externalSignalQuality": {
-    "type": "string",
-    "description": "External Signal Quality"
+    "type": "number",
+    "description": "External Signal Quality, percent"
    },
-   "commercialGuardrailPass": {
+   "simulationId": {
     "type": "string",
-    "description": "Commercial Guardrail — PASS"
+    "description": "Simulation id (saved scenarios keep it)"
    },
-   "contractProtectionPass": {
+   "simulationSource": {
     "type": "string",
-    "description": "Contract Protection — PASS"
+    "description": "Simulation Source",
+    "enum": [
+     "manualPriceChange",
+     "dynamicRule",
+     "aiRecommendation",
+     "newDynamicStrategy",
+     "strategyModification",
+     "bulkPriceChange"
+    ]
    },
-   "priceLadderPass": {
+   "currentPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price Ladder — PASS"
+    "description": "Current price"
    },
-   "approvalThresholdRevenueManager": {
+   "proposedPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Proposed price"
+   },
+   "baselineRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Current strategy: expected revenue"
+   },
+   "baselineDemand": {
     "type": "integer",
-    "description": "Approval Threshold — Revenue Manager"
+    "description": "Current strategy: expected demand"
    },
-   "startExperiment": {
-    "type": "string",
-    "description": "Start Experiment"
+   "baselineOccupancy": {
+    "type": "number",
+    "description": "Current strategy: expected occupancy, percent"
    },
-   "discard": {
-    "type": "string",
-    "description": "Discard"
+   "guardrailChecks": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "check": {
+       "type": "string",
+       "enum": [
+        "commercialGuardrail",
+        "contractProtection",
+        "priceLadder",
+        "approvalThreshold"
+       ],
+       "description": "Guardrail"
+      },
+      "passed": {
+       "type": "boolean",
+       "description": "Pass / fail"
+      },
+      "message": {
+       "type": "string",
+       "description": "Why it failed, or the approval level required"
+      }
+     }
+    },
+    "description": "Guardrail Check shown before the simulation completes"
    }
   }
  },
@@ -3193,105 +4280,148 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Revenue & Demand Impact Forecasting displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "expectedRevenueAed245m": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Expected Revenue: AED 2.45M"
-   },
-   "expectedDemand9800": {
-    "type": "string",
-    "description": "Expected Demand: 9,800"
-   },
-   "expectedOccupancy91": {
-    "type": "integer",
-    "description": "Expected Occupancy: 91%"
-   },
-   "expectedRevenueAed252m": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Expected Revenue: AED 2.52M"
-   },
-   "expectedDemand9500": {
-    "type": "string",
-    "description": "Expected Demand: 9,500"
-   },
-   "expectedOccupancy89": {
-    "type": "integer",
-    "description": "Expected Occupancy: 89%"
-   },
-   "aed70k29": {
-    "type": "number",
-    "description": "+AED 70K / +2.9%"
-   },
-   "aed62k": {
-    "type": "string",
-    "description": "+AED 62K"
-   },
    "revenue": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue"
+    "description": "Proposed: expected revenue"
    },
    "demand": {
-    "type": "string",
-    "description": "Demand"
+    "type": "integer",
+    "description": "Proposed: expected demand"
    },
    "attendance": {
     "type": "integer",
-    "description": "Attendance"
+    "description": "Proposed: attendance"
    },
    "occupancy": {
-    "type": "integer",
-    "description": "Occupancy"
+    "type": "number",
+    "description": "Proposed: occupancy, percent"
    },
    "conversion": {
     "type": "number",
-    "description": "Conversion"
+    "description": "Proposed: conversion, percent"
    },
    "margin": {
-    "type": "number",
-    "description": "Margin"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Proposed: margin"
    },
    "asp": {
-    "type": "string",
-    "description": "ASP"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Proposed: average selling price"
    },
    "sellThrough": {
-    "type": "string",
-    "description": "Sell-Through"
+    "type": "number",
+    "description": "Proposed: sell-through, percent"
    },
    "sellOutProbability": {
-    "type": "string",
-    "description": "Sell-Out Probability"
+    "type": "number",
+    "description": "Proposed: sell-out probability, percent"
    },
-   "memberImpact": {
+   "assessmentId": {
     "type": "string",
-    "description": "Member Impact"
+    "description": "Assessment id"
    },
-   "residentImpact": {
+   "recommendationId": {
     "type": "string",
-    "description": "Resident Impact"
+    "description": "Recommendation assessed",
+    "nullable": true
    },
-   "touristImpact": {
+   "simulationId": {
     "type": "string",
-    "description": "Tourist Impact"
+    "description": "Simulation assessed",
+    "nullable": true
    },
-   "familyImpact": {
-    "type": "string",
-    "description": "Family Impact"
+   "baselineRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Without change: expected revenue"
    },
-   "b2bImpact": {
-    "type": "string",
-    "description": "B2B Impact"
+   "baselineDemand": {
+    "type": "integer",
+    "description": "Without change: expected demand"
    },
-   "customersToAnotherProduct": {
-    "type": "string",
-    "description": "customers to another product"
+   "baselineOccupancy": {
+    "type": "number",
+    "description": "Without change: expected occupancy, percent"
+   },
+   "revenueChange": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Impact: revenue"
+   },
+   "revenueChangePercent": {
+    "type": "number",
+    "description": "Impact: revenue, percent"
+   },
+   "demandChange": {
+    "type": "integer",
+    "description": "Impact: demand"
+   },
+   "demandChangePercent": {
+    "type": "number",
+    "description": "Impact: demand, percent"
+   },
+   "marginChange": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Impact: margin"
+   },
+   "customerImpacts": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "group": {
+       "type": "string",
+       "enum": [
+        "member",
+        "resident",
+        "tourist",
+        "family",
+        "b2b"
+       ],
+       "description": "Customer group"
+      },
+      "demandChangePercent": {
+       "type": "number",
+       "description": "Estimated demand change, percent"
+      },
+      "note": {
+       "type": "string",
+       "description": "Explanation"
+      }
+     }
+    },
+    "description": "Customer Impact, where supported"
+   },
+   "cannibalization": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "toProduct": {
+       "type": "string",
+       "description": "Product demand shifts toward"
+      },
+      "demandShiftPercent": {
+       "type": "number",
+       "description": "Share of demand shifting, percent"
+      }
+     }
+    },
+    "description": "Cannibalization"
+   },
+   "bestCaseRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Sensitivity: best case revenue"
+   },
+   "worstCaseRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Sensitivity: worst case revenue"
    }
   }
  },
- "RevenueOptimizationCommandCenterView": {
+ "RevenueOptimizationCommandCenterSummary": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What Revenue Optimization Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Revenue Optimization Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
   "properties": {
    "revenueOpportunity": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
@@ -3306,7 +4436,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Active Optimizations"
    },
    "recommendationsAwaitingAction": {
-    "type": "string",
+    "type": "integer",
     "description": "Recommendations Awaiting Action"
    },
    "pendingSimulations": {
@@ -3318,8 +4448,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Auto-Executed Changes"
    },
    "approvalRequired": {
-    "type": "boolean",
-    "description": "Approval Required"
+    "type": "integer",
+    "description": "Approval Required: changes waiting for an approver"
    },
    "activeABTests": {
     "type": "integer",
@@ -3334,13 +4464,28 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Revenue at Risk"
    },
    "forecastAccuracy": {
-    "type": "string",
-    "description": "Forecast Accuracy"
+    "type": "number",
+    "description": "Forecast Accuracy over the last 30 days (decided 29 September, readiness close-out), percent"
    },
    "optimizationSuccessRate": {
     "type": "number",
-    "description": "Optimization Success Rate"
+    "description": "Optimization Success Rate: executed changes with a positive measured outcome, percent"
    },
+   "aiRevenueBrief": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI Revenue Brief, e.g. AED 284,000 of opportunity in the next seven days. Advisory only: generated narrative never changes a price (decided 29 September, readiness close-out)"
+   }
+  }
+ },
+ "RevenueOptimizationCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Revenue Optimization Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
    "venue": {
     "type": "string",
     "description": "Venue"
@@ -3351,7 +4496,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "performance": {
     "type": "string",
-    "description": "Performance"
+    "description": "Performance",
+    "nullable": true
    },
    "currentPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
@@ -3367,55 +4513,81 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "expectedUplift": {
     "type": "number",
-    "description": "Expected Uplift"
+    "description": "Expected Uplift, percent"
    },
    "confidence": {
-    "type": "string",
-    "description": "Confidence"
+    "type": "number",
+    "description": "Confidence, percent"
    },
    "automationMode": {
     "type": "string",
-    "description": "Automation Mode"
+    "description": "Automation Mode in force for this scope",
+    "enum": [
+     "advisory",
+     "humanInTheLoop",
+     "conditionalAutonomous",
+     "autonomous"
+    ]
    },
    "approvalStatus": {
     "type": "string",
-    "description": "Approval Status"
+    "description": "Approval Status: notRequired, pending, approved or rejected"
    },
    "executionStatus": {
     "type": "string",
-    "description": "Execution Status"
-   },
-   "ntEdItyCe": {
-    "type": "string",
-    "description": "nt ed ity ce"
-   },
-   "aed235Aed41k88": {
-    "type": "number",
-    "description": "AED 235 +AED 41K 88%"
+    "description": "Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack"
    },
    "revenueRisk": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue Risk"
+    "description": "Revenue Risk if no action is taken"
    },
    "eventProximity": {
-    "type": "string",
-    "description": "Event Proximity"
+    "type": "integer",
+    "description": "Event Proximity: days until the event"
    },
    "inventoryPosition": {
-    "type": "string",
-    "description": "Inventory Position"
+    "type": "number",
+    "description": "Inventory Position: remaining inventory, percent"
    },
    "demandVariance": {
-    "type": "string",
-    "description": "Demand Variance"
+    "type": "number",
+    "description": "Demand Variance against forecast, percent"
    },
    "urgency": {
     "type": "string",
-    "description": "Urgency"
+    "description": "Urgency",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
    },
-   "startExperiment": {
+   "optimizationId": {
     "type": "string",
-    "description": "Start Experiment"
+    "description": "Optimisation id"
+   },
+   "recommendationId": {
+    "type": "string",
+    "description": "Recommendation id",
+    "nullable": true
+   },
+   "revenueOpportunity": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue Opportunity"
+   },
+   "priorityRank": {
+    "type": "integer",
+    "description": "Priority rank (1 = act first)"
+   },
+   "nextAction": {
+    "type": "string",
+    "description": "Suggested next action (the pack's Action column)",
+    "enum": [
+     "review",
+     "simulate",
+     "approve"
+    ]
    }
   }
  },
@@ -3425,121 +4597,326 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Scenario Modeling & What-If Analysis displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "lowDemand": {
-    "type": "string",
-    "description": "Low Demand"
-   },
-   "expectedDemand": {
-    "type": "string",
-    "description": "Expected Demand"
-   },
-   "highDemand": {
-    "type": "string",
-    "description": "High Demand"
-   },
-   "sellOut": {
-    "type": "string",
-    "description": "Sell-Out"
-   },
-   "competitorPriceDrop": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Competitor Price Drop"
-   },
-   "competitorPriceIncrease": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Competitor Price Increase"
-   },
-   "extremeWeather": {
-    "type": "string",
-    "description": "Extreme Weather"
-   },
-   "rain": {
-    "type": "string",
-    "description": "Rain"
-   },
-   "nearbyExhibition": {
-    "type": "string",
-    "description": "Nearby Exhibition"
-   },
-   "majorConcert": {
-    "type": "string",
-    "description": "Major Concert"
-   },
-   "tourismSurge": {
-    "type": "string",
-    "description": "Tourism Surge"
-   },
-   "cancellationSurge": {
-    "type": "string",
-    "description": "Cancellation Surge"
-   },
-   "inventoryReduction": {
-    "type": "string",
-    "description": "Inventory Reduction"
-   },
-   "customScenario": {
-    "type": "string",
-    "description": "Custom Scenario"
-   },
    "demand": {
     "type": "number",
-    "description": "Demand ±%"
+    "description": "Demand adjustment (+/-), percent"
    },
    "occupancy": {
-    "type": "integer",
-    "description": "Occupancy"
+    "type": "number",
+    "description": "Occupancy, percent"
    },
    "inventory": {
-    "type": "string",
-    "description": "Inventory"
+    "type": "integer",
+    "description": "Inventory available"
    },
    "bookingVelocity": {
-    "type": "string",
-    "description": "Booking Velocity"
+    "type": "number",
+    "description": "Booking velocity adjustment, percent"
    },
    "weatherImpact": {
-    "type": "string",
-    "description": "Weather Impact"
+    "type": "number",
+    "description": "Weather impact on demand, percent"
    },
    "nearbyEventImpact": {
-    "type": "string",
-    "description": "Nearby Event Impact"
+    "type": "number",
+    "description": "Nearby event impact on demand, percent"
    },
    "competitorPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Competitor Price"
+    "description": "Competitor price"
    },
    "conversion": {
     "type": "number",
-    "description": "Conversion"
+    "description": "Conversion, percent"
    },
    "price": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Price"
    },
    "eventProximity": {
-    "type": "string",
-    "description": "Event Proximity"
+    "type": "integer",
+    "description": "Event proximity, days"
    },
    "remainingCapacity": {
-    "type": "integer",
-    "description": "Remaining Capacity (the pack shows 24%)"
-   },
-   "avgPrice250262270": {
     "type": "number",
-    "description": "Avg. Price 250 262 270"
+    "description": "Remaining Capacity, percent"
    },
-   "revenue255m261m": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue 2.55M 2.61M"
+   "scenarioId": {
+    "type": "string",
+    "description": "Scenario id"
    },
-   "margin191m198m": {
-    "type": "number",
-    "description": "Margin 1.91M 1.98M"
+   "name": {
+    "type": "string",
+    "description": "Scenario name"
    },
-   "share": {
-    "type": "number",
-    "description": "Share"
+   "scenarioTypes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "lowDemand",
+      "expectedDemand",
+      "highDemand",
+      "sellOut",
+      "competitorPriceDrop",
+      "competitorPriceIncrease",
+      "extremeWeather",
+      "rain",
+      "nearbyExhibition",
+      "majorConcert",
+      "tourismSurge",
+      "cancellationSurge",
+      "inventoryReduction",
+      "customScenario"
+     ]
+    },
+    "description": "Scenario Library entries combined"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event",
+    "nullable": true
+   },
+   "strategyResults": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "strategy": {
+       "type": "string",
+       "enum": [
+        "fixedPrice",
+        "ruleBased",
+        "aiRecommendation",
+        "custom"
+       ],
+       "description": "Strategy compared"
+      },
+      "averagePrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Avg. price"
+      },
+      "demand": {
+       "type": "integer",
+       "description": "Demand"
+      },
+      "revenue": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Revenue"
+      },
+      "occupancy": {
+       "type": "number",
+       "description": "Occupancy, percent"
+      },
+      "margin": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Margin"
+      }
+     }
+    },
+    "description": "Results per strategy"
+   },
+   "reviewStage": {
+    "type": "string",
+    "description": "Review stage: draft, submittedForReview or reviewed (decided 29 September, readiness close-out)"
+   },
+   "createdBy": {
+    "type": "string",
+    "description": "Author user id"
+   },
+   "updatedAt": {
+    "type": "string",
+    "description": "Last saved",
+    "format": "date-time"
+   }
+  }
+ },
+ "SignalRegistryEntry": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.signal_registry",
+  "description": "**The registry of AI signals and models, with their trust and quality** (29 September, data model DM3). ADM-106 and ADM-118. A signal or model not `approved` for a use in `aiUsePermissions` is not used for it.",
+  "required": [
+   "id",
+   "scopePath",
+   "registryKind",
+   "name",
+   "trustLevel"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `tenant` scope."
+   },
+   "registryKind": {
+    "type": "string",
+    "enum": [
+     "signal",
+     "model"
+    ]
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "category": {
+    "type": "string",
+    "enum": [
+     "internalSales",
+     "inventory",
+     "weather",
+     "nearbyEvents",
+     "competitor",
+     "tourism",
+     "calendar",
+     "transport",
+     "market",
+     "other",
+     null
+    ],
+    "nullable": true
+   },
+   "provider": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "source": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "internalExternal": {
+    "type": "string",
+    "enum": [
+     "internal",
+     "external",
+     null
+    ],
+    "nullable": true
+   },
+   "marketCode": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "refreshFrequency": {
+    "type": "string",
+    "enum": [
+     "realTime",
+     "minutes10",
+     "hourly",
+     "daily",
+     "weekly",
+     "manual",
+     null
+    ],
+    "nullable": true
+   },
+   "trustLevel": {
+    "type": "string",
+    "enum": [
+     "approved",
+     "experimental",
+     "advisoryOnly",
+     "blocked"
+    ],
+    "default": "experimental"
+   },
+   "aiUsePermissions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "forecasting",
+      "recommendations",
+      "simulation",
+      "automatedPricing"
+     ]
+    }
+   },
+   "fallbackPolicy": {
+    "type": "string",
+    "enum": [
+     "useHistoricalValue",
+     "ignore",
+     "substitute",
+     "reduceConfidence",
+     "stopAiRecommendation",
+     null
+    ],
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "version": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true,
+    "description": "Models."
+   },
+   "purpose": {
+    "type": "string",
+    "nullable": true
+   },
+   "deployedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "trainingWindow": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true
+   },
+   "validationResult": {
+    "type": "string",
+    "nullable": true
+   },
+   "lastUpdateAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "qualityCounts": {
+    "type": "object",
+    "additionalProperties": true,
+    "readOnly": true,
+    "description": "Signals: `{missingData, delayedData, outliers, invalidValues, unexpectedChanges, sourceFailure, duplicateData}`."
+   },
+   "performance": {
+    "type": "object",
+    "additionalProperties": true,
+    "readOnly": true,
+    "description": "Models: `{forecastAccuracy, bias, recommendationAccuracy, revenuePerformance, drift}` and the per-segment learning metrics."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  }

@@ -566,6 +566,34 @@
      "getWallet",
      "listCreditLots"
     ]
+   },
+   {
+    "operationId": "getWalletAutoReloadSetting",
+    "contract": "wallet",
+    "purpose": "Show auto top-up",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setWalletAutoReloadSetting",
+    "contract": "wallet",
+    "purpose": "Set auto top-up",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getWalletExitBalance",
+    "contract": "wallet",
+    "purpose": "Balance due / refundable at exit",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "settleWalletAtExit",
+    "contract": "wallet",
+    "purpose": "Settle the wallet at exit",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {

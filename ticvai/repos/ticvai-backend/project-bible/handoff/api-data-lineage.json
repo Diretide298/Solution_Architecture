@@ -15490,7 +15490,6 @@
    "ai.assistant_profile",
    "ai.capability",
    "ai.chunk_embedding",
-   "ai.chunk_ref",
    "ai.conversation",
    "ai.knowledge_document",
    "ai.message",
@@ -15528,7 +15527,7 @@
    "staff",
    "guest"
   ],
-  "lineageNote": "ai.chunk_ref and qdrant:knowledge replaced by ai.chunk_embedding (pgvector in the tenant database, design 5.8)."
+  "lineageNote": "ai.chunk_embedding records each chunk's point in the tenant's Qdrant collection (qdrant:knowledge); vectors live in Qdrant from day one (decided 30 September)."
  },
  "semanticSearch": {
   "contract": "ai",
@@ -15536,7 +15535,6 @@
   "path": "/search",
   "reads": [
    "ai.chunk_embedding",
-   "ai.chunk_ref",
    "ai.knowledge_collection",
    "ai.knowledge_document",
    "assets.media_asset",
@@ -15574,7 +15572,7 @@
   "verb": "GET",
   "path": "/collections",
   "reads": [
-   "ai.chunk_ref",
+   "ai.chunk_embedding",
    "ai.knowledge_collection",
    "qdrant:knowledge"
   ],
@@ -15599,7 +15597,7 @@
   "verb": "POST",
   "path": "/collections",
   "reads": [
-   "ai.chunk_ref",
+   "ai.chunk_embedding",
    "ai.knowledge_collection",
    "cache:idempotency",
    "qdrant:knowledge"
@@ -15630,7 +15628,7 @@
   "verb": "POST",
   "path": "/collections/{collectionId}/documents",
   "reads": [
-   "ai.chunk_ref",
+   "ai.chunk_embedding",
    "ai.knowledge_collection",
    "ai.knowledge_document",
    "cache:embedding",
@@ -15667,7 +15665,6 @@
   "path": "/generate/configuration",
   "reads": [
    "ai.chunk_embedding",
-   "ai.chunk_ref",
    "ai.knowledge_document",
    "ai.policy",
    "ai.provider",
@@ -15717,7 +15714,7 @@
   "audience": [
    "staff"
   ],
-  "lineageNote": "Existing reads of the owning modules' configuration tables are unchanged (22 tables, hand-mapped); ai.chunk_ref and qdrant:knowledge replaced by ai.chunk_embedding (pgvector, design 5.8)."
+  "lineageNote": "Existing reads of the owning modules' configuration tables are unchanged (22 tables, hand-mapped); ai.chunk_embedding records each chunk's point in the tenant's Qdrant collection (qdrant:knowledge); vectors live in Qdrant from day one (decided 30 September)."
  },
  "generateVenueLayout": {
   "contract": "ai",
@@ -60709,7 +60706,7 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "Upsert keyed by ruleId (ULID id); logs the change to access.configuration_change"
+  "lineageNote": "Upsert keyed by ruleId (UUIDv7 id); logs the change to access.configuration_change"
  },
  "setHotelWalletExternal": {
   "contract": "access",

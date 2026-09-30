@@ -1,6 +1,6 @@
-# P16-analytics-01 — P16 · Analytics
+# P16-analytics-01 — P16 · Analytics (1 of 2)
 
-**10 screens · 20 operations · 26 schemas · 11 permissions**
+**10 screens · 25 operations · 56 schemas · 10 permissions**
 
 Platform P16 Venue Analytics · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 11 permissions apply here:
-  `AI_APPROVE, AI_USE, DEVICE_VIEW, LEDGER_VIEW, MARKETING_MANAGE, MARKETING_VIEW, ORDER_VIEW, PRODUCT_VIEW, REPORT_MANAGE, REPORT_VIEW_VENUE, USER_MANAGE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 10 permissions apply here:
+  `AI_USE, DEVICE_VIEW, LEDGER_VIEW, MARKETING_MANAGE, MARKETING_VIEW, ORDER_VIEW, PRODUCT_VIEW, REPORT_MANAGE, REPORT_VIEW_VENUE, USER_MANAGE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **5 of these operations work offline**: getCountVariance, listDevices, listExpiringBatches, listOrders, listProducts
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,13 +60,13 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ANL-001` | Executive Command Center | listDetail | 4 | 0 | — |
-| `ANL-002` | Sales, Revenue & Channel | statusTracker | 2 | 0 | — |
-| `ANL-003` | Operational Performance | listDetail | 5 | 0 | — |
-| `ANL-004` | Product Performance | listDetail | 3 | 0 | — |
-| `ANL-005` | Cost, Margin & Profitability | statusTracker | 3 | 0 | — |
-| `ANL-006` | Inventory & Waste Intelligence | listDetail | 4 | 0 | — |
-| `ANL-007` | Guest & Conversion Intelligence | listDetail | 5 | 0 | — |
-| `ANL-008` | Demand Forecasting | statusTracker | 2 | 0 | — |
-| `ANL-009` | AI Assistant & Action Center | approvalInbox | 8 | 0 | — |
-| `ANL-010` | Suggestions & Advice | configEditor | 2 | 0 | — |
+| `ANL-001` | Executive Command Center | listDetail | 7 | 2 | — |
+| `ANL-002` | Sales, Revenue & Channel | statusTracker | 3 | 1 | — |
+| `ANL-003` | Operational Performance | listDetail | 6 | 1 | — |
+| `ANL-004` | Product Performance | listDetail | 4 | 1 | — |
+| `ANL-005` | Cost, Margin & Profitability | statusTracker | 4 | 1 | — |
+| `ANL-006` | Inventory & Waste Intelligence | listDetail | 6 | 1 | — |
+| `ANL-007` | Guest & Conversion Intelligence | listDetail | 6 | 2 | — |
+| `ANL-008` | Demand Forecasting | statusTracker | 4 | 1 | — |
+| `ANL-009` | AI Assistant & Action Center | approvalInbox | 9 | 5 | — |
+| `ANL-010` | Suggestions & Advice | configEditor | 2 | 1 | — |

@@ -1,6 +1,6 @@
 # P06-rentals-01 — P06 · Rentals (1 of 3)
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 6 operations · 10 schemas · 3 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -47,11 +47,11 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `ASSET_VIEW, RENTAL_OPERATE, RENTAL_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **4 of these operations work offline**: assignRentalEquipment, checkOutRental, lookupAsset, recordRentalInspection
+  — and the rest do not. A surface that looks the same online and off is lying.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +61,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `EMP-071` | Rental Checkout Command Center | commandCentre | 0 | 0 | — |
-| `EMP-072` | Voucher Scan & Reservation Retrieval | listDetail | 0 | 0 | — |
-| `EMP-073` | Checkout Readiness Validation | listDetail | 0 | 0 | — |
-| `EMP-074` | Equipment Assignment Workspace | listDetail | 0 | 0 | — |
-| `EMP-075` | Equipment Scan & Validation | listDetail | 0 | 0 | — |
-| `EMP-076` | Pre-Rental Condition Inspection | listDetail | 0 | 0 | — |
-| `EMP-077` | Safety & Handover Checklist | listDetail | 0 | 0 | — |
-| `EMP-078` | Deposit & Financial Handover Validation | listDetail | 0 | 0 | — |
-| `EMP-079` | Group & Multi-Item Checkout | listDetail | 0 | 0 | — |
-| `EMP-080` | Checkout Confirmation & Rental Activation | configEditor | 0 | 0 | — |
+| `EMP-071` | Rental Checkout Command Center | commandCentre | 1 | 0 | — |
+| `EMP-072` | Voucher Scan & Reservation Retrieval | listDetail | 1 | 0 | — |
+| `EMP-073` | Checkout Readiness Validation | listDetail | 1 | 0 | — |
+| `EMP-074` | Equipment Assignment Workspace | listDetail | 1 | 0 | — |
+| `EMP-075` | Equipment Scan & Validation | listDetail | 2 | 0 | — |
+| `EMP-076` | Pre-Rental Condition Inspection | listDetail | 1 | 0 | — |
+| `EMP-077` | Safety & Handover Checklist | listDetail | 1 | 0 | — |
+| `EMP-078` | Deposit & Financial Handover Validation | listDetail | 1 | 0 | — |
+| `EMP-079` | Group & Multi-Item Checkout | listDetail | 1 | 0 | — |
+| `EMP-080` | Checkout Confirmation & Rental Activation | configEditor | 1 | 0 | — |
 
 ## Thin screens in this batch
 

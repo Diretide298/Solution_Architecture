@@ -1,4 +1,208 @@
 {
+ "AiDemandForecastingBookingCurveStudioView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What AI Demand Forecasting & Booking Curve Studio displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "venue": {
+    "type": "string",
+    "description": "Venue id"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product id",
+    "nullable": true
+   },
+   "event": {
+    "type": "string",
+    "description": "Event id",
+    "nullable": true
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance id",
+    "nullable": true
+   },
+   "date": {
+    "type": "string",
+    "description": "Date",
+    "format": "date"
+   },
+   "timeslot": {
+    "type": "string",
+    "description": "Timeslot",
+    "nullable": true
+   },
+   "priceCategory": {
+    "type": "string",
+    "description": "Price category",
+    "nullable": true
+   },
+   "sectionCode": {
+    "type": "string",
+    "nullable": true,
+    "description": "Seat-map section (`seating.Section.code`) the row forecasts; null for a row at price-category or performance level (29 September, build pass, group G2; 21.11.4)"
+   },
+   "channel": {
+    "$ref": "#/components/schemas/Channel",
+    "description": "Channel"
+   },
+   "confidence": {
+    "type": "number",
+    "description": "Forecast Confidence, percent"
+   },
+   "forecastFinalOccupancy": {
+    "type": "number",
+    "description": "Forecast Final Occupancy, percent"
+   },
+   "demand": {
+    "type": "integer",
+    "description": "Forecast demand"
+   },
+   "attendance": {
+    "type": "integer",
+    "description": "Forecast attendance"
+   },
+   "occupancy": {
+    "type": "number",
+    "description": "Forecast occupancy, percent"
+   },
+   "sellThrough": {
+    "type": "number",
+    "description": "Forecast sell-through, percent"
+   },
+   "expectedSellOutTime": {
+    "type": "string",
+    "description": "Expected Sell-Out Time; empty if no sell-out forecast",
+    "format": "date-time",
+    "nullable": true
+   },
+   "revenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Forecast revenue"
+   },
+   "conversion": {
+    "type": "number",
+    "description": "Forecast conversion, percent"
+   },
+   "remainingInventory": {
+    "type": "integer",
+    "description": "Forecast remaining inventory at event"
+   },
+   "mape": {
+    "type": "number",
+    "description": "MAPE over closed forecasts at this level, percent"
+   },
+   "forecastBias": {
+    "type": "number",
+    "description": "Forecast Bias (positive = over-forecast), percent"
+   },
+   "overForecast": {
+    "type": "number",
+    "description": "Share of closed forecasts that over-forecast, percent"
+   },
+   "underForecast": {
+    "type": "number",
+    "description": "Share of closed forecasts that under-forecast, percent"
+   },
+   "forecastId": {
+    "type": "string",
+    "description": "Forecast id"
+   },
+   "horizon": {
+    "type": "string",
+    "description": "Forecast Horizon",
+    "enum": [
+     "intraday",
+     "tomorrow",
+     "days7",
+     "days30",
+     "eventHorizon",
+     "seasonalHorizon"
+    ]
+   },
+   "bookingCurve": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "daysBeforeEvent": {
+       "type": "integer",
+       "description": "T minus days"
+      },
+      "historicalExpectedPercentSold": {
+       "type": "number",
+       "description": "Historical expected curve, percent sold"
+      },
+      "actualPercentSold": {
+       "type": "number",
+       "nullable": true,
+       "description": "Current actual curve, percent sold (empty for future points)"
+      },
+      "forecastPercentSold": {
+       "type": "number",
+       "description": "AI forecast curve, percent sold"
+      }
+     }
+    },
+    "description": "Booking Curve"
+   },
+   "signalContributions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "signal": {
+       "type": "string",
+       "enum": [
+        "internalSales",
+        "bookingVelocity",
+        "occupancy",
+        "historicalEvents",
+        "nearbyEvent",
+        "weather",
+        "marketTourism",
+        "competitor",
+        "priceElasticity",
+        "other"
+       ],
+       "description": "Signal category"
+      },
+      "contributionPercent": {
+       "type": "number",
+       "description": "Explanatory share of the forecast"
+      }
+     }
+    },
+    "description": "Model Inputs: which signals contributed"
+   },
+   "confidenceReasons": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "strongHistoricalData",
+      "stableBookingPattern",
+      "reliableExternalSignals",
+      "limitedHistoricalData",
+      "volatileBookingPattern",
+      "degradedExternalSignals"
+     ]
+    },
+    "description": "Reasons behind the forecast confidence"
+   },
+   "modelVersion": {
+    "type": "string",
+    "description": "Model version that produced the forecast"
+   },
+   "generatedAt": {
+    "type": "string",
+    "description": "When the forecast was produced",
+    "format": "date-time"
+   }
+  }
+ },
  "AnalyticsPipeline": {
   "type": "object",
   "x-ticvai-persistence": "reporting.pipeline",
@@ -62,6 +266,141 @@
    },
    "scopePath": {
     "type": "string"
+   }
+  }
+ },
+ "Channel": {
+  "type": "string",
+  "enum": [
+   "pos",
+   "kiosk",
+   "web",
+   "mobile",
+   "b2b",
+   "ota",
+   "callCentre"
+  ]
+ },
+ "MemberExceptionsOverridesServiceRecoveryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Member Exceptions, Overrides & Service Recovery displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "member": {
+    "type": "string",
+    "description": "Member"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "requestedAction": {
+    "type": "string",
+    "description": "Requested Action"
+   },
+   "standardPolicyResult": {
+    "type": "string",
+    "description": "Standard Policy Result"
+   },
+   "requestedException": {
+    "type": "string",
+    "description": "Requested Exception"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "supportingDocumentation": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Supporting Documentation: document ids"
+   },
+   "financialImpact": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Financial Impact of the exception"
+   },
+   "entitlementImpact": {
+    "type": "string",
+    "description": "Entitlement Impact"
+   },
+   "requestor": {
+    "type": "string",
+    "description": "Requestor"
+   },
+   "exceptionType": {
+    "type": "string",
+    "enum": [
+     "eligibilityOverride",
+     "activationExtension",
+     "expiryExtension",
+     "complimentaryRenewal",
+     "complimentaryBenefit",
+     "entitlementAdjustment",
+     "freezeException",
+     "suspensionOverride",
+     "replacementCredential",
+     "renewalException",
+     "dependentException"
+    ],
+    "description": "Exception Type (pack p.32)"
+   },
+   "exceptionValue": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Value used for approval routing"
+   },
+   "durationDays": {
+    "type": "integer",
+    "description": "Duration in days, for extensions",
+    "nullable": true
+   },
+   "membershipTier": {
+    "type": "string",
+    "description": "Membership Tier"
+   },
+   "exceptionId": {
+    "type": "string",
+    "description": "Exception ID"
+   },
+   "approvalStatus": {
+    "type": "string",
+    "description": "Approval status: pending, approved, rejected or applied"
+   },
+   "approver": {
+    "type": "string",
+    "description": "Approver; must differ from the requestor for high-value exceptions",
+    "nullable": true
+   },
+   "remedy": {
+    "type": "string",
+    "enum": [
+     "extendMembership",
+     "guestTicket",
+     "complimentaryVisit",
+     "feeWaiver",
+     "benefitCredit",
+     "renewalDiscount",
+     "alternativeEntitlement"
+    ],
+    "description": "Service Recovery remedy (pack p.33)",
+    "nullable": true
+   },
+   "aiSuggestion": {
+    "type": "string",
+    "description": "AI suggestion, advisory",
+    "nullable": true
    }
   }
  },
@@ -140,7 +479,17 @@
    },
    "teardownMinutes": {
     "type": "integer",
-    "default": 0
+    "default": 0,
+    "description": "After the booking. **Kept as it is** (decided 29 September, W10): with a `cleaningPolicy` of `afterEveryBooking` the cleaning buffer is added after the teardown, so a room with no teardown and a 15-minute clean is free 15 minutes after each booking ends.\n"
+   },
+   "cleaningPolicy": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ResourceCleaningPolicy"
+     }
+    ],
+    "nullable": true,
+    "description": "How the resource is cleaned between uses (decided 29 September, W10). Null means no cleaning is scheduled beyond `teardownMinutes`."
    },
    "requiresQualification": {
     "type": "array",
@@ -257,6 +606,49 @@
    },
    "scopePath": {
     "type": "string"
+   }
+  }
+ },
+ "ResourceCleaningPolicy": {
+  "x-ticvai-persistence": "none — columns on resources.resource",
+  "type": "object",
+  "description": "**When the resource is cleaned, and what that takes out of availability** (decided 29 September, W10; the meeting-room case from the 29 September website review).\n- `afterEveryBooking` (option A): `bufferMinutes` blocked after every booking, after its teardown. - `timesPerDay` (option B): `cleaningsPerDay` cleanings of `bufferMinutes` each, between `windowStart` and `windowEnd`, **placed by the system**. The targets are spread evenly across the window; each is put in the free gap nearest its target that is long enough, and never on a booking, a hold or a block. **A confirmed booking is never moved for a cleaning.** Placement is computed on read from the day's bookings, so it moves when bookings change, and a start time is offered only if every cleaning of that day can still be placed after it is booked.\n`createResource` and `updateResource` refuse a policy with `timesPerDay` and no `cleaningsPerDay`, or a window that ends before it starts, with `422`.\n",
+  "required": [
+   "mode",
+   "bufferMinutes"
+  ],
+  "properties": {
+   "mode": {
+    "type": "string",
+    "enum": [
+     "afterEveryBooking",
+     "timesPerDay"
+    ]
+   },
+   "bufferMinutes": {
+    "type": "integer",
+    "minimum": 5,
+    "maximum": 240,
+    "description": "Minutes one cleaning takes. The prototype uses 15 (proposed default, client to correct)."
+   },
+   "cleaningsPerDay": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 24,
+    "nullable": true,
+    "description": "Required for `timesPerDay`; ignored for `afterEveryBooking`."
+   },
+   "windowStart": {
+    "type": "string",
+    "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+    "nullable": true,
+    "description": "Venue-local time the cleaning window opens. Null means the resource's opening time."
+   },
+   "windowEnd": {
+    "type": "string",
+    "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+    "nullable": true,
+    "description": "Venue-local time the cleaning window closes. Null means the resource's closing time."
    }
   }
  },

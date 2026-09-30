@@ -35,28 +35,35 @@ public class MoneyTests
     }
 }
 
-public class UlidTests
+public class IdTests
 {
     [Fact]
-    public void Matches_the_contract_pattern()
+    public void Generates_version_7_ids()
     {
-        var id = Ulid.New();
-        Assert.Matches("^[0-9A-HJKMNP-TV-Z]{26}$", id);
-        Assert.True(Ulid.IsValid(id));
+        var id = Id.New();
+        Assert.Equal(7, id.Version);
+        Assert.True(Id.IsVersion7(id));
+        Assert.NotEqual(id, Id.New());
     }
 
     [Fact]
-    public void Carries_its_creation_time()
+    public void Does_not_take_a_version_4_id_for_a_new_one()
     {
-        var at = new DateTimeOffset(2026, 9, 27, 10, 30, 0, TimeSpan.Zero);
-        Assert.Equal(at, Ulid.TimeOf(Ulid.New(at)));
+        Assert.False(Id.IsVersion7(Guid.Parse("3f2504e0-4f89-41d3-9a0c-0305e82c3301")));
     }
 
     [Fact]
-    public void Sorts_by_creation_time()
+    public void Carries_the_time_it_was_minted_for_to_the_millisecond()
     {
-        var earlier = Ulid.New(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
-        var later = Ulid.New(new DateTimeOffset(2026, 1, 1, 0, 0, 1, TimeSpan.Zero));
-        Assert.True(string.CompareOrdinal(earlier, later) < 0);
+        var at = new DateTimeOffset(2026, 9, 30, 10, 30, 0, 123, TimeSpan.Zero);
+        Assert.Equal(at, Id.TimeOf(Id.New(at)));
+    }
+
+    [Fact]
+    public void Sorts_by_the_time_it_was_minted_for()
+    {
+        var earlier = Id.New(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
+        var later = Id.New(new DateTimeOffset(2026, 1, 1, 0, 0, 0, 1, TimeSpan.Zero));
+        Assert.True(string.CompareOrdinal(earlier.ToString(), later.ToString()) < 0);
     }
 }

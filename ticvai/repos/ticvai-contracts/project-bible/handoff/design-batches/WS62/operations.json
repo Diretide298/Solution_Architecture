@@ -8,7 +8,18 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ListingApprovalModerationInput",
   "responds": "ListingApprovalModerationView"
  },
@@ -21,9 +32,60 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ListingCreationSellerConfigurationInput",
   "responds": "ListingCreationSellerConfigurationView"
+ },
+ "getResaleFeePolicy": {
+  "method": "GET",
+  "path": "/resale-fee-policy",
+  "contract": "orders",
+  "summary": "The commission and price cap a resale listing is created under",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResaleFeePolicy"
+ },
+ "getResaleMarketplaceConfig": {
+  "method": "GET",
+  "path": "/resale-marketplace-config",
+  "contract": "orders",
+  "summary": "How the venue's resale marketplace runs",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResaleMarketplaceConfig"
+ },
+ "listFeeSellerProceed": {
+  "method": "GET",
+  "path": "/fee-seller-proceed",
+  "contract": "orders",
+  "summary": "Fees, Seller Proceeds & Listing Confirmation",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "FeesSellerProceedsListingConfirmationView"
  },
  "listListingLifecycleExpiry": {
   "method": "GET",
@@ -34,9 +96,34 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ListingLifecycleExpiryCancellationView"
+ },
+ "listOfficialResaleMarketplace": {
+  "method": "GET",
+  "path": "/official-resale-marketplace",
+  "contract": "orders",
+  "summary": "Official Resale Marketplace & Buyer Discovery",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OfficialResaleMarketplaceBuyerDiscoveryView"
  },
  "listResaleFeeCommission": {
   "method": "GET",
@@ -47,7 +134,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ResaleFeesCommissionSellerProceedsView"
  },
@@ -60,7 +153,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ResaleInventoryAvailabilityManagementView"
  },
@@ -74,6 +173,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "event",
     "in": "query",
@@ -113,6 +217,16 @@
     "name": "approvalStatus",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "seller",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -127,7 +241,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ResalePolicyMarketplaceSettingsView"
  },
@@ -140,9 +260,53 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ResalePricingPriceGuardrailsView"
+ },
+ "listTicketResaleMarketplace": {
+  "method": "GET",
+  "path": "/ticket-resale-marketplace",
+  "contract": "orders",
+  "summary": "My Tickets & Resale Marketplace Entry",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MyTicketsResaleMarketplaceEntryView"
+ },
+ "setEligibilityRule": {
+  "method": "PUT",
+  "path": "/eligibility-rule",
+  "contract": "promotions",
+  "summary": "Eligibility Rule Builder",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "EligibilityRuleBuilderInput",
+  "responds": "EligibilityRuleBuilderView"
  },
  "setResaleEligibilityRule": {
   "method": "PUT",
@@ -153,9 +317,68 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ResaleEligibilityRuleConfigurationInput",
   "responds": "ResaleEligibilityRuleConfigurationView"
+ },
+ "setResaleFeePolicy": {
+  "method": "PUT",
+  "path": "/resale-fee-policy",
+  "contract": "orders",
+  "summary": "Set resale commission and the price ceiling",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResaleFeePolicy",
+  "responds": "ResaleFeePolicy"
+ },
+ "setResaleMarketplaceConfig": {
+  "method": "PUT",
+  "path": "/resale-marketplace-config",
+  "contract": "orders",
+  "summary": "Set how the venue's resale marketplace runs",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResaleMarketplaceConfig",
+  "responds": "ResaleMarketplaceConfig"
  },
  "setResaleMarketplaceRecommendation": {
   "method": "PUT",
@@ -166,7 +389,18 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "AiResaleConfigurationMarketplaceRecommendationsInput",
   "responds": "AiResaleConfigurationMarketplaceRecommendationsView"
  }

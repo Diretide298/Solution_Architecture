@@ -1093,6 +1093,13 @@
     "contract": "catalogue",
     "purpose": "The membership plan templates whose benefits are set",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "createEntitlementTemplate",
+    "contract": "catalogue",
+    "purpose": "Set expiryNoticeDays on a pass template (pre-expiry notice)",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {

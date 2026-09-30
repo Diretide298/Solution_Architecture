@@ -464,7 +464,7 @@ paths:
       - name: entryId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     get:
       operationId: getWaitingGuest
       x-ticvai-consumed-by:
@@ -531,7 +531,7 @@ paths:
       - name: entryId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: redeemWaitingGuest
       x-ticvai-audience: [staff]
@@ -559,7 +559,7 @@ paths:
               type: object
               required: [id, recordedAt]
               properties:
-                id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                id: { type: string, format: uuid }
                 admittedCount:
                   type: integer
                   minimum: 1
@@ -581,7 +581,7 @@ paths:
       - name: entryId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: overrideWaitingGuest
       x-ticvai-audience: [staff]
@@ -672,7 +672,7 @@ paths:
                   calledCount: { type: integer }
                   calledEntryIds:
                     type: array
-                    items: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                    items: { type: string, format: uuid }
                   remainingInQueue: { type: integer }
 
   /queues/{queueId}/entries:
@@ -1429,7 +1429,7 @@ components:
       type: object
       required: [id, queueId, partySize, recordedAt]
       properties:
-        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        id: { type: string, format: uuid }
         queueId: { type: string, format: uuid }
         partySize: { type: integer, minimum: 1 }
         entitlementId:
@@ -1493,9 +1493,9 @@ components:
       properties:
         id:
           type: string
-          pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+          format: uuid
           description: >
-            The client-generated ULID from `JoinQueueRequest.id`, and the `entryId` every entry
+            The client-generated UUIDv7 from `JoinQueueRequest.id`, and the `entryId` every entry
             path takes. `listMyWaitingGuests` gives it back to a guest who has lost it.
         queueId: { type: string, format: uuid }
         queueName: { $ref: '#/components/schemas/LocalisedText' }
@@ -1545,7 +1545,7 @@ components:
       type: object
       required: [entryId, outcome, recordedAt]
       properties:
-        entryId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        entryId: { type: string, format: uuid }
         outcome:
           type: string
           enum: [admitted, denied, overridden]
@@ -1652,7 +1652,7 @@ components:
       type: object
       required: [id, kind, value, observedAt]
       properties:
-        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        id: { type: string, format: uuid }
         feedId:
           type: string
           format: uuid

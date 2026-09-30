@@ -2958,7 +2958,7 @@
        "bindsTo": "VenuePoint.description",
        "operation": "setVenuePoint",
        "notes": "**What the guest reads on Item Detail** (decided 29 September, MOB-4): rides, shows, restaurants and shops. Per language.",
-       "provenance": "agreed name venue-map VenuePoint.description (P29 brief)"
+       "provenance": "agreed name venue-map VenuePoint.description (the 29 September pass brief)"
       },
       {
        "kind": "multiSelect",
@@ -2966,7 +2966,7 @@
        "bindsTo": "VenuePoint.media",
        "operation": "searchMedia",
        "notes": "From the asset library; the first is the gallery cover on GST-004 Item Detail (MOB-4).",
-       "provenance": "agreed name venue-map VenuePoint.media (P29 brief)"
+       "provenance": "agreed name venue-map VenuePoint.media (the 29 September pass brief)"
       },
       {
        "kind": "selectField",
@@ -2974,7 +2974,7 @@
        "bindsTo": "VenuePoint.featuredOffer",
        "operation": "listProducts",
        "notes": "**The product or bundle the item detail proposes** (decided 29 September, MOB-4), on any kind of point, e.g. a restaurant's *meal combo with admission* (a bundle from BO-011). Products from `listProducts`, bundles from `listCatalogueBundles`.",
-       "provenance": "agreed name venue-map VenuePoint.featuredOffer (P29 brief)"
+       "provenance": "agreed name venue-map VenuePoint.featuredOffer (the 29 September pass brief)"
       },
       {
        "kind": "numberField",
@@ -2982,7 +2982,7 @@
        "bindsTo": "VenuePoint.typicalDurationMinutes",
        "operation": "setVenuePoint",
        "notes": "What the Plan tab's planner allows for this stop (MOB-6).",
-       "provenance": "agreed name venue-map VenuePoint.typicalDurationMinutes (P29 brief)"
+       "provenance": "agreed name venue-map VenuePoint.typicalDurationMinutes (the 29 September pass brief)"
       },
       {
        "kind": "multiSelect",
@@ -2990,7 +2990,7 @@
        "bindsTo": "VenuePoint.interestTags",
        "operation": "setVenuePoint",
        "notes": "Matched against the guest's interests on the Plan tab (MOB-6).",
-       "provenance": "agreed name venue-map VenuePoint.interestTags (P29 brief)"
+       "provenance": "agreed name venue-map VenuePoint.interestTags (the 29 September pass brief)"
       },
       {
        "kind": "multiSelect",
@@ -2998,7 +2998,7 @@
        "bindsTo": "VenuePoint.cuisineTags",
        "operation": "setVenuePoint",
        "notes": "For restaurants and kiosks; matched against the guest's cuisine choice on the Plan tab (MOB-6).",
-       "provenance": "agreed name venue-map VenuePoint.cuisineTags (P29 brief)"
+       "provenance": "agreed name venue-map VenuePoint.cuisineTags (the 29 September pass brief)"
       }
      ]
     }
@@ -3016,21 +3016,21 @@
     "contract": "assets",
     "purpose": "Pick an item's photos and video (MOB-4)",
     "trigger": "onAction",
-    "provenance": "decided 29 September, MOB-4 (P29)"
+    "provenance": "decided 29 September, MOB-4 (the 29 September pass)"
    },
    {
     "operationId": "listProducts",
     "contract": "catalogue",
     "purpose": "Products a point can feature (MOB-4)",
     "trigger": "onAction",
-    "provenance": "decided 29 September, MOB-4 (P29)"
+    "provenance": "decided 29 September, MOB-4 (the 29 September pass)"
    },
    {
     "operationId": "listCatalogueBundles",
     "contract": "catalogue",
     "purpose": "Bundles a point can feature, e.g. a meal combo (MOB-4)",
     "trigger": "onAction",
-    "provenance": "decided 29 September, MOB-4 (P29)"
+    "provenance": "decided 29 September, MOB-4 (the 29 September pass)"
    },
    {
     "operationId": "getVenueMap",

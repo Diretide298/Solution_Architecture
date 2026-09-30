@@ -3550,21 +3550,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "maintenance",
     "purpose": "Technicians ranked by skill, shift and load (M17-13)",
     "trigger": "onAction",
-    "provenance": "decided 17 September, M17-13 (P29)"
+    "provenance": "decided 17 September, M17-13 (the 29 September pass)"
    },
    {
     "operationId": "listVendorServiceRequests",
     "contract": "maintenance",
     "purpose": "Outside vendors on this work order (M17-13)",
     "trigger": "onAction",
-    "provenance": "decided 17 September, M17-13 (P29)"
+    "provenance": "decided 17 September, M17-13 (the 29 September pass)"
    },
    {
     "operationId": "createVendorServiceRequest",
     "contract": "maintenance",
     "purpose": "Engage an outside vendor (M17-13)",
     "trigger": "onAction",
-    "provenance": "decided 17 September, M17-13 (P29)",
+    "provenance": "decided 17 September, M17-13 (the 29 September pass)",
     "invalidates": [
      "listVendorServiceRequests"
     ]
@@ -3574,7 +3574,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "maintenance",
     "purpose": "Move a vendor request along (M17-13)",
     "trigger": "onAction",
-    "provenance": "decided 17 September, M17-13 (P29)",
+    "provenance": "decided 17 September, M17-13 (the 29 September pass)",
     "invalidates": [
      "listVendorServiceRequests"
     ]
@@ -8296,6 +8296,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ]
  },
  "AuditRecord": {
+  "x-ticvai-append-only": "occurredAt",
   "type": "object",
   "x-ticvai-persistence": "platform.audit_record",
   "description": "26 September, pull audit R198. **One row of the platform audit trail, as `listAuditRecords` returns it.** It was a free-form object, so nothing said what an audit row carries. These are the fields the operation already filters on — who, where, on which workstation, what action, on what, and when — and nothing more. Written by the operations that audit themselves; never edited and never deleted.\n",
@@ -8343,7 +8344,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "platformStaffGrantId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "**Set when a TICVAI platform operator acted, naming the grant they acted under** (`identity.openPlatformStaffGrant`; decided 28 September, audit R098). Null for the tenant's own staff. Every platform action in a tenant carries one, so the tenant can see all of them.\n"
    }
@@ -8760,7 +8761,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "menuItemId": {
     "type": "string",
@@ -8951,7 +8952,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "title": {
     "type": "string",
@@ -9575,7 +9576,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderNumber": {
     "type": "string"
@@ -9589,7 +9590,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "tableVisitId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "status": {
@@ -9621,10 +9622,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "salesOrderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "x-ticvai-references": "orders.sales_order",
-    "description": "**Retyped 29 September (SD-046)**: `orders.sales_order.id` is a ULID, so a uuid here could never join. **Taken from their `fnb.order`, 20 September.** We carried outlet, table visit and kitchen ticket on an F&B order and nothing joining it to what was actually sold, so an F&B line could not be reconciled to the order that paid for it.\n"
+    "description": "**Retyped 29 September (SD-046)**, and `format: uuid` since ADR-0056 (30 September): every id is a uuid, so this joins `orders.sales_order.id`. **Taken from their `fnb.order`, 20 September.** We carried outlet, table visit and kitchen ticket on an F&B order and nothing joining it to what was actually sold, so an F&B line could not be reconciled to the order that paid for it.\n"
    },
    "updatedAt": {
     "type": "string",
@@ -9640,7 +9641,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "kitchenTicketId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "kitchenTickets": {
@@ -9901,7 +9902,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "incidentNumber": {
     "type": "string",
@@ -9958,7 +9959,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "correctiveWorkOrderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "occurredAt": {
@@ -10029,11 +10030,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "The F&B order the ticket was created from on acceptance (`FnbOrder.id`)."
    },
    "orderNumber": {
@@ -10093,7 +10094,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "properties": {
       "lineId": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+       "format": "uuid"
       },
       "name": {
        "type": "string"
@@ -10119,7 +10120,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       },
       "refireOfLineId": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "format": "uuid",
        "nullable": true,
        "readOnly": true,
        "description": "**Set on a refire.** The line it remakes, which stays — food cost counts both, the bill counts one (`refireItem`)."
@@ -10732,7 +10733,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "properties": {
       "ticketId": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "format": "uuid",
        "description": "The `Entitlement.id`."
       },
       "mediaCodes": {
@@ -10792,7 +10793,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       },
       "ticketId": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "format": "uuid",
        "description": "The `Entitlement.id` in the issuing cell."
       },
       "issuingCellId": {
@@ -12158,6 +12159,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   }
  },
  "ScanEvent": {
+  "x-ticvai-append-only": "recordedAt",
   "x-ticvai-persistence": "access.scan_event",
   "type": "object",
   "required": [
@@ -12171,8 +12173,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "The scan's client-generated ULID, the key offline replay deduplicates on."
+    "format": "uuid",
+    "description": "The scan's client-generated UUIDv7, the key offline replay deduplicates on."
    },
    "accessPointId": {
     "type": "string",
@@ -12187,7 +12189,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "ticketId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The `Entitlement.id` scanned; null where the media resolved to nothing."
    },
@@ -12216,7 +12218,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "overridesScanId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "**Set only on an override row**, naming the denied scan it admits against (decided 28 September, audit R228). The denied scan itself is never updated: the denial and the override are two rows, and at most one override row names any scan. Null on every other scan.\n"
    },
@@ -12388,8 +12390,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID. Also the idempotency key."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7. Also the idempotency key."
    },
    "workstationId": {
     "type": "string",
@@ -12706,7 +12708,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "visitId": {
       "type": "string",
-      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "format": "uuid",
       "nullable": true
      },
      "covers": {
@@ -12741,7 +12743,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "ticketId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "Stable for the life of the ticket, independent of the media carrying it."
    },
    "mediaCode": {
@@ -12828,8 +12830,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID. Also the idempotency key and dedupe key."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7. Also the idempotency key and dedupe key."
    },
    "mediaCode": {
     "type": "string",
@@ -12870,7 +12872,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "scanId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "outcome": {
     "$ref": "#/components/schemas/ScanOutcome"
@@ -12952,7 +12954,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "workOrderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "supplierId": {
     "type": "string",
@@ -13834,7 +13836,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "workOrderNumber": {
     "type": "string",
@@ -13952,12 +13954,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "sourceInspectionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "sourceIncidentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "createdAt": {
@@ -14157,7 +14159,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "supersededByWorkOrderId": {
       "type": "string",
-      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "format": "uuid",
       "nullable": true,
       "description": "Set by `cancelWorkOrder` where the reason is `superseded`."
      },
@@ -14184,7 +14186,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "duplicateOfWorkOrderId": {
       "type": "string",
-      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "format": "uuid",
       "nullable": true,
       "description": "Set by `closeWorkOrder` where the outcome is `duplicate`."
      },

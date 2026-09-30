@@ -2587,7 +2587,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "array",
     "description": "Routes it is sold on. Empty means every active route in the venue.",
     "items": {
-     "$ref": "#/components/schemas/Ulid"
+     "$ref": "../shared/common.yaml#/components/schemas/Id"
     }
    },
    "sortOrder": {
@@ -2723,7 +2723,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "pairedRouteId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The same line run the other way. The swap button lands on it."
    },
@@ -2759,13 +2759,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "$ref": "#/components/schemas/Ulid"
+    "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "routeId": {
-    "$ref": "#/components/schemas/Ulid"
+    "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "timetableId": {
-    "$ref": "#/components/schemas/Ulid"
+    "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "performanceId": {
     "type": "string",
@@ -2824,7 +2824,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "routeId": {
-    "$ref": "#/components/schemas/Ulid"
+    "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "stopsTravelled": {
     "type": "integer",
@@ -2864,7 +2864,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     }
    },
    "passTypeId": {
-    "$ref": "#/components/schemas/Ulid"
+    "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "saving": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
@@ -2884,14 +2884,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "routeId": {
-    "$ref": "#/components/schemas/Ulid",
+    "$ref": "../shared/common.yaml#/components/schemas/Id",
     "description": "Omitted, the active route serving the two stations in this order."
    },
    "fromStationId": {
-    "$ref": "#/components/schemas/Ulid"
+    "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "toStationId": {
-    "$ref": "#/components/schemas/Ulid"
+    "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "passengers": {
     "type": "array",
@@ -2916,7 +2916,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     }
    },
    "passTypeId": {
-    "$ref": "#/components/schemas/Ulid"
+    "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "at": {
     "type": "string",
@@ -2939,10 +2939,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "properties": {
      "id": {
-      "$ref": "#/components/schemas/Ulid"
+      "$ref": "../shared/common.yaml#/components/schemas/Id"
      },
      "routeId": {
-      "$ref": "#/components/schemas/Ulid"
+      "$ref": "../shared/common.yaml#/components/schemas/Id"
      }
     }
    }
@@ -3254,7 +3254,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "properties": {
      "id": {
-      "$ref": "#/components/schemas/Ulid"
+      "$ref": "../shared/common.yaml#/components/schemas/Id"
      },
      "active": {
       "type": "boolean",
@@ -3380,7 +3380,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "properties": {
      "id": {
-      "$ref": "#/components/schemas/Ulid"
+      "$ref": "../shared/common.yaml#/components/schemas/Id"
      },
      "sequence": {
       "type": "integer",
@@ -3403,7 +3403,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "stationId": {
-    "$ref": "#/components/schemas/Ulid"
+    "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "offsetMinutes": {
     "type": "integer",
@@ -3453,10 +3453,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      ],
      "properties": {
       "fromStationId": {
-       "$ref": "#/components/schemas/Ulid"
+       "$ref": "../shared/common.yaml#/components/schemas/Id"
       },
       "toStationId": {
-       "$ref": "#/components/schemas/Ulid"
+       "$ref": "../shared/common.yaml#/components/schemas/Id"
       },
       "fare": {
        "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -3492,7 +3492,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "properties": {
      "id": {
-      "$ref": "#/components/schemas/Ulid"
+      "$ref": "../shared/common.yaml#/components/schemas/Id"
      },
      "active": {
       "type": "boolean",
@@ -3501,6 +3501,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     }
    }
   ]
+ },
+ "SupervisorStepUp": {
+  "type": "object",
+  "description": "**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n",
+  "required": [
+   "principalId",
+   "credential"
+  ],
+  "properties": {
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The supervisor signing. Recorded against the act."
+   },
+   "credential": {
+    "type": "string",
+    "maxLength": 512,
+    "writeOnly": true,
+    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned."
+   }
+  }
  },
  "Timetable": {
   "x-ticvai-persistence": "transport.timetable + transport.timetable_run",
@@ -3517,10 +3538,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "properties": {
      "id": {
-      "$ref": "#/components/schemas/Ulid"
+      "$ref": "../shared/common.yaml#/components/schemas/Id"
      },
      "routeId": {
-      "$ref": "#/components/schemas/Ulid"
+      "$ref": "../shared/common.yaml#/components/schemas/Id"
      },
      "status": {
       "$ref": "#/components/schemas/TransportTimetableStatus"
@@ -3540,7 +3561,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "supersededById": {
       "type": "string",
-      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "format": "uuid",
       "nullable": true,
       "readOnly": true
      }
@@ -3603,7 +3624,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "$ref": "#/components/schemas/Ulid"
+    "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "venueId": {
     "type": "string",
@@ -3772,7 +3793,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "properties": {
      "id": {
-      "$ref": "#/components/schemas/Ulid"
+      "$ref": "../shared/common.yaml#/components/schemas/Id"
      },
      "status": {
       "$ref": "#/components/schemas/TransportRouteStatus"
@@ -3821,10 +3842,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "superseded",
    "withdrawn"
   ]
- },
- "Ulid": {
-  "type": "string",
-  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
  },
  "UploadTicket": {
   "x-ticvai-persistence": "assets.media_upload",

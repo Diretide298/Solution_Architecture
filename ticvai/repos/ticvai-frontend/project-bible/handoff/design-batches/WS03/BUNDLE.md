@@ -2365,7 +2365,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "The ruleId (display rule) or policyId (transfer policy) of the operations"
    },
    "kind": {
@@ -2587,11 +2587,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "entitlementId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "credentialBindingId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "deviceId": {
@@ -2964,7 +2964,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "ruleId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "Absent creates a rule"
    },
    "venueId": {

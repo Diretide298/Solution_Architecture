@@ -1,6 +1,6 @@
 # WS58 — Sales Channel Management board 2
 
-**10 screens · 10 operations · 10 schemas · 1 permissions**
+**10 screens · 17 operations · 17 schemas · 4 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 1 permissions apply here:
-  `PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `AI_APPROVE, PRICE_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-268` | Channel Operations Command Center | commandCentre | 1 | 0 | — |
-| `ADM-269` | Channel Connection & Integration Manager | configEditor | 1 | 0 | — |
-| `ADM-270` | Product, Price & Availability Synchronization | listDetail | 1 | 0 | — |
-| `ADM-271` | Real-Time Channel Availability & Inventory Monitor | listDetail | 1 | 0 | — |
+| `ADM-268` | Channel Operations Command Center | commandCentre | 2 | 0 | — |
+| `ADM-269` | Channel Connection & Integration Manager | configEditor | 3 | 2 | — |
+| `ADM-270` | Product, Price & Availability Synchronization | listDetail | 2 | 1 | — |
+| `ADM-271` | Real-Time Channel Availability & Inventory Monitor | listDetail | 2 | 0 | — |
 | `ADM-272` | Channel Allocation & Rebalancing Operations | listDetail | 1 | 0 | — |
-| `ADM-273` | Channel Exceptions, Incidents & Recovery | configEditor | 1 | 0 | — |
+| `ADM-273` | Channel Exceptions, Incidents & Recovery | configEditor | 3 | 1 | — |
 | `ADM-274` | Channel Performance & Commercial Analytics | commandCentre | 1 | 0 | — |
 | `ADM-275` | Channel Audit, Logs & Transaction Traceability | listDetail | 1 | 0 | — |
 | `ADM-276` | Channel Governance, SLA & Partner Control | configEditor | 1 | 0 | — |
-| `ADM-277` | AI Channel Optimization & Intelligence Center | listDetail | 1 | 0 | — |
+| `ADM-277` | AI Channel Optimization & Intelligence Center | listDetail | 3 | 1 | — |
 
 ## Thin screens in this batch
 
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-268 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-269",
@@ -186,10 +182,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Operations teams can determine the health, commercial activity and current issues of every active sales channel from one central workspace.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each channel should display) — counts over a population, then the population",
   "purpose": "Provide a real-time operational view of all active TICVAI sales channels.",
-  "purposeNote": "Operations teams can determine the health, commercial activity and current issues of every active sales channel from one central workspace.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -201,67 +197,67 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "metricTile",
        "label": "Active Channels",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 20 §Display",
-       "bindsTo": "ChannelOperationsCommandCenterView.activeChannels"
+       "bindsTo": "ChannelOperationsCommandCenterSummary.activeChannels"
       },
       {
        "kind": "metricTile",
        "label": "Connected Channels",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 20 §Display",
-       "bindsTo": "ChannelOperationsCommandCenterView.connectedChannels"
+       "bindsTo": "ChannelOperationsCommandCenterSummary.connectedChannels"
       },
       {
        "kind": "metricTile",
        "label": "Degraded Channels",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 20 §Display",
-       "bindsTo": "ChannelOperationsCommandCenterView.degradedChannels"
+       "bindsTo": "ChannelOperationsCommandCenterSummary.degradedChannels"
       },
       {
        "kind": "metricTile",
        "label": "Offline Channels",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 20 §Display",
-       "bindsTo": "ChannelOperationsCommandCenterView.offlineChannels"
+       "bindsTo": "ChannelOperationsCommandCenterSummary.offlineChannels"
       },
       {
        "kind": "metricTile",
        "label": "Transactions Today",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 20 §Display",
-       "bindsTo": "ChannelOperationsCommandCenterView.transactionsToday"
+       "bindsTo": "ChannelOperationsCommandCenterSummary.transactionsToday"
       },
       {
        "kind": "metricTile",
        "label": "Gross Sales",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 20 §Display",
-       "bindsTo": "ChannelOperationsCommandCenterView.grossSales"
+       "bindsTo": "ChannelOperationsCommandCenterSummary.grossSales"
       },
       {
        "kind": "metricTile",
        "label": "Products Available",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 20 §Display",
-       "bindsTo": "ChannelOperationsCommandCenterView.productsAvailable"
+       "bindsTo": "ChannelOperationsCommandCenterSummary.productsAvailable"
       },
       {
        "kind": "metricTile",
        "label": "Synchronization Errors",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 20 §Display",
-       "bindsTo": "ChannelOperationsCommandCenterView.synchronizationErrors"
+       "bindsTo": "ChannelOperationsCommandCenterSummary.synchronizationErrors"
       },
       {
        "kind": "metricTile",
        "label": "Capacity Alerts",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 20 §Display",
-       "bindsTo": "ChannelOperationsCommandCenterView.capacityAlerts"
+       "bindsTo": "ChannelOperationsCommandCenterSummary.capacityAlerts"
       },
       {
        "kind": "metricTile",
        "label": "Pricing Errors",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 20 §Display",
-       "bindsTo": "ChannelOperationsCommandCenterView.pricingErrors"
+       "bindsTo": "ChannelOperationsCommandCenterSummary.pricingErrors"
       },
       {
        "kind": "metricTile",
        "label": "Failed Transactions",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 20 §Display",
-       "bindsTo": "ChannelOperationsCommandCenterView.failedTransactions"
+       "bindsTo": "ChannelOperationsCommandCenterSummary.failedTransactions"
       },
       {
        "kind": "metricTile",
@@ -347,6 +343,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "apis": [
    {
+    "operationId": "listChannel2",
+    "contract": "catalogue",
+    "purpose": "AI Channel Optimization & Intelligence Center",
+    "trigger": "onLoad"
+   },
+   {
     "operationId": "listChannel",
     "contract": "catalogue",
     "purpose": "Channel Operations Command Center",
@@ -356,7 +358,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-268"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-268",
+   "workshopBoard": "wireframes/WS139 Sales Channel Management Board 2.dc.html#adm-268"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 20. 23 of 23 labels bound to a contract property; 32 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -420,22 +423,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized technical administrators can establish, test and monitor channel connections without modifying core TICVAI application code for supported connector types.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure/reference) and no display directory — it is settings, not a population",
   "purpose": "Configure and manage the technical connection between TICVAI and external or internal sales channels.",
-  "purposeNote": "Authorized technical administrators can establish, test and monitor channel connections without modifying core TICVAI application code for supported connector types.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Webhook, Partner API. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Sales_Channel_Management_Reference.pdf, page 22 §Support"
-   },
-   {
-    "operation": null,
-    "why": "**Channel Connection & Integration Manager declares no operation that writes anything** — its only declared call is `listChannelConnectionIntegration`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -521,13 +512,49 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "TICVAI Native",
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 22 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "REST API",
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 22 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Webhook",
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 22 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reseller API",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 22 §Support"
       },
       {
        "kind": "secondaryButton",
        "label": "Partner API",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 22 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "File/SFTP where required",
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 22 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save channel connection configuration",
+       "operation": "setChannelConnectionConfiguration",
+       "permission": "PRODUCT_CONFIGURE",
+       "notes": "**How TICVAI reaches one channel, per environment** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /channel-connections"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Test channel connection",
+       "operation": "testChannelConnection",
+       "permission": "PRODUCT_CONFIGURE",
+       "notes": "**Runs the connection tests and records the result** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml POST /channel-connections/{connectionId}/test"
       }
      ]
     }
@@ -545,14 +572,95 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Channel Connection & Integration Manager",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setChannelConnectionConfiguration",
+    "contract": "catalogue",
+    "purpose": "Create or update a channel connection",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelConnectionIntegration"
+    ]
+   },
+   {
+    "operationId": "testChannelConnection",
+    "contract": "catalogue",
+    "purpose": "Test a channel connection now",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelConnectionIntegration"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-269"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-269",
+   "workshopBoard": "wireframes/WS139 Sales Channel Management Board 2.dc.html#adm-269"
   },
-  "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 22. 0 of 0 labels bound to a contract property; 16 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 22. 0 of 0 labels bound to a contract property; 20 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetChannelConnectionConfiguration",
+    "component": "modal",
+    "trigger": "Save channel connection configuration",
+    "body": "**Collects what `setChannelConnectionConfiguration` sends before it is called.** Required: `id`, `scopePath`, `salesChannelId`, `connectorName`, `environment`, `connectionType`. Optional: `partner`, `direction`, `endpoint`, `apiVersion`, `authenticationType`, `credentialsReference`, `certificateReference`, `certificateExpiresAt`, `timeoutMs`, `rateLimitPerMinute`, `ipRestrictions`, `retryPolicy` and 3 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ChannelConnection",
+    "confirm": {
+     "label": "Save channel connection configuration",
+     "operation": "setChannelConnectionConfiguration"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "salesChannelId",
+      "connectorName",
+      "environment",
+      "connectionType",
+      "partner",
+      "direction",
+      "endpoint",
+      "apiVersion",
+      "authenticationType",
+      "credentialsReference",
+      "certificateReference",
+      "certificateExpiresAt",
+      "timeoutMs",
+      "rateLimitPerMinute",
+      "ipRestrictions",
+      "retryPolicy"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /channel-connections"
+   },
+   {
+    "id": "formTestChannelConnection",
+    "component": "modal",
+    "trigger": "Test channel connection",
+    "body": "**Collects what `testChannelConnection` sends before it is called.** Nothing in the body is required. Optional: `tests`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Test channel connection",
+     "operation": "testChannelConnection"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "tests"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /channel-connections/{connectionId}/test"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "connectionId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -614,14 +722,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "supported sales channels while clearly identifying failed or inconsistent records.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Control how TICVAI distributes commercial information to connected channels and receives supported updates.",
-  "purposeNote": "supported sales channels while clearly identifying failed or inconsistent records.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Channel → TICVAI, Sync Now, Retry Failed, Compare, Reprocess, Pause Sync, Resume, Export Error. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 8 actions on this screen; 1 are served since the writers pass (29 September): Channel → TICVAI by `setChannelSyncSetting`.** Still unserved: Sync Now, Retry Failed, Compare, Reprocess, Pause Sync, Resume, Export Error. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Sales_Channel_Management_Reference.pdf, page 23 §Support as appropriate"
    }
   ],
@@ -717,6 +825,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "secondaryButton",
        "label": "Export Error",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 23 §Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save channel sync setting",
+       "operation": "setChannelSyncSetting",
+       "permission": "PRODUCT_CONFIGURE",
+       "notes": "**The person's half of `catalogue.channel_sync`** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /channel-syncs"
       }
      ]
     }
@@ -735,6 +851,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Product, Price & Availability Synchronization",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setChannelSyncSetting",
+    "contract": "catalogue",
+    "purpose": "Set how one kind of data synchronises with a channel",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProductPriceAvailability"
+    ]
    }
   ],
   "entryState": {
@@ -750,9 +875,46 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-270"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-270",
+   "workshopBoard": "wireframes/WS139 Sales Channel Management Board 2.dc.html#adm-270"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 23. 8 of 8 labels bound to a contract property; 21 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetChannelSyncSetting",
+    "component": "modal",
+    "trigger": "Save channel sync setting",
+    "body": "**Collects what `setChannelSyncSetting` sends before it is called.** Required: `id`, `scopePath`, `salesChannelId`, `domain`. Optional: `channelConnectionId`, `direction`, `frequency`, `isPaused`, `lastSuccessfulSyncAt`, `nextSyncAt`, `recordsProcessed`, `successful`, `failed`, `pending`, `warnings`, `durationMs` and 1 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ChannelSync",
+    "confirm": {
+     "label": "Save channel sync setting",
+     "operation": "setChannelSyncSetting"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "salesChannelId",
+      "domain",
+      "channelConnectionId",
+      "direction",
+      "frequency",
+      "isPaused",
+      "lastSuccessfulSyncAt",
+      "nextSyncAt",
+      "recordsProcessed",
+      "successful",
+      "failed",
+      "pending",
+      "warnings",
+      "durationMs",
+      "mismatchCount"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /channel-syncs"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -814,10 +976,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Operations can understand current sellable availability across all channels without checking each channel independently.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide operations with a live view of what each channel can currently sell.",
-  "purposeNote": "Operations can understand current sellable availability across all channels without checking each channel independently.",
   "layout": {
    "template": "split",
    "regions": [
@@ -880,6 +1042,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Real-Time Channel Availability & Inventory Monitor",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listRealTimeAvailability",
+    "contract": "promotions",
+    "purpose": "Real-Time Availability & Checkout Validation",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -895,7 +1063,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-271"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-271",
+   "workshopBoard": "wireframes/WS139 Sales Channel Management Board 2.dc.html#adm-271"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 25. 7 of 7 labels bound to a contract property; 7 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -959,10 +1128,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can dynamically rebalance unsold channel capacity without affecting confirmed orders or exceeding underlying capacity.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Allow authorized users to operationally adjust inventory allocations as demand changes. Board 1 defines the allocation rules. Board 2 manages those allocations during live operations.",
-  "purposeNote": "Authorized users can dynamically rebalance unsold channel capacity without affecting confirmed orders or exceeding underlying capacity.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1056,7 +1225,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-272"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-272",
+   "workshopBoard": "wireframes/WS139 Sales Channel Management Board 2.dc.html#adm-272"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 26. 9 of 9 labels bound to a contract property; 16 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1120,14 +1290,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Channel incidents can be identified, assigned, investigated and recovered from a central operational workflow with complete traceability.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
   "purpose": "Provide one operational workspace for resolving channel problems.",
-  "purposeNote": "Channel incidents can be identified, assigned, investigated and recovered from a central operational workflow with complete traceability.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Connection Failure, Product Sync Failure, Pricing Mismatch, Order Failure, Payment Error, Duplicate Transaction, Partner Error. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Connection Failure, Product Sync Failure, Pricing Mismatch, Inventory Mismatch, Order Failure, Payment Error, Duplicate Transaction, Partner Error. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Sales_Channel_Management_Reference.pdf, page 27 §Support"
    }
   ],
@@ -1221,6 +1391,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       },
       {
        "kind": "secondaryButton",
+       "label": "Inventory Mismatch",
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 27 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Order Failure",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 27 §Support"
       },
@@ -1238,6 +1413,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "secondaryButton",
        "label": "Partner Error",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 27 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save channel incident",
+       "operation": "updateChannelIncident",
+       "permission": "PRODUCT_CONFIGURE",
+       "notes": "**The person's moves on a channel incident** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PATCH /channel-incidents/{incidentId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Retry channel incident",
+       "operation": "retryChannelIncident",
+       "permission": "PRODUCT_CONFIGURE",
+       "notes": "**Retry, as a call** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml POST /channel-incidents/{incidentId}/retry"
       }
      ]
     }
@@ -1255,14 +1446,64 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Channel Exceptions, Incidents & Recovery",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateChannelIncident",
+    "contract": "catalogue",
+    "purpose": "Own, investigate, resolve or close a channel incident",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelExceptionIncident"
+    ]
+   },
+   {
+    "operationId": "retryChannelIncident",
+    "contract": "catalogue",
+    "purpose": "Retry the failed channel call behind an incident",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelExceptionIncident"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-273"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-273",
+   "workshopBoard": "wireframes/WS139 Sales Channel Management Board 2.dc.html#adm-273"
   },
-  "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 27. 0 of 0 labels bound to a contract property; 19 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 27. 0 of 0 labels bound to a contract property; 20 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formUpdateChannelIncident",
+    "component": "modal",
+    "trigger": "Save channel incident",
+    "body": "**Collects what `updateChannelIncident` sends before it is called.** Nothing in the body is required. Optional: `status`, `ownerPrincipalId`, `slaDueAt`, `resolutionNote`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save channel incident",
+     "operation": "updateChannelIncident"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "ownerPrincipalId",
+      "slaDueAt",
+      "resolutionNote"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PATCH /channel-incidents/{incidentId}"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "incidentId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1324,10 +1565,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Management can objectively compare channel contribution and commercial efficiency using consistent TICVAI metrics.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Measure) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Compare the commercial effectiveness of TICVAI sales channels.",
-  "purposeNote": "Management can objectively compare channel contribution and commercial efficiency using consistent TICVAI metrics.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -1439,7 +1680,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "metricTile",
        "label": "Cost of Sale where available",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 29 §Measure",
-       "bindsTo": "ChannelPerformanceCommercialAnalyticsView.costOfSaleWhereAvailable"
+       "bindsTo": "ChannelPerformanceCommercialAnalyticsView.costOfSale"
       }
      ]
     }
@@ -1463,7 +1704,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-274"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-274",
+   "workshopBoard": "wireframes/WS139 Sales Channel Management Board 2.dc.html#adm-274"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 29. 12 of 22 labels bound to a contract property; 23 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1527,10 +1769,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Any channel transaction or operational change can be reconstructed from initiation through final result.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Track) and no metric row",
   "purpose": "Provide complete traceability across channel configuration, synchronization and transactions.",
-  "purposeNote": "Any channel transaction or operational change can be reconstructed from initiation through final result.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1571,17 +1813,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every channel audit logs",
        "columns": [
-        "ChannelAuditLogsTransactionTraceabilityView.configurationChange",
-        "ChannelAuditLogsTransactionTraceabilityView.activation",
-        "ChannelAuditLogsTransactionTraceabilityView.suspension",
-        "ChannelAuditLogsTransactionTraceabilityView.allocationChange",
-        "ChannelAuditLogsTransactionTraceabilityView.priceAssignment",
-        "Sync",
-        "ChannelAuditLogsTransactionTraceabilityView.order",
-        "ChannelAuditLogsTransactionTraceabilityView.cancellation",
-        "ChannelAuditLogsTransactionTraceabilityView.error",
-        "ChannelAuditLogsTransactionTraceabilityView.manualIntervention",
-        "ChannelAuditLogsTransactionTraceabilityView.integrationChange"
+        "ChannelAuditLogsTransactionTraceabilityView.category",
+        "Sync"
        ],
        "bindsTo": "ChannelAuditLogsTransactionTraceabilityView",
        "operation": "listChannelLogTransaction",
@@ -1598,17 +1831,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected channel audit logs",
        "bindsTo": "ChannelAuditLogsTransactionTraceabilityView",
        "columns": [
-        "ChannelAuditLogsTransactionTraceabilityView.configurationChange",
-        "ChannelAuditLogsTransactionTraceabilityView.activation",
-        "ChannelAuditLogsTransactionTraceabilityView.suspension",
-        "ChannelAuditLogsTransactionTraceabilityView.allocationChange",
-        "ChannelAuditLogsTransactionTraceabilityView.priceAssignment",
-        "Sync",
-        "ChannelAuditLogsTransactionTraceabilityView.order",
-        "ChannelAuditLogsTransactionTraceabilityView.cancellation",
-        "ChannelAuditLogsTransactionTraceabilityView.error",
-        "ChannelAuditLogsTransactionTraceabilityView.manualIntervention",
-        "ChannelAuditLogsTransactionTraceabilityView.integrationChange"
+        "ChannelAuditLogsTransactionTraceabilityView.category",
+        "Sync"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Transaction Trace”, “Partner Request”, “Export”.",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 30 §Track"
@@ -1634,18 +1858,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "ChannelAuditLogsTransactionTraceabilityView.configurationChange",
-    "ChannelAuditLogsTransactionTraceabilityView.activation",
-    "ChannelAuditLogsTransactionTraceabilityView.suspension",
-    "ChannelAuditLogsTransactionTraceabilityView.allocationChange",
-    "ChannelAuditLogsTransactionTraceabilityView.priceAssignment",
+    "ChannelAuditLogsTransactionTraceabilityView.category",
     "Sync"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-275"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-275",
+   "workshopBoard": "wireframes/WS139 Sales Channel Management Board 2.dc.html#adm-275"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 30. 10 of 21 labels bound to a contract property; 30 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1709,10 +1930,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "governance obligations and can control channels that fall outside approved conditions.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure/monitor) and no display directory — it is settings, not a population",
   "purpose": "Govern live channels and ensure that internal/external channels operate within approved commercial and service conditions.",
-  "purposeNote": "governance obligations and can control channels that fall outside approved conditions.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1796,7 +2017,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-276"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-276",
+   "workshopBoard": "wireframes/WS139 Sales Channel Management Board 2.dc.html#adm-276"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 32. 0 of 0 labels bound to a contract property; 17 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1852,10 +2074,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from ADM-268, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "administrators optimize revenue, capacity and channel performance while respecting commercial and governance controls. Board 2 — Final Screen Register",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Analyze; Monitor) and no metric row",
   "purpose": "Create the AI intelligence layer that looks across all sales channels together rather than optimizing each channel in isolation.",
-  "purposeNote": "administrators optimize revenue, capacity and channel performance while respecting commercial and governance controls. Board 2 — Final Screen Register",
   "gaps": [
    {
     "operation": null,
@@ -1874,20 +2096,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every channel optimization intelligence",
        "columns": [
-        "AiChannelOptimizationIntelligenceCenterView.salesVelocity",
-        "AiChannelOptimizationIntelligenceCenterView.conversion",
-        "AiChannelOptimizationIntelligenceCenterView.capacity",
-        "AiChannelOptimizationIntelligenceCenterView.allocation",
-        "AiChannelOptimizationIntelligenceCenterView.revenue",
-        "AiChannelOptimizationIntelligenceCenterView.netRevenue",
-        "AiChannelOptimizationIntelligenceCenterView.pricing",
-        "AiChannelOptimizationIntelligenceCenterView.channelFees",
-        "AiChannelOptimizationIntelligenceCenterView.commission",
-        "AiChannelOptimizationIntelligenceCenterView.customerDemand",
-        "AiChannelOptimizationIntelligenceCenterView.timeToEvent",
-        "AiChannelOptimizationIntelligenceCenterView.historicalPerformance",
-        "AiChannelOptimizationIntelligenceCenterView.failures",
-        "AiChannelOptimizationIntelligenceCenterView.availability",
+        "AiChannelOptimizationIntelligenceCenterView.signals",
         "Channel Allocation & Rebalancing Operational capacity",
         "4.2.5"
        ],
@@ -1906,20 +2115,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected channel optimization intelligence",
        "bindsTo": "AiChannelOptimizationIntelligenceCenterView",
        "columns": [
-        "AiChannelOptimizationIntelligenceCenterView.salesVelocity",
-        "AiChannelOptimizationIntelligenceCenterView.conversion",
-        "AiChannelOptimizationIntelligenceCenterView.capacity",
-        "AiChannelOptimizationIntelligenceCenterView.allocation",
-        "AiChannelOptimizationIntelligenceCenterView.revenue",
-        "AiChannelOptimizationIntelligenceCenterView.netRevenue",
-        "AiChannelOptimizationIntelligenceCenterView.pricing",
-        "AiChannelOptimizationIntelligenceCenterView.channelFees",
-        "AiChannelOptimizationIntelligenceCenterView.commission",
-        "AiChannelOptimizationIntelligenceCenterView.customerDemand",
-        "AiChannelOptimizationIntelligenceCenterView.timeToEvent",
-        "AiChannelOptimizationIntelligenceCenterView.historicalPerformance",
-        "AiChannelOptimizationIntelligenceCenterView.failures",
-        "AiChannelOptimizationIntelligenceCenterView.availability",
+        "AiChannelOptimizationIntelligenceCenterView.signals",
         "Channel Allocation & Rebalancing Operational capacity",
         "4.2.5"
        ],
@@ -1946,6 +2142,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "secondaryButton",
        "label": "Risk",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 33 §Allow management to ask"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Decide catalogue AI finding",
+       "operation": "decideCatalogueAiFinding",
+       "permission": "AI_APPROVE",
+       "notes": "**The human control on a governance risk or a channel recommendation** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml POST /ai-findings/{findingId}/decision"
       }
      ]
     }
@@ -1964,24 +2168,65 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "AI Channel Optimization & Intelligence Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listChannel",
+    "contract": "catalogue",
+    "purpose": "Channel Operations Command Center",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "decideCatalogueAiFinding",
+    "contract": "catalogue",
+    "purpose": "Acknowledge, accept, dismiss or resolve an AI finding",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannel2",
+     "listChannel"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "AiChannelOptimizationIntelligenceCenterView.salesVelocity",
-    "AiChannelOptimizationIntelligenceCenterView.conversion",
-    "AiChannelOptimizationIntelligenceCenterView.capacity",
-    "AiChannelOptimizationIntelligenceCenterView.allocation",
-    "AiChannelOptimizationIntelligenceCenterView.revenue",
-    "AiChannelOptimizationIntelligenceCenterView.netRevenue"
+    "AiChannelOptimizationIntelligenceCenterView.signals"
+   ],
+   "params": [
+    {
+     "name": "findingId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-277"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-277",
+   "workshopBoard": "wireframes/WS139 Sales Channel Management Board 2.dc.html#adm-277"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 33. 14 of 16 labels bound to a contract property; 19 of 70 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formDecideCatalogueAiFinding",
+    "component": "modal",
+    "trigger": "Decide catalogue AI finding",
+    "body": "**Collects what `decideCatalogueAiFinding` sends before it is called.** Required: `decision`. Optional: `comment`, `ownerPrincipalId`, `dueDate`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Decide catalogue AI finding",
+     "operation": "decideCatalogueAiFinding"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "decision",
+      "comment",
+      "ownerPrincipalId",
+      "dueDate"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /ai-findings/{findingId}/decision"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -2015,6 +2260,25 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+ "decideCatalogueAiFinding": {
+  "method": "POST",
+  "path": "/ai-findings/{findingId}/decision",
+  "contract": "catalogue",
+  "summary": "Acknowledge, accept, dismiss or resolve an AI finding",
+  "permission": "AI_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CatalogueAiFinding"
+ },
  "listChannel": {
   "method": "GET",
   "path": "/channel",
@@ -2024,9 +2288,35 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "type",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "healthStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ChannelOperationsCommandCenterView"
+  "responds": "Page"
  },
  "listChannel2": {
   "method": "GET",
@@ -2037,9 +2327,35 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "category",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "AiChannelOptimizationIntelligenceCenterView"
+  "responds": "Page"
  },
  "listChannelAllocationRebalancing": {
   "method": "GET",
@@ -2050,9 +2366,35 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ChannelAllocationRebalancingOperationsView"
+  "responds": "Page"
  },
  "listChannelConnectionIntegration": {
   "method": "GET",
@@ -2063,9 +2405,40 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "connectionType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "environment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ChannelConnectionIntegrationManagerView"
+  "responds": "Page"
  },
  "listChannelExceptionIncident": {
   "method": "GET",
@@ -2076,9 +2449,45 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "severity",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "errorType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "currentStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ChannelExceptionsIncidentsRecoveryView"
+  "responds": "Page"
  },
  "listChannelGovernanceSla": {
   "method": "GET",
@@ -2089,9 +2498,40 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "complianceFlag",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "governanceStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ChannelGovernanceSlaPartnerControlView"
+  "responds": "Page"
  },
  "listChannelLogTransaction": {
   "method": "GET",
@@ -2142,10 +2582,45 @@ Method, path, parameters, request and response for every operation these screens
     "name": "correlationId",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "apiRequest",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "user",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "category",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "ChannelAuditLogsTransactionTraceabilityView"
+  "responds": "Page"
  },
  "listChannelPerformanceCommercial": {
   "method": "GET",
@@ -2193,13 +2668,43 @@ Method, path, parameters, request and response for every operation these screens
     "required": false
    },
    {
-    "name": "date",
+    "name": "dateFrom",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "dateTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "timeFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "timeTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "currency",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "ChannelPerformanceCommercialAnalyticsView"
+  "responds": "Page"
  },
  "listProductPriceAvailability": {
   "method": "GET",
@@ -2210,9 +2715,53 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "domain",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "frequency",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "hasFailures",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listRealTimeAvailability": {
+  "method": "GET",
+  "path": "/real-time-availability",
+  "contract": "promotions",
+  "summary": "Real-Time Availability & Checkout Validation",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "ProductPriceAvailabilitySynchronizationView"
+  "responds": "RealTimeAvailabilityCheckoutValidationView"
  },
  "listRealTimeChannel": {
   "method": "GET",
@@ -2223,9 +2772,135 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "availabilityStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "RealTimeChannelAvailabilityInventoryMonitorView"
+  "responds": "Page"
+ },
+ "retryChannelIncident": {
+  "method": "POST",
+  "path": "/channel-incidents/{incidentId}/retry",
+  "contract": "catalogue",
+  "summary": "Retry the failed channel call behind an incident",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setChannelConnectionConfiguration": {
+  "method": "PUT",
+  "path": "/channel-connections",
+  "contract": "catalogue",
+  "summary": "Create or update a channel connection",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ChannelConnection",
+  "responds": "ChannelConnection"
+ },
+ "setChannelSyncSetting": {
+  "method": "PUT",
+  "path": "/channel-syncs",
+  "contract": "catalogue",
+  "summary": "Set how one kind of data synchronises with a channel",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ChannelSync",
+  "responds": "ChannelSync"
+ },
+ "testChannelConnection": {
+  "method": "POST",
+  "path": "/channel-connections/{connectionId}/test",
+  "contract": "catalogue",
+  "summary": "Test a channel connection now",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ChannelConnection"
+ },
+ "updateChannelIncident": {
+  "method": "PATCH",
+  "path": "/channel-incidents/{incidentId}",
+  "contract": "catalogue",
+  "summary": "Own, investigate, resolve or close a channel incident",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ChannelIncident"
  }
 }
 ```
@@ -2242,83 +2917,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What AI Channel Optimization & Intelligence Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "salesVelocity": {
-    "type": "string",
-    "description": "Sales velocity"
-   },
-   "conversion": {
-    "type": "number",
-    "description": "Conversion"
-   },
-   "capacity": {
-    "type": "integer",
-    "description": "Capacity"
-   },
-   "allocation": {
-    "type": "string",
-    "description": "Allocation"
-   },
-   "revenue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue"
-   },
-   "netRevenue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Net revenue"
-   },
-   "pricing": {
-    "type": "string",
-    "description": "Pricing"
-   },
-   "channelFees": {
-    "type": "string",
-    "description": "Channel fees"
-   },
-   "commission": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Commission"
-   },
-   "customerDemand": {
-    "type": "string",
-    "description": "Customer demand"
-   },
-   "timeToEvent": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Time to event"
-   },
-   "historicalPerformance": {
-    "type": "string",
-    "description": "Historical performance"
-   },
-   "failures": {
-    "type": "string",
-    "description": "Failures"
-   },
-   "availability": {
-    "type": "string",
-    "description": "Availability"
-   },
-   "expectedUnitsSold": {
-    "type": "string",
-    "description": "Expected units sold"
-   },
-   "revenueImpact": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue impact"
-   },
-   "channelUtilization": {
-    "type": "number",
-    "description": "Channel utilization"
-   },
-   "risk": {
-    "type": "string",
-    "description": "Risk"
-   },
-   "contractualConstraints": {
-    "type": "string",
-    "description": "Contractual constraints"
-   },
    "recommendation": {
     "type": "string",
     "description": "Recommendation"
@@ -2332,25 +2930,247 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Expected Impact"
    },
    "confidence": {
-    "type": "string",
-    "description": "Confidence"
+    "type": "number",
+    "description": "Confidence, 0-1",
+    "minimum": 0,
+    "maximum": 1
    },
    "constraints": {
-    "type": "string",
-    "description": "Constraints"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Constraints (contractual, capacity, approval)"
    },
    "requiredApproval": {
     "type": "string",
-    "description": "Required Approval"
+    "description": "Required Approval: the role that must approve",
+    "nullable": true
    },
-   "realTimeChannelAvailabilityInventory": {
+   "recommendationId": {
+    "type": "string",
+    "description": "Recommendation ID"
+   },
+   "category": {
+    "type": "string",
+    "enum": [
+     "capacity",
+     "channel",
+     "schedule",
+     "commercial",
+     "operational"
+    ],
+    "description": "Recommendation Category (pack p.34)"
+   },
+   "channelIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Channels the recommendation concerns"
+   },
+   "signals": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "salesVelocity",
+      "conversion",
+      "capacity",
+      "allocation",
+      "revenue",
+      "netRevenue",
+      "pricing",
+      "channelFees",
+      "commission",
+      "customerDemand",
+      "timeToEvent",
+      "historicalPerformance",
+      "failures",
+      "availability"
+     ]
+    },
+    "description": "AI Analysis signals behind the recommendation (pack p.33-34)"
+   },
+   "simulation": {
+    "type": "object",
+    "nullable": true,
+    "description": "Scenario Simulation estimate (pack p.34)",
+    "properties": {
+     "expectedUnitsSold": {
+      "type": "integer"
+     },
+     "revenueImpact": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "channelUtilization": {
+      "type": "number"
+     },
+     "risk": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high"
+      ]
+     },
+     "contractualConstraints": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: proposed, accepted, modified, rejected, scheduled or assigned (decided 29 September, readiness close-out)"
+   }
+  }
+ },
+ "CatalogueAiFinding": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.ai_finding",
+  "description": "**Something the AI noticed about the catalogue or its channels, for a person to act on** (29 September, data model DM3). Merges governance risks (ADM-137) and channel optimisation recommendations (ADM-272). Advisory only: a finding never changes configuration; acting on it goes through the ordinary operations and their approvals. **Created by the AI monitoring job** (29 September, writers pass); a person acknowledges, accepts, dismisses or resolves it with `decideCatalogueAiFinding`, and the job resolves one whose condition has cleared (`states/catalogue-ai-finding.yaml`).",
+  "required": [
+   "id",
+   "scopePath",
+   "domain",
+   "findingType",
+   "status",
+   "detectedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "domain": {
+    "type": "string",
+    "enum": [
+     "productGovernance",
+     "channel"
+    ]
+   },
+   "findingType": {
+    "type": "string",
+    "maxLength": 60,
+    "description": "Governance: the `risk` value; channel: the recommendation `category`."
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "salesChannelIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "critical",
+     "high",
+     "medium",
+     "low",
+     null
+    ],
+    "nullable": true
+   },
+   "confidence": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 1
+   },
+   "summary": {
+    "type": "string",
+    "description": "The recommendation, or the risk in one line."
+   },
+   "explanation": {
+    "type": "string",
+    "nullable": true
+   },
+   "businessImpact": {
+    "type": "string",
+    "nullable": true
+   },
+   "recommendedAction": {
+    "type": "string",
+    "nullable": true
+   },
+   "constraints": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "signals": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "simulation": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "Channel findings: `{expectedUnitsSold, revenueImpact, channelUtilization, risk, contractualConstraints}`."
+   },
+   "requiredApproval": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "dueDate": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "acknowledged",
+     "accepted",
+     "dismissed",
+     "resolved"
+    ],
+    "default": "open"
+   },
+   "modelVersion": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true
+   },
+   "detectedAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Real-Time Channel Availability & Inventory"
+    "readOnly": true
    },
-   "paymentFulfillmentValidatePublish": {
+   "resolvedAt": {
     "type": "string",
-    "description": "Payment/Fulfillment → Validate → Publish"
+    "format": "date-time",
+    "nullable": true
    }
   }
  },
@@ -2362,99 +3182,72 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "channel": {
     "type": "string",
-    "description": "Channel"
+    "description": "Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258)"
    },
    "initialAllocation": {
-    "type": "string",
+    "type": "integer",
     "description": "Initial Allocation"
    },
    "sold": {
-    "type": "string",
+    "type": "integer",
     "description": "Sold"
    },
    "held": {
-    "type": "string",
+    "type": "integer",
     "description": "Held"
    },
    "remaining": {
-    "type": "string",
+    "type": "integer",
     "description": "Remaining"
    },
    "utilization": {
     "type": "number",
-    "description": "Utilization"
+    "description": "Utilization %: sold plus held over allocated, 0-100",
+    "minimum": 0,
+    "maximum": 100
    },
    "salesVelocity": {
-    "type": "string",
-    "description": "Sales Velocity"
+    "type": "number",
+    "description": "Sales Velocity: units per hour over the last 24 hours (decided 29 September, readiness close-out)"
    },
    "forecast": {
-    "type": "string",
-    "description": "Forecast"
+    "type": "integer",
+    "description": "Forecast: units the channel is expected to sell by the event"
    },
    "recommendedAllocation": {
-    "type": "string",
-    "description": "Recommended Allocation"
-   },
-   "increaseAllocation": {
-    "type": "string",
-    "description": "Increase allocation"
-   },
-   "reduceAllocation": {
-    "type": "string",
-    "description": "Reduce allocation"
-   },
-   "returnInventory": {
-    "type": "string",
-    "description": "Return inventory"
-   },
-   "allocated1000": {
-    "type": "string",
-    "description": "Allocated: 1,000"
-   },
-   "sold280": {
-    "type": "string",
-    "description": "Sold: 280"
-   },
-   "remaining720": {
-    "type": "string",
-    "description": "Remaining: 720"
-   },
-   "allocated6000": {
-    "type": "string",
-    "description": "Allocated: 6,000"
-   },
-   "sold5880": {
-    "type": "string",
-    "description": "Sold: 5,880"
-   },
-   "remaining120": {
-    "type": "string",
-    "description": "Remaining: 120"
+    "type": "integer",
+    "description": "Recommended Allocation (advisory)",
+    "nullable": true
    },
    "contractualAllocation": {
-    "type": "string",
-    "description": "Contractual allocation"
+    "type": "integer",
+    "description": "Contractual allocation from the partner agreement",
+    "nullable": true
    },
    "minimumGuaranteedInventory": {
-    "type": "string",
-    "description": "Minimum guaranteed inventory"
-   },
-   "capacity": {
     "type": "integer",
-    "description": "Capacity"
+    "description": "Minimum guaranteed inventory",
+    "nullable": true
    },
-   "existingHolds": {
+   "event": {
     "type": "string",
-    "description": "Existing holds"
+    "description": "Event or performance ID"
    },
-   "confirmedTransactions": {
+   "product": {
     "type": "string",
-    "description": "Confirmed transactions"
+    "description": "Product ID",
+    "nullable": true
    },
-   "approvalThresholds": {
-    "type": "string",
-    "description": "Approval thresholds"
+   "frozen": {
+    "type": "boolean",
+    "description": "Allocation frozen"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI allocation recommendations (pack p.27, e.g. transfer 500 units from OTA to B2C). Advisory only: nothing is changed until a user acts."
    }
   }
  },
@@ -2464,46 +3257,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Channel Audit, Logs & Transaction Traceability displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "configurationChange": {
-    "type": "string",
-    "description": "Configuration Change"
-   },
-   "activation": {
-    "type": "string",
-    "description": "Activation"
-   },
-   "suspension": {
-    "type": "string",
-    "description": "Suspension"
-   },
-   "allocationChange": {
-    "type": "string",
-    "description": "Allocation Change"
-   },
-   "priceAssignment": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price Assignment"
-   },
-   "order": {
-    "type": "string",
-    "description": "Order"
-   },
-   "cancellation": {
-    "type": "string",
-    "description": "Cancellation"
-   },
-   "error": {
-    "type": "string",
-    "description": "Error"
-   },
-   "manualIntervention": {
-    "type": "string",
-    "description": "Manual Intervention"
-   },
-   "integrationChange": {
-    "type": "string",
-    "description": "Integration Change"
-   },
    "timestamp": {
     "type": "string",
     "format": "date-time",
@@ -2511,7 +3264,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "userSystem": {
     "type": "string",
-    "description": "User/System"
+    "description": "User/System: user ID or the system component that acted"
    },
    "action": {
     "type": "string",
@@ -2519,39 +3272,252 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "previousValue": {
     "type": "string",
-    "description": "Previous Value"
+    "description": "Previous Value (as text)",
+    "nullable": true
    },
    "newValue": {
-    "type": "integer",
-    "description": "New Value"
+    "type": "string",
+    "description": "New Value (as text)",
+    "nullable": true
    },
    "reference": {
     "type": "string",
-    "description": "Reference"
+    "description": "Reference: order, transaction, ticket or partner reference",
+    "nullable": true
    },
    "result": {
     "type": "string",
+    "enum": [
+     "success",
+     "failure",
+     "partial"
+    ],
     "description": "Result"
    },
    "environment": {
     "type": "string",
+    "enum": [
+     "sandbox",
+     "uat",
+     "production"
+    ],
     "description": "Environment"
    },
-   "finance": {
+   "channelId": {
     "type": "string",
-    "description": "Finance"
+    "description": "Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258)"
    },
-   "partnerDisputes": {
+   "category": {
     "type": "string",
-    "description": "Partner disputes"
+    "enum": [
+     "configurationChange",
+     "activation",
+     "suspension",
+     "allocationChange",
+     "priceAssignment",
+     "sync",
+     "order",
+     "cancellation",
+     "error",
+     "manualIntervention",
+     "integrationChange"
+    ],
+    "description": "Audit Category (pack p.31)"
    },
-   "compliance": {
+   "trace": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "step": {
+       "type": "string",
+       "enum": [
+        "partnerRequest",
+        "requestReceived",
+        "productValidation",
+        "priceValidation",
+        "capacityHold",
+        "orderCreation",
+        "paymentHandling",
+        "ticketIssuance",
+        "responseSent"
+       ]
+      },
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "result": {
+       "type": "string",
+       "enum": [
+        "success",
+        "failure",
+        "skipped"
+       ]
+      }
+     }
+    },
+    "description": "Transaction Trace for an external order (pack p.31); empty for other records"
+   }
+  }
+ },
+ "ChannelConnection": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.channel_connection",
+  "description": "**How TICVAI technically reaches a channel** (29 September, data model DM3). ADM-266. One row per connector and environment. **Credentials are never stored here**: `credentialsReference` names the secret in the vault. `control.integration_listing` is the marketplace entry an adapter comes from; this row is the tenant's connection using it.",
+  "required": [
+   "id",
+   "scopePath",
+   "salesChannelId",
+   "connectorName",
+   "environment",
+   "connectionType"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "Compliance"
+    "format": "uuid",
+    "readOnly": true
    },
-   "technicalInvestigation": {
+   "scopePath": {
     "type": "string",
-    "description": "Technical investigation"
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "salesChannelId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "connectorName": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "partner": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "environment": {
+    "type": "string",
+    "enum": [
+     "sandbox",
+     "uat",
+     "production"
+    ]
+   },
+   "connectionType": {
+    "type": "string",
+    "enum": [
+     "ticvaiNative",
+     "restApi",
+     "webhook",
+     "otaAdapter",
+     "resellerApi",
+     "partnerApi",
+     "middleware",
+     "fileSftp",
+     "customConnector"
+    ]
+   },
+   "direction": {
+    "type": "string",
+    "enum": [
+     "outbound",
+     "inbound",
+     "bidirectional"
+    ],
+    "default": "outbound"
+   },
+   "endpoint": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "apiVersion": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "authenticationType": {
+    "type": "string",
+    "enum": [
+     "none",
+     "oauth",
+     "apiKey",
+     "clientCredentials",
+     "certificate",
+     "signedRequest"
+    ]
+   },
+   "credentialsReference": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "A vault reference, never the secret."
+   },
+   "certificateReference": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "certificateExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "timeoutMs": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 1
+   },
+   "rateLimitPerMinute": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 1
+   },
+   "ipRestrictions": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "retryPolicy": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "`{maxAttempts, backoffSeconds}`."
+   },
+   "adapterId": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "connectionStatus": {
+    "type": "string",
+    "enum": [
+     "notTested",
+     "connected",
+     "degraded",
+     "offline",
+     "disabled"
+    ],
+    "default": "notTested"
+   },
+   "lastTests": {
+    "type": "object",
+    "additionalProperties": true,
+    "readOnly": true,
+    "description": "`[{test, result, testedAt}]`, the latest result per test."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -2561,145 +3527,164 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Channel Connection & Integration Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "ticvaiNative": {
-    "type": "string",
-    "description": "TICVAI Native"
-   },
-   "restApi": {
-    "type": "string",
-    "description": "REST API"
-   },
-   "webhook": {
-    "type": "string",
-    "description": "Webhook"
-   },
-   "otaAdapter": {
-    "type": "string",
-    "description": "OTA Adapter"
-   },
-   "resellerApi": {
-    "type": "string",
-    "description": "Reseller API"
-   },
-   "partnerApi": {
-    "type": "string",
-    "description": "Partner API"
-   },
-   "middleware": {
-    "type": "string",
-    "description": "Middleware"
-   },
-   "fileSftpWhereRequired": {
-    "type": "boolean",
-    "description": "File/SFTP where required"
-   },
-   "customConnector": {
-    "type": "string",
-    "description": "Custom Connector"
-   },
    "connectorName": {
     "type": "string",
     "description": "Connector Name"
    },
    "channel": {
     "type": "string",
-    "description": "Channel"
+    "description": "Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258)"
    },
    "partner": {
     "type": "string",
-    "description": "Partner"
+    "description": "Partner ID (the B2B/OTA partner record)",
+    "nullable": true
    },
    "environment": {
     "type": "string",
-    "description": "Environment"
+    "enum": [
+     "sandbox",
+     "uat",
+     "production"
+    ],
+    "description": "Environment (pack p.23)"
    },
    "endpoint": {
     "type": "string",
-    "description": "Endpoint"
+    "description": "Endpoint URL",
+    "format": "uri",
+    "nullable": true
    },
    "apiVersion": {
     "type": "string",
-    "description": "API Version"
+    "description": "API Version",
+    "nullable": true
    },
    "authenticationType": {
     "type": "string",
-    "description": "Authentication Type"
+    "enum": [
+     "none",
+     "oauth",
+     "apiKey",
+     "clientCredentials",
+     "certificate",
+     "signedRequest"
+    ],
+    "description": "Authentication Type (pack p.23 Security)"
    },
    "credentialsReference": {
     "type": "string",
-    "description": "Credentials reference"
+    "description": "Credentials reference: the secret-store key; the secret itself is never returned"
    },
    "certificate": {
     "type": "string",
-    "description": "Certificate"
+    "description": "Certificate reference (secret-store key)",
+    "nullable": true
    },
    "timeout": {
-    "type": "string",
-    "description": "Timeout"
+    "type": "integer",
+    "description": "Timeout in seconds",
+    "minimum": 1,
+    "default": 30
    },
    "rateLimit": {
     "type": "integer",
-    "description": "Rate Limit"
+    "description": "Rate Limit: requests per minute",
+    "minimum": 1,
+    "nullable": true
    },
    "ipRestrictions": {
-    "type": "string",
-    "description": "IP Restrictions"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "IP Restrictions: allowed CIDR ranges"
    },
    "connectionStatus": {
     "type": "string",
-    "description": "Connection Status"
+    "description": "Connection Status: notTested, connected, degraded, failed or disabled (decided 29 September, readiness close-out)"
    },
-   "oauth": {
+   "connectionType": {
     "type": "string",
-    "description": "OAuth"
+    "enum": [
+     "ticvaiNative",
+     "restApi",
+     "webhook",
+     "otaAdapter",
+     "resellerApi",
+     "partnerApi",
+     "middleware",
+     "fileSftp",
+     "customConnector"
+    ],
+    "description": "Connection Type (pack p.22)"
    },
-   "apiKey": {
+   "direction": {
     "type": "string",
-    "description": "API Key"
+    "enum": [
+     "outbound",
+     "inbound",
+     "bidirectional"
+    ],
+    "description": "Who calls whom: TICVAI calls the partner's API, the partner calls TICVAI, or both (MoM 31 Aug §4.3)"
    },
-   "clientCredentials": {
+   "adapterId": {
     "type": "string",
-    "description": "Client Credentials"
+    "description": "Reusable adapter for an external platform; the platform is named as data on the adapter. Enabling it for a new tenant needs no rebuild (MoM 31 Aug §4.3)",
+    "nullable": true
    },
-   "certificates": {
+   "retryPolicy": {
+    "type": "object",
+    "description": "Retry Policy (pack p.23)",
+    "properties": {
+     "maxAttempts": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "backoffSeconds": {
+      "type": "integer",
+      "minimum": 0
+     }
+    }
+   },
+   "certificateExpiresAt": {
     "type": "string",
-    "description": "Certificates"
+    "format": "date-time",
+    "description": "Certificate expiry, for governance alerts",
+    "nullable": true
    },
-   "signedRequests": {
-    "type": "string",
-    "description": "Signed Requests"
-   },
-   "testAuthentication": {
-    "type": "string",
-    "description": "Test Authentication"
-   },
-   "testConnectivity": {
-    "type": "string",
-    "description": "Test Connectivity"
-   },
-   "testProduct": {
-    "type": "string",
-    "description": "Test Product"
-   },
-   "testPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Test Price"
-   },
-   "testAvailability": {
-    "type": "string",
-    "description": "Test Availability"
-   },
-   "testOrder": {
-    "type": "string",
-    "description": "Test Order"
-   },
-   "testCancellationWhereSupported": {
-    "type": "string",
-    "description": "Test Cancellation where supported"
-   },
-   "thisScreenManagesChannelConnectivity": {
-    "type": "string",
-    "description": "This screen manages channel connectivity"
+   "lastTests": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "test": {
+       "type": "string",
+       "enum": [
+        "authentication",
+        "connectivity",
+        "product",
+        "price",
+        "availability",
+        "order",
+        "cancellation"
+       ]
+      },
+      "result": {
+       "type": "string",
+       "enum": [
+        "passed",
+        "failed",
+        "notSupported"
+       ]
+      },
+      "testedAt": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    },
+    "description": "Connection Testing results, latest per test (pack p.23)"
    }
   }
  },
@@ -2709,138 +3694,115 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Channel Exceptions, Incidents & Recovery displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "connectionFailure": {
-    "type": "string",
-    "description": "Connection Failure"
-   },
-   "authenticationFailure": {
-    "type": "string",
-    "description": "Authentication Failure"
-   },
-   "productSyncFailure": {
-    "type": "string",
-    "description": "Product Sync Failure"
-   },
-   "pricingMismatch": {
-    "type": "string",
-    "description": "Pricing Mismatch"
-   },
-   "inventoryMismatch": {
-    "type": "string",
-    "description": "Inventory Mismatch"
-   },
-   "orderFailure": {
-    "type": "string",
-    "description": "Order Failure"
-   },
-   "paymentError": {
-    "type": "string",
-    "description": "Payment Error"
-   },
-   "timeout": {
-    "type": "string",
-    "description": "Timeout"
-   },
-   "cancellationFailure": {
-    "type": "string",
-    "description": "Cancellation Failure"
-   },
-   "fulfillmentFailure": {
-    "type": "string",
-    "description": "Fulfillment Failure"
-   },
-   "rateLimit": {
-    "type": "integer",
-    "description": "Rate Limit"
-   },
-   "partnerError": {
-    "type": "string",
-    "description": "Partner Error"
-   },
    "incidentId": {
     "type": "string",
     "description": "Incident ID"
    },
    "channel": {
     "type": "string",
-    "description": "Channel"
+    "description": "Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258)"
    },
    "partner": {
     "type": "string",
-    "description": "Partner"
+    "description": "Partner ID",
+    "nullable": true
    },
    "severity": {
     "type": "string",
-    "description": "Severity"
+    "enum": [
+     "critical",
+     "high",
+     "medium",
+     "low"
+    ],
+    "description": "Severity (pack p.28)"
    },
    "errorType": {
     "type": "string",
-    "description": "Error Type"
+    "enum": [
+     "connectionFailure",
+     "authenticationFailure",
+     "productSyncFailure",
+     "pricingMismatch",
+     "inventoryMismatch",
+     "orderFailure",
+     "paymentError",
+     "timeout",
+     "cancellationFailure",
+     "duplicateTransaction",
+     "fulfillmentFailure",
+     "rateLimit",
+     "partnerError"
+    ],
+    "description": "Error Type (pack p.27-28 Exception Categories)"
    },
-   "affectedProduct": {
+   "affectedProductEvent": {
     "type": "string",
-    "description": "Affected Product"
-   },
-   "affectedEvent": {
-    "type": "string",
-    "description": "Affected Event"
+    "description": "Affected Product/Event: product or event ID",
+    "nullable": true
    },
    "transactionsAffected": {
-    "type": "string",
+    "type": "integer",
     "description": "Transactions Affected"
    },
    "businessImpact": {
-    "type": "string",
-    "description": "Business Impact"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Business Impact: estimated sales value at risk"
    },
    "firstDetected": {
     "type": "string",
+    "format": "date-time",
     "description": "First Detected"
    },
    "owner": {
     "type": "string",
-    "description": "Owner"
+    "description": "Owner (user ID)",
+    "nullable": true
    },
-   "sla": {
+   "slaDueAt": {
     "type": "string",
-    "description": "SLA"
+    "format": "date-time",
+    "description": "SLA: resolution due time",
+    "nullable": true
    },
    "currentStatus": {
     "type": "string",
-    "description": "Current Status"
-   },
-   "reSync": {
-    "type": "string",
-    "description": "Re-sync"
-   },
-   "reprocess": {
-    "type": "string",
-    "description": "Reprocess"
-   },
-   "switchToManual": {
-    "type": "string",
-    "description": "Switch to Manual"
+    "description": "Current Status: open, assigned, investigating, recovering, resolved or closed (decided 29 September, readiness close-out)"
    },
    "errorCode": {
     "type": "string",
-    "description": "Error Code"
+    "description": "Error Code",
+    "nullable": true
    },
    "apiRequestReference": {
     "type": "string",
-    "description": "API Request Reference"
+    "description": "API Request Reference",
+    "nullable": true
    },
    "response": {
     "type": "string",
-    "description": "Response"
+    "description": "Response body, sensitive data masked",
+    "nullable": true
    },
    "correlationId": {
     "type": "string",
-    "description": "Correlation ID"
+    "description": "Correlation ID",
+    "nullable": true
    },
    "timestamp": {
     "type": "string",
     "format": "date-time",
-    "description": "Timestamp"
+    "description": "Timestamp of the last failing call",
+    "nullable": true
+   },
+   "retryCount": {
+    "type": "integer",
+    "description": "Retry Count"
+   },
+   "aiSummary": {
+    "type": "string",
+    "description": "AI summary of the incident in business language (pack p.29); advisory",
+    "nullable": true
    }
   }
  },
@@ -2852,53 +3814,86 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "channelOwner": {
     "type": "string",
-    "description": "Channel Owner"
+    "description": "Channel Owner (user ID)",
+    "nullable": true
    },
    "partnerOwner": {
     "type": "string",
-    "description": "Partner Owner"
+    "description": "Partner Owner (user ID)",
+    "nullable": true
    },
    "commercialAgreementReference": {
     "type": "string",
-    "description": "Commercial Agreement Reference"
+    "description": "Commercial Agreement Reference: the B2B/OTA agreement ID",
+    "nullable": true
    },
    "sla": {
-    "type": "string",
-    "description": "SLA"
+    "type": "object",
+    "description": "SLA targets",
+    "properties": {
+     "availabilityPercent": {
+      "type": "number"
+     },
+     "responseTimeMs": {
+      "type": "integer"
+     },
+     "resolutionHours": {
+      "type": "number"
+     }
+    }
    },
    "transactionLimits": {
-    "type": "string",
-    "description": "Transaction Limits"
+    "type": "integer",
+    "description": "Transaction Limits: maximum transactions per day",
+    "nullable": true
    },
    "rateLimits": {
-    "type": "number",
-    "description": "Rate Limits"
+    "type": "integer",
+    "description": "Rate Limits: requests per minute",
+    "nullable": true
    },
    "contractDates": {
-    "type": "string",
-    "description": "Contract Dates"
+    "type": "object",
+    "description": "Contract Dates",
+    "properties": {
+     "start": {
+      "type": "string",
+      "format": "date"
+     },
+     "end": {
+      "type": "string",
+      "format": "date",
+      "nullable": true
+     }
+    }
    },
    "renewalDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "Renewal Date"
+    "format": "date",
+    "description": "Renewal Date",
+    "nullable": true
    },
    "supportContacts": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Support Contacts"
    },
    "escalationContacts": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Escalation Contacts"
    },
    "availability": {
     "type": "number",
-    "description": "Availability %"
+    "description": "Availability % measured"
    },
    "apiResponseTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "API Response Time"
+    "type": "integer",
+    "description": "API Response Time, milliseconds (p95) (decided 29 September, readiness close-out)"
    },
    "transactionSuccess": {
     "type": "number",
@@ -2906,76 +3901,210 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "errorRate": {
     "type": "number",
-    "description": "Error Rate"
+    "description": "Error Rate %"
    },
    "incidentResolutionTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Incident Resolution Time"
-   },
-   "availability999": {
     "type": "number",
-    "description": "Availability: 99.9%"
+    "description": "Incident Resolution Time, average hours"
    },
-   "actual9972": {
+   "channelId": {
+    "type": "string",
+    "description": "Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258)"
+   },
+   "reviewFrequency": {
+    "type": "string",
+    "enum": [
+     "monthly",
+     "quarterly",
+     "semiAnnual",
+     "annual"
+    ],
+    "description": "Review Frequency"
+   },
+   "syncSuccess": {
     "type": "number",
-    "description": "Actual: 99.72%"
+    "description": "Sync Success %"
    },
-   "statusSlaBreach": {
+   "complianceFlags": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "expiredAgreement",
+      "expiredCertificate",
+      "expiringApiCredentials",
+      "missingOwner",
+      "unapprovedProductionIntegration",
+      "slaBreach",
+      "excessiveTransactionFailures"
+     ]
+    },
+    "description": "Compliance Controls raised (pack p.32-33)"
+   },
+   "governanceStatus": {
     "type": "string",
-    "description": "Status: SLA Breach"
-   },
-   "expiredAgreement": {
-    "type": "integer",
-    "description": "Expired agreement"
-   },
-   "expiredCertificate": {
-    "type": "integer",
-    "description": "Expired certificate"
-   },
-   "expiringApiCredentials": {
-    "type": "string",
-    "description": "Expiring API credentials"
-   },
-   "missingOwner": {
-    "type": "string",
-    "description": "Missing owner"
-   },
-   "unapprovedProductionIntegration": {
-    "type": "string",
-    "description": "Unapproved production integration"
-   },
-   "slaBreach": {
-    "type": "string",
-    "description": "SLA breach"
-   },
-   "excessiveTransactionFailures": {
-    "type": "string",
-    "description": "Excessive transaction failures"
-   },
-   "placeUnderReview": {
-    "type": "string",
-    "description": "Place Under Review"
-   },
-   "restrict": {
-    "type": "string",
-    "description": "Restrict"
-   },
-   "reactivate": {
-    "type": "string",
-    "description": "Reactivate"
-   },
-   "resellerOtaDistributionArea": {
-    "type": "string",
-    "description": "Reseller / OTA Distribution area"
+    "description": "Governance status: normal, underReview, restricted or suspended (decided 29 September, readiness close-out)"
    }
   }
  },
- "ChannelOperationsCommandCenterView": {
+ "ChannelIncident": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.channel_incident",
+  "description": "**A channel failure someone has to resolve** (29 September, data model DM3). ADM-269. Opened by the sync and order paths when a call to or from a channel fails; retried, owned and closed here. The per-call trace is in `catalogue.audit_entry` (`domain: channel`). **Opened by the channel sync and order jobs, never through the API** (29 September, writers pass); owned and closed with `updateChannelIncident`, retried with `retryChannelIncident` (`states/channel-incident.yaml`).",
+  "required": [
+   "id",
+   "scopePath",
+   "salesChannelId",
+   "severity",
+   "errorType",
+   "status",
+   "firstDetectedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "salesChannelId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "channelConnectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "partner": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "critical",
+     "high",
+     "medium",
+     "low"
+    ]
+   },
+   "errorType": {
+    "type": "string",
+    "enum": [
+     "connectionFailure",
+     "authenticationFailure",
+     "productSyncFailure",
+     "pricingMismatch",
+     "inventoryMismatch",
+     "orderFailure",
+     "paymentError",
+     "timeout",
+     "cancellationFailure",
+     "duplicateTransaction",
+     "fulfillmentFailure",
+     "rateLimit",
+     "partnerError"
+    ]
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "transactionsAffected": {
+    "type": "integer",
+    "default": 0
+   },
+   "businessImpact": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "firstDetectedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "slaDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "investigating",
+     "retrying",
+     "resolved",
+     "closed"
+    ],
+    "default": "open"
+   },
+   "errorCode": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "apiRequestReference": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "responseExcerpt": {
+    "type": "string",
+    "nullable": true,
+    "description": "The partner response, truncated and scrubbed of personal data."
+   },
+   "correlationId": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "retryCount": {
+    "type": "integer",
+    "default": 0
+   },
+   "aiSummary": {
+    "type": "string",
+    "nullable": true
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "ChannelOperationsCommandCenterSummary": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What Channel Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Channel Operations Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
   "properties": {
    "activeChannels": {
     "type": "integer",
@@ -2994,15 +4123,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Offline Channels"
    },
    "transactionsToday": {
-    "type": "string",
+    "type": "integer",
     "description": "Transactions Today"
    },
    "grossSales": {
-    "type": "integer",
-    "description": "Gross Sales"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Gross Sales today"
    },
    "productsAvailable": {
-    "type": "string",
+    "type": "integer",
     "description": "Products Available"
    },
    "synchronizationErrors": {
@@ -3021,13 +4150,68 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "description": "Failed Transactions"
    },
+   "openOperationalIncidents": {
+    "type": "integer",
+    "description": "Open Operational Incidents"
+   },
+   "liveActivity": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "occurredAt": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "channelId": {
+       "type": "string"
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    },
+    "description": "Live Activity: latest important channel events, newest first (the 50 most recent (decided 29 September, readiness close-out))"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Operational problems prioritised by business impact (pack p.22). Advisory only: nothing is changed until a user acts."
+   }
+  }
+ },
+ "ChannelOperationsCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Channel Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
    "channel": {
     "type": "string",
-    "description": "Channel"
+    "description": "Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258)"
    },
    "type": {
     "type": "string",
-    "description": "Type"
+    "enum": [
+     "b2cWeb",
+     "b2cMobileApp",
+     "pos",
+     "mobilePos",
+     "flyingPos",
+     "kiosk",
+     "callCentre",
+     "b2bPortal",
+     "reseller",
+     "ota",
+     "api",
+     "partnerPortal",
+     "marketplace",
+     "thirdPartyChannel",
+     "customChannel"
+    ],
+    "description": "Type: the channel type"
    },
    "venueScope": {
     "type": "string",
@@ -3035,48 +4219,47 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "connectionStatus": {
     "type": "string",
-    "description": "Connection Status"
+    "description": "Connection Status: connected, degraded, offline or maintenance"
    },
    "lastSync": {
     "type": "string",
     "format": "date-time",
-    "description": "Last Sync"
+    "description": "Last Sync",
+    "nullable": true
    },
    "products": {
-    "type": "string",
-    "description": "Products"
+    "type": "integer",
+    "description": "Products available on the channel"
    },
    "transactions": {
-    "type": "string",
-    "description": "Transactions"
+    "type": "integer",
+    "description": "Transactions today"
    },
    "salesValue": {
-    "type": "string",
-    "description": "Sales Value"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Sales Value today"
    },
    "inventoryStatus": {
     "type": "string",
-    "description": "Inventory Status"
+    "description": "Inventory Status: ok, low, soldOut or syncError (decided 29 September, readiness close-out)"
    },
    "pricingStatus": {
     "type": "string",
-    "description": "Pricing Status"
+    "description": "Pricing Status: ok, mismatch or error (decided 29 September, readiness close-out)"
    },
    "errorCount": {
     "type": "integer",
-    "description": "Error Count"
+    "description": "Error Count today"
    },
    "healthScore": {
     "type": "number",
-    "description": "Health Score"
+    "description": "Health Score, 0-100",
+    "minimum": 0,
+    "maximum": 100
    },
-   "otaTiqtripInventorySynchronized1041": {
+   "healthStatus": {
     "type": "string",
-    "description": "OTA-TiqTrip inventory synchronized — 10:41"
-   },
-   "forceSync": {
-    "type": "string",
-    "description": "Force Sync"
+    "description": "Health Status: healthy, warning, degraded, critical, offline or maintenance (pack p.21)"
    }
   }
  },
@@ -3087,11 +4270,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "description": "**What Channel Performance & Commercial Analytics displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "grossSales": {
-    "type": "integer",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Gross Sales"
    },
    "netSales": {
-    "type": "integer",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Net Sales"
    },
    "transactions": {
@@ -3099,68 +4282,253 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Transactions"
    },
    "ticketsSold": {
-    "type": "string",
+    "type": "integer",
     "description": "Tickets Sold"
    },
    "averageOrderValue": {
-    "type": "number",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Average Order Value"
    },
    "conversionRate": {
     "type": "number",
-    "description": "Conversion Rate"
+    "description": "Conversion Rate %",
+    "nullable": true
    },
    "cancellationRate": {
     "type": "number",
-    "description": "Cancellation Rate"
+    "description": "Cancellation Rate %"
    },
    "capacityUtilization": {
-    "type": "integer",
-    "description": "Capacity Utilization"
+    "type": "number",
+    "description": "Capacity Utilization %"
    },
    "revenuePerAvailableUnit": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Revenue per Available Unit"
    },
    "fees": {
-    "type": "integer",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Fees"
    },
    "commission": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Commission"
    },
-   "costOfSaleWhereAvailable": {
+   "costOfSale": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Cost of Sale where available"
    },
    "allocation": {
-    "type": "string",
-    "description": "Allocation"
+    "type": "integer",
+    "description": "Partner Comparison: Allocation",
+    "nullable": true
    },
    "sold": {
-    "type": "string",
-    "description": "Sold"
+    "type": "integer",
+    "description": "Partner Comparison: Sold",
+    "nullable": true
    },
    "utilization": {
     "type": "number",
-    "description": "Utilization"
+    "description": "Partner Comparison: Utilization %",
+    "nullable": true
    },
    "revenue": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue"
+    "description": "Partner Comparison: Revenue"
    },
-   "cancellation": {
-    "type": "string",
-    "description": "Cancellation"
+   "cancellations": {
+    "type": "integer",
+    "description": "Partner Comparison: Cancellations",
+    "nullable": true
    },
    "settlement": {
-    "type": "string",
-    "description": "Settlement"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Partner Comparison: Settlement, amount settled in the period"
    },
    "growth": {
+    "type": "number",
+    "description": "Partner Comparison: Growth % against the previous equal period",
+    "nullable": true
+   },
+   "channelId": {
     "type": "string",
-    "description": "Growth"
+    "description": "Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258)"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner ID for a B2B/OTA row",
+    "nullable": true
+   },
+   "refundRate": {
+    "type": "number",
+    "description": "Refund Rate %"
+   },
+   "funnel": {
+    "type": "object",
+    "nullable": true,
+    "description": "Channel Funnel for digital channels (pack p.30)",
+    "properties": {
+     "available": {
+      "type": "integer"
+     },
+     "viewed": {
+      "type": "integer"
+     },
+     "selected": {
+      "type": "integer"
+     },
+     "checkout": {
+      "type": "integer"
+     },
+     "paid": {
+      "type": "integer"
+     }
+    }
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI Insights (pack p.30). Advisory only: nothing is changed until a user acts."
+   }
+  }
+ },
+ "ChannelSync": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.channel_sync",
+  "description": "**The synchronisation state of one channel for one kind of data** (29 September, data model DM3). ADM-267. One row per channel and domain (product, price, availability ...); counts are the latest run's, overwritten by the sync job. **Two writers** (29 September, writers pass): the sync job writes the counts and timestamps (the `readOnly` fields); a person sets `direction`, `frequency` and `isPaused` with `setChannelSyncSetting`.",
+  "required": [
+   "id",
+   "scopePath",
+   "salesChannelId",
+   "domain"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "salesChannelId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "channelConnectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "domain": {
+    "type": "string",
+    "enum": [
+     "product",
+     "productDescription",
+     "schedule",
+     "availability",
+     "capacity",
+     "price",
+     "tax",
+     "fees",
+     "media",
+     "restrictions",
+     "salesStatus"
+    ]
+   },
+   "direction": {
+    "type": "string",
+    "enum": [
+     "ticvaiToChannel",
+     "channelToTicvai",
+     "bidirectional"
+    ],
+    "default": "ticvaiToChannel"
+   },
+   "frequency": {
+    "type": "string",
+    "enum": [
+     "realTime",
+     "nearRealTime",
+     "scheduled",
+     "manual",
+     "eventTriggered"
+    ],
+    "default": "nearRealTime"
+   },
+   "isPaused": {
+    "type": "boolean",
+    "default": false
+   },
+   "lastSuccessfulSyncAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "nextSyncAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "recordsProcessed": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "successful": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "failed": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "pending": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "warnings": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "durationMs": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true
+   },
+   "mismatchCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
    }
   }
  },
@@ -3170,89 +4538,24 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Product, Price & Availability Synchronization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "productDescription": {
-    "type": "string",
-    "description": "Product Description"
-   },
-   "availability": {
-    "type": "string",
-    "description": "Availability"
-   },
-   "capacity": {
-    "type": "integer",
-    "description": "Capacity"
-   },
-   "price": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price"
-   },
-   "tax": {
-    "type": "string",
-    "description": "Tax"
-   },
-   "fees": {
-    "type": "string",
-    "description": "Fees"
-   },
-   "media": {
-    "type": "string",
-    "description": "Media"
-   },
-   "restrictions": {
-    "type": "string",
-    "description": "Restrictions"
-   },
-   "salesStatus": {
-    "type": "string",
-    "description": "Sales Status"
-   },
-   "channelTicvai": {
-    "type": "string",
-    "description": "Channel → TICVAI"
-   },
-   "realTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Real Time"
-   },
-   "nearRealTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Near Real Time"
-   },
-   "scheduled": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Scheduled"
-   },
-   "manual": {
-    "type": "string",
-    "description": "Manual"
-   },
-   "eventTriggered": {
-    "type": "string",
-    "description": "Event Triggered"
-   },
    "lastSuccessfulSync": {
     "type": "string",
     "format": "date-time",
-    "description": "Last Successful Sync"
+    "description": "Last Successful Sync",
+    "nullable": true
    },
    "nextSync": {
     "type": "string",
     "format": "date-time",
-    "description": "Next Sync"
+    "description": "Next Sync; empty for manual",
+    "nullable": true
    },
    "recordsProcessed": {
-    "type": "string",
-    "description": "Records Processed"
+    "type": "integer",
+    "description": "Records Processed in the last run"
    },
    "successful": {
-    "type": "string",
+    "type": "integer",
     "description": "Successful"
    },
    "failed": {
@@ -3264,17 +4567,107 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Pending"
    },
    "warning": {
-    "type": "string",
-    "description": "Warning"
+    "type": "integer",
+    "description": "Warning: records synced with a warning"
    },
    "duration": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Duration"
+    "type": "integer",
+    "description": "Duration of the last run in seconds"
    },
-   "reprocess": {
+   "channelId": {
     "type": "string",
-    "description": "Reprocess"
+    "description": "Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258)"
+   },
+   "connectorId": {
+    "type": "string",
+    "description": "Connector ID (ADM-269)",
+    "nullable": true
+   },
+   "domain": {
+    "type": "string",
+    "enum": [
+     "product",
+     "productDescription",
+     "schedule",
+     "availability",
+     "capacity",
+     "price",
+     "tax",
+     "fees",
+     "media",
+     "restrictions",
+     "salesStatus"
+    ],
+    "description": "Synchronization Domain (pack p.23-24)"
+   },
+   "direction": {
+    "type": "string",
+    "enum": [
+     "ticvaiToChannel",
+     "channelToTicvai",
+     "bidirectional"
+    ],
+    "description": "Synchronization Direction (pack p.24)"
+   },
+   "frequency": {
+    "type": "string",
+    "enum": [
+     "realTime",
+     "nearRealTime",
+     "scheduled",
+     "manual",
+     "eventTriggered"
+    ],
+    "description": "Sync Frequency (pack p.24)"
+   },
+   "paused": {
+    "type": "boolean",
+    "description": "Sync paused"
+   },
+   "mismatchCount": {
+    "type": "integer",
+    "description": "Difference Detection: records whose channel value differs from TICVAI's"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Grouped repetitive failures and probable root causes (pack p.25). Advisory only: nothing is changed until a user acts."
+   }
+  }
+ },
+ "RealTimeAvailabilityCheckoutValidationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Real-Time Availability & Checkout Validation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "failedChecks": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "productInactive",
+      "inventoryUnavailable",
+      "capacityUnavailable",
+      "timeslotUnavailable",
+      "resourceUnavailable",
+      "priceInvalid",
+      "promotionInvalid",
+      "partnerComponentInvalid",
+      "componentMappingInvalid"
+     ]
+    },
+    "description": "Checkout validations that failed; empty means the bundle is sellable."
+   },
+   "bundleId": {
+    "type": "string",
+    "description": "Bundle ID"
+   },
+   "sellable": {
+    "type": "boolean",
+    "description": "Whether the bundle can be sold now"
    }
   }
  },
@@ -3284,69 +4677,59 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Real-Time Channel Availability & Inventory Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "ctBA": {
-    "type": "string",
-    "description": "ct B A"
-   },
-   "dD": {
-    "type": "string",
-    "description": "d d"
-   },
-   "available": {
-    "type": "string",
-    "description": "Available"
-   },
-   "lowAvailability": {
-    "type": "string",
-    "description": "Low Availability"
-   },
-   "soldOut": {
-    "type": "string",
-    "description": "Sold Out"
-   },
-   "closed": {
-    "type": "integer",
-    "description": "Closed"
-   },
-   "suspended": {
-    "type": "string",
-    "description": "Suspended"
-   },
-   "notAssigned": {
-    "type": "string",
-    "description": "Not Assigned"
-   },
    "allocated": {
-    "type": "string",
-    "description": "Allocated"
+    "type": "integer",
+    "description": "Allocated; empty when the channel sells from the shared pool",
+    "nullable": true
    },
    "sold": {
-    "type": "string",
+    "type": "integer",
     "description": "Sold"
    },
    "held": {
-    "type": "string",
+    "type": "integer",
     "description": "Held"
    },
    "remaining": {
-    "type": "string",
-    "description": "Remaining"
+    "type": "integer",
+    "description": "Remaining sellable units"
    },
    "utilization": {
     "type": "number",
-    "description": "Utilization %"
+    "description": "Utilization %: sold plus held over allocated, 0-100",
+    "minimum": 0,
+    "maximum": 100
    },
    "salesVelocity": {
-    "type": "string",
-    "description": "Sales Velocity"
+    "type": "number",
+    "description": "Sales Velocity: units sold per hour over the last 24 hours (decided 29 September, readiness close-out)"
    },
    "forecastedSellOut": {
     "type": "string",
-    "description": "Forecasted Sell-Out"
+    "format": "date-time",
+    "description": "Forecasted Sell-Out; empty when no sell-out is forecast",
+    "nullable": true
    },
-   "againstTheSeatMapCapacityPool": {
-    "type": "integer",
-    "description": "against the seat map/capacity pool"
+   "product": {
+    "type": "string",
+    "description": "Product ID"
+   },
+   "channelId": {
+    "type": "string",
+    "description": "Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258)"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event or performance ID",
+    "nullable": true
+   },
+   "sharedPool": {
+    "type": "boolean",
+    "description": "The channel sells from the shared pool (shown as Shared in the matrix)"
+   },
+   "availabilityStatus": {
+    "type": "string",
+    "description": "Status for this product/channel: available, lowAvailability, soldOut, closed, suspended, notAssigned or syncError (pack p.25)"
    }
   }
  }

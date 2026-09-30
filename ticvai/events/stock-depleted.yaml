@@ -11,7 +11,7 @@ emittedBy:
 - postStockCount
 payload:
 - field: movementId
-  type: string
+  type: uuid
 - field: itemId
   type: uuid
 - field: locationId
@@ -25,7 +25,7 @@ payload:
   type: string
   notes: sale, waste, transfer, count, prizeRedemption
 - field: sourceId
-  type: string
+  type: uuid
   notes: The order, transfer or count that caused it
 - field: recordedAt
   type: timestamp

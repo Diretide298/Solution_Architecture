@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS fnb.allergen_verdict (
 -- How one table’s bill was divided. A party of six paying separately is the ordinary case
 CREATE TABLE IF NOT EXISTS fnb.bill_split (
     id                                uuid PRIMARY KEY,
-    visit_id                          text NOT NULL,
+    visit_id                          uuid NOT NULL,
     method                            text NOT NULL CONSTRAINT bill_split_method_chk CHECK (method IN ('byAmount', 'byCovers', 'byCategory', 'byLine', 'bySeat'))
 );
 
@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS fnb.delivery_location (
     label                             text NOT NULL,
     zone                              text,
     table_id                          uuid,
-    seat_id                           text,
+    seat_id                           uuid,
     serving_outlet_ids                text[],
     is_serviceable                    boolean NOT NULL,
     unserviceable_reason              text,
@@ -169,7 +169,7 @@ CREATE TABLE IF NOT EXISTS fnb.kitchen_exception (
     id                                uuid PRIMARY KEY NOT NULL,
     outlet_id                         uuid,
     station_id                        uuid,
-    ticket_id                         text,
+    ticket_id                         uuid,
     kind                              text NOT NULL CONSTRAINT kitchen_exception_kind_chk CHECK (kind IN ('equipmentDown', 'itemRanOut', 'lateDelivery', 'staffShort', 'powerLoss', 'spillage', 'chased', 'other')),
     duration_minutes                  integer,
     raised_at                         timestamptz NOT NULL,
@@ -192,8 +192,8 @@ CREATE TABLE IF NOT EXISTS fnb.kitchen_station (
 -- What the pass sees. One order can produce several, routed by station, and the clock on it is the
 -- kitchen’s rather than the counter’s
 CREATE TABLE IF NOT EXISTS fnb.kitchen_ticket (
-    id                                text PRIMARY KEY NOT NULL,
-    order_id                          text NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
+    order_id                          uuid NOT NULL,
     order_number                      text,
     outlet_id                         uuid NOT NULL,
     table_label                       text,
@@ -211,14 +211,14 @@ CREATE TABLE IF NOT EXISTS fnb.kitchen_ticket (
 
 -- One item the kitchen is making, bumped independently
 CREATE TABLE IF NOT EXISTS fnb.kitchen_ticket_line (
-    kitchen_ticket_id                 text NOT NULL,
-    line_id                           text NOT NULL,
+    kitchen_ticket_id                 uuid NOT NULL,
+    line_id                           uuid NOT NULL,
     name                              text NOT NULL,
     quantity                          integer NOT NULL,
     modifiers                         text[],
     note                              text,
     allergens                         text[],
-    refire_of_line_id                 text,
+    refire_of_line_id                 uuid,
     refire_reason                     text,
     is_chargeable                     boolean,
     course                            integer,
@@ -230,12 +230,12 @@ CREATE TABLE IF NOT EXISTS fnb.kitchen_ticket_line (
 -- A guest claim on a delivery location — a lounger, a cabana. The equivalent of a table session
 -- away from a table
 CREATE TABLE IF NOT EXISTS fnb.location_session (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     location_id                       uuid NOT NULL,
     kind                              text NOT NULL CONSTRAINT location_session_kind_chk CHECK (kind IN ('table', 'seat', 'cabana', 'sunbed', 'poolside', 'box', 'suite', 'lawn', 'collectionPoint', 'namedLocation')),
     label                             text NOT NULL,
     outlet_id                         uuid,
-    visit_id                          text,
+    visit_id                          uuid,
     joined_existing_visit             boolean,
     subject_id                        uuid,
     expires_at                        timestamptz NOT NULL,
@@ -351,7 +351,7 @@ CREATE TABLE IF NOT EXISTS fnb.modifier_option (
 -- window, or taken to a place in the venue. The address is here and nowhere else
 CREATE TABLE IF NOT EXISTS fnb.order_fulfilment (
     id                                uuid PRIMARY KEY,
-    service_order_id                  text,
+    service_order_id                  uuid,
     mode                              text NOT NULL CONSTRAINT order_fulfilment_mode_chk CHECK (mode IN ('collection', 'delivery', 'inVenue')),
     collection_at                     timestamptz,
     window_start                      timestamptz,
@@ -509,17 +509,17 @@ CREATE TABLE IF NOT EXISTS fnb.service_charge_policy (
 -- Food and drink ordered, wherever from — a counter, a table, a lounger, the app. The kitchen
 -- ticket is what the pass sees; this is what the guest bought
 CREATE TABLE IF NOT EXISTS fnb.service_order (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     order_number                      text NOT NULL,
     outlet_id                         uuid NOT NULL,
     service_mode                      text NOT NULL CONSTRAINT service_order_service_mode_chk CHECK (service_mode IN ('quickService', 'tableService', 'roomService', 'collection', 'delivery')),
-    table_visit_id                    text,
+    table_visit_id                    uuid,
     status                            text NOT NULL CONSTRAINT service_order_status_chk CHECK (status IN ('ordered', 'accepted', 'inPreparation', 'ready', 'served', 'collected', 'delivered', 'cancelled', 'refunded')),
-    sales_order_id                    text,
+    sales_order_id                    uuid,
     updated_at                        timestamptz,
     gross_amount                      numeric(18,4) NOT NULL,
     tax_amount                        numeric(18,4),
-    kitchen_ticket_id                 text,
+    kitchen_ticket_id                 uuid,
     estimated_ready_at                timestamptz,
     created_at                        timestamptz NOT NULL,
     recorded_at                       timestamptz,
@@ -528,15 +528,15 @@ CREATE TABLE IF NOT EXISTS fnb.service_order (
 
 -- One item on a food order, with its modifiers resolved at the moment of sale
 CREATE TABLE IF NOT EXISTS fnb.service_order_line (
-    service_order_id                  text NOT NULL,
-    id                                text PRIMARY KEY NOT NULL,
+    service_order_id                  uuid NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     menu_item_id                      uuid NOT NULL,
     quantity                          integer NOT NULL,
     modifier_option_ids               text[],
     note                              text,
     seat_number                       integer,
     course                            integer,
-    redeem_entitlement_id             text,
+    redeem_entitlement_id             uuid,
     status                            text,
     unit_price                        numeric(18,4),
     line_total                        numeric(18,4)
@@ -617,7 +617,7 @@ CREATE TABLE IF NOT EXISTS fnb.table_reservation (
     group_id                          uuid,
     notes                             text,
     actual_party_size                 integer,
-    table_visit_id                    text,
+    table_visit_id                    uuid,
     created_at                        timestamptz,
     amount                            numeric(18,4) NOT NULL,
     basis                             text NOT NULL CONSTRAINT table_reservation_basis_chk CHECK (basis IN ('fixedPerGuest', 'fixedPerTable', 'percentOfMinimumSpend')),
@@ -631,12 +631,12 @@ CREATE TABLE IF NOT EXISTS fnb.table_reservation (
 -- A device claim on a table — a QR scanned, an order opened. The hospitality event around it is a
 -- table_visit
 CREATE TABLE IF NOT EXISTS fnb.table_session (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     outlet_id                         uuid NOT NULL,
     outlet_name                       text,
     table_id                          uuid NOT NULL,
     table_label                       text NOT NULL,
-    visit_id                          text NOT NULL,
+    visit_id                          uuid NOT NULL,
     joined_existing_visit             boolean,
     subject_id                        uuid,
     expires_at                        timestamptz NOT NULL
@@ -646,7 +646,7 @@ CREATE TABLE IF NOT EXISTS fnb.table_session (
 -- device claim: a QR scanned at the table opens a session, and the visit is the hospitality event
 -- around it
 CREATE TABLE IF NOT EXISTS fnb.table_visit (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     table_id                          uuid NOT NULL,
     table_label                       text,
     outlet_id                         uuid NOT NULL,
@@ -654,7 +654,7 @@ CREATE TABLE IF NOT EXISTS fnb.table_visit (
     status                            text NOT NULL CONSTRAINT table_visit_status_chk CHECK (status IN ('open', 'billRequested', 'settled', 'merged', 'cancelled')),
     server_principal_id               uuid,
     subject_id                        uuid,
-    merged_into_visit_id              text,
+    merged_into_visit_id              uuid,
     merged_from_visit_ids             text[],
     running_total                     numeric(18,4),
     gratuity                          numeric(18,4),

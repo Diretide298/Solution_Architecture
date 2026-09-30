@@ -1,6 +1,6 @@
 # WS106 — Subscription Licensing AI Self Service board 9
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 8 operations · 12 schemas · 4 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `PLATFORM_BILLING_MANAGE, PLATFORM_BILLING_VIEW, PLATFORM_PLAN_MANAGE, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-449` | Usage & License Command Center | listDetail | 0 | 0 | — |
-| `ADM-450` | Entitlement & License Inventory | listDetail | 0 | 0 | — |
-| `ADM-451` | Commercial Consumption & Billable Event Metering | listDetail | 0 | 0 | — |
-| `ADM-452` | Operational Usage & Threshold Monitor | listDetail | 0 | 0 | — |
-| `ADM-453` | License Enforcement & Decision Engine | listDetail | 0 | 0 | — |
-| `ADM-454` | Minimum Guarantee & Variable Consumption Monitor | listDetail | 0 | 0 | — |
-| `ADM-455` | Overage, Capacity & Temporary Exception Management | configEditor | 0 | 0 | — |
-| `ADM-456` | Usage Alerts, Reconciliation & Exception Center | configEditor | 0 | 0 | — |
-| `ADM-457` | AI Usage Forecast & Commercial Optimization | listDetail | 0 | 0 | — |
-| `ADM-458` | License, Metering & Commercial Synchronization Audit | listDetail | 0 | 0 | — |
+| `ADM-449` | Usage & License Command Center | listDetail | 1 | 0 | — |
+| `ADM-450` | Entitlement & License Inventory | listDetail | 1 | 0 | — |
+| `ADM-451` | Commercial Consumption & Billable Event Metering | listDetail | 1 | 0 | — |
+| `ADM-452` | Operational Usage & Threshold Monitor | listDetail | 2 | 0 | — |
+| `ADM-453` | License Enforcement & Decision Engine | listDetail | 1 | 0 | — |
+| `ADM-454` | Minimum Guarantee & Variable Consumption Monitor | listDetail | 1 | 0 | — |
+| `ADM-455` | Overage, Capacity & Temporary Exception Management | configEditor | 1 | 0 | — |
+| `ADM-456` | Usage Alerts, Reconciliation & Exception Center | configEditor | 1 | 0 | — |
+| `ADM-457` | AI Usage Forecast & Commercial Optimization | listDetail | 1 | 0 | — |
+| `ADM-458` | License, Metering & Commercial Synchronization Audit | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 

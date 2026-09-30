@@ -340,6 +340,62 @@
    }
   }
  },
+ "StockPosition": {
+  "x-ticvai-persistence": "none — derived from movements",
+  "type": "object",
+  "required": [
+   "itemId",
+   "locationId",
+   "onHand",
+   "unit"
+  ],
+  "properties": {
+   "itemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "itemName": {
+    "type": "string"
+   },
+   "sku": {
+    "type": "string"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationName": {
+    "type": "string"
+   },
+   "onHand": {
+    "type": "number"
+   },
+   "allocated": {
+    "type": "number",
+    "description": "**Reserved for orders**: the quantity under an active stock reservation for an order (decided 28 September, audit R171). A transfer is not allocation: dispatched stock has already left on-hand and sits in transit.\n"
+   },
+   "available": {
+    "type": "number",
+    "description": "**On-hand minus allocated** (decided 28 September, audit R171). What can still be sold or issued.\n"
+   },
+   "unit": {
+    "type": "string"
+   },
+   "value": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "lastCountedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastMovementAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
  "Wallet": {
   "x-ticvai-persistence": "wallet.wallet + wallet.credit_lot",
   "type": "object",

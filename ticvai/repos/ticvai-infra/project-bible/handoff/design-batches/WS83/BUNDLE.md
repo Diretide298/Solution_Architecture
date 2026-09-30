@@ -1,6 +1,6 @@
 # WS83 — Game and Ride board 6
 
-**10 screens · 9 operations · 7 schemas · 5 permissions**
+**10 screens · 9 operations · 8 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -1752,7 +1752,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Wallet"
  },
@@ -2277,6 +2283,62 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "scopePath": {
     "type": "string"
+   }
+  }
+ },
+ "StockPosition": {
+  "x-ticvai-persistence": "none — derived from movements",
+  "type": "object",
+  "required": [
+   "itemId",
+   "locationId",
+   "onHand",
+   "unit"
+  ],
+  "properties": {
+   "itemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "itemName": {
+    "type": "string"
+   },
+   "sku": {
+    "type": "string"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationName": {
+    "type": "string"
+   },
+   "onHand": {
+    "type": "number"
+   },
+   "allocated": {
+    "type": "number",
+    "description": "**Reserved for orders**: the quantity under an active stock reservation for an order (decided 28 September, audit R171). A transfer is not allocation: dispatched stock has already left on-hand and sits in transit.\n"
+   },
+   "available": {
+    "type": "number",
+    "description": "**On-hand minus allocated** (decided 28 September, audit R171). What can still be sold or issued.\n"
+   },
+   "unit": {
+    "type": "string"
+   },
+   "value": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "lastCountedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastMovementAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
    }
   }
  },

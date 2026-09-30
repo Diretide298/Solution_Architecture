@@ -1,7 +1,7 @@
 {
  "generatedBy": "tools/derive-sizing.py",
  "algorithm": "replicas = max(floor, ceil(load_rps x share / rps_per_replica))",
- "note": "**Two loads, two mixes, and they are not the same shape.** Under a sale Catalogue is 64% of the calls and F&B is absent; under normal operation Catalogue is 11%, F&B is 13%, and Order is the largest at 15% because a venue day is mostly transactions rather than browsing.\n\n**A shared cell sized from the burst mix would run eight Catalogue replicas and one F&B** — backwards for 363 days of the year.",
+ "note": "**Two loads, two mixes, and they are not the same shape.** Under a sale Catalogue is 64% of the calls and F&B is absent; under normal operation Catalogue is 23.6%, F&B 5.8% and Order 15.5%.\n\n**A shared cell sized from the burst mix would run eight Catalogue replicas and one F&B** — backwards for 363 days of the year.",
  "unmeasured": "`rpsPerReplica` comes from ADR-0032's autoscale triggers and is a hypothesis until `tools/bench.py` runs. Everything else here is arithmetic on top of it.",
  "venueTiers": {
   "small": {
@@ -297,7 +297,77 @@
     },
     "replicasAtFloor": 34,
     "replicasAtPeak": 34,
-    "note": "**Floor is survivability, not peak.** The autoscaler has all day to react to a busy afternoon, so paying for the peak all night buys nothing."
+    "deployables": {
+     "commerce": {
+      "modules": [
+       "CatalogueService",
+       "IdentityService",
+       "LedgerService",
+       "OrderService",
+       "TenancyService",
+       "WalletService"
+      ],
+      "share": 48.6,
+      "rpsAtLoad": 186.0,
+      "impliedByLoad": 1,
+      "floor": 2,
+      "steadyState": 2,
+      "drivenBy": "survivability floor"
+     },
+     "access": {
+      "modules": [
+       "AccessService"
+      ],
+      "share": 15.2,
+      "rpsAtLoad": 58.1,
+      "impliedByLoad": 1,
+      "floor": 2,
+      "steadyState": 2,
+      "drivenBy": "survivability floor"
+     },
+     "operations": {
+      "modules": [
+       "CrossRegionService",
+       "FnbService",
+       "InventoryService",
+       "MarketingService",
+       "PlatformService",
+       "ReportingService",
+       "RetailService",
+       "VenueOpsService",
+       "WhiteLabelService"
+      ],
+      "share": 35.0,
+      "rpsAtLoad": 133.8,
+      "impliedByLoad": 1,
+      "floor": 2,
+      "steadyState": 2,
+      "drivenBy": "survivability floor"
+     },
+     "ticvai-ai": {
+      "modules": [
+       "AiService"
+      ],
+      "share": 1.2,
+      "rpsAtLoad": 4.6,
+      "impliedByLoad": 1,
+      "floor": 2,
+      "steadyState": 2,
+      "drivenBy": "survivability floor"
+     },
+     "workers": {
+      "modules": [],
+      "share": 0,
+      "rpsAtLoad": 0.0,
+      "impliedByLoad": 0,
+      "floor": 2,
+      "steadyState": 2,
+      "drivenBy": "survivability floor"
+     }
+    },
+    "deployableReplicasAtFloor": 10,
+    "deployableReplicasAtPeak": 10,
+    "note": "**Floor is survivability, not peak.** The autoscaler has all day to react to a busy afternoon, so paying for the peak all night buys nothing. **Per deployable** (ADR-0055) the floor is one replica per zone for each of the five units; ADR-0061, still a proposed draft, would set it at 12 in the small cell."
    },
    "medium cell": {
     "venues": {
@@ -549,7 +619,77 @@
     },
     "replicasAtFloor": 34,
     "replicasAtPeak": 36,
-    "note": "**Floor is survivability, not peak.** The autoscaler has all day to react to a busy afternoon, so paying for the peak all night buys nothing."
+    "deployables": {
+     "commerce": {
+      "modules": [
+       "CatalogueService",
+       "IdentityService",
+       "LedgerService",
+       "OrderService",
+       "TenancyService",
+       "WalletService"
+      ],
+      "share": 48.6,
+      "rpsAtLoad": 1101.8,
+      "impliedByLoad": 6,
+      "floor": 2,
+      "steadyState": 6,
+      "drivenBy": "load"
+     },
+     "access": {
+      "modules": [
+       "AccessService"
+      ],
+      "share": 15.2,
+      "rpsAtLoad": 344.3,
+      "impliedByLoad": 1,
+      "floor": 2,
+      "steadyState": 2,
+      "drivenBy": "survivability floor"
+     },
+     "operations": {
+      "modules": [
+       "CrossRegionService",
+       "FnbService",
+       "InventoryService",
+       "MarketingService",
+       "PlatformService",
+       "ReportingService",
+       "RetailService",
+       "VenueOpsService",
+       "WhiteLabelService"
+      ],
+      "share": 35.0,
+      "rpsAtLoad": 792.5,
+      "impliedByLoad": 4,
+      "floor": 2,
+      "steadyState": 4,
+      "drivenBy": "load"
+     },
+     "ticvai-ai": {
+      "modules": [
+       "AiService"
+      ],
+      "share": 1.2,
+      "rpsAtLoad": 27.1,
+      "impliedByLoad": 1,
+      "floor": 2,
+      "steadyState": 2,
+      "drivenBy": "survivability floor"
+     },
+     "workers": {
+      "modules": [],
+      "share": 0,
+      "rpsAtLoad": 0.0,
+      "impliedByLoad": 0,
+      "floor": 2,
+      "steadyState": 2,
+      "drivenBy": "survivability floor"
+     }
+    },
+    "deployableReplicasAtFloor": 10,
+    "deployableReplicasAtPeak": 16,
+    "note": "**Floor is survivability, not peak.** The autoscaler has all day to react to a busy afternoon, so paying for the peak all night buys nothing. **Per deployable** (ADR-0055) the floor is one replica per zone for each of the five units; ADR-0061, still a proposed draft, would set it at 12 in the small cell."
    },
    "large cell": {
     "venues": {
@@ -801,7 +941,77 @@
     },
     "replicasAtFloor": 34,
     "replicasAtPeak": 49,
-    "note": "**Floor is survivability, not peak.** The autoscaler has all day to react to a busy afternoon, so paying for the peak all night buys nothing."
+    "deployables": {
+     "commerce": {
+      "modules": [
+       "CatalogueService",
+       "IdentityService",
+       "LedgerService",
+       "OrderService",
+       "TenancyService",
+       "WalletService"
+      ],
+      "share": 48.6,
+      "rpsAtLoad": 3421.8,
+      "impliedByLoad": 17,
+      "floor": 2,
+      "steadyState": 17,
+      "drivenBy": "load"
+     },
+     "access": {
+      "modules": [
+       "AccessService"
+      ],
+      "share": 15.2,
+      "rpsAtLoad": 1069.3,
+      "impliedByLoad": 3,
+      "floor": 2,
+      "steadyState": 3,
+      "drivenBy": "load"
+     },
+     "operations": {
+      "modules": [
+       "CrossRegionService",
+       "FnbService",
+       "InventoryService",
+       "MarketingService",
+       "PlatformService",
+       "ReportingService",
+       "RetailService",
+       "VenueOpsService",
+       "WhiteLabelService"
+      ],
+      "share": 35.0,
+      "rpsAtLoad": 2461.2,
+      "impliedByLoad": 12,
+      "floor": 2,
+      "steadyState": 12,
+      "drivenBy": "load"
+     },
+     "ticvai-ai": {
+      "modules": [
+       "AiService"
+      ],
+      "share": 1.2,
+      "rpsAtLoad": 84.1,
+      "impliedByLoad": 2,
+      "floor": 2,
+      "steadyState": 2,
+      "drivenBy": "survivability floor"
+     },
+     "workers": {
+      "modules": [],
+      "share": 0,
+      "rpsAtLoad": 0.0,
+      "impliedByLoad": 0,
+      "floor": 2,
+      "steadyState": 2,
+      "drivenBy": "survivability floor"
+     }
+    },
+    "deployableReplicasAtFloor": 10,
+    "deployableReplicasAtPeak": 36,
+    "note": "**Floor is survivability, not peak.** The autoscaler has all day to react to a busy afternoon, so paying for the peak all night buys nothing. **Per deployable** (ADR-0055) the floor is one replica per zone for each of the five units; ADR-0061, still a proposed draft, would set it at 12 in the small cell."
    }
   }
  },

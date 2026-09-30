@@ -1,6 +1,6 @@
 # WS98 — Subscription Licensing AI Self Service board 1
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 11 operations · 21 schemas · 3 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `PLATFORM_BILLING_VIEW, PLATFORM_PLAN_MANAGE, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-369` | Commercial Command Center | commandCentre | 0 | 0 | — |
-| `ADM-370` | Customer Subscription & Commercial Portfolio | listDetail | 0 | 0 | — |
-| `ADM-371` | Customer Commercial 360° | listDetail | 0 | 0 | — |
-| `ADM-372` | Operational Profile, VSI & Commercial Model Intelligence | commandCentre | 0 | 0 | — |
-| `ADM-373` | Revenue & Commercial Model Analytics | commandCentre | 0 | 0 | — |
-| `ADM-374` | Trial & Conversion Monitor | commandCentre | 0 | 0 | — |
-| `ADM-375` | Renewal & Retention Center | commandCentre | 0 | 0 | — |
-| `ADM-376` | Commercial Optimization & Expansion Opportunities | commandCentre | 0 | 0 | — |
-| `ADM-377` | Subscription Exceptions & Commercial Alerts | listDetail | 0 | 0 | — |
-| `ADM-378` | Executive AI Commercial Intelligence | commandCentre | 0 | 0 | — |
+| `ADM-369` | Commercial Command Center | commandCentre | 2 | 0 | — |
+| `ADM-370` | Customer Subscription & Commercial Portfolio | listDetail | 1 | 0 | — |
+| `ADM-371` | Customer Commercial 360° | listDetail | 2 | 0 | — |
+| `ADM-372` | Operational Profile, VSI & Commercial Model Intelligence | commandCentre | 1 | 0 | — |
+| `ADM-373` | Revenue & Commercial Model Analytics | commandCentre | 1 | 0 | — |
+| `ADM-374` | Trial & Conversion Monitor | commandCentre | 2 | 0 | — |
+| `ADM-375` | Renewal & Retention Center | commandCentre | 1 | 0 | — |
+| `ADM-376` | Commercial Optimization & Expansion Opportunities | commandCentre | 1 | 0 | — |
+| `ADM-377` | Subscription Exceptions & Commercial Alerts | listDetail | 1 | 0 | — |
+| `ADM-378` | Executive AI Commercial Intelligence | commandCentre | 2 | 0 | — |
 
 ## Thin screens in this batch
 

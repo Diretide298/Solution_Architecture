@@ -1,1 +1,194 @@
-{}
+{
+ "cancelReportExecution": {
+  "method": "DELETE",
+  "path": "/report-executions/{executionId}",
+  "contract": "reporting",
+  "summary": "Cancel a running execution",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "createReport": {
+  "method": "POST",
+  "path": "/reports",
+  "contract": "reporting",
+  "summary": "Create a custom report definition",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateReportRequest",
+  "responds": "ReportDefinition"
+ },
+ "getReportExecution": {
+  "method": "GET",
+  "path": "/report-executions/{executionId}",
+  "contract": "reporting",
+  "summary": "Execution status, and where its result is",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ReportExecution"
+ },
+ "getReportResult": {
+  "method": "GET",
+  "path": "/report-executions/{executionId}/result",
+  "contract": "reporting",
+  "summary": "Paged result rows",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ReportResult"
+ },
+ "getSemanticModel": {
+  "method": "GET",
+  "path": "/semantic-model",
+  "contract": "reporting",
+  "summary": "The business data catalogue reports are built from",
+  "permission": "REPORT_VIEW_TENANT",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SemanticModel"
+ },
+ "listReportFields": {
+  "method": "GET",
+  "path": "/report-fields",
+  "contract": "reporting",
+  "summary": "Fields available for a data source",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "dataSource",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "ReportField"
+ },
+ "listReports": {
+  "method": "GET",
+  "path": "/reports",
+  "contract": "reporting",
+  "summary": "List available report definitions",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "category",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listSeededReports": {
+  "method": "GET",
+  "path": "/reports/seeded",
+  "contract": "reporting",
+  "summary": "The reports every venue starts with",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SeededReport"
+ },
+ "runReport": {
+  "method": "POST",
+  "path": "/reports/{reportId}/run",
+  "contract": "reporting",
+  "summary": "Run a report",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RunReportRequest",
+  "responds": "ReportResult"
+ },
+ "updateReport": {
+  "method": "PUT",
+  "path": "/reports/{reportId}",
+  "contract": "reporting",
+  "summary": "Publish a new version of a definition",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateReportRequest",
+  "responds": "ReportDefinition"
+ }
+}

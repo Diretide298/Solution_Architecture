@@ -1,6 +1,6 @@
 # WS172 — Seat Management Venue Mapping Reference v1.0 board 8
 
-**10 screens · 7 operations · 10 schemas · 6 permissions**
+**10 screens · 7 operations · 12 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

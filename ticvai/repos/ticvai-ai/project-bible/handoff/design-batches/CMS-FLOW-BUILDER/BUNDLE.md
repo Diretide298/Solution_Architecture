@@ -4472,7 +4472,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "generated",
    "board": "wireframes/P13 Venue CMS.dc.html#cms-102"
   },
-  "apisNote": "Authored 29 September 2026 (P29 pass, W12 and M24-05) from impact.md section b.",
+  "apisNote": "Authored 29 September 2026 (W12 and M24-05) from impact.md section b.",
   "overlays": [
    {
     "id": "formAddPresetFlows",
@@ -4902,7 +4902,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "generated",
    "board": "wireframes/P13 Venue CMS.dc.html#cms-103"
   },
-  "apisNote": "Authored 29 September 2026 (P29 pass, W12, W6, W8) from impact.md section b.",
+  "apisNote": "Authored 29 September 2026 (W12, W6, W8) from impact.md section b.",
   "overlays": [
    {
     "id": "formCreateBookingFlowDefinition",
@@ -5209,7 +5209,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "provenance": "generated",
    "board": "wireframes/P13 Venue CMS.dc.html#cms-104"
   },
-  "apisNote": "Authored 29 September 2026 (P29 pass, M24-08) from impact.json.",
+  "apisNote": "Authored 29 September 2026 (M24-08) from impact.json.",
   "overlays": [
    {
     "id": "formSetStoreAccounts",

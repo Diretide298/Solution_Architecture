@@ -99,7 +99,27 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createTenant",
+       "label": "Create tenant",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createTenant"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The provisioning list.",
@@ -108,10 +128,19 @@
    "emptyNoResults": "The filter narrowed it and the provisioning are still there. The pack's own statuses are Pending — the state names which is selected.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createTenant",
+    "contract": "subscription",
+    "purpose": "Provision the tenant",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-419"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-419",
+   "workshopBoard": "wireframes/WS158 Subscription Licensing AI Self Service Board 6.dc.html#adm-419"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 72. 0 of 0 labels bound to a contract property; 6 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -190,7 +219,27 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createOrgUnit",
+       "label": "Create org unit",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createOrgUnit"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The tenant organization provisioning list.",
@@ -199,10 +248,19 @@
    "emptyNoResults": "The filter narrowed it and the tenant organization provisioning are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createOrgUnit",
+    "contract": "tenancy",
+    "purpose": "Venue and operational structure",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-420"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-420",
+   "workshopBoard": "wireframes/WS158 Subscription Licensing AI Self Service Board 6.dc.html#adm-420"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 73. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -283,6 +341,44 @@
      "components": [
       {
        "kind": "selectField",
+       "label": "Tenant",
+       "bindsTo": "Tenant",
+       "columns": [
+        "Tenant.id",
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status"
+       ],
+       "operation": "listTenants",
+       "notes": "**Pick a tenant first** (decided 28 September, audit R098). This screen's operations run in that tenant's cell, and a platform token carries no tenant permission there until a platform-staff grant into it is open.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Open grant into this tenant",
+       "bindsTo": "PlatformStaffGrant",
+       "columns": [
+        "PlatformStaffGrant.id",
+        "PlatformStaffGrant.operatorDisplayName",
+        "PlatformStaffGrant.permissions",
+        "PlatformStaffGrant.reason",
+        "PlatformStaffGrant.ticketRef",
+        "PlatformStaffGrant.openedAt",
+        "PlatformStaffGrant.expiresAt"
+       ],
+       "operation": "openPlatformStaffGrant",
+       "notes": "**Always visible while the screen acts on a tenant** (decided 28 September, audit R098): which tenant, which permissions, why, and the time left to `expiresAt`. At expiry every tenant action is disabled and the screen returns to its grantRequired state; a new need is a new grant. The tenant sees the grant in its own audit log.",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Open access grant",
+       "operation": "openPlatformStaffGrant",
+       "notes": "Shown until a grant into the picked tenant is open; asks for the second factor first (step-up, audit R135).",
+       "provenance": "contract identity.yaml POST /platform-staff-grants"
+      },
+      {
+       "kind": "selectField",
        "label": "Venue Name",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings"
       },
@@ -325,17 +421,68 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formOpenPlatformStaffGrant",
+    "component": "modal",
+    "trigger": "Open access grant",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client UUIDv7), `permissions` (tenant permissions only — the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Open access grant",
+     "operation": "openPlatformStaffGrant"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "permissions",
+      "reason",
+      "ticketRef",
+      "expiresAt"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /platform-staff-grants"
+   }
+  ],
   "states": {
    "loading": "The venue operational structure configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the venue operational structure untouched.",
    "emptyFirstRun": "No venue operational structure configured yet. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist",
+   "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098)."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "openPlatformStaffGrant",
+    "contract": "identity",
+    "purpose": "Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (decided 28 September, audit R098)",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listTenants",
+    "contract": "subscription",
+    "purpose": "The tenant picker — the operator picks a tenant before acting in its cell (audit R098)",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createPrincipal",
+    "contract": "identity",
+    "purpose": "The first administrator",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setPasswordPolicy",
+    "contract": "identity",
+    "purpose": "Security initialisation",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-421"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-421",
+   "workshopBoard": "wireframes/WS158 Subscription Licensing AI Self Service Board 6.dc.html#adm-421"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 74. 0 of 0 labels bound to a contract property; 8 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -448,12 +595,36 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getTenantLicences",
+    "contract": "subscription",
+    "purpose": "Licence and entitlement activation",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "addLicenceAddOn",
+    "contract": "subscription",
+    "purpose": "Activate an add-on",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-422"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-422",
+   "workshopBoard": "wireframes/WS158 Subscription Licensing AI Self Service Board 6.dc.html#adm-422"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 75. 0 of 0 labels bound to a contract property; 6 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "tenantId",
+     "from": "session"
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -530,7 +701,19 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listModuleCatalogue",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The license entitlement activation list.",
@@ -539,10 +722,19 @@
    "emptyNoResults": "The filter narrowed it and the license entitlement activation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listModuleCatalogue",
+    "contract": "subscription",
+    "purpose": "Module activation and dependencies",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-423"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-423",
+   "workshopBoard": "wireframes/WS158 Subscription Licensing AI Self Service Board 6.dc.html#adm-423"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 76. 0 of 0 labels bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -621,7 +813,19 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listVenueTypeTemplates",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The module activation dependency list.",
@@ -630,10 +834,19 @@
    "emptyNoResults": "The filter narrowed it and the module activation dependency are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listVenueTypeTemplates",
+    "contract": "subscription",
+    "purpose": "Apply a venue template",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-424"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-424",
+   "workshopBoard": "wireframes/WS158 Subscription Licensing AI Self Service Board 6.dc.html#adm-424"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 77. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -712,7 +925,27 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateRegionSettings",
+       "label": "Save region settings",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateRegionSettings"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The venue template application list.",
@@ -721,12 +954,29 @@
    "emptyNoResults": "The filter narrowed it and the venue template application are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "updateRegionSettings",
+    "contract": "tenancy",
+    "purpose": "Regional defaults",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-425"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-425",
+   "workshopBoard": "wireframes/WS158 Subscription Licensing AI Self Service Board 6.dc.html#adm-425"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 77. 0 of 0 labels bound to a contract property; 0 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "regionId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -862,10 +1112,22 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "runGoLiveValidation",
+    "contract": "subscription",
+    "purpose": "Validate the provisioning",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getGoLiveReadiness"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-426"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-426",
+   "workshopBoard": "wireframes/WS158 Subscription Licensing AI Self Service Board 6.dc.html#adm-426"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 78. 0 of 0 labels bound to a contract property; 11 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -944,7 +1206,12 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
   },
   "states": {
    "loading": "The provisioning validation exception list.",
@@ -953,10 +1220,19 @@
    "emptyNoResults": "The filter narrowed it and the provisioning validation exception are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getGoLiveReadiness",
+    "contract": "subscription",
+    "purpose": "Provisioning outcome",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-427"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-427",
+   "workshopBoard": "wireframes/WS158 Subscription Licensing AI Self Service Board 6.dc.html#adm-427"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 79. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

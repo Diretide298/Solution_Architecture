@@ -11,14 +11,14 @@ emittedBy:
 - orders.syncOrders
 payload:
 - field: rejectionId
-  type: string
+  type: uuid
 - field: workstationId
   type: uuid
 - field: kind
   type: string
   notes: order, payment, refund, void, scan
 - field: entryId
-  type: string
+  type: uuid
 - field: problemType
   type: string
 - field: rejectedAt

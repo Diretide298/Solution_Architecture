@@ -1,6 +1,6 @@
 # WS25 — Customer Service board 1
 
-**10 screens · 10 operations · 15 schemas · 2 permissions**
+**10 screens · 13 operations · 23 schemas · 5 permissions**
 
 Platform P12 Venue Support · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `MARKETING_MANAGE, MARKETING_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `AI_CONFIGURE, AI_USE, CASE_MANAGE, CASE_VIEW, ORDER_REFUND`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `SUP-009` | Customer Service Command Center | listDetail | 1 | 0 | — |
-| `SUP-010` | Customer 360° Service Profile | listDetail | 1 | 0 | — |
+| `SUP-009` | Customer Service Command Center | listDetail | 2 | 0 | — |
+| `SUP-010` | Customer 360° Service Profile | listDetail | 2 | 0 | — |
 | `SUP-011` | Unified Interaction & Communication History | configEditor | 1 | 0 | — |
-| `SUP-012` | Case Creation, Classification & Intelligent Routing | configEditor | 1 | 0 | — |
+| `SUP-012` | Case Creation, Classification & Intelligent Routing | configEditor | 2 | 0 | — |
 | `SUP-013` | Case Investigation & Resolution Workspace | listDetail | 1 | 0 | — |
 | `SUP-014` | Order, Booking & Ticket Service Workspace | listDetail | 1 | 0 | — |
 | `SUP-015` | Refund, Compensation & Service Exception Workspace | listDetail | 1 | 0 | — |
 | `SUP-016` | Escalation, Collaboration & Internal Resolution | configEditor | 1 | 0 | — |
 | `SUP-017` | Case Resolution, Closure & Customer Feedback | configEditor | 1 | 0 | — |
-| `SUP-018` | AI Customer Service Copilot & Knowledge Workspace | listDetail | 1 | 0 | — |
+| `SUP-018` | AI Customer Service Copilot & Knowledge Workspace | listDetail | 3 | 0 | — |
 
 ## Thin screens in this batch
 
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "SUP-001",
      "trigger": "Agent Login",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-009 holds none of them, so the edge carries nothing and SUP-001 opens cold"
     },
     {
      "to": "SUP-010",
@@ -186,10 +182,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "An agent can immediately understand their workload, priorities, SLA exposure and required actions without navigating multiple TICVAI modules.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Show) and no metric row",
   "purpose": "Provide every customer-service agent with a personalized operational workspace showing customers, cases, tasks, SLAs, alerts and workload.",
-  "purposeNote": "An agent can immediately understand their workload, priorities, SLA exposure and required actions without navigating multiple TICVAI modules.",
   "gaps": [
    {
     "operation": null,
@@ -217,26 +213,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "CustomerServiceCommandCenterView.awaitingInternalTeam",
         "CustomerServiceCommandCenterView.escalatedCases",
         "CustomerServiceCommandCenterView.resolvedToday",
-        "CustomerServiceCommandCenterView.averageResolutionTime",
-        "CustomerServiceCommandCenterView.caseId",
-        "CustomerServiceCommandCenterView.customer",
-        "CustomerServiceCommandCenterView.subject",
-        "CustomerServiceCommandCenterView.category",
-        "CustomerServiceCommandCenterView.channel",
-        "CustomerServiceCommandCenterView.priority",
-        "CustomerServiceCommandCenterView.status",
-        "CustomerServiceCommandCenterView.assignedAgent",
-        "CustomerServiceCommandCenterView.slaRemaining",
-        "CustomerServiceCommandCenterView.lastInteraction",
-        "CustomerServiceCommandCenterView.nextAction",
-        "CustomerServiceCommandCenterView.callCustomer",
-        "Review refund request",
-        "CustomerServiceCommandCenterView.followUpFinance",
-        "Reissue ticket",
-        "CustomerServiceCommandCenterView.respondToComplaint",
-        "CustomerServiceCommandCenterView.requestSupervisorApproval"
+        "CustomerServiceCommandCenterView.averageResolutionSeconds",
+        "CustomerServiceCommandCenterView.workQueue[].caseId",
+        "CustomerServiceCommandCenterView.workQueue[].customer",
+        "CustomerServiceCommandCenterView.workQueue[].subject",
+        "CustomerServiceCommandCenterView.workQueue[].category",
+        "CustomerServiceCommandCenterView.workQueue[].channel",
+        "CustomerServiceCommandCenterView.workQueue[].priority",
+        "CustomerServiceCommandCenterView.workQueue[].status",
+        "CustomerServiceCommandCenterView.workQueue[].assignedAgentPrincipalId",
+        "CustomerServiceCommandCenterView.workQueue[].slaRemainingSeconds",
+        "CustomerServiceCommandCenterView.workQueue[].lastInteractionAt",
+        "CustomerServiceCommandCenterView.workQueue[].nextAction",
+        "CustomerServiceCommandCenterView.todaysTasks[].kind"
        ],
-       "bindsTo": "CustomerServiceCommandCenterView",
+       "bindsTo": "CustomerServiceCommandCenterView.workQueue[]",
        "operation": "listCustomerService",
        "provenance": "pack Customer Service_Reference.pdf, page 3 §Display"
       }
@@ -260,24 +251,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "CustomerServiceCommandCenterView.awaitingInternalTeam",
         "CustomerServiceCommandCenterView.escalatedCases",
         "CustomerServiceCommandCenterView.resolvedToday",
-        "CustomerServiceCommandCenterView.averageResolutionTime",
-        "CustomerServiceCommandCenterView.caseId",
-        "CustomerServiceCommandCenterView.customer",
-        "CustomerServiceCommandCenterView.subject",
-        "CustomerServiceCommandCenterView.category",
-        "CustomerServiceCommandCenterView.channel",
-        "CustomerServiceCommandCenterView.priority",
-        "CustomerServiceCommandCenterView.status",
-        "CustomerServiceCommandCenterView.assignedAgent",
-        "CustomerServiceCommandCenterView.slaRemaining",
-        "CustomerServiceCommandCenterView.lastInteraction",
-        "CustomerServiceCommandCenterView.nextAction",
-        "CustomerServiceCommandCenterView.callCustomer",
-        "Review refund request",
-        "CustomerServiceCommandCenterView.followUpFinance",
-        "Reissue ticket",
-        "CustomerServiceCommandCenterView.respondToComplaint",
-        "CustomerServiceCommandCenterView.requestSupervisorApproval"
+        "CustomerServiceCommandCenterView.averageResolutionSeconds",
+        "CustomerServiceCommandCenterView.workQueue[].caseId",
+        "CustomerServiceCommandCenterView.workQueue[].customer",
+        "CustomerServiceCommandCenterView.workQueue[].subject",
+        "CustomerServiceCommandCenterView.workQueue[].category",
+        "CustomerServiceCommandCenterView.workQueue[].channel",
+        "CustomerServiceCommandCenterView.workQueue[].priority",
+        "CustomerServiceCommandCenterView.workQueue[].status",
+        "CustomerServiceCommandCenterView.workQueue[].assignedAgentPrincipalId",
+        "CustomerServiceCommandCenterView.workQueue[].slaRemainingSeconds",
+        "CustomerServiceCommandCenterView.workQueue[].lastInteractionAt",
+        "CustomerServiceCommandCenterView.workQueue[].nextAction",
+        "CustomerServiceCommandCenterView.todaysTasks[].kind"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Use”, “Customer Waiting”.",
        "provenance": "pack Customer Service_Reference.pdf, page 3 §Display"
@@ -345,6 +331,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "marketing-crm",
     "purpose": "Customer Service Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCustomerServiceProfile",
+    "contract": "marketing-crm",
+    "purpose": "Customer 360° Service Profile",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -360,7 +352,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-009"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-009",
+   "workshopBoard": "wireframes/WS42 Customer Service Board 1.dc.html#sup-009"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 3. 25 of 27 labels bound to a contract property; 35 of 53 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -423,10 +416,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Agents can understand the customer's complete TICVAI relationship and relevant service context from one screen.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Show) and no metric row",
   "purpose": "Provide the agent with a complete customer-service view of the customer. This should be one of the most important screens in the entire Customer Service module.",
-  "purposeNote": "Agents can understand the customer's complete TICVAI relationship and relevant service context from one screen.",
   "layout": {
    "template": "split",
    "regions": [
@@ -455,7 +448,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "Customer360ServiceProfileView.activeMembership",
         "Customer360ServiceProfileView.walletBalance",
         "Customer360ServiceProfileView.activeReservations",
-        "Customer360ServiceProfileView.futureGroupBookingWhereApplicable",
+        "Customer360ServiceProfileView.futureGroupBookings",
         "Open Orders"
        ],
        "bindsTo": "Customer360ServiceProfileView",
@@ -490,7 +483,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "Customer360ServiceProfileView.activeMembership",
         "Customer360ServiceProfileView.walletBalance",
         "Customer360ServiceProfileView.activeReservations",
-        "Customer360ServiceProfileView.futureGroupBookingWhereApplicable",
+        "Customer360ServiceProfileView.futureGroupBookings",
         "Open Orders"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Today”, “Yesterday”, “Last Month”, “Display permitted information such as”, “Sensitive information should be”, “Customer Summary”.",
@@ -513,6 +506,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "marketing-crm",
     "purpose": "Customer 360° Service Profile",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCustomerService",
+    "contract": "marketing-crm",
+    "purpose": "Customer Service Command Center",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -528,7 +527,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-010"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-010",
+   "workshopBoard": "wireframes/WS42 Customer Service Board 1.dc.html#sup-010"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 5. 16 of 19 labels bound to a contract property; 19 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -591,10 +591,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Agents can see the complete relevant conversation history without searching separate communication systems.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
   "purpose": "Provide one chronological timeline of customer interactions across supported service channels.",
-  "purposeNote": "Agents can see the complete relevant conversation history without searching separate communication systems.",
   "layout": {
    "template": "form",
    "regions": [
@@ -678,7 +678,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-011"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-011",
+   "workshopBoard": "wireframes/WS42 Customer Service Board 1.dc.html#sup-011"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 11 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -741,10 +742,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Every service request becomes a properly categorized, prioritized and routed case with the appropriate business context attached.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
   "purpose": "Create structured customer-service cases and ensure they reach the correct team.",
-  "purposeNote": "Every service request becomes a properly categorized, prioritized and routed case with the appropriate business context attached.",
   "layout": {
    "template": "form",
    "regions": [
@@ -821,6 +822,43 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "selectField",
        "label": "Attachments",
        "provenance": "pack Customer Service_Reference.pdf, page 9 §Capture"
+      },
+      {
+       "kind": "textField",
+       "label": "Parent category id",
+       "operation": "listCaseCategories",
+       "notes": "Sends `?parentCategoryId=` to `listCaseCategories`.",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      },
+      {
+       "kind": "toggle",
+       "label": "Top level only",
+       "operation": "listCaseCategories",
+       "notes": "Sends `?topLevelOnly=` to `listCaseCategories`.",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is active",
+       "operation": "listCaseCategories",
+       "notes": "Sends `?isActive=` to `listCaseCategories`.",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every case category",
+       "bindsTo": "CaseCategory",
+       "columns": [
+        "CaseCategory.id",
+        "CaseCategory.code",
+        "CaseCategory.name",
+        "CaseCategory.parentCategoryId",
+        "CaseCategory.defaultPriority",
+        "CaseCategory.isActive",
+        "CaseCategory.scopePath"
+       ],
+       "operation": "listCaseCategories",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
       }
      ]
     },
@@ -848,16 +886,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "createCaseClassificationIntelligent",
     "contract": "marketing-crm",
     "purpose": "Case Creation, Classification & Intelligent Routing",
-    "trigger": "onAction",
-    "invalidates": [
-     "createCaseClassificationIntelligent"
-    ]
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listCaseCategories",
+    "contract": "marketing-crm",
+    "purpose": "List case categories and subcategories",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-012"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-012",
+   "workshopBoard": "wireframes/WS42 Customer Service Board 1.dc.html#sup-012"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 14 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -920,10 +962,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "An agent can investigate and progress a customer case from one workspace with all required customer, transaction, policy and communication context visible.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide the primary workspace in which an agent investigates and resolves a case.",
-  "purposeNote": "An agent can investigate and progress a customer case from one workspace with all required customer, transaction, policy and communication context visible.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Action history. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Customer Service_Reference.pdf, page 11 §Support"
+   }
+  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -985,8 +1034,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
-       "provenance": "contract operation setCaseInvestigationResolution"
+       "label": "Action history",
+       "provenance": "pack Customer Service_Reference.pdf, page 11 §Support"
       }
      ]
     }
@@ -1004,10 +1053,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setCaseInvestigationResolution",
     "contract": "marketing-crm",
     "purpose": "Case Investigation & Resolution Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setCaseInvestigationResolution"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1023,9 +1069,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-013"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-013",
+   "workshopBoard": "wireframes/WS42 Customer Service Board 1.dc.html#sup-013"
   },
-  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 11. 11 of 11 labels bound to a contract property; 11 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 11. 11 of 11 labels bound to a contract property; 12 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P12",
    "audience": "staff",
@@ -1086,10 +1133,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Agents can perform authorized ticket and booking service actions through one customer-service interface while underlying TICVAI services remain authoritative.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Allow customer-service agents to perform permitted ticket/order servicing without entering the underlying technical modules.",
-  "purposeNote": "Agents can perform authorized ticket and booking service actions through one customer-service interface while underlying TICVAI services remain authoritative.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1200,10 +1247,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setOrderBookingTicket",
     "contract": "marketing-crm",
     "purpose": "Order, Booking & Ticket Service Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setOrderBookingTicket"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1219,7 +1263,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-014"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-014",
+   "workshopBoard": "wireframes/WS42 Customer Service Board 1.dc.html#sup-014"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 13. 10 of 21 labels bound to a contract property; 21 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1282,14 +1327,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Refunds, compensation and service exceptions are governed by applicable policies, financial limits and approval authorities.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Manage cases requiring money, compensation, goodwill or policy exceptions.",
-  "purposeNote": "Refunds, compensation and service exceptions are governed by applicable policies, financial limits and approval authorities.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Complimentary Ticket, Fee Waiver, Policy Exception. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Full Refund, Partial Refund, Wallet Credit, Voucher, Complimentary Ticket, Fee Waiver, Policy Exception. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Customer Service_Reference.pdf, page 15 §Support"
    }
   ],
@@ -1348,6 +1393,31 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Full Refund",
+       "provenance": "pack Customer Service_Reference.pdf, page 15 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Partial Refund",
+       "provenance": "pack Customer Service_Reference.pdf, page 15 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Service Credit",
+       "provenance": "pack Customer Service_Reference.pdf, page 15 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Wallet Credit",
+       "provenance": "pack Customer Service_Reference.pdf, page 15 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Voucher",
+       "provenance": "pack Customer Service_Reference.pdf, page 15 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Complimentary Ticket",
        "provenance": "pack Customer Service_Reference.pdf, page 15 §Support"
       },
@@ -1377,10 +1447,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setRefundCompensationService",
     "contract": "marketing-crm",
     "purpose": "Refund, Compensation & Service Exception Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setRefundCompensationService"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1396,9 +1463,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-015"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-015",
+   "workshopBoard": "wireframes/WS42 Customer Service Board 1.dc.html#sup-015"
   },
-  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 15. 8 of 8 labels bound to a contract property; 11 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 15. 8 of 8 labels bound to a contract property; 16 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P12",
    "audience": "staff",
@@ -1459,10 +1527,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Agents can obtain assistance from internal departments while retaining one customer-facing case, owner and audit trail.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
   "purpose": "Allow Customer Service to collaborate with other TICVAI departments without losing ownership of the customer case.",
-  "purposeNote": "Agents can obtain assistance from internal departments while retaining one customer-facing case, owner and audit trail.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1531,7 +1599,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-016"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-016",
+   "workshopBoard": "wireframes/WS42 Customer Service Board 1.dc.html#sup-016"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 8 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1594,10 +1663,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Every closed case has a clear resolution, root cause, customer communication and auditable outcome.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture; Where configured, send) and no display directory — it is settings, not a population",
   "purpose": "Govern how cases are resolved and formally closed.",
-  "purposeNote": "Every closed case has a clear resolution, root cause, customer communication and auditable outcome.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1736,7 +1805,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-017"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-017",
+   "workshopBoard": "wireframes/WS42 Customer Service Board 1.dc.html#sup-017"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 17. 0 of 0 labels bound to a contract property; 22 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1791,10 +1861,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Agents receive explainable, context-aware AI assistance that reduces handling time and improves consistency without bypassing TICVAI's policies, permissions or transactional systems. Board 1 — Final Screen Register",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Create the AI intelligence layer assisting agents throughout the service journey. This should not be a simple chatbot added to the side of the screen. It should understand the customer + transaction + policy + case context. Board 1 focused on the individual customer-service agent and individual customer case. Board 2 moves one level higher and provides the supervisor, contact-center manager, operations manager and service leadership layer.",
-  "purposeNote": "Agents receive explainable, context-aware AI assistance that reduces handling time and improves consistency without bypassing TICVAI's policies, permissions or transactional systems. Board 1 — Final Screen Register",
   "gaps": [
    {
     "operation": null,
@@ -1852,18 +1922,38 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setCustomerServiceCopilot",
     "contract": "marketing-crm",
     "purpose": "AI Customer Service Copilot & Knowledge Workspace",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "configureAssistantProfile",
+    "contract": "ai",
+    "purpose": "Define an assistant profile",
     "trigger": "onAction",
-    "invalidates": [
-     "setCustomerServiceCopilot"
-    ]
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAssistantProfiles",
+    "contract": "ai",
+    "purpose": "Assistant profiles",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-018"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-018",
+   "workshopBoard": "wireframes/WS42 Customer Service Board 1.dc.html#sup-018"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 19. 0 of 0 labels bound to a contract property; 1 of 96 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "profileKey",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P12",
    "audience": "staff",
@@ -1896,42 +1986,197 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+ "configureAssistantProfile": {
+  "method": "PUT",
+  "path": "/assistant-profiles/{profileKey}",
+  "contract": "ai",
+  "summary": "Define an assistant profile",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AiAssistantProfile",
+  "responds": "AiAssistantProfile"
+ },
  "createCaseClassificationIntelligent": {
   "method": "POST",
   "path": "/case-classification-intelligent",
   "contract": "marketing-crm",
   "summary": "Case Creation, Classification & Intelligent Routing",
-  "permission": "MARKETING_MANAGE",
+  "permission": "CASE_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "CaseCreationClassificationIntelligentRoutingInput",
   "responds": "CaseCreationClassificationIntelligentRoutingView"
+ },
+ "listAssistantProfiles": {
+  "method": "GET",
+  "path": "/assistant-profiles",
+  "contract": "ai",
+  "summary": "Assistant profiles",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "audience",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listCaseCategories": {
+  "method": "GET",
+  "path": "/case-categories",
+  "contract": "marketing-crm",
+  "summary": "List case categories and subcategories",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "parentCategoryId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "topLevelOnly",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "isActive",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listCaseResolutionClosure": {
   "method": "GET",
   "path": "/case-resolution-closure",
   "contract": "marketing-crm",
   "summary": "Case Resolution, Closure & Customer Feedback",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "caseId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "resolutionCategory",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "rootCause",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "canClose",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CaseResolutionClosureCustomerFeedbackView"
+  "responds": "Page"
  },
  "listCustomerService": {
   "method": "GET",
   "path": "/customer-service",
   "contract": "marketing-crm",
   "summary": "Customer Service Command Center",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "agentPrincipalId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "CustomerServiceCommandCenterView"
  },
@@ -1940,11 +2185,22 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/customer-service-profile",
   "contract": "marketing-crm",
   "summary": "Customer 360° Service Profile",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": true
+   }
+  ],
   "requestBody": null,
   "responds": "Customer360ServiceProfileView"
  },
@@ -1953,68 +2209,140 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/escalation-collaboration-internal",
   "contract": "marketing-crm",
   "summary": "Escalation, Collaboration & Internal Resolution",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "caseId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "department",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "assigneePrincipalId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "escalationType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "overdueOnly",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "EscalationCollaborationInternalResolutionView"
+  "responds": "Page"
  },
  "listUnifiedInteractionCommunication": {
   "method": "GET",
   "path": "/unified-interaction-communication",
   "contract": "marketing-crm",
   "summary": "Unified Interaction & Communication History",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": false
+   },
    {
     "name": "keyword",
     "in": "query",
     "required": false
    },
    {
-    "name": "date",
+    "name": "from",
     "in": "query",
     "required": false
    },
    {
-    "name": "agent",
+    "name": "to",
     "in": "query",
     "required": false
    },
    {
-    "name": "case",
+    "name": "channel",
     "in": "query",
     "required": false
    },
    {
-    "name": "order",
+    "name": "agentPrincipalId",
     "in": "query",
     "required": false
    },
    {
-    "name": "ticket",
+    "name": "caseId",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "orderId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ticketId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "UnifiedInteractionCommunicationHistoryView"
+  "responds": "Page"
  },
  "setCaseInvestigationResolution": {
   "method": "PUT",
   "path": "/case-investigation-resolution",
   "contract": "marketing-crm",
-  "summary": "Case Investigation & Resolution Workspace",
-  "permission": "MARKETING_MANAGE",
+  "summary": "Link a record to a case",
+  "permission": "CASE_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "CaseInvestigationResolutionWorkspaceInput",
   "responds": "CaseInvestigationResolutionWorkspaceView"
  },
@@ -2022,12 +2350,18 @@ Method, path, parameters, request and response for every operation these screens
   "method": "PUT",
   "path": "/customer-service-copilot",
   "contract": "marketing-crm",
-  "summary": "AI Customer Service Copilot & Knowledge Workspace",
-  "permission": "MARKETING_MANAGE",
+  "summary": "Configure the customer-service copilot",
+  "permission": "AI_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "AiCustomerServiceCopilotKnowledgeWorkspaceInput",
   "responds": "AiCustomerServiceCopilotKnowledgeWorkspaceView"
  },
@@ -2035,12 +2369,18 @@ Method, path, parameters, request and response for every operation these screens
   "method": "PUT",
   "path": "/order-booking-ticket",
   "contract": "marketing-crm",
-  "summary": "Order, Booking & Ticket Service Workspace",
-  "permission": "MARKETING_MANAGE",
+  "summary": "Evaluate or perform a service action on an order from a case",
+  "permission": "CASE_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "OrderBookingTicketServiceWorkspaceInput",
   "responds": "OrderBookingTicketServiceWorkspaceView"
  },
@@ -2048,12 +2388,18 @@ Method, path, parameters, request and response for every operation these screens
   "method": "PUT",
   "path": "/refund-compensation-service",
   "contract": "marketing-crm",
-  "summary": "Refund, Compensation & Service Exception Workspace",
-  "permission": "MARKETING_MANAGE",
+  "summary": "Raise or change a refund, compensation or policy-exception request on a case",
+  "permission": "ORDER_REFUND",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "RefundCompensationServiceExceptionWorkspaceInput",
   "responds": "RefundCompensationServiceExceptionWorkspaceView"
  }
@@ -2066,1154 +2412,1600 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AiAssistantProfile": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.assistant_profile",
+  "description": "**One assistant runtime, many profiles** (design 5.10, C5; AIC-069..080). The profile decides the audience, roles, knowledge sources, tools, model task and guest scope: guest concierge, support chatbot and staff assistants by role.",
+  "required": [
+   "profileKey",
+   "audience"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "profileKey": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "audience": {
+    "type": "string",
+    "enum": [
+     "staff",
+     "guest",
+     "support"
+    ]
+   },
+   "roleIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "module": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+     }
+    ],
+    "nullable": true
+   },
+   "collectionIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "Knowledge collections it retrieves from."
+   },
+   "toolKeys": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Registered tools it may propose (an assistant only reads; a change request goes to the configuration assistant, AIC-078)."
+   },
+   "modelTask": {
+    "type": "string",
+    "description": "The gateway task, e.g. `assistant.staff.answer`. The visit planner agent (29 September, MOB-6) is profile `planner.guest` with task `planner.guest.refine` and the five `venue-map` visit-plan tools. The app publishing guide (M24-08) is profile `guide.appPublishing` with task `assistant.staff.answer`, grounded on the platform's store-publishing collection only."
+   },
+   "guestCapabilityScope": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "For a guest profile: the same values as `AiPolicy.guestCapabilityScope`, narrowed."
+   },
+   "locales": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "handoverTarget": {
+    "type": "string",
+    "nullable": true,
+    "description": "Where \"ask a person\" goes: a support queue or a staff role."
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
  "AiCustomerServiceCopilotKnowledgeWorkspaceInput": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is marketing.guest_profile at 5%, so this is not an update to anything the package stores today and no new table has been decided",
-  "description": "**What AI Customer Service Copilot & Knowledge Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "x-ticvai-persistence": "marketing.service_copilot_config",
+  "description": "The customer-service copilot's configuration for one scope (pack 10.1.10). A field left out takes its default, not its old value.",
+  "required": [
+   "scopeLevel",
+   "dataSources",
+   "draftChannels"
+  ],
   "properties": {
-   "whyCanTThisCustomerReschedule": {
+   "id": {
     "type": "string",
-    "description": "“Why can't this customer reschedule?”"
+    "format": "uuid",
+    "readOnly": true
    },
-   "findSundaySAvailableAlternatives": {
+   "scopeLevel": {
     "type": "string",
-    "description": "“Find Sunday's available alternatives.”"
+    "enum": [
+     "tenant",
+     "venue"
+    ]
    },
-   "email": {
+   "scopePath": {
     "type": "string",
-    "description": "Email"
+    "description": "**The partition key** (ADR-0005), and the upsert key: one row per scope."
    },
-   "chat": {
-    "type": "string",
-    "description": "Chat"
+   "isEnabled": {
+    "type": "boolean",
+    "default": false
    },
-   "whatsapp": {
-    "type": "string",
-    "description": "WhatsApp"
+   "dataSources": {
+    "type": "array",
+    "description": "The authorised data the copilot may read, always within the asking agent's own permissions.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "customer",
+      "cases",
+      "orders",
+      "tickets",
+      "products",
+      "servicePolicies",
+      "pricing",
+      "payments",
+      "membership",
+      "wallet",
+      "groupBookings",
+      "interactionHistory",
+      "knowledgeBase"
+     ]
+    }
    },
-   "caseResponse": {
-    "type": "string",
-    "description": "Case response"
+   "knowledgeCollectionIds": {
+    "type": "array",
+    "description": "`ai.knowledge_collection` rows holding service procedures, product information, refund rules, ticket policies, venue instructions, FAQs and internal SOPs.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
    },
-   "internalEscalation": {
-    "type": "string",
-    "description": "Internal escalation"
-   },
-   "takingIntoAccount": {
-    "type": "string",
-    "description": "taking into account"
-   },
-   "customerLanguage": {
-    "type": "string",
-    "description": "Customer language"
+   "draftChannels": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "email",
+      "chat",
+      "whatsapp",
+      "caseResponse",
+      "internalEscalation"
+     ]
+    }
    },
    "brandTone": {
     "type": "string",
-    "description": "Brand tone"
+    "maxLength": 1000,
+    "nullable": true,
+    "description": "Tone guidance applied to every draft."
    },
-   "caseContext": {
-    "type": "string",
-    "description": "Case context"
+   "replyInCustomerLanguage": {
+    "type": "boolean",
+    "default": true
    },
-   "applicablePolicy": {
-    "type": "string",
-    "description": "Applicable policy"
+   "autoSend": {
+    "type": "array",
+    "default": [],
+    "description": "Channels where an approved automation may send without an agent. Empty means every customer-facing message waits for a person.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "email",
+      "chat",
+      "whatsapp"
+     ]
+    }
    },
-   "availability": {
-    "type": "string",
-    "description": "Availability"
+   "patternDetection": {
+    "type": "object",
+    "description": "Flags a systemic problem when many cases share one cause.",
+    "properties": {
+     "isEnabled": {
+      "type": "boolean",
+      "default": true
+     },
+     "minimumCases": {
+      "type": "integer",
+      "minimum": 2,
+      "default": 25
+     },
+     "windowHours": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 720,
+      "default": 168
+     }
+    }
    },
-   "paymentStatus": {
+   "updatedAt": {
     "type": "string",
-    "description": "Payment status"
-   },
-   "ticketValidity": {
-    "type": "string",
-    "description": "Ticket validity"
-   },
-   "customerBalances": {
-    "type": "string",
-    "description": "Customer balances"
-   },
-   "timeline": {
-    "type": "string",
-    "description": "timeline"
-   },
-   "caseCreationClassificationIntelligent": {
-    "type": "string",
-    "description": "Case Creation, Classification & Intelligent"
-   },
-   "collaboration": {
-    "type": "string",
-    "description": "collaboration"
-   },
-   "paymentFinanceServices": {
-    "type": "string",
-    "description": "Payment + Finance services"
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
  "AiCustomerServiceCopilotKnowledgeWorkspaceView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What AI Customer Service Copilot & Knowledge Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.service_copilot_config (new), ai.policy and ai.knowledge_collection",
+  "description": "The stored configuration and what is in effect at that scope after the tenant row and the AI policy are applied.",
+  "required": [
+   "configuration",
+   "effective"
+  ],
   "properties": {
-   "whyCanTThisCustomerReschedule": {
-    "type": "string",
-    "description": "“Why can't this customer reschedule?”"
+   "configuration": {
+    "$ref": "#/components/schemas/AiCustomerServiceCopilotKnowledgeWorkspaceInput"
    },
-   "findSundaySAvailableAlternatives": {
-    "type": "string",
-    "description": "“Find Sunday's available alternatives.”"
+   "effective": {
+    "type": "object",
+    "description": "The narrowest of this row, its tenant row and `getAiPolicy`.",
+    "properties": {
+     "isEnabled": {
+      "type": "boolean"
+     },
+     "dataSources": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "draftChannels": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "autoSend": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "aiCapabilities": {
+      "type": "array",
+      "description": "`AiPolicy.enabledCapabilities` at this scope.",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
    },
-   "email": {
+   "knowledgeCollections": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "id": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "documentCount": {
+       "type": "integer",
+       "minimum": 0
+      }
+     }
+    }
+   }
+  }
+ },
+ "CaseCategory": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.case_category",
+  "description": "**The venue's case taxonomy**: categories and, under them, subcategories (`parentCategoryId`). `Case.categoryId` and the routing rules' `match.categoryIds` point here; `createCaseClassificationIntelligent` recommends one. Maintained by `setCaseCategoryDefinition`, read by `listCaseCategories` (decided 29 September, writers pass). (decided 29 September, data model for the agreed operations)\n",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "Email"
+    "format": "uuid",
+    "readOnly": true
    },
-   "chat": {
+   "code": {
     "type": "string",
-    "description": "Chat"
+    "maxLength": 60
    },
-   "whatsapp": {
+   "name": {
     "type": "string",
-    "description": "WhatsApp"
+    "maxLength": 150
    },
-   "caseResponse": {
+   "parentCategoryId": {
     "type": "string",
-    "description": "Case response"
+    "format": "uuid",
+    "nullable": true,
+    "description": "Set on a subcategory; null on a top-level category."
    },
-   "internalEscalation": {
-    "type": "string",
-    "description": "Internal escalation"
+   "defaultPriority": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CasePriority"
+     }
+    ],
+    "nullable": true,
+    "description": "The priority a case in this category starts at before routing factors apply."
    },
-   "takingIntoAccount": {
-    "type": "string",
-    "description": "taking into account"
+   "isActive": {
+    "type": "boolean",
+    "default": true
    },
-   "customerLanguage": {
+   "scopePath": {
     "type": "string",
-    "description": "Customer language"
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
    },
-   "brandTone": {
+   "createdAt": {
     "type": "string",
-    "description": "Brand tone"
+    "format": "date-time",
+    "readOnly": true
    },
-   "caseContext": {
+   "updatedAt": {
     "type": "string",
-    "description": "Case context"
-   },
-   "applicablePolicy": {
-    "type": "string",
-    "description": "Applicable policy"
-   },
-   "availability": {
-    "type": "string",
-    "description": "Availability"
-   },
-   "paymentStatus": {
-    "type": "string",
-    "description": "Payment status"
-   },
-   "ticketValidity": {
-    "type": "string",
-    "description": "Ticket validity"
-   },
-   "customerBalances": {
-    "type": "string",
-    "description": "Customer balances"
-   },
-   "timeline": {
-    "type": "string",
-    "description": "timeline"
-   },
-   "caseCreationClassificationIntelligent": {
-    "type": "string",
-    "description": "Case Creation, Classification & Intelligent"
-   },
-   "collaboration": {
-    "type": "string",
-    "description": "collaboration"
-   },
-   "paymentFinanceServices": {
-    "type": "string",
-    "description": "Payment + Finance services"
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
  "CaseCreationClassificationIntelligentRoutingInput": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is marketing.message_trigger at 6%, so this is not an update to anything the package stores today and no new table has been decided",
-  "description": "**What Case Creation, Classification & Intelligent Routing submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "x-ticvai-persistence": "none — request only; the case itself is raised with `createCase`",
+  "description": "The case as the agent has captured it so far (pack 10.1.4 Case Creation). Every field maps onto `CreateCaseRequest` or onto a linked record.",
+  "required": [
+   "subject",
+   "description",
+   "channel"
+  ],
   "properties": {
-   "customer": {
+   "subjectId": {
     "type": "string",
-    "description": "Customer"
+    "format": "uuid",
+    "description": "The customer."
    },
    "subject": {
     "type": "string",
-    "description": "Subject"
+    "maxLength": 200
    },
    "description": {
     "type": "string",
-    "description": "Description"
+    "maxLength": 10000
    },
-   "source": {
-    "type": "string",
-    "description": "Source"
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MessageChannel"
+     }
+    ],
+    "description": "The source, as on `CreateCaseRequest.channel`."
    },
-   "category": {
-    "type": "string",
-    "description": "Category"
+   "kind": {
+    "$ref": "#/components/schemas/CaseKind"
    },
-   "subcategory": {
+   "categoryId": {
     "type": "string",
-    "description": "Subcategory"
+    "format": "uuid",
+    "description": "Where the agent has already chosen one."
    },
-   "priority": {
+   "subcategoryId": {
     "type": "string",
-    "description": "Priority"
+    "format": "uuid"
    },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
+   "customerSelectedPriority": {
+    "$ref": "#/components/schemas/CasePriority"
    },
-   "event": {
+   "venueId": {
     "type": "string",
-    "description": "Event"
+    "format": "uuid"
    },
-   "relatedOrder": {
+   "eventId": {
     "type": "string",
-    "description": "Related Order"
+    "format": "uuid"
    },
-   "relatedTicket": {
+   "productId": {
     "type": "string",
-    "description": "Related Ticket"
-   },
-   "relatedPayment": {
-    "type": "string",
-    "description": "Related Payment"
-   },
-   "relatedMembership": {
-    "type": "string",
-    "description": "Related Membership"
-   },
-   "attachments": {
-    "type": "string",
-    "description": "Attachments"
-   },
-   "ticketIssue": {
-    "type": "string",
-    "description": "Ticket Issue"
-   },
-   "bookingIssue": {
-    "type": "string",
-    "description": "Booking Issue"
-   },
-   "payment": {
-    "type": "string",
-    "description": "Payment"
-   },
-   "reschedule": {
-    "type": "string",
-    "description": "Reschedule"
-   },
-   "exchange": {
-    "type": "string",
-    "description": "Exchange"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "loyalty": {
-    "type": "string",
-    "description": "Loyalty"
-   },
-   "wallet": {
-    "type": "string",
-    "description": "Wallet"
-   },
-   "accessProblem": {
-    "type": "string",
-    "description": "Access Problem"
-   },
-   "complaint": {
-    "type": "string",
-    "description": "Complaint"
-   },
-   "technicalIssue": {
-    "type": "string",
-    "description": "Technical Issue"
-   },
-   "groupBooking": {
-    "type": "string",
-    "description": "Group Booking"
-   },
-   "lostTicket": {
-    "type": "string",
-    "description": "Lost Ticket"
-   },
-   "generalEnquiry": {
-    "type": "string",
-    "description": "General Enquiry"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
+    "format": "uuid"
    },
    "language": {
     "type": "string",
-    "description": "Language"
+    "maxLength": 10
    },
-   "customerType": {
-    "type": "string",
-    "description": "Customer type"
+   "relatedRecords": {
+    "type": "array",
+    "maxItems": 20,
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "referenceId"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "order",
+        "ticket",
+        "payment",
+        "refund",
+        "membership",
+        "walletTransaction",
+        "groupBooking",
+        "accessEvent"
+       ]
+      },
+      "referenceId": {
+       "type": "string"
+      }
+     }
+    }
    },
-   "agentSkill": {
-    "type": "string",
-    "description": "Agent skill"
-   },
-   "workload": {
-    "type": "string",
-    "description": "Workload"
-   },
-   "eventProximity": {
-    "type": "string",
-    "description": "Event proximity"
+   "attachmentRefs": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
    }
   }
  },
  "CaseCreationClassificationIntelligentRoutingView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Case Creation, Classification & Intelligent Routing displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — computed from marketing.case, marketing.sla_policy, marketing.agent_availability, marketing.case_category (new) and the routing rules; nothing is stored",
+  "description": "The recommendation for one case. Every recommended value names why.",
+  "required": [
+   "recommendedPriority",
+   "routingFactors",
+   "duplicateCandidates"
+  ],
   "properties": {
-   "customer": {
+   "recommendedCategoryId": {
     "type": "string",
-    "description": "Customer"
+    "format": "uuid",
+    "nullable": true
    },
-   "subject": {
+   "recommendedSubcategoryId": {
     "type": "string",
-    "description": "Subject"
+    "format": "uuid",
+    "nullable": true
    },
-   "description": {
-    "type": "string",
-    "description": "Description"
+   "recommendedPriority": {
+    "$ref": "#/components/schemas/CasePriority"
    },
-   "source": {
-    "type": "string",
-    "description": "Source"
+   "priorityBasis": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "customerSelected",
+      "businessRule",
+      "slaPolicy",
+      "aiAssessment"
+     ]
+    }
    },
-   "category": {
+   "recommendedQueue": {
     "type": "string",
-    "description": "Category"
+    "nullable": true,
+    "description": "The queue's code, e.g. `eventDaySupport`."
    },
-   "subcategory": {
+   "recommendedAssigneePrincipalId": {
     "type": "string",
-    "description": "Subcategory"
+    "format": "uuid",
+    "nullable": true,
+    "description": "The preview; null when nobody with the skill is available."
    },
-   "priority": {
+   "slaPolicyCode": {
     "type": "string",
-    "description": "Priority"
+    "nullable": true
    },
-   "venue": {
+   "slaDueAt": {
     "type": "string",
-    "description": "Venue"
+    "format": "date-time",
+    "nullable": true
    },
-   "event": {
-    "type": "string",
-    "description": "Event"
+   "routingFactors": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "factor"
+     ],
+     "properties": {
+      "factor": {
+       "type": "string",
+       "enum": [
+        "category",
+        "venue",
+        "product",
+        "language",
+        "customerType",
+        "agentSkill",
+        "workload",
+        "priority",
+        "eventProximity"
+       ]
+      },
+      "value": {
+       "type": "string"
+      }
+     }
+    }
    },
-   "relatedOrder": {
-    "type": "string",
-    "description": "Related Order"
+   "aiAssessment": {
+    "type": "object",
+    "nullable": true,
+    "description": "Where the AI policy enables `assist`; AI-derived and labelled as such.",
+    "properties": {
+     "signals": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "maxLength": 80
+      },
+      "description": "e.g. ticket issue, upcoming event, high urgency."
+     },
+     "explanation": {
+      "type": "string",
+      "maxLength": 1000
+     }
+    }
    },
-   "relatedTicket": {
-    "type": "string",
-    "description": "Related Ticket"
-   },
-   "relatedPayment": {
-    "type": "string",
-    "description": "Related Payment"
-   },
-   "relatedMembership": {
-    "type": "string",
-    "description": "Related Membership"
-   },
-   "attachments": {
-    "type": "string",
-    "description": "Attachments"
-   },
-   "ticketIssue": {
-    "type": "string",
-    "description": "Ticket Issue"
-   },
-   "bookingIssue": {
-    "type": "string",
-    "description": "Booking Issue"
-   },
-   "payment": {
-    "type": "string",
-    "description": "Payment"
-   },
-   "reschedule": {
-    "type": "string",
-    "description": "Reschedule"
-   },
-   "exchange": {
-    "type": "string",
-    "description": "Exchange"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "loyalty": {
-    "type": "string",
-    "description": "Loyalty"
-   },
-   "wallet": {
-    "type": "string",
-    "description": "Wallet"
-   },
-   "accessProblem": {
-    "type": "string",
-    "description": "Access Problem"
-   },
-   "complaint": {
-    "type": "string",
-    "description": "Complaint"
-   },
-   "technicalIssue": {
-    "type": "string",
-    "description": "Technical Issue"
-   },
-   "groupBooking": {
-    "type": "string",
-    "description": "Group Booking"
-   },
-   "lostTicket": {
-    "type": "string",
-    "description": "Lost Ticket"
-   },
-   "generalEnquiry": {
-    "type": "string",
-    "description": "General Enquiry"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "language": {
-    "type": "string",
-    "description": "Language"
-   },
-   "customerType": {
-    "type": "string",
-    "description": "Customer type"
-   },
-   "agentSkill": {
-    "type": "string",
-    "description": "Agent skill"
-   },
-   "workload": {
-    "type": "string",
-    "description": "Workload"
-   },
-   "eventProximity": {
-    "type": "string",
-    "description": "Event proximity"
+   "duplicateCandidates": {
+    "type": "array",
+    "maxItems": 10,
+    "description": "Open cases for the same customer and related records, best match first.",
+    "items": {
+     "type": "object",
+     "required": [
+      "caseId",
+      "caseNumber",
+      "status"
+     ],
+     "properties": {
+      "caseId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "caseNumber": {
+       "type": "string"
+      },
+      "subject": {
+       "type": "string"
+      },
+      "status": {
+       "$ref": "#/components/schemas/CaseStatus"
+      },
+      "matchedOn": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "enum": [
+         "customer",
+         "relatedRecord",
+         "subjectText"
+        ]
+       }
+      }
+     }
+    }
    }
   }
  },
  "CaseInvestigationResolutionWorkspaceInput": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
-  "description": "**What Case Investigation & Resolution Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "x-ticvai-persistence": "marketing.case_linked_record",
+  "x-ticvai-record-definition": "Related Records (agents can attach)",
+  "description": "One link between a case and a record another contract owns. The reference is a pointer, never a copy.",
+  "required": [
+   "caseId",
+   "kind",
+   "referenceId"
+  ],
   "properties": {
-   "leftCustomerContext": {
+   "id": {
     "type": "string",
-    "description": "Left — Customer Context"
+    "format": "uuid",
+    "readOnly": true
    },
-   "customerProfileAndRelatedProducts": {
+   "scopePath": {
     "type": "string",
-    "description": "Customer profile and related products"
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
    },
-   "centerCaseTimeline": {
+   "caseId": {
     "type": "string",
-    "description": "Center — Case Timeline"
+    "format": "uuid"
    },
-   "conversationNotesActionsAndInvestigation": {
+   "kind": {
     "type": "string",
-    "description": "Conversation, notes, actions and investigation"
+    "enum": [
+     "order",
+     "ticket",
+     "payment",
+     "refund",
+     "membership",
+     "walletTransaction",
+     "groupBooking",
+     "accessEvent"
+    ]
    },
-   "rightRecommendedActions": {
+   "referenceId": {
     "type": "string",
-    "description": "Right — Recommended Actions"
+    "maxLength": 64,
+    "description": "The record's id in its owning contract (orders, payments, access, wallet)."
    },
-   "order": {
+   "note": {
     "type": "string",
-    "description": "Order"
+    "maxLength": 500,
+    "nullable": true
    },
-   "ticket": {
-    "type": "string",
-    "description": "Ticket"
+   "isActive": {
+    "type": "boolean",
+    "default": true,
+    "description": "False unlinks; the row stays for the audit trail."
    },
-   "payment": {
+   "linkedByPrincipalId": {
     "type": "string",
-    "description": "Payment"
+    "format": "uuid",
+    "readOnly": true
    },
-   "membership": {
+   "updatedAt": {
     "type": "string",
-    "description": "Membership"
-   },
-   "walletTransaction": {
-    "type": "string",
-    "description": "Wallet Transaction"
-   },
-   "groupBooking": {
-    "type": "string",
-    "description": "Group Booking"
-   },
-   "accessEvent": {
-    "type": "string",
-    "description": "Access Event"
-   },
-   "privateNotes": {
-    "type": "string",
-    "description": "Private notes"
-   },
-   "mentions": {
-    "type": "string",
-    "description": "Mentions"
-   },
-   "departmentNotes": {
-    "type": "string",
-    "description": "Department notes"
-   },
-   "attachments": {
-    "type": "string",
-    "description": "Attachments"
-   },
-   "actionHistory": {
-    "type": "string",
-    "description": "Action history"
-   },
-   "reply": {
-    "type": "string",
-    "description": "Reply"
-   },
-   "call": {
-    "type": "string",
-    "description": "Call"
-   },
-   "changeStatus": {
-    "type": "string",
-    "description": "Change Status"
-   },
-   "requestApproval": {
-    "type": "string",
-    "description": "Request Approval"
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
  "CaseInvestigationResolutionWorkspaceView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Case Investigation & Resolution Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.case, marketing.case_message, marketing.case_linked_record (new), marketing.sla_policy and ai.suggestion",
+  "description": "The case workspace (pack 10.1.5). Recommended actions and the summary keep verified data, policy and AI recommendation apart.",
+  "required": [
+   "caseId",
+   "caseNumber",
+   "subject",
+   "priority",
+   "status",
+   "created",
+   "lastUpdated",
+   "linkedRecords",
+   "recommendedActions"
+  ],
   "properties": {
    "caseId": {
     "type": "string",
-    "description": "Case ID"
+    "format": "uuid"
+   },
+   "caseNumber": {
+    "type": "string"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
    },
    "customer": {
     "type": "string",
-    "description": "Customer"
+    "nullable": true,
+    "description": "The guest's name, as `Case.guestName`; null unless the caller holds GUEST_VIEW_PII."
    },
    "subject": {
+    "type": "string"
+   },
+   "categoryId": {
     "type": "string",
-    "description": "Subject"
+    "format": "uuid",
+    "nullable": true
    },
    "category": {
     "type": "string",
-    "description": "Category"
+    "nullable": true,
+    "description": "The category's display name."
    },
    "priority": {
-    "type": "string",
-    "description": "Priority"
+    "$ref": "#/components/schemas/CasePriority"
    },
    "status": {
-    "type": "integer",
-    "description": "Status"
+    "$ref": "#/components/schemas/CaseStatus"
    },
    "sla": {
-    "type": "string",
-    "description": "SLA"
+    "type": "object",
+    "properties": {
+     "policyCode": {
+      "type": "string",
+      "nullable": true
+     },
+     "dueAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "remainingSeconds": {
+      "type": "integer",
+      "nullable": true,
+      "description": "Negative once breached."
+     },
+     "isBreached": {
+      "type": "boolean"
+     },
+     "isPaused": {
+      "type": "boolean",
+      "description": "True while `awaitingGuest`."
+     }
+    }
    },
    "owner": {
     "type": "string",
-    "description": "Owner"
+    "format": "uuid",
+    "nullable": true,
+    "description": "The assigned agent's principal id (`Case.assignedToPrincipalId`)."
    },
    "queue": {
     "type": "string",
-    "description": "Queue"
+    "nullable": true
    },
    "created": {
     "type": "string",
     "format": "date-time",
-    "description": "Created"
+    "description": "`Case.createdAt`."
    },
    "lastUpdated": {
     "type": "string",
-    "format": "date-time",
-    "description": "Last Updated"
+    "format": "date-time"
    },
-   "leftCustomerContext": {
-    "type": "string",
-    "description": "Left — Customer Context"
+   "linkedRecords": {
+    "type": "array",
+    "description": "Active links, newest first.",
+    "items": {
+     "$ref": "#/components/schemas/CaseInvestigationResolutionWorkspaceInput"
+    }
    },
-   "customerProfileAndRelatedProducts": {
-    "type": "string",
-    "description": "Customer profile and related products"
+   "recommendedActions": {
+    "type": "array",
+    "maxItems": 10,
+    "items": {
+     "type": "object",
+     "required": [
+      "action",
+      "basis"
+     ],
+     "properties": {
+      "action": {
+       "type": "string",
+       "enum": [
+        "reply",
+        "call",
+        "reschedule",
+        "exchange",
+        "reissue",
+        "requestRefund",
+        "requestCompensation",
+        "raiseInternalRequest",
+        "escalate",
+        "resolve"
+       ]
+      },
+      "basis": {
+       "type": "string",
+       "enum": [
+        "verifiedData",
+        "policy",
+        "aiRecommendation"
+       ]
+      },
+      "reason": {
+       "type": "string",
+       "maxLength": 500
+      },
+      "policyReference": {
+       "type": "string",
+       "nullable": true,
+       "description": "The policy the action rests on; an AI recommendation never invents one."
+      }
+     }
+    }
    },
-   "centerCaseTimeline": {
-    "type": "string",
-    "description": "Center — Case Timeline"
-   },
-   "conversationNotesActionsAndInvestigation": {
-    "type": "string",
-    "description": "Conversation, notes, actions and investigation"
-   },
-   "rightRecommendedActions": {
-    "type": "string",
-    "description": "Right — Recommended Actions"
-   },
-   "order": {
-    "type": "string",
-    "description": "Order"
-   },
-   "ticket": {
-    "type": "string",
-    "description": "Ticket"
-   },
-   "payment": {
-    "type": "string",
-    "description": "Payment"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "walletTransaction": {
-    "type": "string",
-    "description": "Wallet Transaction"
-   },
-   "groupBooking": {
-    "type": "string",
-    "description": "Group Booking"
-   },
-   "accessEvent": {
-    "type": "string",
-    "description": "Access Event"
-   },
-   "privateNotes": {
-    "type": "string",
-    "description": "Private notes"
-   },
-   "mentions": {
-    "type": "string",
-    "description": "Mentions"
-   },
-   "departmentNotes": {
-    "type": "string",
-    "description": "Department notes"
-   },
-   "attachments": {
-    "type": "string",
-    "description": "Attachments"
-   },
-   "actionHistory": {
-    "type": "string",
-    "description": "Action history"
-   },
-   "reply": {
-    "type": "string",
-    "description": "Reply"
-   },
-   "call": {
-    "type": "string",
-    "description": "Call"
-   },
-   "changeStatus": {
-    "type": "string",
-    "description": "Change Status"
-   },
-   "requestApproval": {
-    "type": "string",
-    "description": "Request Approval"
+   "aiSummary": {
+    "type": "object",
+    "nullable": true,
+    "description": "Where the AI policy enables `summarise`; AI-derived and labelled as such.",
+    "properties": {
+     "issue": {
+      "type": "string"
+     },
+     "policy": {
+      "type": "string",
+      "nullable": true
+     },
+     "currentStatus": {
+      "type": "string",
+      "nullable": true
+     },
+     "commercialImpact": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "nullable": true
+     },
+     "recommendedAction": {
+      "type": "string",
+      "nullable": true
+     },
+     "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
    }
   }
  },
+ "CaseKind": {
+  "type": "string",
+  "description": "**What the guest says the case is about**, in their words rather than the venue's taxonomy — `raiseMyCase` asks for it and `categoryId` is what staff file it under. Stored on the case, because a lost-property report that forgets it was one cannot be routed to the lost and found desk.\n**`other` only with a note (decided 28 September, audit R222).** A case raised as `other` must carry a non-empty `detail` (`raiseMyCase`), or it is refused with 400; the notes are reviewed quarterly to add the real kinds they reveal.\n",
+  "enum": [
+   "lostProperty",
+   "complaint",
+   "question",
+   "accessibility",
+   "refundRequest",
+   "other"
+  ]
+ },
+ "CasePriority": {
+  "type": "string",
+  "enum": [
+   "low",
+   "normal",
+   "high",
+   "urgent"
+  ]
+ },
  "CaseResolutionClosureCustomerFeedbackView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Case Resolution, Closure & Customer Feedback displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "marketing.case_resolution",
+  "description": "One case's resolution record (pack 10.1.9), with closure checks, feedback and reopen history computed on read from marketing.case, marketing.case_message, marketing.case_internal_request, marketing.case_compensation_request, approvals.request and marketing.form_submission.",
+  "required": [
+   "caseId",
+   "resolutionCategory",
+   "resolutionSummary",
+   "rootCause"
+  ],
   "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "caseId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "caseNumber": {
+    "type": "string",
+    "readOnly": true,
+    "x-ticvai-persisted": false
+   },
+   "caseStatus": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CaseStatus"
+     }
+    ],
+    "readOnly": true,
+    "x-ticvai-persisted": false
+   },
    "resolutionCategory": {
     "type": "string",
-    "description": "Resolution Category"
+    "enum": [
+     "informationProvided",
+     "ticketReissued",
+     "bookingChanged",
+     "refundProcessed",
+     "compensationIssued",
+     "technicalIssueResolved",
+     "customerError",
+     "policyApplied",
+     "duplicate",
+     "noActionRequired",
+     "other"
+    ]
    },
    "resolutionSummary": {
     "type": "string",
-    "description": "Resolution Summary"
+    "minLength": 3,
+    "maxLength": 2000
    },
    "actionTaken": {
     "type": "string",
-    "description": "Action Taken"
+    "maxLength": 2000,
+    "nullable": true
    },
    "financialImpact": {
-    "type": "string",
-    "description": "Financial Impact"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Net money refunded or credited; zero when none."
    },
-   "compensation": {
-    "type": "string",
-    "description": "Compensation"
+   "compensationRequestIds": {
+    "type": "array",
+    "description": "The case's compensation requests (`setRefundCompensationService`) this resolution relied on.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
    },
    "rootCause": {
     "type": "string",
-    "description": "Root Cause"
+    "enum": [
+     "customer",
+     "product",
+     "payment",
+     "system",
+     "integration",
+     "operational",
+     "content",
+     "policy",
+     "staff",
+     "unknown"
+    ]
+   },
+   "duplicateOfCaseId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Required when `resolutionCategory` is `duplicate`."
+   },
+   "customerNotification": {
+    "type": "object",
+    "nullable": true,
+    "description": "How the customer was told; the message itself is a `CaseMessage` or a `MessageDispatch`.",
+    "properties": {
+     "channel": {
+      "$ref": "#/components/schemas/MessageChannel"
+     },
+     "messageId": {
+      "type": "string",
+      "nullable": true
+     },
+     "sentAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
    },
    "resolvedBy": {
     "type": "string",
-    "description": "Resolved By"
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The principal who recorded it."
    },
    "resolutionDate": {
     "type": "string",
     "format": "date-time",
-    "description": "Resolution Date"
+    "readOnly": true
    },
-   "customerNotification": {
-    "type": "string",
-    "description": "Customer Notification"
+   "closureChecks": {
+    "type": "object",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "properties": {
+     "requiredCustomerResponseSent": {
+      "type": "boolean"
+     },
+     "financialActionCompleteOrTracked": {
+      "type": "boolean"
+     },
+     "internalTasksCompleted": {
+      "type": "boolean"
+     },
+     "requiredApprovalsComplete": {
+      "type": "boolean"
+     },
+     "resolutionDocumented": {
+      "type": "boolean"
+     }
+    }
    },
-   "customer": {
-    "type": "string",
-    "description": "Customer"
+   "canClose": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-persisted": false
    },
-   "product": {
-    "type": "string",
-    "description": "Product"
+   "feedback": {
+    "type": "object",
+    "readOnly": true,
+    "nullable": true,
+    "x-ticvai-persisted": false,
+    "description": "Null where no survey is configured for case resolution.",
+    "properties": {
+     "surveyStatus": {
+      "type": "string",
+      "enum": [
+       "scheduled",
+       "sent",
+       "responded",
+       "expired"
+      ]
+     },
+     "formSubmissionId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     },
+     "score": {
+      "type": "number",
+      "nullable": true
+     },
+     "scaleMax": {
+      "type": "integer",
+      "nullable": true
+     },
+     "respondedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
    },
-   "payment": {
-    "type": "string",
-    "description": "Payment"
+   "reopenCount": {
+    "type": "integer",
+    "minimum": 0,
+    "readOnly": true,
+    "x-ticvai-persisted": false
    },
-   "system": {
+   "lastReopenReason": {
     "type": "string",
-    "description": "System"
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "`reopenCase`'s reason; `refundFailed` when the system reopened it after a refund failed."
    },
-   "integration": {
+   "updatedAt": {
     "type": "string",
-    "description": "Integration"
-   },
-   "operational": {
-    "type": "string",
-    "description": "Operational"
-   },
-   "content": {
-    "type": "string",
-    "description": "Content"
-   },
-   "policy": {
-    "type": "string",
-    "description": "Policy"
-   },
-   "staff": {
-    "type": "string",
-    "description": "Staff"
-   },
-   "unknown": {
-    "type": "string",
-    "description": "Unknown"
-   },
-   "requiredCustomerResponseSent": {
-    "type": "string",
-    "description": "Required customer response sent"
-   },
-   "financialActionCompleteOrTracked": {
-    "type": "string",
-    "description": "Financial action complete or tracked"
-   },
-   "internalTasksCompleted": {
-    "type": "string",
-    "description": "Internal tasks completed"
-   },
-   "requiredApprovalsComplete": {
-    "type": "string",
-    "description": "Required approvals complete"
-   },
-   "resolutionDocumented": {
-    "type": "string",
-    "description": "Resolution documented"
-   },
-   "csatSurvey": {
-    "type": "string",
-    "description": "CSAT survey"
-   },
-   "serviceRating": {
-    "type": "string",
-    "description": "Service rating"
-   },
-   "feedbackRequest": {
-    "type": "string",
-    "description": "Feedback request"
-   },
-   "customerReplies": {
-    "type": "string",
-    "description": "Customer replies"
-   },
-   "resolutionFails": {
-    "type": "string",
-    "description": "Resolution fails"
-   },
-   "supervisorReopens": {
-    "type": "string",
-    "description": "Supervisor reopens"
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
+ "CaseStatus": {
+  "type": "string",
+  "enum": [
+   "open",
+   "inProgress",
+   "awaitingGuest",
+   "escalated",
+   "resolved",
+   "closed"
+  ]
+ },
+ "ConsentDecision": {
+  "type": "string",
+  "enum": [
+   "granted",
+   "withdrawn",
+   "notAsked"
+  ]
+ },
  "Customer360ServiceProfileView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Customer 360° Service Profile displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.guest_profile, pii.subject, pii.subject_contact, marketing.loyalty_position, marketing.guest_preference, marketing.consent_record, marketing.suppression, marketing.case, orders.sales_order, orders.reservation, orders.group_booking, access.entitlement and wallet.balance",
+  "description": "The service view of one guest. Fields the caller may not see are null, never omitted.",
+  "required": [
+   "customerId",
+   "customerSince",
+   "openCases",
+   "serviceAlerts"
+  ],
   "properties": {
-   "customerName": {
-    "type": "string",
-    "description": "Customer Name"
-   },
    "customerId": {
     "type": "string",
-    "description": "Customer ID"
+    "format": "uuid",
+    "description": "The guest's `subjectId`."
+   },
+   "customerName": {
+    "type": "string",
+    "nullable": true,
+    "description": "Null unless the caller holds GUEST_VIEW_PII."
    },
    "customerType": {
     "type": "string",
-    "description": "Customer Type"
+    "enum": [
+     "individual",
+     "member",
+     "groupOrganiser",
+     "corporate",
+     "partner"
+    ]
    },
    "membershipStatus": {
-    "type": "integer",
-    "description": "Membership Status"
+    "type": "string",
+    "enum": [
+     "none",
+     "active",
+     "expiring",
+     "lapsed"
+    ]
    },
    "loyaltyTier": {
     "type": "string",
-    "description": "Loyalty Tier"
+    "nullable": true
    },
    "preferredLanguage": {
     "type": "string",
-    "description": "Preferred Language"
+    "maxLength": 10,
+    "nullable": true
    },
    "country": {
     "type": "string",
-    "description": "Country"
+    "pattern": "^[A-Z]{2}$",
+    "nullable": true
    },
    "contactDetails": {
-    "type": "integer",
-    "description": "Contact Details"
+    "type": "object",
+    "description": "Masked (e.g. `j***@example.com`, `+971 ** *** 4821`) unless the caller holds GUEST_VIEW_PII.",
+    "properties": {
+     "email": {
+      "type": "string",
+      "nullable": true
+     },
+     "phone": {
+      "type": "string",
+      "nullable": true
+     }
+    }
    },
    "customerSince": {
     "type": "string",
-    "description": "Customer Since"
+    "format": "date-time"
    },
    "customerValue": {
-    "type": "string",
-    "description": "Customer Value"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Lifetime net spend across the tenant."
+   },
+   "openCases": {
+    "type": "integer",
+    "minimum": 0
    },
    "riskAttentionIndicator": {
     "type": "string",
-    "description": "Risk/Attention Indicator"
-   },
-   "membershipRenewed": {
-    "type": "string",
-    "description": "Membership renewed"
+    "enum": [
+     "none",
+     "attention",
+     "risk"
+    ],
+    "description": "`attention` with an open complaint or an unresolved refund case; `risk` with a breached SLA or a repeat contact on the same issue."
    },
    "upcomingTickets": {
     "type": "integer",
-    "description": "Upcoming Tickets"
+    "minimum": 0
    },
    "activeMembership": {
-    "type": "integer",
-    "description": "Active Membership"
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "membershipId": {
+      "type": "string"
+     },
+     "planName": {
+      "type": "string"
+     },
+     "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
    },
    "walletBalance": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Wallet Balance"
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "activeReservations": {
     "type": "integer",
-    "description": "Active Reservations"
+    "minimum": 0
    },
-   "futureGroupBookingWhereApplicable": {
-    "type": "string",
-    "description": "Future Group Booking where applicable"
+   "futureGroupBookings": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "openOrders": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "serviceAlerts": {
+    "type": "array",
+    "maxItems": 20,
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "message"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "eventSoon",
+        "unresolvedRefundCase",
+        "membershipExpiring",
+        "openComplaint",
+        "communicationRestricted"
+       ]
+      },
+      "message": {
+       "type": "string"
+      },
+      "referenceId": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
    },
    "preferredCommunicationChannel": {
-    "type": "string",
-    "description": "Preferred Communication Channel"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MessageChannel"
+     }
+    ],
+    "nullable": true
    },
    "marketingConsent": {
-    "type": "boolean",
-    "description": "Marketing Consent"
+    "$ref": "#/components/schemas/ConsentDecision"
    },
-   "accessibilityRequirementsWhereAppropriatelyAuthorized": {
-    "type": "string",
-    "description": "Accessibility Requirements where appropriately authorized"
+   "accessibilityRequirements": {
+    "type": "array",
+    "nullable": true,
+    "description": "Null unless the caller holds GUEST_VIEW_PII.",
+    "items": {
+     "type": "string"
+    }
    },
    "communicationRestrictions": {
-    "type": "integer",
-    "description": "Communication restrictions"
+    "type": "array",
+    "description": "Channels the guest must not be contacted on (`getSuppressionList`).",
+    "items": {
+     "$ref": "#/components/schemas/MessageChannel"
+    }
    },
-   "roleRestricted": {
-    "type": "string",
-    "description": "Role restricted"
-   },
-   "maskedWhereAppropriate": {
-    "type": "string",
-    "description": "Masked where appropriate"
-   },
-   "disputesRecorded": {
-    "type": "string",
-    "description": "disputes recorded"
+   "aiSummary": {
+    "type": "object",
+    "nullable": true,
+    "description": "Where the AI policy enables `summarise`. AI-derived and labelled as such.",
+    "properties": {
+     "text": {
+      "type": "string",
+      "maxLength": 2000
+     },
+     "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
    }
   }
  },
  "CustomerServiceCommandCenterView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Customer Service Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.case, marketing.case_message, marketing.case_internal_request (new), marketing.case_compensation_request (new), marketing.sla_policy and approvals.request",
+  "description": "One agent's workload for the filters given. \"Today\" is the venue's local day. Counts are of cases assigned to the agent unless the name says otherwise.",
+  "required": [
+   "myOpenCases",
+   "slaAtRisk",
+   "slaBreached",
+   "workQueue",
+   "todaysTasks",
+   "liveAlerts"
+  ],
   "properties": {
    "myOpenCases": {
     "type": "integer",
-    "description": "My Open Cases"
+    "minimum": 0,
+    "description": "Status not `resolved` or `closed`."
    },
    "newCases": {
     "type": "integer",
-    "description": "New Cases"
+    "minimum": 0,
+    "description": "Assigned to the agent and still `open` (not yet picked up)."
    },
    "casesDueToday": {
-    "type": "string",
-    "description": "Cases Due Today"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Open, with `slaDueAt` falling today."
    },
    "slaAtRisk": {
-    "type": "string",
-    "description": "SLA At Risk"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Open, not breached, with less than 25% of the SLA window left."
    },
    "slaBreached": {
-    "type": "string",
-    "description": "SLA Breached"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Open with `Case.isSlaBreached` true."
    },
    "awaitingCustomer": {
-    "type": "string",
-    "description": "Awaiting Customer"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Status `awaitingGuest`."
    },
    "awaitingInternalTeam": {
-    "type": "string",
-    "description": "Awaiting Internal Team"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Open, with at least one open internal request."
    },
    "escalatedCases": {
     "type": "integer",
-    "description": "Escalated Cases"
+    "minimum": 0
    },
    "resolvedToday": {
-    "type": "string",
-    "description": "Resolved Today"
-   },
-   "averageResolutionTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Average Resolution Time"
-   },
-   "caseId": {
-    "type": "string",
-    "description": "Case ID"
-   },
-   "customer": {
-    "type": "string",
-    "description": "Customer"
-   },
-   "subject": {
-    "type": "string",
-    "description": "Subject"
-   },
-   "category": {
-    "type": "string",
-    "description": "Category"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "priority": {
-    "type": "string",
-    "description": "Priority"
-   },
-   "status": {
     "type": "integer",
-    "description": "Status"
+    "minimum": 0
    },
-   "assignedAgent": {
-    "type": "string",
-    "description": "Assigned Agent"
-   },
-   "slaRemaining": {
-    "type": "string",
-    "description": "SLA Remaining"
-   },
-   "lastInteraction": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Last Interaction"
-   },
-   "nextAction": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Next Action"
-   },
-   "callCustomer": {
-    "type": "string",
-    "description": "Call customer"
-   },
-   "followUpFinance": {
-    "type": "string",
-    "description": "Follow up Finance"
-   },
-   "respondToComplaint": {
-    "type": "string",
-    "description": "Respond to complaint"
-   },
-   "requestSupervisorApproval": {
-    "type": "string",
-    "description": "Request supervisor approval"
-   },
-   "newCase": {
+   "averageResolutionSeconds": {
     "type": "integer",
-    "description": "New Case"
+    "minimum": 0,
+    "nullable": true,
+    "description": "Mean of `resolvedAt - recordedAt - slaPausedSeconds` over the agent's cases resolved in the last 30 days; null when none."
    },
-   "findCustomer": {
-    "type": "string",
-    "description": "Find Customer"
+   "workQueue": {
+    "type": "array",
+    "maxItems": 50,
+    "description": "The agent's 50 most urgent open cases.",
+    "items": {
+     "type": "object",
+     "required": [
+      "caseId",
+      "caseNumber",
+      "subject",
+      "status",
+      "priority"
+     ],
+     "properties": {
+      "caseId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "caseNumber": {
+       "type": "string"
+      },
+      "customer": {
+       "type": "string",
+       "nullable": true,
+       "description": "The guest's name, resolved from `pii.subject` as `Case.guestName` is; null unless the caller holds GUEST_VIEW_PII."
+      },
+      "subjectId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "subject": {
+       "type": "string"
+      },
+      "categoryId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "category": {
+       "type": "string",
+       "nullable": true,
+       "description": "The category's display name."
+      },
+      "channel": {
+       "$ref": "#/components/schemas/MessageChannel"
+      },
+      "priority": {
+       "$ref": "#/components/schemas/CasePriority"
+      },
+      "status": {
+       "$ref": "#/components/schemas/CaseStatus"
+      },
+      "assignedAgentPrincipalId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "slaDueAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "slaRemainingSeconds": {
+       "type": "integer",
+       "nullable": true,
+       "description": "Negative once breached."
+      },
+      "lastInteractionAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true,
+       "description": "The latest `CaseMessage.recordedAt`."
+      },
+      "nextAction": {
+       "type": "string",
+       "nullable": true,
+       "enum": [
+        "respondToCustomer",
+        "followUpInternalRequest",
+        "awaitApproval",
+        "proposeResolution",
+        "closeCase"
+       ]
+      },
+      "aiPriorityRank": {
+       "type": "integer",
+       "minimum": 1,
+       "nullable": true,
+       "description": "Where AI prioritisation is enabled (`getAiPolicy`), the case's rank in the queue."
+      },
+      "aiPriorityFactors": {
+       "type": "array",
+       "description": "What raised the rank; AI-derived and labelled as such on screen.",
+       "items": {
+        "type": "string",
+        "enum": [
+         "sla",
+         "customerImpact",
+         "transactionValue",
+         "eventProximity",
+         "customerSentiment",
+         "caseAge",
+         "operationalUrgency"
+        ]
+       }
+      }
+     }
+    }
    },
-   "findOrder": {
-    "type": "string",
-    "description": "Find Order"
+   "todaysTasks": {
+    "type": "array",
+    "maxItems": 100,
+    "description": "Work due today derived from the agent's cases, earliest `dueAt` first.",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "caseId"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "callCustomer",
+        "respondToComplaint",
+        "reviewRefundRequest",
+        "followUpFinance",
+        "followUpInternalRequest",
+        "reissueTicket",
+        "requestSupervisorApproval"
+       ]
+      },
+      "caseId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "referenceId": {
+       "type": "string",
+       "nullable": true,
+       "description": "The internal request, compensation request or approval request behind it."
+      },
+      "dueAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      }
+     }
+    }
    },
-   "findTicket": {
-    "type": "string",
-    "description": "Find Ticket"
-   },
-   "findBooking": {
-    "type": "string",
-    "description": "Find Booking"
+   "liveAlerts": {
+    "type": "array",
+    "maxItems": 50,
+    "description": "Newest first.",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "caseId",
+      "raisedAt"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "slaRisk",
+        "slaBreached",
+        "customerWaiting",
+        "internalRequestOverdue",
+        "approvalDecided"
+       ]
+      },
+      "caseId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "message": {
+       "type": "string"
+      },
+      "raisedAt": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
    }
   }
  },
  "EscalationCollaborationInternalResolutionView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Escalation, Collaboration & Internal Resolution displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "marketing.case_internal_request",
+  "description": "One internal request from a case to a department (pack 10.1.8 Internal Request). The case keeps its owner; this is the department's piece of work.",
+  "required": [
+   "id",
+   "caseId",
+   "department",
+   "request",
+   "priority",
+   "escalationType"
+  ],
   "properties": {
-   "ticketing": {
+   "id": {
     "type": "string",
-    "description": "Ticketing"
+    "format": "uuid",
+    "description": "Client-generated UUIDv7; equals the `Idempotency-Key` header on the write."
    },
-   "finance": {
+   "scopePath": {
     "type": "string",
-    "description": "Finance"
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
    },
-   "operations": {
+   "caseId": {
     "type": "string",
-    "description": "Operations"
-   },
-   "accessControl": {
-    "type": "string",
-    "description": "Access Control"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "crm": {
-    "type": "string",
-    "description": "CRM"
-   },
-   "fB": {
-    "type": "string",
-    "description": "F&B"
-   },
-   "retail": {
-    "type": "string",
-    "description": "Retail"
-   },
-   "groupSales": {
-    "type": "string",
-    "description": "Group Sales"
-   },
-   "technicalSupport": {
-    "type": "boolean",
-    "description": "Technical Support"
-   },
-   "venueManagement": {
-    "type": "string",
-    "description": "Venue Management"
-   },
-   "management": {
-    "type": "string",
-    "description": "Management"
-   },
-   "confirmRefundTransactionStatus": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Confirm refund transaction status"
+    "format": "uuid"
    },
    "department": {
     "type": "string",
-    "description": "Department"
+    "enum": [
+     "ticketing",
+     "finance",
+     "operations",
+     "accessControl",
+     "membership",
+     "crm",
+     "fnb",
+     "retail",
+     "groupSales",
+     "technicalSupport",
+     "venueManagement",
+     "management"
+    ]
    },
-   "assignee": {
+   "assigneePrincipalId": {
     "type": "string",
-    "description": "Assignee"
+    "format": "uuid",
+    "nullable": true
    },
    "request": {
     "type": "string",
-    "description": "Request"
+    "minLength": 3,
+    "maxLength": 2000
    },
    "priority": {
-    "type": "string",
-    "description": "Priority"
-   },
-   "dueDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Due Date"
-   },
-   "relatedCase": {
-    "type": "string",
-    "description": "Related Case"
-   },
-   "relatedTransaction": {
-    "type": "string",
-    "description": "Related Transaction"
-   },
-   "attachments": {
-    "type": "string",
-    "description": "Attachments"
+    "$ref": "#/components/schemas/CasePriority"
    },
    "escalationType": {
     "type": "string",
@@ -3224,379 +4016,733 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "technical",
      "financial",
      "emergencyEventDay"
+    ]
+   },
+   "dueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "relatedTransaction": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "kind": {
+      "type": "string",
+      "enum": [
+       "order",
+       "payment",
+       "refund",
+       "walletTransaction",
+       "groupBooking"
+      ]
+     },
+     "referenceId": {
+      "type": "string"
+     }
+    }
+   },
+   "attachmentRefs": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "inProgress",
+     "completed",
+     "cancelled"
     ],
-    "description": "Vocabulary listed under Escalation Types."
+    "default": "open"
+   },
+   "response": {
+    "type": "string",
+    "maxLength": 2000,
+    "nullable": true,
+    "description": "The department's answer; required to complete."
+   },
+   "isOverdue": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "Computed on read; open or in progress past `dueAt`."
+   },
+   "aiRecommendedDepartment": {
+    "type": "string",
+    "readOnly": true,
+    "nullable": true,
+    "x-ticvai-persisted": false,
+    "description": "Where the AI policy enables `assist`; the department AI suggests from the case context."
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "nullable": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
+ },
  "OrderBookingTicketServiceWorkspaceInput": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
-  "description": "**What Order, Booking & Ticket Service Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "x-ticvai-persistence": "marketing.case_service_action",
+  "x-ticvai-record-definition": "Permitted Service Actions (one per executed action)",
+  "description": "One service action on an order, taken from a case. Only an `execute` stores a row.",
+  "required": [
+   "id",
+   "mode",
+   "orderId"
+  ],
   "properties": {
-   "changeName": {
+   "id": {
     "type": "string",
-    "description": "Change Name"
+    "format": "uuid",
+    "description": "Client-generated UUIDv7; equals the `Idempotency-Key` header."
    },
-   "reschedule": {
+   "scopePath": {
     "type": "string",
-    "description": "Reschedule"
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
    },
-   "exchange": {
+   "mode": {
     "type": "string",
-    "description": "Exchange"
+    "enum": [
+     "evaluate",
+     "execute"
+    ]
    },
-   "requestRefund": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Request Refund"
-   },
-   "saturday1600": {
+   "caseId": {
     "type": "string",
-    "description": "Saturday 16:00"
+    "format": "uuid",
+    "description": "Required with `execute`; the action is recorded on this case."
    },
-   "sunday1400Aed0": {
+   "orderId": {
     "type": "string",
-    "description": "Sunday 14:00 — +AED 0"
+    "format": "uuid"
    },
-   "sunday1600Aed20Ticket": {
-    "type": "string",
-    "description": "Sunday 16:00 — +AED 20/ticket"
+   "lineIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "Omit for the whole order."
    },
-   "inCustomerService": {
+   "action": {
     "type": "string",
-    "description": "in Customer Service"
+    "description": "Required with `execute`.",
+    "enum": [
+     "resendTicket",
+     "downloadTicket",
+     "reissue",
+     "transfer",
+     "changeName",
+     "reschedule",
+     "exchange",
+     "upgrade",
+     "cancel"
+    ]
+   },
+   "targetPerformanceId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "For `reschedule` and `exchange`, the option chosen from the evaluation."
+   },
+   "targetProductId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "For `exchange` and `upgrade`."
+   },
+   "recipientSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "For `transfer` and `changeName`, the new ticket holder."
+   },
+   "deliveryChannel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MessageChannel"
+     }
+    ],
+    "description": "For `resendTicket`."
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 500
+   },
+   "status": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "completed",
+     "pendingPayment",
+     "refused",
+     "failed"
+    ]
+   },
+   "downstreamOperation": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The operation that performed it, e.g. `rescheduleOrder`."
+   },
+   "downstreamReference": {
+    "type": "string",
+    "readOnly": true,
+    "nullable": true
+   },
+   "performedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
  "OrderBookingTicketServiceWorkspaceView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Order, Booking & Ticket Service Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over orders.sales_order, orders.order_line, orders.payment, access.entitlement, marketing.case_service_action (new) and the policies each owning operation reads",
+  "description": "The order as a service agent sees it, what may be done to it, and what was done.",
+  "required": [
+   "orderId",
+   "order",
+   "availableActions"
+  ],
   "properties": {
+   "orderId": {
+    "type": "string",
+    "format": "uuid"
+   },
    "order": {
     "type": "string",
-    "description": "Order"
+    "description": "The order number shown to the guest."
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
    },
    "purchaseDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "Purchase Date"
+    "format": "date-time"
    },
    "channel": {
     "type": "string",
-    "description": "Channel"
+    "description": "The sales channel the order came through."
    },
    "products": {
     "type": "integer",
-    "description": "Products"
+    "minimum": 0
    },
    "tickets": {
     "type": "integer",
-    "description": "Tickets"
+    "minimum": 0
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
    },
    "dateTime": {
     "type": "string",
     "format": "date-time",
-    "description": "Date/Time"
+    "nullable": true,
+    "description": "The performance start."
    },
    "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Amount"
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "payment": {
     "type": "string",
-    "description": "Payment"
+    "enum": [
+     "paid",
+     "partiallyPaid",
+     "unpaid",
+     "partiallyRefunded",
+     "refunded"
+    ]
    },
    "fulfillment": {
     "type": "string",
-    "description": "Fulfillment"
+    "enum": [
+     "pending",
+     "issued",
+     "delivered",
+     "failed"
+    ]
    },
    "ticketStatus": {
-    "type": "integer",
-    "description": "Ticket Status"
-   },
-   "changeName": {
     "type": "string",
-    "description": "Change Name"
+    "enum": [
+     "valid",
+     "partiallyUsed",
+     "used",
+     "expired",
+     "cancelled"
+    ]
    },
-   "reschedule": {
-    "type": "string",
-    "description": "Reschedule"
+   "availableActions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "action",
+      "isPermitted"
+     ],
+     "properties": {
+      "action": {
+       "type": "string",
+       "enum": [
+        "resendTicket",
+        "downloadTicket",
+        "reissue",
+        "transfer",
+        "changeName",
+        "reschedule",
+        "exchange",
+        "upgrade",
+        "cancel",
+        "requestRefund"
+       ]
+      },
+      "isPermitted": {
+       "type": "boolean"
+      },
+      "refusedBy": {
+       "type": "string",
+       "nullable": true,
+       "enum": [
+        "ticketPolicy",
+        "servicePolicy",
+        "orderStatus",
+        "eventDate",
+        "customerEntitlement",
+        "permission"
+       ]
+      },
+      "policyReference": {
+       "type": "string",
+       "nullable": true
+      },
+      "options": {
+       "type": "array",
+       "description": "Alternatives for `reschedule`, `exchange` and `upgrade`, earliest first.",
+       "items": {
+        "type": "object",
+        "properties": {
+         "performanceId": {
+          "type": "string",
+          "format": "uuid",
+          "nullable": true
+         },
+         "productId": {
+          "type": "string",
+          "format": "uuid",
+          "nullable": true
+         },
+         "startsAt": {
+          "type": "string",
+          "format": "date-time",
+          "nullable": true
+         },
+         "available": {
+          "type": "boolean"
+         },
+         "priceDifferencePerTicket": {
+          "$ref": "../shared/common.yaml#/components/schemas/Money"
+         },
+         "priceDifferenceTotal": {
+          "$ref": "../shared/common.yaml#/components/schemas/Money"
+         }
+        }
+       }
+      }
+     }
+    }
    },
-   "exchange": {
-    "type": "string",
-    "description": "Exchange"
+   "lastAction": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OrderBookingTicketServiceWorkspaceInput"
+     }
+    ],
+    "nullable": true,
+    "description": "The action just executed; null on `evaluate`."
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
    },
-   "requestRefund": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Request Refund"
+   "nextCursor": {
+    "type": "string"
    },
-   "saturday1600": {
-    "type": "string",
-    "description": "Saturday 16:00"
-   },
-   "sunday1400Aed0": {
-    "type": "string",
-    "description": "Sunday 14:00 — +AED 0"
-   },
-   "sunday1600Aed20Ticket": {
-    "type": "string",
-    "description": "Sunday 16:00 — +AED 20/ticket"
-   },
-   "inCustomerService": {
-    "type": "string",
-    "description": "in Customer Service"
+   "hasMore": {
+    "type": "boolean"
    }
   }
  },
  "RefundCompensationServiceExceptionWorkspaceInput": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
-  "description": "**What Refund, Compensation & Service Exception Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "x-ticvai-persistence": "marketing.case_compensation_request",
+  "x-ticvai-record-definition": "Request Types",
+  "description": "One refund, compensation or policy-exception request raised from a case. The order, refund and approval are references, never copies.",
+  "required": [
+   "id",
+   "caseId",
+   "requestType",
+   "value",
+   "reason"
+  ],
   "properties": {
-   "fullRefund": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Client-generated UUIDv7; equals the `Idempotency-Key` header."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "caseId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Required for `fullRefund`, `partialRefund`, `feeWaiver`, `upgrade` and `discount`."
+   },
+   "lineIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "requestType": {
+    "type": "string",
+    "enum": [
+     "fullRefund",
+     "partialRefund",
+     "serviceCredit",
+     "walletCredit",
+     "voucher",
+     "complimentaryTicket",
+     "feeWaiver",
+     "upgrade",
+     "discount",
+     "policyException"
+    ]
+   },
+   "value": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Full Refund"
+    "description": "The money value requested; for a complimentary ticket or upgrade, its face value. This is what the approval thresholds are compared with."
    },
-   "partialRefund": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Partial Refund"
-   },
-   "serviceCredit": {
+   "reason": {
     "type": "string",
-    "description": "Service Credit"
+    "minLength": 3,
+    "maxLength": 1000
    },
-   "walletCredit": {
+   "isPolicyException": {
+    "type": "boolean",
+    "default": false,
+    "description": "True when the standard policy would not allow it; always needs approval."
+   },
+   "exceptionReason": {
     "type": "string",
-    "description": "Wallet Credit"
+    "maxLength": 1000,
+    "nullable": true,
+    "description": "Required when `isPolicyException` is true."
    },
-   "voucher": {
+   "submit": {
+    "type": "boolean",
+    "default": false,
+    "description": "False saves a draft; true routes it.",
+    "writeOnly": true
+   },
+   "status": {
     "type": "string",
-    "description": "Voucher"
+    "readOnly": true,
+    "enum": [
+     "draft",
+     "pendingApproval",
+     "approved",
+     "declined",
+     "fulfilled",
+     "failed",
+     "withdrawn"
+    ]
    },
-   "complimentaryTicket": {
+   "approvalRequestId": {
     "type": "string",
-    "description": "Complimentary Ticket"
+    "readOnly": true,
+    "nullable": true
    },
-   "feeWaiver": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fee Waiver"
-   },
-   "discount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount"
-   },
-   "policyException": {
+   "fulfilmentOperation": {
     "type": "string",
-    "description": "Policy Exception"
+    "readOnly": true,
+    "nullable": true,
+    "description": "e.g. `createRefund`, `topUpWallet`."
    },
-   "agentPermitted": {
+   "fulfilmentReference": {
     "type": "string",
-    "description": "Agent permitted"
+    "readOnly": true,
+    "nullable": true,
+    "description": "The refund, wallet transaction or voucher it produced."
    },
-   "aed2011000": {
+   "requestedByPrincipalId": {
     "type": "string",
-    "description": "AED 201–1,000"
+    "format": "uuid",
+    "readOnly": true
    },
-   "supervisorApproval": {
+   "updatedAt": {
     "type": "string",
-    "description": "Supervisor approval"
-   },
-   "managerFinanceApproval": {
-    "type": "string",
-    "description": "Manager/Finance approval"
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
  "RefundCompensationServiceExceptionWorkspaceView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Refund, Compensation & Service Exception Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.case_compensation_request (new), orders.sales_order, orders.refund, orders.order_fee, orders.refund_policy and approvals.request",
+  "description": "The request, the order's financial context, the policy evaluation and who must approve.",
+  "required": [
+   "request",
+   "approvalLevel"
+  ],
   "properties": {
-   "fullRefund": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Full Refund"
-   },
-   "partialRefund": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Partial Refund"
-   },
-   "serviceCredit": {
-    "type": "string",
-    "description": "Service Credit"
-   },
-   "walletCredit": {
-    "type": "string",
-    "description": "Wallet Credit"
-   },
-   "voucher": {
-    "type": "string",
-    "description": "Voucher"
-   },
-   "complimentaryTicket": {
-    "type": "string",
-    "description": "Complimentary Ticket"
-   },
-   "feeWaiver": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fee Waiver"
-   },
-   "discount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount"
-   },
-   "policyException": {
-    "type": "string",
-    "description": "Policy Exception"
+   "request": {
+    "$ref": "#/components/schemas/RefundCompensationServiceExceptionWorkspaceInput"
    },
    "originalTransaction": {
     "type": "string",
-    "description": "Original Transaction"
+    "nullable": true,
+    "description": "The order number."
    },
    "amountPaid": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Amount Paid"
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "amountUsed": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Amount Used"
+    "description": "Value of tickets already scanned or consumed."
    },
    "refundableAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Refundable Amount"
+    "description": "What the refund policy's time bands allow now, less previous refunds."
    },
    "previousRefund": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Previous Refund"
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "fees": {
-    "type": "integer",
-    "description": "Fees"
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "proposedRefund": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Proposed Refund"
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "proposedCompensation": {
-    "type": "string",
-    "description": "Proposed Compensation"
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "requestType": {
+      "type": "string"
+     },
+     "value": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    }
    },
-   "agentPermitted": {
-    "type": "string",
-    "description": "Agent permitted"
+   "policyEvaluation": {
+    "type": "object",
+    "properties": {
+     "standardPolicy": {
+      "type": "string",
+      "description": "The rule that applies, as the venue's refund policy states it."
+     },
+     "isWithinPolicy": {
+      "type": "boolean"
+     },
+     "policyReference": {
+      "type": "string",
+      "nullable": true
+     }
+    }
    },
-   "aed2011000": {
+   "approvalLevel": {
     "type": "string",
-    "description": "AED 201–1,000"
+    "enum": [
+     "agent",
+     "secondUser",
+     "approver"
+    ],
+    "description": "From the venue's `selfAuthoriseLimit`, `requiresSecondUserAbove` and `requiresApprovalAbove`; a policy exception is always `approver`."
    },
-   "supervisorApproval": {
+   "aiExplanation": {
     "type": "string",
-    "description": "Supervisor approval"
-   },
-   "managerFinanceApproval": {
-    "type": "string",
-    "description": "Manager/Finance approval"
+    "nullable": true,
+    "maxLength": 1000,
+    "description": "AI-derived and labelled as such; cites a recorded policy or says none applies."
    }
   }
  },
  "UnifiedInteractionCommunicationHistoryView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Unified Interaction & Communication History displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.case_message, marketing.conversation_message, marketing.conversation (telephony), marketing.message_dispatch and marketing.kiosk_assist_session",
+  "description": "One interaction on the timeline. `social` and `whatsapp` appear only where that channel is integrated.",
+  "required": [
+   "id",
+   "occurredAt",
+   "channel",
+   "direction",
+   "actorKind",
+   "source",
+   "recordId"
+  ],
   "properties": {
-   "email": {
+   "id": {
     "type": "string",
-    "description": "Email"
+    "description": "Stable across pages; the source and record id combined."
    },
-   "phone": {
+   "occurredAt": {
     "type": "string",
-    "description": "Phone"
-   },
-   "liveChat": {
-    "type": "string",
-    "description": "Live Chat"
-   },
-   "whatsappWhereIntegrated": {
-    "type": "string",
-    "description": "WhatsApp where integrated"
-   },
-   "webForm": {
-    "type": "string",
-    "description": "Web Form"
-   },
-   "mobileApp": {
-    "type": "string",
-    "description": "Mobile App"
-   },
-   "b2cPortal": {
-    "type": "string",
-    "description": "B2C Portal"
-   },
-   "socialChannelWhereIntegrated": {
-    "type": "string",
-    "description": "Social channel where integrated"
-   },
-   "posFrontDesk": {
-    "type": "string",
-    "description": "POS/Front Desk"
-   },
-   "internalNotes": {
-    "type": "string",
-    "description": "Internal Notes"
-   },
-   "automatedNotifications": {
-    "type": "string",
-    "description": "Automated Notifications"
-   },
-   "dateTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date/Time"
+    "format": "date-time"
    },
    "channel": {
     "type": "string",
-    "description": "Channel"
+    "enum": [
+     "email",
+     "phone",
+     "liveChat",
+     "whatsapp",
+     "sms",
+     "webForm",
+     "mobileApp",
+     "b2cPortal",
+     "social",
+     "posFrontDesk",
+     "internalNote",
+     "automatedNotification"
+    ]
    },
-   "customer": {
+   "subjectId": {
     "type": "string",
-    "description": "Customer"
+    "format": "uuid",
+    "nullable": true,
+    "description": "The guest; the name is resolved on screen through `getGuestProfile` under GUEST_VIEW_PII."
    },
-   "agentSystem": {
+   "actorKind": {
     "type": "string",
-    "description": "Agent/System"
+    "enum": [
+     "guest",
+     "agent",
+     "system",
+     "ai"
+    ]
+   },
+   "actorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
    },
    "direction": {
     "type": "string",
-    "description": "Direction"
+    "enum": [
+     "inbound",
+     "outbound",
+     "internal"
+    ]
    },
    "subject": {
     "type": "string",
-    "description": "Subject"
+    "nullable": true
    },
-   "relatedCase": {
+   "excerpt": {
     "type": "string",
-    "description": "Related Case"
+    "maxLength": 500,
+    "nullable": true
    },
-   "relatedOrder": {
+   "relatedCaseId": {
     "type": "string",
-    "description": "Related Order"
+    "format": "uuid",
+    "nullable": true
    },
-   "relatedTicket": {
+   "relatedOrderId": {
     "type": "string",
-    "description": "Related Ticket"
+    "nullable": true
    },
-   "attachments": {
+   "relatedTicketId": {
     "type": "string",
-    "description": "Attachments"
+    "nullable": true
    },
-   "sentimentWhereEnabled": {
-    "type": "boolean",
-    "description": "Sentiment where enabled"
+   "attachmentRefs": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "sentiment": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "positive",
+     "neutral",
+     "negative"
+    ],
+    "description": "Where sentiment analysis is enabled; AI-derived."
+   },
+   "source": {
+    "type": "string",
+    "enum": [
+     "caseMessage",
+     "conversationMessage",
+     "call",
+     "messageDispatch",
+     "kioskAssist"
+    ]
+   },
+   "recordId": {
+    "type": "string",
+    "description": "The row in the source table."
    }
   }
  }

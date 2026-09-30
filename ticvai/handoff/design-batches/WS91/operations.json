@@ -6,7 +6,7 @@
   "summary": "Define how a rental is priced",
   "permission": "RENTAL_PRICE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -25,7 +25,7 @@
   "summary": "Why the price is what it is, rule by rule",
   "permission": "RENTAL_VIEW",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -191,7 +191,7 @@
   "summary": "Deviate from policy, with a reason and an approver",
   "permission": "RENTAL_OVERRIDE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -210,7 +210,7 @@
   "summary": "How much is held, how, and what happens to it",
   "permission": "RENTAL_PRICE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -229,7 +229,7 @@
   "summary": "Grace period, late fees and extension pricing",
   "permission": "RENTAL_PRICE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -248,7 +248,7 @@
   "summary": "Test a commercial configuration before publishing it",
   "permission": "RENTAL_PRICE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -286,7 +286,7 @@
   "summary": "Change a pricing profile",
   "permission": "RENTAL_PRICE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {

@@ -15,7 +15,7 @@ payload:
 - field: walletId
   type: uuid
 - field: walletTransactionId
-  type: string
+  type: uuid
 - field: amount
   type: Money
 - field: availableAfter

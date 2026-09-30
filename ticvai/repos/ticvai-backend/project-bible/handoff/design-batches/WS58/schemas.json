@@ -5,83 +5,6 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What AI Channel Optimization & Intelligence Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "salesVelocity": {
-    "type": "string",
-    "description": "Sales velocity"
-   },
-   "conversion": {
-    "type": "number",
-    "description": "Conversion"
-   },
-   "capacity": {
-    "type": "integer",
-    "description": "Capacity"
-   },
-   "allocation": {
-    "type": "string",
-    "description": "Allocation"
-   },
-   "revenue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue"
-   },
-   "netRevenue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Net revenue"
-   },
-   "pricing": {
-    "type": "string",
-    "description": "Pricing"
-   },
-   "channelFees": {
-    "type": "string",
-    "description": "Channel fees"
-   },
-   "commission": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Commission"
-   },
-   "customerDemand": {
-    "type": "string",
-    "description": "Customer demand"
-   },
-   "timeToEvent": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Time to event"
-   },
-   "historicalPerformance": {
-    "type": "string",
-    "description": "Historical performance"
-   },
-   "failures": {
-    "type": "string",
-    "description": "Failures"
-   },
-   "availability": {
-    "type": "string",
-    "description": "Availability"
-   },
-   "expectedUnitsSold": {
-    "type": "string",
-    "description": "Expected units sold"
-   },
-   "revenueImpact": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue impact"
-   },
-   "channelUtilization": {
-    "type": "number",
-    "description": "Channel utilization"
-   },
-   "risk": {
-    "type": "string",
-    "description": "Risk"
-   },
-   "contractualConstraints": {
-    "type": "string",
-    "description": "Contractual constraints"
-   },
    "recommendation": {
     "type": "string",
     "description": "Recommendation"
@@ -95,25 +18,247 @@
     "description": "Expected Impact"
    },
    "confidence": {
-    "type": "string",
-    "description": "Confidence"
+    "type": "number",
+    "description": "Confidence, 0-1",
+    "minimum": 0,
+    "maximum": 1
    },
    "constraints": {
-    "type": "string",
-    "description": "Constraints"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Constraints (contractual, capacity, approval)"
    },
    "requiredApproval": {
     "type": "string",
-    "description": "Required Approval"
+    "description": "Required Approval: the role that must approve",
+    "nullable": true
    },
-   "realTimeChannelAvailabilityInventory": {
+   "recommendationId": {
+    "type": "string",
+    "description": "Recommendation ID"
+   },
+   "category": {
+    "type": "string",
+    "enum": [
+     "capacity",
+     "channel",
+     "schedule",
+     "commercial",
+     "operational"
+    ],
+    "description": "Recommendation Category (pack p.34)"
+   },
+   "channelIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Channels the recommendation concerns"
+   },
+   "signals": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "salesVelocity",
+      "conversion",
+      "capacity",
+      "allocation",
+      "revenue",
+      "netRevenue",
+      "pricing",
+      "channelFees",
+      "commission",
+      "customerDemand",
+      "timeToEvent",
+      "historicalPerformance",
+      "failures",
+      "availability"
+     ]
+    },
+    "description": "AI Analysis signals behind the recommendation (pack p.33-34)"
+   },
+   "simulation": {
+    "type": "object",
+    "nullable": true,
+    "description": "Scenario Simulation estimate (pack p.34)",
+    "properties": {
+     "expectedUnitsSold": {
+      "type": "integer"
+     },
+     "revenueImpact": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "channelUtilization": {
+      "type": "number"
+     },
+     "risk": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high"
+      ]
+     },
+     "contractualConstraints": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: proposed, accepted, modified, rejected, scheduled or assigned (decided 29 September, readiness close-out)"
+   }
+  }
+ },
+ "CatalogueAiFinding": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.ai_finding",
+  "description": "**Something the AI noticed about the catalogue or its channels, for a person to act on** (29 September, data model DM3). Merges governance risks (ADM-137) and channel optimisation recommendations (ADM-272). Advisory only: a finding never changes configuration; acting on it goes through the ordinary operations and their approvals. **Created by the AI monitoring job** (29 September, writers pass); a person acknowledges, accepts, dismisses or resolves it with `decideCatalogueAiFinding`, and the job resolves one whose condition has cleared (`states/catalogue-ai-finding.yaml`).",
+  "required": [
+   "id",
+   "scopePath",
+   "domain",
+   "findingType",
+   "status",
+   "detectedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "domain": {
+    "type": "string",
+    "enum": [
+     "productGovernance",
+     "channel"
+    ]
+   },
+   "findingType": {
+    "type": "string",
+    "maxLength": 60,
+    "description": "Governance: the `risk` value; channel: the recommendation `category`."
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "salesChannelIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "critical",
+     "high",
+     "medium",
+     "low",
+     null
+    ],
+    "nullable": true
+   },
+   "confidence": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 1
+   },
+   "summary": {
+    "type": "string",
+    "description": "The recommendation, or the risk in one line."
+   },
+   "explanation": {
+    "type": "string",
+    "nullable": true
+   },
+   "businessImpact": {
+    "type": "string",
+    "nullable": true
+   },
+   "recommendedAction": {
+    "type": "string",
+    "nullable": true
+   },
+   "constraints": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "signals": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "simulation": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "Channel findings: `{expectedUnitsSold, revenueImpact, channelUtilization, risk, contractualConstraints}`."
+   },
+   "requiredApproval": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "dueDate": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "acknowledged",
+     "accepted",
+     "dismissed",
+     "resolved"
+    ],
+    "default": "open"
+   },
+   "modelVersion": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true
+   },
+   "detectedAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Real-Time Channel Availability & Inventory"
+    "readOnly": true
    },
-   "paymentFulfillmentValidatePublish": {
+   "resolvedAt": {
     "type": "string",
-    "description": "Payment/Fulfillment → Validate → Publish"
+    "format": "date-time",
+    "nullable": true
    }
   }
  },
@@ -125,99 +270,72 @@
   "properties": {
    "channel": {
     "type": "string",
-    "description": "Channel"
+    "description": "Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258)"
    },
    "initialAllocation": {
-    "type": "string",
+    "type": "integer",
     "description": "Initial Allocation"
    },
    "sold": {
-    "type": "string",
+    "type": "integer",
     "description": "Sold"
    },
    "held": {
-    "type": "string",
+    "type": "integer",
     "description": "Held"
    },
    "remaining": {
-    "type": "string",
+    "type": "integer",
     "description": "Remaining"
    },
    "utilization": {
     "type": "number",
-    "description": "Utilization"
+    "description": "Utilization %: sold plus held over allocated, 0-100",
+    "minimum": 0,
+    "maximum": 100
    },
    "salesVelocity": {
-    "type": "string",
-    "description": "Sales Velocity"
+    "type": "number",
+    "description": "Sales Velocity: units per hour over the last 24 hours (decided 29 September, readiness close-out)"
    },
    "forecast": {
-    "type": "string",
-    "description": "Forecast"
+    "type": "integer",
+    "description": "Forecast: units the channel is expected to sell by the event"
    },
    "recommendedAllocation": {
-    "type": "string",
-    "description": "Recommended Allocation"
-   },
-   "increaseAllocation": {
-    "type": "string",
-    "description": "Increase allocation"
-   },
-   "reduceAllocation": {
-    "type": "string",
-    "description": "Reduce allocation"
-   },
-   "returnInventory": {
-    "type": "string",
-    "description": "Return inventory"
-   },
-   "allocated1000": {
-    "type": "string",
-    "description": "Allocated: 1,000"
-   },
-   "sold280": {
-    "type": "string",
-    "description": "Sold: 280"
-   },
-   "remaining720": {
-    "type": "string",
-    "description": "Remaining: 720"
-   },
-   "allocated6000": {
-    "type": "string",
-    "description": "Allocated: 6,000"
-   },
-   "sold5880": {
-    "type": "string",
-    "description": "Sold: 5,880"
-   },
-   "remaining120": {
-    "type": "string",
-    "description": "Remaining: 120"
+    "type": "integer",
+    "description": "Recommended Allocation (advisory)",
+    "nullable": true
    },
    "contractualAllocation": {
-    "type": "string",
-    "description": "Contractual allocation"
+    "type": "integer",
+    "description": "Contractual allocation from the partner agreement",
+    "nullable": true
    },
    "minimumGuaranteedInventory": {
-    "type": "string",
-    "description": "Minimum guaranteed inventory"
-   },
-   "capacity": {
     "type": "integer",
-    "description": "Capacity"
+    "description": "Minimum guaranteed inventory",
+    "nullable": true
    },
-   "existingHolds": {
+   "event": {
     "type": "string",
-    "description": "Existing holds"
+    "description": "Event or performance ID"
    },
-   "confirmedTransactions": {
+   "product": {
     "type": "string",
-    "description": "Confirmed transactions"
+    "description": "Product ID",
+    "nullable": true
    },
-   "approvalThresholds": {
-    "type": "string",
-    "description": "Approval thresholds"
+   "frozen": {
+    "type": "boolean",
+    "description": "Allocation frozen"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI allocation recommendations (pack p.27, e.g. transfer 500 units from OTA to B2C). Advisory only: nothing is changed until a user acts."
    }
   }
  },
@@ -227,46 +345,6 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Channel Audit, Logs & Transaction Traceability displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "configurationChange": {
-    "type": "string",
-    "description": "Configuration Change"
-   },
-   "activation": {
-    "type": "string",
-    "description": "Activation"
-   },
-   "suspension": {
-    "type": "string",
-    "description": "Suspension"
-   },
-   "allocationChange": {
-    "type": "string",
-    "description": "Allocation Change"
-   },
-   "priceAssignment": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price Assignment"
-   },
-   "order": {
-    "type": "string",
-    "description": "Order"
-   },
-   "cancellation": {
-    "type": "string",
-    "description": "Cancellation"
-   },
-   "error": {
-    "type": "string",
-    "description": "Error"
-   },
-   "manualIntervention": {
-    "type": "string",
-    "description": "Manual Intervention"
-   },
-   "integrationChange": {
-    "type": "string",
-    "description": "Integration Change"
-   },
    "timestamp": {
     "type": "string",
     "format": "date-time",
@@ -274,7 +352,7 @@
    },
    "userSystem": {
     "type": "string",
-    "description": "User/System"
+    "description": "User/System: user ID or the system component that acted"
    },
    "action": {
     "type": "string",
@@ -282,39 +360,252 @@
    },
    "previousValue": {
     "type": "string",
-    "description": "Previous Value"
+    "description": "Previous Value (as text)",
+    "nullable": true
    },
    "newValue": {
-    "type": "integer",
-    "description": "New Value"
+    "type": "string",
+    "description": "New Value (as text)",
+    "nullable": true
    },
    "reference": {
     "type": "string",
-    "description": "Reference"
+    "description": "Reference: order, transaction, ticket or partner reference",
+    "nullable": true
    },
    "result": {
     "type": "string",
+    "enum": [
+     "success",
+     "failure",
+     "partial"
+    ],
     "description": "Result"
    },
    "environment": {
     "type": "string",
+    "enum": [
+     "sandbox",
+     "uat",
+     "production"
+    ],
     "description": "Environment"
    },
-   "finance": {
+   "channelId": {
     "type": "string",
-    "description": "Finance"
+    "description": "Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258)"
    },
-   "partnerDisputes": {
+   "category": {
     "type": "string",
-    "description": "Partner disputes"
+    "enum": [
+     "configurationChange",
+     "activation",
+     "suspension",
+     "allocationChange",
+     "priceAssignment",
+     "sync",
+     "order",
+     "cancellation",
+     "error",
+     "manualIntervention",
+     "integrationChange"
+    ],
+    "description": "Audit Category (pack p.31)"
    },
-   "compliance": {
+   "trace": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "step": {
+       "type": "string",
+       "enum": [
+        "partnerRequest",
+        "requestReceived",
+        "productValidation",
+        "priceValidation",
+        "capacityHold",
+        "orderCreation",
+        "paymentHandling",
+        "ticketIssuance",
+        "responseSent"
+       ]
+      },
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "result": {
+       "type": "string",
+       "enum": [
+        "success",
+        "failure",
+        "skipped"
+       ]
+      }
+     }
+    },
+    "description": "Transaction Trace for an external order (pack p.31); empty for other records"
+   }
+  }
+ },
+ "ChannelConnection": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.channel_connection",
+  "description": "**How TICVAI technically reaches a channel** (29 September, data model DM3). ADM-266. One row per connector and environment. **Credentials are never stored here**: `credentialsReference` names the secret in the vault. `control.integration_listing` is the marketplace entry an adapter comes from; this row is the tenant's connection using it.",
+  "required": [
+   "id",
+   "scopePath",
+   "salesChannelId",
+   "connectorName",
+   "environment",
+   "connectionType"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "Compliance"
+    "format": "uuid",
+    "readOnly": true
    },
-   "technicalInvestigation": {
+   "scopePath": {
     "type": "string",
-    "description": "Technical investigation"
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "salesChannelId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "connectorName": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "partner": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "environment": {
+    "type": "string",
+    "enum": [
+     "sandbox",
+     "uat",
+     "production"
+    ]
+   },
+   "connectionType": {
+    "type": "string",
+    "enum": [
+     "ticvaiNative",
+     "restApi",
+     "webhook",
+     "otaAdapter",
+     "resellerApi",
+     "partnerApi",
+     "middleware",
+     "fileSftp",
+     "customConnector"
+    ]
+   },
+   "direction": {
+    "type": "string",
+    "enum": [
+     "outbound",
+     "inbound",
+     "bidirectional"
+    ],
+    "default": "outbound"
+   },
+   "endpoint": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "apiVersion": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "authenticationType": {
+    "type": "string",
+    "enum": [
+     "none",
+     "oauth",
+     "apiKey",
+     "clientCredentials",
+     "certificate",
+     "signedRequest"
+    ]
+   },
+   "credentialsReference": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "A vault reference, never the secret."
+   },
+   "certificateReference": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "certificateExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "timeoutMs": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 1
+   },
+   "rateLimitPerMinute": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 1
+   },
+   "ipRestrictions": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "retryPolicy": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "`{maxAttempts, backoffSeconds}`."
+   },
+   "adapterId": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "connectionStatus": {
+    "type": "string",
+    "enum": [
+     "notTested",
+     "connected",
+     "degraded",
+     "offline",
+     "disabled"
+    ],
+    "default": "notTested"
+   },
+   "lastTests": {
+    "type": "object",
+    "additionalProperties": true,
+    "readOnly": true,
+    "description": "`[{test, result, testedAt}]`, the latest result per test."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -324,145 +615,164 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Channel Connection & Integration Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "ticvaiNative": {
-    "type": "string",
-    "description": "TICVAI Native"
-   },
-   "restApi": {
-    "type": "string",
-    "description": "REST API"
-   },
-   "webhook": {
-    "type": "string",
-    "description": "Webhook"
-   },
-   "otaAdapter": {
-    "type": "string",
-    "description": "OTA Adapter"
-   },
-   "resellerApi": {
-    "type": "string",
-    "description": "Reseller API"
-   },
-   "partnerApi": {
-    "type": "string",
-    "description": "Partner API"
-   },
-   "middleware": {
-    "type": "string",
-    "description": "Middleware"
-   },
-   "fileSftpWhereRequired": {
-    "type": "boolean",
-    "description": "File/SFTP where required"
-   },
-   "customConnector": {
-    "type": "string",
-    "description": "Custom Connector"
-   },
    "connectorName": {
     "type": "string",
     "description": "Connector Name"
    },
    "channel": {
     "type": "string",
-    "description": "Channel"
+    "description": "Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258)"
    },
    "partner": {
     "type": "string",
-    "description": "Partner"
+    "description": "Partner ID (the B2B/OTA partner record)",
+    "nullable": true
    },
    "environment": {
     "type": "string",
-    "description": "Environment"
+    "enum": [
+     "sandbox",
+     "uat",
+     "production"
+    ],
+    "description": "Environment (pack p.23)"
    },
    "endpoint": {
     "type": "string",
-    "description": "Endpoint"
+    "description": "Endpoint URL",
+    "format": "uri",
+    "nullable": true
    },
    "apiVersion": {
     "type": "string",
-    "description": "API Version"
+    "description": "API Version",
+    "nullable": true
    },
    "authenticationType": {
     "type": "string",
-    "description": "Authentication Type"
+    "enum": [
+     "none",
+     "oauth",
+     "apiKey",
+     "clientCredentials",
+     "certificate",
+     "signedRequest"
+    ],
+    "description": "Authentication Type (pack p.23 Security)"
    },
    "credentialsReference": {
     "type": "string",
-    "description": "Credentials reference"
+    "description": "Credentials reference: the secret-store key; the secret itself is never returned"
    },
    "certificate": {
     "type": "string",
-    "description": "Certificate"
+    "description": "Certificate reference (secret-store key)",
+    "nullable": true
    },
    "timeout": {
-    "type": "string",
-    "description": "Timeout"
+    "type": "integer",
+    "description": "Timeout in seconds",
+    "minimum": 1,
+    "default": 30
    },
    "rateLimit": {
     "type": "integer",
-    "description": "Rate Limit"
+    "description": "Rate Limit: requests per minute",
+    "minimum": 1,
+    "nullable": true
    },
    "ipRestrictions": {
-    "type": "string",
-    "description": "IP Restrictions"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "IP Restrictions: allowed CIDR ranges"
    },
    "connectionStatus": {
     "type": "string",
-    "description": "Connection Status"
+    "description": "Connection Status: notTested, connected, degraded, failed or disabled (decided 29 September, readiness close-out)"
    },
-   "oauth": {
+   "connectionType": {
     "type": "string",
-    "description": "OAuth"
+    "enum": [
+     "ticvaiNative",
+     "restApi",
+     "webhook",
+     "otaAdapter",
+     "resellerApi",
+     "partnerApi",
+     "middleware",
+     "fileSftp",
+     "customConnector"
+    ],
+    "description": "Connection Type (pack p.22)"
    },
-   "apiKey": {
+   "direction": {
     "type": "string",
-    "description": "API Key"
+    "enum": [
+     "outbound",
+     "inbound",
+     "bidirectional"
+    ],
+    "description": "Who calls whom: TICVAI calls the partner's API, the partner calls TICVAI, or both (MoM 31 Aug §4.3)"
    },
-   "clientCredentials": {
+   "adapterId": {
     "type": "string",
-    "description": "Client Credentials"
+    "description": "Reusable adapter for an external platform; the platform is named as data on the adapter. Enabling it for a new tenant needs no rebuild (MoM 31 Aug §4.3)",
+    "nullable": true
    },
-   "certificates": {
+   "retryPolicy": {
+    "type": "object",
+    "description": "Retry Policy (pack p.23)",
+    "properties": {
+     "maxAttempts": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "backoffSeconds": {
+      "type": "integer",
+      "minimum": 0
+     }
+    }
+   },
+   "certificateExpiresAt": {
     "type": "string",
-    "description": "Certificates"
+    "format": "date-time",
+    "description": "Certificate expiry, for governance alerts",
+    "nullable": true
    },
-   "signedRequests": {
-    "type": "string",
-    "description": "Signed Requests"
-   },
-   "testAuthentication": {
-    "type": "string",
-    "description": "Test Authentication"
-   },
-   "testConnectivity": {
-    "type": "string",
-    "description": "Test Connectivity"
-   },
-   "testProduct": {
-    "type": "string",
-    "description": "Test Product"
-   },
-   "testPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Test Price"
-   },
-   "testAvailability": {
-    "type": "string",
-    "description": "Test Availability"
-   },
-   "testOrder": {
-    "type": "string",
-    "description": "Test Order"
-   },
-   "testCancellationWhereSupported": {
-    "type": "string",
-    "description": "Test Cancellation where supported"
-   },
-   "thisScreenManagesChannelConnectivity": {
-    "type": "string",
-    "description": "This screen manages channel connectivity"
+   "lastTests": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "test": {
+       "type": "string",
+       "enum": [
+        "authentication",
+        "connectivity",
+        "product",
+        "price",
+        "availability",
+        "order",
+        "cancellation"
+       ]
+      },
+      "result": {
+       "type": "string",
+       "enum": [
+        "passed",
+        "failed",
+        "notSupported"
+       ]
+      },
+      "testedAt": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    },
+    "description": "Connection Testing results, latest per test (pack p.23)"
    }
   }
  },
@@ -472,138 +782,115 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Channel Exceptions, Incidents & Recovery displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "connectionFailure": {
-    "type": "string",
-    "description": "Connection Failure"
-   },
-   "authenticationFailure": {
-    "type": "string",
-    "description": "Authentication Failure"
-   },
-   "productSyncFailure": {
-    "type": "string",
-    "description": "Product Sync Failure"
-   },
-   "pricingMismatch": {
-    "type": "string",
-    "description": "Pricing Mismatch"
-   },
-   "inventoryMismatch": {
-    "type": "string",
-    "description": "Inventory Mismatch"
-   },
-   "orderFailure": {
-    "type": "string",
-    "description": "Order Failure"
-   },
-   "paymentError": {
-    "type": "string",
-    "description": "Payment Error"
-   },
-   "timeout": {
-    "type": "string",
-    "description": "Timeout"
-   },
-   "cancellationFailure": {
-    "type": "string",
-    "description": "Cancellation Failure"
-   },
-   "fulfillmentFailure": {
-    "type": "string",
-    "description": "Fulfillment Failure"
-   },
-   "rateLimit": {
-    "type": "integer",
-    "description": "Rate Limit"
-   },
-   "partnerError": {
-    "type": "string",
-    "description": "Partner Error"
-   },
    "incidentId": {
     "type": "string",
     "description": "Incident ID"
    },
    "channel": {
     "type": "string",
-    "description": "Channel"
+    "description": "Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258)"
    },
    "partner": {
     "type": "string",
-    "description": "Partner"
+    "description": "Partner ID",
+    "nullable": true
    },
    "severity": {
     "type": "string",
-    "description": "Severity"
+    "enum": [
+     "critical",
+     "high",
+     "medium",
+     "low"
+    ],
+    "description": "Severity (pack p.28)"
    },
    "errorType": {
     "type": "string",
-    "description": "Error Type"
+    "enum": [
+     "connectionFailure",
+     "authenticationFailure",
+     "productSyncFailure",
+     "pricingMismatch",
+     "inventoryMismatch",
+     "orderFailure",
+     "paymentError",
+     "timeout",
+     "cancellationFailure",
+     "duplicateTransaction",
+     "fulfillmentFailure",
+     "rateLimit",
+     "partnerError"
+    ],
+    "description": "Error Type (pack p.27-28 Exception Categories)"
    },
-   "affectedProduct": {
+   "affectedProductEvent": {
     "type": "string",
-    "description": "Affected Product"
-   },
-   "affectedEvent": {
-    "type": "string",
-    "description": "Affected Event"
+    "description": "Affected Product/Event: product or event ID",
+    "nullable": true
    },
    "transactionsAffected": {
-    "type": "string",
+    "type": "integer",
     "description": "Transactions Affected"
    },
    "businessImpact": {
-    "type": "string",
-    "description": "Business Impact"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Business Impact: estimated sales value at risk"
    },
    "firstDetected": {
     "type": "string",
+    "format": "date-time",
     "description": "First Detected"
    },
    "owner": {
     "type": "string",
-    "description": "Owner"
+    "description": "Owner (user ID)",
+    "nullable": true
    },
-   "sla": {
+   "slaDueAt": {
     "type": "string",
-    "description": "SLA"
+    "format": "date-time",
+    "description": "SLA: resolution due time",
+    "nullable": true
    },
    "currentStatus": {
     "type": "string",
-    "description": "Current Status"
-   },
-   "reSync": {
-    "type": "string",
-    "description": "Re-sync"
-   },
-   "reprocess": {
-    "type": "string",
-    "description": "Reprocess"
-   },
-   "switchToManual": {
-    "type": "string",
-    "description": "Switch to Manual"
+    "description": "Current Status: open, assigned, investigating, recovering, resolved or closed (decided 29 September, readiness close-out)"
    },
    "errorCode": {
     "type": "string",
-    "description": "Error Code"
+    "description": "Error Code",
+    "nullable": true
    },
    "apiRequestReference": {
     "type": "string",
-    "description": "API Request Reference"
+    "description": "API Request Reference",
+    "nullable": true
    },
    "response": {
     "type": "string",
-    "description": "Response"
+    "description": "Response body, sensitive data masked",
+    "nullable": true
    },
    "correlationId": {
     "type": "string",
-    "description": "Correlation ID"
+    "description": "Correlation ID",
+    "nullable": true
    },
    "timestamp": {
     "type": "string",
     "format": "date-time",
-    "description": "Timestamp"
+    "description": "Timestamp of the last failing call",
+    "nullable": true
+   },
+   "retryCount": {
+    "type": "integer",
+    "description": "Retry Count"
+   },
+   "aiSummary": {
+    "type": "string",
+    "description": "AI summary of the incident in business language (pack p.29); advisory",
+    "nullable": true
    }
   }
  },
@@ -615,53 +902,86 @@
   "properties": {
    "channelOwner": {
     "type": "string",
-    "description": "Channel Owner"
+    "description": "Channel Owner (user ID)",
+    "nullable": true
    },
    "partnerOwner": {
     "type": "string",
-    "description": "Partner Owner"
+    "description": "Partner Owner (user ID)",
+    "nullable": true
    },
    "commercialAgreementReference": {
     "type": "string",
-    "description": "Commercial Agreement Reference"
+    "description": "Commercial Agreement Reference: the B2B/OTA agreement ID",
+    "nullable": true
    },
    "sla": {
-    "type": "string",
-    "description": "SLA"
+    "type": "object",
+    "description": "SLA targets",
+    "properties": {
+     "availabilityPercent": {
+      "type": "number"
+     },
+     "responseTimeMs": {
+      "type": "integer"
+     },
+     "resolutionHours": {
+      "type": "number"
+     }
+    }
    },
    "transactionLimits": {
-    "type": "string",
-    "description": "Transaction Limits"
+    "type": "integer",
+    "description": "Transaction Limits: maximum transactions per day",
+    "nullable": true
    },
    "rateLimits": {
-    "type": "number",
-    "description": "Rate Limits"
+    "type": "integer",
+    "description": "Rate Limits: requests per minute",
+    "nullable": true
    },
    "contractDates": {
-    "type": "string",
-    "description": "Contract Dates"
+    "type": "object",
+    "description": "Contract Dates",
+    "properties": {
+     "start": {
+      "type": "string",
+      "format": "date"
+     },
+     "end": {
+      "type": "string",
+      "format": "date",
+      "nullable": true
+     }
+    }
    },
    "renewalDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "Renewal Date"
+    "format": "date",
+    "description": "Renewal Date",
+    "nullable": true
    },
    "supportContacts": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Support Contacts"
    },
    "escalationContacts": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Escalation Contacts"
    },
    "availability": {
     "type": "number",
-    "description": "Availability %"
+    "description": "Availability % measured"
    },
    "apiResponseTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "API Response Time"
+    "type": "integer",
+    "description": "API Response Time, milliseconds (p95) (decided 29 September, readiness close-out)"
    },
    "transactionSuccess": {
     "type": "number",
@@ -669,76 +989,210 @@
    },
    "errorRate": {
     "type": "number",
-    "description": "Error Rate"
+    "description": "Error Rate %"
    },
    "incidentResolutionTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Incident Resolution Time"
-   },
-   "availability999": {
     "type": "number",
-    "description": "Availability: 99.9%"
+    "description": "Incident Resolution Time, average hours"
    },
-   "actual9972": {
+   "channelId": {
+    "type": "string",
+    "description": "Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258)"
+   },
+   "reviewFrequency": {
+    "type": "string",
+    "enum": [
+     "monthly",
+     "quarterly",
+     "semiAnnual",
+     "annual"
+    ],
+    "description": "Review Frequency"
+   },
+   "syncSuccess": {
     "type": "number",
-    "description": "Actual: 99.72%"
+    "description": "Sync Success %"
    },
-   "statusSlaBreach": {
+   "complianceFlags": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "expiredAgreement",
+      "expiredCertificate",
+      "expiringApiCredentials",
+      "missingOwner",
+      "unapprovedProductionIntegration",
+      "slaBreach",
+      "excessiveTransactionFailures"
+     ]
+    },
+    "description": "Compliance Controls raised (pack p.32-33)"
+   },
+   "governanceStatus": {
     "type": "string",
-    "description": "Status: SLA Breach"
-   },
-   "expiredAgreement": {
-    "type": "integer",
-    "description": "Expired agreement"
-   },
-   "expiredCertificate": {
-    "type": "integer",
-    "description": "Expired certificate"
-   },
-   "expiringApiCredentials": {
-    "type": "string",
-    "description": "Expiring API credentials"
-   },
-   "missingOwner": {
-    "type": "string",
-    "description": "Missing owner"
-   },
-   "unapprovedProductionIntegration": {
-    "type": "string",
-    "description": "Unapproved production integration"
-   },
-   "slaBreach": {
-    "type": "string",
-    "description": "SLA breach"
-   },
-   "excessiveTransactionFailures": {
-    "type": "string",
-    "description": "Excessive transaction failures"
-   },
-   "placeUnderReview": {
-    "type": "string",
-    "description": "Place Under Review"
-   },
-   "restrict": {
-    "type": "string",
-    "description": "Restrict"
-   },
-   "reactivate": {
-    "type": "string",
-    "description": "Reactivate"
-   },
-   "resellerOtaDistributionArea": {
-    "type": "string",
-    "description": "Reseller / OTA Distribution area"
+    "description": "Governance status: normal, underReview, restricted or suspended (decided 29 September, readiness close-out)"
    }
   }
  },
- "ChannelOperationsCommandCenterView": {
+ "ChannelIncident": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.channel_incident",
+  "description": "**A channel failure someone has to resolve** (29 September, data model DM3). ADM-269. Opened by the sync and order paths when a call to or from a channel fails; retried, owned and closed here. The per-call trace is in `catalogue.audit_entry` (`domain: channel`). **Opened by the channel sync and order jobs, never through the API** (29 September, writers pass); owned and closed with `updateChannelIncident`, retried with `retryChannelIncident` (`states/channel-incident.yaml`).",
+  "required": [
+   "id",
+   "scopePath",
+   "salesChannelId",
+   "severity",
+   "errorType",
+   "status",
+   "firstDetectedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "salesChannelId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "channelConnectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "partner": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "critical",
+     "high",
+     "medium",
+     "low"
+    ]
+   },
+   "errorType": {
+    "type": "string",
+    "enum": [
+     "connectionFailure",
+     "authenticationFailure",
+     "productSyncFailure",
+     "pricingMismatch",
+     "inventoryMismatch",
+     "orderFailure",
+     "paymentError",
+     "timeout",
+     "cancellationFailure",
+     "duplicateTransaction",
+     "fulfillmentFailure",
+     "rateLimit",
+     "partnerError"
+    ]
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "transactionsAffected": {
+    "type": "integer",
+    "default": 0
+   },
+   "businessImpact": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "firstDetectedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "slaDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "investigating",
+     "retrying",
+     "resolved",
+     "closed"
+    ],
+    "default": "open"
+   },
+   "errorCode": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "apiRequestReference": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "responseExcerpt": {
+    "type": "string",
+    "nullable": true,
+    "description": "The partner response, truncated and scrubbed of personal data."
+   },
+   "correlationId": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "retryCount": {
+    "type": "integer",
+    "default": 0
+   },
+   "aiSummary": {
+    "type": "string",
+    "nullable": true
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "ChannelOperationsCommandCenterSummary": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What Channel Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Channel Operations Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
   "properties": {
    "activeChannels": {
     "type": "integer",
@@ -757,15 +1211,15 @@
     "description": "Offline Channels"
    },
    "transactionsToday": {
-    "type": "string",
+    "type": "integer",
     "description": "Transactions Today"
    },
    "grossSales": {
-    "type": "integer",
-    "description": "Gross Sales"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Gross Sales today"
    },
    "productsAvailable": {
-    "type": "string",
+    "type": "integer",
     "description": "Products Available"
    },
    "synchronizationErrors": {
@@ -784,13 +1238,68 @@
     "type": "integer",
     "description": "Failed Transactions"
    },
+   "openOperationalIncidents": {
+    "type": "integer",
+    "description": "Open Operational Incidents"
+   },
+   "liveActivity": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "occurredAt": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "channelId": {
+       "type": "string"
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    },
+    "description": "Live Activity: latest important channel events, newest first (the 50 most recent (decided 29 September, readiness close-out))"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Operational problems prioritised by business impact (pack p.22). Advisory only: nothing is changed until a user acts."
+   }
+  }
+ },
+ "ChannelOperationsCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Channel Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
    "channel": {
     "type": "string",
-    "description": "Channel"
+    "description": "Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258)"
    },
    "type": {
     "type": "string",
-    "description": "Type"
+    "enum": [
+     "b2cWeb",
+     "b2cMobileApp",
+     "pos",
+     "mobilePos",
+     "flyingPos",
+     "kiosk",
+     "callCentre",
+     "b2bPortal",
+     "reseller",
+     "ota",
+     "api",
+     "partnerPortal",
+     "marketplace",
+     "thirdPartyChannel",
+     "customChannel"
+    ],
+    "description": "Type: the channel type"
    },
    "venueScope": {
     "type": "string",
@@ -798,48 +1307,47 @@
    },
    "connectionStatus": {
     "type": "string",
-    "description": "Connection Status"
+    "description": "Connection Status: connected, degraded, offline or maintenance"
    },
    "lastSync": {
     "type": "string",
     "format": "date-time",
-    "description": "Last Sync"
+    "description": "Last Sync",
+    "nullable": true
    },
    "products": {
-    "type": "string",
-    "description": "Products"
+    "type": "integer",
+    "description": "Products available on the channel"
    },
    "transactions": {
-    "type": "string",
-    "description": "Transactions"
+    "type": "integer",
+    "description": "Transactions today"
    },
    "salesValue": {
-    "type": "string",
-    "description": "Sales Value"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Sales Value today"
    },
    "inventoryStatus": {
     "type": "string",
-    "description": "Inventory Status"
+    "description": "Inventory Status: ok, low, soldOut or syncError (decided 29 September, readiness close-out)"
    },
    "pricingStatus": {
     "type": "string",
-    "description": "Pricing Status"
+    "description": "Pricing Status: ok, mismatch or error (decided 29 September, readiness close-out)"
    },
    "errorCount": {
     "type": "integer",
-    "description": "Error Count"
+    "description": "Error Count today"
    },
    "healthScore": {
     "type": "number",
-    "description": "Health Score"
+    "description": "Health Score, 0-100",
+    "minimum": 0,
+    "maximum": 100
    },
-   "otaTiqtripInventorySynchronized1041": {
+   "healthStatus": {
     "type": "string",
-    "description": "OTA-TiqTrip inventory synchronized — 10:41"
-   },
-   "forceSync": {
-    "type": "string",
-    "description": "Force Sync"
+    "description": "Health Status: healthy, warning, degraded, critical, offline or maintenance (pack p.21)"
    }
   }
  },
@@ -850,11 +1358,11 @@
   "description": "**What Channel Performance & Commercial Analytics displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "grossSales": {
-    "type": "integer",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Gross Sales"
    },
    "netSales": {
-    "type": "integer",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Net Sales"
    },
    "transactions": {
@@ -862,68 +1370,253 @@
     "description": "Transactions"
    },
    "ticketsSold": {
-    "type": "string",
+    "type": "integer",
     "description": "Tickets Sold"
    },
    "averageOrderValue": {
-    "type": "number",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Average Order Value"
    },
    "conversionRate": {
     "type": "number",
-    "description": "Conversion Rate"
+    "description": "Conversion Rate %",
+    "nullable": true
    },
    "cancellationRate": {
     "type": "number",
-    "description": "Cancellation Rate"
+    "description": "Cancellation Rate %"
    },
    "capacityUtilization": {
-    "type": "integer",
-    "description": "Capacity Utilization"
+    "type": "number",
+    "description": "Capacity Utilization %"
    },
    "revenuePerAvailableUnit": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Revenue per Available Unit"
    },
    "fees": {
-    "type": "integer",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Fees"
    },
    "commission": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Commission"
    },
-   "costOfSaleWhereAvailable": {
+   "costOfSale": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Cost of Sale where available"
    },
    "allocation": {
-    "type": "string",
-    "description": "Allocation"
+    "type": "integer",
+    "description": "Partner Comparison: Allocation",
+    "nullable": true
    },
    "sold": {
-    "type": "string",
-    "description": "Sold"
+    "type": "integer",
+    "description": "Partner Comparison: Sold",
+    "nullable": true
    },
    "utilization": {
     "type": "number",
-    "description": "Utilization"
+    "description": "Partner Comparison: Utilization %",
+    "nullable": true
    },
    "revenue": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue"
+    "description": "Partner Comparison: Revenue"
    },
-   "cancellation": {
-    "type": "string",
-    "description": "Cancellation"
+   "cancellations": {
+    "type": "integer",
+    "description": "Partner Comparison: Cancellations",
+    "nullable": true
    },
    "settlement": {
-    "type": "string",
-    "description": "Settlement"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Partner Comparison: Settlement, amount settled in the period"
    },
    "growth": {
+    "type": "number",
+    "description": "Partner Comparison: Growth % against the previous equal period",
+    "nullable": true
+   },
+   "channelId": {
     "type": "string",
-    "description": "Growth"
+    "description": "Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258)"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner ID for a B2B/OTA row",
+    "nullable": true
+   },
+   "refundRate": {
+    "type": "number",
+    "description": "Refund Rate %"
+   },
+   "funnel": {
+    "type": "object",
+    "nullable": true,
+    "description": "Channel Funnel for digital channels (pack p.30)",
+    "properties": {
+     "available": {
+      "type": "integer"
+     },
+     "viewed": {
+      "type": "integer"
+     },
+     "selected": {
+      "type": "integer"
+     },
+     "checkout": {
+      "type": "integer"
+     },
+     "paid": {
+      "type": "integer"
+     }
+    }
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI Insights (pack p.30). Advisory only: nothing is changed until a user acts."
+   }
+  }
+ },
+ "ChannelSync": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.channel_sync",
+  "description": "**The synchronisation state of one channel for one kind of data** (29 September, data model DM3). ADM-267. One row per channel and domain (product, price, availability ...); counts are the latest run's, overwritten by the sync job. **Two writers** (29 September, writers pass): the sync job writes the counts and timestamps (the `readOnly` fields); a person sets `direction`, `frequency` and `isPaused` with `setChannelSyncSetting`.",
+  "required": [
+   "id",
+   "scopePath",
+   "salesChannelId",
+   "domain"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "salesChannelId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "channelConnectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "domain": {
+    "type": "string",
+    "enum": [
+     "product",
+     "productDescription",
+     "schedule",
+     "availability",
+     "capacity",
+     "price",
+     "tax",
+     "fees",
+     "media",
+     "restrictions",
+     "salesStatus"
+    ]
+   },
+   "direction": {
+    "type": "string",
+    "enum": [
+     "ticvaiToChannel",
+     "channelToTicvai",
+     "bidirectional"
+    ],
+    "default": "ticvaiToChannel"
+   },
+   "frequency": {
+    "type": "string",
+    "enum": [
+     "realTime",
+     "nearRealTime",
+     "scheduled",
+     "manual",
+     "eventTriggered"
+    ],
+    "default": "nearRealTime"
+   },
+   "isPaused": {
+    "type": "boolean",
+    "default": false
+   },
+   "lastSuccessfulSyncAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "nextSyncAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "recordsProcessed": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "successful": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "failed": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "pending": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "warnings": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "durationMs": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true
+   },
+   "mismatchCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
    }
   }
  },
@@ -933,89 +1626,24 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Product, Price & Availability Synchronization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "productDescription": {
-    "type": "string",
-    "description": "Product Description"
-   },
-   "availability": {
-    "type": "string",
-    "description": "Availability"
-   },
-   "capacity": {
-    "type": "integer",
-    "description": "Capacity"
-   },
-   "price": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price"
-   },
-   "tax": {
-    "type": "string",
-    "description": "Tax"
-   },
-   "fees": {
-    "type": "string",
-    "description": "Fees"
-   },
-   "media": {
-    "type": "string",
-    "description": "Media"
-   },
-   "restrictions": {
-    "type": "string",
-    "description": "Restrictions"
-   },
-   "salesStatus": {
-    "type": "string",
-    "description": "Sales Status"
-   },
-   "channelTicvai": {
-    "type": "string",
-    "description": "Channel → TICVAI"
-   },
-   "realTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Real Time"
-   },
-   "nearRealTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Near Real Time"
-   },
-   "scheduled": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Scheduled"
-   },
-   "manual": {
-    "type": "string",
-    "description": "Manual"
-   },
-   "eventTriggered": {
-    "type": "string",
-    "description": "Event Triggered"
-   },
    "lastSuccessfulSync": {
     "type": "string",
     "format": "date-time",
-    "description": "Last Successful Sync"
+    "description": "Last Successful Sync",
+    "nullable": true
    },
    "nextSync": {
     "type": "string",
     "format": "date-time",
-    "description": "Next Sync"
+    "description": "Next Sync; empty for manual",
+    "nullable": true
    },
    "recordsProcessed": {
-    "type": "string",
-    "description": "Records Processed"
+    "type": "integer",
+    "description": "Records Processed in the last run"
    },
    "successful": {
-    "type": "string",
+    "type": "integer",
     "description": "Successful"
    },
    "failed": {
@@ -1027,17 +1655,107 @@
     "description": "Pending"
    },
    "warning": {
-    "type": "string",
-    "description": "Warning"
+    "type": "integer",
+    "description": "Warning: records synced with a warning"
    },
    "duration": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Duration"
+    "type": "integer",
+    "description": "Duration of the last run in seconds"
    },
-   "reprocess": {
+   "channelId": {
     "type": "string",
-    "description": "Reprocess"
+    "description": "Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258)"
+   },
+   "connectorId": {
+    "type": "string",
+    "description": "Connector ID (ADM-269)",
+    "nullable": true
+   },
+   "domain": {
+    "type": "string",
+    "enum": [
+     "product",
+     "productDescription",
+     "schedule",
+     "availability",
+     "capacity",
+     "price",
+     "tax",
+     "fees",
+     "media",
+     "restrictions",
+     "salesStatus"
+    ],
+    "description": "Synchronization Domain (pack p.23-24)"
+   },
+   "direction": {
+    "type": "string",
+    "enum": [
+     "ticvaiToChannel",
+     "channelToTicvai",
+     "bidirectional"
+    ],
+    "description": "Synchronization Direction (pack p.24)"
+   },
+   "frequency": {
+    "type": "string",
+    "enum": [
+     "realTime",
+     "nearRealTime",
+     "scheduled",
+     "manual",
+     "eventTriggered"
+    ],
+    "description": "Sync Frequency (pack p.24)"
+   },
+   "paused": {
+    "type": "boolean",
+    "description": "Sync paused"
+   },
+   "mismatchCount": {
+    "type": "integer",
+    "description": "Difference Detection: records whose channel value differs from TICVAI's"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Grouped repetitive failures and probable root causes (pack p.25). Advisory only: nothing is changed until a user acts."
+   }
+  }
+ },
+ "RealTimeAvailabilityCheckoutValidationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Real-Time Availability & Checkout Validation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "failedChecks": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "productInactive",
+      "inventoryUnavailable",
+      "capacityUnavailable",
+      "timeslotUnavailable",
+      "resourceUnavailable",
+      "priceInvalid",
+      "promotionInvalid",
+      "partnerComponentInvalid",
+      "componentMappingInvalid"
+     ]
+    },
+    "description": "Checkout validations that failed; empty means the bundle is sellable."
+   },
+   "bundleId": {
+    "type": "string",
+    "description": "Bundle ID"
+   },
+   "sellable": {
+    "type": "boolean",
+    "description": "Whether the bundle can be sold now"
    }
   }
  },
@@ -1047,69 +1765,59 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Real-Time Channel Availability & Inventory Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "ctBA": {
-    "type": "string",
-    "description": "ct B A"
-   },
-   "dD": {
-    "type": "string",
-    "description": "d d"
-   },
-   "available": {
-    "type": "string",
-    "description": "Available"
-   },
-   "lowAvailability": {
-    "type": "string",
-    "description": "Low Availability"
-   },
-   "soldOut": {
-    "type": "string",
-    "description": "Sold Out"
-   },
-   "closed": {
-    "type": "integer",
-    "description": "Closed"
-   },
-   "suspended": {
-    "type": "string",
-    "description": "Suspended"
-   },
-   "notAssigned": {
-    "type": "string",
-    "description": "Not Assigned"
-   },
    "allocated": {
-    "type": "string",
-    "description": "Allocated"
+    "type": "integer",
+    "description": "Allocated; empty when the channel sells from the shared pool",
+    "nullable": true
    },
    "sold": {
-    "type": "string",
+    "type": "integer",
     "description": "Sold"
    },
    "held": {
-    "type": "string",
+    "type": "integer",
     "description": "Held"
    },
    "remaining": {
-    "type": "string",
-    "description": "Remaining"
+    "type": "integer",
+    "description": "Remaining sellable units"
    },
    "utilization": {
     "type": "number",
-    "description": "Utilization %"
+    "description": "Utilization %: sold plus held over allocated, 0-100",
+    "minimum": 0,
+    "maximum": 100
    },
    "salesVelocity": {
-    "type": "string",
-    "description": "Sales Velocity"
+    "type": "number",
+    "description": "Sales Velocity: units sold per hour over the last 24 hours (decided 29 September, readiness close-out)"
    },
    "forecastedSellOut": {
     "type": "string",
-    "description": "Forecasted Sell-Out"
+    "format": "date-time",
+    "description": "Forecasted Sell-Out; empty when no sell-out is forecast",
+    "nullable": true
    },
-   "againstTheSeatMapCapacityPool": {
-    "type": "integer",
-    "description": "against the seat map/capacity pool"
+   "product": {
+    "type": "string",
+    "description": "Product ID"
+   },
+   "channelId": {
+    "type": "string",
+    "description": "Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258)"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event or performance ID",
+    "nullable": true
+   },
+   "sharedPool": {
+    "type": "boolean",
+    "description": "The channel sells from the shared pool (shown as Shared in the matrix)"
+   },
+   "availabilityStatus": {
+    "type": "string",
+    "description": "Status for this product/channel: available, lowAvailability, soldOut, closed, suspended, notAssigned or syncError (pack p.25)"
    }
   }
  }

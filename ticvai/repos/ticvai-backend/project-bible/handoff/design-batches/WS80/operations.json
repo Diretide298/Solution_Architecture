@@ -25,7 +25,7 @@
   "summary": "Define a kind of credit, without a release",
   "permission": "WALLET_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {
@@ -65,9 +65,41 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Wallet"
+ },
+ "getWalletAutoReloadSetting": {
+  "method": "GET",
+  "path": "/wallets/{walletId}/auto-reload",
+  "contract": "wallet",
+  "summary": "A wallet's own auto top-up, if the holder set one",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WalletAutoReloadSetting"
+ },
+ "getWalletExitBalance": {
+  "method": "GET",
+  "path": "/wallets/{walletId}/exit-balance",
+  "contract": "wallet",
+  "summary": "What the holder owes or is owed on leaving",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WalletExitBalance"
  },
  "listCreditLots": {
   "method": "GET",
@@ -138,6 +170,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -150,9 +187,14 @@
   "summary": "Where this credit may be spent, and on what",
   "permission": "WALLET_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -162,6 +204,30 @@
   "requestBody": "CreditEligibility",
   "responds": "CreditEligibility"
  },
+ "setWalletAutoReloadSetting": {
+  "method": "PUT",
+  "path": "/wallets/{walletId}/auto-reload",
+  "contract": "wallet",
+  "summary": "Top the wallet up automatically from a stored card when it runs low",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletAutoReloadSetting",
+  "responds": "WalletAutoReloadSetting"
+ },
  "setWalletFundingRules": {
   "method": "PUT",
   "path": "/wallet-funding-rules",
@@ -169,9 +235,14 @@
   "summary": "Amounts, channels, bonuses, limits and velocity",
   "permission": "WALLET_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -180,6 +251,25 @@
   ],
   "requestBody": "WalletFundingRules",
   "responds": "WalletFundingRules"
+ },
+ "settleWalletAtExit": {
+  "method": "POST",
+  "path": "/wallets/{walletId}/exit-settlement",
+  "contract": "wallet",
+  "summary": "Settle a short balance, or refund a credit, when the holder leaves",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletExitSettlement"
  },
  "suspendWallet": {
   "method": "POST",
@@ -207,9 +297,14 @@
   "summary": "Change a kind of credit",
   "permission": "WALLET_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

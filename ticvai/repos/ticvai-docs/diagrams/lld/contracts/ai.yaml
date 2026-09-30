@@ -332,7 +332,7 @@ operations:
   - staff
   offline: false
   reads:
-  - ai.chunk_ref
+  - ai.chunk_embedding
   - ai.knowledge_collection
   - cache:idempotency
   - qdrant:knowledge
@@ -574,7 +574,6 @@ operations:
   offline: false
   reads:
   - ai.chunk_embedding
-  - ai.chunk_ref
   - ai.knowledge_document
   - ai.policy
   - ai.provider
@@ -845,7 +844,7 @@ operations:
   - staff
   offline: false
   reads:
-  - ai.chunk_ref
+  - ai.chunk_embedding
   - ai.knowledge_collection
   - ai.knowledge_document
   - cache:embedding
@@ -1164,7 +1163,7 @@ operations:
   - staff
   offline: false
   reads:
-  - ai.chunk_ref
+  - ai.chunk_embedding
   - ai.knowledge_collection
   - qdrant:knowledge
   writes: []
@@ -1897,7 +1896,6 @@ operations:
   offline: false
   reads:
   - ai.chunk_embedding
-  - ai.chunk_ref
   - ai.knowledge_collection
   - ai.knowledge_document
   - assets.media_asset
@@ -1923,7 +1921,6 @@ operations:
   - ai.assistant_profile
   - ai.capability
   - ai.chunk_embedding
-  - ai.chunk_ref
   - ai.conversation
   - ai.knowledge_document
   - ai.message

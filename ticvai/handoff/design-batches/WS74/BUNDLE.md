@@ -1,6 +1,6 @@
 # WS74 — Digital Asset Management DAM board 1
 
-**10 screens · 14 operations · 15 schemas · 2 permissions**
+**10 screens · 15 operations · 16 schemas · 3 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `AI_USE, ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,7 +61,7 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `CMS-061` | Digital Asset Management Command Center | listDetail | 2 | 0 | — |
-| `CMS-062` | Central Digital Asset Library | listDetail | 2 | 0 | — |
+| `CMS-062` | Central Digital Asset Library | listDetail | 3 | 0 | — |
 | `CMS-063` | Upload & Asset Ingestion Workspace | listDetail | 3 | 0 | — |
 | `CMS-064` | Folder, Collection & Workspace Management | listDetail | 2 | 0 | — |
 | `CMS-065` | Metadata & Taxonomy Management | listDetail | 2 | 0 | — |
@@ -516,6 +516,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Collections to file into",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "semanticSearch",
+    "contract": "ai",
+    "purpose": "Natural-language search of the media library (kind media)",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -2118,6 +2125,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
+ "semanticSearch": {
+  "method": "POST",
+  "path": "/search",
+  "contract": "ai",
+  "summary": "Search meaning, not words",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SearchResult"
+ },
  "setMediaAssetTags": {
   "method": "PUT",
   "path": "/media-assets/{assetId}/tags",
@@ -2889,6 +2915,62 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "hasMore": {
     "type": "boolean"
+   }
+  }
+ },
+ "SearchResult": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed",
+  "properties": {
+   "kind": {
+    "type": "string"
+   },
+   "id": {
+    "type": "string"
+   },
+   "title": {
+    "type": "string"
+   },
+   "excerpt": {
+    "type": "string"
+   },
+   "relevance": {
+    "type": "number"
+   },
+   "collectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For kind `media`, the asset (29 September, build; 23.1.6)."
+   },
+   "mediaType": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "image",
+     "video",
+     "audio",
+     "document"
+    ]
+   },
+   "matchedOn": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "title",
+     "description",
+     "tags",
+     "aiDescription"
+    ],
+    "description": "Which text the match came from, so a wrong hit can be traced to a wrong tag."
    }
   }
  },

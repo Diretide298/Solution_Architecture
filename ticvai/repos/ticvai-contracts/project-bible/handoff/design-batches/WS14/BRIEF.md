@@ -1,6 +1,6 @@
 # WS14 — Approval Workflows and Governance board 2
 
-**9 screens · 0 operations · 0 schemas · 0 permissions**
+**9 screens · 8 operations · 16 schemas · 4 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `APPROVAL_CONFIGURE, APPROVAL_VIEW, GUEST_VIEW, PRODUCT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,15 +60,15 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-319` | Approval Workflow Library | listDetail | 0 | 0 | — |
-| `ADM-320` | Create Approval Workflow | configEditor | 0 | 0 | — |
-| `ADM-322` | Approval Stage Configuration | configEditor | 0 | 0 | — |
-| `ADM-323` | Condition & Decision Rule Builder | listDetail | 0 | 0 | — |
-| `ADM-324` | Approval Sequence & Parallel Routing | listDetail | 0 | 0 | — |
-| `ADM-325` | Workflow Outcome & Action Configuration | listDetail | 0 | 0 | — |
-| `ADM-326` | Workflow Validation & Simulation | listDetail | 0 | 0 | — |
-| `ADM-327` | Workflow Publication & Lifecycle | configEditor | 0 | 0 | — |
-| `ADM-328` | Workflow Versioning & Change History | listDetail | 0 | 0 | — |
+| `ADM-319` | Approval Workflow Library | listDetail | 2 | 0 | — |
+| `ADM-320` | Create Approval Workflow | configEditor | 1 | 0 | — |
+| `ADM-322` | Approval Stage Configuration | configEditor | 1 | 0 | — |
+| `ADM-323` | Condition & Decision Rule Builder | listDetail | 2 | 0 | — |
+| `ADM-324` | Approval Sequence & Parallel Routing | listDetail | 1 | 0 | — |
+| `ADM-325` | Workflow Outcome & Action Configuration | listDetail | 1 | 0 | — |
+| `ADM-326` | Workflow Validation & Simulation | listDetail | 1 | 0 | — |
+| `ADM-327` | Workflow Publication & Lifecycle | configEditor | 2 | 0 | — |
+| `ADM-328` | Workflow Versioning & Change History | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch
 

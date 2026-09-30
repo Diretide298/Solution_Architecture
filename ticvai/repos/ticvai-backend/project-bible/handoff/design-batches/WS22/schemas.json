@@ -2,24 +2,26 @@
  "AgreementContractTermsBuilderInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is control.api_licence at 6%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; stored as control.partner_agreement (PartnerAgreement), a new version per amendment; documents are control.partner_document rows with agreementId; legalEntity, commercialOwner and financeOwner land in legalEntityId, commercialOwnerPrincipalId and financeOwnerPrincipalId (data model DM4)",
   "description": "**What Agreement & Contract Terms Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "agreementId": {
     "type": "string",
-    "description": "Agreement ID"
+    "format": "uuid",
+    "description": "Agreement ID; omit to create"
    },
    "agreementName": {
     "type": "string",
     "description": "Agreement Name"
    },
-   "partner": {
+   "partnerId": {
     "type": "string",
+    "format": "uuid",
     "description": "Partner"
    },
    "agreementType": {
     "type": "string",
-    "description": "Agreement Type"
+    "description": "Agreement Type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate, distribution, apiCommercial (pack p.26)"
    },
    "contractReference": {
     "type": "string",
@@ -29,150 +31,193 @@
     "type": "string",
     "description": "Legal Entity"
    },
-   "brand": {
+   "brandId": {
     "type": "string",
-    "description": "Brand"
+    "description": "Brand id",
+    "nullable": true
    },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
+   "allowedVenueIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "Venues the agreement covers"
    },
    "territory": {
     "type": "string",
     "description": "Territory"
    },
-   "currency": {
+   "settlementCurrency": {
     "type": "string",
-    "description": "Currency"
+    "pattern": "^[A-Z]{3}$",
+    "description": "Settlement currency, ISO 4217"
    },
-   "effectiveFrom": {
+   "validFrom": {
     "type": "string",
+    "format": "date",
     "description": "Effective From"
    },
-   "effectiveTo": {
+   "validTo": {
     "type": "string",
-    "description": "Effective To"
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
    },
    "renewalType": {
     "type": "string",
+    "enum": [
+     "manual",
+     "auto"
+    ],
     "description": "Renewal Type"
    },
    "commercialOwner": {
     "type": "string",
-    "description": "Commercial Owner"
+    "description": "Commercial Owner: staff principal id"
    },
    "financeOwner": {
     "type": "string",
-    "description": "Finance Owner"
+    "description": "Finance Owner: staff principal id"
    },
-   "paymentTerms": {
-    "type": "string",
-    "description": "Payment Terms"
+   "creditTermDays": {
+    "type": "integer",
+    "description": "Payment Terms in days (0 = due immediately; Net 7/15/30/45 or custom)"
    },
    "commissionTerms": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Commission Terms"
+    "type": "string",
+    "description": "Commission Terms: summary or reference to the commission rules (listCommissionMarginIncentive)",
+    "nullable": true
    },
    "pricingBasis": {
     "type": "string",
-    "description": "Pricing Basis"
+    "enum": [
+     "retailPrice",
+     "netRate",
+     "discountFromRetail",
+     "markup",
+     "derivedRate"
+    ],
+    "description": "Pricing Basis (pack p.27 pricing models)"
    },
    "creditTerms": {
     "type": "string",
-    "description": "Credit Terms"
+    "description": "Credit Terms",
+    "nullable": true
    },
    "allocationTerms": {
     "type": "string",
-    "description": "Allocation Terms"
+    "description": "Allocation Terms",
+    "nullable": true
    },
    "cancellationConditions": {
     "type": "string",
-    "description": "Cancellation Conditions"
+    "description": "Cancellation Conditions",
+    "nullable": true
    },
    "bookingRestrictions": {
     "type": "string",
-    "description": "Booking Restrictions"
+    "description": "Booking Restrictions",
+    "nullable": true
    },
    "settlementTerms": {
     "type": "string",
-    "description": "Settlement Terms"
+    "description": "Settlement Terms",
+    "nullable": true
    },
    "minimumCommitment": {
-    "type": "string",
-    "description": "Minimum Commitment"
+    "type": "integer",
+    "description": "Minimum Commitment: tickets over the agreement term",
+    "nullable": true
    },
    "salesTarget": {
-    "type": "string",
-    "description": "Sales Target"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Sales Target over the agreement term"
    },
-   "manualRenewal": {
-    "type": "string",
-    "description": "Manual Renewal"
-   },
-   "autoRenewal": {
-    "type": "string",
-    "description": "Auto-Renewal"
-   },
-   "renewalNoticePeriod": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Renewal Notice Period"
+   "renewalNoticeDays": {
+    "type": "integer",
+    "description": "Renewal Notice Period in days",
+    "nullable": true
    },
    "renegotiationRequired": {
     "type": "boolean",
     "description": "Renegotiation Required"
    },
-   "renewalApproval": {
-    "type": "string",
-    "description": "Renewal Approval"
+   "renewalRequiresApproval": {
+    "type": "boolean",
+    "description": "Renewal Approval: renewal needs approval"
    },
-   "signedContract": {
-    "type": "string",
-    "description": "Signed Contract"
+   "rateMode": {
+    "$ref": "#/components/schemas/PartnerRateMode",
+    "description": "Net rate or commission, as on PartnerAgreement"
    },
-   "addendum": {
+   "paymentModel": {
     "type": "string",
-    "description": "Addendum"
+    "enum": [
+     "creditAccount",
+     "prepaid",
+     "payPerTransaction"
+    ],
+    "description": "Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced periodically), prepaid (pre-funded wallet drawn down per sale) or payPerTransaction (card at each sale)"
    },
-   "rateSheet": {
-    "type": "number",
-    "description": "Rate Sheet"
-   },
-   "sla": {
+   "refundConditions": {
     "type": "string",
-    "description": "SLA"
+    "description": "Refund Conditions (pack p.26)",
+    "nullable": true
    },
-   "nda": {
-    "type": "string",
-    "description": "NDA"
+   "agreementValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Agreement value (MoM 31 Aug 4.4: each agreement captures term/value)"
    },
-   "commercialAnnex": {
-    "type": "string",
-    "description": "Commercial Annex"
+   "documents": {
+    "type": "array",
+    "description": "Document Association",
+    "items": {
+     "type": "object",
+     "properties": {
+      "documentType": {
+       "type": "string",
+       "enum": [
+        "signedContract",
+        "addendum",
+        "rateSheet",
+        "sla",
+        "nda",
+        "commercialAnnex"
+       ]
+      },
+      "documentId": {
+       "type": "string",
+       "format": "uuid"
+      }
+     }
+    }
    }
   }
  },
  "AgreementContractTermsBuilderView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_agreement and control.partner_document and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Agreement & Contract Terms Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "agreementId": {
     "type": "string",
-    "description": "Agreement ID"
+    "format": "uuid",
+    "description": "Agreement ID; omit to create"
    },
    "agreementName": {
     "type": "string",
     "description": "Agreement Name"
    },
-   "partner": {
+   "partnerId": {
     "type": "string",
+    "format": "uuid",
     "description": "Partner"
    },
    "agreementType": {
     "type": "string",
-    "description": "Agreement Type"
+    "description": "Agreement Type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate, distribution, apiCommercial (pack p.26)"
    },
    "contractReference": {
     "type": "string",
@@ -182,219 +227,263 @@
     "type": "string",
     "description": "Legal Entity"
    },
-   "brand": {
+   "brandId": {
     "type": "string",
-    "description": "Brand"
+    "description": "Brand id",
+    "nullable": true
    },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
+   "allowedVenueIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "Venues the agreement covers"
    },
    "territory": {
     "type": "string",
     "description": "Territory"
    },
-   "currency": {
+   "settlementCurrency": {
     "type": "string",
-    "description": "Currency"
+    "pattern": "^[A-Z]{3}$",
+    "description": "Settlement currency, ISO 4217"
    },
-   "effectiveFrom": {
+   "validFrom": {
     "type": "string",
+    "format": "date",
     "description": "Effective From"
    },
-   "effectiveTo": {
+   "validTo": {
     "type": "string",
-    "description": "Effective To"
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
    },
    "renewalType": {
     "type": "string",
+    "enum": [
+     "manual",
+     "auto"
+    ],
     "description": "Renewal Type"
    },
    "commercialOwner": {
     "type": "string",
-    "description": "Commercial Owner"
+    "description": "Commercial Owner: staff principal id"
    },
    "financeOwner": {
     "type": "string",
-    "description": "Finance Owner"
+    "description": "Finance Owner: staff principal id"
    },
-   "paymentTerms": {
-    "type": "string",
-    "description": "Payment Terms"
+   "creditTermDays": {
+    "type": "integer",
+    "description": "Payment Terms in days (0 = due immediately; Net 7/15/30/45 or custom)"
    },
    "commissionTerms": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Commission Terms"
+    "type": "string",
+    "description": "Commission Terms: summary or reference to the commission rules (listCommissionMarginIncentive)",
+    "nullable": true
    },
    "pricingBasis": {
     "type": "string",
-    "description": "Pricing Basis"
+    "enum": [
+     "retailPrice",
+     "netRate",
+     "discountFromRetail",
+     "markup",
+     "derivedRate"
+    ],
+    "description": "Pricing Basis (pack p.27 pricing models)"
    },
    "creditTerms": {
     "type": "string",
-    "description": "Credit Terms"
+    "description": "Credit Terms",
+    "nullable": true
    },
    "allocationTerms": {
     "type": "string",
-    "description": "Allocation Terms"
+    "description": "Allocation Terms",
+    "nullable": true
    },
    "cancellationConditions": {
     "type": "string",
-    "description": "Cancellation Conditions"
+    "description": "Cancellation Conditions",
+    "nullable": true
    },
    "bookingRestrictions": {
     "type": "string",
-    "description": "Booking Restrictions"
+    "description": "Booking Restrictions",
+    "nullable": true
    },
    "settlementTerms": {
     "type": "string",
-    "description": "Settlement Terms"
+    "description": "Settlement Terms",
+    "nullable": true
    },
    "minimumCommitment": {
-    "type": "string",
-    "description": "Minimum Commitment"
+    "type": "integer",
+    "description": "Minimum Commitment: tickets over the agreement term",
+    "nullable": true
    },
    "salesTarget": {
-    "type": "string",
-    "description": "Sales Target"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Sales Target over the agreement term"
    },
-   "manualRenewal": {
-    "type": "string",
-    "description": "Manual Renewal"
-   },
-   "autoRenewal": {
-    "type": "string",
-    "description": "Auto-Renewal"
-   },
-   "renewalNoticePeriod": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Renewal Notice Period"
+   "renewalNoticeDays": {
+    "type": "integer",
+    "description": "Renewal Notice Period in days",
+    "nullable": true
    },
    "renegotiationRequired": {
     "type": "boolean",
     "description": "Renegotiation Required"
    },
-   "renewalApproval": {
-    "type": "string",
-    "description": "Renewal Approval"
+   "renewalRequiresApproval": {
+    "type": "boolean",
+    "description": "Renewal Approval: renewal needs approval"
    },
-   "signedContract": {
-    "type": "string",
-    "description": "Signed Contract"
+   "rateMode": {
+    "$ref": "#/components/schemas/PartnerRateMode",
+    "description": "Net rate or commission, as on PartnerAgreement"
    },
-   "addendum": {
+   "paymentModel": {
     "type": "string",
-    "description": "Addendum"
+    "enum": [
+     "creditAccount",
+     "prepaid",
+     "payPerTransaction"
+    ],
+    "description": "Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced periodically), prepaid (pre-funded wallet drawn down per sale) or payPerTransaction (card at each sale)"
    },
-   "rateSheet": {
-    "type": "number",
-    "description": "Rate Sheet"
-   },
-   "sla": {
+   "refundConditions": {
     "type": "string",
-    "description": "SLA"
+    "description": "Refund Conditions (pack p.26)",
+    "nullable": true
    },
-   "nda": {
-    "type": "string",
-    "description": "NDA"
+   "agreementValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Agreement value (MoM 31 Aug 4.4: each agreement captures term/value)"
    },
-   "commercialAnnex": {
-    "type": "string",
-    "description": "Commercial Annex"
+   "documents": {
+    "type": "array",
+    "description": "Document Association",
+    "items": {
+     "type": "object",
+     "properties": {
+      "documentType": {
+       "type": "string",
+       "enum": [
+        "signedContract",
+        "addendum",
+        "rateSheet",
+        "sla",
+        "nda",
+        "commercialAnnex"
+       ]
+      },
+      "documentId": {
+       "type": "string",
+       "format": "uuid"
+      }
+     }
+    }
+   },
+   "version": {
+    "type": "integer",
+    "description": "Agreement version; amendments create a new one"
+   },
+   "status": {
+    "$ref": "#/components/schemas/PartnerAgreementStatus",
+    "description": "Agreement status"
    }
   }
  },
  "BookingLimitsCommercialExceptionsApprovalInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is control.tenant_migration at 4%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; stored as control.partner_booking_limit (PartnerBookingLimit) for the limits and control.partner_commercial_exception (PartnerCommercialException) for a request or decision; the decision itself goes to approvals (data model DM4)",
   "description": "**What Booking Limits, Commercial Exceptions & Approval submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "maximumTicketsPerBooking": {
-    "type": "string",
-    "description": "Maximum Tickets Per Booking"
+    "type": "integer",
+    "description": "Maximum Tickets Per Booking",
+    "nullable": true
    },
    "maximumBookingValue": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Maximum Booking Value"
    },
    "dailyBookingLimit": {
     "type": "integer",
-    "description": "Daily Booking Limit"
+    "description": "Daily Booking Limit: bookings per day (MoM 31 Aug 4.4: transactions per day)",
+    "nullable": true
    },
    "monthlyBookingLimit": {
     "type": "integer",
-    "description": "Monthly Booking Limit"
+    "description": "Monthly Booking Limit: bookings per month",
+    "nullable": true
    },
    "eventLimit": {
     "type": "integer",
-    "description": "Event Limit"
+    "description": "Event Limit: tickets per event",
+    "nullable": true
    },
    "productLimit": {
     "type": "integer",
-    "description": "Product Limit"
+    "description": "Product Limit: tickets per product per day",
+    "nullable": true
    },
    "holdLimit": {
     "type": "integer",
-    "description": "Hold Limit"
+    "description": "Hold Limit: tickets on hold at once",
+    "nullable": true
    },
-   "reservationDuration": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Reservation Duration"
-   },
-   "cancellationLimit": {
+   "holdDurationMinutes": {
     "type": "integer",
-    "description": "Cancellation Limit"
+    "description": "Reservation Duration: hold duration in minutes",
+    "nullable": true
    },
-   "priceException": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price Exception"
+   "cancellationLimitPercent": {
+    "type": "number",
+    "description": "Cancellation Limit: percent of a booking that may be cancelled without approval (decided 29 September, readiness close-out)",
+    "nullable": true
    },
-   "creditException": {
+   "partnerId": {
     "type": "string",
-    "description": "Credit Exception"
+    "format": "uuid",
+    "description": "Partner; empty for the overall limit that applies to every partner",
+    "nullable": true
    },
-   "allocationException": {
+   "agreementId": {
     "type": "string",
-    "description": "Allocation Exception"
-   },
-   "commissionException": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Commission Exception"
-   },
-   "bookingLimitException": {
-    "type": "integer",
-    "description": "Booking Limit Exception"
-   },
-   "paymentTermException": {
-    "type": "string",
-    "description": "Payment-Term Exception"
-   },
-   "cancellationException": {
-    "type": "string",
-    "description": "Cancellation Exception"
-   },
-   "partner": {
-    "type": "string",
-    "description": "Partner"
-   },
-   "agreement": {
-    "type": "string",
-    "description": "Agreement"
+    "format": "uuid",
+    "description": "Agreement",
+    "nullable": true
    },
    "requestType": {
     "type": "string",
-    "description": "Request Type"
+    "enum": [
+     "priceException",
+     "creditException",
+     "allocationException",
+     "commissionException",
+     "bookingLimitException",
+     "paymentTermException",
+     "cancellationException"
+    ],
+    "description": "Exception Request type",
+    "nullable": true
    },
    "currentRule": {
     "type": "string",
-    "description": "Current Rule"
+    "description": "Current Rule",
+    "nullable": true
    },
    "requestedException": {
     "type": "string",
-    "description": "Requested Exception"
+    "description": "Requested Exception",
+    "nullable": true
    },
    "amountImpact": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
@@ -402,109 +491,124 @@
    },
    "reason": {
     "type": "string",
-    "description": "Reason"
+    "description": "Reason",
+    "nullable": true
    },
-   "effectivePeriod": {
+   "exceptionId": {
     "type": "string",
-    "format": "date-time",
-    "description": "Effective Period"
+    "format": "uuid",
+    "description": "Exception request id; omit to raise a new request",
+    "nullable": true
    },
-   "requester": {
+   "effectiveFrom": {
     "type": "string",
-    "description": "Requester"
+    "format": "date",
+    "description": "Effective Period start",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective Period end",
+    "nullable": true
+   },
+   "decision": {
+    "type": "string",
+    "enum": [
+     "approve",
+     "reject",
+     "returnForChanges"
+    ],
+    "description": "Approver's decision on exceptionId; empty when setting limits or raising a request",
+    "nullable": true
    }
   }
  },
  "BookingLimitsCommercialExceptionsApprovalView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_booking_limit and control.partner_commercial_exception and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Booking Limits, Commercial Exceptions & Approval displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "maximumTicketsPerBooking": {
-    "type": "string",
-    "description": "Maximum Tickets Per Booking"
+    "type": "integer",
+    "description": "Maximum Tickets Per Booking",
+    "nullable": true
    },
    "maximumBookingValue": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Maximum Booking Value"
    },
    "dailyBookingLimit": {
     "type": "integer",
-    "description": "Daily Booking Limit"
+    "description": "Daily Booking Limit: bookings per day (MoM 31 Aug 4.4: transactions per day)",
+    "nullable": true
    },
    "monthlyBookingLimit": {
     "type": "integer",
-    "description": "Monthly Booking Limit"
+    "description": "Monthly Booking Limit: bookings per month",
+    "nullable": true
    },
    "eventLimit": {
     "type": "integer",
-    "description": "Event Limit"
+    "description": "Event Limit: tickets per event",
+    "nullable": true
    },
    "productLimit": {
     "type": "integer",
-    "description": "Product Limit"
+    "description": "Product Limit: tickets per product per day",
+    "nullable": true
    },
    "holdLimit": {
     "type": "integer",
-    "description": "Hold Limit"
+    "description": "Hold Limit: tickets on hold at once",
+    "nullable": true
    },
-   "reservationDuration": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Reservation Duration"
-   },
-   "cancellationLimit": {
+   "holdDurationMinutes": {
     "type": "integer",
-    "description": "Cancellation Limit"
+    "description": "Reservation Duration: hold duration in minutes",
+    "nullable": true
    },
-   "priceException": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price Exception"
+   "cancellationLimitPercent": {
+    "type": "number",
+    "description": "Cancellation Limit: percent of a booking that may be cancelled without approval (decided 29 September, readiness close-out)",
+    "nullable": true
    },
-   "creditException": {
+   "partnerId": {
     "type": "string",
-    "description": "Credit Exception"
+    "format": "uuid",
+    "description": "Partner; empty for the overall limit that applies to every partner",
+    "nullable": true
    },
-   "allocationException": {
+   "agreementId": {
     "type": "string",
-    "description": "Allocation Exception"
-   },
-   "commissionException": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Commission Exception"
-   },
-   "bookingLimitException": {
-    "type": "integer",
-    "description": "Booking Limit Exception"
-   },
-   "paymentTermException": {
-    "type": "string",
-    "description": "Payment-Term Exception"
-   },
-   "cancellationException": {
-    "type": "string",
-    "description": "Cancellation Exception"
-   },
-   "partner": {
-    "type": "string",
-    "description": "Partner"
-   },
-   "agreement": {
-    "type": "string",
-    "description": "Agreement"
+    "format": "uuid",
+    "description": "Agreement",
+    "nullable": true
    },
    "requestType": {
     "type": "string",
-    "description": "Request Type"
+    "enum": [
+     "priceException",
+     "creditException",
+     "allocationException",
+     "commissionException",
+     "bookingLimitException",
+     "paymentTermException",
+     "cancellationException"
+    ],
+    "description": "Exception Request type",
+    "nullable": true
    },
    "currentRule": {
     "type": "string",
-    "description": "Current Rule"
+    "description": "Current Rule",
+    "nullable": true
    },
    "requestedException": {
     "type": "string",
-    "description": "Requested Exception"
+    "description": "Requested Exception",
+    "nullable": true
    },
    "amountImpact": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
@@ -512,85 +616,126 @@
    },
    "reason": {
     "type": "string",
-    "description": "Reason"
-   },
-   "effectivePeriod": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Effective Period"
+    "description": "Reason",
+    "nullable": true
    },
    "requester": {
     "type": "string",
-    "description": "Requester"
+    "description": "Requester",
+    "nullable": true
    },
-   "dependingOnExceptionType": {
+   "exceptionId": {
     "type": "string",
-    "description": "depending on exception type"
+    "format": "uuid",
+    "description": "Exception request id; omit to raise a new request",
+    "nullable": true
    },
-   "dependingOnExceptionValue": {
+   "effectiveFrom": {
     "type": "string",
-    "description": "depending on exception value"
+    "format": "date",
+    "description": "Effective Period start",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective Period end",
+    "nullable": true
+   },
+   "decision": {
+    "type": "string",
+    "enum": [
+     "approve",
+     "reject",
+     "returnForChanges"
+    ],
+    "description": "Approver's decision on exceptionId; empty when setting limits or raising a request",
+    "nullable": true
+   },
+   "approvalStatus": {
+    "type": "string",
+    "description": "Approval status of the exception: pendingApproval, approved, rejected, returned or expired",
+    "nullable": true
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "description": "Approval request",
+    "nullable": true
+   },
+   "aiImpactSummary": {
+    "type": "string",
+    "description": "Advisory AI impact summary",
+    "nullable": true
    }
   }
  },
  "CommercialAgreement360HealthAiReviewView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_agreement with control.partner_security, control.partner_allocation, control.partner_commission_rule, control.partner_rate and control.partner_commercial_exception and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Commercial Agreement 360°, Health & AI Review displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "contractStatus": {
-    "type": "string",
+    "$ref": "#/components/schemas/PartnerAgreementStatus",
     "description": "Contract status"
-   },
-   "effectiveDates": {
-    "type": "string",
-    "description": "Effective dates"
    },
    "renewal": {
     "type": "string",
-    "description": "Renewal"
+    "description": "Renewal: manual or auto, and whether a renewal workflow is open"
    },
    "rateModel": {
-    "type": "number",
+    "type": "string",
+    "enum": [
+     "retailPrice",
+     "netRate",
+     "discountFromRetail",
+     "markup",
+     "derivedRate"
+    ],
     "description": "Rate model"
    },
    "averageDiscount": {
     "type": "number",
-    "description": "Average discount"
+    "description": "Average discount from retail, percent"
    },
-   "currentCommission": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Current commission"
+   "currentCommissionPercent": {
+    "type": "number",
+    "description": "Current commission, percent",
+    "nullable": true
    },
    "incentives": {
-    "type": "string",
-    "description": "Incentives"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Active incentives"
    },
-   "limit": {
-    "type": "integer",
-    "description": "Limit"
+   "creditLimit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Credit limit"
    },
-   "exposure": {
-    "type": "string",
-    "description": "Exposure"
+   "creditExposure": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Credit exposure"
    },
    "availableCredit": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Available credit"
    },
    "depositGuarantee": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Deposit/guarantee"
+    "description": "Deposit/guarantee held"
    },
-   "expiry": {
+   "securityExpiry": {
     "type": "string",
-    "format": "date-time",
-    "description": "Expiry"
+    "format": "date",
+    "description": "Security expiry",
+    "nullable": true
    },
-   "paymentTerms": {
-    "type": "string",
-    "description": "Payment terms"
+   "creditTermDays": {
+    "type": "integer",
+    "description": "Payment terms in days",
+    "nullable": true
    },
    "outstandingBalance": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
@@ -601,85 +746,127 @@
     "description": "Overdue amount"
    },
    "contractualAllocation": {
-    "type": "string",
-    "description": "Contractual allocation"
+    "type": "integer",
+    "description": "Contractual allocation, units"
    },
    "utilization": {
     "type": "number",
-    "description": "Utilization"
+    "description": "Allocation utilisation, percent"
    },
    "minimumSales": {
-    "type": "string",
-    "description": "Minimum sales"
+    "type": "integer",
+    "description": "Minimum sales commitment, units",
+    "nullable": true
    },
    "achievement": {
-    "type": "string",
-    "description": "Achievement"
+    "type": "number",
+    "description": "Commitment achievement, percent"
    },
    "activeApprovedExceptions": {
     "type": "integer",
     "description": "Active approved exceptions"
    },
-   "increaseReduceCredit": {
+   "partnerId": {
     "type": "string",
-    "description": "Increase/reduce credit"
+    "format": "uuid",
+    "description": "Partner"
    },
-   "rebalanceAllocation": {
+   "partnerName": {
     "type": "string",
-    "description": "Rebalance allocation"
+    "description": "Partner"
    },
-   "renewAgreement": {
+   "agreementId": {
     "type": "string",
-    "description": "Renew agreement"
+    "format": "uuid",
+    "description": "Agreement"
    },
-   "requestUpdatedGuarantee": {
+   "commercialOwner": {
     "type": "string",
-    "format": "date-time",
-    "description": "Request updated guarantee"
+    "description": "Commercial Owner"
    },
-   "reduceUnusedCommitment": {
+   "validFrom": {
     "type": "string",
-    "description": "Reduce unused commitment"
+    "format": "date",
+    "description": "Effective period start"
    },
-   "placePartnerUnderReview": {
+   "validTo": {
     "type": "string",
-    "description": "Place partner under review"
+    "format": "date",
+    "description": "Effective period end",
+    "nullable": true
    },
-   "startRenewal": {
+   "riskRating": {
     "type": "string",
-    "description": "Start Renewal"
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
+    "description": "Risk"
    },
-   "requestCommercialReview": {
-    "type": "string",
-    "description": "Request Commercial Review"
+   "healthScore": {
+    "type": "integer",
+    "description": "Commercial Health score, 0-100"
    },
-   "changeTerms": {
-    "type": "string",
-    "description": "Change Terms"
+   "healthBreakdown": {
+    "type": "object",
+    "description": "Commercial Health by component, each 0-100",
+    "properties": {
+     "agreement": {
+      "type": "integer"
+     },
+     "margin": {
+      "type": "integer"
+     },
+     "credit": {
+      "type": "integer"
+     },
+     "payment": {
+      "type": "integer"
+     },
+     "security": {
+      "type": "integer"
+     },
+     "allocation": {
+      "type": "integer"
+     },
+     "commitment": {
+      "type": "integer"
+     }
+    }
    },
-   "requestCreditReview": {
-    "type": "string",
-    "description": "Request Credit Review"
+   "recommendations": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "reviewRate",
+      "adjustCredit",
+      "rebalanceAllocation",
+      "renewAgreement",
+      "reviewCommission",
+      "requestUpdatedGuarantee",
+      "reduceUnusedCommitment",
+      "placePartnerUnderReview"
+     ]
+    },
+    "description": "Advisory AI Recommendations"
    },
-   "commercialRisk": {
-    "type": "string",
-    "description": "commercial risk"
-   },
-   "intelligence": {
-    "type": "string",
-    "description": "intelligence"
-   },
-   "channelAllocationArea4": {
-    "type": "string",
-    "description": "Channel Allocation — Area 4"
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Advisory AI Executive Review"
    }
   }
  },
- "CommercialAgreementCommandCenterView": {
+ "CommercialAgreementCommandCenterSummary": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
-  "description": "**What Commercial Agreement Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Commercial Agreement Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
   "properties": {
    "activeAgreements": {
     "type": "integer",
@@ -687,34 +874,34 @@
    },
    "draftAgreements": {
     "type": "integer",
-    "description": "Draft Agreements"
+    "description": "Draft Agreements: pendingApproval agreements not yet submitted to the approvals engine (decided 29 September, readiness close-out)"
    },
    "pendingApproval": {
     "type": "integer",
-    "description": "Pending Approval"
+    "description": "Pending Approval: pendingApproval agreements with an open approval request"
    },
    "agreementsExpiringSoon": {
-    "type": "string",
-    "description": "Agreements Expiring Soon"
+    "type": "integer",
+    "description": "Agreements Expiring Soon: status expiringSoon"
    },
    "expiredAgreements": {
     "type": "integer",
     "description": "Expired Agreements"
    },
    "partnersOnCreditHold": {
-    "type": "string",
+    "type": "integer",
     "description": "Partners on Credit Hold"
    },
    "totalApprovedCredit": {
-    "type": "integer",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Total Approved Credit"
    },
    "currentCreditExposure": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Current Credit Exposure"
    },
    "outstandingReceivables": {
-    "type": "integer",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Outstanding Receivables"
    },
    "activeCommercialAllocations": {
@@ -728,253 +915,457 @@
    "commercialRiskAlerts": {
     "type": "integer",
     "description": "Commercial Risk Alerts"
-   },
+   }
+  }
+ },
+ "CommercialAgreementCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over control.partner_agreement with control.partner, control.partner_credit_profile, control.partner_allocation and control.partner_commission_rule and the existing subscription state, assembled at read time (data model DM4)",
+  "description": "**What Commercial Agreement Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
    "agreementId": {
     "type": "string",
+    "format": "uuid",
     "description": "Agreement ID"
    },
    "partner": {
     "type": "string",
-    "description": "Partner"
+    "description": "Partner trading name"
    },
    "agreementType": {
     "type": "string",
-    "description": "Agreement Type"
+    "description": "Agreement Type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate, distribution, apiCommercial (pack p.26)"
    },
    "brandVenue": {
     "type": "string",
-    "description": "Brand/Venue"
+    "description": "Brand/Venue summary of the agreement scope"
    },
    "market": {
     "type": "string",
     "description": "Market"
    },
-   "effectiveFrom": {
+   "validFrom": {
     "type": "string",
+    "format": "date",
     "description": "Effective From"
    },
-   "effectiveTo": {
+   "validTo": {
     "type": "string",
-    "description": "Effective To"
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
    },
    "pricingModel": {
     "type": "string",
-    "description": "Pricing Model"
+    "enum": [
+     "retailPrice",
+     "netRate",
+     "discountFromRetail",
+     "markup",
+     "derivedRate"
+    ],
+    "description": "Pricing Model (pack p.27)"
    },
    "commissionModel": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Commission Model"
+    "type": "string",
+    "enum": [
+     "fixedPercentage",
+     "fixedAmount",
+     "productSpecific",
+     "tiered",
+     "volumeBased",
+     "revenueBased",
+     "performanceIncentive",
+     "campaignIncentive",
+     "none"
+    ],
+    "description": "Commission Model (pack p.29); none for a net-rate agreement"
    },
-   "paymentTerms": {
+   "creditTermDays": {
     "type": "integer",
-    "description": "Payment Terms"
+    "description": "Payment Terms in days (0 = due immediately; Net 7/15/30/45 or custom)",
+    "nullable": true
    },
    "creditLimit": {
-    "type": "integer",
-    "description": "Credit Limit"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Credit Limit; empty unless the payment model is creditAccount"
    },
    "currentExposure": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Current Exposure"
    },
    "allocationModel": {
     "type": "string",
-    "description": "Allocation Model"
+    "enum": [
+     "guaranteed",
+     "onRequest",
+     "shared",
+     "fixedQuantity",
+     "percentage",
+     "rolling",
+     "seasonal",
+     "none"
+    ],
+    "description": "Allocation Model (pack p.35)"
    },
    "agreementStatus": {
-    "type": "integer",
+    "$ref": "#/components/schemas/PartnerAgreementStatus",
     "description": "Agreement Status"
    },
    "commercialOwner": {
     "type": "string",
     "description": "Commercial Owner"
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Partner"
+   },
+   "rateMode": {
+    "$ref": "#/components/schemas/PartnerRateMode",
+    "description": "Net rate or commission, as on PartnerAgreement"
+   },
+   "paymentModel": {
+    "type": "string",
+    "enum": [
+     "creditAccount",
+     "prepaid",
+     "payPerTransaction"
+    ],
+    "description": "Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced periodically), prepaid (pre-funded wallet drawn down per sale) or payPerTransaction (card at each sale)"
+   },
+   "riskRating": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
+    "description": "Commercial risk"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Advisory AI commercial-risk flags, e.g. expiry against forward bookings"
    }
   }
  },
  "CommercialAllocationQuotaCommitmentManagementView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_allocation (PartnerAllocation) and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Commercial Allocation, Quota & Commitment Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "guaranteedAllocation": {
-    "type": "string",
-    "description": "Guaranteed Allocation"
-   },
-   "onRequestAllocation": {
-    "type": "string",
-    "description": "On-Request Allocation"
-   },
-   "sharedAllocation": {
-    "type": "string",
-    "description": "Shared Allocation"
-   },
-   "fixedQuantity": {
-    "type": "integer",
-    "description": "Fixed Quantity"
-   },
-   "percentageAllocation": {
+   "allocationPercent": {
     "type": "number",
-    "description": "Percentage Allocation"
+    "description": "Percent of capacity, for the percentage model",
+    "nullable": true
    },
-   "rollingAllocation": {
+   "partnerId": {
     "type": "string",
-    "description": "Rolling Allocation"
-   },
-   "seasonalAllocation": {
-    "type": "string",
-    "description": "Seasonal Allocation"
-   },
-   "useItOrReleaseIt": {
-    "type": "string",
-    "description": "Use-it-or-release-it"
-   },
-   "takeOrPayWhereCommerciallyApplicable": {
-    "type": "string",
-    "description": "Take-or-pay where commercially applicable"
-   },
-   "guaranteedMinimum": {
-    "type": "string",
-    "description": "Guaranteed minimum"
-   },
-   "automaticRelease": {
-    "type": "string",
-    "description": "Automatic release"
-   },
-   "manualRelease": {
-    "type": "string",
-    "description": "Manual release"
-   },
-   "partner": {
-    "type": "string",
+    "format": "uuid",
     "description": "Partner"
    },
-   "agreement": {
+   "agreementId": {
     "type": "string",
+    "format": "uuid",
     "description": "Agreement"
    },
-   "venue": {
+   "venueId": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue id"
    },
-   "event": {
+   "eventId": {
     "type": "string",
-    "description": "Event"
+    "description": "Event id",
+    "nullable": true
    },
-   "product": {
+   "productId": {
     "type": "string",
-    "description": "Product"
+    "description": "Product id",
+    "nullable": true
    },
    "ticketType": {
     "type": "string",
-    "description": "Ticket Type"
+    "description": "Ticket Type",
+    "nullable": true
    },
    "quantity": {
     "type": "integer",
-    "description": "Quantity"
+    "description": "Contractual allocation quantity"
    },
    "minimumCommitment": {
-    "type": "string",
-    "description": "Minimum Commitment"
+    "type": "integer",
+    "description": "Minimum Commitment, units",
+    "nullable": true
    },
    "maximumAllocation": {
-    "type": "string",
-    "description": "Maximum Allocation"
+    "type": "integer",
+    "description": "Maximum Allocation, units",
+    "nullable": true
    },
    "returnRule": {
     "type": "string",
-    "description": "Return Rule"
+    "description": "Return Rule",
+    "nullable": true
    },
    "sellThroughTarget": {
-    "type": "string",
-    "description": "Sell-Through Target"
+    "type": "number",
+    "description": "Sell-Through Target, percent",
+    "nullable": true
    },
    "allocated": {
-    "type": "string",
+    "type": "integer",
     "description": "Allocated"
    },
    "booked": {
-    "type": "string",
+    "type": "integer",
     "description": "Booked"
    },
    "sold": {
-    "type": "string",
+    "type": "integer",
     "description": "Sold"
    },
    "returned": {
-    "type": "string",
+    "type": "integer",
     "description": "Returned"
    },
    "remaining": {
-    "type": "string",
+    "type": "integer",
     "description": "Remaining"
    },
    "utilization": {
     "type": "number",
-    "description": "Utilization"
+    "description": "Utilization, percent"
    },
    "commitmentAchievement": {
+    "type": "number",
+    "description": "Commitment Achievement, percent of the minimum commitment"
+   },
+   "allocationId": {
     "type": "string",
-    "description": "Commitment Achievement"
+    "format": "uuid",
+    "description": "Allocation id"
+   },
+   "allocationModel": {
+    "type": "string",
+    "enum": [
+     "guaranteed",
+     "onRequest",
+     "shared",
+     "fixedQuantity",
+     "percentage",
+     "rolling",
+     "seasonal"
+    ],
+    "description": "Allocation Model"
+   },
+   "commitmentRule": {
+    "type": "string",
+    "enum": [
+     "useItOrRelease",
+     "takeOrPay",
+     "guaranteedMinimum"
+    ],
+    "description": "Commitment Rule",
+    "nullable": true
+   },
+   "releaseMode": {
+    "type": "string",
+    "enum": [
+     "automatic",
+     "manual"
+    ],
+    "description": "Release: automatic or manual"
+   },
+   "releaseHoursBeforeEvent": {
+    "type": "integer",
+    "description": "Release Date as a deadline before the event (e.g. 48 hours)",
+    "nullable": true
+   },
+   "releaseDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Release Date as a fixed time",
+    "nullable": true
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Advisory AI under-utilisation forecast"
    }
   }
  },
  "CommissionMarginIncentiveManagementView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_commission_rule + control.partner_commission_rule_tier (PartnerCommissionRule) and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Commission, Margin & Incentive Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "fixedPercentage": {
-    "type": "number",
-    "description": "Fixed Percentage"
-   },
-   "fixedAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed Amount"
-   },
-   "productSpecificCommission": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Product-Specific Commission"
-   },
-   "tieredCommission": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Tiered Commission"
-   },
-   "volumeBasedCommission": {
-    "type": "integer",
-    "description": "Volume-Based Commission"
-   },
-   "revenueBasedCommission": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue-Based Commission"
-   },
-   "performanceIncentive": {
+   "partnerId": {
     "type": "string",
-    "description": "Performance Incentive"
-   },
-   "campaignIncentive": {
-    "type": "string",
-    "description": "Campaign Incentive"
-   },
-   "partner": {
-    "type": "string",
+    "format": "uuid",
     "description": "Partner"
    },
-   "agreement": {
+   "agreementId": {
     "type": "string",
+    "format": "uuid",
     "description": "Agreement"
    },
-   "product": {
+   "productId": {
     "type": "string",
-    "description": "Product"
+    "description": "Product id",
+    "nullable": true
+   },
+   "ruleId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Commission rule id"
+   },
+   "commissionModel": {
+    "type": "string",
+    "enum": [
+     "fixedPercentage",
+     "fixedAmount",
+     "productSpecific",
+     "tiered",
+     "volumeBased",
+     "revenueBased",
+     "performanceIncentive",
+     "campaignIncentive"
+    ],
+    "description": "Commission Model"
+   },
+   "productCategory": {
+    "type": "string",
+    "description": "Product Category",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "description": "Venue",
+    "nullable": true
+   },
+   "eventId": {
+    "type": "string",
+    "description": "Event",
+    "nullable": true
+   },
+   "market": {
+    "type": "string",
+    "description": "Market",
+    "nullable": true
+   },
+   "salesChannel": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+     }
+    ],
+    "nullable": true,
+    "description": "Sales Channel"
+   },
+   "commissionPercent": {
+    "type": "number",
+    "description": "Commission percent, for percentage models",
+    "nullable": true
+   },
+   "commissionAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fixed commission per ticket, for fixedAmount"
+   },
+   "tiers": {
+    "type": "array",
+    "description": "Tiers for tiered/volume/revenue models, e.g. 0-1,000 tickets 8%, 1,001-5,000 10%, 5,001+ 12%",
+    "items": {
+     "type": "object",
+     "properties": {
+      "fromUnits": {
+       "type": "integer"
+      },
+      "commissionPercent": {
+       "type": "number"
+      }
+     }
+    }
+   },
+   "volumeWindow": {
+    "type": "string",
+    "enum": [
+     "calendarMonth",
+     "calendarQuarter",
+     "calendarYear",
+     "agreementYear",
+     "rolling12Months"
+    ],
+    "description": "Period over which volume is counted, as on PartnerAgreement",
+    "nullable": true
+   },
+   "incentiveType": {
+    "type": "string",
+    "enum": [
+     "volumeBonus",
+     "growthBonus",
+     "targetAchievement",
+     "seasonalIncentive",
+     "newProductIncentive",
+     "strategicPartnerBonus"
+    ],
+    "description": "Incentive type",
+    "nullable": true
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective from"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective to",
+    "nullable": true
+   },
+   "estimatedNetContribution": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Margin Visibility: retail price - partner rate - commission/incentive - commercial cost"
+   },
+   "validationIssues": {
+    "type": "array",
+    "description": "Conflict Detection",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "overlappingCommissionRule"
+       ]
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Advisory AI observations for this row; never acted on without a human decision"
    }
   }
  },
  "CreditLimitExposureManagementView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_credit_profile (PartnerCreditProfile) with control.partner_agreement.credit_limit and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Credit Limit & Exposure Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "creditEnabled": {
@@ -982,20 +1373,17 @@
     "description": "Credit Enabled"
    },
    "approvedCreditLimit": {
-    "type": "integer",
-    "description": "Approved Credit Limit"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Approved Credit Limit (PartnerAgreement.creditLimit)"
    },
    "currency": {
     "type": "string",
-    "description": "Currency"
+    "pattern": "^[A-Z]{3}$",
+    "description": "Currency of the limit (the agreement's settlement currency)"
    },
    "temporaryCreditLimit": {
-    "type": "integer",
-    "description": "Temporary Credit Limit"
-   },
-   "effectiveDates": {
-    "type": "string",
-    "description": "Effective Dates"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Temporary Credit Limit; empty when none"
    },
    "creditOwner": {
     "type": "string",
@@ -1003,107 +1391,126 @@
    },
    "riskClassification": {
     "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
     "description": "Risk Classification"
    },
    "approvalAuthority": {
     "type": "string",
     "description": "Approval Authority"
    },
-   "warningAt70": {
+   "warningThresholdPercent": {
     "type": "number",
-    "description": "Warning at 70%"
+    "description": "Threshold: warning at this utilisation percent, default 70 (decided 29 September, readiness close-out)"
    },
-   "highRiskAt90": {
+   "highRiskThresholdPercent": {
     "type": "number",
-    "description": "High Risk at 90%"
+    "description": "Threshold: high risk at this utilisation percent, default 90 (decided 29 September, readiness close-out)"
    },
-   "approvedCreditLimitAed500000": {
-    "type": "integer",
-    "description": "Approved Credit Limit: AED 500,000"
+   "unbilledTransactions": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Unbilled Transactions"
    },
-   "unbilledTransactionsAed95000": {
+   "activeHoldsReservations": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Active Holds/Reservations"
+   },
+   "availableCredit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Available Credit"
+   },
+   "partnerId": {
     "type": "string",
-    "description": "Unbilled Transactions: AED 95,000"
+    "format": "uuid",
+    "description": "Partner"
    },
-   "activeHoldsReservationsAed40000": {
-    "type": "integer",
-    "description": "Active Holds/Reservations: AED 40,000"
-   },
-   "availableCreditAed155000": {
+   "partnerName": {
     "type": "string",
-    "description": "Available Credit: AED 155,000"
+    "description": "Partner trading name"
    },
-   "increaseLimit": {
-    "type": "integer",
-    "description": "Increase Limit"
-   },
-   "reduceLimit": {
-    "type": "integer",
-    "description": "Reduce Limit"
-   },
-   "temporaryIncrease": {
+   "agreementId": {
     "type": "string",
-    "description": "Temporary Increase"
+    "format": "uuid",
+    "description": "Agreement"
    },
-   "placeCreditHold": {
+   "effectiveFrom": {
     "type": "string",
-    "description": "Place Credit Hold"
+    "format": "date",
+    "description": "Effective from"
    },
-   "unlessAnApprovedExceptionExists": {
+   "effectiveTo": {
     "type": "string",
-    "description": "unless an approved exception exists"
+    "format": "date",
+    "description": "Effective to",
+    "nullable": true
+   },
+   "temporaryLimitUntil": {
+    "type": "string",
+    "format": "date",
+    "description": "Temporary limit ends (e.g. until 31 December)",
+    "nullable": true
+   },
+   "blockThresholdPercent": {
+    "type": "number",
+    "description": "Threshold: block at this utilisation percent, default 100 (decided 29 September, readiness close-out)"
+   },
+   "openInvoices": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Open Invoices"
+   },
+   "utilizationPercent": {
+    "type": "number",
+    "description": "Credit Utilization, percent"
+   },
+   "creditStatus": {
+    "type": "string",
+    "description": "Credit status: notEnabled, withinLimit, warning, highRisk, onHold, blocked"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Advisory AI credit-pressure forecast"
    }
   }
  },
  "DepositGuaranteeFinancialSecurityManagementView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_security (PartnerSecurity) and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Deposit, Guarantee & Financial Security Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "cashDeposit": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Cash Deposit"
-   },
-   "bankGuarantee": {
-    "type": "string",
-    "description": "Bank Guarantee"
-   },
-   "securityDeposit": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Security Deposit"
-   },
-   "letterOfCredit": {
-    "type": "string",
-    "description": "Letter of Credit"
-   },
-   "prepaymentBalance": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Prepayment Balance"
-   },
-   "corporateGuarantee": {
-    "type": "string",
-    "description": "Corporate Guarantee"
-   },
-   "otherApprovedSecurity": {
-    "type": "string",
-    "description": "Other Approved Security"
-   },
    "securityId": {
     "type": "string",
     "description": "Security ID"
    },
-   "partner": {
+   "partnerId": {
     "type": "string",
+    "format": "uuid",
     "description": "Partner"
    },
-   "agreement": {
+   "agreementId": {
     "type": "string",
+    "format": "uuid",
     "description": "Agreement"
    },
-   "type": {
+   "securityType": {
     "type": "string",
-    "description": "Type"
+    "enum": [
+     "cashDeposit",
+     "bankGuarantee",
+     "securityDeposit",
+     "letterOfCredit",
+     "prepaymentBalance",
+     "corporateGuarantee",
+     "other"
+    ],
+    "description": "Security type"
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
@@ -1111,6 +1518,7 @@
    },
    "currency": {
     "type": "string",
+    "pattern": "^[A-Z]{3}$",
     "description": "Currency"
    },
    "issuingInstitution": {
@@ -1123,289 +1531,1131 @@
    },
    "effectiveDate": {
     "type": "string",
-    "format": "date-time",
+    "format": "date",
     "description": "Effective Date"
    },
    "expiryDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "Expiry Date"
+    "format": "date",
+    "description": "Expiry Date",
+    "nullable": true
    },
-   "document": {
+   "documentId": {
     "type": "string",
-    "description": "Document"
+    "description": "Supporting document id",
+    "nullable": true
    },
    "verificationStatus": {
     "type": "string",
-    "description": "Verification Status"
+    "description": "Verification Status: pending, verified, rejected or expired"
    },
-   "creditExposureAed500000": {
-    "type": "string",
-    "description": "Credit Exposure: AED 500,000"
+   "creditExposure": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Coverage: partner credit exposure"
    },
-   "guaranteeAed300000": {
-    "type": "string",
-    "description": "Guarantee: AED 300,000"
+   "securityCoverage": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Coverage: verified security held for the partner"
    },
-   "unsecuredExposureAed200000": {
-    "type": "string",
-    "description": "Unsecured Exposure: AED 200,000"
+   "unsecuredExposure": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Coverage: exposure not covered by verified security"
    },
-   "generatesWarning": {
-    "type": "string",
-    "description": "Generates warning"
+   "daysToExpiry": {
+    "type": "integer",
+    "description": "Days until expiry",
+    "nullable": true
    },
-   "reducesCredit": {
+   "expiryAction": {
     "type": "string",
-    "description": "Reduces credit"
-   },
-   "blocksNewCreditSales": {
-    "type": "string",
-    "description": "Blocks new credit sales"
-   },
-   "placesPartnerOnHold": {
-    "type": "string",
-    "description": "Places partner on hold"
-   },
-   "requiresFinanceReview": {
-    "type": "string",
-    "description": "Requires finance review"
+    "enum": [
+     "generateWarning",
+     "reduceCredit",
+     "blockNewCreditSales",
+     "placePartnerOnHold",
+     "requireFinanceReview"
+    ],
+    "description": "Rules: what expiry of this security does"
    }
   }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PartnerAgreementStatus": {
+  "type": "string",
+  "enum": [
+   "pendingApproval",
+   "active",
+   "expiringSoon",
+   "expired",
+   "suspended",
+   "terminated"
+  ]
+ },
+ "PartnerAllocation": {
+  "type": "object",
+  "x-ticvai-persistence": "control.partner_allocation",
+  "description": "A contractual allocation under an agreement: the event or product, the quantity or percent of capacity, the commitment and the release rule. Booked, sold and remaining are counted from orders against it, not stored (decided 29 September, data model DM4)\n\n**Written by** setPartnerAllocations, which replaces the agreement's allocations as a set; a new or increased guaranteed allocation goes through approvals.request. The corporate allocations once held on `PartnerAgreement.corporateAllocations` are rows here, with `perMemberLimit` (decided 29 September, writers pass; DM4).",
+  "required": [
+   "id",
+   "partnerId",
+   "agreementId",
+   "allocationModel",
+   "releaseMode"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The partner (control.partner)."
+   },
+   "agreementId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The agreement (control.partner_agreement) this row belongs to."
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Venue."
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Event (catalogue.event)."
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Product (catalogue.product)."
+   },
+   "ticketType": {
+    "type": "string",
+    "nullable": true,
+    "description": "Ticket type."
+   },
+   "allocationModel": {
+    "type": "string",
+    "enum": [
+     "guaranteed",
+     "onRequest",
+     "shared",
+     "fixedQuantity",
+     "percentage",
+     "rolling",
+     "seasonal"
+    ],
+    "description": "Allocation model (pack p.35)."
+   },
+   "quantity": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Contractual allocation quantity."
+   },
+   "allocationPercent": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Percent of capacity, for the percentage model."
+   },
+   "minimumCommitment": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Minimum commitment, units."
+   },
+   "maximumAllocation": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Maximum allocation, units."
+   },
+   "commitmentRule": {
+    "type": "string",
+    "enum": [
+     "useItOrRelease",
+     "takeOrPay",
+     "guaranteedMinimum"
+    ],
+    "nullable": true,
+    "description": "Commitment rule."
+   },
+   "sellThroughTarget": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Sell-through target, percent."
+   },
+   "returnRule": {
+    "type": "string",
+    "nullable": true,
+    "description": "Return rule."
+   },
+   "releaseMode": {
+    "type": "string",
+    "enum": [
+     "automatic",
+     "manual"
+    ],
+    "description": "Release: automatic or manual."
+   },
+   "releaseHoursBeforeEvent": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Release deadline before the event (e.g. 48 hours)."
+   },
+   "releaseDate": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Release at a fixed time instead."
+   },
+   "perMemberLimit": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "For a corporate allocation: places one member (employee) may take from it; empty for no per-member limit. Carried over from the retired `PartnerAgreement.corporateAllocations` (decided 29 September, writers pass; DM4)"
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The approvals.request raised for this row when it was created or changed; the row is not in force until that request is approved, as a PartnerRate is not (decided 29 September, writers pass; DM4)"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The partition key (ADR-0005), written at `tenant` scope."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "PartnerApprovalRoutedResult": {
+  "type": "object",
+  "x-ticvai-persistence": "none — response only (decided 29 September, writers pass; DM4)",
+  "description": "The answer of a partner set operation whose change is money and goes through approvals (setPartnerCommissionRules, setPartnerCreditProfile, setPartnerAllocations), shaped like the approvePartnerStatuLifecycle response (decided 29 September, writers pass; DM4)",
+  "required": [
+   "applied"
+  ],
+  "properties": {
+   "applied": {
+    "type": "boolean",
+    "description": "True when the change is in force now; false when it awaits the approval below"
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The approvals.request raised; empty when none was needed"
+   },
+   "items": {
+    "type": "array",
+    "description": "The rows as saved (PartnerCommissionRule, PartnerCreditProfile or PartnerAllocation)",
+    "items": {
+     "oneOf": [
+      {
+       "$ref": "#/components/schemas/PartnerCommissionRule"
+      },
+      {
+       "$ref": "#/components/schemas/PartnerCreditProfile"
+      },
+      {
+       "$ref": "#/components/schemas/PartnerAllocation"
+      }
+     ]
+    }
+   }
+  }
+ },
+ "PartnerCommissionRule": {
+  "type": "object",
+  "x-ticvai-persistence": "control.partner_commission_rule + control.partner_commission_rule_tier",
+  "description": "One commission or incentive rule under an agreement: the model, the product, venue, event, market and channel it applies to, the percent, amount or tiers, and the dates. The agreement's own `commissionPercent` is the default these rules refine (decided 29 September, data model DM4)\n\n**Written by** setPartnerCommissionRules; a new or changed rule goes through approvals.request and is not in force until approved, as a partner rate below its guardrails is not (decided 29 September, writers pass; DM4).",
+  "required": [
+   "id",
+   "partnerId",
+   "agreementId",
+   "commissionModel",
+   "effectiveFrom"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The partner (control.partner)."
+   },
+   "agreementId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The agreement (control.partner_agreement) this row belongs to."
+   },
+   "commissionModel": {
+    "type": "string",
+    "enum": [
+     "fixedPercentage",
+     "fixedAmount",
+     "productSpecific",
+     "tiered",
+     "volumeBased",
+     "revenueBased",
+     "performanceIncentive",
+     "campaignIncentive"
+    ],
+    "description": "Commission model (pack p.29)."
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Product (catalogue.product)."
+   },
+   "productCategory": {
+    "type": "string",
+    "nullable": true,
+    "description": "Product category."
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Venue."
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Event (catalogue.event)."
+   },
+   "market": {
+    "type": "string",
+    "nullable": true,
+    "description": "Market."
+   },
+   "salesChannel": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+     }
+    ],
+    "nullable": true,
+    "description": "Sales channel; blank = all."
+   },
+   "commissionPercent": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Commission percent, for percentage models."
+   },
+   "commissionAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Fixed commission per ticket, for fixedAmount."
+   },
+   "tiers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "fromUnits",
+      "commissionPercent"
+     ],
+     "properties": {
+      "fromUnits": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "commissionPercent": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 100
+      }
+     }
+    },
+    "description": "Tiers for tiered/volume/revenue models, e.g. 0-1,000 tickets 8%, 1,001-5,000 10%, 5,001+ 12%. The rows of control.partner_commission_rule_tier."
+   },
+   "volumeWindow": {
+    "type": "string",
+    "enum": [
+     "calendarMonth",
+     "calendarQuarter",
+     "calendarYear",
+     "agreementYear",
+     "rolling12Months"
+    ],
+    "nullable": true,
+    "description": "Period over which volume is counted, as on PartnerAgreement."
+   },
+   "incentiveType": {
+    "type": "string",
+    "enum": [
+     "volumeBonus",
+     "growthBonus",
+     "targetAchievement",
+     "seasonalIncentive",
+     "newProductIncentive",
+     "strategicPartnerBonus"
+    ],
+    "nullable": true,
+    "description": "Incentive type."
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective from."
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "Effective to."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The approvals.request raised for this row when it was created or changed; the row is not in force until that request is approved, as a PartnerRate is not (decided 29 September, writers pass; DM4)"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The partition key (ADR-0005), written at `tenant` scope."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "PartnerCreditProfile": {
+  "type": "object",
+  "x-ticvai-persistence": "control.partner_credit_profile",
+  "description": "The credit controls around an agreement's approved limit: thresholds, a temporary limit and its end, the owner, the risk class and the credit status. The approved limit itself stays `PartnerAgreement.creditLimit`; this row is how it is watched (decided 29 September, data model DM4)\n\n**Written by** setPartnerCreditProfile; enabling credit, a temporary limit and loosened thresholds go through approvals.request, a manual hold applies at once (decided 29 September, writers pass; DM4).",
+  "required": [
+   "id",
+   "partnerId",
+   "agreementId",
+   "creditEnabled",
+   "creditStatus"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The partner (control.partner)."
+   },
+   "agreementId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The agreement (control.partner_agreement) this row belongs to."
+   },
+   "creditEnabled": {
+    "type": "boolean",
+    "default": false,
+    "description": "Credit enabled."
+   },
+   "temporaryCreditLimit": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Temporary credit limit; empty when none."
+   },
+   "temporaryLimitUntil": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "Temporary limit ends (e.g. until 31 December)."
+   },
+   "creditOwnerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Credit owner, a staff principal."
+   },
+   "approvalAuthority": {
+    "type": "string",
+    "nullable": true,
+    "description": "Approval authority."
+   },
+   "riskClassification": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
+    "nullable": true,
+    "description": "Risk classification."
+   },
+   "warningThresholdPercent": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100,
+    "default": 70,
+    "description": "Warning at this utilisation percent (decided 29 September, readiness close-out)."
+   },
+   "highRiskThresholdPercent": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100,
+    "default": 90,
+    "description": "High risk at this utilisation percent (decided 29 September, readiness close-out)."
+   },
+   "blockThresholdPercent": {
+    "type": "number",
+    "minimum": 0,
+    "default": 100,
+    "description": "Block at this utilisation percent (decided 29 September, readiness close-out)."
+   },
+   "creditStatus": {
+    "type": "string",
+    "enum": [
+     "notEnabled",
+     "withinLimit",
+     "warning",
+     "highRisk",
+     "onHold",
+     "blocked"
+    ],
+    "default": "notEnabled",
+    "description": "Credit status. withinLimit, warning and highRisk are recomputed from utilisation against the thresholds; onHold and blocked are set by finance and stay until lifted."
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective from."
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "Effective to."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The approvals.request raised when credit was enabled, a temporary limit set or a threshold loosened; those changes are not in force until it is approved (decided 29 September, writers pass; DM4)"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The partition key (ADR-0005), written at `tenant` scope."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "PartnerRateMode": {
+  "type": "string",
+  "description": "**Alternatives, not both.** A partner buys at a net rate and keeps the margin, or sells at face value and is paid commission. Both is being paid twice for the same sale.\n",
+  "enum": [
+   "netRate",
+   "commission"
+  ]
  },
  "PartnerRateNetPricingConfigurationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is control.api_licence at 10%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; stored as control.partner_rate + control.partner_rate_volume_band (PartnerRate); rateId is its id (data model DM4)",
   "description": "**What Partner Rate & Net Pricing Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "partner": {
+   "partnerId": {
     "type": "string",
+    "format": "uuid",
     "description": "Partner"
    },
-   "agreement": {
+   "agreementId": {
     "type": "string",
+    "format": "uuid",
     "description": "Agreement"
    },
    "product": {
     "type": "string",
-    "description": "Product"
+    "description": "Product id; blank = all in the family/venue",
+    "nullable": true
    },
    "productFamily": {
     "type": "string",
-    "description": "Product Family"
+    "description": "Product Family",
+    "nullable": true
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue id; rates may differ per venue (MoM 31 Aug 4.3)",
+    "nullable": true
    },
    "event": {
     "type": "string",
-    "description": "Event"
+    "description": "Event id",
+    "nullable": true
    },
    "ticketType": {
     "type": "string",
-    "description": "Ticket Type"
+    "description": "Ticket Type",
+    "nullable": true
    },
    "priceCategory": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price Category"
+    "type": "string",
+    "description": "Price Category",
+    "nullable": true
    },
    "market": {
     "type": "string",
-    "description": "Market"
+    "description": "Market",
+    "nullable": true
    },
    "channel": {
-    "type": "string",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+     }
+    ],
+    "nullable": true,
     "description": "Channel"
    },
    "effectiveFrom": {
     "type": "string",
+    "format": "date",
     "description": "Effective From"
    },
    "effectiveTo": {
     "type": "string",
-    "description": "Effective To"
+    "format": "date",
+    "description": "Effective To",
+    "nullable": true
    },
    "blackoutDates": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "date"
+    },
     "description": "Blackout Dates"
    },
    "eventExceptions": {
-    "type": "string",
-    "description": "Event Exceptions"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Event Exceptions: event ids this rate does not apply to"
    },
    "seasonalRate": {
-    "type": "number",
-    "description": "Seasonal Rate"
+    "type": "boolean",
+    "description": "Seasonal Rate: this row overrides the base rate within its dates"
    },
    "minimumPermittedRate": {
-    "type": "number",
-    "description": "Minimum permitted rate"
-   },
-   "maximumDiscount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Maximum discount"
+    "description": "Guardrail: minimum permitted rate"
+   },
+   "maxDiscountPercent": {
+    "type": "number",
+    "description": "Guardrail: maximum discount from retail, percent",
+    "nullable": true
    },
    "marginFloor": {
     "type": "number",
-    "description": "Margin floor"
+    "description": "Guardrail: margin floor, percent",
+    "nullable": true
    },
-   "manualOverride": {
-    "type": "string",
-    "description": "Manual override"
+   "manualOverrideAllowed": {
+    "type": "boolean",
+    "description": "Guardrail: manual override permitted"
    },
    "approvalThreshold": {
-    "type": "integer",
-    "description": "Approval threshold"
+    "type": "number",
+    "description": "Guardrail: discount percent above which the rate needs approval (pack p.37: discount > 15% requires approval)",
+    "nullable": true
+   },
+   "rateId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Rate id; omit to create"
+   },
+   "pricingModel": {
+    "type": "string",
+    "enum": [
+     "retailPrice",
+     "netRate",
+     "discountFromRetail",
+     "markup",
+     "derivedRate"
+    ],
+    "description": "Pricing Model: retail price, net rate, discount from retail, markup or derived from a pricing profile"
+   },
+   "netRate": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Partner net rate, for netRate"
+   },
+   "discountPercent": {
+    "type": "number",
+    "description": "Discount from retail, percent, for discountFromRetail",
+    "nullable": true
+   },
+   "maxMarkupPercent": {
+    "type": "number",
+    "description": "Permitted markup, percent, for markup",
+    "nullable": true
+   },
+   "pricingProfileId": {
+    "type": "string",
+    "description": "Approved pricing profile, for derivedRate",
+    "nullable": true
+   },
+   "volumeBands": {
+    "type": "array",
+    "description": "Tiered volume bands (MoM 31 Aug 4.4, MoM 1 Sep 4.3: e.g. 10% up to 1,000 tickets, 15% from 1,000-5,000); fromUnits as on PartnerAgreement.volumeTiers",
+    "items": {
+     "type": "object",
+     "properties": {
+      "fromUnits": {
+       "type": "integer"
+      },
+      "discountPercent": {
+       "type": "number"
+      }
+     }
+    }
    }
   }
  },
  "PartnerRateNetPricingConfigurationView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_rate (PartnerRate) and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Partner Rate & Net Pricing Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "partner": {
+   "partnerId": {
     "type": "string",
+    "format": "uuid",
     "description": "Partner"
    },
-   "agreement": {
+   "agreementId": {
     "type": "string",
+    "format": "uuid",
     "description": "Agreement"
    },
    "product": {
     "type": "string",
-    "description": "Product"
+    "description": "Product id; blank = all in the family/venue",
+    "nullable": true
    },
    "productFamily": {
     "type": "string",
-    "description": "Product Family"
+    "description": "Product Family",
+    "nullable": true
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue id; rates may differ per venue (MoM 31 Aug 4.3)",
+    "nullable": true
    },
    "event": {
     "type": "string",
-    "description": "Event"
+    "description": "Event id",
+    "nullable": true
    },
    "ticketType": {
     "type": "string",
-    "description": "Ticket Type"
+    "description": "Ticket Type",
+    "nullable": true
    },
    "priceCategory": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price Category"
+    "type": "string",
+    "description": "Price Category",
+    "nullable": true
    },
    "market": {
     "type": "string",
-    "description": "Market"
+    "description": "Market",
+    "nullable": true
    },
    "channel": {
-    "type": "string",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+     }
+    ],
+    "nullable": true,
     "description": "Channel"
    },
    "effectiveFrom": {
     "type": "string",
+    "format": "date",
     "description": "Effective From"
    },
    "effectiveTo": {
     "type": "string",
-    "description": "Effective To"
+    "format": "date",
+    "description": "Effective To",
+    "nullable": true
    },
    "blackoutDates": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "date"
+    },
     "description": "Blackout Dates"
    },
    "eventExceptions": {
-    "type": "string",
-    "description": "Event Exceptions"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Event Exceptions: event ids this rate does not apply to"
    },
    "seasonalRate": {
-    "type": "number",
-    "description": "Seasonal Rate"
+    "type": "boolean",
+    "description": "Seasonal Rate: this row overrides the base rate within its dates"
    },
    "minimumPermittedRate": {
-    "type": "number",
-    "description": "Minimum permitted rate"
-   },
-   "maximumDiscount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Maximum discount"
+    "description": "Guardrail: minimum permitted rate"
+   },
+   "maxDiscountPercent": {
+    "type": "number",
+    "description": "Guardrail: maximum discount from retail, percent",
+    "nullable": true
    },
    "marginFloor": {
     "type": "number",
-    "description": "Margin floor"
+    "description": "Guardrail: margin floor, percent",
+    "nullable": true
    },
-   "manualOverride": {
-    "type": "string",
-    "description": "Manual override"
+   "manualOverrideAllowed": {
+    "type": "boolean",
+    "description": "Guardrail: manual override permitted"
    },
    "approvalThreshold": {
-    "type": "integer",
-    "description": "Approval threshold"
+    "type": "number",
+    "description": "Guardrail: discount percent above which the rate needs approval (pack p.37: discount > 15% requires approval)",
+    "nullable": true
+   },
+   "rateId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Rate id; omit to create"
+   },
+   "pricingModel": {
+    "type": "string",
+    "enum": [
+     "retailPrice",
+     "netRate",
+     "discountFromRetail",
+     "markup",
+     "derivedRate"
+    ],
+    "description": "Pricing Model: retail price, net rate, discount from retail, markup or derived from a pricing profile"
+   },
+   "netRate": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Partner net rate, for netRate"
+   },
+   "discountPercent": {
+    "type": "number",
+    "description": "Discount from retail, percent, for discountFromRetail",
+    "nullable": true
+   },
+   "maxMarkupPercent": {
+    "type": "number",
+    "description": "Permitted markup, percent, for markup",
+    "nullable": true
+   },
+   "pricingProfileId": {
+    "type": "string",
+    "description": "Approved pricing profile, for derivedRate",
+    "nullable": true
+   },
+   "volumeBands": {
+    "type": "array",
+    "description": "Tiered volume bands (MoM 31 Aug 4.4, MoM 1 Sep 4.3: e.g. 10% up to 1,000 tickets, 15% from 1,000-5,000); fromUnits as on PartnerAgreement.volumeTiers",
+    "items": {
+     "type": "object",
+     "properties": {
+      "fromUnits": {
+       "type": "integer"
+      },
+      "discountPercent": {
+       "type": "number"
+      }
+     }
+    }
+   },
+   "publicRate": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Public rate from the price list, read-only, for comparison"
+   },
+   "rateHierarchyLevel": {
+    "type": "string",
+    "enum": [
+     "standardPrice",
+     "partnerTypeRate",
+     "partnerAgreementRate",
+     "productEventException"
+    ],
+    "description": "Rate Hierarchy level of this row"
+   },
+   "validationIssues": {
+    "type": "array",
+    "description": "Guardrail breaches and overlaps",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "belowMinimumRate",
+        "discountAboveMaximum",
+        "marginBelowFloor",
+        "overlappingRate"
+       ]
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Advisory AI margin-erosion or inconsistent-rate flags"
+   }
+  }
+ },
+ "PartnerSecurity": {
+  "type": "object",
+  "x-ticvai-persistence": "control.partner_security",
+  "description": "A deposit, guarantee or other financial security a partner has lodged, with its verification and what its expiry does. Verified, unexpired security is what covers credit exposure (decided 29 September, data model DM4)\n\n**Written by** setPartnerSecurity (record a security, then verify or reject it); only a `verified`, unexpired row counts against exposure (decided 29 September, writers pass; DM4).",
+  "required": [
+   "id",
+   "partnerId",
+   "securityType",
+   "amount",
+   "currency",
+   "effectiveDate",
+   "verificationStatus"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The partner (control.partner)."
+   },
+   "agreementId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The agreement (control.partner_agreement) this row belongs to; empty when it applies to the partner as a whole."
+   },
+   "securityType": {
+    "type": "string",
+    "enum": [
+     "cashDeposit",
+     "bankGuarantee",
+     "securityDeposit",
+     "letterOfCredit",
+     "prepaymentBalance",
+     "corporateGuarantee",
+     "other"
+    ],
+    "description": "Security type."
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Amount, in `currency`."
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "description": "Currency of the security, ISO 4217; a guarantee is issued in its own currency, not necessarily the settlement one."
+   },
+   "issuingInstitution": {
+    "type": "string",
+    "nullable": true,
+    "description": "Issuing institution."
+   },
+   "reference": {
+    "type": "string",
+    "nullable": true,
+    "description": "Reference."
+   },
+   "effectiveDate": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective date."
+   },
+   "expiryDate": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "Expiry date."
+   },
+   "documentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Supporting document (control.partner_document)."
+   },
+   "verificationStatus": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "verified",
+     "rejected",
+     "expired"
+    ],
+    "default": "pending",
+    "description": "Verification status."
+   },
+   "expiryAction": {
+    "type": "string",
+    "enum": [
+     "generateWarning",
+     "reduceCredit",
+     "blockNewCreditSales",
+     "placePartnerOnHold",
+     "requireFinanceReview"
+    ],
+    "nullable": true,
+    "description": "What expiry of this security does."
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The partition key (ADR-0005), written at `tenant` scope."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
  "PaymentTermsBillingAccountConfigurationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; stored as control.partner_billing_profile (PartnerBillingProfile); paymentModel and creditTermDays are control.partner_agreement columns, billingCurrency is its settlementCurrency, billingEntity lands in billingEntityName, the partner's own billing entity as text, not a ledger.legal_entity reference (decided 29 September, writers pass; DM4)",
   "description": "**What Payment Terms, Billing & Account Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "immediatePayment": {
-    "type": "string",
-    "description": "Immediate Payment"
-   },
-   "prepaid": {
-    "type": "string",
-    "description": "Prepaid"
-   },
-   "creditAccount": {
-    "type": "string",
-    "description": "Credit Account"
-   },
-   "depositBalance": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Deposit Balance"
-   },
-   "monthlyInvoice": {
-    "type": "string",
-    "description": "Monthly Invoice"
-   },
-   "weeklyInvoice": {
-    "type": "string",
-    "description": "Weekly Invoice"
-   },
-   "perTransactionBilling": {
-    "type": "string",
-    "description": "Per-Transaction Billing"
-   },
    "consolidatedBilling": {
-    "type": "string",
-    "description": "Consolidated Billing"
+    "type": "boolean",
+    "description": "Consolidated Billing: one invoice across the partner's branches"
    },
    "billingEntity": {
     "type": "string",
-    "description": "Billing Entity"
+    "description": "Billing Entity: the partner's own legal entity invoiced, as text; stored as PartnerBillingProfile.billingEntityName, not a ledger.legal_entity reference (decided 29 September, writers pass; DM4)"
    },
    "billingCurrency": {
     "type": "string",
-    "description": "Billing Currency"
+    "pattern": "^[A-Z]{3}$",
+    "description": "Billing Currency; equals the agreement settlementCurrency"
    },
    "invoiceFrequency": {
     "type": "string",
+    "enum": [
+     "perTransaction",
+     "weekly",
+     "monthly"
+    ],
     "description": "Invoice Frequency"
    },
    "invoiceGrouping": {
     "type": "string",
-    "description": "Invoice Grouping"
+    "enum": [
+     "perPartner",
+     "perBranch",
+     "perVenue",
+     "perEvent",
+     "perPurchaseOrder"
+    ],
+    "description": "Invoice Grouping (decided 29 September, readiness close-out)"
    },
    "taxProfile": {
     "type": "string",
-    "description": "Tax Profile"
+    "description": "Tax Profile id"
    },
    "purchaseOrderRequired": {
     "type": "boolean",
@@ -1413,95 +2663,104 @@
    },
    "statementFrequency": {
     "type": "string",
+    "enum": [
+     "weekly",
+     "monthly"
+    ],
     "description": "Statement Frequency"
    },
    "billingContact": {
     "type": "string",
-    "description": "Billing Contact"
+    "description": "Billing Contact (partner contact id)"
    },
    "financeEmail": {
     "type": "string",
-    "description": "Finance Email"
+    "description": "Finance Email",
+    "format": "email"
    },
-   "bankTransfer": {
+   "partnerId": {
     "type": "string",
-    "description": "Bank Transfer"
+    "format": "uuid",
+    "description": "Partner"
    },
-   "card": {
+   "agreementId": {
     "type": "string",
-    "description": "Card"
+    "format": "uuid",
+    "description": "Agreement"
    },
-   "paymentLink": {
+   "paymentModel": {
     "type": "string",
-    "description": "Payment Link"
+    "enum": [
+     "creditAccount",
+     "prepaid",
+     "payPerTransaction"
+    ],
+    "description": "Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced periodically), prepaid (pre-funded wallet drawn down per sale) or payPerTransaction (card at each sale)"
    },
-   "prepaidBalance": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Prepaid Balance"
+   "creditTermDays": {
+    "type": "integer",
+    "description": "Payment Terms in days: 0 due immediately, 7, 15, 30, 45 or custom (as on PartnerAgreement)"
    },
-   "otherApprovedMethod": {
-    "type": "string",
-    "description": "Other approved method"
+   "allowedPaymentMethods": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "creditAccount",
+      "bankTransfer",
+      "cheque",
+      "card",
+      "paymentLink",
+      "prepaidBalance",
+      "other"
+     ]
+    },
+    "description": "Payment Methods (cheque from MoM 31 Aug 4.4)"
    }
   }
  },
  "PaymentTermsBillingAccountConfigurationView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_billing_profile (PartnerBillingProfile) and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Payment Terms, Billing & Account Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "immediatePayment": {
-    "type": "string",
-    "description": "Immediate Payment"
-   },
-   "prepaid": {
-    "type": "string",
-    "description": "Prepaid"
-   },
-   "creditAccount": {
-    "type": "string",
-    "description": "Credit Account"
-   },
-   "depositBalance": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Deposit Balance"
-   },
-   "monthlyInvoice": {
-    "type": "string",
-    "description": "Monthly Invoice"
-   },
-   "weeklyInvoice": {
-    "type": "string",
-    "description": "Weekly Invoice"
-   },
-   "perTransactionBilling": {
-    "type": "string",
-    "description": "Per-Transaction Billing"
-   },
    "consolidatedBilling": {
-    "type": "string",
-    "description": "Consolidated Billing"
+    "type": "boolean",
+    "description": "Consolidated Billing: one invoice across the partner's branches"
    },
    "billingEntity": {
     "type": "string",
-    "description": "Billing Entity"
+    "description": "Billing Entity: the partner's own legal entity invoiced, as text; stored as PartnerBillingProfile.billingEntityName, not a ledger.legal_entity reference (decided 29 September, writers pass; DM4)"
    },
    "billingCurrency": {
     "type": "string",
-    "description": "Billing Currency"
+    "pattern": "^[A-Z]{3}$",
+    "description": "Billing Currency; equals the agreement settlementCurrency"
    },
    "invoiceFrequency": {
     "type": "string",
+    "enum": [
+     "perTransaction",
+     "weekly",
+     "monthly"
+    ],
     "description": "Invoice Frequency"
    },
    "invoiceGrouping": {
     "type": "string",
-    "description": "Invoice Grouping"
+    "enum": [
+     "perPartner",
+     "perBranch",
+     "perVenue",
+     "perEvent",
+     "perPurchaseOrder"
+    ],
+    "description": "Invoice Grouping (decided 29 September, readiness close-out)"
    },
    "taxProfile": {
     "type": "string",
-    "description": "Tax Profile"
+    "description": "Tax Profile id"
    },
    "purchaseOrderRequired": {
     "type": "boolean",
@@ -1509,65 +2768,107 @@
    },
    "statementFrequency": {
     "type": "string",
+    "enum": [
+     "weekly",
+     "monthly"
+    ],
     "description": "Statement Frequency"
    },
    "billingContact": {
     "type": "string",
-    "description": "Billing Contact"
+    "description": "Billing Contact (partner contact id)"
    },
    "financeEmail": {
     "type": "string",
-    "description": "Finance Email"
-   },
-   "bankTransfer": {
-    "type": "string",
-    "description": "Bank Transfer"
-   },
-   "card": {
-    "type": "string",
-    "description": "Card"
-   },
-   "paymentLink": {
-    "type": "string",
-    "description": "Payment Link"
+    "description": "Finance Email",
+    "format": "email"
    },
    "prepaidBalance": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Prepaid Balance"
-   },
-   "otherApprovedMethod": {
-    "type": "string",
-    "description": "Other approved method"
+    "description": "Prepaid wallet balance (payment model prepaid)"
    },
    "currentBalance": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Current Balance"
    },
    "outstanding": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Outstanding"
    },
    "overdue": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Overdue"
    },
    "availableCredit": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Available Credit"
    },
    "lastPayment": {
     "type": "string",
-    "format": "date-time",
-    "description": "Last Payment"
+    "format": "date",
+    "description": "Last Payment date",
+    "nullable": true
    },
    "nextInvoice": {
     "type": "string",
-    "format": "date-time",
-    "description": "Next Invoice"
+    "format": "date",
+    "description": "Next Invoice date",
+    "nullable": true
    },
    "oldestOutstandingInvoice": {
     "type": "string",
-    "description": "Oldest Outstanding Invoice"
+    "format": "date",
+    "description": "Due date of the Oldest Outstanding Invoice",
+    "nullable": true
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Partner"
+   },
+   "agreementId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Agreement"
+   },
+   "paymentModel": {
+    "type": "string",
+    "enum": [
+     "creditAccount",
+     "prepaid",
+     "payPerTransaction"
+    ],
+    "description": "Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced periodically), prepaid (pre-funded wallet drawn down per sale) or payPerTransaction (card at each sale)"
+   },
+   "creditTermDays": {
+    "type": "integer",
+    "description": "Payment Terms in days: 0 due immediately, 7, 15, 30, 45 or custom (as on PartnerAgreement)"
+   },
+   "allowedPaymentMethods": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "creditAccount",
+      "bankTransfer",
+      "cheque",
+      "card",
+      "paymentLink",
+      "prepaidBalance",
+      "other"
+     ]
+    },
+    "description": "Payment Methods (cheque from MoM 31 Aug 4.4)"
+   },
+   "applied": {
+    "type": "boolean",
+    "description": "False when the save changed `paymentModel` or `creditTermDays` and the agreement amendment awaits approval; the billing-profile fields are applied either way (decided 29 September, writers pass; DM4)"
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The approvals.request raised for the agreement amendment; empty when none was needed (decided 29 September, writers pass; DM4)"
    }
   }
  }

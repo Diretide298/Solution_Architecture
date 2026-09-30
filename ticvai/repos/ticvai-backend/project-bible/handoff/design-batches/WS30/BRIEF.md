@@ -1,6 +1,6 @@
 # WS30 — Membership   Annual Pass Management board 2
 
-**10 screens · 19 operations · 18 schemas · 6 permissions**
+**10 screens · 19 operations · 31 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

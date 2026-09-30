@@ -161,6 +161,13 @@
     "purpose": "The executive view",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Accreditation KPIs (kpiCodes=accreditation*)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -282,6 +289,13 @@
     "purpose": "Status and portfolio",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Applications by status, active holders by category (groupBy)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1269,6 +1283,34 @@
     "purpose": "Webhooks",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listWebhookEventTypes",
+    "contract": "public-api",
+    "purpose": "Accreditation events (publisher=accreditation)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "createWebhookSubscription",
+    "contract": "public-api",
+    "purpose": "Subscribe an endpoint to accreditation events",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "testWebhookSubscription",
+    "contract": "public-api",
+    "purpose": "Send a signed test event",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listWebhookDeliveries",
+    "contract": "public-api",
+    "purpose": "Delivery log",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1277,6 +1319,14 @@
    "workshopBoard": "wireframes/WS08 ACCREDITATION Board 8.dc.html#bo-692"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 71. 0 of 0 labels bound to a contract property; 8 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "subscriptionId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

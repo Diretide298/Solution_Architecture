@@ -1,0 +1,93 @@
+{
+ "about": "P02 guest mobile: the 17 screens that are views in the client's Mobile App v4 (29 September build). Captured 30 September with tools/capture-prototype.mjs. Every screen opens Summit Peaks with the decided tab bar (Home, Explore, Buy tickets, Plan, Tickets; the Map tab is optional in v4, so At the Venue opens from Home). Union Arena is used for the seat map.",
+ "prototype": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+ "assetRoots": ["sources/designs/guest-rev3-28-september"],
+ "caption": "Client prototype mobile v4 (29 Sep 2026)",
+ "imgBase": "frames/img/",
+ "viewport": {"width": 1600, "height": 1000},
+ "frame": {"width": 390, "height": 844, "inset": 1},
+ "maxBytes": 250000,
+ "loadWait": 3000,
+ "stepWait": 1200,
+ "setup": [
+  {"clickPage": "Home · Explore · Buy · Plan · Tickets"},
+  {"click": "Summit Peaks"},
+  {"wait": 1500},
+  {"click": "Skip introduction"}
+ ],
+ "screens": [
+  {"id": "GST-001", "name": "Home", "view": "Home tab (Summit Peaks, after the intro)",
+   "steps": [], "expect": ["Open now", "Live map, ride waits and alerts", "Start planning"]},
+
+  {"id": "GST-002", "name": "Explore", "view": "Explore tab",
+   "steps": [{"click": "Explore"}], "expect": ["Rides", "Dining", "Shows", "Shops", "Summit Coaster", "Junior Circuit"]},
+
+  {"id": "GST-063", "name": "Explore – Search Results", "view": "Explore tab → search (\"coaster\")",
+   "steps": [{"click": "Explore"}, {"fill": "Search rides, food, shows…", "text": "coaster"}],
+   "expect": ["Summit Coaster"], "absent": ["Junior Circuit", "Freefall Tower"]},
+
+  {"id": "GST-003", "name": "Buy Tickets", "view": "Buy tickets (the centre tab)",
+   "steps": [{"click": "Buy tickets"}], "expect": ["Dated day pass", "Meal combo + admission", "Book now"]},
+
+  {"id": "GST-004", "name": "Item Detail", "view": "Explore → Summit Coaster (Item detail)",
+   "steps": [{"click": "Explore"}, {"click": "Summit Coaster"}],
+   "expect": ["Summit Coaster", "Skip the queue with Fast Track", "Where it is"]},
+
+  {"id": "GST-006", "name": "Item Detail – Event / Exhibition", "view": "Explore → Shows → Night of Nine → More info (Item detail, an event)",
+   "steps": [{"click": "Explore"}, {"click": "Shows"}, {"clickSelector": "[aria-label='More info']", "nth": 1}, {"clickContains": "More info →"}],
+   "expect": ["Night of Nine", "Sat 3 Oct", "Event entry by time slot", "Choose an entry time"]},
+
+  {"id": "GST-007", "name": "Select Date & Time", "view": "Buy tickets → Timed entry → Book now (step 1: date, then entry window)",
+   "steps": [{"click": "Buy tickets"}, {"clickContains": "Book now", "nth": 2}, {"wait": 2500}, {"click": "FRI"}, {"click": "MIDDAY"}],
+   "expect": ["Step 1 of 4", "When will you arrive?", "Entry window", "12:00 – 15:00"]},
+
+  {"id": "GST-008", "name": "Tickets & Add-ons", "view": "Buy tickets → Dated day pass → Book now → Fri 2 Oct (step 2: tickets; add-ons are step 3)",
+   "steps": [{"click": "Buy tickets"}, {"clickContains": "Book now", "nth": 0}, {"wait": 2500}, {"click": "FRI"}, {"click": "Continue"},
+             {"click": "+", "nth": 0}, {"click": "+", "nth": 0}, {"click": "+", "nth": 1}],
+   "expect": ["Step 2 of 5", "Choose your ticket", "Two-day flexible", "AED 900"]},
+
+  {"id": "GST-049", "name": "Interactive Seat Selection", "view": "Union Arena → Buy tickets → Direct seat map → 2D plan → section 104 (← Whole map)",
+   "noSetup": true,
+   "steps": [{"clickPage": "Home · Explore · Buy · Plan · Tickets"}, {"click": "Union Arena"}, {"wait": 1500}, {"click": "Skip introduction"},
+             {"clickContains": "Buy"}, {"clickContains": "Book now", "nth": 2}, {"wait": 4000}, {"click": "2D plan"}, {"wait": 1500},
+             {"scroll": 430}, {"wait": 800}, {"click": "104"}, {"wait": 4000}],
+   "expect": ["Direct seat map", "Whole map", "Section 104", "Premium · AED 245"]},
+
+  {"id": "GST-041", "name": "Checkout Entry", "view": "Cart (header basket, after a booking is added to the cart)",
+   "steps": [{"click": "Buy tickets"}, {"clickContains": "Book now", "nth": 0}, {"wait": 2500}, {"click": "FRI"}, {"click": "Continue"},
+             {"click": "+", "nth": 0}, {"click": "+", "nth": 0}, {"click": "+", "nth": 1}, {"click": "Continue"}, {"click": "Skip"},
+             {"click": "Continue as a guest"}, {"clickSelector": "input"}, {"type": "layla@example.ae"}, {"click": "Send code"},
+             {"clickSelector": "input"}, {"type": "123456"}, {"click": "Verify code"}, {"clickContains": "I accept the terms"},
+             {"click": "Continue to payment"}, {"click": "Add to cart and keep shopping"}, {"wait": 3500}, {"click": "Home"},
+             {"clickSelector": "[aria-label=Cart]"}, {"wait": 1000}],
+   "expect": ["Your cart", "Dated day pass", "Fri 2 Oct", "Pay AED 900"]},
+
+  {"id": "GST-012", "name": "My Tickets", "view": "Tickets tab",
+   "steps": [{"click": "Tickets"}], "expect": ["Scan a ticket", "Show QR", "Single day · 2 adults, 1 child"]},
+
+  {"id": "GST-051", "name": "Plan", "view": "Plan tab (Plan your visit · 1 of 6)",
+   "steps": [{"click": "Plan"}], "expect": ["Plan your visit · 1 of 6", "Who is joining the trip?", "Next"]},
+
+  {"id": "GST-053", "name": "Your Plan", "view": "Plan tab → the six questions → Make my plan (Your plan)",
+   "steps": [{"click": "Plan"}, {"click": "Next"}, {"click": "Next"}, {"click": "Next"}, {"click": "Next"}, {"click": "Next"},
+             {"click": "Make my plan"}, {"wait": 1000}],
+   "expect": ["Your plan", "Change answers", "Day 1", "Book this plan"]},
+
+  {"id": "GST-054", "name": "AI Planner", "view": "Ask Sahli (the assistant chat; v4 has no plan-specific chat)",
+   "steps": [{"clickSelector": "[aria-label^='Ask ']"}, {"wait": 1000},
+             {"fill": "Ask Sahli anything…", "text": "How do we skip the long queues on our plan?"}, {"press": "Enter"}, {"wait": 2500}],
+   "expect": ["Sahli", "Online · answers in seconds", "How do we skip the long queues on our plan?", "See live waits"]},
+
+  {"id": "GST-038", "name": "At the Venue", "view": "Home → You're at Summit Peaks (At the venue · live, Map view)",
+   "steps": [{"clickContains": "Live map, ride waits and alerts"}, {"wait": 2000}],
+   "expect": ["At the venue · live", "Shortest wait right now", "Waits", "Services"]},
+
+  {"id": "GST-021", "name": "Interactive Map", "view": "At the venue → Map (the venue map, scrolled to the map and nearest-place filters)",
+   "steps": [{"clickContains": "Live map, ride waits and alerts"}, {"wait": 2500}, {"scroll": 210}, {"wait": 800}],
+   "expect": ["Nearest toilets", "Nearest food", "Nearest rides", "Alerts"]},
+
+  {"id": "GST-022", "name": "Attraction Wait Times", "view": "At the venue → Waits",
+   "steps": [{"clickContains": "Live map, ride waits and alerts"}, {"wait": 1500}, {"click": "Waits"}],
+   "expect": ["Cloudline Gondola", "Join queue", "Canyon Rapids"]}
+ ]
+}

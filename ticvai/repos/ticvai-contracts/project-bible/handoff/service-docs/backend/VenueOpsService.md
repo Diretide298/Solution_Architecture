@@ -130,7 +130,7 @@
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | mediaId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Responses**
 
@@ -259,7 +259,7 @@ Derivatives regenerate. The previous version is retained for rollback.
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | mediaId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -432,7 +432,7 @@ A partial update: only the fields sent change. `collectionIds`, when sent, repla
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | mediaId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -583,13 +583,13 @@ Physical cards are pre-printed and activated at sale; digital cards live in the 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `IssueGameCardRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Client-generated ULID for this request, and the idempotency key: it must equal the Idempotency-Key header, and a mismatch is the shared 409 Conflict. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Client-generated UUIDv7 for this request, and the idempotency key: it must equal the Idempotency-Key header, and a mismatch is the shared 409 Conflict. |
 | kind | enum (physical, digital) | yes |  |
 | cardCode | string |  | Required for physical cards, which are pre-printed. |
 | venueId | string (uuid) | yes |  |
@@ -646,7 +646,7 @@ A damaged or lost card. The source moves to status `transferred`, with `transfer
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | cardCode | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -704,7 +704,7 @@ A damaged or lost card. The source moves to status `transferred`, with `transfer
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -785,8 +785,8 @@ Folders — by campaign, venue, season or product line. An asset may sit in seve
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| fromStationId | query | yes | string |  |
-| toStationId | query | yes | string |  |
+| fromStationId | query | yes | string (uuid) |  |
+| toStationId | query | yes | string (uuid) |  |
 | after | query |  | string (date-time) |  |
 | passengers | query |  | array of string | As on searchTransportDepartures. |
 
@@ -794,9 +794,9 @@ Folders — by campaign, venue, season or product line. An asset may sit in seve
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| departureId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| departureId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | performanceId | string (uuid) | yes |  |
-| routeId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| routeId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | routeCode | string |  | The price card's label, e.g. |
 | departsAt | string (date-time) | yes | At the boarding stop. |
 | arrivesAt | string (date-time) | yes | At the alighting stop. |
@@ -847,8 +847,8 @@ Only departures `onSale` and before the route's booking cut-off are returned; a 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| fromStationId | query | yes | string |  |
-| toStationId | query | yes | string |  |
+| fromStationId | query | yes | string (uuid) |  |
+| toStationId | query | yes | string (uuid) |  |
 | date | query | yes | string (date) | Travel date, venue local. |
 | period | query |  | TimePeriod: enum (morning, afternoon, evening, night) |  |
 | passengers | query |  | array of string | The party as code:count pairs, one per passenger type (adult:2, child:1). |
@@ -860,9 +860,9 @@ Only departures `onSale` and before the route's booking cut-off are returned; a 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of DepartureOffer | yes |  |
-| items[].departureId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].departureId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | items[].performanceId | string (uuid) | yes |  |
-| items[].routeId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].routeId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | items[].routeCode | string |  | The price card's label, e.g. |
 | items[].departsAt | string (date-time) | yes | At the boarding stop. |
 | items[].arrivesAt | string (date-time) | yes | At the alighting stop. |
@@ -924,13 +924,13 @@ Position, parties ahead, estimated call time. Polled by the guest app, so it is 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| entryId | path | yes | string |  |
+| entryId | path | yes | string (uuid) |  |
 
 **Response**: `WaitingGuest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | The client-generated ULID from JoinQueueRequest.id, and the entryId every entry path takes. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | The client-generated UUIDv7 from JoinQueueRequest.id, and the entryId every entry path takes. |
 | queueId | string (uuid) | yes |  |
 | queueName | LocalisedText |  |  |
 | subjectId | string (uuid) |  | (nullable) |
@@ -987,13 +987,13 @@ Where the party includes someone below the height requirement, the join is refus
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `JoinQueueRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes |  |
 | queueId | string (uuid) | yes |  |
 | partySize | integer | yes | (min 1) |
 | entitlementId | string |  | Fast Pass or priority entitlement. (nullable) |
@@ -1006,7 +1006,7 @@ Where the party includes someone below the height requirement, the join is refus
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | The client-generated ULID from JoinQueueRequest.id, and the entryId every entry path takes. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | The client-generated UUIDv7 from JoinQueueRequest.id, and the entryId every entry path takes. |
 | queueId | string (uuid) | yes |  |
 | queueName | LocalisedText |  |  |
 | subjectId | string (uuid) |  | (nullable) |
@@ -1058,8 +1058,8 @@ Where the party includes someone below the height requirement, the join is refus
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| entryId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| entryId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Responses**
 
@@ -1101,7 +1101,7 @@ Operator view. Position order, with no-shows and expiries visible.
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of WaitingGuest | yes |  |
-| items[].id | string | yes | The client-generated ULID from JoinQueueRequest.id, and the entryId every entry path takes. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].id | string (uuid) | yes | The client-generated UUIDv7 from JoinQueueRequest.id, and the entryId every entry path takes. |
 | items[].queueId | string (uuid) | yes |  |
 | items[].queueName | LocalisedText |  |  |
 | items[].subjectId | string (uuid) |  | (nullable) |
@@ -1158,7 +1158,7 @@ The passenger picker reads its types from here (adult, child, student, person of
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| routeId | path | yes | string |  |
+| routeId | path | yes | string (uuid) |  |
 
 **Response**: `FareTable`
 
@@ -1174,8 +1174,8 @@ The passenger picker reads its types from here (adult, child, student, person of
 | perStopFare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | perStopFare.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | matrix | array of object |  | matrix only. |
-| matrix[].fromStationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| matrix[].toStationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| matrix[].fromStationId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| matrix[].toStationId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | matrix[].fare | Money | yes | On the wire this is three fields; in the database it is one column. |
 | matrix[].fare.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | matrix[].fare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -1191,8 +1191,8 @@ The passenger picker reads its types from here (adult, child, student, person of
 | passengerTypes[].isDefault | boolean |  | The type a new search starts with, one of it. (default False) |
 | passengerTypes[].catalogueVariantId | string (uuid) |  | The variant of the route's trip product this type is sold as. (read-only) |
 | effectiveFrom | string (date-time) | yes |  |
-| id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| routeId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| routeId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 
 **Responses**
 
@@ -1226,20 +1226,20 @@ Fare: `stopCount` is `baseFare + perStopFare × stops travelled`; `matrix` reads
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| routeId | string |  | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| fromStationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| toStationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| routeId | string (uuid) |  | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| fromStationId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| toStationId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | passengers | array of object |  | Omitted, one of the default type. (max items 10) |
 | passengers[].code | string | yes |  |
 | passengers[].count | integer | yes | (min 0; max 99) |
-| passTypeId | string |  | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| passTypeId | string (uuid) |  | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | at | string (date-time) |  | The sale instant the fare table is read at. |
 
 **Response**: `FareQuote`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| routeId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| routeId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | stopsTravelled | integer | yes | (min 1) |
 | adultFare | Money | yes | On the wire this is three fields; in the database it is one column. |
 | adultFare.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -1257,7 +1257,7 @@ Fare: `stopCount` is `baseFare + perStopFare × stops travelled`; `matrix` reads
 | lines[].lineTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].lineTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].lineTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| passTypeId | string |  | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| passTypeId | string (uuid) |  | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | saving | Money |  | On the wire this is three fields; in the database it is one column. |
 | saving.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | saving.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -1299,8 +1299,8 @@ Replaces the route's fare table as a whole (decided 29 September, rev 3 REV3-21)
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| routeId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| routeId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `SetFareTableRequest`
 
@@ -1316,8 +1316,8 @@ Replaces the route's fare table as a whole (decided 29 September, rev 3 REV3-21)
 | perStopFare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | perStopFare.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | matrix | array of object |  | matrix only. |
-| matrix[].fromStationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| matrix[].toStationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| matrix[].fromStationId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| matrix[].toStationId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | matrix[].fare | Money | yes | On the wire this is three fields; in the database it is one column. |
 | matrix[].fare.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | matrix[].fare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -1348,8 +1348,8 @@ Replaces the route's fare table as a whole (decided 29 September, rev 3 REV3-21)
 | perStopFare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | perStopFare.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | matrix | array of object |  | matrix only. |
-| matrix[].fromStationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| matrix[].toStationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| matrix[].fromStationId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| matrix[].toStationId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | matrix[].fare | Money | yes | On the wire this is three fields; in the database it is one column. |
 | matrix[].fare.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | matrix[].fare.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -1365,8 +1365,8 @@ Replaces the route's fare table as a whole (decided 29 September, rev 3 REV3-21)
 | passengerTypes[].isDefault | boolean |  | The type a new search starts with, one of it. (default False) |
 | passengerTypes[].catalogueVariantId | string (uuid) |  | The variant of the route's trip product this type is sold as. (read-only) |
 | effectiveFrom | string (date-time) | yes |  |
-| id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| routeId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| routeId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 
 **Responses**
 
@@ -1399,8 +1399,8 @@ Replaces the route's fare table as a whole (decided 29 September, rev 3 REV3-21)
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| favouriteId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| favouriteId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Responses**
 
@@ -1442,10 +1442,10 @@ The Favourites tab (decided 29 September, rev 3 REV3-21): each saved pair of sta
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of FavouriteRoute | yes |  |
-| items[].id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | items[].venueId | string (uuid) | yes |  |
-| items[].fromStationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| items[].toStationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].fromStationId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| items[].toStationId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | items[].fromStationName | string |  | (read-only) |
 | items[].toStationName | string |  | (read-only) |
 | items[].label | string |  | (nullable) |
@@ -1487,25 +1487,25 @@ The Favourites tab (decided 29 September, rev 3 REV3-21): each saved pair of sta
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | venueId | string (uuid) | yes |  |
-| fromStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| toStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| fromStationId | string (uuid) | yes |  |
+| toStationId | string (uuid) | yes |  |
 | label | string |  | (max length 60; nullable) |
 
 **Response**: `FavouriteRoute`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | venueId | string (uuid) | yes |  |
-| fromStationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| toStationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| fromStationId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| toStationId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | fromStationName | string |  | (read-only) |
 | toStationName | string |  | (read-only) |
 | label | string |  | (nullable) |
@@ -1553,7 +1553,7 @@ Enables integration for a venue and selects an adaptor. **TICVAI ships no vendor
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `QueueFeed`
 
@@ -1677,7 +1677,7 @@ Items may be marked safety-critical. **A failed safety-critical item blocks the 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `InspectionTemplate`
 
@@ -1761,14 +1761,14 @@ Refused `409` while the import has any `error` finding, is not `previewReady`, o
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| importId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| importId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Response**: `TransportNetworkImport`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | venueId | string (uuid) | yes | (read-only) |
 | format | enum (csvBundle, gtfs) | yes |  |
 | sourceRef | string (uuid) | yes |  |
@@ -1825,7 +1825,7 @@ Refused `409` while the import has any `error` finding, is not `previewReady`, o
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ImportTransportNetworkRequest`
 
@@ -1839,7 +1839,7 @@ Refused `409` while the import has any `error` finding, is not `previewReady`, o
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | venueId | string (uuid) | yes | (read-only) |
 | format | enum (csvBundle, gtfs) | yes |  |
 | sourceRef | string (uuid) | yes |  |
@@ -1898,7 +1898,7 @@ Refused `409` while the import has any `error` finding, is not `previewReady`, o
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreatePassTypeRequest`
 
@@ -1913,7 +1913,7 @@ Refused `409` while the import has any `error` finding, is not `previewReady`, o
 | fareMultiplier | number | yes | The pass price as a multiple of the single adult fare between its two stations. (min 0; max 1000) |
 | referenceTrips | integer | yes | The single trips the saving is measured against — trips for a multi-trip card, an number the venue sets for unlimited (14 a week, 60 a month in the demo seed data). (min 1; max 1000) |
 | validityDays | integer | yes | (min 1; max 366) |
-| routeIds | array of string |  | Routes it is sold on. |
+| routeIds | array of string (uuid) |  | Routes it is sold on. |
 | sortOrder | integer |  | (min 0; default 0) |
 
 **Response**: `PassType`
@@ -1929,9 +1929,9 @@ Refused `409` while the import has any `error` finding, is not `previewReady`, o
 | fareMultiplier | number | yes | The pass price as a multiple of the single adult fare between its two stations. (min 0; max 1000) |
 | referenceTrips | integer | yes | The single trips the saving is measured against — trips for a multi-trip card, an number the venue sets for unlimited (14 a week, 60 a month in the demo seed data). (min 1; max 1000) |
 | validityDays | integer | yes | (min 1; max 366) |
-| routeIds | array of string |  | Routes it is sold on. |
+| routeIds | array of string (uuid) |  | Routes it is sold on. |
 | sortOrder | integer |  | (min 0; default 0) |
-| id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | active | boolean | yes | (default True) |
 | catalogueProductId | string (uuid) |  | The catalogue openDated product this pass is sold as. (read-only) |
 
@@ -1966,8 +1966,8 @@ The Multi-trip tab (decided 29 September, rev 3 REV3-21): 5-trip and 10-trip car
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| fromStationId | query | yes | string |  |
-| toStationId | query | yes | string |  |
+| fromStationId | query | yes | string (uuid) |  |
+| toStationId | query | yes | string (uuid) |  |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
@@ -1976,9 +1976,9 @@ The Multi-trip tab (decided 29 September, rev 3 REV3-21): 5-trip and 10-trip car
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of PassOffer | yes |  |
-| items[].passTypeId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].passTypeId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | items[].catalogueProductId | string (uuid) | yes |  |
-| items[].routeId | string |  | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].routeId | string (uuid) |  | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | items[].name | string | yes |  |
 | items[].description | string |  |  |
 | items[].kind | enum (multiTrip, unlimited) |  |  |
@@ -2029,7 +2029,7 @@ Bound to an attraction and, where one exists, to an asset — so a ride taken ou
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateQueueRequest`
 
@@ -2317,7 +2317,7 @@ Guest-facing when called with a guest token — returns only queues that are ope
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | queueId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2417,7 +2417,7 @@ Guest-facing when called with a guest token — returns only queues that are ope
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `Resource`
 
@@ -2506,7 +2506,7 @@ Board 2.07. **A block is not a booking and the difference is operational.** An o
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ResourceBlock`
 
@@ -2570,13 +2570,13 @@ Board 2.07. **A block is not a booking and the difference is operational.** An o
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateResourceHoldRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Client-generated ULID, as a seat hold's. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Client-generated UUIDv7, as a seat hold's. |
 | mapId | string (uuid) | yes | The published venue map the guest picked from. |
 | resourceIds | array of string (uuid) | yes | Placed resources on that map, e.g. (min items 1; max items 10) |
 | from | string (date-time) | yes |  |
@@ -2589,7 +2589,7 @@ Board 2.07. **A block is not a booking and the difference is operational.** An o
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes |  |
 | mapId | string (uuid) | yes |  |
 | resourceIds | array of string (uuid) | yes |  |
 | from | string (date-time) | yes |  |
@@ -2637,7 +2637,7 @@ Board 2.07. **A block is not a booking and the difference is operational.** An o
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ResourcePackage`
 
@@ -2732,14 +2732,14 @@ For a guest still completing payment. **The same bounds as a seat hold**: `Venue
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| holdId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| holdId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Response**: `ResourceHold`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes |  |
 | mapId | string (uuid) | yes |  |
 | resourceIds | array of string (uuid) | yes |  |
 | from | string (date-time) | yes |  |
@@ -2908,13 +2908,13 @@ The countdown's source of truth, as `seating.getSeatHold`.
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| holdId | path | yes | string |  |
+| holdId | path | yes | string (uuid) |  |
 
 **Response**: `ResourceHold`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes |  |
 | mapId | string (uuid) | yes |  |
 | resourceIds | array of string (uuid) | yes |  |
 | from | string (date-time) | yes |  |
@@ -3013,7 +3013,7 @@ Start times fall on `stepMinutes` from the venue's opening on that date, and a w
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | blockId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Responses**
 
@@ -3045,8 +3045,8 @@ The guest picked another cabana or left the map. The resource is free at once.
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| holdId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| holdId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Responses**
 
@@ -3079,7 +3079,7 @@ Requirements are stated as type and quantity with optional qualifications — *o
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | experienceId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -3128,7 +3128,7 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | resourceId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 | Prefer | header |  | enum (validate-only) | Validate, do not write (29 September, AI system design 2.3 and 2.2 D step 4). |
 
 **Request body**: `ResourceSchedule`
@@ -3204,7 +3204,7 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | resourceId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `Resource`
 
@@ -3292,7 +3292,7 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | packageId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ResourcePackage`
 
@@ -3426,7 +3426,7 @@ Created as `draft`. **Creating a route creates its catalogue side** — a catalo
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateTransportRouteRequest`
 
@@ -3437,10 +3437,10 @@ Created as `draft`. **Creating a route creates its catalogue side** — a catalo
 | lineCode | string |  | The public line number shared by both directions, e.g. (max length 16) |
 | name | LocalisedText | yes |  |
 | colour | string |  | (pattern ^#[0-9a-fA-F]{6}$) |
-| pairedRouteId | string |  | The same line run the other way. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| pairedRouteId | string (uuid) |  | The same line run the other way. (nullable) |
 | bookingCutoffMinutes | integer |  | How long before a departure leaves the boarding stop that online sale stops. (min 0; max 1440; default 5) |
 | stops | array of RouteStopInput | yes | (min items 2; max items 100) |
-| stops[].stationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].stationId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | stops[].offsetMinutes | integer | yes | Minutes after the departure from the first stop that the coach leaves this one. (min 0; max 1440) |
 | stops[].boardingAllowed | boolean |  | (default True) |
 | stops[].alightingAllowed | boolean |  | (default True) |
@@ -3454,14 +3454,14 @@ Created as `draft`. **Creating a route creates its catalogue side** — a catalo
 | lineCode | string |  | The public line number shared by both directions, e.g. (max length 16) |
 | name | LocalisedText | yes |  |
 | colour | string |  | (pattern ^#[0-9a-fA-F]{6}$) |
-| pairedRouteId | string |  | The same line run the other way. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| pairedRouteId | string (uuid) |  | The same line run the other way. (nullable) |
 | bookingCutoffMinutes | integer |  | How long before a departure leaves the boarding stop that online sale stops. (min 0; max 1440; default 5) |
 | stops | array of RouteStop | yes |  |
-| stops[].stationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].stationId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | stops[].offsetMinutes | integer | yes | Minutes after the departure from the first stop that the coach leaves this one. (min 0; max 1440) |
 | stops[].boardingAllowed | boolean |  | (default True) |
 | stops[].alightingAllowed | boolean |  | (default True) |
-| stops[].id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | stops[].sequence | integer | yes | 1 for the origin. (min 1) |
 | stops[].station | Station |  |  |
 | stops[].station.venueId | string (uuid) | yes |  |
@@ -3470,9 +3470,9 @@ Created as `draft`. **Creating a route creates its catalogue side** — a catalo
 | stops[].station.shortName | LocalisedText |  | The label on the route diagram and the map pin (Union Sq, MoE). |
 | stops[].station.latitude | number |  | (min -90; max 90; nullable) |
 | stops[].station.longitude | number |  | (min -180; max 180; nullable) |
-| stops[].station.id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].station.id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | stops[].station.active | boolean | yes | (default True) |
-| id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | status | TransportRouteStatus: enum (draft, active, suspended, retired) | yes |  |
 | totalMinutes | integer |  | The last stop's offset. (read-only) |
 | catalogueEventId | string (uuid) |  | The catalogue event its departures are performances of. (read-only) |
@@ -3510,7 +3510,7 @@ The stop list from origin to end. A guest or public caller gets 404 for a route 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| routeId | path | yes | string |  |
+| routeId | path | yes | string (uuid) |  |
 
 **Response**: `TransportRoute`
 
@@ -3521,14 +3521,14 @@ The stop list from origin to end. A guest or public caller gets 404 for a route 
 | lineCode | string |  | The public line number shared by both directions, e.g. (max length 16) |
 | name | LocalisedText | yes |  |
 | colour | string |  | (pattern ^#[0-9a-fA-F]{6}$) |
-| pairedRouteId | string |  | The same line run the other way. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| pairedRouteId | string (uuid) |  | The same line run the other way. (nullable) |
 | bookingCutoffMinutes | integer |  | How long before a departure leaves the boarding stop that online sale stops. (min 0; max 1440; default 5) |
 | stops | array of RouteStop | yes |  |
-| stops[].stationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].stationId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | stops[].offsetMinutes | integer | yes | Minutes after the departure from the first stop that the coach leaves this one. (min 0; max 1440) |
 | stops[].boardingAllowed | boolean |  | (default True) |
 | stops[].alightingAllowed | boolean |  | (default True) |
-| stops[].id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | stops[].sequence | integer | yes | 1 for the origin. (min 1) |
 | stops[].station | Station |  |  |
 | stops[].station.venueId | string (uuid) | yes |  |
@@ -3537,9 +3537,9 @@ The stop list from origin to end. A guest or public caller gets 404 for a route 
 | stops[].station.shortName | LocalisedText |  | The label on the route diagram and the map pin (Union Sq, MoE). |
 | stops[].station.latitude | number |  | (min -90; max 90; nullable) |
 | stops[].station.longitude | number |  | (min -180; max 180; nullable) |
-| stops[].station.id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].station.id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | stops[].station.active | boolean | yes | (default True) |
-| id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | status | TransportRouteStatus: enum (draft, active, suspended, retired) | yes |  |
 | totalMinutes | integer |  | The last stop's offset. (read-only) |
 | catalogueEventId | string (uuid) |  | The catalogue event its departures are performances of. (read-only) |
@@ -3577,19 +3577,19 @@ The stop list from departure to arrival and the street map beside it (decided 29
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| routeId | path | yes | string |  |
-| fromStationId | query |  | string |  |
-| toStationId | query |  | string |  |
+| routeId | path | yes | string (uuid) |  |
+| fromStationId | query |  | string (uuid) |  |
+| toStationId | query |  | string (uuid) |  |
 
 **Response**: `RouteMap`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| routeId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| routeId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | lineCode | string |  |  |
 | colour | string |  |  |
 | stops | array of object | yes | Every stop in route order. |
-| stops[].stationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].stationId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | stops[].sequence | integer | yes |  |
 | stops[].name | string | yes | Localised to the caller. |
 | stops[].shortName | string |  |  |
@@ -3640,8 +3640,8 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | venueId | query | yes | string (uuid) |  |
-| fromStationId | query |  | string |  |
-| toStationId | query |  | string |  |
+| fromStationId | query |  | string (uuid) |  |
+| toStationId | query |  | string (uuid) |  |
 | status | query |  | TransportRouteStatus: enum (draft, active, suspended, retired) |  |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
@@ -3656,17 +3656,17 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 | items[].lineCode | string |  | The public line number shared by both directions, e.g. (max length 16) |
 | items[].name | LocalisedText | yes |  |
 | items[].colour | string |  | (pattern ^#[0-9a-fA-F]{6}$) |
-| items[].pairedRouteId | string |  | The same line run the other way. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| items[].pairedRouteId | string (uuid) |  | The same line run the other way. (nullable) |
 | items[].bookingCutoffMinutes | integer |  | How long before a departure leaves the boarding stop that online sale stops. (min 0; max 1440; default 5) |
 | items[].stops | array of RouteStop | yes |  |
-| items[].stops[].stationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].stops[].stationId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | items[].stops[].offsetMinutes | integer | yes | Minutes after the departure from the first stop that the coach leaves this one. (min 0; max 1440) |
 | items[].stops[].boardingAllowed | boolean |  | (default True) |
 | items[].stops[].alightingAllowed | boolean |  | (default True) |
-| items[].stops[].id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].stops[].id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | items[].stops[].sequence | integer | yes | 1 for the origin. (min 1) |
 | items[].stops[].station | Station |  |  |
-| items[].id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | items[].status | TransportRouteStatus: enum (draft, active, suspended, retired) | yes |  |
 | items[].totalMinutes | integer |  | The last stop's offset. (read-only) |
 | items[].catalogueEventId | string (uuid) |  | The catalogue event its departures are performances of. (read-only) |
@@ -3703,8 +3703,8 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| routeId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| routeId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -3712,10 +3712,10 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 |---|---|---|---|
 | name | LocalisedText |  |  |
 | colour | string |  | (pattern ^#[0-9a-fA-F]{6}$) |
-| pairedRouteId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| pairedRouteId | string (uuid) |  | (nullable) |
 | bookingCutoffMinutes | integer |  | (min 0; max 1440) |
 | stops | array of RouteStopInput |  | (min items 2) |
-| stops[].stationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].stationId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | stops[].offsetMinutes | integer | yes | Minutes after the departure from the first stop that the coach leaves this one. (min 0; max 1440) |
 | stops[].boardingAllowed | boolean |  | (default True) |
 | stops[].alightingAllowed | boolean |  | (default True) |
@@ -3729,14 +3729,14 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 | lineCode | string |  | The public line number shared by both directions, e.g. (max length 16) |
 | name | LocalisedText | yes |  |
 | colour | string |  | (pattern ^#[0-9a-fA-F]{6}$) |
-| pairedRouteId | string |  | The same line run the other way. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| pairedRouteId | string (uuid) |  | The same line run the other way. (nullable) |
 | bookingCutoffMinutes | integer |  | How long before a departure leaves the boarding stop that online sale stops. (min 0; max 1440; default 5) |
 | stops | array of RouteStop | yes |  |
-| stops[].stationId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].stationId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | stops[].offsetMinutes | integer | yes | Minutes after the departure from the first stop that the coach leaves this one. (min 0; max 1440) |
 | stops[].boardingAllowed | boolean |  | (default True) |
 | stops[].alightingAllowed | boolean |  | (default True) |
-| stops[].id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | stops[].sequence | integer | yes | 1 for the origin. (min 1) |
 | stops[].station | Station |  |  |
 | stops[].station.venueId | string (uuid) | yes |  |
@@ -3745,9 +3745,9 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 | stops[].station.shortName | LocalisedText |  | The label on the route diagram and the map pin (Union Sq, MoE). |
 | stops[].station.latitude | number |  | (min -90; max 90; nullable) |
 | stops[].station.longitude | number |  | (min -180; max 180; nullable) |
-| stops[].station.id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| stops[].station.id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | stops[].station.active | boolean | yes | (default True) |
-| id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | status | TransportRouteStatus: enum (draft, active, suspended, retired) | yes |  |
 | totalMinutes | integer |  | The last stop's offset. (read-only) |
 | catalogueEventId | string (uuid) |  | The catalogue event its departures are performances of. (read-only) |
@@ -3787,7 +3787,7 @@ Venue Management transport setup (decided 29 September, rev 3 REV3-21). **A stat
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateStationRequest`
 
@@ -3810,7 +3810,7 @@ Venue Management transport setup (decided 29 September, rev 3 REV3-21). **A stat
 | shortName | LocalisedText |  | The label on the route diagram and the map pin (Union Sq, MoE). |
 | latitude | number |  | (min -90; max 90; nullable) |
 | longitude | number |  | (min -180; max 180; nullable) |
-| id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | active | boolean | yes | (default True) |
 
 **Responses**
@@ -3861,7 +3861,7 @@ The From and To station menus (decided 29 September, rev 3 REV3-21). A guest or 
 | items[].shortName | LocalisedText |  | The label on the route diagram and the map pin (Union Sq, MoE). |
 | items[].latitude | number |  | (min -90; max 90; nullable) |
 | items[].longitude | number |  | (min -180; max 180; nullable) |
-| items[].id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | items[].active | boolean | yes | (default True) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
@@ -3900,8 +3900,8 @@ Departure times from the route's origin by day of week, valid over a date range.
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| routeId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| routeId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateTimetableRequest`
 
@@ -3930,12 +3930,12 @@ Departure times from the route's origin by day of week, valid over a date range.
 | runs | array of TimetableRun | yes | (min items 1; max items 500) |
 | runs[].departsAt | string | yes | Venue local time, 24-hour HH:MM, at the route's first stop. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
 | runs[].days | array of enum (mon, tue, wed, thu, fri, sat, sun) | yes | (min items 1) |
-| id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| routeId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| routeId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | status | TransportTimetableStatus: enum (draft, published, superseded, withdrawn) | yes |  |
 | publishedAt | string (date-time) |  | (read-only; nullable) |
 | releasedThrough | string (date) |  | The last date whose departures have been generated. (read-only; nullable) |
-| supersededById | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+| supersededById | string (uuid) |  | (read-only; nullable) |
 
 **Responses**
 
@@ -3970,8 +3970,8 @@ The route must be `active` and have a fare table.
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| timetableId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| timetableId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Response**: `Timetable`
 
@@ -3986,12 +3986,12 @@ The route must be `active` and have a fare table.
 | runs | array of TimetableRun | yes | (min items 1; max items 500) |
 | runs[].departsAt | string | yes | Venue local time, 24-hour HH:MM, at the route's first stop. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
 | runs[].days | array of enum (mon, tue, wed, thu, fri, sat, sun) | yes | (min items 1) |
-| id | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| routeId | string | yes | A ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| routeId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | status | TransportTimetableStatus: enum (draft, published, superseded, withdrawn) | yes |  |
 | publishedAt | string (date-time) |  | (read-only; nullable) |
 | releasedThrough | string (date) |  | The last date whose departures have been generated. (read-only; nullable) |
-| supersededById | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+| supersededById | string (uuid) |  | (read-only; nullable) |
 
 **Responses**
 
@@ -4031,7 +4031,7 @@ Files are scanned before becoming available. An asset that fails scanning is qua
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | uploadId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -4127,7 +4127,7 @@ Confirm with `POST /media/uploads/{id}/complete` once the transfer finishes. The
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -4190,7 +4190,7 @@ A venue may have several — **a park map and a floor plan per building are diff
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `VenueMap`
 
@@ -4460,7 +4460,7 @@ Carries every lesson CF-122 taught on the seat importer, because it is the same 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | mapId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -4607,7 +4607,7 @@ Refuses a draft with unresolved proposals or a point linked to something that no
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | mapId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -4673,7 +4673,7 @@ Refuses a draft with unresolved proposals or a point linked to something that no
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | mapId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `SetPlacedResourceRequest`
 
@@ -4754,7 +4754,7 @@ Unlinked points are fine and expected — a toilet is a toilet.
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | mapId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `SetVenuePointRequest`
 
@@ -4863,7 +4863,7 @@ The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets show
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | planId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -4924,7 +4924,7 @@ The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets show
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `VisitPlanRequest`
 
@@ -5184,7 +5184,7 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | planId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `VisitPlanUpdate`
 
@@ -5480,7 +5480,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | root_cause_note | text | no |  |
 | escalated_at | timestamptz | no |  |
 | escalation_level | integer | no | Escalation is a clock, not a decision. |
-| id | text | yes |  |
+| id | uuid | yes |  |
 | work_order_number | text | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | title | text | yes |  |
 | venue_id | uuid | yes |  |
@@ -5502,8 +5502,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | due_at | timestamptz | no |  |
 | requires_verification | boolean | no |  |
 | source_plan_id | uuid | no |  |
-| source_inspection_id | text | no |  |
-| source_incident_id | text | no |  |
+| source_inspection_id | uuid | no |  |
+| source_incident_id | uuid | no |  |
 | created_at | timestamptz | yes |  |
 | recorded_at | timestamptz | no |  |
 | completed_at | timestamptz | no |  |
@@ -5524,11 +5524,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 | verified_by_principal_id | uuid | no |  |
 | cancel_reason | text | no |  |
 | cancel_note | text | no |  |
-| superseded_by_work_order_id | text | no | Set by cancelWorkOrder where the reason is superseded. |
+| superseded_by_work_order_id | uuid | no | Set by cancelWorkOrder where the reason is superseded. |
 | cancelled_at | timestamptz | no |  |
 | close_outcome | text | no |  |
 | close_note | text | no |  |
-| duplicate_of_work_order_id | text | no | Set by closeWorkOrder where the outcome is duplicate. |
+| duplicate_of_work_order_id | uuid | no | Set by closeWorkOrder where the outcome is duplicate. |
 | closed_at | timestamptz | no |  |
 | closed_by_principal_id | uuid | no |  |
 
@@ -5536,7 +5536,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes | The client-generated ULID from JoinQueueRequest.id, and the entryId every entry path takes. |
+| id | uuid | yes | The client-generated UUIDv7 from JoinQueueRequest.id, and the entryId every entry path takes. |
 | queue_id | uuid | yes |  |
 | queue_name | jsonb | no |  |
 | subject_id | uuid | no |  |
@@ -5551,7 +5551,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | priority_tier_id | uuid | no | The loyalty tier that granted priority, where priorityBasis is loyaltyTier. |
 | priority_promotion_id | uuid | no | The promotion that granted priority, where priorityBasis is promotion. |
 | is_accessibility_need_declared | boolean | no | What the party declared at join, shown to the operator at the front. |
-| entitlement_id | text | no |  |
+| entitlement_id | uuid | no |  |
 | called_at | timestamptz | no |  |
 | return_window_ends_at | timestamptz | no |  |
 | redeemed_at | timestamptz | no |  |
@@ -5631,7 +5631,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes |  |
+| id | uuid | yes |  |
 | feed_id | uuid | no | The feed that sent it, taken from the submitQueueReading body. |
 | disposition | text | no | Set on receipt. |
 | kind | text | yes | Deliberately narrow. |
@@ -5647,11 +5647,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes |  |
 | resource_id | uuid | yes |  |
 | subject_id | uuid | no |  |
-| order_id | text | no |  |
+| order_id | uuid | no |  |
 | valid_from | timestamptz | yes |  |
 | valid_to | timestamptz | yes |  |
 | status | text | yes |  |
-| hold_id | text | no | The ResourceHold this booking was converted from, where a guest picked the resource on a venue map (rev 3 REV3-15). |
+| hold_id | uuid | no | The ResourceHold this booking was converted from, where a guest picked the resource on a venue map (rev 3 REV3-15). |
 | recurrence_group_id | uuid | no | Ties the occurrences of a recurring booking. |
 | deposit_authorisation_id | uuid | no | The hold, through orders.authoriseStoredValue (CF-126). |
 | checked_out_at | timestamptz | no |  |
@@ -5699,7 +5699,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes |  |
+| id | uuid | yes |  |
 | map_id | uuid | yes |  |
 | resource_ids | text[] | yes |  |
 | valid_from | timestamptz | yes |  |
@@ -5765,9 +5765,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes |  |
-| route_id | text | yes |  |
-| timetable_id | text | yes |  |
+| id | uuid | yes |  |
+| route_id | uuid | yes |  |
+| timetable_id | uuid | yes |  |
 | performance_id | uuid | yes | The catalogue performance this departure is sold as. |
 | service_date | date | yes |  |
 | departs_at | timestamptz | yes | At the route's first stop. |
@@ -5780,9 +5780,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| fare_table_id | text | yes | The parent row. |
-| from_station_id | text | yes |  |
-| to_station_id | text | yes |  |
+| fare_table_id | uuid | yes | The parent row. |
+| from_station_id | uuid | yes |  |
+| to_station_id | uuid | yes |  |
 | fare | numeric(18,4) | yes |  |
 | id | uuid | yes | Synthesised key. |
 
@@ -5790,7 +5790,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| fare_table_id | text | yes | The parent row. |
+| fare_table_id | uuid | yes | The parent row. |
 | code | text | yes | adult, child, student, determination. |
 | name | jsonb | yes |  |
 | description | jsonb | no | What the picker shows under the name ("Age 5–11 · half fare"). |
@@ -5810,17 +5810,17 @@ Every table this service owns that the slice reads or writes, with its columns a
 | base_fare | numeric(18,4) | no | stopCount only. |
 | per_stop_fare | numeric(18,4) | no | stopCount only. |
 | effective_from | timestamptz | yes |  |
-| id | text | yes |  |
-| route_id | text | yes |  |
+| id | uuid | yes |  |
+| route_id | uuid | yes |  |
 
 ### `transport.favourite_route`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes |  |
+| id | uuid | yes |  |
 | venue_id | uuid | yes |  |
-| from_station_id | text | yes |  |
-| to_station_id | text | yes |  |
+| from_station_id | uuid | yes |  |
+| to_station_id | uuid | yes |  |
 | from_station_name | text | no |  |
 | to_station_name | text | no |  |
 | label | text | no |  |
@@ -5830,7 +5830,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes |  |
+| id | uuid | yes |  |
 | venue_id | uuid | yes |  |
 | format | text | yes |  |
 | source_ref | uuid | yes |  |
@@ -5856,7 +5856,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | validity_days | integer | yes |  |
 | route_ids | text[] | no | Routes it is sold on. |
 | sort_order | integer | no |  |
-| id | text | yes |  |
+| id | uuid | yes |  |
 | is_active | boolean | yes |  |
 | catalogue_product_id | uuid | no | The catalogue openDated product this pass is sold as. |
 
@@ -5869,9 +5869,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | line_code | text | no | The public line number shared by both directions, e.g. |
 | name | jsonb | yes |  |
 | colour | text | no |  |
-| paired_route_id | text | no | The same line run the other way. |
+| paired_route_id | uuid | no | The same line run the other way. |
 | booking_cutoff_minutes | integer | no | How long before a departure leaves the boarding stop that online sale stops. |
-| id | text | yes |  |
+| id | uuid | yes |  |
 | status | text | yes |  |
 | total_minutes | integer | no | The last stop's offset. |
 | catalogue_event_id | uuid | no | The catalogue event its departures are performances of. |
@@ -5881,12 +5881,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| route_id | text | yes | The parent row. |
-| station_id | text | yes |  |
+| route_id | uuid | yes | The parent row. |
+| station_id | uuid | yes |  |
 | offset_minutes | integer | yes | Minutes after the departure from the first stop that the coach leaves this one. |
 | is_boarding_allowed | boolean | no |  |
 | is_alighting_allowed | boolean | no |  |
-| id | text | yes |  |
+| id | uuid | yes |  |
 | sequence | integer | yes | 1 for the origin. |
 
 ### `transport.station`
@@ -5899,7 +5899,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | short_name | jsonb | no | The label on the route diagram and the map pin (Union Sq, MoE). |
 | latitude | numeric | no |  |
 | longitude | numeric | no |  |
-| id | text | yes |  |
+| id | uuid | yes |  |
 | is_active | boolean | yes |  |
 
 ### `transport.timetable`
@@ -5912,18 +5912,18 @@ Every table this service owns that the slice reads or writes, with its columns a
 | release_horizon_days | integer | no | How many days ahead departures go on sale. |
 | seat_capacity | integer | yes | Seats per departure, unless a departure overrides it. |
 | seat_map_id | uuid | no | The coach seat map for Seat Selection (seating). |
-| id | text | yes |  |
-| route_id | text | yes |  |
+| id | uuid | yes |  |
+| route_id | uuid | yes |  |
 | status | text | yes |  |
 | published_at | timestamptz | no |  |
 | released_through | date | no | The last date whose departures have been generated. |
-| superseded_by_id | text | no |  |
+| superseded_by_id | uuid | no |  |
 
 ### `transport.timetable_run`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| timetable_id | text | yes | The parent row. |
+| timetable_id | uuid | yes | The parent row. |
 | departs_at | text | yes | Venue local time, 24-hour HH:MM, at the route's first stop. |
 | days | text[] | yes |  |
 | id | uuid | yes | Synthesised key. |

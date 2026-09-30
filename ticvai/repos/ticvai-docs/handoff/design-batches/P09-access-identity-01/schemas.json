@@ -1,4 +1,81 @@
 {
+ "ActiveSession": {
+  "x-ticvai-persistence": "none — Redis session registry",
+  "type": "object",
+  "required": [
+   "sessionId",
+   "principalId",
+   "status",
+   "startedAt",
+   "lastSeenAt"
+  ],
+  "properties": {
+   "status": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/SessionStatus"
+     }
+    ],
+    "description": "**A registry that only holds live sessions cannot answer why one ended.** Kept on the record so a supervisor asking *what happened to till 4* gets `terminated` or `expired` rather than an absence.\n"
+   },
+   "sessionId": {
+    "type": "string"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "principalName": {
+    "type": "string"
+   },
+   "roleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "roleName": {
+    "type": "string",
+    "nullable": true
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "workstationName": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "ipAddress": {
+    "type": "string",
+    "nullable": true
+   },
+   "deviceInfo": {
+    "type": "string",
+    "nullable": true
+   },
+   "hasOpenShift": {
+    "type": "boolean",
+    "description": "Revoking this session leaves cash unreconciled."
+   },
+   "mfaSatisfied": {
+    "type": "boolean"
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lastSeenAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "CreatePrincipalRequest": {
   "type": "object",
   "required": [
@@ -16,7 +93,8 @@
    },
    "initialCredential": {
     "type": "string",
-    "maxLength": 512
+    "maxLength": 512,
+    "writeOnly": true
    },
    "mustChangeCredential": {
     "type": "boolean",
@@ -35,65 +113,6 @@
    }
   }
  },
- "GuestSession": {
-  "x-ticvai-persistence": "none — Redis session registry",
-  "type": "object",
-  "required": [
-   "subjectId",
-   "tokens",
-   "isVerified",
-   "expiresAt"
-  ],
-  "properties": {
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "displayName": {
-    "type": "string",
-    "nullable": true
-   },
-   "tokens": {
-    "$ref": "#/components/schemas/TokenPair"
-   },
-   "isVerified": {
-    "type": "boolean",
-    "description": "False until an OTP or a verified provider identity confirms ownership. An unverified account may browse but not transact.\n"
-   },
-   "identityProviders": {
-    "type": "array",
-    "description": "Linked providers. Several may resolve to one account.",
-    "items": {
-     "type": "string",
-     "enum": [
-      "password",
-      "otp",
-      "apple",
-      "google",
-      "uaePass"
-     ]
-    }
-   },
-   "guestLinkId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Present where the guest is linked across cells (ADR-0010)."
-   },
-   "homeCellName": {
-    "type": "string",
-    "nullable": true
-   },
-   "preferredLanguage": {
-    "type": "string",
-    "nullable": true
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Longer lived than a staff session. No single-session rule — a guest may be signed in on a phone and a laptop at once.\n"
-   }
-  }
- },
  "LoginRequest": {
   "type": "object",
   "required": [
@@ -109,7 +128,8 @@
    "credential": {
     "type": "string",
     "description": "Password, PIN, card token or RFID token depending on `method`.\n",
-    "maxLength": 512
+    "maxLength": 512,
+    "writeOnly": true
    },
    "method": {
     "type": "string",
@@ -143,11 +163,27 @@
    {
     "type": "object",
     "required": [
-     "requiresRoleSelection"
+     "requiresRoleSelection",
+     "requiresMfa"
     ],
     "properties": {
      "requiresRoleSelection": {
       "type": "boolean"
+     },
+     "requiresMfa": {
+      "type": "boolean",
+      "description": "True when the principal holds any permission listed in `PasswordPolicy.mfaRequiredForPermissions` (decided 28 September, audit R135). The session is not usable until `verifyMfaChallenge` succeeds on a `signIn` challenge."
+     },
+     "hasMfaMethod": {
+      "type": "boolean",
+      "description": "Whether the principal has an active MFA method. With `requiresMfa` true and this false, the client must enrol one first (audit R135, R126 (5))."
+     },
+     "mfaMethods": {
+      "type": "array",
+      "description": "The principal's active methods, so the client can offer the right one for the `signIn` challenge. Empty when `requiresMfa` is false.",
+      "items": {
+       "$ref": "#/components/schemas/MfaMethod"
+      }
      },
      "availableRoles": {
       "type": "array",
@@ -161,6 +197,49 @@
     }
    }
   ]
+ },
+ "MfaEnrolment": {
+  "x-ticvai-persistence": "none — transient",
+  "type": "object",
+  "required": [
+   "methodId",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.\n"
+   },
+   "methodId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MfaKind"
+   },
+   "secret": {
+    "type": "string",
+    "nullable": true,
+    "description": "TOTP shared secret. Returned once, at enrolment, and never again."
+   },
+   "qrCodeUri": {
+    "type": "string",
+    "nullable": true
+   },
+   "recoveryCodes": {
+    "type": "array",
+    "description": "Returned once, in this enrolment response (`enrolMfaMethod` writes them, hashed, to `identity.mfa_recovery_code`). Not retrievable afterwards — `verifyMfaEnrolment` does not return them.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
  },
  "MfaKind": {
   "type": "string",
@@ -301,7 +380,9 @@
     "format": "uuid"
    },
    "code": {
-    "type": "string"
+    "type": "string",
+    "x-ticvai-unique": "tenant",
+    "description": "**Unique within the tenant** (decided 28 September, audit R108). A seeded role's code is reserved in every tenant. Unique per tenant, not per venue, because a grant names a role anywhere in the tree; `createRole` refuses a duplicate with `409 duplicate-code`.\n"
    },
    "name": {
     "type": "string"
@@ -325,7 +406,7 @@
    "isSystem": {
     "type": "boolean",
     "default": false,
-    "description": "**Seeded roles ship and are editable; deleting one is refused.** A venue that removes `cashier` and rebuilds it has two roles with one name in the audit log.\n"
+    "description": "**Seeded roles ship and are editable; deleting one is refused.** A venue that removes `cashier` and rebuilds it has two roles with one name in the audit log.\n**The seeded system roles are Cashier, Supervisor, Venue Manager, Finance and Tenant Admin** (proposed in `docs/active/seed-data-proposal.md` section 2, client to correct; audit R229).\n"
    },
    "principalCount": {
     "type": "integer"
@@ -425,6 +506,16 @@
    }
   }
  },
+ "SessionStatus": {
+  "type": "string",
+  "description": "**The life of one signed-in session, which is not the life of a shift.** A shift holds the float and survives a break; a session holds the person and does not. `ShiftStatus.suspended` is where a break lives — *break cover; float intact, workstation released* — and the release of the workstation is exactly why the session ends rather than pausing: the next person opens their own.\n**One principal, one active session per workstation.** Enforced by the `ActiveSession` registry rather than by a state, because it is a fact about the set of sessions and not about any one of them.\n",
+  "enum": [
+   "active",
+   "signedOut",
+   "terminated",
+   "expired"
+  ]
+ },
  "SsoProtocol": {
   "type": "string",
   "enum": [
@@ -461,7 +552,8 @@
    },
    "scopePath": {
     "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope**; the server sets it and ignores it in a request."
    }
   }
  },

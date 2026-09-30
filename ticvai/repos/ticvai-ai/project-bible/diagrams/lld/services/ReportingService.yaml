@@ -2,6 +2,7 @@ id: LLD-ReportingService
 title: ReportingService — 48 operations, 24 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
+deployable: operations
 index: diagrams/hld/02-services.yaml
 why: '**Reads almost everything and writes only its own definitions.** Separate because it is the one
   service that should never touch the transactional primary — ADR-0016 read-write separation exists

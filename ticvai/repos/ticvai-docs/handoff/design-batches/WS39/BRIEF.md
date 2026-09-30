@@ -1,6 +1,6 @@
 # WS39 — Pricing   Revenue Management board 6
 
-**10 screens · 10 operations · 10 schemas · 1 permissions**
+**10 screens · 12 operations · 15 schemas · 3 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 1 permissions apply here:
-  `PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `AI_CONFIGURE, PRICE_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -63,15 +62,15 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `ADM-098` | AI Pricing Intelligence Command Center | commandCentre | 1 | 0 | — |
 | `ADM-099` | Internal Demand & Booking Signal Hub | listDetail | 1 | 0 | — |
-| `ADM-100` | Weather Intelligence & Demand Impact Configuration | commandCentre | 1 | 0 | — |
-| `ADM-101` | Nearby Event, Exhibition & Local Demand Intelligence | configEditor | 1 | 0 | — |
-| `ADM-102` | Competitor Pricing & Market Position Intelligence | listDetail | 1 | 0 | — |
-| `ADM-103` | Market, Tourism, Holiday & Contextual Signal Hub | listDetail | 1 | 0 | — |
+| `ADM-100` | Weather Intelligence & Demand Impact Configuration | commandCentre | 2 | 1 | — |
+| `ADM-101` | Nearby Event, Exhibition & Local Demand Intelligence | configEditor | 2 | 1 | — |
+| `ADM-102` | Competitor Pricing & Market Position Intelligence | listDetail | 2 | 1 | — |
+| `ADM-103` | Market, Tourism, Holiday & Contextual Signal Hub | listDetail | 2 | 1 | — |
 | `ADM-104` | AI Demand Forecasting & Booking Curve Studio | listDetail | 1 | 0 | — |
 | `ADM-105` | Price Elasticity & Revenue Response Intelligence | listDetail | 1 | 0 | — |
 | `ADM-106` | AI Pricing Recommendation & Explainability Center | listDetail | 1 | 0 | — |
-| `ADM-107` | AI Signal Registry, Data Quality & Model Governance | listDetail | 1 | 0 | — |
+| `ADM-107` | AI Signal Registry, Data Quality & Model Governance | listDetail | 2 | 1 | — |
 
 ## Thin screens in this batch
 
-**ADM-099, ADM-100, ADM-102, ADM-103, ADM-104, ADM-105, ADM-106, ADM-107 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-099, ADM-102, ADM-103, ADM-104, ADM-105, ADM-106 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

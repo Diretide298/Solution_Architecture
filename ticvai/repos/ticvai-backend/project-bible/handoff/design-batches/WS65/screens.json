@@ -39,10 +39,7 @@
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-308 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-309",
@@ -101,10 +98,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can monitor the complete upgrade and conversion configuration portfolio and operational activity from one workspace.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each configuration displays) — counts over a population, then the population",
   "purpose": "Provide administrators and operations teams with one centralized view of all ticket upgrade, exchange and conversion configurations and operational activity.",
-  "purposeNote": "Authorized users can monitor the complete upgrade and conversion configuration portfolio and operational activity from one workspace.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -286,7 +283,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-308"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-308",
+   "workshopBoard": "wireframes/WS171 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-308"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Upgrade, Exchange & Conversion_Reference.pdf page 3. 26 of 31 labels bound to a contract property; 32 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -405,16 +403,14 @@
     "operationId": "setUpgradeConversionPath",
     "contract": "orders",
     "purpose": "Upgrade & Conversion Path Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setUpgradeConversionPath"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-309"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-309",
+   "workshopBoard": "wireframes/WS171 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-309"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Upgrade, Exchange & Conversion_Reference.pdf page 5. 0 of 0 labels bound to a contract property; 0 of 4 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -478,10 +474,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "customer, time and transaction conditions.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure eligibility for) and no display directory — it is settings, not a population",
   "purpose": "Determine whether a particular ticket/customer/transaction qualifies for a configured upgrade or conversion path. A path existing does not automatically mean every ticket can use it.",
-  "purposeNote": "customer, time and transaction conditions.",
   "layout": {
    "template": "form",
    "regions": [
@@ -545,7 +541,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-310"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-310",
+   "workshopBoard": "wireframes/WS171 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-310"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Upgrade, Exchange & Conversion_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 7 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -609,14 +606,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Upgrade and conversion rules correctly account for ticket lifecycle, usage and remaining entitlement before allowing a transaction.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure treatment of; Configure; Configure whether) and no display directory — it is settings, not a population",
   "purpose": "Define how ticket lifecycle state affects upgrade and conversion behavior. This deserves its own screen because a ticket may already have been partially consumed.",
-  "purposeNote": "Upgrade and conversion rules correctly account for ticket lifecycle, usage and remaining entitlement before allowing a transaction.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Grace Period. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Before Expiry, Grace Period. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Ticket Upgrade, Exchange & Conversion_Reference.pdf, page 9 §Support"
    }
   ],
@@ -700,6 +697,11 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Before Expiry",
+       "provenance": "pack Ticket Upgrade, Exchange & Conversion_Reference.pdf, page 9 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Grace Period",
        "provenance": "pack Ticket Upgrade, Exchange & Conversion_Reference.pdf, page 9 §Support"
       }
@@ -724,9 +726,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-311"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-311",
+   "workshopBoard": "wireframes/WS171 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-311"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket Upgrade, Exchange & Conversion_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 14 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket Upgrade, Exchange & Conversion_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 15 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -788,10 +791,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Area 11 can define upgrade financial policies while all monetary calculations are resolved consistently through TICVAI's central pricing engine.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure whether target pricing uses; Configure whether existing) and no display directory — it is settings, not a population",
   "purpose": "Define how the financial relationship between the old and new product should be treated.",
-  "purposeNote": "Area 11 can define upgrade financial policies while all monetary calculations are resolved consistently through TICVAI's central pricing engine.",
   "layout": {
    "template": "form",
    "regions": [
@@ -870,7 +873,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-312"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-312",
+   "workshopBoard": "wireframes/WS171 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-312"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Upgrade, Exchange & Conversion_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 10 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -998,7 +1002,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-313"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-313",
+   "workshopBoard": "wireframes/WS171 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-313"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Upgrade, Exchange & Conversion_Reference.pdf page 12. 0 of 0 labels bound to a contract property; 0 of 12 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1062,10 +1067,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "structures while preserving eligibility and consumption integrity.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Handle conversions that change more than simply the commercial level of a ticket.",
-  "purposeNote": "structures while preserving eligibility and consumption integrity.",
   "gaps": [
    {
     "operation": null,
@@ -1111,17 +1116,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "PersonTypeProductEntitlementConversionRulesView.childAdult",
-    "PersonTypeProductEntitlementConversionRulesView.juniorAdult",
-    "PersonTypeProductEntitlementConversionRulesView.seniorAdult",
-    "PersonTypeProductEntitlementConversionRulesView.residentTourist",
-    "PersonTypeProductEntitlementConversionRulesView.standardMember"
+    "PersonTypeProductEntitlementConversionRulesView.conversionType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-314"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-314",
+   "workshopBoard": "wireframes/WS171 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-314"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Upgrade, Exchange & Conversion_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 0 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1185,14 +1187,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized operations teams can safely process large group and bulk upgrades with eligibility, financial and exception validation before execution.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Select by; Configure) and no display directory — it is settings, not a population",
   "purpose": "Support operational upgrades involving multiple tickets rather than requiring staff to process each individually.",
-  "purposeNote": "Authorized operations teams can safely process large group and bulk upgrades with eligibility, financial and exception validation before execution.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Change Person Type. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Upgrade Selected, Convert Product, Change Person Type, Move to Alternative Performance. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Ticket Upgrade, Exchange & Conversion_Reference.pdf, page 16 §Support"
    }
   ],
@@ -1256,7 +1258,22 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Upgrade Selected",
+       "provenance": "pack Ticket Upgrade, Exchange & Conversion_Reference.pdf, page 16 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Convert Product",
+       "provenance": "pack Ticket Upgrade, Exchange & Conversion_Reference.pdf, page 16 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Change Person Type",
+       "provenance": "pack Ticket Upgrade, Exchange & Conversion_Reference.pdf, page 16 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Move to Alternative Performance",
        "provenance": "pack Ticket Upgrade, Exchange & Conversion_Reference.pdf, page 16 §Support"
       }
      ]
@@ -1280,9 +1297,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-315"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-315",
+   "workshopBoard": "wireframes/WS171 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-315"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket Upgrade, Exchange & Conversion_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 10 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket Upgrade, Exchange & Conversion_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 13 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1344,10 +1362,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Completed upgrades correctly update tickets, entitlements, credentials, access rights, financial records and applicable sales channels as one controlled transaction.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Depending on configuration) and no display directory — it is settings, not a population",
   "purpose": "Control what happens operationally once an upgrade or conversion is approved and financially completed.",
-  "purposeNote": "Completed upgrades correctly update tickets, entitlements, credentials, access rights, financial records and applicable sales channels as one controlled transaction.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1421,16 +1439,14 @@
     "operationId": "createUpgradeCredentialRegeneration",
     "contract": "orders",
     "purpose": "Upgrade Execution, Credential Regeneration & Channel Controls",
-    "trigger": "onAction",
-    "invalidates": [
-     "createUpgradeCredentialRegeneration"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-316"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-316",
+   "workshopBoard": "wireframes/WS171 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-316"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Upgrade, Exchange & Conversion_Reference.pdf page 18. 0 of 0 labels bound to a contract property; 8 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1486,10 +1502,10 @@
    "notes": "**Reached from ADM-308, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Every upgrade/conversion transaction and exception can be fully reconstructed across commercial, financial, ticketing, credential and user activity. Board 1 — Final Screen Register # Backend Screen Core Responsibility 11.1.1 Upgrade & Conversion Command Center Central operations",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide complete operational and financial traceability for every upgrade, downgrade, exchange and conversion.",
-  "purposeNote": "Every upgrade/conversion transaction and exception can be fully reconstructed across commercial, financial, ticketing, credential and user activity. Board 1 — Final Screen Register # Backend Screen Core Responsibility 11.1.1 Upgrade & Conversion Command Center Central operations",
   "layout": {
    "template": "split",
    "regions": [
@@ -1530,14 +1546,7 @@
        "kind": "dataTable",
        "label": "Every upgrade history exception",
        "columns": [
-        "UpgradeHistoryExceptionManagementAuditExplorerView.eligibilityOverride",
-        "UpgradeHistoryExceptionManagementAuditExplorerView.financialOverride",
-        "UpgradeHistoryExceptionManagementAuditExplorerView.expiredTicketException",
-        "UpgradeHistoryExceptionManagementAuditExplorerView.manualCredit",
-        "UpgradeHistoryExceptionManagementAuditExplorerView.complimentaryUpgrade",
-        "UpgradeHistoryExceptionManagementAuditExplorerView.failedCredentialUpdate",
-        "UpgradeHistoryExceptionManagementAuditExplorerView.failedPaymentReconciliation",
-        "UpgradeHistoryExceptionManagementAuditExplorerView.channelSynchronizationFailure"
+        "UpgradeHistoryExceptionManagementAuditExplorerView.exceptionType"
        ],
        "bindsTo": "UpgradeHistoryExceptionManagementAuditExplorerView",
        "operation": "listUpgradeException",
@@ -1554,14 +1563,7 @@
        "label": "The selected upgrade history exception",
        "bindsTo": "UpgradeHistoryExceptionManagementAuditExplorerView",
        "columns": [
-        "UpgradeHistoryExceptionManagementAuditExplorerView.eligibilityOverride",
-        "UpgradeHistoryExceptionManagementAuditExplorerView.financialOverride",
-        "UpgradeHistoryExceptionManagementAuditExplorerView.expiredTicketException",
-        "UpgradeHistoryExceptionManagementAuditExplorerView.manualCredit",
-        "UpgradeHistoryExceptionManagementAuditExplorerView.complimentaryUpgrade",
-        "UpgradeHistoryExceptionManagementAuditExplorerView.failedCredentialUpdate",
-        "UpgradeHistoryExceptionManagementAuditExplorerView.failedPaymentReconciliation",
-        "UpgradeHistoryExceptionManagementAuditExplorerView.channelSynchronizationFailure"
+        "UpgradeHistoryExceptionManagementAuditExplorerView.exceptionType"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Store”, “Standard Admission”, “Manual Override”, “Require”, “Source-to-target”, “Controls”.",
        "provenance": "pack Ticket Upgrade, Exchange & Conversion_Reference.pdf, page 20 §Display"
@@ -1587,18 +1589,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "UpgradeHistoryExceptionManagementAuditExplorerView.eligibilityOverride",
-    "UpgradeHistoryExceptionManagementAuditExplorerView.financialOverride",
-    "UpgradeHistoryExceptionManagementAuditExplorerView.expiredTicketException",
-    "UpgradeHistoryExceptionManagementAuditExplorerView.manualCredit",
-    "UpgradeHistoryExceptionManagementAuditExplorerView.complimentaryUpgrade",
-    "UpgradeHistoryExceptionManagementAuditExplorerView.failedCredentialUpdate"
+    "UpgradeHistoryExceptionManagementAuditExplorerView.exceptionType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-317"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-317",
+   "workshopBoard": "wireframes/WS171 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-317"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Upgrade, Exchange & Conversion_Reference.pdf page 20. 13 of 18 labels bound to a contract property; 23 of 88 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

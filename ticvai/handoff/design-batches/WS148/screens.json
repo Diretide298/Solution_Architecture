@@ -1244,7 +1244,7 @@
       },
       {
        "kind": "metricTile",
-       "label": "P95/P99 latency where available",
+       "label": "95th and 99th percentile latency where available",
        "provenance": "pack Payment_Payment_Orchestration.pdf, page 33 §Health Metrics"
       },
       {

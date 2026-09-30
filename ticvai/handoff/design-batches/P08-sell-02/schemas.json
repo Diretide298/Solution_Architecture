@@ -277,8 +277,8 @@
    },
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID. Also the idempotency key."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7. Also the idempotency key."
    },
    "channelCapacityId": {
     "type": "string",
@@ -741,8 +741,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID. Also the idempotency key: it must equal the `Idempotency-Key` header, and a replay or a mismatch follows `IdempotencyKey` in `shared/common.yaml`. Offline replay through `syncOrders` carries no header, and this id alone deduplicates there.\n"
+    "format": "uuid",
+    "description": "Client-generated UUIDv7. Also the idempotency key: it must equal the `Idempotency-Key` header, and a replay or a mismatch follows `IdempotencyKey` in `shared/common.yaml`. Offline replay through `syncOrders` carries no header, and this id alone deduplicates there.\n"
    },
    "venueId": {
     "type": "string",
@@ -753,7 +753,7 @@
    },
    "shiftId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "subjectId": {
     "type": "string",
@@ -795,12 +795,12 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID of the payment, and its idempotency key — it must equal the `Idempotency-Key` header."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7 of the payment, and its idempotency key — it must equal the `Idempotency-Key` header."
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "tender": {
     "$ref": "#/components/schemas/TenderKind"
@@ -1457,7 +1457,7 @@
      "properties": {
       "ticketId": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "format": "uuid",
        "description": "The `Entitlement.id`."
       },
       "mediaCodes": {
@@ -1517,7 +1517,7 @@
       },
       "ticketId": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "format": "uuid",
        "description": "The `Entitlement.id` in the issuing cell."
       },
       "issuingCellId": {
@@ -1738,7 +1738,7 @@
      "properties": {
       "id": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "format": "uuid",
        "description": "The `OfflineOrder.id` this result is about."
       },
       "sequence": {
@@ -2631,7 +2631,7 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "workstationId": {
     "type": "string",
@@ -2688,7 +2688,7 @@
    },
    "resolvedRecordId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "readOnly": true,
     "description": "The order, void or refund the resolution produced — what stops the entry being posted twice."

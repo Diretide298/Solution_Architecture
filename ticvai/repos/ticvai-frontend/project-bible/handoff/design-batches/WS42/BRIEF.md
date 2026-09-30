@@ -1,6 +1,6 @@
 # WS42 — Privacy  Consent   Preference Management board 2
 
-**10 screens · 10 operations · 13 schemas · 4 permissions**
+**10 screens · 11 operations · 21 schemas · 4 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -62,13 +62,13 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `CMS-031` | Privacy Operations Command Center | listDetail | 1 | 0 | — |
 | `CMS-032` | Customer Privacy, Consent & Preference 360° | listDetail | 1 | 0 | — |
-| `CMS-033` | Consent Evidence, History & Withdrawal Management | listDetail | 1 | 0 | — |
+| `CMS-033` | Consent Evidence, History & Withdrawal Management | listDetail | 2 | 0 | — |
 | `CMS-034` | Data Subject / Customer Privacy Request Management | listDetail | 1 | 0 | — |
 | `CMS-035` | Data Discovery, Access, Export & Correction Workspace | listDetail | 1 | 0 | — |
 | `CMS-036` | Deletion, Anonymization & Restriction Operations | listDetail | 1 | 2 | — |
 | `CMS-037` | Data Retention, Expiry & Legal Hold Operations | listDetail | 1 | 2 | — |
 | `CMS-038` | Privacy Compliance, Exception & Investigation Workspace | listDetail | 1 | 0 | — |
-| `CMS-039` | Privacy Audit, Evidence & Compliance Reporting | configEditor | 1 | 0 | — |
+| `CMS-039` | Privacy Audit, Evidence & Compliance Reporting | configEditor | 2 | 0 | — |
 | `CMS-040` | Privacy Analytics & AI Compliance Intelligence | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch

@@ -1,4 +1,24 @@
 {
+ "AllergenCode": {
+  "type": "string",
+  "description": "**The fourteen declarable allergens, as one closed list.** Every allergen field in this contract uses it — the menu claim, the ticket line, a substitution's delta, a modifier option, the label on a bag — so a declared set and an actual set compare without anybody normalising case or synonyms. It was the `Allergen.contains` enum; the other fields were free text.\n",
+  "enum": [
+   "gluten",
+   "crustaceans",
+   "eggs",
+   "fish",
+   "peanuts",
+   "soybeans",
+   "milk",
+   "nuts",
+   "celery",
+   "mustard",
+   "sesame",
+   "sulphites",
+   "lupin",
+   "molluscs"
+  ]
+ },
  "Bill": {
   "x-ticvai-persistence": "none — computed from visit orders",
   "type": "object",
@@ -114,12 +134,14 @@
        }
       },
       "subtotal": {
+       "x-ticvai-column": "net_amount",
        "$ref": "../shared/common.yaml#/components/schemas/Money"
       },
       "taxAmount": {
        "$ref": "../shared/common.yaml#/components/schemas/Money"
       },
       "total": {
+       "x-ticvai-column": "gross_amount",
        "$ref": "../shared/common.yaml#/components/schemas/Money"
       },
       "status": {
@@ -133,6 +155,25 @@
     }
    }
   }
+ },
+ "ConsentDecision": {
+  "type": "string",
+  "enum": [
+   "granted",
+   "withdrawn",
+   "notAsked"
+  ]
+ },
+ "ConsentPurpose": {
+  "type": "string",
+  "enum": [
+   "marketing",
+   "personalisation",
+   "profiling",
+   "thirdPartySharing",
+   "aiProcessing",
+   "transactional"
+  ]
  },
  "ConsentState": {
   "x-ticvai-persistence": "none — projection over consent_record",
@@ -186,6 +227,17 @@
    }
   }
  },
+ "CoursingPolicy": {
+  "type": "string",
+  "description": "How a ticket's courses are fired. `fireAndForget` sends every course at once, which is no coursing; `holdAndFire` waits for a server to call each course; `timed` fires on a clock; `phased` staggers by course. **One vocabulary for the ticket (`KitchenTicket.coursing`) and the outlet default (`CourseRules.defaultCoursing`)** — the default said `none` for `fireAndForget` and had no `delayed` until 26 September, so a default could not be copied onto the field it defaults.\n",
+  "enum": [
+   "fireAndForget",
+   "holdAndFire",
+   "phased",
+   "timed",
+   "delayed"
+  ]
+ },
  "CreateFnbOrderLine": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -197,7 +249,7 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "menuItemId": {
     "type": "string",
@@ -228,6 +280,12 @@
     "type": "integer",
     "nullable": true,
     "description": "Course grouping, so the kitchen fires in sequence."
+   },
+   "redeemEntitlementId": {
+    "type": "string",
+    "nullable": true,
+    "x-ticvai-references": "access.entitlement",
+    "description": "**A meal combo redeemed at the till or by a scan** (29 September, MOB-4; applied 30 September). The entitlement a bundle's `fnbMenuItem` component issued (promotions `BundleComponent.componentKind: fnbMenuItem`, `menuItemId`, `redeemAtOutletIds`). The line is priced at zero against it, `menuItemId` must be the component's menu item and the outlet one of `redeemAtOutletIds` (or any outlet with the item on a live menu when that list is empty), and the entitlement is marked used in the same step through access `validateAccess` at the outlet. An entitlement already used, for another item or outlet, or not yet valid is refused 409 `entitlementNotRedeemable`; a till that is offline queues the redemption like any sale and the replay is refused the same way if it was used meanwhile."
    }
   }
  },
@@ -244,7 +302,7 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "outletId": {
     "type": "string",
@@ -255,6 +313,7 @@
    },
    "tableVisitId": {
     "type": "string",
+    "format": "uuid",
     "nullable": true,
     "description": "Required for table service. Absent for quick service."
    },
@@ -264,6 +323,12 @@
     "items": {
      "$ref": "#/components/schemas/CreateFnbOrderLine"
     }
+   },
+   "salesOrderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `orders.sales_order` this F&B order fulfils (SD-046, 29 September). A POS sale sends the order it took payment on; the commercial order is the sales order and this is its fulfilment."
    },
    "recordedAt": {
     "type": "string",
@@ -283,10 +348,12 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid",
+    "description": "Client-generated UUIDv7 of the payment, and its idempotency key — it must equal the `Idempotency-Key` header."
    },
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid"
    },
    "tender": {
     "$ref": "#/components/schemas/TenderKind"
@@ -294,18 +361,42 @@
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
-   "tenderedAmount": {
+   "tenderCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "description": "The currency the guest handed over, where it is not the venue's — becomes `Payment.tenderCurrency`. Omit for a payment in the venue's own currency."
+   },
+   "tenderAmount": {
     "allOf": [
      {
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "Cash only. Change is the difference."
+    "description": "**What the guest handed over**, in `tenderCurrency` — becomes `Payment.tenderAmount`, one name for one concept (renamed from `tenderedAmount` on 26 September). For cash, change is the difference.\n"
    },
    "walletAuthorisationId": {
     "type": "string",
     "nullable": true,
     "description": "Cross-cell wallet hold, where the guest's home cell is elsewhere."
+   },
+   "walletHoldId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a `wallet` tender, the hold `wallet.holdWalletFunds` placed (SD-027). Capture debits it; the order service writes no wallet table."
+   },
+   "returnUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "description": "Where the provider returns the guest after a 3-D Secure challenge or hosted page (SD-034). Required for a card payment from the guest web or app."
+   },
+   "terminalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The card terminal to instruct, for a card payment at a till (ECR flow, SD-034)."
    },
    "deviceId": {
     "type": "string",
@@ -318,8 +409,15 @@
    }
   }
  },
+ "ExchangeRateDecimal": {
+  "type": "string",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,6)",
+  "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n",
+  "pattern": "^\\d+(\\.\\d{1,6})?$"
+ },
  "FnbOrder": {
-  "x-ticvai-persistence": "fnb.fnb_order + fnb.fnb_order_line",
+  "x-ticvai-persistence": "fnb.service_order + fnb.service_order_line",
   "type": "object",
   "required": [
    "id",
@@ -333,7 +431,8 @@
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid"
    },
    "orderNumber": {
     "type": "string"
@@ -347,6 +446,7 @@
    },
    "tableVisitId": {
     "type": "string",
+    "format": "uuid",
     "nullable": true
    },
    "status": {
@@ -376,6 +476,19 @@
      ]
     }
    },
+   "salesOrderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "orders.sales_order",
+    "description": "**Retyped 29 September (SD-046)**, and `format: uuid` since ADR-0056 (30 September): every id is a uuid, so this joins `orders.sales_order.id`. **Taken from their `fnb.order`, 20 September.** We carried outlet, table visit and kitchen ticket on an F&B order and nothing joining it to what was actually sold, so an F&B line could not be reconciled to the order that paid for it.\n"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Taken from their `fnb.order`. Ours had `recordedAt` and `syncedAt`, which are both offline-sync fields, and no plain updated timestamp.\n"
+   },
    "grossAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
@@ -384,7 +497,17 @@
    },
    "kitchenTicketId": {
     "type": "string",
+    "format": "uuid",
     "nullable": true
+   },
+   "kitchenTickets": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The kitchen tickets this order created, one per station (SD-046). Returned, not stored here; they are `fnb.kitchen_ticket` rows.",
+    "items": {
+     "$ref": "#/components/schemas/KitchenTicket"
+    }
    },
    "estimatedReadyAt": {
     "type": "string",
@@ -420,6 +543,89 @@
    "cancelled",
    "refunded"
   ]
+ },
+ "FnbReservationTable": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.reservation_table",
+  "description": "**Taken from the backend workbook, 20 September.** Maps one or more dining tables assigned to a reservation.",
+  "required": [
+   "reservationId",
+   "tableId",
+   "createdAt"
+  ],
+  "properties": {
+   "reservationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "tableId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "GuestNote": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.guest_note",
+  "description": "A note on a guest, written by staff (`addGuestNote`). **Attributed and personal data**, and `isAllergy` keeps an allergy apart from every other kind so it surfaces on the order screen.\n",
+  "required": [
+   "id",
+   "subjectId",
+   "kind",
+   "text",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "allergy",
+     "dietary",
+     "seatingPreference",
+     "occasion",
+     "serviceRecovery",
+     "vip",
+     "general"
+    ]
+   },
+   "text": {
+    "type": "string"
+   },
+   "isAllergy": {
+    "type": "boolean",
+    "default": false
+   },
+   "visibleToServer": {
+    "type": "boolean",
+    "default": true
+   },
+   "authorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
  },
  "GuestProfile": {
   "x-ticvai-persistence": "marketing.guest_profile",
@@ -503,6 +709,19 @@
    },
    "isActive": {
     "type": "boolean"
+   },
+   "mergedIntoSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Set on the absorbed profile by `mergeGuestProfiles` and `mergeGuests`**, which retain it as a redirect rather than deleting it. A read that lands here follows it; a second merge of a profile that has one is refused as `alreadyMerged`.\n"
+   },
+   "mergedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    }
   }
  },
@@ -564,10 +783,13 @@
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid"
    },
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid",
+    "description": "The F&B order the ticket was created from on acceptance (`FnbOrder.id`)."
    },
    "orderNumber": {
     "type": "string"
@@ -584,15 +806,12 @@
     "$ref": "#/components/schemas/ServiceMode"
    },
    "coursing": {
-    "type": "string",
-    "nullable": true,
-    "enum": [
-     "fireAndForget",
-     "holdAndFire",
-     "phased",
-     "timed",
-     "delayed"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CoursingPolicy"
+     }
     ],
+    "nullable": true,
     "description": "BL-131. **Starters before mains is the entire job of a kitchen pass**, and the model fired everything at once.\n`holdAndFire` waits for a server to call it; `timed` fires on a clock; `phased` staggers by course. **Without this a table gets its dessert while eating its starter.**\n"
    },
    "buzzerCode": {
@@ -628,7 +847,8 @@
      ],
      "properties": {
       "lineId": {
-       "type": "string"
+       "type": "string",
+       "format": "uuid"
       },
       "name": {
        "type": "string"
@@ -649,8 +869,30 @@
       "allergens": {
        "type": "array",
        "items": {
-        "type": "string"
+        "$ref": "#/components/schemas/AllergenCode"
        }
+      },
+      "refireOfLineId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true,
+       "readOnly": true,
+       "description": "**Set on a refire.** The line it remakes, which stays — food cost counts both, the bill counts one (`refireItem`)."
+      },
+      "refireReason": {
+       "allOf": [
+        {
+         "$ref": "#/components/schemas/RefireReason"
+        }
+       ],
+       "nullable": true,
+       "readOnly": true
+      },
+      "isChargeable": {
+       "type": "boolean",
+       "nullable": true,
+       "readOnly": true,
+       "description": "A refire's `chargeable` flag. Null on a line that is not a refire."
       },
       "course": {
        "type": "integer",
@@ -702,6 +944,12 @@
    "tierCode"
   ],
   "properties": {
+   "leaderboardNickname": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 24,
+    "description": "BL-173. **The name shown on a leaderboard, chosen by the guest.** Offered whenever they reach the board and changeable afterwards; `setLeaderboardNickname` is the only thing that writes it.\n**Null means the guest has not chosen one yet, and the board shows a generated `Player-4821` in its place** — never `pii.subject.display_name`, which would disclose silently on the day a guest first placed and is the case this field exists to prevent.\n**The generated name is computed at read time and not stored here.** Writing it would make *\"has this guest chosen a name\"* unanswerable, and that flag is what the prompt-on-reaching-the-board depends on.\n"
+   },
    "subjectId": {
     "type": "string",
     "format": "uuid"
@@ -715,6 +963,12 @@
    },
    "lifetimePoints": {
     "type": "integer"
+   },
+   "tierId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The tier this row's `tierCode` and `tierName` are a copy of.** Added 20 September with `marketing.programme_tier`: the two strings were a cache of something that did not exist, and a cache with no source cannot be rebuilt or audited.\n"
    },
    "tierCode": {
     "type": "string"
@@ -737,6 +991,117 @@
    }
   }
  },
+ "MergeResult": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "survivingSubjectId",
+   "absorbedSubjectId",
+   "transferred"
+  ],
+  "properties": {
+   "survivingSubjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "absorbedSubjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "transferred": {
+    "type": "object",
+    "properties": {
+     "orders": {
+      "type": "integer"
+     },
+     "cases": {
+      "type": "integer"
+     },
+     "loyaltyPoints": {
+      "type": "integer",
+      "description": "The total points moved across every programme. The per-programme outcome is `loyaltyProgrammes`."
+     }
+    }
+   },
+   "loyaltyProgrammes": {
+    "type": "array",
+    "description": "**One entry per loyalty programme either record belonged to (decided 28 September, audit R149).** Points are added and the higher tier is kept, per programme — a single points number cannot say which programme it belongs to.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "programmeId",
+      "pointsAdded",
+      "resultingPoints"
+     ],
+     "properties": {
+      "programmeId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "pointsAdded": {
+       "type": "integer",
+       "description": "The absorbed record's balance in this programme, added to the survivor's."
+      },
+      "resultingPoints": {
+       "type": "integer"
+      },
+      "tierKept": {
+       "type": "string",
+       "nullable": true,
+       "description": "The higher of the two records' tiers in this programme."
+      }
+     }
+    }
+   },
+   "consentOutcome": {
+    "type": "array",
+    "description": "Per purpose, the resulting position. Where the two profiles disagreed, the more restrictive position won.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "purpose": {
+       "$ref": "#/components/schemas/ConsentPurpose"
+      },
+      "result": {
+       "$ref": "#/components/schemas/ConsentDecision"
+      },
+      "wasRestricted": {
+       "type": "boolean"
+      }
+     }
+    }
+   }
+  }
+ },
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
+   }
+  }
+ },
  "OpenTableVisitRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -749,7 +1114,7 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "tableId": {
     "type": "string",
@@ -769,6 +1134,95 @@
     "format": "uuid"
    },
    "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "OrderChannel": {
+  "type": "string",
+  "description": "Where the order originated. Added when guest self-ordering was contracted — an order a guest placed on their own phone is commercially and operationally different from one a cashier typed, and reporting that cannot separate them cannot answer whether self-ordering is working.\n",
+  "enum": [
+   "pos",
+   "kiosk",
+   "guestApp",
+   "guestWeb",
+   "callCentre",
+   "partner",
+   "api",
+   "backOffice"
+  ]
+ },
+ "OrderStatus": {
+  "type": "string",
+  "enum": [
+   "pending",
+   "held",
+   "paid",
+   "partiallyPaid",
+   "completed",
+   "voided",
+   "refunded",
+   "partiallyRefunded",
+   "failed"
+  ],
+  "description": "`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"
+ },
+ "OrderSummary": {
+  "x-ticvai-persistence": "none — projection",
+  "type": "object",
+  "required": [
+   "id",
+   "orderNumber",
+   "status",
+   "grossAmount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/OrderStatus"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "refundedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OrderChannel"
+     }
+    ],
+    "description": "The same vocabulary as `Order.channel`, which this projects."
+   },
+   "lineCount": {
+    "type": "integer"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The cashier who raised it — what the held-orders list shows."
+   },
+   "holdLabel": {
+    "type": "string",
+    "nullable": true,
+    "description": "As `Order.holdLabel`."
+   },
+   "heldUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "As `Order.heldUntil`, so a held-orders list can warn about the ones about to lapse."
+   },
+   "createdAt": {
     "type": "string",
     "format": "date-time"
    }
@@ -806,10 +1260,12 @@
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid"
    },
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid"
    },
    "tender": {
     "$ref": "#/components/schemas/TenderKind"
@@ -828,7 +1284,11 @@
     "description": "The amount in `tenderCurrency`, at that currency's own scale."
    },
    "fxRate": {
-    "type": "number",
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
     "nullable": true,
     "description": "The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"
    },
@@ -872,7 +1332,45 @@
    },
    "providerReference": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "The provider's own id for the charge (Stripe PaymentIntent, NI order reference). What `payments.receivePaymentProviderWebhook` matches an incoming event on (SD-034)."
+   },
+   "providerIdempotencyKey": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The idempotency key sent to the provider, which is this payment's `id` (SD-034, 29 September). A retried provider call cannot charge twice."
+   },
+   "terminalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The card terminal a till payment ran on (ECR flow, SD-034)."
+   },
+   "nextAction": {
+    "type": "object",
+    "nullable": true,
+    "x-ticvai-persisted": false,
+    "description": "**What the caller does while the payment is `pendingConfirmation`** (SD-034, 29 September). `redirect`: send the browser to `url` (3-D Secure challenge or hosted page); the provider returns the guest to `returnUrl` and the result arrives by webhook. `terminal`: the card terminal has been instructed; wait for its result. Null once the payment has an outcome.",
+    "properties": {
+     "kind": {
+      "type": "string",
+      "enum": [
+       "redirect",
+       "terminal"
+      ]
+     },
+     "url": {
+      "type": "string",
+      "format": "uri",
+      "nullable": true
+     },
+     "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
    },
    "lastInquiryAt": {
     "type": "string",
@@ -890,6 +1388,20 @@
    }
   }
  },
+ "RefireReason": {
+  "type": "string",
+  "description": "Why a line was made again (`refireItem`). The reasons are the data.",
+  "enum": [
+   "overcooked",
+   "undercooked",
+   "wrongItem",
+   "dropped",
+   "cold",
+   "allergyRisk",
+   "guestChangedMind",
+   "lateAdd"
+  ]
+ },
  "RestaurantWaitlist": {
   "type": "object",
   "x-ticvai-persistence": "fnb.waitlist_entry",
@@ -898,7 +1410,8 @@
    "id",
    "outletId",
    "partySize",
-   "status"
+   "status",
+   "recordedAt"
   ],
   "properties": {
    "id": {
@@ -949,11 +1462,62 @@
     "format": "date-time",
     "nullable": true
    },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "**When the party joined, on the device.** The wait a party had is measured from here to `notifiedAt` or to seating, which is the report `walkedAway` exists for. Required on a join — the operation is offline-capable."
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
    "holdExpiresAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true,
     "description": "**How long a table waits for somebody who was called.** Too short and a guest returning from the bathroom loses it; too long and the table sits empty at peak — which is why it is a setting rather than a constant.\n"
+   }
+  }
+ },
+ "SectionLayout": {
+  "type": "object",
+  "description": "An outlet's floor divided into sections, each with its server (`setSectionLayout`).",
+  "required": [
+   "sections"
+  ],
+  "properties": {
+   "sections": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "name",
+      "tableIds"
+     ],
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "tableIds": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "uuid"
+       }
+      },
+      "serverPrincipalId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "servicePeriod": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
    }
   }
  },
@@ -971,9 +1535,15 @@
   "x-ticvai-persistence": "none — request only",
   "type": "object",
   "required": [
-   "method"
+   "method",
+   "recordedAt"
   ],
   "properties": {
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Device time of the split (offline-capable)."
+   },
    "method": {
     "$ref": "#/components/schemas/SplitMethod"
    },
@@ -1041,6 +1611,105 @@
    "bySeat"
   ]
  },
+ "TableCombination": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.table_combination",
+  "description": "**Tables that can be pushed together, and what they seat together.** Declared by a host rather than inferred from a floor plan — a pillar, a step or a service run stops two adjacent tables combining. `setTableCombinations` writes the outlet's set.\n",
+  "required": [
+   "tableIds",
+   "combinedCovers"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The outlet in the path."
+   },
+   "tableIds": {
+    "type": "array",
+    "minItems": 2,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "combinedCovers": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "setupMinutes": {
+    "type": "integer",
+    "default": 5
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `outlet` scope."
+   }
+  }
+ },
+ "TableDefinition": {
+  "x-ticvai-persistence": "fnb.dining_table",
+  "type": "object",
+  "description": "A restaurant (dining) table, reserved with `createTableReservation`. Not a map-bookable `resources` table, which is a non-dining spot sold like a cabana (decided 29 September, rev 3 GAP-C2).",
+  "required": [
+   "id",
+   "label",
+   "capacity"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "label": {
+    "type": "string",
+    "maxLength": 32,
+    "x-ticvai-unique": "venue",
+    "description": "**The table code, unique per venue** (decided 28 September, audit R108). Two tables in one venue never share a label, across all its outlets, so *T12* names one table wherever it is read. `createTable` and `updateTable` refuse a duplicate with `409` `duplicate-code`.\n"
+   },
+   "capacity": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "zone": {
+    "type": "string",
+    "nullable": true
+   },
+   "position": {
+    "type": "object",
+    "properties": {
+     "x": {
+      "type": "number"
+     },
+     "y": {
+      "type": "number"
+     }
+    }
+   },
+   "shape": {
+    "type": "string",
+    "enum": [
+     "round",
+     "square",
+     "rectangle",
+     "booth",
+     "bar"
+    ]
+   },
+   "isOutOfService": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Damaged, or its section closed.** `getTableMap` shows it as `outOfService` and a claim on it is refused with `tableOutOfService`."
+   }
+  }
+ },
  "TableMap": {
   "x-ticvai-persistence": "none — projection",
   "type": "object",
@@ -1070,6 +1739,9 @@
  "TableReservation": {
   "type": "object",
   "x-ticvai-persistence": "fnb.table_reservation",
+  "x-ticvai-retired-columns": [
+   "table_ids"
+  ],
   "required": [
    "outletId",
    "startsAt",
@@ -1108,12 +1780,11 @@
     "type": "integer",
     "description": "**How long the cover is held.** An outlet turning tables twice an evening needs this to be real, or the second sitting cannot be booked.\n"
    },
-   "tableIds": {
+   "tables": {
     "type": "array",
-    "description": "Usually empty until seating. **Committing a specific table at booking time refuses later bookings against a constraint that did not need to exist.**\n",
+    "description": "The dining tables assigned to this reservation, one row each.\n**Usually empty until seating.** Committing a specific table at booking time refuses later bookings against a constraint that did not need to exist — that was true of the `tableIds` array this replaces and it is still true, because it is about *when* a table is assigned rather than how the assignment is stored.\n**Replaces `tableIds`, retired 20 September.** An array cannot carry per-row state, which is the same reason this merge took `entry_rule_point`, `menu_item_modifier`, `seat_block_item`, `plan_benefit`, `payment_method_config` and `tier_module` from the backend workbook. A party seated across three tables that releases one early has nowhere to say so in an array, and *\"which reservations are on table 7 tonight\"* is a GIN scan over every reservation instead of an index seek.\n",
     "items": {
-     "type": "string",
-     "format": "uuid"
+     "$ref": "#/components/schemas/FnbReservationTable"
     }
    },
    "status": {
@@ -1142,6 +1813,9 @@
     "nullable": true,
     "readOnly": true
    },
+   "deposit": {
+    "$ref": "#/components/schemas/TableReservationDeposit"
+   },
    "createdAt": {
     "type": "string",
     "format": "date-time",
@@ -1149,9 +1823,64 @@
    }
   }
  },
+ "TableReservationDeposit": {
+  "type": "object",
+  "nullable": true,
+  "readOnly": true,
+  "x-ticvai-persistence": "fnb.table_reservation",
+  "description": "**The deposit this booking holds, snapshotted from `orders.DepositPolicy.dining` when it was made** (decided 29 September, rev 3 REV3-8b). Null where no deposit applied, which is every booking while the venue leaves `dining.enabled` false (the default). A later change to the policy does not re-price a booking already made.\n",
+  "required": [
+   "amount",
+   "basis"
+  ],
+  "properties": {
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "basis": {
+    "type": "string",
+    "enum": [
+     "fixedPerGuest",
+     "fixedPerTable",
+     "percentOfMinimumSpend"
+    ]
+   },
+   "holdExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "While `awaitingDeposit`, when the held cover is released if the deposit has not been authorised. The cart lease of the deposit line (15 minutes, audit R169)."
+   },
+   "refundableUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "`startsAt` less `dining.refundableUntilHours`. Cancelling before it releases the deposit in full."
+   },
+   "variantId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The venue's table-deposit variant, `DepositPolicy.dining.depositVariantId`, which the client sends to `addCartLine` with this booking's id."
+   },
+   "cartLineId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `orders.CartLine` carrying the deposit, once added."
+   },
+   "depositId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `orders.deposit` row, once the payment is authorised."
+   }
+  }
+ },
  "TableReservationStatus": {
   "type": "string",
+  "description": "`awaitingDeposit` only where the venue's dining deposit applies (decided 29 September, rev 3 REV3-8b); a booking with no deposit starts `booked`.",
   "enum": [
+   "awaitingDeposit",
    "booked",
    "confirmed",
    "seated",
@@ -1177,6 +1906,7 @@
      },
      "visitId": {
       "type": "string",
+      "format": "uuid",
       "nullable": true
      },
      "covers": {
@@ -1214,7 +1944,8 @@
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid"
    },
    "tableId": {
     "type": "string",
@@ -1258,16 +1989,28 @@
    },
    "mergedIntoVisitId": {
     "type": "string",
+    "format": "uuid",
     "nullable": true
    },
    "mergedFromVisitIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "format": "uuid"
     }
    },
    "runningTotal": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "gratuity": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "The gratuity taken at `closeTableVisit`. **Not the service charge**, which is revenue (`FnbServiceChargePolicy`); this is the guest's tip, and `reassignServer` decides who shares it."
    },
    "openedAt": {
     "type": "string",
@@ -1282,6 +2025,7 @@
  },
  "TenderKind": {
   "type": "string",
+  "description": "`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n",
   "enum": [
    "cash",
    "card",

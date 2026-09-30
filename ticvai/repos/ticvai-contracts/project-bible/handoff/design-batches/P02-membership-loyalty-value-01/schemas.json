@@ -692,8 +692,8 @@
   "properties": {
    "entitlementId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "The `access.Entitlement.id` this membership is — a ULID, like every entitlement id."
+    "format": "uuid",
+    "description": "The `access.Entitlement.id` this membership is — a UUIDv7, like every entitlement id."
    },
    "productId": {
     "type": "string",
@@ -1041,7 +1041,7 @@
    },
    "paymentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "dunningCaseId": {
@@ -1075,7 +1075,7 @@
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "subjectId": {
     "type": "string",
@@ -1966,12 +1966,12 @@
    },
    "paymentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "refundId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "walletTransactionId": {

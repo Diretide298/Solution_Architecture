@@ -653,6 +653,13 @@
     "purpose": "Intent and knowledge",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listKnowledgeGaps",
+    "contract": "ai",
+    "purpose": "Questions the assistant could not answer",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {

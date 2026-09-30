@@ -1591,6 +1591,20 @@
     "purpose": "Where the SLA is failing",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listApprovalRequests",
+    "contract": "approvals",
+    "purpose": "Pending requests with AI escalation suggestions (sort=aiPriority)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "escalateApprovalRequest",
+    "contract": "approvals",
+    "purpose": "A person acts on an escalation suggestion",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1599,6 +1613,14 @@
    "workshopBoard": "wireframes/WS34 Approval Workflows and Governance Board 5.dc.html#bo-393"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 48. 0 of 0 labels bound to a contract property; 0 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Approval_Workflows_and_Governance_Reference.pdf p.48; contract approvals.yaml GET /approval-analytics. Pack labels with no schema field yet (shown as plain labels): Predicted SLA breaches (next 60 min), Predicted average wait time, Recommendation text, Expected impact (before/after), Risk level (HIGH/...), Bottleneck share of breaches (e.g. 38%), Grouping by approval stage or department.",
+  "entryState": {
+   "params": [
+    {
+     "name": "requestId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

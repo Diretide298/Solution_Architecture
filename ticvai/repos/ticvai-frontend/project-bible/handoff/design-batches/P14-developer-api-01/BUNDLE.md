@@ -169,7 +169,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "ApiVersion.changes",
        "operation": "listApiVersions",
        "notes": "**Every operation added, changed, deprecated or removed, with breaking changes marked** (17 September minutes, M17-14; ADR-0026).",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     },
@@ -234,7 +234,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "public-api",
     "purpose": "The module scope catalogue the reference is grouped by",
     "trigger": "onLoad",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "entryState": {
@@ -585,7 +585,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "ApiScope",
        "operation": "listApiScopes",
        "notes": "**A scope picker grouped by module** (M17-05): `{module}.read` and `{module}.write`, with unlicensed modules shown and disabled rather than hidden.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     },
@@ -641,7 +641,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Request production access",
        "operation": "requestProductionAccess",
        "notes": "**Production keys only after certification** (M17-06). Enabled on a sandbox client whose integration is certified; asks for the tenants, the scopes and the IP allow-list. TICVAI issues the production client.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     }
@@ -718,7 +718,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       "note"
      ]
     },
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "states": {
@@ -767,14 +767,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "public-api",
     "purpose": "Scopes to choose from, by module",
     "trigger": "onLoad",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "operationId": "requestProductionAccess",
     "contract": "public-api",
     "purpose": "Ask for production keys for a certified integration",
     "trigger": "onAction",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "entryState": {
@@ -938,7 +938,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "ProductionAccessRequest",
        "operation": "listProductionAccessRequests",
        "notes": "**Sandbox, certification, production** (17 September minutes, M17-06): where this developer stands, the certification and the production access request with its decision.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     },
@@ -963,7 +963,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Promote to production",
        "operation": "requestProductionAccess",
        "notes": "Opens the production access request for the client tested here; disabled until the integration is certified.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     }
@@ -1015,7 +1015,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       "note"
      ]
     },
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "states": {
@@ -1055,7 +1055,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "public-api",
     "purpose": "The path to production and its state",
     "trigger": "onLoad",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "operationId": "requestProductionAccess",
@@ -1065,7 +1065,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listProductionAccessRequests"
     ],
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "entryState": {
@@ -1504,7 +1504,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listApiAnomalies",
        "notes": "**Abnormal volume on your own clients** (17 September minutes, M17-07), so a runaway integration is seen here before a venue calls.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     }
@@ -1529,7 +1529,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "public-api",
     "purpose": "Abnormal traffic flagged on the developer's clients",
     "trigger": "onLoad",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "wireframe": {
@@ -1879,7 +1879,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Production access requests",
        "bindsTo": "ProductionAccessRequest",
        "operation": "listProductionAccessRequests",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     },
@@ -1915,13 +1915,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "secondaryButton",
        "label": "Decide production access",
        "operation": "decideProductionAccess",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       },
       {
        "kind": "secondaryButton",
        "label": "Save anomaly rule",
        "operation": "setApiAnomalyRule",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     },
@@ -1975,7 +1975,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "public-api",
     "purpose": "The production key queue",
     "trigger": "onLoad",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "operationId": "decideProductionAccess",
@@ -1985,14 +1985,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listProductionAccessRequests"
     ],
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "operationId": "setApiAnomalyRule",
     "contract": "public-api",
     "purpose": "When API traffic is flagged",
     "trigger": "onAction",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "entryState": {
@@ -2099,7 +2099,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       "credentialTtlDays"
      ]
     },
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "id": "formSetApiAnomalyRule",
@@ -2124,7 +2124,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       "isActive"
      ]
     },
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "_platform": {

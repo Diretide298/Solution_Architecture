@@ -1,4 +1,124 @@
 {
+ "Asset": {
+  "x-ticvai-persistence": "maintenance.asset",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateAssetRequest"
+   },
+   {
+    "type": "object",
+    "x-ticvai-retired-columns": [
+     "is_maintenance_overdue",
+     "document_refs"
+    ],
+    "required": [
+     "id",
+     "status"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "resourceId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "1.2.x. **Where this asset is also bookable.** An AV rig is an asset to maintain and a resource to allocate, and they are the same object seen from two sides.\n**`resources` owns the calendar and this owns the condition.** An asset out of service makes its resource unbookable, which is one link rather than two models of availability.\n"
+     },
+     "deviceId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "BL-160. **Where this asset is also a registered device.** A turnstile is an asset to maintain and a device to operate, and — exactly as with `resourceId` above — they are the same object seen from two sides.\n**Nothing joined them before this.** A turnstile controller reporting `needsAttention` could not raise a work order against itself, and an engineer closing one had no way back to the device whose firmware caused it.\n**Null for most assets and for most devices.** A chiller is not a device and a signature pad is not on the asset register; the link is sparse, and it lives here rather than on `platform.device` because `platform` is the foundation tier and a foreign key pointing from it into `maintenance` would invert the tiers — every cell running a spine would carry a column for a satellite it may not deploy.\n"
+     },
+     "acquisitionCost": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "acquiredOn": {
+      "type": "string",
+      "format": "date",
+      "nullable": true
+     },
+     "depreciation": {
+      "type": "object",
+      "nullable": true,
+      "description": "**Recorded here and posted by `finance`.** Depreciation is an accounting act and the asset register is where the useful life is actually known — an engineer knows a chiller lasts fifteen years and an accountant knows what to do about it.\n",
+      "properties": {
+       "method": {
+        "type": "string",
+        "enum": [
+         "straightLine",
+         "reducingBalance",
+         "unitsOfProduction",
+         "none"
+        ]
+       },
+       "usefulLifeMonths": {
+        "type": "integer"
+       },
+       "residualValue": {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       },
+       "accumulatedDepreciation": {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      }
+     },
+     "retiredOn": {
+      "type": "string",
+      "format": "date",
+      "nullable": true,
+      "description": "**Retirement is not deletion.** A work order from three years ago still names this asset, and an inspection record with no asset is an inspection of nothing.\n"
+     },
+     "disposalProceeds": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "status": {
+      "$ref": "#/components/schemas/AssetStatus"
+     },
+     "statusReason": {
+      "type": "string",
+      "nullable": true
+     },
+     "openWorkOrderCount": {
+      "type": "integer",
+      "readOnly": true,
+      "x-ticvai-derived": "onWrite",
+      "description": "Work orders on this asset whose status is `open`, `assigned`, `inProgress`, `paused` or `awaitingParts` — the same set `AssetDetail.openWorkOrders` returns. **Maintained on write**: `createWorkOrder` and every transition into or out of that set (complete, cancel, close, reject back to open) adjust it in the same transaction as the work-order row.\n"
+     },
+     "nextMaintenanceDueAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "x-ticvai-derived": "onWrite",
+      "description": "The earliest `nextDueAt` among this asset's active maintenance plans; null when none has one. **Maintained on write**: recomputed whenever one of those plans is created, amended, suspended or has its `nextDueAt` moved by a completed work order. `listAssets?maintenanceDue` filters on this column against the clock.\n"
+     },
+     "isMaintenanceOverdue": {
+      "type": "boolean",
+      "readOnly": true,
+      "x-ticvai-persisted": false,
+      "x-ticvai-derived": "onRead",
+      "description": "`nextMaintenanceDueAt` is in the past at the moment of the read. **Computed on read and not stored** — it depends on the clock, so a stored copy is stale the minute after it is written.\n"
+     },
+     "lastInspectionAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "x-ticvai-derived": "onWrite",
+      "description": "`performedAt` of the latest inspection submitted against this asset. **Maintained on write** by `submitInspection`, in the same transaction as the inspection row; an inspection synced late with an earlier `performedAt` does not move it back.\n"
+     },
+     "usageCounter": {
+      "type": "number",
+      "nullable": true,
+      "description": "Cycles, hours or kilometres. Drives usage-based maintenance."
+     }
+    }
+   }
+  ]
+ },
  "AssetCriticality": {
   "type": "string",
   "enum": [
@@ -8,6 +128,162 @@
    "low"
   ]
  },
+ "AssetHistoryEntry": {
+  "x-ticvai-persistence": "none — union view over work orders, inspections, incidents and asset status changes",
+  "type": "object",
+  "description": "**Every kind has a source.** `workOrder` is a work-order row, `inspection` an inspection, `incident` an incident, `statusChange` a `maintenance.asset_status_change` row. `partReplaced` is a completed work order whose `resolutionCode` is `partReplaced`, and `planCompleted` a completed work order with a `sourcePlanId` — both read from `maintenance.work_order`, not stored twice.\n",
+  "required": [
+   "kind",
+   "occurredAt",
+   "summary"
+  ],
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "workOrder",
+     "inspection",
+     "incident",
+     "statusChange",
+     "partReplaced",
+     "planCompleted"
+    ]
+   },
+   "referenceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The source row's id: a work order, inspection or incident, or an `asset_status_change` id. A uuid, as every id is (ADR-0056).\n"
+   },
+   "summary": {
+    "type": "string"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "AssetStatus": {
+  "type": "string",
+  "enum": [
+   "inService",
+   "outOfService",
+   "underMaintenance",
+   "awaitingParts",
+   "retired",
+   "disposed"
+  ]
+ },
+ "CreateAssetRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "assetTag",
+   "name",
+   "venueId",
+   "criticality"
+  ],
+  "properties": {
+   "assetTag": {
+    "type": "string",
+    "maxLength": 64,
+    "x-ticvai-unique": "venue",
+    "description": "**Unique per venue** (decided 28 September, audit R108). Two assets in one venue never share a tag; `createAsset` refuses a duplicate with `409` `duplicate-code`. Two venues may each have an `A-001`.\n"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationDescription": {
+    "type": "string",
+    "maxLength": 500
+   },
+   "criticality": {
+    "$ref": "#/components/schemas/AssetCriticality"
+   },
+   "priorityOverride": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/WorkOrderPriority"
+     }
+    ],
+    "nullable": true,
+    "description": "**\"If this device goes down, raise this priority\"** (decided 17 September, M17-01). A corrective work order raised on this asset takes this priority instead of the score. Null means the score decides.\n"
+   },
+   "manufacturer": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "model": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "serialNumber": {
+    "type": "string",
+    "maxLength": 128
+   },
+   "commissionedAt": {
+    "type": "string",
+    "format": "date"
+   },
+   "warrantyExpiresAt": {
+    "type": "string",
+    "format": "date"
+   },
+   "supplierId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "linkedProductIds": {
+    "type": "array",
+    "description": "Products this asset delivers. A fault here can stop them selling.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "linkedAccessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Access point this asset controls. Out of service blocks it."
+   },
+   "requiresInspectionToReturn": {
+    "type": "boolean",
+    "default": false,
+    "description": "True means a completed inspection is required before return to service. A technician cannot simply declare a ride safe.\n"
+   },
+   "documents": {
+    "type": "array",
+    "description": "Manuals, procedures, certificates, each with its name and kind. Stored one row per document in `maintenance.asset_document`, which is where `AssetDetail.documents` reads them from.\n",
+    "items": {
+     "$ref": "#/components/schemas/AssetDocumentInput"
+    }
+   },
+   "documentRefs": {
+    "type": "array",
+    "x-ticvai-persisted": false,
+    "description": "**The refs alone, kept for callers that predate `documents`.** Each ref sent here is stored as an `asset_document` row with no name and no kind. Returned as the refs of `documents`, computed on read — there is no second copy to fall out of step.\n",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
  "CreateWorkOrderRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -15,13 +291,12 @@
    "id",
    "title",
    "venueId",
-   "priority",
    "recordedAt"
   ],
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "title": {
     "type": "string",
@@ -52,7 +327,23 @@
     "default": "corrective"
    },
    "priority": {
-    "$ref": "#/components/schemas/WorkOrderPriority"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/WorkOrderPriority"
+     }
+    ],
+    "description": "**Optional since 29 September** (M17-01). Sent, it is `manual` and wins. Absent, the asset's `priorityOverride` applies, and failing that the venue's `WorkOrderPriorityPolicy` scores the fault.\n"
+   },
+   "faultAssessment": {
+    "$ref": "#/components/schemas/WorkOrderFaultAssessment"
+   },
+   "requiredQualificationCodes": {
+    "type": "array",
+    "maxItems": 10,
+    "items": {
+     "type": "string"
+    },
+    "description": "Skills the job needs, as qualification codes; `suggestWorkOrderAssignee` ranks by them (M17-13)."
    },
    "categoryId": {
     "type": "string",
@@ -132,7 +423,7 @@
    },
    "workOrderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    }
   }
@@ -151,7 +442,7 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "templateId": {
     "type": "string",
@@ -219,7 +510,7 @@
    },
    "inspectionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "templateItemId": {
     "type": "string",
@@ -270,6 +561,14 @@
    }
   }
  },
+ "InspectionOutcome": {
+  "type": "string",
+  "enum": [
+   "passed",
+   "passedWithObservations",
+   "failed"
+  ]
+ },
  "InspectionResult": {
   "x-ticvai-persistence": "none — computed",
   "type": "object",
@@ -299,7 +598,7 @@
       "type": "array",
       "items": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+       "format": "uuid"
       }
      },
      "productsSuspended": {
@@ -315,6 +614,35 @@
       "nullable": true
      }
     }
+   }
+  }
+ },
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
    }
   }
  },
@@ -1347,7 +1675,17 @@
    },
    "teardownMinutes": {
     "type": "integer",
-    "default": 0
+    "default": 0,
+    "description": "After the booking. **Kept as it is** (decided 29 September, W10): with a `cleaningPolicy` of `afterEveryBooking` the cleaning buffer is added after the teardown, so a room with no teardown and a 15-minute clean is free 15 minutes after each booking ends.\n"
+   },
+   "cleaningPolicy": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ResourceCleaningPolicy"
+     }
+    ],
+    "nullable": true,
+    "description": "How the resource is cleaned between uses (decided 29 September, W10). Null means no cleaning is scheduled beyond `teardownMinutes`."
    },
    "requiresQualification": {
     "type": "array",
@@ -1470,7 +1808,7 @@
    },
    "holdId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The `ResourceHold` this booking was converted from, where a guest picked the resource on a venue map (rev 3 REV3-15). Null for a staff booking or an allocation.\n"
    },
@@ -1528,6 +1866,49 @@
    "cancelled",
    "noShow"
   ]
+ },
+ "ResourceCleaningPolicy": {
+  "x-ticvai-persistence": "none — columns on resources.resource",
+  "type": "object",
+  "description": "**When the resource is cleaned, and what that takes out of availability** (decided 29 September, W10; the meeting-room case from the 29 September website review).\n- `afterEveryBooking` (option A): `bufferMinutes` blocked after every booking, after its teardown. - `timesPerDay` (option B): `cleaningsPerDay` cleanings of `bufferMinutes` each, between `windowStart` and `windowEnd`, **placed by the system**. The targets are spread evenly across the window; each is put in the free gap nearest its target that is long enough, and never on a booking, a hold or a block. **A confirmed booking is never moved for a cleaning.** Placement is computed on read from the day's bookings, so it moves when bookings change, and a start time is offered only if every cleaning of that day can still be placed after it is booked.\n`createResource` and `updateResource` refuse a policy with `timesPerDay` and no `cleaningsPerDay`, or a window that ends before it starts, with `422`.\n",
+  "required": [
+   "mode",
+   "bufferMinutes"
+  ],
+  "properties": {
+   "mode": {
+    "type": "string",
+    "enum": [
+     "afterEveryBooking",
+     "timesPerDay"
+    ]
+   },
+   "bufferMinutes": {
+    "type": "integer",
+    "minimum": 5,
+    "maximum": 240,
+    "description": "Minutes one cleaning takes. The prototype uses 15 (proposed default, client to correct)."
+   },
+   "cleaningsPerDay": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 24,
+    "nullable": true,
+    "description": "Required for `timesPerDay`; ignored for `afterEveryBooking`."
+   },
+   "windowStart": {
+    "type": "string",
+    "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+    "nullable": true,
+    "description": "Venue-local time the cleaning window opens. Null means the resource's opening time."
+   },
+   "windowEnd": {
+    "type": "string",
+    "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+    "nullable": true,
+    "description": "Venue-local time the cleaning window closes. Null means the resource's closing time."
+   }
+  }
  },
  "ResourceCostEntry": {
   "type": "object",
@@ -1616,6 +1997,33 @@
    "mealPlan": "**Listed by 5.5.8b and deliberately not a kind.** 5.5.8b groups meal plans with lockers and parking, but a meal plan is a balance rather than an object. It resolves to `retail.Wallet` with a `mealPlan` credit kind (CF-126), not to a resource — so it is not offered here, and a form built from this enum cannot offer it either."
   }
  },
+ "ResourceLifecycleState": {
+  "type": "string",
+  "description": "Board 1.10. **States of one machine**, whose allowed transitions are configuration.",
+  "enum": [
+   "draft",
+   "pendingApproval",
+   "approved",
+   "active",
+   "temporarilyUnavailable",
+   "underMaintenance",
+   "suspended",
+   "retired",
+   "archived"
+  ]
+ },
+ "StoredValueKind": {
+  "type": "string",
+  "description": "**Six things in this package hold a balance and behave the same way** — a wallet, a gift card, a game card, a voucher, a loyalty position and a prepaid entitlement. They were built separately across three sessions and each grew its own balance, bonus balance, status, blocked reason and expiry (CF-126).\n**The concern is not tidiness. Only one of the six could hold an authorisation.** `authoriseWalletSpend` / `captureWalletAuthorisation` / `relinquishWalletAuthorisation` gave two-phase spend to the retail wallet alone, so **a guest with 200 game credits starting a play the machine then failed had no held balance** — the credits were either taken or not, with no third state.\nThe entities stay distinct because their lifecycles genuinely differ — a gift card activates at a till, a loyalty position never expires the same way. **What is shared is the spend mechanism**, and this enum is what lets it be shared.\n",
+  "enum": [
+   "wallet",
+   "giftCard",
+   "gameCard",
+   "voucher",
+   "loyalty",
+   "prepaidEntitlement"
+  ]
+ },
  "SubmitInspectionRequest": {
   "x-ticvai-persistence": "maintenance.inspection + maintenance.inspection_item",
   "type": "object",
@@ -1629,7 +2037,7 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "templateId": {
     "type": "string",
@@ -1740,7 +2148,7 @@
    },
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "workOrderNumber": {
     "type": "string",
@@ -1771,6 +2179,34 @@
    },
    "priority": {
     "$ref": "#/components/schemas/WorkOrderPriority"
+   },
+   "priorityScore": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The score the venue's policy gave the fault when raised; null when a person or the asset set the priority (M17-01)."
+   },
+   "prioritySource": {
+    "type": "string",
+    "enum": [
+     "scored",
+     "assetOverride",
+     "manual"
+    ],
+    "readOnly": true,
+    "description": "Where `priority` came from (M17-01). A change through `updateWorkOrder` makes it `manual`."
+   },
+   "faultAssessment": {
+    "$ref": "#/components/schemas/WorkOrderFaultAssessment"
+   },
+   "requiredQualificationCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Skills the job needs (M17-13)."
    },
    "kind": {
     "$ref": "#/components/schemas/WorkOrderKind"
@@ -1830,12 +2266,12 @@
    },
    "sourceInspectionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "sourceIncidentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "createdAt": {
@@ -1855,6 +2291,26 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   }
+  }
+ },
+ "WorkOrderFaultAssessment": {
+  "x-ticvai-persistence": "none — columns on maintenance.work_order",
+  "type": "object",
+  "description": "What the person raising a fault says about it, which the priority score reads (M17-01).",
+  "properties": {
+   "safetyRisk": {
+    "type": "boolean",
+    "default": false
+   },
+   "guestImpact": {
+    "type": "string",
+    "enum": [
+     "none",
+     "degraded",
+     "closed"
+    ],
+    "default": "none"
    }
   }
  },

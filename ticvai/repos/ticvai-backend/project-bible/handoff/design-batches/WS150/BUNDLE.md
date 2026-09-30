@@ -2077,8 +2077,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID of the line. `lineIds` everywhere in this contract are these."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7 of the line. `lineIds` everywhere in this contract are these."
    },
    "variantId": {
     "type": "string",
@@ -2107,13 +2107,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "maxItems": 50,
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     },
     "description": "Seated products only, as `seating.Seat.id`. Not available offline. **At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel** (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); **at most 10 per sale on staff and POS** (audit R080 (c)), across all the lines of one order for one performance. `createOrder` refuses more with 422 `seatLimitExceeded` (problem type `seat-limit-exceeded`)."
    },
    "resourceHoldId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant. `createOrder` converts the hold into a `ResourceBooking` without releasing it. Not available offline."
    },
@@ -2305,7 +2305,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "description": "The entitlements this line issued. **These are the ticket ids** — `transferOrderTickets.ticketIds` and `reprintOrder.reissuedTicketIds` take and return them.",
       "items": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+       "format": "uuid"
       }
      },
      "crossRegionRightIds": {
@@ -2395,11 +2395,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "tender": {
     "$ref": "#/components/schemas/TenderKind"
@@ -2659,11 +2659,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "reservationId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "Where the link was issued against a reservation rather than an order. **A reservation holds inventory and carries no money**, which is the whole reason a link is needed.\n"
    },

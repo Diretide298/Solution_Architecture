@@ -40,12 +40,12 @@
     "description": "At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); at most 10 per sale on staff and POS (audit R080 (c)). Over the limit is 422 `seatLimitExceeded`.",
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     }
    },
    "resourceHoldId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant and `quantity` is 1. The hold is the line's capacity; no inventory lease is taken."
    },
@@ -324,12 +324,12 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "readOnly": true
    },
    "questionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "questionVersion": {
     "type": "integer",
@@ -369,14 +369,14 @@
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "readOnly": true,
     "description": "Set by `orders.checkoutCart` when the cart becomes an order."
    },
    "orderLineId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "readOnly": true
    },
@@ -935,12 +935,12 @@
     "maxItems": 50,
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     }
    },
    "resourceHoldId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The `resources.ResourceHold` this line buys (decided 29 September, rev 3 REV3-15). While set, `leaseExpiresAt` is the hold's `expiresAt` and `inventoryHoldId` is null."
    },
@@ -1187,8 +1187,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID, as a seat hold's."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7, as a seat hold's."
    },
    "mapId": {
     "type": "string",
@@ -1244,7 +1244,7 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "performanceId": {
     "type": "string",
@@ -1483,9 +1483,9 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "readOnly": true,
-    "description": "ULID."
+    "description": "UUIDv7."
    },
    "venueId": {
     "type": "string",
@@ -1542,9 +1542,9 @@
      "properties": {
       "id": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "format": "uuid",
        "readOnly": true,
-       "description": "ULID. The row's own key."
+       "description": "UUIDv7. The row's own key."
       },
       "title": {
        "$ref": "#/components/schemas/LocalisedText"
@@ -1579,9 +1579,9 @@
         "properties": {
          "id": {
           "type": "string",
-          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+          "format": "uuid",
           "readOnly": true,
-          "description": "ULID. The row's own key."
+          "description": "UUIDv7. The row's own key."
          },
          "title": {
           "$ref": "#/components/schemas/LocalisedText"
@@ -2971,7 +2971,7 @@
      "properties": {
       "questionId": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+       "format": "uuid"
       },
       "questionVersion": {
        "type": "integer",
@@ -3037,7 +3037,7 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "mapId": {
     "type": "string",

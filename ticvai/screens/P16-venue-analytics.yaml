@@ -2278,7 +2278,7 @@ screens:
         none of them, so the edge carries nothing and ANL-001 opens cold
     - to: ANL-071
       trigger: AI maturity
-      provenance: 29 September pass (P29 group A) — the stage badge links to the maturity page
+      provenance: 29 September pass (group A) — the stage badge links to the maturity page
   notes: '**Built 24 August.** The client F&B boards drew six suggestion endpoints — price, requisition,
     replenishment, scenario, SLA, demand plan. **One screen and one operation answer all six**, because
     a suggestion surface that differs per domain is six screens to change when the model changes. **Owns
@@ -2360,7 +2360,7 @@ screens:
         operation: requestSuggestion
         notes: 'Shown only on a 422 `missing-setting`: names the setting (a current cost, a par level,
           the venue AI profile) and links to the screen that sets it. Little history is never this banner.'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
   states:
     loading: Open suggestions, newest first, grouped by kind.
     error: Could not load. **Trading is unaffected** — this advises and does not act.
@@ -9704,7 +9704,7 @@ screens:
     - to: ANL-010
       trigger: Suggestions & Advice
       back: true
-      provenance: 29 September pass (P29 group A)
+      provenance: 29 September pass (group A)
   notes: '**Added 29 September (AI functions review, the product owner''s "build it right, it gets more
     accurate with time").** No customer is told an AI feature "comes later": every answer starts from
     a baseline and learns. This is where the venue sees how far each answer has come, gives the figures
@@ -9734,11 +9734,11 @@ screens:
         - AiCapabilityMaturity.since
         operation: listAiCapabilityMaturity
         notes: Stage badge, the "Based on" line, the share of own data and what the next stage needs.
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
       - kind: multiSelect
         label: Stage
         operation: listAiCapabilityMaturity
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
     - name: contextPanel
       slot: selection
       components:
@@ -9758,7 +9758,7 @@ screens:
         operation: getAiVenueSettings
         notes: '**The venue can correct its profile at any time** — the honest answer to a baseline that
           is wrong for an unusual venue in the first weeks.'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
       - kind: dataTable
         label: History imports
         bindsTo: AiHistoryImport
@@ -9771,26 +9771,26 @@ screens:
         - AiHistoryImport.rowsLoaded
         - AiHistoryImport.rowsRejected
         operation: listVenueHistoryImports
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
       - kind: detailPanel
         label: Import findings
         bindsTo: AiHistoryImport.findings
         operation: getVenueHistoryImport
         notes: Each rejected row and why, so the venue can fix the export and import again.
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
     - name: actionBar
       slot: rowActions
       components:
       - kind: primaryButton
         label: Save venue AI profile
         operation: setAiVenueSettings
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
       - kind: secondaryButton
         label: Import history
         operation: importVenueHistory
         notes: '**Loaded into the AI data only, never the ledger**: an imported sale teaches the forecast
           and is never counted as revenue. The form says so.'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
   states:
     loading: The stage of each answer; the venue profile resolves separately.
     error: Could not load. **Every AI answer still works** — this page reports on them and changes none.
@@ -9804,12 +9804,12 @@ screens:
     contract: ai
     purpose: Where each answer stands
     trigger: onLoad
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   - operationId: getAiVenueSettings
     contract: ai
     purpose: The venue AI profile
     trigger: onLoad
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   - operationId: setAiVenueSettings
     contract: ai
     purpose: Correct the venue AI profile
@@ -9817,24 +9817,24 @@ screens:
     invalidates:
     - getAiVenueSettings
     - listAiCapabilityMaturity
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   - operationId: listVenueHistoryImports
     contract: ai
     purpose: Past imports and their result
     trigger: onLoad
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   - operationId: getVenueHistoryImport
     contract: ai
     purpose: One import's findings
     trigger: onAction
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   - operationId: importVenueHistory
     contract: ai
     purpose: Import the venue's own history
     trigger: onAction
     invalidates:
     - listVenueHistoryImports
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   entryState:
     params:
     - name: venueId
@@ -9871,7 +9871,7 @@ screens:
       - averageSpend
       - fnbAttachRate
       - staffProductivity
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   - id: formImportVenueHistory
     component: modal
     trigger: Import history
@@ -9889,4 +9889,4 @@ screens:
       - columnMapping
       - sourceSystem
       - dryRun
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)

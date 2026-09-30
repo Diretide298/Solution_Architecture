@@ -478,7 +478,7 @@ paths:
         are reported as divergences rather than rejected outright — the guest already played, and the
         record should say so.
 
-        **The play ID is the key here because a batch has no per-play header.** Each play keeps the ULID
+        **The play ID is the key here because a batch has no per-play header.** Each play keeps the UUIDv7
         it was recorded under, which is the same value `recordGamePlay` sends as its `Idempotency-Key`,
         so a play that reached the server both ways is counted once, under `duplicates`.
 
@@ -661,8 +661,8 @@ paths:
               properties:
                 id:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-                  description: 'Client-generated ULID for the redemption, returned as
+                  format: uuid
+                  description: 'Client-generated UUIDv7 for the redemption, returned as
                     `PrizeRedemption.id`. Also the idempotency key: it must equal the `Idempotency-Key`
                     header, and a mismatch is the shared 409 `Conflict`.
 
@@ -3094,8 +3094,8 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: 'Client-generated ULID for this request, and the idempotency key: it must equal
+          format: uuid
+          description: 'Client-generated UUIDv7 for this request, and the idempotency key: it must equal
             the `Idempotency-Key` header, and a mismatch is the shared 409 `Conflict`. **Not stored and
             not returned** — a card is keyed by `cardCode` (`games.card`), so this identifies the
             request, not the card.
@@ -3257,7 +3257,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: 'The play ID, generated on the reader, and returned as `PlayResult.playId`. Also
             the idempotency key: on `recordGamePlay` it must equal the `Idempotency-Key` header (a
             mismatch is the shared 409 `Conflict`); in a `syncGamePlays` batch it is the key on its own.

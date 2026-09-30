@@ -1,6 +1,6 @@
 # WS17 — Approval Workflows and Governance board 5
 
-**10 screens · 9 operations · 11 schemas · 5 permissions**
+**10 screens · 11 operations · 18 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `APPROVAL_ACT, APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_VIEW, GUEST_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `APPROVAL_ACT, APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_REQUEST, APPROVAL_VIEW, GUEST_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -69,7 +69,7 @@ convincingly. It is never a caption.
 | `BO-390` | Escalation Policy Builder | listDetail | 1 | 0 | — |
 | `BO-391` | Live Escalation Operations Center | listDetail | 2 | 1 | — |
 | `BO-392` | SLA & Escalation Performance Analytics | listDetail | 1 | 0 | — |
-| `BO-393` | AI SLA & Escalation Advisor | listDetail | 1 | 0 | — |
+| `BO-393` | AI SLA & Escalation Advisor | listDetail | 3 | 0 | — |
 
 ## Thin screens in this batch
 
@@ -1675,6 +1675,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Where the SLA is failing",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listApprovalRequests",
+    "contract": "approvals",
+    "purpose": "Pending requests with AI escalation suggestions (sort=aiPriority)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "escalateApprovalRequest",
+    "contract": "approvals",
+    "purpose": "A person acts on an escalation suggestion",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1683,6 +1697,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS34 Approval Workflows and Governance Board 5.dc.html#bo-393"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 48. 0 of 0 labels bound to a contract property; 0 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Approval_Workflows_and_Governance_Reference.pdf p.48; contract approvals.yaml GET /approval-analytics. Pack labels with no schema field yet (shown as plain labels): Predicted SLA breaches (next 60 min), Predicted average wait time, Recommendation text, Expected impact (before/after), Risk level (HIGH/...), Bottleneck share of breaches (e.g. 38%), Grouping by approval stage or department.",
+  "entryState": {
+   "params": [
+    {
+     "name": "requestId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1753,6 +1775,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "ApprovalDelegation",
   "responds": "ApprovalDelegation"
  },
+ "escalateApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests/{requestId}/escalate",
+  "contract": "approvals",
+  "summary": "Move it up a level",
+  "permission": "APPROVAL_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalRequest"
+ },
  "getApprovalAnalytics": {
   "method": "GET",
   "path": "/approval-analytics",
@@ -1789,6 +1830,60 @@ Method, path, parameters, request and response for every operation these screens
   "parameters": [],
   "requestBody": null,
   "responds": "ApprovalDelegation"
+ },
+ "listApprovalRequests": {
+  "method": "GET",
+  "path": "/approval-requests",
+  "contract": "approvals",
+  "summary": "Requests awaiting a decision, or already decided",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "assignedToMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "raisedByMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "breachingWithinMinutes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "sort",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listDelegations": {
   "method": "GET",
@@ -1983,6 +2078,68 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "ApprovalDecision": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.decision",
+  "required": [
+   "level",
+   "principalId",
+   "decision",
+   "decidedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "level": {
+    "type": "integer"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "isDelegate": {
+    "type": "boolean"
+   },
+   "delegatedFrom": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "decision": {
+    "type": "string",
+    "enum": [
+     "approve",
+     "reject"
+    ]
+   },
+   "comment": {
+    "type": "string",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "usedMfa": {
+    "type": "boolean"
+   },
+   "signatureRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "ApprovalDelegation": {
   "type": "object",
   "x-ticvai-persistence": "approvals.delegation",
@@ -2069,6 +2226,255 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "productChange",
    "pricingChange"
   ]
+ },
+ "ApprovalMode": {
+  "type": "string",
+  "description": "11.1.43–11.1.46. **Sequential** asks one at a time, **parallel** asks everyone at once, **consensus** needs all of them, **majority** needs more than half.\nParallel and consensus differ in when it completes: parallel completes on the first approval, consensus waits for all. Conflating them is how a four-eyes rule turns into a one-eye rule.\n",
+  "enum": [
+   "sequential",
+   "parallel",
+   "consensus",
+   "majority"
+  ]
+ },
+ "ApprovalRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.request",
+  "required": [
+   "id",
+   "kind",
+   "status",
+   "requestedByPrincipalId",
+   "requestedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/ApprovalKind"
+   },
+   "rerouteOnNoApprover": {
+    "type": "boolean",
+    "default": true,
+    "description": "BL-154. **An approver on leave is an approval that waits for them to come back.** Reroutes to the next in the chain rather than stalling — `workforce` already knows who is on leave, and an approval queue nobody is watching is the thing that stops a venue.\n"
+   },
+   "outOfOfficeDelegateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "allowEmailApproval": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Approving from an email link with no second factor is the weakest path in the system**, so it is off by default and available only below a configured value.\n"
+   },
+   "reopenedFrom": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Reopening a decided approval creates a new one that points back.** Editing a decision in place destroys the record of what was originally approved, which is the only thing an audit wants.\n"
+   },
+   "status": {
+    "$ref": "#/components/schemas/ApprovalStatus"
+   },
+   "subjectContract": {
+    "type": "string"
+   },
+   "subjectType": {
+    "type": "string"
+   },
+   "subjectId": {
+    "type": "string"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "summary": {
+    "type": "string"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "justification": {
+    "type": "string",
+    "nullable": true
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "matrixVersion": {
+    "type": "integer"
+   },
+   "mode": {
+    "$ref": "#/components/schemas/ApprovalMode"
+   },
+   "currentLevel": {
+    "type": "integer"
+   },
+   "totalLevels": {
+    "type": "integer"
+   },
+   "pendingApprovers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "principalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "displayName": {
+       "type": "string"
+      },
+      "isDelegate": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "decisions": {
+    "type": "array",
+    "description": "Every decision at every level, in order. **Immutable once the request completes** (11.1.56) — an approval is evidence, and amending one is a different fact.\n",
+    "items": {
+     "$ref": "#/components/schemas/ApprovalDecision"
+    }
+   },
+   "escalations": {
+    "type": "array",
+    "description": "11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "reason": {
+       "type": "string"
+      },
+      "fromLevel": {
+       "type": "integer"
+      },
+      "toLevel": {
+       "type": "integer"
+      },
+      "wasAutomatic": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "resubmittedFromId": {
+    "type": "string",
+    "nullable": true
+   },
+   "reopenedFromId": {
+    "type": "string",
+    "nullable": true
+   },
+   "slaDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "slaBreached": {
+    "type": "boolean"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "requestedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "aiAssessment": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.",
+    "properties": {
+     "riskScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "riskBand": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high",
+       "critical"
+      ]
+     },
+     "priorityScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "escalationSuggestion": {
+      "type": "object",
+      "description": "A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.",
+      "properties": {
+       "action": {
+        "type": "string",
+        "enum": [
+         "escalate",
+         "addBackupApprover",
+         "none"
+        ]
+       },
+       "reason": {
+        "type": "string",
+        "nullable": true
+       }
+      }
+     },
+     "signals": {
+      "type": "array",
+      "maxItems": 10,
+      "description": "The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.",
+      "items": {
+       "type": "object",
+       "properties": {
+        "code": {
+         "type": "string"
+        },
+        "contribution": {
+         "type": "number"
+        },
+        "detail": {
+         "type": "string",
+         "nullable": true
+        }
+       }
+      }
+     },
+     "scoreId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."
+     },
+     "decisionRecordId": {
+      "type": "string",
+      "description": "The ai decision record, for the audit of what the AI said and why."
+     },
+     "assessedAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  }
  },
  "ApprovalSlaPolicy": {
   "type": "object",
@@ -2170,6 +2576,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "ApprovalStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "pending",
+   "escalated",
+   "returned",
+   "informationRequested",
+   "approved",
+   "rejected",
+   "withdrawn",
+   "expired",
+   "cancelled"
+  ]
+ },
  "ApproverAvailability": {
   "type": "object",
   "x-ticvai-persistence": "approvals.approver_availability",
@@ -2217,6 +2638,118 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "DelegatedAccess": {
+  "x-ticvai-persistence": "identity.delegated_access",
+  "type": "object",
+  "required": [
+   "id",
+   "permission",
+   "scopePath",
+   "effect"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "roleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "permission": {
+    "type": "string",
+    "description": "From the permission enum. `*` permitted on DENY only."
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "CF-132, CL-05. **A grant held by a guest rather than a staff principal.**\nSection 5.5 asks for portfolios — a primary holder assigning entitlements, transfer between linked accounts, shared wallets with individual tracking — and it appears ten times across ten sections. **Every one of those reduces to the same question: who may act on whose behalf, over what, and until when.**\n**That is a grant, not a household table.** A primary holder assigning an entitlement is a grant. A group leader holding tickets for twelve is a grant. A corporate account enrolling members is a grant with a quota. **A shared wallet with individual tracking is a grant over a balance, and the transaction log already records who spent.**\n**A household table would answer one of those four.**\n"
+   },
+   "overSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Whose behalf. **Null for a staff grant, which is the existing behaviour** — every grant written before 18 August means exactly what it meant before.\n"
+   },
+   "overObjectRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "**Where the authority is over a thing rather than a scope** — a wallet, an entitlement, a booking. `scopePath` answers *where*; this answers *what*, and a guest's authority is almost always over a specific object rather than a branch of the tree.\n"
+   },
+   "delegationKind": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "primaryHolder",
+     "familyMember",
+     "groupLeader",
+     "attendee",
+     "corporateAdmin",
+     "corporateMember",
+     "carer"
+    ],
+    "description": "**What kind of relationship this expresses**, for display and for reporting. The mechanism does not branch on it — a family member and a group attendee are the same grant with different words around them, which is the point.\n"
+   },
+   "quota": {
+    "type": "integer",
+    "nullable": true,
+    "description": "2.14.15 and 4.3.11. **How many the holder may assign.** A corporate account with fifty allocations and a family with four are the same structure with different numbers.\n"
+   },
+   "isRevocableBySubject": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Whether the person it is over can end it.** A guest who linked a family member should be able to unlink them; a corporate member should not be able to revoke their employer's oversight — and **a delegation nobody can end is a delegation somebody will regret.**\n"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "effect": {
+    "type": "string",
+    "enum": [
+     "ALLOW",
+     "DENY"
+    ]
+   },
+   "permissionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Taken from `identity.user_access`, 20 September, when that table was collapsed into this one.** `permission` above is free text; this names a row in `identity.permission`, the catalogue wired the same day. A grant that names a catalogue row can be checked against the keys the contracts actually enforce — which is the whole point of a catalogue that reported *154 on operations, 35 in roles.yaml, 0 shared*.\nNullable because a role grant carries no permission at all.\n"
+   },
+   "revokedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Taken from `identity.user_access`. This table recorded `revokedBy` and not when, so it could say who revoked a grant and not whether it was before or after the thing somebody is asking about.\n"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "createdByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -2233,6 +2766,114 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "hasMore": {
     "type": "boolean"
+   }
+  }
+ },
+ "SlaEscalationBottleneckMonitorView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over approvals.workflow_instance, whose SLA and reminder timestamps it lists (data model for the agreed operations, 29 September)",
+  "description": "**What SLA, Escalation & Bottleneck Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "workflow": {
+    "type": "string",
+    "description": "Workflow"
+   },
+   "instance": {
+    "type": "string",
+    "description": "Instance"
+   },
+   "currentStep": {
+    "type": "string",
+    "description": "Current Step"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "started": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Started"
+   },
+   "target": {
+    "type": "string",
+    "format": "date-time",
+    "description": "SLA deadline"
+   },
+   "timeRemaining": {
+    "type": "integer",
+    "description": "Minutes until breach; negative once breached"
+   },
+   "risk": {
+    "type": "string",
+    "description": "Risk"
+   },
+   "escalationLevel": {
+    "type": "string",
+    "description": "Escalation Level"
+   },
+   "firstReminder": {
+    "type": "string",
+    "format": "date-time",
+    "description": "First Reminder"
+   },
+   "secondReminder": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Second Reminder"
+   },
+   "managerEscalation": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Manager Escalation"
+   },
+   "executiveEscalation": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Executive Escalation"
+   },
+   "finalOutcome": {
+    "type": "string",
+    "description": "Final Outcome"
+   }
+  },
+  "required": [
+   "instance"
+  ]
+ },
+ "SlaEscalationBottleneckMonitorViewSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none - aggregate computed at read time over the rows the page lists",
+  "description": "The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).",
+  "properties": {
+   "withinSla": {
+    "type": "integer",
+    "description": "Within SLA"
+   },
+   "atRisk": {
+    "type": "integer",
+    "description": "At Risk"
+   },
+   "breached": {
+    "type": "integer",
+    "description": "Breached"
+   },
+   "escalated": {
+    "type": "integer",
+    "description": "Escalated"
+   },
+   "averageProcessingTime": {
+    "type": "integer",
+    "description": "Minutes"
+   },
+   "averageApprovalTime": {
+    "type": "integer",
+    "description": "Minutes"
+   },
+   "longestWaitingStep": {
+    "type": "string",
+    "description": "Longest Waiting Step"
    }
   }
  },

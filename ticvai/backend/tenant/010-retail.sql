@@ -3,10 +3,10 @@
 
 -- Goods swapped rather than returned, which settles differently
 CREATE TABLE IF NOT EXISTS retail.exchange (
-    id                                text PRIMARY KEY NOT NULL,
-    sale_id                           text NOT NULL,
-    return_id                         text NOT NULL,
-    new_sale_id                       text NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
+    sale_id                           uuid NOT NULL,
+    return_id                         uuid NOT NULL,
+    new_sale_id                       uuid NOT NULL,
     returned_value                    numeric(18,4),
     replacement_value                 numeric(18,4),
     difference                        numeric(18,4) NOT NULL,
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS retail.product_recommendation (
 -- pii.subject, platform.outlet. Reached by: 1 operations read it and 1 write it; 1 tables
 -- reference it.
 CREATE TABLE IF NOT EXISTS retail.reservation (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     reservation_number                text,
     outlet_id                         uuid NOT NULL,
     subject_id                        uuid,
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS retail.reservation (
 -- keys; references retail.merchandise, retail.reservation. Reached by: 1 operations read it and 1
 -- write it.
 CREATE TABLE IF NOT EXISTS retail.reservation_line (
-    reservation_id                    text NOT NULL,
+    reservation_id                    uuid NOT NULL,
     merchandise_id                    uuid,
     name                              text,
     quantity                          integer,
@@ -82,10 +82,10 @@ CREATE TABLE IF NOT EXISTS retail.reservation_line (
 
 -- Goods coming back, against the sale that produced them
 CREATE TABLE IF NOT EXISTS retail."return" (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     return_number                     text,
-    sale_id                           text NOT NULL,
-    refund_id                         text,
+    sale_id                           uuid NOT NULL,
+    refund_id                         uuid,
     reason                            text CONSTRAINT return_reason_chk CHECK (reason IN ('changedMind', 'wrongSize', 'wrongItem', 'faulty', 'damagedInTransit', 'duplicatePurchase', 'giftReturn', 'other')),
     refund_amount                     numeric(18,4) NOT NULL,
     refund_tender                     text,
@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS retail."return" (
 
 -- One item returned, with its condition
 CREATE TABLE IF NOT EXISTS retail.return_line (
-    return_id                         text NOT NULL,
+    return_id                         uuid NOT NULL,
     line_id                           text,
     merchandise_id                    uuid,
     name                              text,
@@ -127,11 +127,11 @@ CREATE TABLE IF NOT EXISTS retail.return_policy (
 
 -- A retail transaction, distinct from an admission sale because it moves stock
 CREATE TABLE IF NOT EXISTS retail.sale (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     receipt_number                    text NOT NULL,
-    order_id                          text NOT NULL,
+    order_id                          uuid NOT NULL,
     outlet_id                         uuid NOT NULL,
-    shift_id                          text,
+    shift_id                          uuid,
     subject_id                        uuid,
     net_amount                        numeric(18,4),
     discount_amount                   numeric(18,4),
@@ -144,7 +144,7 @@ CREATE TABLE IF NOT EXISTS retail.sale (
 
 -- One item sold, which produces a stock movement
 CREATE TABLE IF NOT EXISTS retail.sale_line (
-    sale_id                           text NOT NULL,
+    sale_id                           uuid NOT NULL,
     line_id                           text,
     merchandise_id                    uuid,
     name                              text,
@@ -161,11 +161,11 @@ CREATE TABLE IF NOT EXISTS retail.sale_line (
 
 -- Bought now, collected later. The reason a guest is not carrying it round the park
 CREATE TABLE IF NOT EXISTS retail.shop_and_drop (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     drop_reference                    text NOT NULL,
-    sale_id                           text,
-    order_id                          text,
-    entitlement_id                    text,
+    sale_id                           uuid,
+    order_id                          uuid,
+    entitlement_id                    uuid,
     subject_id                        uuid,
     collection_point_id               uuid NOT NULL,
     collection_point_name             text,
@@ -182,7 +182,7 @@ CREATE TABLE IF NOT EXISTS retail.shop_and_drop (
 -- retail.sale through its keys; references retail.merchandise, retail.shop_and_drop. Reached by: 3
 -- operations read it and 0 write it.
 CREATE TABLE IF NOT EXISTS retail.shop_and_drop_line (
-    shop_and_drop_id                  text NOT NULL,
+    shop_and_drop_id                  uuid NOT NULL,
     line_id                           text,
     merchandise_id                    uuid,
     name                              text,

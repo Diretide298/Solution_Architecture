@@ -89,7 +89,13 @@
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Order"
  },
@@ -159,6 +165,11 @@
    },
    {
     "name": "includeSiblingOutlets",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "outletId",
     "in": "query",
     "required": null
    }

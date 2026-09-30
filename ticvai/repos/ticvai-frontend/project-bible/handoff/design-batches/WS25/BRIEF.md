@@ -1,6 +1,6 @@
 # WS25 — Customer Service board 1
 
-**10 screens · 10 operations · 15 schemas · 2 permissions**
+**10 screens · 13 operations · 23 schemas · 5 permissions**
 
 Platform P12 Venue Support · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `MARKETING_MANAGE, MARKETING_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `AI_CONFIGURE, AI_USE, CASE_MANAGE, CASE_VIEW, ORDER_REFUND`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `SUP-009` | Customer Service Command Center | listDetail | 1 | 0 | — |
-| `SUP-010` | Customer 360° Service Profile | listDetail | 1 | 0 | — |
+| `SUP-009` | Customer Service Command Center | listDetail | 2 | 0 | — |
+| `SUP-010` | Customer 360° Service Profile | listDetail | 2 | 0 | — |
 | `SUP-011` | Unified Interaction & Communication History | configEditor | 1 | 0 | — |
-| `SUP-012` | Case Creation, Classification & Intelligent Routing | configEditor | 1 | 0 | — |
+| `SUP-012` | Case Creation, Classification & Intelligent Routing | configEditor | 2 | 0 | — |
 | `SUP-013` | Case Investigation & Resolution Workspace | listDetail | 1 | 0 | — |
 | `SUP-014` | Order, Booking & Ticket Service Workspace | listDetail | 1 | 0 | — |
 | `SUP-015` | Refund, Compensation & Service Exception Workspace | listDetail | 1 | 0 | — |
 | `SUP-016` | Escalation, Collaboration & Internal Resolution | configEditor | 1 | 0 | — |
 | `SUP-017` | Case Resolution, Closure & Customer Feedback | configEditor | 1 | 0 | — |
-| `SUP-018` | AI Customer Service Copilot & Knowledge Workspace | listDetail | 1 | 0 | — |
+| `SUP-018` | AI Customer Service Copilot & Knowledge Workspace | listDetail | 3 | 0 | — |
 
 ## Thin screens in this batch
 

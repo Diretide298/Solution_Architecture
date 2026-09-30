@@ -1,6 +1,6 @@
 # P12-knowledge-responses-01 — P12 · Knowledge & Responses
 
-**2 screens · 4 operations · 7 schemas · 4 permissions**
+**2 screens · 5 operations · 8 schemas · 5 permissions**
 
 Platform P12 Venue Support · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `AI_CONFIGURE, MARKETING_MANAGE, MARKETING_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `AI_CONFIGURE, AI_USE, MARKETING_MANAGE, MARKETING_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **1 of these operations work offline**: listFaqs
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,12 +60,12 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `SUP-006` | Knowledge Base Search | listDetail | 2 | 0 | — |
-| `SUP-007` | Canned Response Management | listDetail | 2 | 0 | — |
+| `SUP-006` | Knowledge Base Search | listDetail | 3 | 0 | — |
+| `SUP-007` | Canned Response Management | listDetail | 2 | 1 | — |
 
 ## Thin screens in this batch
 
-**SUP-006, SUP-007 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**SUP-006 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -95,36 +94,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "exitTo": [
     "SUP-001",
-    "SUP-002",
-    "SUP-003",
-    "SUP-005"
+    "SUP-003"
    ],
    "inferred": true,
    "transitions": [
     {
      "to": "SUP-001",
      "trigger": "Agent Login",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry them"
-    },
-    {
-     "to": "SUP-002",
-     "trigger": "Agent Dashboard",
-     "carries": [
-      "caseId"
-     ],
-     "provenance": "derived — SUP-002 declares entryState.params caseId, so an edge into it must carry them"
-    },
-    {
-     "to": "SUP-005",
-     "trigger": "Live Chat Workspace",
-     "carries": [
-      "caseId",
-      "conversationId"
-     ],
-     "provenance": "derived — SUP-005 declares entryState.params caseId, conversationId, so an edge into it must carry them"
+     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-006 holds none of them, so the edge carries nothing and SUP-001 opens cold"
     }
    ]
   },
@@ -133,13 +110,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listKnowledgeCollections` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "Find something when the guest does not know what it is called.",
-  "gaps": [
-   {
-    "operation": "listFaqs",
-    "why": "**1 declared operation reach no component on this screen**: listFaqs. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -149,7 +119,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every knowledge base search",
+       "label": "Every knowledge collection",
        "bindsTo": "KnowledgeCollection",
        "columns": [
         "KnowledgeCollection.id",
@@ -167,6 +137,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listKnowledgeCollections",
        "provenance": "contract ai.yaml GET /collections"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every faq category",
+       "bindsTo": "FaqCategory",
+       "columns": [
+        "FaqCategory.code",
+        "FaqCategory.name",
+        "FaqCategory.sortOrder",
+        "FaqCategory.entries",
+        "FaqCategory.scopePath"
+       ],
+       "operation": "listFaqs",
+       "provenance": "contract white-label.yaml GET /tenant-config/faqs"
       }
      ]
     },
@@ -176,7 +160,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected knowledge base search",
+       "label": "The selected knowledge collection",
        "bindsTo": "KnowledgeCollection",
        "columns": [
         "KnowledgeCollection.id",
@@ -202,9 +186,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The knowledge base search list.",
    "error": "Could not load. Names which read failed and leaves the knowledge base search untouched.",
-   "emptyFirstRun": "No knowledge base search yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the knowledge base search are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No knowledge base search yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listKnowledgeCollections` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `AI_CONFIGURE`, which `listKnowledgeCollections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -218,6 +202,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "white-label",
     "purpose": "Published answers, as the guest sees them",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listKnowledgeGaps",
+    "contract": "ai",
+    "purpose": "Questions the assistant could not answer",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -297,25 +288,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "inferred": true,
    "exitTo": [
     "SUP-001",
-    "SUP-002",
     "SUP-003"
    ],
    "transitions": [
     {
      "to": "SUP-001",
      "trigger": "Agent Login",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry them"
-    },
-    {
-     "to": "SUP-002",
-     "trigger": "Agent Dashboard",
-     "carries": [
-      "caseId"
-     ],
-     "provenance": "derived — SUP-002 declares entryState.params caseId, so an edge into it must carry them"
+     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-007 holds none of them, so the edge carries nothing and SUP-001 opens cold"
     }
    ]
   },
@@ -332,8 +311,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Channel",
+       "operation": "listMessageTemplates",
+       "notes": "Sends `?channel=` to `listMessageTemplates`.",
+       "provenance": "contract marketing-crm.yaml GET /message-templates"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every canned response",
+       "label": "Every message template",
        "bindsTo": "MessageTemplate",
        "columns": [
         "MessageTemplate.id",
@@ -357,7 +343,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected canned response",
+       "label": "The selected message template",
        "bindsTo": "MessageTemplate",
        "columns": [
         "MessageTemplate.id",
@@ -381,7 +367,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create message template",
        "operation": "createMessageTemplate",
        "provenance": "contract marketing-crm.yaml POST /message-templates"
       }
@@ -392,9 +378,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The canned response list.",
    "error": "Could not load. Names which read failed and leaves the canned response untouched.",
-   "emptyFirstRun": "No canned response yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the canned response are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No canned response yet. Offers Create message template (`createMessageTemplate`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on channel and the canned response are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listMessageTemplates` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -428,6 +414,34 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P12 Venue Support.dc.html#sup-007"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateMessageTemplate",
+    "component": "modal",
+    "trigger": "Create message template",
+    "body": "**Collects what `createMessageTemplate` sends before it is called.** Required: `id`, `code`, `name`, `channel`, `bodies`. Optional: `subjects`, `mergeFields`, `missingLanguages`, `providerTemplateId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "MessageTemplate",
+    "confirm": {
+     "label": "Create message template",
+     "operation": "createMessageTemplate"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "code",
+      "name",
+      "channel",
+      "bodies",
+      "subjects",
+      "mergeFields",
+      "missingLanguages",
+      "providerTemplateId"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /message-templates"
+   }
+  ],
   "_platform": {
    "code": "P12",
    "audience": "staff",
@@ -505,6 +519,45 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "KnowledgeCollection"
  },
+ "listKnowledgeGaps": {
+  "method": "GET",
+  "path": "/knowledge-gaps",
+  "contract": "ai",
+  "summary": "Questions the assistant could not answer",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "audience",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listMessageTemplates": {
   "method": "GET",
   "path": "/message-templates",
@@ -543,6 +596,93 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AiKnowledgeGap": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.knowledge_gap",
+  "description": "**A question the assistant could not answer**, grouped so the content owner gets a task, not a log (AIC-061, AIC-062). Also written for an analytics question outside the semantic model (design 5.7).",
+  "required": [
+   "question",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "question": {
+    "type": "string",
+    "description": "The normalised question."
+   },
+   "examples": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Up to ten phrasings as asked, with personal data masked."
+   },
+   "occurrences": {
+    "type": "integer",
+    "minimum": 1,
+    "readOnly": true
+   },
+   "audience": {
+    "type": "string",
+    "enum": [
+     "staff",
+     "guest"
+    ]
+   },
+   "locale": {
+    "type": "string",
+    "nullable": true
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "knowledge",
+     "analytics"
+    ]
+   },
+   "suggestedCollectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.knowledge_collection"
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "assigned",
+     "answered",
+     "dismissed"
+    ]
+   },
+   "resolvedDocumentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.knowledge_document"
+   },
+   "lastAskedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
  "FaqCategory": {
   "x-ticvai-persistence": "whitelabel.faq_category + whitelabel.faq_entry",
   "type": "object",
@@ -592,6 +732,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "scopePath": {
     "type": "string",
+    "readOnly": true,
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
    }
   }
@@ -708,6 +849,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -754,6 +896,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "nullable": true,
     "description": "Required for WhatsApp, where templates are pre-approved by the provider."
+   },
+   "brandId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The brand whose identity the template carries; null for the tenant default."
+   },
+   "ownership": {
+    "type": "string",
+    "enum": [
+     "platform",
+     "crm"
+    ],
+    "default": "crm",
+    "description": "`platform` = a transactional template owned by the communication service; `crm` = a marketing template owned by CRM (`listSystemTransactionalTemplate`). Content by language and version is in `MessageTemplateVersion`. (decided 29 September, data model for the agreed operations)"
    }
   }
  },

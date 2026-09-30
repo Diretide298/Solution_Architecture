@@ -8,7 +8,7 @@ and the primary's connections are a shared budget** — amended again by
 [ADR-0040](0040-a-cell-may-hold-more-than-one-instance.md), which also gives the region a second
 instance when one is not enough.
 **Date:** 31 August 2026
-**Related:** [ADR-0016](0016-read-write-separation.md) · [ADR-0028](0028-service-decomposition.md) · [ADR-0031](0031-contention-and-locking.md) · CF-161
+**Related:** [ADR-0016](0016-read-write-separation.md) · [ADR-0028](0028-service-decomposition.md) (amended by ADR-0055: five deployables) · [ADR-0031](0031-contention-and-locking.md) · CF-161
 
 ---
 

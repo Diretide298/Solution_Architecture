@@ -152,6 +152,9 @@
  "document:docs\\active\\design-pack-coverage.md": [
   "ai:names it"
  ],
+ "document:docs\\active\\development-plan.md": [
+  "ai:names it"
+ ],
  "document:docs\\active\\dump-audit-3-september.md": [
   "ai:names it"
  ],
@@ -233,6 +236,27 @@
  "document:docs\\adr\\0047-how-long-data-is-kept-and-where-it-goes-next.md": [
   "ai:names it"
  ],
+ "document:docs\\adr\\0049-vectors-live-in-qdrant-one-collection-per-tenant.md": [
+  "ai:names it"
+ ],
+ "document:docs\\adr\\0050-one-autonomy-scale.md": [
+  "ai:names it"
+ ],
+ "document:docs\\adr\\0051-ai-ships-on-a-baseline-and-learns-per-tenant.md": [
+  "ai:names it"
+ ],
+ "document:docs\\adr\\0055-a-modular-monolith-deployed-as-five-units.md": [
+  "ai:names it"
+ ],
+ "document:docs\\adr\\0057-events-travel-on-rabbitmq-or-kafka.md": [
+  "ai:names it"
+ ],
+ "document:docs\\adr\\0058-one-relay-per-region-and-an-inbox-per-tenant-database.md": [
+  "ai:names it"
+ ],
+ "document:docs\\adr\\0059-ai-phasing-against-the-six-month-plan.md": [
+  "ai:names it"
+ ],
  "document:docs\\architecture\\README.md": [
   "ai:names it"
  ],
@@ -240,6 +264,9 @@
   "ai:names it"
  ],
  "document:docs\\architecture\\ai-system-design.md": [
+  "ai:names it"
+ ],
+ "document:docs\\architecture\\data-model.md": [
   "ai:names it"
  ],
  "event:access.rejected": [
@@ -1599,9 +1626,6 @@
   "ai:owned"
  ],
  "table:ai.chunk_embedding": [
-  "ai:owned"
- ],
- "table:ai.chunk_ref": [
   "ai:owned"
  ],
  "table:ai.config_session": [

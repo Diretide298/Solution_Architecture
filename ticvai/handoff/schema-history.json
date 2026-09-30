@@ -1139,7 +1139,10 @@
   "whitelabel.booking_flow": "2026-09-30",
   "whitelabel.booking_flow_step": "2026-09-30",
   "whitelabel.site_setup_progress": "2026-09-30",
-  "whitelabel.store_account": "2026-09-30"
+  "whitelabel.store_account": "2026-09-30",
+  "ai.inbox": "2026-09-30",
+  "control.outbox_relay": "2026-09-30",
+  "kernel.inbox": "2026-09-30"
  },
  "renames": [
   {
@@ -1314,7 +1317,8 @@
   "fnb.table_reservation (deposit_* columns; the money itself is orders.deposit)": "2026-09-30",
   "marketing.waiver_signatory_rule (guardian threshold and flag on marketing.form_definition)": "2026-09-30",
   "marketing.waiver_version_control (checklist, simulation and aiFindings computed at read time)": "2026-09-30",
-  "orders.deposit_policy (dining_* columns)": "2026-09-30"
+  "orders.deposit_policy (dining_* columns)": "2026-09-30",
+  "ai.chunk_ref": "2026-09-30"
  },
  "baseline": "2026-09-19",
  "generated": "2026-09-30"

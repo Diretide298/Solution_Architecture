@@ -1,6 +1,6 @@
 # WS72 — Waiver, Consent & Digital Form Management board 1
 
-**10 screens · 10 operations · 10 schemas · 2 permissions**
+**10 screens · 10 operations · 17 schemas · 2 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·

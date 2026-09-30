@@ -183,7 +183,7 @@
        "bindsTo": "Product.bookingFlowId",
        "operation": "listBookingFlows",
        "notes": "**Which booking flow sells this product** (decided 29 September, W8 and W12): a flow from CMS-103, e.g. *workshop: product first, then date and time*. Empty means the category's flow, then the venue's flow for the product kind; the screen shows which one applies. Saved with `updateProduct`.",
-       "provenance": "decided 29 September, W12; agreed name white-label listBookingFlows (P29 brief)"
+       "provenance": "decided 29 September, W12; agreed name white-label listBookingFlows (the 29 September pass brief)"
       },
       {
        "kind": "textField",
@@ -225,7 +225,7 @@
     "contract": "white-label",
     "purpose": "The booking flows a product can be sold through (W12)",
     "trigger": "onAction",
-    "provenance": "decided 29 September, W12 (P29)"
+    "provenance": "decided 29 September, W12 (the 29 September pass)"
    },
    {
     "operationId": "getProduct",

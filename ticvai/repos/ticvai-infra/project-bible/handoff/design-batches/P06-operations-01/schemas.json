@@ -1,4 +1,388 @@
 {
+ "AccessAccreditationCredential": {
+  "type": "object",
+  "x-ticvai-persistence": "access.accreditation_credential",
+  "x-ticvai-agreed": "29 September: build pass (group OWN, from group RA's handoff; BL-181); the events accreditation.credentialIssued and accreditation.holderStatusChanged name access as their critical consumer",
+  "description": "**What a gate needs to admit an accredited person, kept by `access`** (29 September, build). Written only by the consumers of `accreditation.credentialIssued` (a row per credential; a replacement sets the replaced row's `admits` false) and `accreditation.holderStatusChanged` (every credential of the holder: `admits` false unless the holder is `active`, validity taken from the event). Read by `validateAccess` and shipped in the offline package. The record of truth stays in `accreditation`; this is a copy shaped for the gate, never edited by a person.",
+  "required": [
+   "id",
+   "holderId",
+   "encodedIdentifier",
+   "admits",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The accreditation credential's id (`credentialId` on the events)."
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "programmeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "kind": {
+    "type": "string",
+    "description": "printedBadge, mobileCredential, qr, nfcCard, rfidCard or wristband, as issued."
+   },
+   "encodedIdentifier": {
+    "type": "string",
+    "x-ticvai-unique": "tenant",
+    "description": "What the gate reads from the credential. Never sent to webhook subscribers."
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "zoneIds": {
+    "type": "array",
+    "description": "The holder's effective zones, from the event (`effectiveZones`).",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "holderStatus": {
+    "type": "string",
+    "enum": [
+     "active",
+     "suspended",
+     "revoked",
+     "expired",
+     "archived"
+    ],
+    "description": "The holder's status as last published; only `active` admits."
+   },
+   "admits": {
+    "type": "boolean",
+    "description": "False once the credential is replaced or the holder is not active."
+   },
+   "sourceChangedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "The `issuedAt` or `changedAt` of the event last applied; an older event arriving late is ignored."
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005), the accreditation programme's scope."
+   }
+  }
+ },
+ "AccessDynamicPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "access.dynamic_policy",
+  "description": "One guest-admission dynamic (attribute-based) policy with its current content - type, context or identity it tests, condition expression, result, priority, zones, validity, status and current version. Not identity.access_policy, which is staff permission (declared 29 September, data-model close-out DM1).\n\n**Which of the two policy engines this is** (stated 29 September, build pass). **This one governs who may pass which gate**: admission of a guest, pass holder, accreditation holder or employee at an access point, decided in validation with results a gate acts on (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor). **identity `AccessPolicy` governs who may do what in the software**: a principal's permissions on operations and screens, decided by identity `evaluateAccess`. An employee's badge opening a staff door is decided here; the same employee approving a refund is decided in identity. Effectiveness is reported per engine: `listDynamicPolicyEffectiveness` here, `listAccessPolicyEffectiveness` in identity.",
+  "required": [
+   "id",
+   "scopePath",
+   "name",
+   "policyType",
+   "conditionExpression",
+   "result",
+   "status",
+   "currentVersion"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The policyId"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node; where it applies further is access.policy_scope_assignment"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "policyType": {
+    "type": "string",
+    "enum": [
+     "guestAttribute",
+     "accreditation",
+     "occupancy",
+     "employee",
+     "risk",
+     "membership",
+     "timeEvent"
+    ]
+   },
+   "contextType": {
+    "type": "string",
+    "enum": [
+     "date",
+     "day",
+     "time",
+     "season",
+     "event",
+     "performance",
+     "specialEvent",
+     "holiday",
+     "operatingCalendar",
+     "occupancy",
+     "attractionStatus"
+    ],
+    "nullable": true,
+    "description": "Context/time/event policies (setContextTimeEvent)"
+   },
+   "identityType": {
+    "type": "string",
+    "enum": [
+     "guest",
+     "member",
+     "annualPassHolder",
+     "employee",
+     "contractor",
+     "vendor",
+     "performer",
+     "media",
+     "vip",
+     "security",
+     "emergencyServices",
+     "eventStaff"
+    ],
+    "nullable": true,
+    "description": "Identity-based policies (listIdentityMembershipAccreditation)"
+   },
+   "conditionExpression": {
+    "type": "string",
+    "description": "Condition tree over access.access_attribute keys using AND, OR, NOT, IN and BETWEEN"
+   },
+   "result": {
+    "type": "string",
+    "enum": [
+     "allow",
+     "deny",
+     "review",
+     "requireId",
+     "requireBiometric",
+     "requireCompanion",
+     "requireSupervisor"
+    ]
+   },
+   "priority": {
+    "type": "integer",
+    "nullable": true
+   },
+   "allowedZoneIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "deniedZoneIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "monitorThresholdPercent": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Occupancy policies. Percent at which the band becomes Monitor"
+   },
+   "restrictThresholdPercent": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Occupancy policies. Percent at which the band becomes Restrict"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The grant expires automatically at validTo"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "pendingApproval",
+     "active",
+     "inactive",
+     "expired"
+    ],
+    "default": "draft"
+   },
+   "currentVersion": {
+    "type": "integer",
+    "minimum": 1,
+    "description": "The version in force (access.dynamic_policy_version)"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "AccreditationCredentialVerification": {
+  "type": "object",
+  "description": "18.8.3. **What a steward needs to believe the person in front of them**: the face, the name, the category and the zones, and whether any of it is valid now. Returned by `verifyAccreditationCredential`; not stored.\n",
+  "required": [
+   "outcome"
+  ],
+  "properties": {
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "valid",
+     "notYetValid",
+     "expired",
+     "suspended",
+     "revoked",
+     "credentialReplaced",
+     "credentialLost",
+     "credentialInactive"
+    ],
+    "description": "`valid` only when the holder is `active`, today is inside the holder's validity, and the credential is `issued` or `active`"
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "credentialId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "credentialKind": {
+    "type": "string"
+   },
+   "credentialStatus": {
+    "type": "string"
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "accreditationNumber": {
+    "type": "string"
+   },
+   "fullName": {
+    "type": "string"
+   },
+   "photoAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "photoUrl": {
+    "type": "string",
+    "nullable": true,
+    "description": "Signed and short-lived, so the scan screen can show the face without a second call"
+   },
+   "organisationName": {
+    "type": "string",
+    "nullable": true
+   },
+   "affiliationRole": {
+    "type": "string",
+    "nullable": true
+   },
+   "programmeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "categoryCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "categoryName": {
+    "type": "string",
+    "nullable": true
+   },
+   "holderStatus": {
+    "type": "string"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "effectiveZones": {
+    "type": "array",
+    "description": "The zones the holder may enter under their profiles and exceptions, today",
+    "items": {
+     "type": "object",
+     "properties": {
+      "zoneId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "zoneName": {
+       "type": "string"
+      },
+      "allowedNow": {
+       "type": "boolean",
+       "description": "Inside the profile schedule (date, day, time, event phase) at this moment"
+      }
+     }
+    }
+   },
+   "escortRequired": {
+    "type": "boolean"
+   },
+   "zoneCheck": {
+    "type": "object",
+    "nullable": true,
+    "description": "Present when `zoneId` was given",
+    "properties": {
+     "zoneId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "allowed": {
+      "type": "boolean"
+     },
+     "reason": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   },
+   "checkedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "Announcement": {
   "type": "object",
   "x-ticvai-persistence": "workforce.announcement",
@@ -48,6 +432,21 @@
    },
    "requiresAcknowledgement": {
     "type": "boolean"
+   },
+   "deliveryChannels": {
+    "type": "array",
+    "description": "How it reaches people (29 September, build, 18.1.5). `inApp` always; `push` to the targeted people's registered staff phones (tenancy `RegisteredDevice`, kind `mobileHandset`). `emergency` is sent by both whatever is set here.\n",
+    "items": {
+     "type": "string",
+     "enum": [
+      "inApp",
+      "push"
+     ]
+    },
+    "default": [
+     "inApp",
+     "push"
+    ]
    },
    "expiresAt": {
     "type": "string",
@@ -133,7 +532,28 @@
     ],
     "properties": {
      "shiftId": {
-      "type": "string"
+      "type": "string",
+      "format": "uuid"
+     },
+     "depositBoxId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "The box the cash moved in or out of. Set on every lift `withdrawFromDepositBox` records (26 September, pull audit R099).\n"
+     },
+     "witnessPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "The cashier who countersigned a withdrawal. Null on other movements."
+     },
+     "withdrawalReason": {
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/WithdrawalReason"
+       }
+      ],
+      "nullable": true
      },
      "authorisedByPrincipalId": {
       "type": "string",
@@ -159,7 +579,8 @@
    "openingFloat",
    "lift",
    "add"
-  ]
+  ],
+  "description": "`openingFloat` is written by `openShift`; `lift` by `createCashMovement` and by `withdrawFromDepositBox`, which is a lift from one cashier's box; `add` by `createCashMovement`.\n"
  },
  "CloseShiftRequest": {
   "type": "object",
@@ -169,7 +590,12 @@
   ],
   "properties": {
    "countedCash": {
-    "$ref": "#/components/schemas/DenominationCount"
+    "type": "array",
+    "minItems": 1,
+    "description": "**The cashier's blind count, one line per denomination counted** (decided 29 September, readiness close-out; our build plan). The server writes each line as one `CashCountLine` (`countKind` close) against the shift, taking the face value from `platform.denomination`. A denomination may appear once; a repeat is refused with 422 `duplicate-denomination`.\n",
+    "items": {
+     "$ref": "#/components/schemas/CountedDenominationLine"
+    }
    },
    "nonCashDeclared": {
     "type": "array",
@@ -205,6 +631,36 @@
    }
   }
  },
+ "CountedDenominationLine": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; lands as `CashCountLine` rows",
+  "description": "**One line of a cash count as the cashier types it: which note or coin, how many, and what they come to** (decided 29 September, readiness close-out; our build plan). The shape of the blind count on close (`closeShift`) and of the count columns on the till screens (POS-007, POS-011). It is the request side of `CashCountLine`, which is the stored row and adds the shift, the count kind, who counted and when.\n**`total` is shown to the cashier and checked, not trusted**: the server recomputes `count` times the denomination's face value and refuses a line whose `total` disagrees with 422 `count-total-mismatch`. An inactive or unknown denomination is refused with 422 `unknown-denomination`.\n",
+  "required": [
+   "denominationId",
+   "count"
+  ],
+  "properties": {
+   "denominationId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "References `platform.denomination` (`Denomination.id`) — face value, kind and counting order live there."
+   },
+   "count": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100000,
+    "description": "**How many of this note or coin were counted.** Zero is a line, not an omission: a denomination counted and found empty."
+   },
+   "total": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "`count` times the face value, in the denomination's currency. Optional on the way in (the server computes it) and checked when sent.\n"
+   }
+  }
+ },
  "CreateCashMovementRequest": {
   "type": "object",
   "required": [
@@ -216,8 +672,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7."
    },
    "kind": {
     "$ref": "#/components/schemas/CashMovementKind"
@@ -226,7 +682,9 @@
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "denominations": {
-    "$ref": "#/components/schemas/DenominationCount"
+    "$ref": "#/components/schemas/DenominationCount",
+    "x-ticvai-persisted": false,
+    "description": "**Stored as `orders.cash_count_line` rows** with `countKind: movement` and this movement's `cashMovementId`, not as a column. The jsonb blob this used to land in is what `Denomination` was created to replace (26 September, pull audit R099).\n"
    },
    "reference": {
     "type": "string",
@@ -250,13 +708,12 @@
    "id",
    "title",
    "venueId",
-   "priority",
    "recordedAt"
   ],
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "title": {
     "type": "string",
@@ -287,7 +744,23 @@
     "default": "corrective"
    },
    "priority": {
-    "$ref": "#/components/schemas/WorkOrderPriority"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/WorkOrderPriority"
+     }
+    ],
+    "description": "**Optional since 29 September** (M17-01). Sent, it is `manual` and wins. Absent, the asset's `priorityOverride` applies, and failing that the venue's `WorkOrderPriorityPolicy` scores the fault.\n"
+   },
+   "faultAssessment": {
+    "$ref": "#/components/schemas/WorkOrderFaultAssessment"
+   },
+   "requiredQualificationCodes": {
+    "type": "array",
+    "maxItems": 10,
+    "items": {
+     "type": "string"
+    },
+    "description": "Skills the job needs, as qualification codes; `suggestWorkOrderAssignee` ranks by them (M17-13)."
    },
    "categoryId": {
     "type": "string",
@@ -348,7 +821,8 @@
    "mediaDeactivated",
    "unpaid",
    "delegatedRightExhausted",
-   "delegatedRightRevoked"
+   "delegatedRightRevoked",
+   "journeyNotCovered"
   ]
  },
  "Direction": {
@@ -359,65 +833,6 @@
    "reentry",
    "crossover"
   ]
- },
- "GuestSession": {
-  "x-ticvai-persistence": "none — Redis session registry",
-  "type": "object",
-  "required": [
-   "subjectId",
-   "tokens",
-   "isVerified",
-   "expiresAt"
-  ],
-  "properties": {
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "displayName": {
-    "type": "string",
-    "nullable": true
-   },
-   "tokens": {
-    "$ref": "#/components/schemas/TokenPair"
-   },
-   "isVerified": {
-    "type": "boolean",
-    "description": "False until an OTP or a verified provider identity confirms ownership. An unverified account may browse but not transact.\n"
-   },
-   "identityProviders": {
-    "type": "array",
-    "description": "Linked providers. Several may resolve to one account.",
-    "items": {
-     "type": "string",
-     "enum": [
-      "password",
-      "otp",
-      "apple",
-      "google",
-      "uaePass"
-     ]
-    }
-   },
-   "guestLinkId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Present where the guest is linked across cells (ADR-0010)."
-   },
-   "homeCellName": {
-    "type": "string",
-    "nullable": true
-   },
-   "preferredLanguage": {
-    "type": "string",
-    "nullable": true
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Longer lived than a staff session. No single-session rule — a guest may be signed in on a phone and a laptop at once.\n"
-   }
-  }
  },
  "Incident": {
   "x-ticvai-persistence": "maintenance.incident",
@@ -434,10 +849,13 @@
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid"
    },
    "incidentNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity.\n"
    },
    "kind": {
     "$ref": "#/components/schemas/IncidentKind"
@@ -473,7 +891,10 @@
    "notifiedAt": {
     "type": "string",
     "format": "date-time",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "The earliest `notifiedAt` among this incident's authority notifications. **Maintained on write** by `recordAuthorityNotification`; each notification itself is a row of `maintenance.incident_authority_notification`.\n"
    },
    "assignedToPrincipalId": {
     "type": "string",
@@ -486,6 +907,7 @@
    },
    "correctiveWorkOrderId": {
     "type": "string",
+    "format": "uuid",
     "nullable": true
    },
    "occurredAt": {
@@ -508,6 +930,54 @@
    }
   }
  },
+ "IncidentAuthorityNotification": {
+  "x-ticvai-persistence": "maintenance.incident_authority_notification",
+  "type": "object",
+  "description": "**One notification to an external authority, appended by `recordAuthorityNotification`.** An incident may be reported to more than one authority, or to the same one twice, and each is the evidence that an obligation was met — so each is a row, not an overwrite of `maintenance.incident.notified_at`.\n",
+  "required": [
+   "id",
+   "incidentId",
+   "authority",
+   "notifiedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "incidentId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "authority": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "reference": {
+    "type": "string",
+    "maxLength": 128,
+    "nullable": true
+   },
+   "notifiedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "notifiedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "attachmentRefs": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "IncidentDetail": {
   "x-ticvai-persistence": "maintenance.incident",
   "allOf": [
@@ -523,7 +993,17 @@
      },
      "investigationNote": {
       "type": "string",
-      "nullable": true
+      "nullable": true,
+      "readOnly": true,
+      "description": "The latest entry of `investigationNotes`, kept for readers that show one line."
+     },
+     "investigationNotes": {
+      "type": "array",
+      "readOnly": true,
+      "description": "**Every investigation note, oldest first** (decided 28 September, audit R106 (5)). Read from `maintenance.incident_investigation_note`; appended by `updateIncident`.\n",
+      "items": {
+       "$ref": "#/components/schemas/IncidentInvestigationNote"
+      }
      },
      "rootCause": {
       "type": "string",
@@ -548,32 +1028,95 @@
        "type": "string"
       }
      },
+     "involvedParties": {
+      "type": "array",
+      "description": "Who was involved, as given in `ReportIncidentRequest.involvedSubjectIds` and `involvedStaffPrincipalIds`. Read from `maintenance.incident_involved_party`.\n",
+      "items": {
+       "$ref": "#/components/schemas/IncidentInvolvedParty"
+      }
+     },
      "authorityNotifications": {
       "type": "array",
+      "description": "Read from `maintenance.incident_authority_notification`, oldest first.",
       "items": {
-       "type": "object",
-       "properties": {
-        "authority": {
-         "type": "string"
-        },
-        "reference": {
-         "type": "string",
-         "nullable": true
-        },
-        "notifiedAt": {
-         "type": "string",
-         "format": "date-time"
-        },
-        "notifiedByPrincipalId": {
-         "type": "string",
-         "format": "uuid"
-        }
-       }
+       "$ref": "#/components/schemas/IncidentAuthorityNotification"
       }
      }
     }
    }
   ]
+ },
+ "IncidentInvestigationNote": {
+  "x-ticvai-persistence": "maintenance.incident_investigation_note",
+  "type": "object",
+  "description": "**One investigation note, appended by `updateIncident`** (decided 28 September, audit R106 (5)). A history rather than a field, so what an investigator thought on Tuesday survives what they found on Thursday.\n",
+  "required": [
+   "id",
+   "incidentId",
+   "note",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "incidentId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 10000
+   },
+   "writtenByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "IncidentInvolvedParty": {
+  "x-ticvai-persistence": "maintenance.incident_involved_party",
+  "type": "object",
+  "description": "**One person involved in an incident, by opaque reference.** A guest or member of the public is a `pii.subject` id — personal details live there, the erasable store of ADR-0023, so the incident record survives an erasure request intact. A member of staff is a principal id. Exactly one of the two is set, as `kind` says.\n",
+  "required": [
+   "id",
+   "incidentId",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "incidentId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "subject",
+     "staff"
+    ]
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A `pii.subject` id where `kind` is `subject`."
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The staff principal where `kind` is `staff`."
+   }
+  }
  },
  "IncidentKind": {
   "type": "string",
@@ -609,6 +1152,71 @@
    "closed"
   ]
  },
+ "InventoryStockReservation": {
+  "type": "object",
+  "x-ticvai-persistence": "inventory.stock_reservation",
+  "description": "**Taken from the backend workbook, 20 September.** Temporarily reserves stock for an order or operational requirement so it cannot be allocated elsewhere.",
+  "required": [
+   "itemId",
+   "locationId",
+   "quantity",
+   "sourceType",
+   "sourceId",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "itemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "quantity": {
+    "type": "number",
+    "exclusiveMinimum": 0
+   },
+   "sourceType": {
+    "$ref": "#/components/schemas/StockReservationSourceType"
+   },
+   "sourceId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The id of what the stock is reserved for: a work order, a rental agreement or an order. A uuid, as every id is (ADR-0056); it was text from 29 September to 30 September because a work order id was then 26-character text (M17-02)."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "consumed",
+     "released",
+     "expired"
+    ],
+    "readOnly": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "releasedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
  "LoginRequest": {
   "type": "object",
   "required": [
@@ -624,7 +1232,8 @@
    "credential": {
     "type": "string",
     "description": "Password, PIN, card token or RFID token depending on `method`.\n",
-    "maxLength": 512
+    "maxLength": 512,
+    "writeOnly": true
    },
    "method": {
     "type": "string",
@@ -658,11 +1267,27 @@
    {
     "type": "object",
     "required": [
-     "requiresRoleSelection"
+     "requiresRoleSelection",
+     "requiresMfa"
     ],
     "properties": {
      "requiresRoleSelection": {
       "type": "boolean"
+     },
+     "requiresMfa": {
+      "type": "boolean",
+      "description": "True when the principal holds any permission listed in `PasswordPolicy.mfaRequiredForPermissions` (decided 28 September, audit R135). The session is not usable until `verifyMfaChallenge` succeeds on a `signIn` challenge."
+     },
+     "hasMfaMethod": {
+      "type": "boolean",
+      "description": "Whether the principal has an active MFA method. With `requiresMfa` true and this false, the client must enrol one first (audit R135, R126 (5))."
+     },
+     "mfaMethods": {
+      "type": "array",
+      "description": "The principal's active methods, so the client can offer the right one for the `signIn` challenge. Empty when `requiresMfa` is false.",
+      "items": {
+       "$ref": "#/components/schemas/MfaMethod"
+      }
      },
      "availableRoles": {
       "type": "array",
@@ -754,10 +1379,12 @@
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid"
    },
    "shiftId": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid"
    },
    "workstationId": {
     "type": "string",
@@ -815,8 +1442,20 @@
     "type": "string",
     "format": "uuid"
    },
+   "entitlementsVersion": {
+    "type": "integer",
+    "description": "The highest `access.entitlement` change included (SD-052, 29 September). A refresh sends it as `sinceVersion` and receives only what changed after it, so a 60,000-guest venue is not re-sent whole."
+   },
+   "dynamicPolicies": {
+    "type": "array",
+    "description": "The active guest-admission dynamic policies for this access point's zones (SD-052), so an offline gate applies the same rules as an online one.",
+    "items": {
+     "$ref": "#/components/schemas/AccessDynamicPolicy"
+    }
+   },
    "entitlements": {
     "type": "array",
+    "description": "Read from `access.entitlement` (SD-052). With `sinceVersion`, only the rows changed after it, including ones now void or used, so a device removes them.",
     "items": {
      "type": "object",
      "required": [
@@ -829,7 +1468,9 @@
      ],
      "properties": {
       "ticketId": {
-       "type": "string"
+       "type": "string",
+       "format": "uuid",
+       "description": "The `Entitlement.id`."
       },
       "mediaCodes": {
        "type": "array",
@@ -887,7 +1528,9 @@
        "type": "string"
       },
       "ticketId": {
-       "type": "string"
+       "type": "string",
+       "format": "uuid",
+       "description": "The `Entitlement.id` in the issuing cell."
       },
       "issuingCellId": {
        "type": "string"
@@ -960,8 +1603,57 @@
       }
      }
     }
+   },
+   "accreditationCredentials": {
+    "type": "array",
+    "description": "Accreditation credentials that admit at this access point, from access.accreditation_credential (29 September, build; BL-181). Only rows that admit are included; a credential dropped from one package to the next no longer admits.",
+    "items": {
+     "$ref": "#/components/schemas/AccessAccreditationCredential"
+    }
    }
   }
+ },
+ "OfflineScan": {
+  "x-ticvai-persistence": "none — client-side journal",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/ValidateRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "sequence",
+     "localOutcome"
+    ],
+    "properties": {
+     "sequence": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Monotonic per device. The server processes in this order."
+     },
+     "localOutcome": {
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/ScanOutcome"
+       }
+      ],
+      "description": "What the device decided offline. The server is authoritative and may disagree; disagreements are returned for reconciliation, not discarded.\n"
+     },
+     "localDenyReason": {
+      "$ref": "#/components/schemas/DenyReason"
+     },
+     "overriddenByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     },
+     "overrideReason": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   }
+  ]
  },
  "OpenShiftRequest": {
   "type": "object",
@@ -990,7 +1682,7 @@
    "recordedAt": {
     "type": "string",
     "format": "date-time",
-    "description": "When the device recorded it. Differs from server receipt time for shifts opened offline.\n"
+    "description": "When the device recorded it. `openShift` is online-only (F32), so this differs from server receipt time only by transit; it is kept because the shift's other device writes are ordered against it.\n"
    }
   }
  },
@@ -1028,7 +1720,7 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "kind": {
     "$ref": "#/components/schemas/IncidentKind"
@@ -1108,6 +1800,56 @@
    "deferred"
   ]
  },
+ "Role": {
+  "x-ticvai-persistence": "identity.role",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "x-ticvai-unique": "tenant",
+    "description": "**Unique within the tenant** (decided 28 September, audit R108). A seeded role's code is reserved in every tenant. Unique per tenant, not per venue, because a grant names a role anywhere in the tree; `createRole` refuses a duplicate with `409 duplicate-code`.\n"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string"
+   },
+   "permissions": {
+    "type": "array",
+    "description": "**A role that grants no permissions is not a role.** `Role` carried a code, a name and two counts until 18 August, and `identity.role_permission` derived from it with exactly one column — `role_id`. **A join table that joins to nothing**, found by Hrushikant in review and missed by the schema audit that ran the same day.\n**The audit asked whether every table had columns, a relationship and an owner, and this table had all three.** What it did not ask is whether a table with one column can do the job its name claims.\n",
+    "items": {
+     "$ref": "../shared/permissions.yaml#/components/schemas/Permission"
+    }
+   },
+   "inheritsFromRoleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Role composition, one level deep and no deeper.** A supervisor role that is a cashier plus three permissions is how venues actually describe them.\n**Cycles are refused and depth is capped at one**, because a permission set nobody can read off the screen is a permission set nobody audits.\n"
+   },
+   "isSystem": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Seeded roles ship and are editable; deleting one is refused.** A venue that removes `cashier` and rebuilds it has two roles with one name in the audit log.\n**The seeded system roles are Cashier, Supervisor, Venue Manager, Finance and Tenant Admin** (proposed in `docs/active/seed-data-proposal.md` section 2, client to correct; audit R229).\n"
+   },
+   "principalCount": {
+    "type": "integer"
+   },
+   "grantCount": {
+    "type": "integer"
+   }
+  }
+ },
  "RoleSummary": {
   "x-ticvai-persistence": "none — projection over role",
   "type": "object",
@@ -1129,6 +1871,129 @@
    },
    "isPrimary": {
     "type": "boolean"
+   }
+  }
+ },
+ "ScanEvent": {
+  "x-ticvai-append-only": "recordedAt",
+  "x-ticvai-persistence": "access.scan_event",
+  "type": "object",
+  "required": [
+   "id",
+   "accessPointId",
+   "venueId",
+   "outcome",
+   "direction",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The scan's client-generated UUIDv7, the key offline replay deduplicates on."
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "ticketId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `Entitlement.id` scanned; null where the media resolved to nothing."
+   },
+   "mediaCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "outcome": {
+    "$ref": "#/components/schemas/ScanOutcome"
+   },
+   "denyReason": {
+    "$ref": "#/components/schemas/DenyReason"
+   },
+   "direction": {
+    "$ref": "#/components/schemas/Direction"
+   },
+   "operatorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "overridesScanId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Set only on an override row**, naming the denied scan it admits against (decided 28 September, audit R228). The denied scan itself is never updated: the denial and the override are two rows, and at most one override row names any scan. Null on every other scan.\n"
+   },
+   "overrideReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "The supervisor's justification, on the override row only. The overriding principal is that row's `operatorPrincipalId`."
+   },
+   "dynamicPolicyId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The dynamic access policy (`access.dynamic_policy`) whose result decided this scan; null when no dynamic policy matched and the entitlement alone decided (added 29 September, build pass, 3.3.48). `listDynamicPolicyEffectiveness` counts from it."
+   },
+   "dynamicPolicyVersion": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "The version of that policy in force at the scan, so a report spanning a change counts each version apart."
+   },
+   "dynamicPolicyResult": {
+    "type": "string",
+    "enum": [
+     "allow",
+     "deny",
+     "review",
+     "requireId",
+     "requireBiometric",
+     "requireCompanion",
+     "requireSupervisor"
+    ],
+    "nullable": true,
+    "description": "What the policy decided, which for a step-up is not the same as the scan's outcome."
+   },
+   "quantity": {
+    "type": "integer",
+    "minimum": 1,
+    "default": 1,
+    "description": "Admissions this scan counted. More than one only for a group wave (`validateGroupAccess`) or a quantity entitlement consumed in one pass (added 29 September, data-model close-out DM1)."
+   },
+   "localSequence": {
+    "type": "integer",
+    "nullable": true,
+    "description": "The device-local sequence number of a scan recorded offline; null for an online scan (added 29 September, data-model close-out DM1)."
+   },
+   "packageVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "The offline package (`access.edge_package`) the device validated against; null for an online scan (added 29 September, data-model close-out DM1)."
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Null while pending. Differs from recordedAt for offline scans."
    }
   }
  },
@@ -1265,7 +2130,8 @@
   }
  },
  "Shift": {
-  "x-ticvai-persistence": "orders.shift",
+  "x-ticvai-persistence": "orders.pos_shift + orders.pos_shift_approval + orders.pos_shift_incident",
+  "description": "**`approvals` and `incidents` are child rows** (26 September, pull audit R099): `orders.pos_shift_approval` and `orders.pos_shift_incident`, one row per item, keyed to the shift. Until then the contract carried both and `orders.pos_shift` had nowhere to put either.\n",
   "type": "object",
   "required": [
    "id",
@@ -1281,8 +2147,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID. Also the idempotency key."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7. Also the idempotency key."
    },
    "workstationId": {
     "type": "string",
@@ -1365,13 +2231,52 @@
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "salesTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "x-ticvai-column": "gross_sales_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "What the till took in sales, as the guest paid it — tax included."
    },
    "refundsTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "x-ticvai-column": "gross_refunded_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "What the till paid back, as the guest was refunded it — tax included."
    },
    "liftsTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "x-ticvai-column": "lifted_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Cash taken out mid-shift by lifts and withdrawals. Cash, so neither gross nor net."
+   },
+   "expectedCash": {
+    "x-ticvai-column": "expected_cash_amount",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "nullable": true,
+    "description": "26 September, pull audit R207. **The figure the blind count was measured against**, revealed once the count is in — null until then. Until this date only `ShiftCloseResult` carried it, returned once by `closeShift`, so BO-040 could not show the over/short it exists to accept.\n"
+   },
+   "countedCash": {
+    "x-ticvai-column": "counted_cash_amount",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "nullable": true,
+    "description": "What the close count found. Null until the shift is counted."
+   },
+   "variance": {
+    "x-ticvai-column": "variance_amount",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "nullable": true,
+    "description": "Counted minus expected, as `ShiftCloseResult.variance`. Negative is short."
    },
    "heldLeaseCount": {
     "type": "integer",
@@ -1384,17 +2289,29 @@
    "recordedAt": {
     "type": "string",
     "format": "date-time",
-    "description": "When the device recorded the open. Differs from `openedAt` when offline."
+    "description": "When the device recorded the open. `openedAt` is the server's time."
    },
    "suspendedAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true
    },
+   "suspendReason": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "The `reason` given to `suspendShift`. Cleared on resume."
+   },
    "closedAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "closedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Who submitted the close count. `reopenShift` refuses an approver who is this principal, and until 26 September there was nothing to compare against (pull audit R099).\n"
    },
    "syncedAt": {
     "type": "string",
@@ -1418,7 +2335,8 @@
         "open",
         "close",
         "variance"
-       ]
+       ],
+       "description": "`open` from `approveShiftOpen`, `close` from `approveShiftClose`, `variance` from `acceptShiftVariance`.\n"
       },
       "principalId": {
        "type": "string",
@@ -1466,7 +2384,7 @@
    },
    "requiresAcceptance": {
     "type": "boolean",
-    "description": "True when the variance exceeds the configured threshold."
+    "description": "True when the variance exceeds the venue's `shiftVarianceThreshold` (audit R094). The shift is then `pendingVariance` and only `acceptShiftVariance` finalises it (audit R080 (e)).\n"
    },
    "nonCashVariances": {
     "type": "array",
@@ -1544,7 +2462,40 @@
    },
    "scopePath": {
     "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope**; the server sets it and ignores it in a request."
+   }
+  }
+ },
+ "StockReservationSourceType": {
+  "type": "string",
+  "enum": [
+   "workOrder",
+   "rentalAgreement",
+   "order",
+   "transfer",
+   "other"
+  ],
+  "description": "What a stock reservation is for (decided 17 September, M17-02; `rentalAgreement` is the existing use from `rental.agreement_item`)."
+ },
+ "SupervisorStepUp": {
+  "type": "object",
+  "description": "**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n",
+  "required": [
+   "principalId",
+   "credential"
+  ],
+  "properties": {
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The supervisor signing. Recorded against the act."
+   },
+   "credential": {
+    "type": "string",
+    "maxLength": 512,
+    "writeOnly": true,
+    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned."
    }
   }
  },
@@ -1559,7 +2510,7 @@
   "properties": {
    "ticketId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "Stable for the life of the ticket, independent of the media carrying it."
    },
    "mediaCode": {
@@ -1660,8 +2611,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID. Also the idempotency key and dedupe key."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7. Also the idempotency key and dedupe key."
    },
    "mediaCode": {
     "type": "string",
@@ -1702,7 +2653,7 @@
   "properties": {
    "scanId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "outcome": {
     "$ref": "#/components/schemas/ScanOutcome"
@@ -1732,11 +2683,51 @@
    "serverEvaluatedAt": {
     "type": "string",
     "format": "date-time"
+   },
+   "advisory": {
+    "type": "object",
+    "nullable": true,
+    "description": "BL-179, CF-130. **What a device observed, for the steward, never for the gate.** Present only where an access point's device reports the matching `DeviceCapability` and the venue has turned the corresponding setting on.\n**Never persisted.** This schema is computed and stored as `access.scan_event`, and the advisory is deliberately not part of what is stored: an inferred classification kept against a guest is sensitive personal data with no consent behind it. **A guest agreed to be admitted, not to be classified** — Face Pass and Face Tag carry `consent_purpose_id` and `consent_given_at` because somebody enrolled, and nobody enrols in being looked at by a turnstile. `scan_event` records that an override happened and never what the device thought, which keeps `overrideRateAlertThreshold` working without building a register nobody agreed to.\n**It cannot reach `outcome` or `denyReason`.** Those are decisive and `entitlementGated` is `true` and read-only: the gate admits on the entitlement, and everything here sits on top of that without replacing any of it.\n",
+    "properties": {
+     "genderClassification": {
+      "type": "string",
+      "enum": [
+       "women",
+       "men",
+       "undetermined"
+      ],
+      "description": "**`undetermined` is a real answer and the most common one to design for.** A classifier that never returns it is one that has been tuned to look confident.\n"
+     },
+     "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "**Required reading for the steward, not decoration.** An advisory with no confidence is read as a fact, and `overrideRateAlertThreshold` exists to catch exactly the failure that produces — *an override rate near zero means the steward has stopped deciding.* That number only means anything if the steward could see how sure the device was.\n"
+     },
+     "reportedByDeviceId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "**Which device said it.** A classifier that degrades is one camera, not a venue, and an advisory nobody can trace to hardware cannot be investigated or switched off alone.\n"
+     }
+    }
    }
   }
  },
+ "WithdrawalReason": {
+  "type": "string",
+  "description": "Why a supervisor took cash out of a box. Set only on lifts `withdrawFromDepositBox` records.",
+  "enum": [
+   "banking",
+   "safeDrop",
+   "changeOrder",
+   "other"
+  ]
+ },
  "WorkOrder": {
   "x-ticvai-persistence": "maintenance.work_order",
+  "x-ticvai-retired-columns": [
+   "is_overdue"
+  ],
   "type": "object",
   "required": [
    "id",
@@ -1753,7 +2744,8 @@
     "type": "integer",
     "nullable": true,
     "readOnly": true,
-    "description": "**Measured from out-of-service to back-in-service, not from work start to work end.** A ride down for six hours of which two were spent working is down six hours, and the gap between the two numbers is the thing worth managing.\n"
+    "x-ticvai-derived": "onWrite",
+    "description": "**Measured from out-of-service to back-in-service, not from work start to work end.** A ride down for six hours of which two were spent working is down six hours, and the gap between the two numbers is the thing worth managing.\n**Maintained on write**: set when the asset returns to service, as the minutes from the `maintenance.asset_status_change` row that took it out carrying this work order's id to the asset's next change back to `inService`. Null while the asset is still out, and for a work order that never took it out.\n"
    },
    "rootCause": {
     "type": "string",
@@ -1786,10 +2778,13 @@
     "description": "**Escalation is a clock, not a decision.** A work order on a ride nobody has accepted after twenty minutes escalates itself, because the alternative is somebody noticing.\n"
    },
    "id": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid"
    },
    "workOrderNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity.\n"
    },
    "title": {
     "type": "string"
@@ -1805,13 +2800,44 @@
    },
    "assetName": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "The asset's name, copied when the work order is raised or its asset changes, and not updated when the asset is later renamed — the record reads as it was raised.\n"
    },
    "status": {
     "$ref": "#/components/schemas/WorkOrderStatus"
    },
    "priority": {
     "$ref": "#/components/schemas/WorkOrderPriority"
+   },
+   "priorityScore": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The score the venue's policy gave the fault when raised; null when a person or the asset set the priority (M17-01)."
+   },
+   "prioritySource": {
+    "type": "string",
+    "enum": [
+     "scored",
+     "assetOverride",
+     "manual"
+    ],
+    "readOnly": true,
+    "description": "Where `priority` came from (M17-01). A change through `updateWorkOrder` makes it `manual`."
+   },
+   "faultAssessment": {
+    "$ref": "#/components/schemas/WorkOrderFaultAssessment"
+   },
+   "requiredQualificationCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Skills the job needs (M17-13)."
    },
    "kind": {
     "$ref": "#/components/schemas/WorkOrderKind"
@@ -1825,11 +2851,29 @@
     "type": "string",
     "format": "uuid"
    },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "As raised in `CreateWorkOrderRequest.categoryId`, amendable by `updateWorkOrder`. The category is what `completeWorkOrder` reads to decide whether completion photographs are required.\n"
+   },
+   "locationDescription": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "description": "Where the fault is, as raised. Needed where there is no asset — a broken tile, a leak in a corridor.\n"
+   },
    "elapsedMinutes": {
-    "type": "integer"
+    "type": "integer",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Labour minutes accumulated up to the last pause or stop. **Maintained on write** by `recordWorkOrderTime`, `pauseWorkOrder` and `completeWorkOrder`; while `isTimerRunning` is true the interval since the last start is not yet included.\n"
    },
    "isTimerRunning": {
-    "type": "boolean"
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Maintained on write by `startWorkOrder`, `resumeWorkOrder`, `recordWorkOrderTime`, `pauseWorkOrder` and `completeWorkOrder`.\n"
    },
    "dueAt": {
     "type": "string",
@@ -1837,7 +2881,11 @@
     "nullable": true
    },
    "isOverdue": {
-    "type": "boolean"
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "`dueAt` is in the past and the status is still `open`, `assigned`, `inProgress`, `paused` or `awaitingParts`. **Computed on read and not stored** — it depends on the clock. `listWorkOrders?overdueOnly` applies the same test to `due_at`.\n"
    },
    "requiresVerification": {
     "type": "boolean"
@@ -1849,10 +2897,12 @@
    },
    "sourceInspectionId": {
     "type": "string",
+    "format": "uuid",
     "nullable": true
    },
    "sourceIncidentId": {
     "type": "string",
+    "format": "uuid",
     "nullable": true
    },
    "createdAt": {
@@ -2002,6 +3052,10 @@
         "quantity": {
          "type": "number"
         },
+        "reservedQuantity": {
+         "type": "number",
+         "description": "Still reserved for this work order and not yet issued (M17-02)."
+        },
         "cost": {
          "$ref": "../shared/common.yaml#/components/schemas/Money"
         }
@@ -2015,9 +3069,102 @@
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      },
      "totalCost": {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
+      "$ref": "../shared/common.yaml#/components/schemas/Money",
+      "x-ticvai-column": "net_cost_amount"
+     },
+     "completedByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "Who called `completeWorkOrder`. **What `verifyWorkOrder` compares against** — the verifier may not be the technician who completed the work, and the assignee is not necessarily that person.\n"
+     },
+     "followUpRequired": {
+      "type": "boolean",
+      "default": false
+     },
+     "followUpNote": {
+      "type": "string",
+      "maxLength": 1000,
+      "nullable": true
+     },
+     "verificationOutcome": {
+      "type": "string",
+      "enum": [
+       "verified",
+       "rejected"
+      ],
+      "nullable": true,
+      "description": "The latest `verifyWorkOrder` outcome."
+     },
+     "verificationNote": {
+      "type": "string",
+      "maxLength": 1000,
+      "nullable": true
+     },
+     "verifiedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
      },
      "verifiedByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     },
+     "cancelReason": {
+      "type": "string",
+      "enum": [
+       "raisedInError",
+       "duplicate",
+       "superseded",
+       "noLongerRequired"
+      ],
+      "nullable": true
+     },
+     "cancelNote": {
+      "type": "string",
+      "maxLength": 300,
+      "nullable": true
+     },
+     "supersededByWorkOrderId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "Set by `cancelWorkOrder` where the reason is `superseded`."
+     },
+     "cancelledAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "closeOutcome": {
+      "type": "string",
+      "enum": [
+       "completedAndVerified",
+       "notReproducible",
+       "supersededByReplacement",
+       "noLongerApplicable",
+       "duplicate"
+      ],
+      "nullable": true
+     },
+     "closeNote": {
+      "type": "string",
+      "maxLength": 500,
+      "nullable": true
+     },
+     "duplicateOfWorkOrderId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "Set by `closeWorkOrder` where the outcome is `duplicate`."
+     },
+     "closedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "closedByPrincipalId": {
       "type": "string",
       "format": "uuid",
       "nullable": true
@@ -2025,6 +3172,26 @@
     }
    }
   ]
+ },
+ "WorkOrderFaultAssessment": {
+  "x-ticvai-persistence": "none — columns on maintenance.work_order",
+  "type": "object",
+  "description": "What the person raising a fault says about it, which the priority score reads (M17-01).",
+  "properties": {
+   "safetyRisk": {
+    "type": "boolean",
+    "default": false
+   },
+   "guestImpact": {
+    "type": "string",
+    "enum": [
+     "none",
+     "degraded",
+     "closed"
+    ],
+    "default": "none"
+   }
+  }
  },
  "WorkOrderKind": {
   "type": "string",

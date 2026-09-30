@@ -53,7 +53,7 @@ On-premise   onPremiseIsolated · onPremiseConnected      the client operates
 
 **There is no third model, and the RFP's "Hybrid" is answered by `onPremiseConnected`** — the
 client's hardware, kept current by us. If a client ever asks for a genuine split workload, that is a
-new decision with its own cost, and ADR-0009 and ADR-0020 both reopen when it is taken.
+new decision with its own cost, and ADR-0009 and ADR-0020 (both amended by ADR-0049 on where vectors live) both reopen when it is taken.
 
 ### 1 · `onPremiseIsolated` — ADR-0017's model, unchanged
 

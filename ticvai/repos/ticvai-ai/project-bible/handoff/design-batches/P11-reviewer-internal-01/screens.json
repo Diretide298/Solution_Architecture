@@ -10,10 +10,11 @@
   "purpose": "Work the queue of applications waiting on a decision, oldest-due first, and approve the straightforward ones without opening them.\n",
   "apis": [
    {
-    "operationId": "listApprovalRequests",
-    "contract": "approvals",
-    "purpose": "Accreditation applications awaiting a decision",
-    "trigger": "onLoad"
+    "operationId": "listAccreditationApplications",
+    "contract": "accreditation",
+    "purpose": "Applications awaiting review, oldest first",
+    "trigger": "onLoad",
+    "provenance": "readiness close-out, 29 September 2026"
    }
   ],
   "gaps": [
@@ -119,17 +120,14 @@
      "to": "ACC-007",
      "trigger": "Reviewer Application Detail",
      "carries": [
-      "requestId"
+      "documentId"
      ],
-     "provenance": "derived — ACC-007 declares entryState.params requestId, so an edge into it must carry them"
+     "provenance": "derived — ACC-007 declares entryState.params applicationId, documentId and ACC-006 holds documentId, so an edge into it carries them"
     },
     {
      "to": "ACC-008",
      "trigger": "Credential Register",
-     "carries": [
-      "programmeId"
-     ],
-     "provenance": "derived — ACC-008 declares entryState.params programmeId, so an edge into it must carry them"
+     "provenance": "derived — ACC-008 declares entryState.params  and ACC-006 holds none of them, so the edge carries nothing and ACC-008 opens cold"
     }
    ]
   },
@@ -182,20 +180,32 @@
   "purpose": "Everything the decision needs about one application, in one place, so the reviewer does not open another screen to decide.\n",
   "apis": [
    {
-    "operationId": "listApprovalRequests",
-    "contract": "approvals",
-    "purpose": "The application under review",
-    "trigger": "onLoad"
+    "operationId": "decideAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "Approve, reject or return for information",
+    "trigger": "onAction",
+    "provenance": "readiness close-out, 29 September 2026"
    },
    {
-    "operationId": "decideApprovalRequest",
-    "contract": "approvals",
-    "purpose": "Approve or refuse, with a reason",
+    "operationId": "getAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "The application under review",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAccreditationDocuments",
+    "contract": "accreditation",
+    "purpose": "The application's documents (applicationId), each with its state",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "verifyAccreditationDocument",
+    "contract": "accreditation",
+    "purpose": "Verify or refuse each document",
     "trigger": "onAction",
-    "invalidates": [
-     "listApprovalRequests",
-     "listAccreditationBadges"
-    ]
+    "provenance": "build, 29 September 2026"
    }
   ],
   "gaps": [
@@ -278,8 +288,12 @@
   "entryState": {
    "params": [
     {
-     "name": "requestId",
+     "name": "applicationId",
      "from": "ACC-006"
+    },
+    {
+     "name": "documentId",
+     "from": "navigation"
     }
    ],
    "preloaded": [
@@ -301,25 +315,22 @@
    ],
    "transitions": [
     {
-     "to": "ACC-005",
-     "trigger": "The badge is issued",
-     "provenance": "flow F23 step 2→3"
-    },
-    {
      "to": "ACC-006",
      "trigger": "Reviewer Queue",
-     "carries": [
-      "programmeId"
-     ],
-     "provenance": "derived — ACC-006 declares entryState.params programmeId, so an edge into it must carry them"
+     "provenance": "derived — ACC-006 declares entryState.params  and ACC-007 holds none of them, so the edge carries nothing and ACC-006 opens cold"
     },
     {
      "to": "ACC-008",
      "trigger": "Credential Register",
+     "provenance": "derived — ACC-008 declares entryState.params  and ACC-007 holds none of them, so the edge carries nothing and ACC-008 opens cold"
+    },
+    {
+     "to": "ACC-005",
+     "trigger": "The badge is issued",
+     "provenance": "flow F23 step 2→3",
      "carries": [
-      "programmeId"
-     ],
-     "provenance": "derived — ACC-008 declares entryState.params programmeId, so an edge into it must carry them"
+      "holderId"
+     ]
     }
    ]
   },
@@ -373,10 +384,11 @@
   "purposeNote": "**Rewritten 9 September.** The purpose read *\"Get a guest into the app, fast, on a device that may be shared\"*, which is a login screen's purpose on a credential register. Found independently by Claude Design on the drawn frame and by this pass.\n",
   "apis": [
    {
-    "operationId": "listAccreditationBadges",
-    "contract": "approvals",
-    "purpose": "Credentials issued for this programme",
-    "trigger": "onLoad"
+    "operationId": "listAccreditationCredentials",
+    "contract": "accreditation",
+    "purpose": "Every credential issued, with its validity",
+    "trigger": "onLoad",
+    "provenance": "readiness close-out, 29 September 2026"
    }
   ],
   "gaps": [
@@ -500,18 +512,12 @@
     {
      "to": "ACC-006",
      "trigger": "Reviewer Queue",
-     "carries": [
-      "programmeId"
-     ],
-     "provenance": "derived — ACC-006 declares entryState.params programmeId, so an edge into it must carry them"
+     "provenance": "derived — ACC-006 declares entryState.params  and ACC-008 holds none of them, so the edge carries nothing and ACC-006 opens cold"
     },
     {
      "to": "ACC-007",
      "trigger": "Reviewer Application Detail",
-     "carries": [
-      "requestId"
-     ],
-     "provenance": "derived — ACC-007 declares entryState.params requestId, so an edge into it must carry them"
+     "provenance": "derived — ACC-007 declares entryState.params applicationId, documentId and ACC-008 holds none of them, so the edge carries nothing and ACC-007 opens cold"
     }
    ]
   },

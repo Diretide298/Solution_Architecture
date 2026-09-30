@@ -1,6 +1,6 @@
 # WS113 — ACCREDITATION board 6
 
-**10 screens · 5 operations · 4 schemas · 3 permissions**
+**10 screens · 7 operations · 5 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `ACCREDITATION_CONFIGURE, ACCREDITATION_MANAGE, ACCREDITATION_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `ACCREDITATION_APPLY, ACCREDITATION_CONFIGURE, ACCREDITATION_MANAGE, ACCREDITATION_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -63,13 +63,13 @@ convincingly. It is never a caption.
 | `BO-664` | Accreditation Lifecycle Command Center | listDetail | 1 | 0 | — |
 | `BO-665` | Accreditation Status Workflow | configEditor | 1 | 0 | — |
 | `BO-666` | Validity Period Configuration | listDetail | 1 | 0 | — |
-| `BO-667` | Event & Venue Accreditation Assignment | listDetail | 1 | 0 | — |
+| `BO-667` | Event & Venue Accreditation Assignment | listDetail | 2 | 0 | — |
 | `BO-668` | Multi-Venue Accreditation Management | listDetail | 1 | 0 | — |
 | `BO-669` | Temporary & Seasonal Accreditation | configEditor | 1 | 0 | — |
 | `BO-670` | Suspension & Reactivation Management | configEditor | 1 | 0 | — |
 | `BO-671` | Accreditation Revocation Management | listDetail | 1 | 0 | — |
-| `BO-672` | Expiry Monitor & Expiration Rules | listDetail | 1 | 0 | — |
-| `BO-673` | Accreditation Renewal Workspace | listDetail | 1 | 0 | — |
+| `BO-672` | Expiry Monitor & Expiration Rules | listDetail | 2 | 0 | — |
+| `BO-673` | Accreditation Renewal Workspace | listDetail | 3 | 0 | — |
 
 ## Thin screens in this batch
 

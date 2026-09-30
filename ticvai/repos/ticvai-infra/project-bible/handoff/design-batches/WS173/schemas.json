@@ -120,6 +120,48 @@
    }
   }
  },
+ "SeatRecommendation": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "seatIds",
+   "totalPrice",
+   "isContiguous",
+   "rank"
+  ],
+  "properties": {
+   "seatIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "displayLabels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "totalPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "isContiguous": {
+    "type": "boolean"
+   },
+   "rank": {
+    "type": "integer",
+    "description": "Best first."
+   },
+   "rationale": {
+    "type": "string",
+    "description": "Why this option was chosen — closest to stage, best value in category, only contiguous block remaining. Shown to a call-centre agent, not the guest.\n"
+   }
+  }
+ },
  "SeatRecommendationRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",

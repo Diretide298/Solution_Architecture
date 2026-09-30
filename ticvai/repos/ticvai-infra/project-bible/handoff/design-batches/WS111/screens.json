@@ -772,6 +772,13 @@
     "purpose": "The print queue",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "deliverAccreditationCredential",
+    "contract": "accreditation",
+    "purpose": "Send a mobile credential to its holder",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -780,6 +787,14 @@
    "workshopBoard": "wireframes/WS04 ACCREDITATION Board 4.dc.html#bo-649"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 32. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "credentialId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1014,6 +1029,13 @@
     "invalidates": [
      "listAccreditationCredentials"
     ]
+   },
+   {
+    "operationId": "deliverAccreditationCredential",
+    "contract": "accreditation",
+    "purpose": "Deliver, and optionally activate on open",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1022,6 +1044,14 @@
    "workshopBoard": "wireframes/WS04 ACCREDITATION Board 4.dc.html#bo-651"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 33. 0 of 0 labels bound to a contract property; 0 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "credentialId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

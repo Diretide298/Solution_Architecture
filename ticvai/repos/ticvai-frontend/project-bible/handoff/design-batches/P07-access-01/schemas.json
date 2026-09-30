@@ -1,4 +1,307 @@
 {
+ "AccessAccreditationCredential": {
+  "type": "object",
+  "x-ticvai-persistence": "access.accreditation_credential",
+  "x-ticvai-agreed": "29 September: build pass (group OWN, from group RA's handoff; BL-181); the events accreditation.credentialIssued and accreditation.holderStatusChanged name access as their critical consumer",
+  "description": "**What a gate needs to admit an accredited person, kept by `access`** (29 September, build). Written only by the consumers of `accreditation.credentialIssued` (a row per credential; a replacement sets the replaced row's `admits` false) and `accreditation.holderStatusChanged` (every credential of the holder: `admits` false unless the holder is `active`, validity taken from the event). Read by `validateAccess` and shipped in the offline package. The record of truth stays in `accreditation`; this is a copy shaped for the gate, never edited by a person.",
+  "required": [
+   "id",
+   "holderId",
+   "encodedIdentifier",
+   "admits",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The accreditation credential's id (`credentialId` on the events)."
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "programmeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "kind": {
+    "type": "string",
+    "description": "printedBadge, mobileCredential, qr, nfcCard, rfidCard or wristband, as issued."
+   },
+   "encodedIdentifier": {
+    "type": "string",
+    "x-ticvai-unique": "tenant",
+    "description": "What the gate reads from the credential. Never sent to webhook subscribers."
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "zoneIds": {
+    "type": "array",
+    "description": "The holder's effective zones, from the event (`effectiveZones`).",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "holderStatus": {
+    "type": "string",
+    "enum": [
+     "active",
+     "suspended",
+     "revoked",
+     "expired",
+     "archived"
+    ],
+    "description": "The holder's status as last published; only `active` admits."
+   },
+   "admits": {
+    "type": "boolean",
+    "description": "False once the credential is replaced or the holder is not active."
+   },
+   "sourceChangedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "The `issuedAt` or `changedAt` of the event last applied; an older event arriving late is ignored."
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005), the accreditation programme's scope."
+   }
+  }
+ },
+ "AccessDynamicPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "access.dynamic_policy",
+  "description": "One guest-admission dynamic (attribute-based) policy with its current content - type, context or identity it tests, condition expression, result, priority, zones, validity, status and current version. Not identity.access_policy, which is staff permission (declared 29 September, data-model close-out DM1).\n\n**Which of the two policy engines this is** (stated 29 September, build pass). **This one governs who may pass which gate**: admission of a guest, pass holder, accreditation holder or employee at an access point, decided in validation with results a gate acts on (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor). **identity `AccessPolicy` governs who may do what in the software**: a principal's permissions on operations and screens, decided by identity `evaluateAccess`. An employee's badge opening a staff door is decided here; the same employee approving a refund is decided in identity. Effectiveness is reported per engine: `listDynamicPolicyEffectiveness` here, `listAccessPolicyEffectiveness` in identity.",
+  "required": [
+   "id",
+   "scopePath",
+   "name",
+   "policyType",
+   "conditionExpression",
+   "result",
+   "status",
+   "currentVersion"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The policyId"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node; where it applies further is access.policy_scope_assignment"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "policyType": {
+    "type": "string",
+    "enum": [
+     "guestAttribute",
+     "accreditation",
+     "occupancy",
+     "employee",
+     "risk",
+     "membership",
+     "timeEvent"
+    ]
+   },
+   "contextType": {
+    "type": "string",
+    "enum": [
+     "date",
+     "day",
+     "time",
+     "season",
+     "event",
+     "performance",
+     "specialEvent",
+     "holiday",
+     "operatingCalendar",
+     "occupancy",
+     "attractionStatus"
+    ],
+    "nullable": true,
+    "description": "Context/time/event policies (setContextTimeEvent)"
+   },
+   "identityType": {
+    "type": "string",
+    "enum": [
+     "guest",
+     "member",
+     "annualPassHolder",
+     "employee",
+     "contractor",
+     "vendor",
+     "performer",
+     "media",
+     "vip",
+     "security",
+     "emergencyServices",
+     "eventStaff"
+    ],
+    "nullable": true,
+    "description": "Identity-based policies (listIdentityMembershipAccreditation)"
+   },
+   "conditionExpression": {
+    "type": "string",
+    "description": "Condition tree over access.access_attribute keys using AND, OR, NOT, IN and BETWEEN"
+   },
+   "result": {
+    "type": "string",
+    "enum": [
+     "allow",
+     "deny",
+     "review",
+     "requireId",
+     "requireBiometric",
+     "requireCompanion",
+     "requireSupervisor"
+    ]
+   },
+   "priority": {
+    "type": "integer",
+    "nullable": true
+   },
+   "allowedZoneIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "deniedZoneIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "monitorThresholdPercent": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Occupancy policies. Percent at which the band becomes Monitor"
+   },
+   "restrictThresholdPercent": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Occupancy policies. Percent at which the band becomes Restrict"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The grant expires automatically at validTo"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "pendingApproval",
+     "active",
+     "inactive",
+     "expired"
+    ],
+    "default": "draft"
+   },
+   "currentVersion": {
+    "type": "integer",
+    "minimum": 1,
+    "description": "The version in force (access.dynamic_policy_version)"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "AccessPodiumShift": {
+  "type": "object",
+  "x-ticvai-persistence": "access.podium_shift",
+  "description": "One operator session on a podium or device: who, in what role, where, and login and logout times. Logout is null while the shift is open (declared 29 September, data-model close-out DM1) Written by startPodiumShift and endPodiumShift; an identity sign-out ends the open shift (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "venueId",
+   "operatorPrincipalId",
+   "loginAt",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "operatorPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "role": {
+    "type": "string",
+    "nullable": true
+   },
+   "podiumId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "accessDeviceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Device used (access.access_device)"
+   },
+   "loginAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "logoutAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node (ADR-0005)"
+   }
+  }
+ },
  "AccessPoint": {
   "x-ticvai-persistence": "access.access_point",
   "type": "object",
@@ -7,7 +310,7 @@
    "code",
    "name",
    "venueId",
-   "mode",
+   "operatingMode",
    "isActive"
   ],
   "properties": {
@@ -29,81 +332,29 @@
     "type": "string"
    },
    "externalCredentialSources": {
-    "type": "array",
-    "description": "BL-108. **A hotel room card admitting a guest to a water park** — externally issued, and the platform validates it without having sold it.\n**The entitlement is created on first use, not on check-in.** A hotel with 400 rooms does not want 400 entitlements a night for guests who never visit.\n",
-    "items": {
-     "type": "object",
-     "properties": {
-      "kind": {
-       "type": "string",
-       "enum": [
-        "hotelRoomCard",
-        "corporateBadge",
-        "cityPass",
-        "transitCard",
-        "partnerToken"
-       ]
-      },
-      "providerName": {
-       "type": "string"
-      },
-      "endpoint": {
-       "type": "string"
-      },
-      "credentialRef": {
-       "type": "string"
-      },
-      "grantsProductId": {
-       "type": "string",
-       "format": "uuid"
-      }
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExternalCredentialSourceList"
      }
-    }
+    ],
+    "description": "BL-108. **A hotel room card admitting a guest to a water park** — externally issued, and the platform validates it without having sold it.\n**The entitlement is created on first use, not on check-in.** A hotel with 400 rooms does not want 400 entitlements a night for guests who never visit.\n"
    },
    "scanAnomalyRules": {
-    "type": "array",
-    "description": "BL-104. **Rule-based scan anomalies, separated from the parked model-based engine** — device sharing, simultaneous entries at two gates, an impossible walking time between them.\n**These are deterministic and need no model**, which is why they are here and not in `ai`: two entries eight seconds apart at gates four hundred metres apart is arithmetic.\n",
-    "items": {
-     "type": "object",
-     "properties": {
-      "rule": {
-       "type": "string",
-       "enum": [
-        "simultaneousEntry",
-        "impossibleTravelTime",
-        "rapidReentry",
-        "sharedDevice",
-        "velocityBreach"
-       ]
-      },
-      "action": {
-       "type": "string",
-       "enum": [
-        "log",
-        "flag",
-        "requireSupervisor",
-        "deny"
-       ]
-      },
-      "thresholdSeconds": {
-       "type": "integer",
-       "nullable": true
-      }
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ScanAnomalyRuleList"
      }
-    }
+    ],
+    "description": "BL-104. **Rule-based scan anomalies, separated from the parked model-based engine** — device sharing, simultaneous entries at two gates, an impossible walking time between them.\n**These are deterministic and need no model**, which is why they are here and not in `ai`: two entries eight seconds apart at gates four hundred metres apart is arithmetic.\n"
    },
    "operatingMode": {
-    "type": "string",
-    "enum": [
-     "normal",
-     "freeFlow",
-     "dropArm",
-     "closed",
-     "podium",
-     "maintenance"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AccessPointOperatingMode"
+     }
     ],
     "default": "normal",
-    "description": "BL-107 and BL-109. **A closed turnstile and one in emergency drop-arm mode look the same in the model and are opposite in meaning.** Closed refuses everybody; drop-arm lets everybody through, and it is the state that exists for an evacuation.\n**`podium` is a supervised validation position** — a member of staff directing a group through a lane, validating by eye against a list. It scans nothing and it is how school parties actually enter.\n**`freeFlow` counts without validating.** Useful at a free event, and a mode that must be visibly distinct from a broken reader.\n"
+    "description": "**Set by the podium with `setTurnstileMode`, and it wins** (audit R221). BL-107 and BL-109. **A closed turnstile and one in emergency drop-arm mode look the same in the model and are opposite in meaning.** Closed refuses everybody; drop-arm lets everybody through, and it is the state that exists for an evacuation.\n**`podium` is a supervised validation position** — a member of staff directing a group through a lane, validating by eye against a list. It scans nothing and it is how school parties actually enter.\n**`freeFlow` counts without validating.** Useful at a free event, and a mode that must be visibly distinct from a broken reader.\n"
    },
    "vehicleLocationCapture": {
     "type": "boolean",
@@ -111,13 +362,43 @@
     "description": "BL-023. **Nothing helped a guest find their vehicle.** Where the access point is a car park entry, the level and zone are captured against the visit so the app can answer it — **the guest who cannot find their car at 11pm is the last impression of the day.**\n"
    },
    "mode": {
-    "$ref": "#/components/schemas/TurnstileMode"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/TurnstileMode"
+     }
+    ],
+    "nullable": true,
+    "description": "Narrows `operatingMode` only: `freeRotation` or `closed` within `normal` or `podium`, null otherwise and whenever the turnstile validates in its fixed `direction` (audit R221).\n"
    },
    "direction": {
-    "$ref": "#/components/schemas/Direction"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/Direction"
+     }
+    ],
+    "description": "**Fixed per access point** (audit R221): set in the back office by `createAccessPoint` and `updateAccessPoint`, never by the podium.\n"
    },
    "antiPassbackEnabled": {
     "type": "boolean"
+   },
+   "requiresExitBeforeReentry": {
+    "type": "boolean",
+    "default": false,
+    "description": "Written by `createAccessPoint` and `updateAccessPoint`, and returned so the edit form reads back what it wrote."
+   },
+   "driver": {
+    "type": "string",
+    "nullable": true,
+    "description": "Driver identifier for the controller behind this access point, as written by `createAccessPoint` and `updateAccessPoint`. Where the reader speaks OSDP the driver is standards-based; the controller layer above it is vendor-specific.\n"
+   },
+   "geofence": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AccessPointGeofence"
+     }
+    ],
+    "nullable": true,
+    "description": "Written by `setAccessPointGeofence`; null until one is set. **One `jsonb` column on the access point row** (`access.access_point.geofence`), read with the point when a handheld validates against it.\n"
    },
    "isActive": {
     "type": "boolean"
@@ -126,6 +407,387 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   }
+  }
+ },
+ "AccessPointGeofence": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "Where a handheld may validate for one access point, and what happens outside it. The body of `setAccessPointGeofence` and the value of `AccessPoint.geofence`.\n",
+  "required": [
+   "enforcement"
+  ],
+  "properties": {
+   "latitude": {
+    "type": "number"
+   },
+   "longitude": {
+    "type": "number"
+   },
+   "radiusMetres": {
+    "type": "integer",
+    "minimum": 5,
+    "maximum": 5000
+   },
+   "enforcement": {
+    "type": "string",
+    "enum": [
+     "off",
+     "warn",
+     "deny"
+    ],
+    "description": "`off` keeps the fence on record and checks nothing; `warn` lets a validation from outside the fence through with a warning; `deny` refuses it.\n"
+   },
+   "allowProximityBeacon": {
+    "type": "boolean",
+    "description": "Accept a BLE proximity assertion in place of GPS. Better indoors."
+   }
+  }
+ },
+ "AccessPointOperatingMode": {
+  "type": "string",
+  "description": "BL-107 and BL-109. **What the gate does, and what the podium sets** (`setTurnstileMode`, decided 28 September, audit R221). `closed` refuses everybody; `dropArm` lets everybody through and exists for an evacuation; `podium` is supervised validation by eye; `freeFlow` counts without validating; `maintenance` takes the lane out of use.\n",
+  "enum": [
+   "normal",
+   "freeFlow",
+   "dropArm",
+   "closed",
+   "podium",
+   "maintenance"
+  ]
+ },
+ "AccreditationCredentialVerification": {
+  "type": "object",
+  "description": "18.8.3. **What a steward needs to believe the person in front of them**: the face, the name, the category and the zones, and whether any of it is valid now. Returned by `verifyAccreditationCredential`; not stored.\n",
+  "required": [
+   "outcome"
+  ],
+  "properties": {
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "valid",
+     "notYetValid",
+     "expired",
+     "suspended",
+     "revoked",
+     "credentialReplaced",
+     "credentialLost",
+     "credentialInactive"
+    ],
+    "description": "`valid` only when the holder is `active`, today is inside the holder's validity, and the credential is `issued` or `active`"
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "credentialId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "credentialKind": {
+    "type": "string"
+   },
+   "credentialStatus": {
+    "type": "string"
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "accreditationNumber": {
+    "type": "string"
+   },
+   "fullName": {
+    "type": "string"
+   },
+   "photoAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "photoUrl": {
+    "type": "string",
+    "nullable": true,
+    "description": "Signed and short-lived, so the scan screen can show the face without a second call"
+   },
+   "organisationName": {
+    "type": "string",
+    "nullable": true
+   },
+   "affiliationRole": {
+    "type": "string",
+    "nullable": true
+   },
+   "programmeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "categoryCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "categoryName": {
+    "type": "string",
+    "nullable": true
+   },
+   "holderStatus": {
+    "type": "string"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "effectiveZones": {
+    "type": "array",
+    "description": "The zones the holder may enter under their profiles and exceptions, today",
+    "items": {
+     "type": "object",
+     "properties": {
+      "zoneId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "zoneName": {
+       "type": "string"
+      },
+      "allowedNow": {
+       "type": "boolean",
+       "description": "Inside the profile schedule (date, day, time, event phase) at this moment"
+      }
+     }
+    }
+   },
+   "escortRequired": {
+    "type": "boolean"
+   },
+   "zoneCheck": {
+    "type": "object",
+    "nullable": true,
+    "description": "Present when `zoneId` was given",
+    "properties": {
+     "zoneId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "allowed": {
+      "type": "boolean"
+     },
+     "reason": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   },
+   "checkedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "BlacklistEntry": {
+  "x-ticvai-persistence": "access.blacklist",
+  "type": "object",
+  "required": [
+   "mediaCode",
+   "reason",
+   "addedAt",
+   "addedByPrincipalId"
+  ],
+  "properties": {
+   "mediaCode": {
+    "type": "string",
+    "x-ticvai-unique": "tenant",
+    "description": "**Unique within the tenant** (decided 28 September, audit R108): one entry per code. `addBlacklistEntry` refuses a second entry with `409 duplicate-code`. **One code space for both lists** (decided 29 September, writers pass): a code on the blacklist cannot also be whitelisted; adding it to the other list is the same `409 duplicate-code`. Move a code between lists by removing and re-adding it."
+   },
+   "reason": {
+    "type": "string"
+   },
+   "addedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "addedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "listType": {
+    "type": "string",
+    "enum": [
+     "blacklist",
+     "whitelist"
+    ],
+    "default": "blacklist",
+    "description": "A blacklist entry refuses the media; a whitelist entry is an approved exception to a restriction (added 29 September, data-model close-out DM1)."
+   },
+   "disableScope": {
+    "type": "string",
+    "enum": [
+     "entireCredential",
+     "venueAccess",
+     "attractionAccess",
+     "reEntry",
+     "fastPass",
+     "specificEntitlement"
+    ],
+    "default": "entireCredential",
+    "description": "What the entry disables (added 29 September, data-model close-out DM1)."
+   },
+   "distributedTo": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "centralPlatform",
+      "venueEdge",
+      "onlineGates",
+      "offlineRevocationPackage"
+     ]
+    },
+    "description": "Where the restriction has been distributed so far, as `listCredentialDisableBlacklist` returns it (added 29 September, data-model close-out DM1)."
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "CreateOrderRequest": {
+  "type": "object",
+  "required": [
+   "id",
+   "venueId",
+   "channel",
+   "lines",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Client-generated UUIDv7. Also the idempotency key: it must equal the `Idempotency-Key` header, and a replay or a mismatch follows `IdempotencyKey` in `shared/common.yaml`. Offline replay through `syncOrders` carries no header, and this id alone deduplicates there.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "channel": {
+    "$ref": "#/components/schemas/Channel"
+   },
+   "shiftId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null for an anonymous sale. Identity and entitlement are separate."
+   },
+   "guestLinkId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Present where the guest is linked across cells."
+   },
+   "catalogueBundleVersion": {
+    "type": "string",
+    "description": "The bundle the client priced from. Lets the server explain a variance rather than merely report one.\n"
+   },
+   "lines": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "$ref": "#/components/schemas/CreateOrderLine"
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CreatePaymentRequest": {
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "tender",
+   "amount",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Client-generated UUIDv7 of the payment, and its idempotency key — it must equal the `Idempotency-Key` header."
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "tender": {
+    "$ref": "#/components/schemas/TenderKind"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "tenderCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "description": "The currency the guest handed over, where it is not the venue's — becomes `Payment.tenderCurrency`. Omit for a payment in the venue's own currency."
+   },
+   "tenderAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "**What the guest handed over**, in `tenderCurrency` — becomes `Payment.tenderAmount`, one name for one concept (renamed from `tenderedAmount` on 26 September). For cash, change is the difference.\n"
+   },
+   "walletAuthorisationId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Cross-cell wallet hold, where the guest's home cell is elsewhere."
+   },
+   "walletHoldId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a `wallet` tender, the hold `wallet.holdWalletFunds` placed (SD-027). Capture debits it; the order service writes no wallet table."
+   },
+   "returnUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "description": "Where the provider returns the guest after a 3-D Secure challenge or hosted page (SD-034). Required for a card payment from the guest web or app."
+   },
+   "terminalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The card terminal to instruct, for a card payment at a till (ECR flow, SD-034)."
+   },
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
    }
   }
  },
@@ -152,7 +814,7 @@
    },
    "rightId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "ticketId": {
     "type": "string"
@@ -241,7 +903,8 @@
    "mediaDeactivated",
    "unpaid",
    "delegatedRightExhausted",
-   "delegatedRightRevoked"
+   "delegatedRightRevoked",
+   "journeyNotCovered"
   ]
  },
  "Direction": {
@@ -253,62 +916,37 @@
    "crossover"
   ]
  },
- "GuestSession": {
-  "x-ticvai-persistence": "none — Redis session registry",
-  "type": "object",
-  "required": [
-   "subjectId",
-   "tokens",
-   "isVerified",
-   "expiresAt"
-  ],
-  "properties": {
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "displayName": {
-    "type": "string",
-    "nullable": true
-   },
-   "tokens": {
-    "$ref": "#/components/schemas/TokenPair"
-   },
-   "isVerified": {
-    "type": "boolean",
-    "description": "False until an OTP or a verified provider identity confirms ownership. An unverified account may browse but not transact.\n"
-   },
-   "identityProviders": {
-    "type": "array",
-    "description": "Linked providers. Several may resolve to one account.",
-    "items": {
+ "ExternalCredentialSourceList": {
+  "type": "array",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "**One `jsonb` column on the access point row** (`access.access_point.external_credential_sources`). Read with the access point when a credential is presented; a source is never queried on its own.\n",
+  "items": {
+   "type": "object",
+   "properties": {
+    "kind": {
      "type": "string",
      "enum": [
-      "password",
-      "otp",
-      "apple",
-      "google",
-      "uaePass"
+      "hotelRoomCard",
+      "corporateBadge",
+      "cityPass",
+      "transitCard",
+      "partnerToken"
      ]
+    },
+    "providerName": {
+     "type": "string"
+    },
+    "endpoint": {
+     "type": "string"
+    },
+    "credentialRef": {
+     "type": "string"
+    },
+    "grantsProductId": {
+     "type": "string",
+     "format": "uuid"
     }
-   },
-   "guestLinkId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Present where the guest is linked across cells (ADR-0010)."
-   },
-   "homeCellName": {
-    "type": "string",
-    "nullable": true
-   },
-   "preferredLanguage": {
-    "type": "string",
-    "nullable": true
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Longer lived than a staff session. No single-session rule — a guest may be signed in on a phone and a laptop at once.\n"
    }
   }
  },
@@ -327,7 +965,8 @@
    "credential": {
     "type": "string",
     "description": "Password, PIN, card token or RFID token depending on `method`.\n",
-    "maxLength": 512
+    "maxLength": 512,
+    "writeOnly": true
    },
    "method": {
     "type": "string",
@@ -361,11 +1000,27 @@
    {
     "type": "object",
     "required": [
-     "requiresRoleSelection"
+     "requiresRoleSelection",
+     "requiresMfa"
     ],
     "properties": {
      "requiresRoleSelection": {
       "type": "boolean"
+     },
+     "requiresMfa": {
+      "type": "boolean",
+      "description": "True when the principal holds any permission listed in `PasswordPolicy.mfaRequiredForPermissions` (decided 28 September, audit R135). The session is not usable until `verifyMfaChallenge` succeeds on a `signIn` challenge."
+     },
+     "hasMfaMethod": {
+      "type": "boolean",
+      "description": "Whether the principal has an active MFA method. With `requiresMfa` true and this false, the client must enrol one first (audit R135, R126 (5))."
+     },
+     "mfaMethods": {
+      "type": "array",
+      "description": "The principal's active methods, so the client can offer the right one for the `signIn` challenge. Empty when `requiresMfa` is false.",
+      "items": {
+       "$ref": "#/components/schemas/MfaMethod"
+      }
      },
      "availableRoles": {
       "type": "array",
@@ -445,6 +1100,34 @@
    }
   }
  },
+ "OfflineOrder": {
+  "x-ticvai-persistence": "none — client-side journal, not server storage",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateOrderRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "sequence",
+     "payments"
+    ],
+    "properties": {
+     "sequence": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Monotonic per device. Processed in this order."
+     },
+     "payments": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/CreatePaymentRequest"
+      }
+     }
+    }
+   }
+  ]
+ },
  "OfflinePackage": {
   "x-ticvai-persistence": "none — generated artefact in object storage",
   "type": "object",
@@ -476,8 +1159,20 @@
     "type": "string",
     "format": "uuid"
    },
+   "entitlementsVersion": {
+    "type": "integer",
+    "description": "The highest `access.entitlement` change included (SD-052, 29 September). A refresh sends it as `sinceVersion` and receives only what changed after it, so a 60,000-guest venue is not re-sent whole."
+   },
+   "dynamicPolicies": {
+    "type": "array",
+    "description": "The active guest-admission dynamic policies for this access point's zones (SD-052), so an offline gate applies the same rules as an online one.",
+    "items": {
+     "$ref": "#/components/schemas/AccessDynamicPolicy"
+    }
+   },
    "entitlements": {
     "type": "array",
+    "description": "Read from `access.entitlement` (SD-052). With `sinceVersion`, only the rows changed after it, including ones now void or used, so a device removes them.",
     "items": {
      "type": "object",
      "required": [
@@ -490,7 +1185,9 @@
      ],
      "properties": {
       "ticketId": {
-       "type": "string"
+       "type": "string",
+       "format": "uuid",
+       "description": "The `Entitlement.id`."
       },
       "mediaCodes": {
        "type": "array",
@@ -548,7 +1245,9 @@
        "type": "string"
       },
       "ticketId": {
-       "type": "string"
+       "type": "string",
+       "format": "uuid",
+       "description": "The `Entitlement.id` in the issuing cell."
       },
       "issuingCellId": {
        "type": "string"
@@ -621,8 +1320,57 @@
       }
      }
     }
+   },
+   "accreditationCredentials": {
+    "type": "array",
+    "description": "Accreditation credentials that admit at this access point, from access.accreditation_credential (29 September, build; BL-181). Only rows that admit are included; a credential dropped from one package to the next no longer admits.",
+    "items": {
+     "$ref": "#/components/schemas/AccessAccreditationCredential"
+    }
    }
   }
+ },
+ "OfflineScan": {
+  "x-ticvai-persistence": "none — client-side journal",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/ValidateRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "sequence",
+     "localOutcome"
+    ],
+    "properties": {
+     "sequence": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Monotonic per device. The server processes in this order."
+     },
+     "localOutcome": {
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/ScanOutcome"
+       }
+      ],
+      "description": "What the device decided offline. The server is authoritative and may disagree; disagreements are returned for reconciliation, not discarded.\n"
+     },
+     "localDenyReason": {
+      "$ref": "#/components/schemas/DenyReason"
+     },
+     "overriddenByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     },
+     "overrideReason": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   }
+  ]
  },
  "OrderSyncResult": {
   "x-ticvai-persistence": "none — computed",
@@ -638,7 +1386,7 @@
    "stoppedAtSequence": {
     "type": "integer",
     "nullable": true,
-    "description": "First entry that could not be processed. Null when the batch succeeded. The client retries from here and never past it.\n"
+    "description": "First entry that hit a **transient** failure (SD-028, 29 September): a refusal on the merits no longer stops the batch. Null when every entry was accepted, duplicate or quarantined. The client retries from here and never past it.\n"
    },
    "results": {
     "type": "array",
@@ -651,7 +1399,9 @@
      ],
      "properties": {
       "id": {
-       "type": "string"
+       "type": "string",
+       "format": "uuid",
+       "description": "The `OfflineOrder.id` this result is about."
       },
       "sequence": {
        "type": "integer"
@@ -661,8 +1411,10 @@
        "enum": [
         "accepted",
         "duplicate",
-        "rejected"
-       ]
+        "rejected",
+        "blockedByRejection"
+       ],
+       "description": "`rejected`: refused on its merits and quarantined in `sync.rejection`; the batch continues. `blockedByRejection`: depends on a rejected entry for the same order (a void, a refund, a later payment) and is quarantined with it (SD-028, 29 September)."
       },
       "orderNumber": {
        "type": "string",
@@ -679,6 +1431,11 @@
       "varianceExceedsThreshold": {
        "type": "boolean",
        "description": "True when review is required per the venue's variance threshold."
+      },
+      "rejectionId": {
+       "type": "string",
+       "nullable": true,
+       "description": "For a `rejected` or `blockedByRejection` entry, the `sync.rejection` row it was quarantined into (SD-028). The batch carried on past it."
       },
       "error": {
        "$ref": "../shared/common.yaml#/components/schemas/Problem"
@@ -707,6 +1464,202 @@
    }
   }
  },
+ "Permission": {
+  "type": "string",
+  "enum": [
+   "SESSION_FORCE_LOGOUT",
+   "USER_MANAGE",
+   "ROLE_MANAGE",
+   "PERMISSION_GRANT",
+   "PERMISSION_VIEW",
+   "PERMISSION_MANAGE",
+   "PLATFORM_TENANT_VIEW",
+   "PLATFORM_TENANT_MANAGE",
+   "PLATFORM_TENANT_TERMINATE",
+   "PLATFORM_PLAN_MANAGE",
+   "PLATFORM_CELL_VIEW",
+   "PLATFORM_CELL_MANAGE",
+   "PLATFORM_BILLING_VIEW",
+   "PLATFORM_AI_MANAGE",
+   "PLATFORM_BILLING_MANAGE",
+   "PLATFORM_RELEASE_VIEW",
+   "PLATFORM_RELEASE_MANAGE",
+   "PLATFORM_RELEASE_PROMOTE",
+   "PLATFORM_MIGRATION_VIEW",
+   "PLATFORM_MIGRATION_APPLY",
+   "PLATFORM_TENANT_ACCESS",
+   "TENANT_CONFIGURE",
+   "TENANT_VIEW",
+   "TENANT_PUBLISH",
+   "SCOPE_VIEW",
+   "SCOPE_MANAGE",
+   "REGION_CONFIGURE",
+   "WORKSTATION_CONFIGURE",
+   "PRODUCT_VIEW",
+   "PRODUCT_CONFIGURE",
+   "PRODUCT_APPROVE",
+   "PRODUCT_PUBLISH",
+   "PRICE_VIEW",
+   "PRICE_CONFIGURE",
+   "EVENT_CONFIGURE",
+   "PERFORMANCE_CONFIGURE",
+   "CAPACITY_CONFIGURE",
+   "ORDER_VIEW",
+   "ORDER_VIEW_OTHER",
+   "ORDER_CREATE",
+   "ORDER_MODIFY",
+   "ORDER_DISCOUNT",
+   "ORDER_CANCEL",
+   "ORDER_VOID",
+   "ORDER_REFUND",
+   "ORDER_REFUND_APPROVE",
+   "ORDER_REFUND_BULK",
+   "ORDER_EXCHANGE",
+   "ORDER_RESCHEDULE",
+   "ORDER_REPRINT",
+   "PRICE_OVERRIDE",
+   "DISCOUNT_APPLY",
+   "CREDIT_MANAGE",
+   "CREDIT_OVERRIDE",
+   "WALLET_VIEW",
+   "WALLET_OPERATE",
+   "WALLET_CONFIGURE",
+   "PAYMENT_VIEW",
+   "PAYMENT_CONFIGURE",
+   "PAYMENT_PROVIDER_MANAGE",
+   "PAYMENT_DISPUTE",
+   "SHIFT_OPEN",
+   "SHIFT_CLOSE",
+   "SHIFT_SUSPEND",
+   "SHIFT_CLOSE_OTHER",
+   "SHIFT_APPROVE_OPEN",
+   "SHIFT_APPROVE_CLOSE",
+   "SHIFT_REOPEN",
+   "CASH_LIFT",
+   "CASH_ADD",
+   "CASH_NO_SALE",
+   "DEPOSIT_BOX_MODIFY_OWN",
+   "DEPOSIT_BOX_MODIFY_OTHER",
+   "OVERSHORT_ACCEPT",
+   "ACCESS_VALIDATE",
+   "ACCESS_OVERRIDE",
+   "ACCESS_POINT_CONFIGURE",
+   "TURNSTILE_MODE_SET",
+   "TICKET_LOOKUP",
+   "ACCREDITATION_VIEW",
+   "ACCREDITATION_APPLY",
+   "ACCREDITATION_APPROVE",
+   "ACCREDITATION_ISSUE",
+   "ACCREDITATION_MANAGE",
+   "ACCREDITATION_CONFIGURE",
+   "REPORT_VIEW_OWN",
+   "REPORT_VIEW_WORKSTATION",
+   "REPORT_VIEW_VENUE",
+   "REPORT_VIEW_REGION",
+   "REPORT_VIEW_TENANT",
+   "REPORT_EXPORT",
+   "REPORT_EXPORT_PII",
+   "REPORT_MANAGE",
+   "REPORT_SCHEDULE",
+   "LEDGER_VIEW",
+   "LEDGER_POST",
+   "LEDGER_APPROVE",
+   "TAX_CONFIGURE",
+   "ACCOUNT_CONFIGURE",
+   "SETTLEMENT_VIEW",
+   "SETTLEMENT_RECONCILE",
+   "GUEST_VIEW",
+   "GUEST_VIEW_PII",
+   "GUEST_MANAGE",
+   "VENUE_MAP_VIEW",
+   "VENUE_MAP_MANAGE",
+   "VENUE_MAP_PUBLISH",
+   "RESOURCE_VIEW",
+   "RESOURCE_BOOK",
+   "RESOURCE_MANAGE",
+   "RESOURCE_CONFIGURE",
+   "RENTAL_VIEW",
+   "RENTAL_BOOK",
+   "RENTAL_OPERATE",
+   "RENTAL_MANAGE",
+   "RENTAL_CONFIGURE",
+   "RENTAL_PRICE",
+   "RENTAL_APPROVE",
+   "RENTAL_OVERRIDE",
+   "DEVELOPER_VIEW",
+   "DEVELOPER_MANAGE",
+   "DEVELOPER_ADMIN",
+   "LOYALTY_ACCRUE",
+   "LOYALTY_REDEEM",
+   "LOYALTY_ADJUST",
+   "MARKETING_VIEW",
+   "MARKETING_MANAGE",
+   "MARKETING_SEND",
+   "CASE_VIEW",
+   "CASE_MANAGE",
+   "ASSET_LIBRARY_VIEW",
+   "ASSET_LIBRARY_MANAGE",
+   "ASSET_LIBRARY_APPROVE",
+   "ASSET_LIBRARY_SHARE",
+   "QUEUE_VIEW",
+   "QUEUE_MANAGE",
+   "QUEUE_REDEEM",
+   "QUEUE_OVERRIDE",
+   "TRANSPORT_VIEW",
+   "TRANSPORT_MANAGE",
+   "TRANSPORT_PRICE",
+   "ASSET_VIEW",
+   "ASSET_MANAGE",
+   "WORK_ORDER_VIEW",
+   "WORK_ORDER_MANAGE",
+   "WORK_ORDER_VERIFY",
+   "INSPECTION_VIEW",
+   "INSPECTION_SUBMIT",
+   "INSPECTION_MANAGE",
+   "INCIDENT_REPORT",
+   "INCIDENT_VIEW",
+   "INCIDENT_MANAGE",
+   "KIOSK_ATTEND",
+   "DEVICE_VIEW",
+   "DEVICE_CONFIGURE",
+   "DEVICE_MANAGE",
+   "APPROVAL_ACT",
+   "APPROVAL_DELEGATE",
+   "AI_USE",
+   "AI_CONFIGURE",
+   "AI_APPROVE",
+   "AI_AUDIT_VIEW",
+   "RISK_REVIEW",
+   "RISK_INVESTIGATE",
+   "AUDIT_VIEW",
+   "APPROVAL_VIEW",
+   "APPROVAL_REQUEST",
+   "APPROVAL_DECIDE",
+   "APPROVAL_CONFIGURE",
+   "MAINTENANCE_EXECUTE",
+   "MAINTENANCE_APPROVE",
+   "WORKFORCE_VIEW",
+   "WORKFORCE_MANAGE",
+   "ATTENDANCE_RECORD",
+   "ANNOUNCEMENT_PUBLISH",
+   "ANNOUNCEMENT_EMERGENCY",
+   "PARTNER_VIEW",
+   "PARTNER_MANAGE",
+   "PARKING_CONFIGURE",
+   "PAYMENT_VOID",
+   "PROCUREMENT_VIEW",
+   "PROCUREMENT_REQUEST",
+   "PROCUREMENT_MANAGE",
+   "PROCUREMENT_RECEIVE"
+  ]
+ },
+ "PermissionSet": {
+  "type": "array",
+  "items": {
+   "$ref": "#/components/schemas/Permission"
+  },
+  "uniqueItems": true
+ },
  "RoleSummary": {
   "x-ticvai-persistence": "none — projection over role",
   "type": "object",
@@ -728,6 +1681,163 @@
    },
    "isPrimary": {
     "type": "boolean"
+   }
+  }
+ },
+ "ScanAnomalyRuleList": {
+  "type": "array",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "**One `jsonb` column on the access point row** (`access.access_point.scan_anomaly_rules`). Read with the access point at validation, and a rule is never queried on its own.\n",
+  "items": {
+   "type": "object",
+   "properties": {
+    "rule": {
+     "type": "string",
+     "enum": [
+      "simultaneousEntry",
+      "impossibleTravelTime",
+      "rapidReentry",
+      "sharedDevice",
+      "velocityBreach"
+     ]
+    },
+    "action": {
+     "type": "string",
+     "enum": [
+      "log",
+      "flag",
+      "requireSupervisor",
+      "deny"
+     ]
+    },
+    "thresholdSeconds": {
+     "type": "integer",
+     "nullable": true
+    }
+   }
+  }
+ },
+ "ScanEvent": {
+  "x-ticvai-append-only": "recordedAt",
+  "x-ticvai-persistence": "access.scan_event",
+  "type": "object",
+  "required": [
+   "id",
+   "accessPointId",
+   "venueId",
+   "outcome",
+   "direction",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The scan's client-generated UUIDv7, the key offline replay deduplicates on."
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "ticketId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `Entitlement.id` scanned; null where the media resolved to nothing."
+   },
+   "mediaCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "outcome": {
+    "$ref": "#/components/schemas/ScanOutcome"
+   },
+   "denyReason": {
+    "$ref": "#/components/schemas/DenyReason"
+   },
+   "direction": {
+    "$ref": "#/components/schemas/Direction"
+   },
+   "operatorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "overridesScanId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Set only on an override row**, naming the denied scan it admits against (decided 28 September, audit R228). The denied scan itself is never updated: the denial and the override are two rows, and at most one override row names any scan. Null on every other scan.\n"
+   },
+   "overrideReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "The supervisor's justification, on the override row only. The overriding principal is that row's `operatorPrincipalId`."
+   },
+   "dynamicPolicyId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The dynamic access policy (`access.dynamic_policy`) whose result decided this scan; null when no dynamic policy matched and the entitlement alone decided (added 29 September, build pass, 3.3.48). `listDynamicPolicyEffectiveness` counts from it."
+   },
+   "dynamicPolicyVersion": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "The version of that policy in force at the scan, so a report spanning a change counts each version apart."
+   },
+   "dynamicPolicyResult": {
+    "type": "string",
+    "enum": [
+     "allow",
+     "deny",
+     "review",
+     "requireId",
+     "requireBiometric",
+     "requireCompanion",
+     "requireSupervisor"
+    ],
+    "nullable": true,
+    "description": "What the policy decided, which for a step-up is not the same as the scan's outcome."
+   },
+   "quantity": {
+    "type": "integer",
+    "minimum": 1,
+    "default": 1,
+    "description": "Admissions this scan counted. More than one only for a group wave (`validateGroupAccess`) or a quantity entitlement consumed in one pass (added 29 September, data-model close-out DM1)."
+   },
+   "localSequence": {
+    "type": "integer",
+    "nullable": true,
+    "description": "The device-local sequence number of a scan recorded offline; null for an online scan (added 29 September, data-model close-out DM1)."
+   },
+   "packageVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "The offline package (`access.edge_package`) the device validated against; null for an online scan (added 29 September, data-model close-out DM1)."
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Null while pending. Differs from recordedAt for offline scans."
    }
   }
  },
@@ -794,6 +1904,23 @@
       }
      }
     }
+   }
+  }
+ },
+ "ScopedPermissions": {
+  "type": "object",
+  "description": "Permissions effective at a given scope path, after deny resolution. Clients filter navigation on this and never compute permissions themselves.\n",
+  "required": [
+   "scopePath",
+   "permissions"
+  ],
+  "properties": {
+   "scopePath": {
+    "type": "string",
+    "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$"
+   },
+   "permissions": {
+    "$ref": "#/components/schemas/PermissionSet"
    }
   }
  },
@@ -864,7 +1991,8 @@
   }
  },
  "Shift": {
-  "x-ticvai-persistence": "orders.shift",
+  "x-ticvai-persistence": "orders.pos_shift + orders.pos_shift_approval + orders.pos_shift_incident",
+  "description": "**`approvals` and `incidents` are child rows** (26 September, pull audit R099): `orders.pos_shift_approval` and `orders.pos_shift_incident`, one row per item, keyed to the shift. Until then the contract carried both and `orders.pos_shift` had nowhere to put either.\n",
   "type": "object",
   "required": [
    "id",
@@ -880,8 +2008,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID. Also the idempotency key."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7. Also the idempotency key."
    },
    "workstationId": {
     "type": "string",
@@ -964,13 +2092,52 @@
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "salesTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "x-ticvai-column": "gross_sales_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "What the till took in sales, as the guest paid it — tax included."
    },
    "refundsTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "x-ticvai-column": "gross_refunded_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "What the till paid back, as the guest was refunded it — tax included."
    },
    "liftsTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "x-ticvai-column": "lifted_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Cash taken out mid-shift by lifts and withdrawals. Cash, so neither gross nor net."
+   },
+   "expectedCash": {
+    "x-ticvai-column": "expected_cash_amount",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "nullable": true,
+    "description": "26 September, pull audit R207. **The figure the blind count was measured against**, revealed once the count is in — null until then. Until this date only `ShiftCloseResult` carried it, returned once by `closeShift`, so BO-040 could not show the over/short it exists to accept.\n"
+   },
+   "countedCash": {
+    "x-ticvai-column": "counted_cash_amount",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "nullable": true,
+    "description": "What the close count found. Null until the shift is counted."
+   },
+   "variance": {
+    "x-ticvai-column": "variance_amount",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "nullable": true,
+    "description": "Counted minus expected, as `ShiftCloseResult.variance`. Negative is short."
    },
    "heldLeaseCount": {
     "type": "integer",
@@ -983,17 +2150,29 @@
    "recordedAt": {
     "type": "string",
     "format": "date-time",
-    "description": "When the device recorded the open. Differs from `openedAt` when offline."
+    "description": "When the device recorded the open. `openedAt` is the server's time."
    },
    "suspendedAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true
    },
+   "suspendReason": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "The `reason` given to `suspendShift`. Cleared on resume."
+   },
    "closedAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "closedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Who submitted the close count. `reopenShift` refuses an approver who is this principal, and until 26 September there was nothing to compare against (pull audit R099).\n"
    },
    "syncedAt": {
     "type": "string",
@@ -1017,7 +2196,8 @@
         "open",
         "close",
         "variance"
-       ]
+       ],
+       "description": "`open` from `approveShiftOpen`, `close` from `approveShiftClose`, `variance` from `acceptShiftVariance`.\n"
       },
       "principalId": {
        "type": "string",
@@ -1083,7 +2263,85 @@
    },
    "scopePath": {
     "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope**; the server sets it and ignores it in a request."
+   }
+  }
+ },
+ "SyncRejection": {
+  "x-ticvai-persistence": "sync.rejection",
+  "type": "object",
+  "required": [
+   "id",
+   "workstationId",
+   "kind",
+   "rejectedAt",
+   "problem"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "order",
+     "payment",
+     "refund",
+     "void",
+     "scan"
+    ]
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "rejectedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "problem": {
+    "$ref": "../shared/common.yaml#/components/schemas/Problem"
+   },
+   "payload": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "**Deliberately open: the journal entry exactly as the till sent it.** Its shape is the request schema for `kind` — an `OfflineOrder` for `order`, a `CreatePaymentRequest` for `payment` — kept verbatim so the supervisor resolves what was actually recorded, not a re-typed copy.\n"
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "resolvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "resolution": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "enum": [
+     "posted",
+     "voided",
+     "refunded"
+    ],
+    "description": "What `resolveSyncRejection` recorded. Null while the rejection waits."
+   },
+   "resolvedRecordId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The order, void or refund the resolution produced — what stops the entry being posted twice."
    }
   }
  },
@@ -1098,7 +2356,7 @@
   "properties": {
    "ticketId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "Stable for the life of the ticket, independent of the media carrying it."
    },
    "mediaCode": {
@@ -1189,11 +2447,8 @@
  },
  "TurnstileMode": {
   "type": "string",
+  "description": "**Reduced to two values — decided 28 September, audit R221.** Entry, exit, re-entry and crossover were the access point's `Direction` under another name, and two fields that could disagree left the gate to guess. Direction is fixed per access point; within `normal` or `podium` operation the turnstile may only be let spin free or held closed.\n",
   "enum": [
-   "entry",
-   "reentry",
-   "crossover",
-   "exit",
    "freeRotation",
    "closed"
   ]
@@ -1210,8 +2465,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID. Also the idempotency key and dedupe key."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7. Also the idempotency key and dedupe key."
    },
    "mediaCode": {
     "type": "string",
@@ -1252,7 +2507,7 @@
   "properties": {
    "scanId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "outcome": {
     "$ref": "#/components/schemas/ScanOutcome"
@@ -1282,6 +2537,33 @@
    "serverEvaluatedAt": {
     "type": "string",
     "format": "date-time"
+   },
+   "advisory": {
+    "type": "object",
+    "nullable": true,
+    "description": "BL-179, CF-130. **What a device observed, for the steward, never for the gate.** Present only where an access point's device reports the matching `DeviceCapability` and the venue has turned the corresponding setting on.\n**Never persisted.** This schema is computed and stored as `access.scan_event`, and the advisory is deliberately not part of what is stored: an inferred classification kept against a guest is sensitive personal data with no consent behind it. **A guest agreed to be admitted, not to be classified** — Face Pass and Face Tag carry `consent_purpose_id` and `consent_given_at` because somebody enrolled, and nobody enrols in being looked at by a turnstile. `scan_event` records that an override happened and never what the device thought, which keeps `overrideRateAlertThreshold` working without building a register nobody agreed to.\n**It cannot reach `outcome` or `denyReason`.** Those are decisive and `entitlementGated` is `true` and read-only: the gate admits on the entitlement, and everything here sits on top of that without replacing any of it.\n",
+    "properties": {
+     "genderClassification": {
+      "type": "string",
+      "enum": [
+       "women",
+       "men",
+       "undetermined"
+      ],
+      "description": "**`undetermined` is a real answer and the most common one to design for.** A classifier that never returns it is one that has been tuned to look confident.\n"
+     },
+     "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "**Required reading for the steward, not decoration.** An advisory with no confidence is read as a fact, and `overrideRateAlertThreshold` exists to catch exactly the failure that produces — *an override rate near zero means the steward has stopped deciding.* That number only means anything if the steward could see how sure the device was.\n"
+     },
+     "reportedByDeviceId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "**Which device said it.** A classifier that degrades is one camera, not a venue, and an advisory nobody can trace to hardware cannot be investigated or switched off alone.\n"
+     }
+    }
    }
   }
  },

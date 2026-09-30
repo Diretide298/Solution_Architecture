@@ -39,10 +39,7 @@
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-188 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-189",
@@ -196,9 +193,21 @@
   },
   "apis": [
    {
+    "operationId": "listDynamicBundle2",
+    "contract": "promotions",
+    "purpose": "Dynamic Bundle Simulation & AI Optimization",
+    "trigger": "onLoad"
+   },
+   {
     "operationId": "listDynamicBundle",
     "contract": "promotions",
     "purpose": "Dynamic Bundle Operations Command Center",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listDynamicBundleRule",
+    "contract": "promotions",
+    "purpose": "Dynamic Bundle Rule & Composition Engine",
     "trigger": "onLoad"
    }
   ],
@@ -215,7 +224,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-188"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-188",
+   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-188"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 78. 12 of 12 labels bound to a contract property; 12 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -305,6 +315,12 @@
        "derived": true,
        "impliedBy": "listComponentInventoryAvailability",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getInventoryKitDefinition",
+       "notes": "One record, read-only."
       }
      ]
     }
@@ -323,21 +339,31 @@
     "contract": "promotions",
     "purpose": "Component Inventory & Availability Matrix",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getInventoryKitDefinition",
+    "contract": "inventory",
+    "purpose": "Show kit components",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
    "preloaded": [
-    "ComponentInventoryAvailabilityMatrixView.tRyTyLe",
-    "ComponentInventoryAvailabilityMatrixView.dE",
-    "ComponentInventoryAvailabilityMatrixView.souvenir0Open",
-    "ComponentInventoryAvailabilityMatrixView.ticketInventory",
-    "ComponentInventoryAvailabilityMatrixView.attractionCapacity"
+    "ComponentInventoryAvailabilityMatrixView.availabilitySource"
+   ],
+   "params": [
+    {
+     "name": "itemId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-189"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-189",
+   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-189"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 79. 0 of 0 labels bound to a contract property; 1 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -465,17 +491,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "BundleSellabilityDependencyRuleEngineView.allComponentsRequired",
-    "BundleSellabilityDependencyRuleEngineView.atLeastXOfY",
-    "BundleSellabilityDependencyRuleEngineView.atLeastOneFromCategory",
-    "BundleSellabilityDependencyRuleEngineView.optionalComponent",
-    "BundleSellabilityDependencyRuleEngineView.conditionalComponent"
+    "BundleSellabilityDependencyRuleEngineView.dependencyRule"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-190"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-190",
+   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-190"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 80. 0 of 0 labels bound to a contract property; 1 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -542,13 +565,6 @@
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Manage how bundle sales consume capacity from underlying products. This is particularly important because a bundle must not create artificial inventory separate from the actual attraction/product capacity.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Capacity Pool & Reservation Manager declares no operation that writes anything** — its only declared call is `listCapacityPoolReservation`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -590,6 +606,41 @@
        "kind": "selectField",
        "label": "Waitlist behavior",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 81 §Configure"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every bundle capacity policy",
+       "bindsTo": "BundleCapacityPolicy",
+       "columns": [
+        "BundleCapacityPolicy.id",
+        "BundleCapacityPolicy.bundleId",
+        "BundleCapacityPolicy.channel",
+        "BundleCapacityPolicy.venueId",
+        "BundleCapacityPolicy.partnerId",
+        "BundleCapacityPolicy.capacitySource",
+        "BundleCapacityPolicy.allocationMode",
+        "BundleCapacityPolicy.capacityCeiling",
+        "BundleCapacityPolicy.holdDurationMinutes",
+        "BundleCapacityPolicy.bookingCutoffMinutes",
+        "BundleCapacityPolicy.allowOverbooking",
+        "BundleCapacityPolicy.allowWaitlist"
+       ],
+       "operation": "listBundleCapacityPolicies",
+       "provenance": "contract promotions.yaml GET /bundles/{bundleId}/capacity-policies"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save bundle capacity policy",
+       "operation": "setBundleCapacityPolicy",
+       "permission": "PRODUCT_CONFIGURE",
+       "notes": "Replaces the bundle's `promotions.bundle_capacity_policy` rows with the set sent: a row sent with an `id` is updated, one without is created, and a stored row not sent is removed.",
+       "provenance": "contract promotions.yaml PUT /bundles/{bundleId}/capacity-policies"
       }
      ]
     }
@@ -607,14 +658,58 @@
     "contract": "promotions",
     "purpose": "Capacity Pool & Reservation Manager",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listBundleCapacityPolicies",
+    "contract": "promotions",
+    "purpose": "List a bundle's capacity policies",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setBundleCapacityPolicy",
+    "contract": "promotions",
+    "purpose": "Set a bundle's capacity policies",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCapacityPoolReservation",
+     "listBundleCapacityPolicies"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-191"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-191",
+   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-191"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 81. 0 of 0 labels bound to a contract property; 7 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "bundleId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "formSetBundleCapacityPolicy",
+    "component": "modal",
+    "trigger": "Save bundle capacity policy",
+    "body": "**Collects what `setBundleCapacityPolicy` sends before it is called.** Required: `policies`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save bundle capacity policy",
+     "operation": "setBundleCapacityPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "policies"
+     ]
+    },
+    "provenance": "contract promotions.yaml PUT /bundles/{bundleId}/capacity-policies"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -757,7 +852,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-192"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-192",
+   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-192"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 82. 0 of 0 labels bound to a contract property; 10 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -879,7 +975,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-193"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-193",
+   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-193"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 83. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -985,7 +1082,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-194"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-194",
+   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-194"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 84. 0 of 0 labels bound to a contract property; 1 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1083,6 +1181,41 @@
        "kind": "selectField",
        "label": "Sales location",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 85 §Configure"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every bundle capacity policy",
+       "bindsTo": "BundleCapacityPolicy",
+       "columns": [
+        "BundleCapacityPolicy.id",
+        "BundleCapacityPolicy.bundleId",
+        "BundleCapacityPolicy.channel",
+        "BundleCapacityPolicy.venueId",
+        "BundleCapacityPolicy.partnerId",
+        "BundleCapacityPolicy.capacitySource",
+        "BundleCapacityPolicy.allocationMode",
+        "BundleCapacityPolicy.capacityCeiling",
+        "BundleCapacityPolicy.holdDurationMinutes",
+        "BundleCapacityPolicy.bookingCutoffMinutes",
+        "BundleCapacityPolicy.allowOverbooking",
+        "BundleCapacityPolicy.allowWaitlist"
+       ],
+       "operation": "listBundleCapacityPolicies",
+       "provenance": "contract promotions.yaml GET /bundles/{bundleId}/capacity-policies"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save bundle capacity policy",
+       "operation": "setBundleCapacityPolicy",
+       "permission": "PRODUCT_CONFIGURE",
+       "notes": "Replaces the bundle's `promotions.bundle_capacity_policy` rows with the set sent: a row sent with an `id` is updated, one without is created, and a stored row not sent is removed.",
+       "provenance": "contract promotions.yaml PUT /bundles/{bundleId}/capacity-policies"
       }
      ]
     }
@@ -1100,14 +1233,58 @@
     "contract": "promotions",
     "purpose": "Bundle Availability by Channel, Venue & Partner",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listBundleCapacityPolicies",
+    "contract": "promotions",
+    "purpose": "List a bundle's capacity policies",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setBundleCapacityPolicy",
+    "contract": "promotions",
+    "purpose": "Set a bundle's capacity policies",
+    "trigger": "onAction",
+    "invalidates": [
+     "listBundleAvailabilityChannel",
+     "listBundleCapacityPolicies"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-195"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-195",
+   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-195"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 85. 0 of 0 labels bound to a contract property; 5 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "bundleId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "formSetBundleCapacityPolicy",
+    "component": "modal",
+    "trigger": "Save bundle capacity policy",
+    "body": "**Collects what `setBundleCapacityPolicy` sends before it is called.** Required: `policies`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save bundle capacity policy",
+     "operation": "setBundleCapacityPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "policies"
+     ]
+    },
+    "provenance": "contract promotions.yaml PUT /bundles/{bundleId}/capacity-policies"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1253,7 +1430,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-196"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-196",
+   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-196"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 86. 9 of 9 labels bound to a contract property; 9 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1376,6 +1554,18 @@
     "contract": "promotions",
     "purpose": "Dynamic Bundle Simulation & AI Optimization",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listDynamicBundle",
+    "contract": "promotions",
+    "purpose": "Dynamic Bundle Operations Command Center",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listDynamicBundleRule",
+    "contract": "promotions",
+    "purpose": "Dynamic Bundle Rule & Composition Engine",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -1391,7 +1581,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-197"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-197",
+   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-197"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 87. 8 of 8 labels bound to a contract property; 9 of 87 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

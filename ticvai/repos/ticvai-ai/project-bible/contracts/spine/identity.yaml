@@ -3818,8 +3818,8 @@ paths:
               properties:
                 id:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-                  description: Client-generated ULID for the grant.
+                  format: uuid
+                  description: Client-generated UUIDv7 for the grant.
                 permissions:
                   type: array
                   minItems: 1
@@ -5906,7 +5906,7 @@ components:
           nullable: true
         approvalRequestId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: The `approvals.request` that approved the episode, where one was needed
         endsEpisodeHistoryId:
@@ -6471,7 +6471,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         operatorPrincipalId:
           type: string
           format: uuid

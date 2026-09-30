@@ -1118,20 +1118,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "selectField",
        "label": "View: day, week or month",
        "notes": "**Every calendar has day, week and month views, and the day view is broken into hours from the venue's day start hour** (17 September minutes, M17-03). Built on the shared calendar view (`calendarView`, to be added to the component library); until then a timeline per view.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       },
       {
        "kind": "multiSelect",
        "label": "Category",
        "notes": "**Filtered by category, so a team sees only what is theirs** (M17-03).",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       },
       {
        "kind": "calendarView",
        "label": "Calendar",
        "operation": "listSeasonalCalendarDay",
        "notes": "Entries of the view in force, placed by date and hour.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     }

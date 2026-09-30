@@ -23,7 +23,7 @@
     {
      "to": "BO-084",
      "trigger": "Approval Inbox",
-     "provenance": "derived — BO-084 declares entryState.params requestId and BO-088 holds none of them, so the edge carries nothing and BO-084 opens cold"
+     "provenance": "derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-088 holds none of them, so the edge carries nothing and BO-084 opens cold"
     },
     {
      "to": "BO-085",
@@ -223,7 +223,7 @@
     {
      "to": "BO-084",
      "trigger": "Approval Inbox",
-     "provenance": "derived — BO-084 declares entryState.params requestId and BO-106 holds none of them, so the edge carries nothing and BO-084 opens cold"
+     "provenance": "derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-106 holds none of them, so the edge carries nothing and BO-084 opens cold"
     },
     {
      "to": "BO-085",
@@ -234,6 +234,11 @@
      "to": "BO-087",
      "trigger": "Approval Delegations",
      "provenance": "derived — BO-087 declares entryState.params delegationId and BO-106 holds none of them, so the edge carries nothing and BO-087 opens cold"
+    },
+    {
+     "to": "BO-054",
+     "trigger": "Role Assignment",
+     "provenance": "derived — BO-054 declares entryState.params campaignId and BO-106 holds none of them, so the edge carries nothing and BO-054 opens cold"
     }
    ]
   },

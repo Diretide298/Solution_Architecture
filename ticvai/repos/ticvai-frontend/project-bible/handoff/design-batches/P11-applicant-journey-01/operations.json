@@ -1,28 +1,212 @@
 {
- "issueAccreditationBadge": {
+ "createAccreditationApplication": {
   "method": "POST",
-  "path": "/accreditation-badges",
-  "contract": "approvals",
-  "summary": "Issue a badge",
-  "permission": "APPROVAL_ACT",
-  "offlineCapable": false,
+  "path": "/accreditation-applications",
+  "contract": "accreditation",
+  "summary": "Apply, or apply on behalf of somebody",
+  "permission": "ACCREDITATION_APPLY",
+  "offlineCapable": null,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": "AccreditationBadge",
-  "responds": "AccreditationBadge"
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccreditationApplication",
+  "responds": "AccreditationApplication"
  },
- "listAccreditationBadges": {
-  "method": "GET",
-  "path": "/accreditation-badges",
-  "contract": "approvals",
-  "summary": "Badges issued and their state",
-  "permission": "APPROVAL_VIEW",
-  "offlineCapable": false,
+ "issueMyAccreditationWalletPass": {
+  "method": "POST",
+  "path": "/my/accreditation-credentials/{credentialId}/wallet-pass",
+  "contract": "accreditation",
+  "summary": "Put my accreditation credential in Apple or Google Wallet",
+  "permission": "ACCREDITATION_APPLY",
+  "offlineCapable": null,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "AccreditationBadge"
+  "responds": "AccreditationCredentialDelivery"
+ },
+ "listMyAccreditationApplications": {
+  "method": "GET",
+  "path": "/my/accreditation-applications",
+  "contract": "accreditation",
+  "summary": "The applications this person made, or that were made for them",
+  "permission": "ACCREDITATION_APPLY",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMyAccreditationCredentials": {
+  "method": "GET",
+  "path": "/my/accreditation-credentials",
+  "contract": "accreditation",
+  "summary": "The credentials this person holds, with where each is valid",
+  "permission": "ACCREDITATION_APPLY",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "renewAccreditation": {
+  "method": "POST",
+  "path": "/accreditation-holders/{holderId}/renew",
+  "contract": "accreditation",
+  "summary": "Renew a holder's accreditation for another period",
+  "permission": "ACCREDITATION_APPLY",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationApplication"
+ },
+ "resubmitAccreditationApplication": {
+  "method": "POST",
+  "path": "/accreditation-applications/{applicationId}/resubmit",
+  "contract": "accreditation",
+  "summary": "Send an application back after a return for information or a rejection",
+  "permission": "ACCREDITATION_APPLY",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationApplication"
+ },
+ "submitAccreditationApplication": {
+  "method": "POST",
+  "path": "/accreditation-applications/{applicationId}/submit",
+  "contract": "accreditation",
+  "summary": "Send a draft for review",
+  "permission": "ACCREDITATION_APPLY",
+  "offlineCapable": null,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationApplication"
+ },
+ "submitAccreditationDocument": {
+  "method": "POST",
+  "path": "/accreditation-documents",
+  "contract": "accreditation",
+  "summary": "Supply a document against a requirement",
+  "permission": "ACCREDITATION_APPLY",
+  "offlineCapable": null,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccreditationDocument",
+  "responds": "AccreditationDocument"
+ },
+ "updateAccreditationApplication": {
+  "method": "PUT",
+  "path": "/accreditation-applications/{applicationId}",
+  "contract": "accreditation",
+  "summary": "Save a draft, or amend an application returned for information",
+  "permission": "ACCREDITATION_APPLY",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccreditationApplication",
+  "responds": "AccreditationApplication"
+ },
+ "withdrawAccreditationApplication": {
+  "method": "POST",
+  "path": "/accreditation-applications/{applicationId}/withdraw",
+  "contract": "accreditation",
+  "summary": "Withdraw an application before it is decided",
+  "permission": "ACCREDITATION_APPLY",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationApplication"
  }
 }

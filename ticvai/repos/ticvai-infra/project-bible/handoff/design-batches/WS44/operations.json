@@ -8,7 +8,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ApprovalReviewDecisionWorkspaceInput",
   "responds": "ApprovalReviewDecisionWorkspaceView"
  },
@@ -21,9 +27,34 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ApprovalWorkflowDesignerInput",
   "responds": "ApprovalWorkflowDesignerView"
+ },
+ "decideCatalogueAiFinding": {
+  "method": "POST",
+  "path": "/ai-findings/{findingId}/decision",
+  "contract": "catalogue",
+  "summary": "Acknowledge, accept, dismiss or resolve an AI finding",
+  "permission": "AI_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CatalogueAiFinding"
  },
  "listChangeImpactAnalysis": {
   "method": "GET",
@@ -34,7 +65,33 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "changeRequestId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "area",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "minRisk",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "ChangeImpactAnalysisView"
  },
@@ -47,9 +104,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "changeRequestId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dependencyType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "conflictsOnly",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ChangePropagationDependencyControlView"
+  "responds": "Page"
  },
  "listGovernanceRiskMonitoring": {
   "method": "GET",
@@ -60,9 +148,45 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "severity",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "risk",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "owner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "GovernanceRiskAiMonitoringControlCenterView"
+  "responds": "Page"
  },
  "listProductGovernance": {
   "method": "GET",
@@ -74,6 +198,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
    {
     "name": "productType",
     "in": "query",
@@ -100,7 +229,22 @@
     "required": false
    },
    {
+    "name": "changeType",
+    "in": "query",
+    "required": false
+   },
+   {
     "name": "approver",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "effectiveFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "effectiveTo",
     "in": "query",
     "required": false
    },
@@ -108,10 +252,20 @@
     "name": "channel",
     "in": "query",
     "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "ProductGovernanceCommandCenterView"
+  "responds": "Page"
  },
  "listProductRetirementSuspension": {
   "method": "GET",
@@ -122,9 +276,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "action",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "lifecycleState",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ProductRetirementSuspensionArchiveView"
+  "responds": "Page"
  },
  "listProductTrailChange": {
   "method": "GET",
@@ -137,7 +322,37 @@
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "date",
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "userId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "action",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "version",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "configurationArea",
     "in": "query",
     "required": false
    },
@@ -155,10 +370,25 @@
     "name": "risk",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "environment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "ProductAuditTrailChangeHistoryView"
+  "responds": "Page"
  },
  "listProductVersions": {
   "method": "GET",
@@ -182,8 +412,58 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "scope",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "emergency",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "RollbackRecoveryManagementView"
+  "responds": "Page"
+ },
+ "setProductLinks": {
+  "method": "PUT",
+  "path": "/products/{productId}/links",
+  "contract": "catalogue",
+  "summary": "Replace what depends on a product",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ProductLink",
+  "responds": "ProductLink"
  }
 }

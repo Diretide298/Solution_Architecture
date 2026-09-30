@@ -39,16 +39,7 @@
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
-    },
-    {
-     "to": "ADM-079",
-     "trigger": "Works in Pricing Change Request & Workspace",
-     "provenance": "flow F146 step 1→2",
-     "operation": "listPricingGovernance"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-078 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-080",
@@ -97,14 +88,23 @@
      "trigger": "Works in Pricing History, Audit & Compliance Explorer",
      "provenance": "flow F146 step 17→18",
      "operation": "listPricingGovernance"
+    },
+    {
+     "to": "ADM-079",
+     "trigger": "Works in Pricing Change Request & Workspace",
+     "provenance": "flow F146 step 1→2",
+     "operation": "listPricingGovernance",
+     "carries": [
+      "changeId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized administrators can monitor and control the complete pricing-change lifecycle from a centralized governance workspace.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide Commercial, Revenue, Finance, and authorized management with one operational view of all pricing changes and governance activities.",
-  "purposeNote": "Authorized administrators can monitor and control the complete pricing-change lifecycle from a centralized governance workspace.",
   "gaps": [
    {
     "operation": null,
@@ -148,25 +148,101 @@
     },
     {
      "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Pricing Changes in Draft",
+       "bindsTo": "PricingGovernanceCommandCenterSummary.pricingChangesInDraft",
+       "operation": "listPricingGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pending Validation",
+       "bindsTo": "PricingGovernanceCommandCenterSummary.pendingValidation",
+       "operation": "listPricingGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pending Approval",
+       "bindsTo": "PricingGovernanceCommandCenterSummary.pendingApproval",
+       "operation": "listPricingGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Approved Changes",
+       "bindsTo": "PricingGovernanceCommandCenterSummary.approvedChanges",
+       "operation": "listPricingGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Scheduled Publications",
+       "bindsTo": "PricingGovernanceCommandCenterSummary.scheduledPublications",
+       "operation": "listPricingGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Published today",
+       "bindsTo": "PricingGovernanceCommandCenterSummary.publishedToday",
+       "operation": "listPricingGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Failed Publications",
+       "bindsTo": "PricingGovernanceCommandCenterSummary.failedPublications",
+       "operation": "listPricingGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Emergency Changes",
+       "bindsTo": "PricingGovernanceCommandCenterSummary.emergencyChanges",
+       "operation": "listPricingGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Rollbacks",
+       "bindsTo": "PricingGovernanceCommandCenterSummary.rollbacks",
+       "operation": "listPricingGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Expiring prices",
+       "bindsTo": "PricingGovernanceCommandCenterSummary.expiringPrices",
+       "operation": "listPricingGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Governance exceptions",
+       "bindsTo": "PricingGovernanceCommandCenterSummary.governanceExceptions",
+       "operation": "listPricingGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "High risk changes",
+       "bindsTo": "PricingGovernanceCommandCenterSummary.highRiskChanges",
+       "operation": "listPricingGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
      "slot": "collection",
      "components": [
       {
        "kind": "dataTable",
        "label": "Every pricing governance",
-       "columns": [
-        "PricingGovernanceCommandCenterView.pricingChangesInDraft",
-        "PricingGovernanceCommandCenterView.pendingValidation",
-        "PricingGovernanceCommandCenterView.pendingApproval",
-        "PricingGovernanceCommandCenterView.approvedChanges",
-        "PricingGovernanceCommandCenterView.scheduledPublications",
-        "PricingGovernanceCommandCenterView.publishedToday",
-        "PricingGovernanceCommandCenterView.failedPublications",
-        "PricingGovernanceCommandCenterView.emergencyChanges",
-        "PricingGovernanceCommandCenterView.rollbacks",
-        "PricingGovernanceCommandCenterView.expiringPrices",
-        "PricingGovernanceCommandCenterView.governanceExceptions",
-        "PricingGovernanceCommandCenterView.highRiskChanges"
-       ],
        "bindsTo": "PricingGovernanceCommandCenterView",
        "operation": "listPricingGovernance",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 57 §Display"
@@ -181,20 +257,6 @@
        "kind": "detailPanel",
        "label": "The selected pricing governance",
        "bindsTo": "PricingGovernanceCommandCenterView",
-       "columns": [
-        "PricingGovernanceCommandCenterView.pricingChangesInDraft",
-        "PricingGovernanceCommandCenterView.pendingValidation",
-        "PricingGovernanceCommandCenterView.pendingApproval",
-        "PricingGovernanceCommandCenterView.approvedChanges",
-        "PricingGovernanceCommandCenterView.scheduledPublications",
-        "PricingGovernanceCommandCenterView.publishedToday",
-        "PricingGovernanceCommandCenterView.failedPublications",
-        "PricingGovernanceCommandCenterView.emergencyChanges",
-        "PricingGovernanceCommandCenterView.rollbacks",
-        "PricingGovernanceCommandCenterView.expiringPrices",
-        "PricingGovernanceCommandCenterView.governanceExceptions",
-        "PricingGovernanceCommandCenterView.highRiskChanges"
-       ],
        "notes": "The pack groups this record's detail under its own headings: “Change Scope Impact Status”, “VAT Update UAE Finance Scheduled”.",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 57 §Display"
       }
@@ -227,6 +289,7 @@
       {
        "kind": "secondaryButton",
        "label": "Approve",
+       "operation": "decidePricingChangeRequest",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 57 §Quick Actions"
       },
       {
@@ -256,22 +319,35 @@
     "contract": "catalogue",
     "purpose": "Pricing Governance Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "decidePricingChangeRequest",
+    "contract": "catalogue",
+    "purpose": "Approve, reject or return a pricing change request",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "changeId",
+     "from": "navigation"
+    }
+   ],
    "preloaded": [
-    "PricingGovernanceCommandCenterView.pricingChangesInDraft",
-    "PricingGovernanceCommandCenterView.pendingValidation",
-    "PricingGovernanceCommandCenterView.pendingApproval",
-    "PricingGovernanceCommandCenterView.approvedChanges",
-    "PricingGovernanceCommandCenterView.scheduledPublications",
-    "PricingGovernanceCommandCenterView.publishedToday"
+    "PricingGovernanceCommandCenterSummary.pricingChangesInDraft",
+    "PricingGovernanceCommandCenterSummary.pendingValidation",
+    "PricingGovernanceCommandCenterSummary.pendingApproval",
+    "PricingGovernanceCommandCenterSummary.approvedChanges",
+    "PricingGovernanceCommandCenterSummary.scheduledPublications",
+    "PricingGovernanceCommandCenterSummary.publishedToday"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-078"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-078",
+   "workshopBoard": "wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-078"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 57. 12 of 24 labels bound to a contract property; 31 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -330,15 +406,18 @@
      "to": "ADM-078",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F146 step 2→3",
-     "operation": "setPricingChangeRequest"
+     "operation": "setPricingChangeRequest",
+     "carries": [
+      "changeId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "All governed pricing modifications can originate from a traceable change request without directly editing live commercial configuration.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
   "purpose": "Provide a governed workspace for creating individual or structured pricing changes before modifying production pricing.",
-  "purposeNote": "All governed pricing modifications can originate from a traceable change request without directly editing live commercial configuration.",
   "gaps": [
    {
     "operation": null,
@@ -473,6 +552,19 @@
        "kind": "secondaryButton",
        "label": "Emergency Change",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 58 §Support"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Submit",
+       "operation": "submitPricingChangeRequest",
+       "provenance": "contract catalogue.yaml POST /pricing-change-request/{changeId}/submit (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Approve, reject or return",
+       "operation": "decidePricingChangeRequest",
+       "notes": "Shown to an approver holding PRODUCT_APPROVE once the request is submitted; the author cannot decide their own.",
+       "provenance": "contract catalogue.yaml POST /pricing-change-request/{changeId}/decision (decided 29 September, readiness close-out)"
       }
      ]
     }
@@ -489,18 +581,36 @@
     "operationId": "setPricingChangeRequest",
     "contract": "catalogue",
     "purpose": "Pricing Change Request & Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setPricingChangeRequest"
-    ]
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "submitPricingChangeRequest",
+    "contract": "catalogue",
+    "purpose": "Submit the draft pricing change for validation and approval",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "decidePricingChangeRequest",
+    "contract": "catalogue",
+    "purpose": "Approve, reject or return the pricing change request",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-079"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-079",
+   "workshopBoard": "wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-079"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 58. 0 of 0 labels bound to a contract property; 23 of 46 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "changeId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -562,14 +672,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Large-scale pricing changes can be safely prepared, validated, previewed, and submitted through controlled bulk operations.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Allow large pricing portfolios to be updated efficiently without manually editing hundreds or thousands of records.",
-  "purposeNote": "Large-scale pricing changes can be safely prepared, validated, previewed, and submitted through controlled bulk operations.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Increase by %, Increase Fixed Amount, Change Currency, Clone for New Season, Increase 5%, CSV/XLSX pricing files, Price lists. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 12 actions on this screen and the screen declares 1 operation.** Unserved: Increase by %, Decrease by %, Increase Fixed Amount, Decrease Fixed Amount, Replace Amount, Copy Rate, Change Currency, Set Effective Dates …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 60 §Support"
    }
   ],
@@ -584,10 +694,10 @@
        "kind": "dataTable",
        "label": "Every bulk pricing update",
        "columns": [
-        "BulkPricingUpdateImportMassMaintenanceView.recordsRead5420",
-        "BulkPricingUpdateImportMassMaintenanceView.valid5371",
-        "BulkPricingUpdateImportMassMaintenanceView.warnings37",
-        "BulkPricingUpdateImportMassMaintenanceView.errors12"
+        "BulkPricingUpdateImportMassMaintenanceView.recordsRead",
+        "BulkPricingUpdateImportMassMaintenanceView.validRecords",
+        "BulkPricingUpdateImportMassMaintenanceView.warningCount",
+        "BulkPricingUpdateImportMassMaintenanceView.errorCount"
        ],
        "bindsTo": "BulkPricingUpdateImportMassMaintenanceView",
        "operation": "listBulkPricingUpdate",
@@ -604,10 +714,10 @@
        "label": "The selected bulk pricing update",
        "bindsTo": "BulkPricingUpdateImportMassMaintenanceView",
        "columns": [
-        "BulkPricingUpdateImportMassMaintenanceView.recordsRead5420",
-        "BulkPricingUpdateImportMassMaintenanceView.valid5371",
-        "BulkPricingUpdateImportMassMaintenanceView.warnings37",
-        "BulkPricingUpdateImportMassMaintenanceView.errors12"
+        "BulkPricingUpdateImportMassMaintenanceView.recordsRead",
+        "BulkPricingUpdateImportMassMaintenanceView.validRecords",
+        "BulkPricingUpdateImportMassMaintenanceView.warningCount",
+        "BulkPricingUpdateImportMassMaintenanceView.errorCount"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Preview”, “Before committing”, “Export”.",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 60 §Show"
@@ -625,7 +735,27 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Decrease by %",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 60 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Increase Fixed Amount",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 60 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Decrease Fixed Amount",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 60 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Replace Amount",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 60 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Copy Rate",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 60 §Support"
       },
       {
@@ -635,23 +765,8 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Clone for New Season",
+       "label": "Set Effective Dates",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 60 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Increase 5%",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 60 §Action"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "CSV/XLSX pricing files",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 60 §Support controlled import of"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Price lists",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 60 §Support controlled import of"
       }
      ]
     }
@@ -674,18 +789,19 @@
   ],
   "entryState": {
    "preloaded": [
-    "BulkPricingUpdateImportMassMaintenanceView.recordsRead5420",
-    "BulkPricingUpdateImportMassMaintenanceView.valid5371",
-    "BulkPricingUpdateImportMassMaintenanceView.warnings37",
-    "BulkPricingUpdateImportMassMaintenanceView.errors12"
+    "BulkPricingUpdateImportMassMaintenanceView.recordsRead",
+    "BulkPricingUpdateImportMassMaintenanceView.validRecords",
+    "BulkPricingUpdateImportMassMaintenanceView.warningCount",
+    "BulkPricingUpdateImportMassMaintenanceView.errorCount"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-080"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-080",
+   "workshopBoard": "wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-080"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 60. 4 of 4 labels bound to a contract property; 22 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 60. 4 of 4 labels bound to a contract property; 27 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -747,10 +863,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "configuration was effective for any historical transaction.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Compare; Show) and no metric row",
   "purpose": "Maintain immutable versions of pricing configuration so TICVAI always knows what configuration existed at a particular time.",
-  "purposeNote": "configuration was effective for any historical transaction.",
   "layout": {
    "template": "split",
    "regions": [
@@ -771,8 +887,6 @@
         "PricingVersionBaselineManagementView.productCount",
         "PricingVersionBaselineManagementView.changeCount",
         "PricingVersionBaselineManagementView.status",
-        "PricingVersionBaselineManagementView.version42",
-        "PricingVersionBaselineManagementView.version43",
         "PricingVersionBaselineManagementView.added",
         "PricingVersionBaselineManagementView.removed",
         "PricingVersionBaselineManagementView.modified",
@@ -802,8 +916,6 @@
         "PricingVersionBaselineManagementView.productCount",
         "PricingVersionBaselineManagementView.changeCount",
         "PricingVersionBaselineManagementView.status",
-        "PricingVersionBaselineManagementView.version42",
-        "PricingVersionBaselineManagementView.version43",
         "PricingVersionBaselineManagementView.added",
         "PricingVersionBaselineManagementView.removed",
         "PricingVersionBaselineManagementView.modified",
@@ -844,7 +956,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-081"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-081",
+   "workshopBoard": "wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-081"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 62. 15 of 15 labels bound to a contract property; 15 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -908,10 +1021,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Approvers can understand financial, customer, channel, dependency, and operational impact before authorizing a pricing change.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Analyze) and no metric row",
   "purpose": "Determine the commercial and operational consequences of a pricing change before approval and publication. This is one of the most important screens in Board 4.",
-  "purposeNote": "Approvers can understand financial, customer, channel, dependency, and operational impact before authorizing a pricing change.",
   "layout": {
    "template": "split",
    "regions": [
@@ -986,6 +1099,12 @@
     "contract": "catalogue",
     "purpose": "Pricing Change Impact Analysis",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listChangeImpactAnalysis",
+    "contract": "catalogue",
+    "purpose": "Change Impact Analysis",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -1001,7 +1120,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-082"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-082",
+   "workshopBoard": "wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-082"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 63. 13 of 13 labels bound to a contract property; 13 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1065,10 +1185,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Pricing changes cannot progress beyond their configured governance threshold without all required approvals.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure who must approve pricing changes based on their commercial risk and scope.",
-  "purposeNote": "Pricing changes cannot progress beyond their configured governance threshold without all required approvals.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1122,16 +1242,14 @@
     "operationId": "approvePricingWorkflowAuthority",
     "contract": "catalogue",
     "purpose": "Pricing Approval Workflow & Authority Matrix",
-    "trigger": "onAction",
-    "invalidates": [
-     "approvePricingWorkflowAuthority"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-083"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-083",
+   "workshopBoard": "wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-083"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 64. 0 of 0 labels bound to a contract property; 4 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1195,10 +1313,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Only validated and fully approved pricing configurations can be scheduled and activated at controlled effective dates.",
   "pattern": "configEditor",
   "patternReason": "the screen declares a publishing operation over fields the pack configures",
   "purpose": "Control exactly when approved pricing becomes commercially effective.",
-  "purposeNote": "Only validated and fully approved pricing configurations can be scheduled and activated at controlled effective dates.",
   "gaps": [
    {
     "operation": null,
@@ -1260,16 +1378,14 @@
     "operationId": "publishPricingEffectiveDate",
     "contract": "catalogue",
     "purpose": "Pricing Publication & Effective-Date Scheduler",
-    "trigger": "onAction",
-    "invalidates": [
-     "publishPricingEffectiveDate"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-084"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-084",
+   "workshopBoard": "wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-084"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 66. 7 of 7 labels bound to a contract property; 11 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1333,10 +1449,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can confirm that approved pricing has been successfully distributed and synchronized to all intended channels and systems.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Monitor; Display) and no metric row",
   "purpose": "Ensure published pricing reaches every TICVAI channel and dependent system consistently.",
-  "purposeNote": "Administrators can confirm that approved pricing has been successfully distributed and synchronized to all intended channels and systems.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1348,18 +1464,7 @@
        "kind": "dataTable",
        "label": "Every pricing distribution synchronization",
        "columns": [
-        "PricingDistributionSynchronizationPublicationMonitorView.b2c",
-        "PricingDistributionSynchronizationPublicationMonitorView.mobileApp",
-        "PricingDistributionSynchronizationPublicationMonitorView.pos",
-        "PricingDistributionSynchronizationPublicationMonitorView.mobilePos",
-        "PricingDistributionSynchronizationPublicationMonitorView.kiosk",
-        "PricingDistributionSynchronizationPublicationMonitorView.callCenter",
-        "PricingDistributionSynchronizationPublicationMonitorView.b2b",
-        "PricingDistributionSynchronizationPublicationMonitorView.reseller",
-        "PricingDistributionSynchronizationPublicationMonitorView.ota",
-        "PricingDistributionSynchronizationPublicationMonitorView.apis",
-        "PricingDistributionSynchronizationPublicationMonitorView.cacheCdnWhereApplicable",
-        "PricingDistributionSynchronizationPublicationMonitorView.externalIntegratedSystems",
+        "PricingDistributionSynchronizationPublicationMonitorView.target",
         "PricingDistributionSynchronizationPublicationMonitorView.publicationStarted",
         "PricingDistributionSynchronizationPublicationMonitorView.lastUpdated",
         "PricingDistributionSynchronizationPublicationMonitorView.recordsPublished",
@@ -1382,18 +1487,7 @@
        "label": "The selected pricing distribution synchronization",
        "bindsTo": "PricingDistributionSynchronizationPublicationMonitorView",
        "columns": [
-        "PricingDistributionSynchronizationPublicationMonitorView.b2c",
-        "PricingDistributionSynchronizationPublicationMonitorView.mobileApp",
-        "PricingDistributionSynchronizationPublicationMonitorView.pos",
-        "PricingDistributionSynchronizationPublicationMonitorView.mobilePos",
-        "PricingDistributionSynchronizationPublicationMonitorView.kiosk",
-        "PricingDistributionSynchronizationPublicationMonitorView.callCenter",
-        "PricingDistributionSynchronizationPublicationMonitorView.b2b",
-        "PricingDistributionSynchronizationPublicationMonitorView.reseller",
-        "PricingDistributionSynchronizationPublicationMonitorView.ota",
-        "PricingDistributionSynchronizationPublicationMonitorView.apis",
-        "PricingDistributionSynchronizationPublicationMonitorView.cacheCdnWhereApplicable",
-        "PricingDistributionSynchronizationPublicationMonitorView.externalIntegratedSystems",
+        "PricingDistributionSynchronizationPublicationMonitorView.target",
         "PricingDistributionSynchronizationPublicationMonitorView.publicationStarted",
         "PricingDistributionSynchronizationPublicationMonitorView.lastUpdated",
         "PricingDistributionSynchronizationPublicationMonitorView.recordsPublished",
@@ -1425,18 +1519,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "PricingDistributionSynchronizationPublicationMonitorView.b2c",
-    "PricingDistributionSynchronizationPublicationMonitorView.mobileApp",
-    "PricingDistributionSynchronizationPublicationMonitorView.pos",
-    "PricingDistributionSynchronizationPublicationMonitorView.mobilePos",
-    "PricingDistributionSynchronizationPublicationMonitorView.kiosk",
-    "PricingDistributionSynchronizationPublicationMonitorView.callCenter"
+    "PricingDistributionSynchronizationPublicationMonitorView.target"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-085"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-085",
+   "workshopBoard": "wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-085"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 67. 18 of 18 labels bound to a contract property; 18 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1500,14 +1590,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can rapidly contain and reverse problematic pricing changes without altering historical transactions or losing audit traceability.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide controlled recovery when a pricing publication is incorrect or creates unacceptable commercial impact.",
-  "purposeNote": "Authorized users can rapidly contain and reverse problematic pricing changes without altering historical transactions or losing audit traceability.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Previous Price, Selected Channel, Entire Publication. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 9 actions on this screen; 8 are served since the writers pass (29 September): Previous Version, Selected Version, Previous Price, Commercial Baseline, Selected Products, Selected Venue, Selected Market, Selected Channel by `requestPricingRollback`.** Still unserved: the rest of the pack list past the eight shown here. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 69 §Support"
    },
    {
@@ -1530,7 +1620,37 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Previous Version",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 69 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected Version",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 69 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Previous Price",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 69 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Commercial Baseline",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 69 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected Products",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 69 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected Venue",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 69 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected Market",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 69 §Support"
       },
       {
@@ -1539,15 +1659,26 @@
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 69 §Support"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Entire Publication",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 69 §Support"
-      },
-      {
        "kind": "banner",
        "label": "Permissions this screen separates",
        "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Freeze Price List, Freeze Product Pricing, Freeze Venue Pricing, Stop Scheduled Publication, Stop Distribution, Restore Last Known Good Version. Each needs attaching to the control it gates, or the screen needs the control.",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 69 §Authorized users should have"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request pricing rollback",
+       "operation": "requestPricingRollback",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**A pricing rollback or emergency action, as a record first** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml POST /pricing-rollback-emergency"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Cancel pricing rollback",
+       "operation": "cancelPricingRollback",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**Only before it runs** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml POST /pricing-rollback-emergency/{actionId}/cancel"
       }
      ]
     },
@@ -1570,23 +1701,89 @@
     "contract": "catalogue",
     "purpose": "Pricing Rollback & Emergency Control Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "requestPricingRollback",
+    "contract": "catalogue",
+    "purpose": "Roll pricing back, or take an emergency pricing action",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPricingRollbackEmergency"
+    ]
+   },
+   {
+    "operationId": "cancelPricingRollback",
+    "contract": "catalogue",
+    "purpose": "Cancel a rollback that has not started",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPricingRollbackEmergency"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "PricingRollbackEmergencyControlCenterView.previousVersion",
-    "PricingRollbackEmergencyControlCenterView.selectedVersion",
-    "PricingRollbackEmergencyControlCenterView.previousPrice",
-    "PricingRollbackEmergencyControlCenterView.commercialBaseline",
-    "PricingRollbackEmergencyControlCenterView.selectedProducts"
+    "PricingRollbackEmergencyControlCenterView.rollbackTarget",
+    "PricingRollbackEmergencyControlCenterView.rollbackScope"
+   ],
+   "params": [
+    {
+     "name": "actionId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-086"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-086",
+   "workshopBoard": "wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-086"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 69. 0 of 0 labels bound to a contract property; 9 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 69. 0 of 0 labels bound to a contract property; 15 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formRequestPricingRollback",
+    "component": "modal",
+    "trigger": "Request pricing rollback",
+    "body": "**Collects what `requestPricingRollback` sends before it is called.** Required: `id`, `scopePath`, `subject`, `actionType`, `reason`, `status`, `requestedByPrincipalId`, `requestedAt`. Optional: `productId`, `priceListId`, `fromVersion`, `toVersion`, `productScope`, `rollbackTarget`, `rollbackScope`, `scopeIds`, `dependencies`, `executionMode`, `isEmergency`, `scheduledAt` and 6 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CatalogueRollbackAction",
+    "confirm": {
+     "label": "Request pricing rollback",
+     "operation": "requestPricingRollback"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "subject",
+      "actionType",
+      "reason",
+      "status",
+      "requestedByPrincipalId",
+      "requestedAt",
+      "productId",
+      "priceListId",
+      "fromVersion",
+      "toVersion",
+      "productScope",
+      "rollbackTarget",
+      "rollbackScope",
+      "scopeIds",
+      "dependencies",
+      "executionMode"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /pricing-rollback-emergency"
+   },
+   {
+    "id": "confirmCancelPricingRollback",
+    "component": "confirmDialog",
+    "trigger": "Cancel pricing rollback",
+    "body": "**Names what `cancelPricingRollback` changes and what it leaves alone**, in the consequence rather than the verb. A catalogue rollback action this affects should be identified in the dialog, not just counted. **Collects what `cancelPricingRollback` sends before it is called.** Required: `reason`.",
+    "provenance": "contract catalogue.yaml POST /pricing-rollback-emergency/{actionId}/cancel"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1637,14 +1834,26 @@
     "ADM-078"
    ],
    "inferred": false,
-   "notes": "**Reached from ADM-078, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+   "notes": "**Reached from ADM-078, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-078",
+     "trigger": "Pricing Governance Command Center",
+     "provenance": "derived — ADM-078 declares entryState.params changeId and ADM-087 holds none of them, so the edge carries nothing and ADM-078 opens cold"
+    }
+   ]
   },
   "density": "compact",
+  "purposeNote": "Every material pricing configuration, approval, publication, override, and rollback is fully traceable and can be reconstructed for operational, financial, and compliance purposes. Board 4 — Final Screen Register # Backend Screen Core Responsibility 10.4. Pricing Governance Command Center Governance operations 1 10.4. Pricing Change Request & Workspace Controlled change creation 2 10.4. Bulk Pricing Update, Import & Mass Maintenance Mass pricing operations 3 10.4. Pricing Version & Baseline Management Version control 4 10.4. Pricing Change Impact Analysis Pre-change impact 5 10.4. Pricing Appr",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide complete forensic traceability for every pricing configuration and change. Enable TICVAI revenue administrators to configure dynamic-pricing strategies using real-time commercial conditions such as: Demand + Occupancy + Availability + Inventory + Booking Velocity + Time-to- Event + Season + Day + Timeslot + Channel + Customer Segment + Location The engine converts those conditions into controlled price movements while always respecting commercial guardrails.",
-  "purposeNote": "Every material pricing configuration, approval, publication, override, and rollback is fully traceable and can be reconstructed for operational, financial, and compliance purposes. Board 4 — Final Screen Register # Backend Screen Core Responsibility 10.4. Pricing Governance Command Center Governance operations 1 10.4. Pricing Change Request & Workspace Controlled change creation 2 10.4. Bulk Pricing Update, Import & Mass Maintenance Mass pricing operations 3 10.4. Pricing Version & Baseline Management Version control 4 10.4. Pricing Change Impact Analysis Pre-change impact 5 10.4. Pricing Appr",
   "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Board 5 — Dynamic Pricing, Revenue. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 70 §Operations"
+   },
    {
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
@@ -1690,6 +1899,11 @@
      "slot": "rowActions",
      "components": [
       {
+       "kind": "primaryButton",
+       "label": "Board 5 — Dynamic Pricing, Revenue",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 70 §Operations"
+      },
+      {
        "kind": "banner",
        "label": "Permissions this screen separates",
        "notes": "**The pack separates these permissions and no action on the screen claims them yet:** “Who approved the Dubai summer pricing?”. Each needs attaching to the control it gates, or the screen needs the control.",
@@ -1717,9 +1931,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-087"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-087",
+   "workshopBoard": "wireframes/WS98 Pricing   Revenue Management Board 4.dc.html#adm-087"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 70. 0 of 12 labels bound to a contract property; 13 of 118 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 70. 0 of 12 labels bound to a contract property; 14 of 118 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

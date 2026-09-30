@@ -1,6 +1,6 @@
 # WS50 — Promotions   Bundles Management board 6
 
-**10 screens · 10 operations · 10 schemas · 1 permissions**
+**10 screens · 13 operations · 14 schemas · 3 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 1 permissions apply here:
-  `PRICE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `PRICE_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-188` | Dynamic Bundle Operations Command Center | commandCentre | 1 | 0 | — |
-| `ADM-189` | Component Inventory & Availability Matrix | listDetail | 1 | 0 | — |
+| `ADM-188` | Dynamic Bundle Operations Command Center | commandCentre | 3 | 0 | — |
+| `ADM-189` | Component Inventory & Availability Matrix | listDetail | 2 | 0 | — |
 | `ADM-190` | Bundle Sellability & Dependency Rule Engine | listDetail | 1 | 0 | — |
-| `ADM-191` | Capacity Pool & Reservation Manager | configEditor | 1 | 0 | — |
+| `ADM-191` | Capacity Pool & Reservation Manager | configEditor | 3 | 1 | — |
 | `ADM-192` | Dynamic Component Substitution Engine | configEditor | 1 | 0 | — |
 | `ADM-193` | Dynamic Bundle Rule & Composition Engine | listDetail | 1 | 0 | — |
 | `ADM-194` | Real-Time Availability & Checkout Validation | configEditor | 1 | 0 | — |
-| `ADM-195` | Bundle Availability by Channel, Venue & Partner | configEditor | 1 | 0 | — |
+| `ADM-195` | Bundle Availability by Channel, Venue & Partner | configEditor | 3 | 1 | — |
 | `ADM-196` | Bundle Availability Forecast, Alerts & Recovery | listDetail | 1 | 0 | — |
-| `ADM-197` | Dynamic Bundle Simulation & AI Optimization | listDetail | 1 | 0 | — |
+| `ADM-197` | Dynamic Bundle Simulation & AI Optimization | listDetail | 3 | 0 | — |
 
 ## Thin screens in this batch
 

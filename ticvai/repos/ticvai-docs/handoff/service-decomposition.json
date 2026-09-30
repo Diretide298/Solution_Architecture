@@ -1,5 +1,5 @@
 {
- "note": "How 33 contracts and 1091 tables become 17 deployable services. **The data boundaries were drawn first and the service boundaries follow them** — no service spans two schemas it does not own.",
+ "note": "How 33 contracts and 1093 tables become 17 modules, deployed as 5 units. **The data boundaries were drawn first and the service boundaries follow them** — no service spans two schemas it does not own. **30 September 2026 (ADR-0055):** the 17 are modules of one .NET solution, and `deployable` on each says which of the five units it ships in; `workers` carries the relay, the consumers and the scheduled jobs and owns no module.",
  "generated": "21 September 2026",
  "tiers": {
   "foundation": "Read by everything, reads nothing above. Deploys first and alone.",
@@ -8,9 +8,17 @@
   "engagement": "Guests and intelligence. Nothing that takes money depends on these.",
   "platform": "Provisioning, publishing, reporting, and the one cross-region path."
  },
+ "deployables": {
+  "commerce": "The sale path: order, payment and ledger commit in one transaction. Autoscales on requests per second.",
+  "access": "The gate hot path, flat high rate, offline package. The same module code builds the venue edge node.",
+  "operations": "Back office and engagement. Nothing that takes money waits on it.",
+  "ticvai-ai": "AI, in Python, isolated (ADR-0020): three process groups, read-only on the transactional schemas.",
+  "workers": "No module of its own: the outbox relay (one per region, ADR-0058), every module's event consumers and scheduled jobs. Scales on queue depth."
+ },
  "services": {
   "IdentityService": {
    "tier": "foundation",
+   "deployable": "commerce",
    "contracts": [
     "identity"
    ],
@@ -45,6 +53,7 @@
   },
   "TenancyService": {
    "tier": "foundation",
+   "deployable": "commerce",
    "contracts": [
     "tenancy",
     "workforce",
@@ -85,6 +94,7 @@
   },
   "CatalogueService": {
    "tier": "commerce",
+   "deployable": "commerce",
    "contracts": [
     "catalogue",
     "promotions",
@@ -125,6 +135,7 @@
   },
   "OrderService": {
    "tier": "commerce",
+   "deployable": "commerce",
    "contracts": [
     "orders",
     "shift",
@@ -169,6 +180,7 @@
   },
   "AccessService": {
    "tier": "commerce",
+   "deployable": "access",
    "contracts": [
     "access"
    ],
@@ -205,6 +217,7 @@
   },
   "LedgerService": {
    "tier": "commerce",
+   "deployable": "commerce",
    "contracts": [
     "finance"
    ],
@@ -238,6 +251,7 @@
   },
   "InventoryService": {
    "tier": "operations",
+   "deployable": "operations",
    "contracts": [
     "inventory"
    ],
@@ -268,6 +282,7 @@
   },
   "FnbService": {
    "tier": "operations",
+   "deployable": "operations",
    "contracts": [
     "fnb"
    ],
@@ -304,6 +319,7 @@
   },
   "RetailService": {
    "tier": "operations",
+   "deployable": "operations",
    "contracts": [
     "retail"
    ],
@@ -332,6 +348,7 @@
   },
   "MarketingService": {
    "tier": "engagement",
+   "deployable": "operations",
    "contracts": [
     "marketing-crm"
    ],
@@ -369,6 +386,7 @@
   },
   "AiService": {
    "tier": "engagement",
+   "deployable": "ticvai-ai",
    "contracts": [
     "ai"
    ],
@@ -405,6 +423,7 @@
   },
   "VenueOpsService": {
    "tier": "operations",
+   "deployable": "operations",
    "contracts": [
     "queue",
     "maintenance",
@@ -458,6 +477,7 @@
   },
   "PlatformService": {
    "tier": "platform",
+   "deployable": "operations",
    "contracts": [
     "subscription",
     "platform-ops",
@@ -468,7 +488,7 @@
     "subscription"
    ],
    "operations": 212,
-   "tables": 102,
+   "tables": 103,
    "why": "**Three contracts, one schema, 41 tables.** Subscription, platform operations and the public API all write `control.*` — **they are one bounded context that was split into three contracts for API-surface reasons, not for data reasons.**\n\nSplitting them would give three services writing one schema, which is the arrangement every distributed-data guide warns about.",
    "scale": "Low volume, high consequence. Tenant provisioning and licensing.",
    "risk": "Down blocks provisioning and the developer API. **Trading is unaffected.**",
@@ -498,6 +518,7 @@
   },
   "WhiteLabelService": {
    "tier": "platform",
+   "deployable": "operations",
    "contracts": [
     "white-label"
    ],
@@ -529,6 +550,7 @@
   },
   "ReportingService": {
    "tier": "platform",
+   "deployable": "operations",
    "contracts": [
     "reporting"
    ],
@@ -560,6 +582,7 @@
   },
   "CrossRegionService": {
    "tier": "platform",
+   "deployable": "operations",
    "contracts": [
     "cross-region"
    ],
@@ -588,6 +611,7 @@
   },
   "WalletService": {
    "tier": "commerce",
+   "deployable": "commerce",
    "contracts": [
     "wallet"
    ],

@@ -1,42 +1,78 @@
 {
- "approveMatrixMultiLevel": {
-  "method": "PUT",
-  "path": "/matrix-multi-level",
-  "contract": "approvals",
-  "summary": "Approval Matrix & Multi-Level Approval Configuration",
-  "permission": "APPROVAL_REQUEST",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": "ApprovalMatrixMultiLevelApprovalConfigurationInput",
-  "responds": "ApprovalMatrixMultiLevelApprovalConfigurationView"
- },
- "approveRoleAuthorityDelegation": {
-  "method": "PUT",
-  "path": "/role-authority-delegation",
-  "contract": "approvals",
-  "summary": "Roles, Authority, Delegation & Approval Limits",
-  "permission": "APPROVAL_REQUEST",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": "RolesAuthorityDelegationApprovalLimitsInput",
-  "responds": "RolesAuthorityDelegationApprovalLimitsView"
- },
  "approveVersioningGovernance": {
   "method": "PUT",
   "path": "/versioning-governance",
   "contract": "approvals",
   "summary": "Versioning, Governance, Approval & Publication",
-  "permission": "APPROVAL_REQUEST",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VersioningGovernanceApprovalPublicationInput",
+  "responds": "VersioningGovernanceApprovalPublicationView"
+ },
+ "createApprovalDelegation": {
+  "method": "POST",
+  "path": "/delegations",
+  "contract": "approvals",
+  "summary": "Delegate approval authority",
+  "permission": "APPROVAL_DECIDE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApprovalDelegation",
+  "responds": "ApprovalDelegation"
+ },
+ "listApprovalDelegations": {
+  "method": "GET",
+  "path": "/delegations",
+  "contract": "approvals",
+  "summary": "Who is standing in for whom",
+  "permission": "APPROVAL_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [],
-  "requestBody": "VersioningGovernanceApprovalPublicationInput",
-  "responds": "VersioningGovernanceApprovalPublicationView"
+  "requestBody": null,
+  "responds": "ApprovalDelegation"
+ },
+ "listApprovalMatrices": {
+  "method": "GET",
+  "path": "/approval-matrices",
+  "contract": "approvals",
+  "summary": "What requires approval here",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "effective",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalMatrix"
  },
  "listConditionDecisionLogic": {
   "method": "GET",
@@ -60,9 +96,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "type",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "sourceModule",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "RulesWorkflowCommandCenterView"
+  "responds": "Page"
  },
  "listSlaEscalationReminder": {
   "method": "GET",
@@ -77,16 +139,41 @@
   "requestBody": null,
   "responds": "SlaEscalationReminderTimeoutRulesView"
  },
+ "setApprovalMatrix": {
+  "method": "PUT",
+  "path": "/approval-matrices",
+  "contract": "approvals",
+  "summary": "Configure what requires approval",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApprovalMatrix",
+  "responds": "ApprovalMatrix"
+ },
  "setTriggerActionCross": {
   "method": "PUT",
   "path": "/trigger-action-cross",
   "contract": "approvals",
   "summary": "Trigger, Action & Cross-Module Orchestration Configuration",
-  "permission": "APPROVAL_REQUEST",
+  "permission": "APPROVAL_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "TriggerActionCrossModuleOrchestrationConfigurationInput",
   "responds": "TriggerActionCrossModuleOrchestrationConfigurationView"
  },
@@ -95,11 +182,17 @@
   "path": "/visual-business-rule",
   "contract": "approvals",
   "summary": "Visual Business Rule Builder",
-  "permission": "APPROVAL_REQUEST",
+  "permission": "APPROVAL_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "VisualBusinessRuleBuilderInput",
   "responds": "VisualBusinessRuleBuilderView"
  },
@@ -108,11 +201,17 @@
   "path": "/visual-workflow",
   "contract": "approvals",
   "summary": "Visual Workflow Designer",
-  "permission": "APPROVAL_REQUEST",
+  "permission": "APPROVAL_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "VisualWorkflowDesignerInput",
   "responds": "VisualWorkflowDesignerView"
  },
@@ -121,11 +220,17 @@
   "path": "/workflow-testing-impact",
   "contract": "approvals",
   "summary": "Workflow Testing, Simulation & Impact Analysis",
-  "permission": "APPROVAL_REQUEST",
+  "permission": "APPROVAL_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "WorkflowTestingSimulationImpactAnalysisInput",
   "responds": "WorkflowTestingSimulationImpactAnalysisView"
  }

@@ -2661,6 +2661,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ]
  },
  "AuditRecord": {
+  "x-ticvai-append-only": "occurredAt",
   "type": "object",
   "x-ticvai-persistence": "platform.audit_record",
   "description": "26 September, pull audit R198. **One row of the platform audit trail, as `listAuditRecords` returns it.** It was a free-form object, so nothing said what an audit row carries. These are the fields the operation already filters on — who, where, on which workstation, what action, on what, and when — and nothing more. Written by the operations that audit themselves; never edited and never deleted.\n",
@@ -2708,7 +2709,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "platformStaffGrantId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "**Set when a TICVAI platform operator acted, naming the grant they acted under** (`identity.openPlatformStaffGrant`; decided 28 September, audit R098). Null for the tenant's own staff. Every platform action in a tenant carries one, so the tenant can see all of them.\n"
    }
@@ -2975,8 +2976,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID of the line. `lineIds` everywhere in this contract are these."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7 of the line. `lineIds` everywhere in this contract are these."
    },
    "variantId": {
     "type": "string",
@@ -3005,13 +3006,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "maxItems": 50,
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     },
     "description": "Seated products only, as `seating.Seat.id`. Not available offline. **At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel** (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); **at most 10 per sale on staff and POS** (audit R080 (c)), across all the lines of one order for one performance. `createOrder` refuses more with 422 `seatLimitExceeded` (problem type `seat-limit-exceeded`)."
    },
    "resourceHoldId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant. `createOrder` converts the hold into a `ResourceBooking` without releasing it. Not available offline."
    },
@@ -3091,8 +3092,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID. Also the idempotency key: it must equal the `Idempotency-Key` header, and a replay or a mismatch follows `IdempotencyKey` in `shared/common.yaml`. Offline replay through `syncOrders` carries no header, and this id alone deduplicates there.\n"
+    "format": "uuid",
+    "description": "Client-generated UUIDv7. Also the idempotency key: it must equal the `Idempotency-Key` header, and a replay or a mismatch follows `IdempotencyKey` in `shared/common.yaml`. Offline replay through `syncOrders` carries no header, and this id alone deduplicates there.\n"
    },
    "venueId": {
     "type": "string",
@@ -3103,7 +3104,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "shiftId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "subjectId": {
     "type": "string",
@@ -3145,12 +3146,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID of the payment, and its idempotency key — it must equal the `Idempotency-Key` header."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7 of the payment, and its idempotency key — it must equal the `Idempotency-Key` header."
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "tender": {
     "$ref": "#/components/schemas/TenderKind"
@@ -3637,8 +3638,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "The client ULID from `CreateOrderRequest.id`."
+    "format": "uuid",
+    "description": "The client UUIDv7 from `CreateOrderRequest.id`."
    },
    "orderNumber": {
     "type": "string",
@@ -3745,7 +3746,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "shiftId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "subjectId": {
@@ -3846,7 +3847,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "description": "The entitlements this line issued. **These are the ticket ids** — `transferOrderTickets.ticketIds` and `reprintOrder.reissuedTicketIds` take and return them.",
       "items": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+       "format": "uuid"
       }
      },
      "crossRegionRightIds": {
@@ -3924,7 +3925,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "properties": {
       "id": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "format": "uuid",
        "description": "The `OfflineOrder.id` this result is about."
       },
       "sequence": {
@@ -4002,11 +4003,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "tender": {
     "$ref": "#/components/schemas/TenderKind"
@@ -4352,7 +4353,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "workstationId": {
     "type": "string",
@@ -4409,7 +4410,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "resolvedRecordId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "readOnly": true,
     "description": "The order, void or refund the resolution produced — what stops the entry being posted twice."

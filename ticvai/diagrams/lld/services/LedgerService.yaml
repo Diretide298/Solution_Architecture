@@ -2,6 +2,7 @@ id: LLD-LedgerService
 title: LedgerService — 72 operations, 27 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
+deployable: commerce
 index: diagrams/hld/02-services.yaml
 why: '**Money, and it is append-only.** 72 operations over 27 tables that are never updated and never
   deleted — a different discipline from everything around it, and one that should not share a deploy
@@ -817,7 +818,7 @@ tables:
   - payments
   - shift
 - table: ledger.journal_line
-  columns: 8
+  columns: 9
   store: postgres
   parent: ledger.journal_entry
   writtenBy:

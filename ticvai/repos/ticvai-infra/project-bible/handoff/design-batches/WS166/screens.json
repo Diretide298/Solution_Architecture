@@ -1201,6 +1201,27 @@
     "purpose": "Numbering and labelling",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "decideProposedAction",
+    "contract": "ai",
+    "purpose": "Record which AI draft or proposal was used, or why it was refused",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "proposeSeatMapChanges",
+    "contract": "ai",
+    "purpose": "Propose categories, numbering, a stage variant or consistency findings for this map",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getActionPlan",
+    "contract": "ai",
+    "purpose": "The seat-map plan's steps before approval",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1213,6 +1234,14 @@
    "params": [
     {
      "name": "seatMapId",
+     "from": "navigation"
+    },
+    {
+     "name": "actionId",
+     "from": "navigation"
+    },
+    {
+     "name": "planId",
      "from": "navigation"
     }
    ]

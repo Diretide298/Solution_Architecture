@@ -18,36 +18,14 @@
    ],
    "exitTo": [
     "SUP-001",
-    "SUP-002",
-    "SUP-003",
-    "SUP-005"
+    "SUP-003"
    ],
    "inferred": true,
    "transitions": [
     {
      "to": "SUP-001",
      "trigger": "Agent Login",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry them"
-    },
-    {
-     "to": "SUP-002",
-     "trigger": "Agent Dashboard",
-     "carries": [
-      "caseId"
-     ],
-     "provenance": "derived — SUP-002 declares entryState.params caseId, so an edge into it must carry them"
-    },
-    {
-     "to": "SUP-005",
-     "trigger": "Live Chat Workspace",
-     "carries": [
-      "caseId",
-      "conversationId"
-     ],
-     "provenance": "derived — SUP-005 declares entryState.params caseId, conversationId, so an edge into it must carry them"
+     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-006 holds none of them, so the edge carries nothing and SUP-001 opens cold"
     }
    ]
   },
@@ -56,13 +34,6 @@
   "pattern": "listDetail",
   "patternReason": "`listKnowledgeCollections` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "Find something when the guest does not know what it is called.",
-  "gaps": [
-   {
-    "operation": "listFaqs",
-    "why": "**1 declared operation reach no component on this screen**: listFaqs. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -72,7 +43,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every knowledge base search",
+       "label": "Every knowledge collection",
        "bindsTo": "KnowledgeCollection",
        "columns": [
         "KnowledgeCollection.id",
@@ -90,6 +61,20 @@
        ],
        "operation": "listKnowledgeCollections",
        "provenance": "contract ai.yaml GET /collections"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every faq category",
+       "bindsTo": "FaqCategory",
+       "columns": [
+        "FaqCategory.code",
+        "FaqCategory.name",
+        "FaqCategory.sortOrder",
+        "FaqCategory.entries",
+        "FaqCategory.scopePath"
+       ],
+       "operation": "listFaqs",
+       "provenance": "contract white-label.yaml GET /tenant-config/faqs"
       }
      ]
     },
@@ -99,7 +84,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected knowledge base search",
+       "label": "The selected knowledge collection",
        "bindsTo": "KnowledgeCollection",
        "columns": [
         "KnowledgeCollection.id",
@@ -125,9 +110,9 @@
   "states": {
    "loading": "The knowledge base search list.",
    "error": "Could not load. Names which read failed and leaves the knowledge base search untouched.",
-   "emptyFirstRun": "No knowledge base search yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the knowledge base search are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No knowledge base search yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listKnowledgeCollections` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `AI_CONFIGURE`, which `listKnowledgeCollections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -141,6 +126,13 @@
     "contract": "white-label",
     "purpose": "Published answers, as the guest sees them",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listKnowledgeGaps",
+    "contract": "ai",
+    "purpose": "Questions the assistant could not answer",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -220,25 +212,13 @@
    "inferred": true,
    "exitTo": [
     "SUP-001",
-    "SUP-002",
     "SUP-003"
    ],
    "transitions": [
     {
      "to": "SUP-001",
      "trigger": "Agent Login",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry them"
-    },
-    {
-     "to": "SUP-002",
-     "trigger": "Agent Dashboard",
-     "carries": [
-      "caseId"
-     ],
-     "provenance": "derived — SUP-002 declares entryState.params caseId, so an edge into it must carry them"
+     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-007 holds none of them, so the edge carries nothing and SUP-001 opens cold"
     }
    ]
   },
@@ -255,8 +235,15 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Channel",
+       "operation": "listMessageTemplates",
+       "notes": "Sends `?channel=` to `listMessageTemplates`.",
+       "provenance": "contract marketing-crm.yaml GET /message-templates"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every canned response",
+       "label": "Every message template",
        "bindsTo": "MessageTemplate",
        "columns": [
         "MessageTemplate.id",
@@ -280,7 +267,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected canned response",
+       "label": "The selected message template",
        "bindsTo": "MessageTemplate",
        "columns": [
         "MessageTemplate.id",
@@ -304,7 +291,7 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create message template",
        "operation": "createMessageTemplate",
        "provenance": "contract marketing-crm.yaml POST /message-templates"
       }
@@ -315,9 +302,9 @@
   "states": {
    "loading": "The canned response list.",
    "error": "Could not load. Names which read failed and leaves the canned response untouched.",
-   "emptyFirstRun": "No canned response yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the canned response are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No canned response yet. Offers Create message template (`createMessageTemplate`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on channel and the canned response are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listMessageTemplates` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -351,6 +338,34 @@
    "board": "wireframes/P12 Venue Support.dc.html#sup-007"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateMessageTemplate",
+    "component": "modal",
+    "trigger": "Create message template",
+    "body": "**Collects what `createMessageTemplate` sends before it is called.** Required: `id`, `code`, `name`, `channel`, `bodies`. Optional: `subjects`, `mergeFields`, `missingLanguages`, `providerTemplateId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "MessageTemplate",
+    "confirm": {
+     "label": "Create message template",
+     "operation": "createMessageTemplate"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "code",
+      "name",
+      "channel",
+      "bodies",
+      "subjects",
+      "mergeFields",
+      "missingLanguages",
+      "providerTemplateId"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /message-templates"
+   }
+  ],
   "_platform": {
    "code": "P12",
    "audience": "staff",

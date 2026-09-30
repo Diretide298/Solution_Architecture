@@ -1,4 +1,23 @@
 {
+ "cancelGateModeChange": {
+  "method": "POST",
+  "path": "/gate-mode-changes/{changeId}/cancel",
+  "contract": "access",
+  "summary": "Cancel a scheduled gate mode change",
+  "permission": "TURNSTILE_MODE_SET",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessGateModeChange"
+ },
  "getAccessPoint": {
   "method": "GET",
   "path": "/access-points/{accessPointId}",

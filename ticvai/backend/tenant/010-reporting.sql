@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS reporting.delivery (
 
 -- One run of a report definition. The result set is cached in object storage, not here
 CREATE TABLE IF NOT EXISTS reporting.execution (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     report_id                         uuid NOT NULL,
     report_name                       text,
     definition_version                text NOT NULL,
@@ -130,8 +130,8 @@ CREATE TABLE IF NOT EXISTS reporting.execution (
 
 -- A file somebody asked for, with an expiry
 CREATE TABLE IF NOT EXISTS reporting.export (
-    id                                text PRIMARY KEY NOT NULL,
-    execution_id                      text NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
+    execution_id                      uuid NOT NULL,
     format                            text NOT NULL CONSTRAINT export_format_chk CHECK (format IN ('csv', 'xlsx', 'pdf', 'json')),
     status                            text NOT NULL CONSTRAINT export_status_chk CHECK (status IN ('queued', 'generating', 'ready', 'failed', 'expired')),
     includes_personal_data            boolean,

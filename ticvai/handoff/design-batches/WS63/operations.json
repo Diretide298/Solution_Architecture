@@ -1,4 +1,23 @@
 {
+ "holdResaleSettlement": {
+  "method": "POST",
+  "path": "/resale-settlements/{resaleSettlementId}/hold",
+  "contract": "orders",
+  "summary": "Put a seller's resale payout on manual hold",
+  "permission": "SETTLEMENT_RECONCILE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResaleSettlement"
+ },
  "listBuyerPurchaseResale": {
   "method": "GET",
   "path": "/buyer-purchase-resale",
@@ -8,7 +27,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "BuyerPurchaseResaleOrderManagementView"
  },
@@ -21,7 +46,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "CapacityInventoryReconciliationView"
  },
@@ -34,7 +65,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "CredentialRevocationRegenerationView"
  },
@@ -60,7 +97,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ResaleOperationsCommandCenterView"
  },
@@ -74,6 +117,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "venue",
     "in": "query",
@@ -118,6 +166,25 @@
   "requestBody": null,
   "responds": "ResaleAnalyticsAiIntelligenceView"
  },
+ "listResaleConfirmationOwnership": {
+  "method": "GET",
+  "path": "/resale-confirmation-ownership",
+  "contract": "orders",
+  "summary": "Resale Confirmation, Ownership Transfer & Ticket Delivery",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResaleConfirmationOwnershipTransferTicketDeliveryView"
+ },
  "listResaleFraudDuplicate": {
   "method": "GET",
   "path": "/resale-fraud-duplicate",
@@ -127,7 +194,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ResaleFraudDuplicateSaleProtectionView"
  },
@@ -140,7 +213,63 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "ticketId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "credential",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "order",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "resaleTransaction",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "seller",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "buyer",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "seat",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "paymentReference",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "export",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "ResaleAuditOwnershipHistoryView"
  },
@@ -153,7 +282,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "SellerSettlementPayoutManagementView"
  },
@@ -166,8 +301,33 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "TicketOwnershipTransferManagementView"
+ },
+ "releaseResaleSettlementHold": {
+  "method": "POST",
+  "path": "/resale-settlements/{resaleSettlementId}/release",
+  "contract": "orders",
+  "summary": "Release a manual or compliance hold on a seller's resale payout",
+  "permission": "SETTLEMENT_RECONCILE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResaleSettlement"
  }
 }

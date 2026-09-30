@@ -1,6 +1,6 @@
 # P05-sell-01 — P05 · Sell (1 of 2)
 
-**10 screens · 14 operations · 34 schemas · 5 permissions**
+**10 screens · 13 operations · 49 schemas · 5 permissions**
 
 Platform P05 Guest Kiosk · ships as **guest** ·
 guest audience · kiosk ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 5 permissions apply here:
   `ORDER_CREATE, ORDER_VIEW, PRICE_VIEW, PRODUCT_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **6 of these operations work offline**: createPayment, evaluatePromotions, getOrder, getTenantAppStatus, listProductVariants, listProducts
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -65,13 +64,13 @@ convincingly. It is never a caption.
 | `KSK-002` | Language Select | statusTracker | 2 | 0 | — |
 | `KSK-003` | What are you buying | listDetail | 1 | 0 | — |
 | `KSK-004` | Choose tickets | listDetail | 2 | 0 | — |
-| `KSK-005` | Choose a session | statusTracker | 2 | 0 | — |
-| `KSK-006` | Review | statusTracker | 4 | 0 | — |
+| `KSK-005` | Choose a performance | statusTracker | 2 | 1 | — |
+| `KSK-006` | Review | statusTracker | 4 | 3 | — |
 | `KSK-007` | Payment | configEditor | 1 | 0 | — |
 | `KSK-008` | Payment unresolved | configEditor | 1 | 0 | — |
-| `KSK-009` | Ticket issued | statusTracker | 2 | 0 | — |
+| `KSK-009` | Ticket issued | statusTracker | 2 | 1 | — |
 | `KSK-010` | Print failure | configEditor | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**KSK-001, KSK-002, KSK-004, KSK-005, KSK-008, KSK-010 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**KSK-001, KSK-002, KSK-004, KSK-005, KSK-008, KSK-009 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

@@ -1212,6 +1212,41 @@
     "purpose": "Export",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listAccreditationExports",
+    "contract": "accreditation",
+    "purpose": "Export history: requested by, date, filters, fields, records, status",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "exportAccreditationData",
+    "contract": "accreditation",
+    "purpose": "Request an export",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getAccreditationExport",
+    "contract": "accreditation",
+    "purpose": "Status and download link",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "runReport",
+    "contract": "reporting",
+    "purpose": "Report over the accreditation data sources",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "exportReportResult",
+    "contract": "reporting",
+    "purpose": "csv or xlsx extract",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1220,6 +1255,22 @@
    "workshopBoard": "wireframes/WS07 ACCREDITATION Board 7.dc.html#bo-682"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 61. 0 of 0 labels bound to a contract property; 7 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "executionId",
+     "from": "navigation"
+    },
+    {
+     "name": "exportId",
+     "from": "navigation"
+    },
+    {
+     "name": "reportId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

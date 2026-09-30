@@ -169,9 +169,14 @@
   "summary": "Which ledger account each credit type sits in",
   "permission": "WALLET_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -191,6 +196,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

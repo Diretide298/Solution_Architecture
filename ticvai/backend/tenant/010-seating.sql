@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS seating.group_request (
     status                            text CONSTRAINT group_request_status_chk CHECK (status IN ('enquiry', 'quoted', 'accepted', 'allocated', 'deposited', 'confirmed', 'cancelled', 'lapsed')),
     quote_expires_at                  timestamptz,
     deposit_amount                    numeric(18,4),
-    order_id                          text,
+    order_id                          uuid,
     scope_path                        ltree NOT NULL
 );
 
@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS seating.import_job (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS seating.reassignment (
     id                                uuid PRIMARY KEY,
-    order_id                          text,
+    order_id                          uuid,
     from_seat_ids                     text[],
     to_seat_ids                       text[],
     reason                            text,
@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS seating.recommendation_rules (
 
 -- One seat, addressable and holdable. 396 rows in the sample manifest is one amphitheatre
 CREATE TABLE IF NOT EXISTS seating.seat (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     section_code                      text NOT NULL,
     row_label                         text NOT NULL,
     seat_number                       text NOT NULL,
@@ -170,7 +170,7 @@ CREATE TABLE IF NOT EXISTS seating.seat_category (
 
 -- A temporary claim on a seat. Expires, which is what stops two channels selling it
 CREATE TABLE IF NOT EXISTS seating.seat_hold (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     performance_id                    uuid NOT NULL,
     seat_ids                          text[] NOT NULL,
     buffered_seat_ids                 text[],

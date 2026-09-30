@@ -1,6 +1,6 @@
 # P17-onboarding-assessment-01 — P17 · Onboarding & Assessment
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 4 operations · 8 schemas · 3 permissions**
 
 Platform P17 TICVAI Sign-up · ships as **ticvai-control** ·
 public audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `PLATFORM_PLAN_MANAGE, PRODUCT_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `SGN-001` | Welcome & Start Your TICVAI Journey | configEditor | 0 | 0 | — |
-| `SGN-002` | Customer & Organization Registration | listDetail | 0 | 0 | — |
-| `SGN-003` | Venue Type & Business Profile | listDetail | 0 | 0 | — |
-| `SGN-004` | Visitor, Capacity & Operational Scale | listDetail | 0 | 0 | — |
-| `SGN-005` | Sales Channel Assessment | configEditor | 0 | 0 | — |
-| `SGN-006` | Ticketing & Product Requirements | configEditor | 0 | 0 | — |
-| `SGN-007` | Access, Queue & Visitor Experience Assessment | listDetail | 0 | 0 | — |
-| `SGN-008` | Additional Business Module Assessment | listDetail | 0 | 0 | — |
-| `SGN-009` | Integration, Payment & Technical Readiness | listDetail | 0 | 0 | — |
-| `SGN-010` | AI Assessment Summary & Handoff | listDetail | 0 | 0 | — |
+| `SGN-001` | Welcome & Start Your TICVAI Journey | configEditor | 1 | 0 | — |
+| `SGN-002` | Customer & Organization Registration | listDetail | 1 | 0 | — |
+| `SGN-003` | Venue Type & Business Profile | listDetail | 1 | 0 | — |
+| `SGN-004` | Visitor, Capacity & Operational Scale | listDetail | 1 | 0 | — |
+| `SGN-005` | Sales Channel Assessment | configEditor | 2 | 0 | — |
+| `SGN-006` | Ticketing & Product Requirements | configEditor | 1 | 0 | — |
+| `SGN-007` | Access, Queue & Visitor Experience Assessment | listDetail | 1 | 0 | — |
+| `SGN-008` | Additional Business Module Assessment | listDetail | 2 | 0 | — |
+| `SGN-009` | Integration, Payment & Technical Readiness | listDetail | 1 | 0 | — |
+| `SGN-010` | AI Assessment Summary & Handoff | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
@@ -150,7 +149,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "scoreVsiAssessment",
+    "contract": "subscription",
+    "purpose": "Begin the assessment",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 21. 0 of 0 labels bound to a contract property; 4 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "isEntryPoint": true,
@@ -222,7 +229,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "submitOnboardingApplication",
+       "label": "Submit",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "submitOnboardingApplication"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The customer organization registration list.",
@@ -243,7 +270,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 22"
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "submitOnboardingApplication",
+    "contract": "subscription",
+    "purpose": "Register the organisation",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 22. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -393,7 +428,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 23 §Visual cards"
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "scoreVsiAssessment",
+    "contract": "subscription",
+    "purpose": "Venue type and business profile",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 23. 0 of 12 labels bound to a contract property; 19 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "entryState": {
    "preloaded": [
@@ -482,7 +525,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "scoreVsiAssessment",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "scoreVsiAssessment"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The visitor capacity operational list.",
@@ -503,7 +565,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 23"
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "scoreVsiAssessment",
+    "contract": "subscription",
+    "purpose": "Visitors, capacity and scale",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 23. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -653,7 +723,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listSaleChannel",
+    "contract": "catalogue",
+    "purpose": "Sales Channel Command Center",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "scoreVsiAssessment",
+    "contract": "subscription",
+    "purpose": "Record the answers and score them",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 24. 0 of 0 labels bound to a contract property; 11 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -823,7 +907,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "scoreVsiAssessment",
+    "contract": "subscription",
+    "purpose": "Ticketing and product needs",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 25. 0 of 0 labels bound to a contract property; 15 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -902,7 +994,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "scoreVsiAssessment",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "scoreVsiAssessment"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The access queue visitor list.",
@@ -923,7 +1034,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 26"
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "scoreVsiAssessment",
+    "contract": "subscription",
+    "purpose": "Access, queue and experience",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 26. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -1002,7 +1121,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listModuleCatalogue",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "scoreVsiAssessment",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "scoreVsiAssessment"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The additional business module list.",
@@ -1023,7 +1167,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 27"
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listModuleCatalogue",
+    "contract": "subscription",
+    "purpose": "Additional modules",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "scoreVsiAssessment",
+    "contract": "subscription",
+    "purpose": "Record the answers",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 27. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -1102,7 +1261,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "scoreVsiAssessment",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "scoreVsiAssessment"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The integration payment technical list.",
@@ -1123,7 +1301,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 28"
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "scoreVsiAssessment",
+    "contract": "subscription",
+    "purpose": "Integration and technical needs",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 28. 0 of 0 labels bound to a contract property; 0 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -1202,7 +1388,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "scoreVsiAssessment",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "scoreVsiAssessment"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The assessment summary handoff list.",
@@ -1223,7 +1428,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 29"
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "scoreVsiAssessment",
+    "contract": "subscription",
+    "purpose": "Score and recommend",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 29. 0 of 0 labels bound to a contract property; 0 of 63 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -1280,7 +1493,108 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
 Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
 
 ```json
-{}
+{
+ "listModuleCatalogue": {
+  "method": "GET",
+  "path": "/module-catalogue",
+  "contract": "subscription",
+  "summary": "Modules, their dependencies and their commercial treatment",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ModuleListing"
+ },
+ "listSaleChannel": {
+  "method": "GET",
+  "path": "/sale-channel",
+  "contract": "catalogue",
+  "summary": "Sales Channel Command Center",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channelType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brand",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "scoreVsiAssessment": {
+  "method": "POST",
+  "path": "/vsi-assessments",
+  "contract": "subscription",
+  "summary": "Score a prospect's answers into a tier and a package",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VsiAssessment",
+  "responds": "VsiResult"
+ },
+ "submitOnboardingApplication": {
+  "method": "POST",
+  "path": "/onboarding-applications",
+  "contract": "subscription",
+  "summary": "A prospect signs themselves up",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "OnboardingApplication",
+  "responds": "OnboardingApplication"
+ }
+}
 ```
 
 ## `schemas.json`
@@ -1288,5 +1602,422 @@ Method, path, parameters, request and response for every operation these screens
 The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
 
 ```json
-{}
+{
+ "ModuleListing": {
+  "type": "object",
+  "x-ticvai-persistence": "subscription.module_listing",
+  "description": "Board 4.6. **A marketplace without a dependency graph sells combinations that cannot be provisioned.**\n**TICVAI configures each module's price here, and tenants are billed per module (decided 29 September, Chinmay).** A usage-priced module (the AI module's tokens) has `pricingBasis` `metered`: `price` is then per `meteredUnitSize` units of `meteredMetric`, and the invoice carries it as a `metered` line.\n",
+  "required": [
+   "moduleCode"
+  ],
+  "properties": {
+   "moduleCode": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "category": {
+    "type": "string",
+    "nullable": true
+   },
+   "requiresModules": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "incompatibleWithModules": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "includedInTiers": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "price": {
+    "x-ticvai-column": "list_price",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "pricingBasis": {
+    "type": "string",
+    "enum": [
+     "included",
+     "flatFee",
+     "perVenue",
+     "perUnit",
+     "revenueShare",
+     "metered"
+    ]
+   },
+   "meteredMetric": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/UsageMetric"
+     }
+    ],
+    "nullable": true,
+    "description": "For `metered`, what is counted (`aiTokens` for the AI module). Null otherwise."
+   },
+   "meteredUnitSize": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "For `metered`, how many units `price` buys (e.g. 1000 tokens). Null otherwise."
+   },
+   "provisioningMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "requiresProfessionalServices": {
+    "type": "boolean",
+    "default": false
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "available",
+     "beta",
+     "deprecated",
+     "withdrawn"
+    ]
+   }
+  }
+ },
+ "OnboardingApplication": {
+  "type": "object",
+  "x-ticvai-persistence": "control.onboarding_application",
+  "description": "BL-165. **`subscription` handles the operator-led path well and has no prospect-led one.** `createTenant` and `provisionCell` assume somebody at Softlabs decided this tenant exists.\nA prospect signing themselves up is a different shape: **nothing is provisioned until they are verified**, because an unverified application that provisions a cell is a cell somebody has to clean up.\n",
+  "required": [
+   "id",
+   "companyName",
+   "contactEmail",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "companyName": {
+    "type": "string"
+   },
+   "contactEmail": {
+    "type": "string",
+    "format": "email"
+   },
+   "contactPhone": {
+    "type": "string",
+    "nullable": true
+   },
+   "countryCode": {
+    "type": "string"
+   },
+   "venueTypeTemplateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**A water park and a theatre need different defaults**, and asking a prospect to configure 300 settings from empty is asking them to leave.\n"
+   },
+   "requestedPlanId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "submitted",
+     "verifying",
+     "approved",
+     "provisioning",
+     "active",
+     "rejected",
+     "abandoned"
+    ]
+   },
+   "trialEndsAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**Trial is a state, not a plan.** A tenant on trial has the plan they will pay for and a date by which they must — modelling it as a separate plan means migrating them at conversion, which is the moment least worth adding risk to.\n"
+   },
+   "rejectionReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "provisionedTenantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "SalesChannelCommandCenterSummary": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Sales Channel Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
+  "properties": {
+   "totalChannels": {
+    "type": "integer",
+    "description": "Total Channels"
+   },
+   "activeChannels": {
+    "type": "integer",
+    "description": "Active Channels"
+   },
+   "inactiveChannels": {
+    "type": "integer",
+    "description": "Inactive Channels"
+   },
+   "channelsInDraft": {
+    "type": "integer",
+    "description": "Channels in Draft"
+   },
+   "channelsWithErrors": {
+    "type": "integer",
+    "description": "Channels With Errors"
+   },
+   "productsDistributed": {
+    "type": "integer",
+    "description": "Products Distributed: distinct products assigned to at least one active channel"
+   },
+   "channelsWithCapacityAlerts": {
+    "type": "integer",
+    "description": "Channels With Capacity Alerts"
+   },
+   "channelsWithPricingIssues": {
+    "type": "integer",
+    "description": "Channels With Pricing Issues"
+   },
+   "scheduledActivations": {
+    "type": "integer",
+    "description": "Scheduled Activations"
+   },
+   "scheduledDeactivations": {
+    "type": "integer",
+    "description": "Scheduled Deactivations"
+   }
+  }
+ },
+ "SalesChannelCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Sales Channel Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "channelId": {
+    "type": "string",
+    "description": "Channel ID"
+   },
+   "channelName": {
+    "type": "string",
+    "description": "Channel Name"
+   },
+   "channelType": {
+    "type": "string",
+    "enum": [
+     "b2cWeb",
+     "b2cMobileApp",
+     "pos",
+     "mobilePos",
+     "flyingPos",
+     "kiosk",
+     "callCentre",
+     "b2bPortal",
+     "reseller",
+     "ota",
+     "api",
+     "partnerPortal",
+     "marketplace",
+     "thirdPartyChannel",
+     "customChannel"
+    ],
+    "description": "Channel Type (pack p.3-4 Channel Types). The type decides which configuration applies (p.6); each type reports under one SalesChannel value (see salesChannel)"
+   },
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "venueScope": {
+    "type": "string",
+    "description": "Venue/Scope: the channel's operational scope level and the name of the scoped item (e.g. a venue name, or Global)"
+   },
+   "products": {
+    "type": "integer",
+    "description": "Products: number of products assigned to the channel"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency: ISO 4217 code",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, configuration, validation, approved, scheduled, active, suspended, disabled or archived (the pack's suggested lifecycle, p.5)"
+   },
+   "publicationStatus": {
+    "type": "string",
+    "description": "Publication Status: unpublished, pendingApproval, scheduled or published (decided 29 September, readiness close-out)"
+   },
+   "integrationStatus": {
+    "type": "string",
+    "description": "Integration Status: notRequired, notConfigured, connected, degraded or offline (decided 29 September, readiness close-out)"
+   },
+   "lastUpdated": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last Updated"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner: the channel's commercial owner (user ID)"
+   },
+   "salesChannel": {
+    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel",
+    "description": "The shared reporting dimension this channel's sales are attributed to (b2cWeb -> guestWeb, b2cMobileApp -> guestApp, the POS types -> pos, callCentre, b2bPortal -> b2b, ota and marketplace -> ota, api, reseller/partnerPortal/thirdPartyChannel -> partner; a custom channel picks one) (decided 29 September, readiness close-out)"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Configuration problems AI flags on this channel (pack p.5, e.g. products assigned without a valid price profile for the channel). Advisory only: nothing is changed until a user acts."
+   }
+  }
+ },
+ "UsageMetric": {
+  "type": "string",
+  "enum": [
+   "venues",
+   "workstations",
+   "activeUsers",
+   "devices",
+   "brandedApps",
+   "aiTokens",
+   "apiCalls",
+   "storageGb",
+   "transactions",
+   "guestProfiles"
+  ]
+ },
+ "VsiAssessment": {
+  "type": "object",
+  "x-ticvai-persistence": "subscription.vsi_assessment",
+  "description": "Board 2 — the ten-screen questionnaire, as data.",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "organisationName": {
+    "type": "string",
+    "nullable": true
+   },
+   "contactEmail": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueType": {
+    "type": "string",
+    "nullable": true
+   },
+   "answers": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "requestedModules": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "submittedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "VsiResult": {
+  "type": "object",
+  "description": "Board 2.10. **A prospect told only their price has been told nothing they can argue with.**\n",
+  "properties": {
+   "assessmentId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "score": {
+    "type": "number"
+   },
+   "tierCode": {
+    "type": "string"
+   },
+   "tierName": {
+    "type": "string"
+   },
+   "factors": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string"
+      },
+      "label": {
+       "type": "string"
+      },
+      "answer": {
+       "type": "string"
+      },
+      "points": {
+       "type": "number"
+      }
+     }
+    }
+   },
+   "recommendedModules": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "recommendedPlanId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "indicativePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  }
+ }
+}
 ```

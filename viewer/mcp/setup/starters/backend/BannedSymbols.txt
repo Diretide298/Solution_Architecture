@@ -2,3 +2,4 @@ P:System.DateTime.Now;Server-local time is meaningless across venues: use DateTi
 P:System.DateTime.Today;Server-local date: use TimeProvider and the venue's time zone
 P:System.DateTime.UtcNow;Use DateTimeOffset.UtcNow (or TimeProvider) so the offset travels with the value
 P:System.DateTimeOffset.Now;Server-local offset: use DateTimeOffset.UtcNow or TimeProvider
+M:System.Guid.NewGuid;Ids are UUIDv7 (ADR-0056): use TICVAI.Domain.Identity.Id.New()

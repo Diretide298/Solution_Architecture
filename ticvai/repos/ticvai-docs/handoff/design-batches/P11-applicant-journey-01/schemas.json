@@ -1,50 +1,411 @@
 {
- "AccreditationBadge": {
+ "AccreditationApplication": {
   "type": "object",
-  "x-ticvai-persistence": "approvals.accreditation_badge",
-  "description": "**Drafted 4 September.** The credential an approved application produces. **Its lifetime is not the approval's** - a badge is revoked, lost or expires while the decision that authorised it still stands.",
+  "x-ticvai-persistence": "accreditation.application",
+  "description": "Board 1.3. **Usually submitted by an organisation on behalf of its people.**",
   "required": [
-   "id"
+   "programmeId"
   ],
   "properties": {
    "id": {
     "type": "string",
     "format": "uuid"
    },
-   "approvalRequestId": {
+   "reference": {
+    "type": "string"
+   },
+   "programmeId": {
     "type": "string",
     "format": "uuid"
    },
-   "holderName": {
+   "categoryCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "applicantType": {
     "type": "string"
    },
-   "zones": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Where this badge admits, which is the whole point of it."
+   "submittedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
    },
-   "state": {
+   "organisationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "subject": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Name, date of birth, nationality, contact — shaped by the requirements matrix."
+   },
+   "requirementStatus": {
+    "type": "array",
+    "readOnly": true,
+    "items": {
+     "type": "object",
+     "properties": {
+      "requirementCode": {
+       "type": "string"
+      },
+      "satisfied": {
+       "type": "boolean"
+      },
+      "documentId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "status": {
     "type": "string",
     "enum": [
-     "issued",
-     "collected",
-     "suspended",
-     "revoked",
+     "draft",
+     "submitted",
+     "underReview",
+     "informationRequested",
+     "approved",
+     "rejected",
+     "withdrawn",
      "expired"
     ]
+   },
+   "decisionReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "missingRequirements": {
+    "type": "array",
+    "readOnly": true,
+    "description": "The requirement codes a reviewer returned the application for, or rejected it over — what the applicant must change before resubmitting",
+    "items": {
+     "type": "string"
+    }
+   },
+   "decisionDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a decision is due — the approvals request's SLA. **A date, not a queue position**"
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "renewsHolderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "12.1.37. Set by `renewAccreditation`; approval extends this holder rather than creating one"
+   },
+   "resubmissionOfApplicationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "12.1.33. The rejected application this one resubmits, so the rejection stays in the record"
+   },
+   "resubmissionNote": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true,
+    "readOnly": true,
+    "description": "What the applicant changed, from `resubmitAccreditationApplication`"
+   },
+   "submittedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "AccreditationCredential": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.credential",
+  "description": "Board 4. **Not the accreditation** — reissuing one re-vets nobody.",
+  "required": [
+   "holderId",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "printedBadge",
+     "mobileCredential",
+     "qr",
+     "nfcCard",
+     "rfidCard",
+     "wristband"
+    ]
+   },
+   "symbology": {
+    "type": "string",
+    "nullable": true,
+    "description": "12.1.22. **How `encodedIdentifier` is carried**, so a reader and a badge renderer agree: `qr` for a QR credential and the default for a `mobileCredential`, a barcode where a printed badge carries one, `nfcNdef` or `rfidEpc` for an encoded card, `none` where nothing is encoded.\n",
+    "enum": [
+     "qr",
+     "dataMatrix",
+     "pdf417",
+     "aztec",
+     "code128",
+     "nfcNdef",
+     "rfidEpc",
+     "none"
+    ]
+   },
+   "serialNumber": {
+    "type": "string",
+    "nullable": true
+   },
+   "encodedIdentifier": {
+    "type": "string",
+    "nullable": true
+   },
+   "badgeTemplateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
    },
    "issuedAt": {
     "type": "string",
     "format": "date-time"
    },
-   "expiresAt": {
+   "issuedBy": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "activatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pendingPrint",
+     "issued",
+     "active",
+     "lost",
+     "replaced",
+     "revoked",
+     "expired"
+    ]
+   },
+   "replacesCredentialId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "replacementCount": {
+    "type": "integer",
+    "default": 0
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "AccreditationCredentialDelivery": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.mobile_credential_delivery",
+  "description": "12.1.21. **Issuing a mobile credential and getting it onto a phone are two acts**, and the second is recorded so *\"I never got it\"* has an answer. Written by `deliverAccreditationCredential` (the accreditation team sends it) and `issueMyAccreditationWalletPass` (the holder adds it to a wallet).\n",
+  "required": [
+   "credentialId",
+   "channel"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "credentialId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "channel": {
+    "type": "string",
+    "enum": [
+     "email",
+     "sms",
+     "holderApp",
+     "appleWallet",
+     "googleWallet"
+    ]
+   },
+   "destinationMasked": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The address or number used, masked (`j***@agency.com`). Always the holder's own"
+   },
+   "walletPassSerial": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "walletPassUrl": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Signed and expiring; adds the pass to the wallet"
+   },
+   "status": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "queued",
+     "sent",
+     "delivered",
+     "opened",
+     "failed",
+     "superseded"
+    ]
+   },
+   "failureReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "requestedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "deliveredAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "AccreditationDocument": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.document",
+  "description": "Board 2.5. **Submitted against a named requirement, not into a folder.**",
+  "required": [
+   "requirementCode",
+   "assetId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "applicationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "requirementCode": {
+    "type": "string"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "submittedAt": {
     "type": "string",
     "format": "date-time"
    },
-   "revokedReason": {
+   "status": {
+    "type": "string",
+    "enum": [
+     "submitted",
+     "verified",
+     "rejected",
+     "expired"
+    ]
+   },
+   "verifiedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "verifiedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "rejectionReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "**An insurance certificate valid until March accredits somebody until March**, whatever the programme says.\n"
+   },
+   "scopePath": {
     "type": "string"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
    }
   }
  }

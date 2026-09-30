@@ -44,6 +44,45 @@
   "requestBody": null,
   "responds": "KnowledgeCollection"
  },
+ "listKnowledgeGaps": {
+  "method": "GET",
+  "path": "/knowledge-gaps",
+  "contract": "ai",
+  "summary": "Questions the assistant could not answer",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "audience",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listMessageTemplates": {
   "method": "GET",
   "path": "/message-templates",

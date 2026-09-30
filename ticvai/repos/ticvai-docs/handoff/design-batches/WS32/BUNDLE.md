@@ -1943,6 +1943,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "ApprovalExceptionServiceRecoveryManagementInput",
@@ -2123,6 +2128,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "AfterSalesFinancialSettlementAdjustmentWorkspaceInput",
@@ -2138,6 +2148,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -2161,6 +2176,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "CancellationPartialCancellationPolicyConfigurationInput",
@@ -2176,6 +2196,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -2199,6 +2224,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "RefundCalculationPolicyInput",
@@ -2214,6 +2244,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -3204,8 +3239,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "A ULID, matching `TicketStatus.ticketId` — **stable for the life of the ticket and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement with a new `mediaCode`.\n**This is the ticket id.** Wherever an operation takes a `ticketId` or `ticketIds` — `lookupTicket`, `listScans`, `ScanEvent`, the offline package and `transferOrderTickets` — it is this value. An order line's `entitlementIds` are the ticket ids of that line.\n"
+    "format": "uuid",
+    "description": "A UUIDv7, matching `TicketStatus.ticketId` — **stable for the life of the ticket and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement with a new `mediaCode`.\n**This is the ticket id.** Wherever an operation takes a `ticketId` or `ticketIds` — `lookupTicket`, `listScans`, `ScanEvent`, the offline package and `transferOrderTickets` — it is this value. An order line's `entitlementIds` are the ticket ids of that line.\n"
    },
    "templateId": {
     "type": "string",
@@ -3218,8 +3253,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "The order's id, a ULID as in `/orders/{orderId}` (`orders.sales_order.id`)."
+    "format": "uuid",
+    "description": "The order's id, a UUIDv7 as in `/orders/{orderId}` (`orders.sales_order.id`)."
    },
    "orderLineId": {
     "type": "string",
@@ -3257,7 +3292,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "validTo": {
     "type": "string",
     "format": "date-time",
-    "description": "**Resolved at issue from the template, then owned here.** A freeze extends it, a reissue replaces it, and neither reaches back to the template.\n"
+    "description": "**Resolved at issue from the template, then owned here.** A freeze extends it, a reissue replaces it, and neither reaches back to the template.\n**What the pre-expiry notice is measured from** (29 September, build pass, group G2; 5.5.30). A daily run in access publishes `entitlement.expiringSoon` once per entitlement and `validTo` when an entitlement in `issued` or `partiallyConsumed` comes within its template's `expiryNoticeDays` (`catalogue.EntitlementTemplate`), and not for one bought inside that window. Marketing turns it into the reminder (a `MessageTrigger` on the event, or a triggered campaign on `entitlementExpiring`); access only says the date is near. A freeze or renewal that moves `validTo` raises the next notice once.\n"
    },
    "entriesUsed": {
     "type": "integer",
@@ -3338,7 +3373,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "supersedesEntitlementId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "For a reissue or a resale. **The chain is traceable** — a ticket appearing from nowhere is indistinguishable from a fraudulent one.\n"
    },
@@ -3412,8 +3447,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "The client ULID from `CreateOrderRequest.id`."
+    "format": "uuid",
+    "description": "The client UUIDv7 from `CreateOrderRequest.id`."
    },
    "orderNumber": {
     "type": "string",
@@ -3520,7 +3555,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "shiftId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "subjectId": {
@@ -3711,7 +3746,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ]
  },
  "OrderLine": {
-  "x-ticvai-persistence": "orders.order_line + orders.order_line_eligibility",
+  "x-ticvai-persistence": "orders.order_line + orders.order_line_eligibility + orders.order_line_discount",
+  "x-ticvai-retired-columns": [
+   "promotion_id",
+   "name",
+   "reason"
+  ],
   "allOf": [
    {
     "$ref": "#/components/schemas/CreateOrderLine"
@@ -3755,7 +3795,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "description": "The entitlements this line issued. **These are the ticket ids** — `transferOrderTickets.ticketIds` and `reprintOrder.reissuedTicketIds` take and return them.",
       "items": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+       "format": "uuid"
       }
      },
      "crossRegionRightIds": {
@@ -3771,6 +3811,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "default": 0,
       "readOnly": true,
       "description": "How many times this line's tickets were reprinted or resent. `reprintOrder` increments it; repeated reprints are the signal worth surfacing."
+     },
+     "venueId": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order."
+     },
+     "discounts": {
+      "type": "array",
+      "readOnly": true,
+      "description": "**The discounts applied to this line, one row each** (system-design review SD-008, 29 September). Until then a discount object was flattened into the line as `promotion_id NOT NULL`, so a line with no promotion could not be inserted. A line with no discount has none.",
+      "items": {
+       "$ref": "#/components/schemas/OrderLineDiscount"
+      }
      }
     }
    }
@@ -3805,11 +3859,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "tender": {
     "$ref": "#/components/schemas/TenderKind"
@@ -3876,7 +3930,45 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "providerReference": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "The provider's own id for the charge (Stripe PaymentIntent, NI order reference). What `payments.receivePaymentProviderWebhook` matches an incoming event on (SD-034)."
+   },
+   "providerIdempotencyKey": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The idempotency key sent to the provider, which is this payment's `id` (SD-034, 29 September). A retried provider call cannot charge twice."
+   },
+   "terminalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The card terminal a till payment ran on (ECR flow, SD-034)."
+   },
+   "nextAction": {
+    "type": "object",
+    "nullable": true,
+    "x-ticvai-persisted": false,
+    "description": "**What the caller does while the payment is `pendingConfirmation`** (SD-034, 29 September). `redirect`: send the browser to `url` (3-D Secure challenge or hosted page); the provider returns the guest to `returnUrl` and the result arrives by webhook. `terminal`: the card terminal has been instructed; wait for its result. Null once the payment has an outcome.",
+    "properties": {
+     "kind": {
+      "type": "string",
+      "enum": [
+       "redirect",
+       "terminal"
+      ]
+     },
+     "url": {
+      "type": "string",
+      "format": "uri",
+      "nullable": true
+     },
+     "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
    },
    "lastInquiryAt": {
     "type": "string",

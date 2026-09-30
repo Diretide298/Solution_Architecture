@@ -1,6 +1,6 @@
 # P06-rentals-03 — P06 · Rentals (3 of 3)
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 6 operations · 10 schemas · 3 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -47,11 +47,11 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `ASSET_MANAGE, RENTAL_OPERATE, RENTAL_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **3 of these operations work offline**: recordRentalInspection, returnRental, setAssetStatus
+  — and the rest do not. A surface that looks the same online and off is lying.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +61,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `EMP-091` | Rental Return Command Center | commandCentre | 0 | 0 | — |
-| `EMP-092` | Return Scan & Rental Retrieval | listDetail | 0 | 0 | — |
-| `EMP-093` | Return Summary & Actual Return Time | listDetail | 0 | 0 | — |
-| `EMP-094` | Post-Rental Condition Inspection | listDetail | 0 | 0 | — |
-| `EMP-095` | Before vs After Condition Comparison | listDetail | 0 | 0 | — |
-| `EMP-096` | Damage Assessment & Charge Workflow | listDetail | 0 | 0 | — |
-| `EMP-097` | Partial Return & Missing Equipment | listDetail | 0 | 0 | — |
-| `EMP-098` | Late Fees, Damage Fees & Final Settlement | listDetail | 0 | 0 | — |
-| `EMP-099` | Deposit Release, Capture & Customer Confirmation | listDetail | 0 | 0 | — |
-| `EMP-100` | Return Completion & Equipment Disposition | listDetail | 0 | 0 | — |
+| `EMP-091` | Rental Return Command Center | commandCentre | 1 | 0 | — |
+| `EMP-092` | Return Scan & Rental Retrieval | listDetail | 1 | 0 | — |
+| `EMP-093` | Return Summary & Actual Return Time | listDetail | 1 | 0 | — |
+| `EMP-094` | Post-Rental Condition Inspection | listDetail | 1 | 0 | — |
+| `EMP-095` | Before vs After Condition Comparison | listDetail | 1 | 0 | — |
+| `EMP-096` | Damage Assessment & Charge Workflow | listDetail | 1 | 0 | — |
+| `EMP-097` | Partial Return & Missing Equipment | listDetail | 1 | 0 | — |
+| `EMP-098` | Late Fees, Damage Fees & Final Settlement | listDetail | 1 | 0 | — |
+| `EMP-099` | Deposit Release, Capture & Customer Confirmation | listDetail | 1 | 0 | — |
+| `EMP-100` | Return Completion & Equipment Disposition | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch
 

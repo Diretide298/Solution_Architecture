@@ -11,9 +11,9 @@ emittedBy:
 - createRefund
 payload:
 - field: orderId
-  type: string
+  type: uuid
 - field: refundId
-  type: string
+  type: uuid
 - field: venueId
   type: uuid
 - field: amount

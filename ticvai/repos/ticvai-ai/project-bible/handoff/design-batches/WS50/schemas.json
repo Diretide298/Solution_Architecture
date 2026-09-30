@@ -22,10 +22,6 @@
     ],
     "description": "Vocabulary listed under Channels."
    },
-   "eEE": {
-    "type": "string",
-    "description": "e e e"
-   },
    "venueSpecificAvailability": {
     "type": "string",
     "description": "Venue-specific availability"
@@ -141,51 +137,126 @@
    }
   }
  },
+ "BundleCapacityPolicy": {
+  "x-ticvai-persistence": "promotions.bundle_capacity_policy",
+  "type": "object",
+  "description": "How a bundle draws on capacity, per channel where it differs: the capacity source, dedicated or shared and hard or soft allocation, the ceiling, how long a hold lasts, the booking cut-off, and whether overbooking or a waitlist is allowed (Capacity Pool & Reservation Manager; Bundle Availability by Channel, Venue & Partner). The capacity itself is the catalogue's (`catalogue.channel_capacity`, `catalogue.inventory_hold`). A row with no channel is the bundle's default. (DM5, 29 September: data model for the agreed operations)\n**Written by setBundleCapacityPolicy; read by listBundleCapacityPolicies, listCapacityPoolReservation and listBundleAvailabilityChannel** (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "bundleId",
+   "capacitySource"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "bundleId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+     }
+    ],
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where the policy differs by venue for a multi-venue bundle."
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "capacitySource": {
+    "type": "string",
+    "enum": [
+     "sharedPool",
+     "dedicatedBundleAllocation",
+     "channelAllocation",
+     "partnerAllocation",
+     "eventCapacity",
+     "timeslotCapacity",
+     "seatInventory",
+     "resourceCapacity"
+    ]
+   },
+   "allocationMode": {
+    "type": "string",
+    "enum": [
+     "hard",
+     "soft"
+    ],
+    "default": "hard",
+    "description": "Hard allocation is ring-fenced for the bundle; soft is released back when unsold."
+   },
+   "capacityCeiling": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "holdDurationMinutes": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "How long a temporary reservation of the components lasts."
+   },
+   "bookingCutoffMinutes": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Minutes before the experience after which the bundle is no longer sold."
+   },
+   "allowOverbooking": {
+    "type": "boolean",
+    "default": false
+   },
+   "allowWaitlist": {
+    "type": "boolean",
+    "default": false
+   }
+  }
+ },
  "BundleSellabilityDependencyRuleEngineView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Bundle Sellability & Dependency Rule Engine displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "allComponentsRequired": {
-    "type": "boolean",
-    "description": "All components required"
-   },
-   "atLeastXOfY": {
+   "dependencyRule": {
     "type": "string",
-    "description": "At least X of Y"
+    "enum": [
+     "allComponentsRequired",
+     "atLeastXOfY",
+     "atLeastOneFromCategory",
+     "optionalComponent",
+     "conditionalComponent",
+     "substituteAllowed",
+     "partnerComponentRequired"
+    ],
+    "description": "The sellability rule."
    },
-   "atLeastOneFromCategory": {
+   "bundleId": {
     "type": "string",
-    "description": "At least one from category"
+    "description": "Bundle ID"
    },
-   "optionalComponent": {
-    "type": "string",
-    "description": "Optional component"
+   "componentIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Components the rule covers"
    },
-   "conditionalComponent": {
-    "type": "string",
-    "description": "Conditional component"
-   },
-   "substituteAllowed": {
-    "type": "boolean",
-    "description": "Substitute allowed"
-   },
-   "partnerComponentRequired": {
-    "type": "boolean",
-    "description": "Partner component required"
-   },
-   "waterParkMandatory": {
-    "type": "string",
-    "description": "Water Park — Mandatory"
-   },
-   "aquariumMandatory": {
-    "type": "string",
-    "description": "Aquarium — Mandatory"
-   },
-   "photoOptional": {
-    "type": "string",
-    "description": "Photo — Optional"
+   "minimumCount": {
+    "type": "integer",
+    "description": "For atLeastXOfY: X"
    }
   }
  },
@@ -195,54 +266,6 @@
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Capacity Pool & Reservation Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "aquariumRemainingCapacity": {
-    "type": "integer",
-    "description": "Aquarium remaining capacity (the pack shows 100)"
-   },
-   "standaloneSales": {
-    "type": "integer",
-    "description": "Standalone sales (the pack shows 60)"
-   },
-   "held": {
-    "type": "string",
-    "description": "Held (the pack shows 5)"
-   },
-   "remainingSellable": {
-    "type": "string",
-    "description": "Remaining sellable (the pack shows 10)"
-   },
-   "sharedPool": {
-    "type": "string",
-    "description": "Shared pool"
-   },
-   "dedicatedBundleAllocation": {
-    "type": "string",
-    "description": "Dedicated bundle allocation"
-   },
-   "channelAllocation": {
-    "type": "string",
-    "description": "Channel allocation"
-   },
-   "partnerAllocation": {
-    "type": "string",
-    "description": "Partner allocation"
-   },
-   "eventCapacity": {
-    "type": "integer",
-    "description": "Event capacity"
-   },
-   "timeslotCapacity": {
-    "type": "integer",
-    "description": "Timeslot capacity"
-   },
-   "seatInventory": {
-    "type": "string",
-    "description": "Seat inventory"
-   },
-   "resourceCapacity": {
-    "type": "integer",
-    "description": "Resource capacity"
-   },
    "temporaryReservation": {
     "type": "string",
     "description": "Temporary reservation"
@@ -268,9 +291,19 @@
     "type": "string",
     "description": "Waitlist behavior"
    },
-   "capacityAutomaticallyReleased": {
-    "type": "integer",
-    "description": "Capacity automatically released"
+   "capacitySource": {
+    "type": "string",
+    "enum": [
+     "sharedPool",
+     "dedicatedBundleAllocation",
+     "channelAllocation",
+     "partnerAllocation",
+     "eventCapacity",
+     "timeslotCapacity",
+     "seatInventory",
+     "resourceCapacity"
+    ],
+    "description": "Capacity source."
    }
   }
  },
@@ -280,93 +313,56 @@
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Component Inventory & Availability Matrix displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "tRyTyLe": {
+   "availabilitySource": {
     "type": "string",
-    "description": "t ry ty le"
+    "enum": [
+     "ticketInventory",
+     "attractionCapacity",
+     "eventCapacity",
+     "seatInventory",
+     "timeslots",
+     "fBAvailability",
+     "retailStock",
+     "resourceAvailability",
+     "parking",
+     "rental",
+     "externalPartnerApi"
+    ],
+    "description": "Where the component's availability comes from."
    },
-   "dE": {
+   "componentStatus": {
     "type": "string",
-    "description": "d e"
+    "enum": [
+     "available",
+     "limited",
+     "low",
+     "soldOut",
+     "closed",
+     "suspended",
+     "unpublished",
+     "apiUnavailable"
+    ],
+    "description": "Component status."
    },
-   "souvenir0Open": {
+   "componentId": {
+    "type": "string",
+    "description": "Component ID"
+   },
+   "componentName": {
+    "type": "string",
+    "description": "Component"
+   },
+   "inventory": {
     "type": "integer",
-    "description": "Souvenir 0 — Open"
+    "description": "Inventory"
    },
-   "ticketInventory": {
-    "type": "string",
-    "description": "Ticket inventory"
-   },
-   "attractionCapacity": {
+   "capacity": {
     "type": "integer",
-    "description": "Attraction capacity"
+    "description": "Capacity"
    },
-   "eventCapacity": {
-    "type": "integer",
-    "description": "Event capacity"
-   },
-   "seatInventory": {
+   "schedule": {
     "type": "string",
-    "description": "Seat inventory"
-   },
-   "timeslots": {
-    "type": "string",
-    "description": "Timeslots"
-   },
-   "fBAvailability": {
-    "type": "string",
-    "description": "F&B availability"
-   },
-   "retailStock": {
-    "type": "string",
-    "description": "Retail stock"
-   },
-   "resourceAvailability": {
-    "type": "string",
-    "description": "Resource availability"
-   },
-   "parking": {
-    "type": "string",
-    "description": "Parking"
-   },
-   "rental": {
-    "type": "string",
-    "description": "Rental"
-   },
-   "externalPartnerApi": {
-    "type": "string",
-    "description": "External partner API"
-   },
-   "available": {
-    "type": "string",
-    "description": "Available"
-   },
-   "limited": {
-    "type": "string",
-    "description": "Limited"
-   },
-   "low": {
-    "type": "string",
-    "description": "Low"
-   },
-   "soldOut": {
-    "type": "string",
-    "description": "Sold Out"
-   },
-   "closed": {
-    "type": "integer",
-    "description": "Closed"
-   },
-   "suspended": {
-    "type": "string",
-    "description": "Suspended"
-   },
-   "unpublished": {
-    "type": "string",
-    "description": "Unpublished"
-   },
-   "apiUnavailable": {
-    "type": "string",
-    "description": "API Unavailable"
+    "description": "Schedule"
    }
   }
  },
@@ -424,41 +420,18 @@
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Recovered Revenue"
    },
-   "healthy": {
-    "type": "string",
-    "description": "Healthy"
-   },
-   "warning": {
-    "type": "string",
-    "description": "Warning"
-   },
-   "critical": {
-    "type": "string",
-    "description": "Critical"
-   },
    "unavailable": {
     "type": "string",
     "description": "Unavailable"
    },
-   "waterParkAvailable": {
+   "health": {
     "type": "string",
-    "description": "Water Park — Available"
-   },
-   "aquariumAvailable": {
-    "type": "string",
-    "description": "Aquarium — Available"
-   },
-   "familyMealLowStock": {
-    "type": "string",
-    "description": "Family Meal — Low Stock"
-   },
-   "photoAvailable": {
-    "type": "string",
-    "description": "Photo — Available"
-   },
-   "bundleHealthWarning": {
-    "type": "string",
-    "description": "Bundle Health: WARNING"
+    "enum": [
+     "healthy",
+     "warning",
+     "critical"
+    ],
+    "description": "Bundle health."
    }
   }
  },
@@ -537,30 +510,6 @@
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Dynamic Bundle Simulation & AI Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "aquariumUnavailable": {
-    "type": "string",
-    "description": "Aquarium unavailable"
-   },
-   "aquariumRequiredSubstituteAllowed": {
-    "type": "boolean",
-    "description": "Aquarium required → Substitute allowed"
-   },
-   "observationDeckAvailable": {
-    "type": "string",
-    "description": "Observation Deck available"
-   },
-   "aed20": {
-    "type": "string",
-    "description": "+AED 20"
-   },
-   "customerApprovalRequired": {
-    "type": "boolean",
-    "description": "Customer approval required"
-   },
-   "bundleRemainsSellable": {
-    "type": "string",
-    "description": "Bundle remains sellable"
-   },
    "bundleStatus": {
     "type": "integer",
     "description": "Bundle status"
@@ -592,91 +541,6 @@
    "revenueImpact": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Revenue impact"
-   },
-   "beforeRecommendingSubstitutions": {
-    "type": "string",
-    "description": "before recommending substitutions"
-   },
-   "level1RecommendOnly": {
-    "type": "string",
-    "description": "Level 1 — Recommend Only"
-   },
-   "humanApproves": {
-    "type": "string",
-    "description": "Human approves"
-   },
-   "level2PreApprovedAutomation": {
-    "type": "string",
-    "description": "Level 2 — Pre-Approved Automation"
-   },
-   "productStatusAndInventory": {
-    "type": "string",
-    "description": "Product status and inventory"
-   },
-   "attractionEventCapacity": {
-    "type": "integer",
-    "description": "Attraction/event capacity"
-   },
-   "seatAvailabilityWhereIncluded": {
-    "type": "string",
-    "description": "Seat availability where included"
-   },
-   "resourceAvailability": {
-    "type": "string",
-    "description": "Resource availability"
-   },
-   "menuAvailability": {
-    "type": "string",
-    "description": "Menu availability"
-   },
-   "physicalInventory": {
-    "type": "string",
-    "description": "Physical inventory"
-   },
-   "membershipBasedComponents": {
-    "type": "string",
-    "description": "Membership-based components"
-   },
-   "entitlementRedemptionState": {
-    "type": "string",
-    "description": "Entitlement/redemption state"
-   },
-   "realTimePricing": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Real-time pricing"
-   },
-   "promotionQualification": {
-    "type": "string",
-    "description": "Promotion qualification"
-   },
-   "checkoutPaymentCoordination": {
-    "type": "string",
-    "description": "Checkout/payment coordination"
-   },
-   "partnerAllocation": {
-    "type": "string",
-    "description": "Partner allocation"
-   },
-   "externalAvailability": {
-    "type": "string",
-    "description": "External availability"
-   },
-   "commercialImpact": {
-    "type": "string",
-    "description": "Commercial impact"
-   },
-   "whatIsTheBundle": {
-    "type": "string",
-    "description": "WHAT IS THE BUNDLE?"
-   },
-   "change": {
-    "type": "string",
-    "description": "CHANGE?"
-   },
-   "matrixCoverageBoard6": {
-    "type": "string",
-    "description": "Matrix Coverage — Board 6"
    }
   }
  },
@@ -706,30 +570,6 @@
     "type": "string",
     "description": "Fallback action"
    },
-   "soldOut": {
-    "type": "string",
-    "description": "Sold out"
-   },
-   "capacityExhausted": {
-    "type": "integer",
-    "description": "Capacity exhausted"
-   },
-   "productSuspended": {
-    "type": "string",
-    "description": "Product suspended"
-   },
-   "venueClosed": {
-    "type": "integer",
-    "description": "Venue closed"
-   },
-   "externalApiUnavailable": {
-    "type": "string",
-    "description": "External API unavailable"
-   },
-   "inventoryBelowThreshold": {
-    "type": "integer",
-    "description": "Inventory below threshold"
-   },
    "maintainsSameBundlePrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Maintains same bundle price"
@@ -749,6 +589,95 @@
    "requiresOperatorApproval": {
     "type": "string",
     "description": "Requires operator approval"
+   },
+   "substitutionTriggers": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "soldOut",
+      "capacityExhausted",
+      "productSuspended",
+      "venueClosed",
+      "externalApiUnavailable",
+      "inventoryBelowThreshold"
+     ]
+    },
+    "description": "When substitution may occur."
+   }
+  }
+ },
+ "InventoryKitComponent": {
+  "x-ticvai-persistence": "inventory.kit_component",
+  "type": "object",
+  "description": "4.4.20. One component of a kit and the quantity one kit consumes.",
+  "required": [
+   "componentItemId",
+   "quantity"
+  ],
+  "properties": {
+   "kitItemId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "componentItemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "quantity": {
+    "type": "number",
+    "exclusiveMinimum": 0
+   },
+   "unit": {
+    "type": "string",
+    "nullable": true,
+    "description": "The component's base unit where omitted."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Written at the kit item's venue scope."
+   }
+  }
+ },
+ "InventoryKitDefinition": {
+  "x-ticvai-persistence": "none — composed of the item's inventory.kit_component rows",
+  "type": "object",
+  "description": "4.4.20. Also the `setInventoryKitDefinition` body.",
+  "required": [
+   "components"
+  ],
+  "properties": {
+   "kitItemId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "components": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/InventoryKitComponent"
+    }
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
    }
   }
  },
@@ -758,41 +687,31 @@
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Real-Time Availability & Checkout Validation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "productActive": {
-    "type": "integer",
-    "description": "Product active"
+   "failedChecks": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "productInactive",
+      "inventoryUnavailable",
+      "capacityUnavailable",
+      "timeslotUnavailable",
+      "resourceUnavailable",
+      "priceInvalid",
+      "promotionInvalid",
+      "partnerComponentInvalid",
+      "componentMappingInvalid"
+     ]
+    },
+    "description": "Checkout validations that failed; empty means the bundle is sellable."
    },
-   "inventoryAvailable": {
+   "bundleId": {
     "type": "string",
-    "description": "Inventory available"
+    "description": "Bundle ID"
    },
-   "capacityAvailable": {
-    "type": "integer",
-    "description": "Capacity available"
-   },
-   "timeslotAvailable": {
-    "type": "string",
-    "description": "Timeslot available"
-   },
-   "resourceAvailable": {
-    "type": "string",
-    "description": "Resource available"
-   },
-   "priceValid": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price valid"
-   },
-   "promotionValid": {
-    "type": "string",
-    "description": "Promotion valid"
-   },
-   "partnerComponentValid": {
-    "type": "string",
-    "description": "Partner component valid"
-   },
-   "componentMappingValid": {
-    "type": "string",
-    "description": "Component mapping valid"
+   "sellable": {
+    "type": "boolean",
+    "description": "Whether the bundle can be sold now"
    }
   }
  }

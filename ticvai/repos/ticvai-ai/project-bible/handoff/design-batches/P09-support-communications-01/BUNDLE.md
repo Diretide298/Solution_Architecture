@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 4 permissions apply here:
   `ANNOUNCEMENT_PUBLISH, PLATFORM_RELEASE_MANAGE, PLATFORM_RELEASE_VIEW, WORKFORCE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **1 of these operations work offline**: listAnnouncements
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,8 +60,8 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-035` | Support & Escalation Console | listDetail | 2 | 0 | — |
-| `ADM-036` | Platform Notification Broadcast | listDetail | 4 | 0 | — |
+| `ADM-035` | Support & Escalation Console | listDetail | 2 | 1 | — |
+| `ADM-036` | Platform Notification Broadcast | listDetail | 4 | 2 | — |
 
 ---
 
@@ -91,34 +90,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "inferred": true,
    "exitTo": [
     "ADM-001",
-    "ADM-002",
-    "ADM-003"
+    "ADM-002"
    ],
    "transitions": [
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-035 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
-    },
-    {
-     "to": "ADM-003",
-     "trigger": "Cross-Tenant Health Dashboard",
-     "carries": [
-      "cellId",
-      "rightId"
-     ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-035 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     }
    ]
   },
@@ -139,7 +122,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every support escalation console",
+       "label": "Every support notice",
        "bindsTo": "SupportNotice",
        "columns": [
         "SupportNotice.id",
@@ -152,6 +135,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listSupportNotices",
        "provenance": "contract platform-ops.yaml GET /support-notices"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishSupportNotice",
+       "notes": "Declares `publishSupportNotice`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -161,7 +150,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected support escalation console",
+       "label": "The selected support notice",
        "bindsTo": "SupportNotice",
        "columns": [
         "SupportNotice.id",
@@ -183,7 +172,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Publish",
+       "label": "Publish support notice",
        "operation": "publishSupportNotice",
        "provenance": "contract platform-ops.yaml POST /support-notices"
       },
@@ -194,49 +183,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "authored — required by check-screens"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listSupportNotices",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "publishSupportNotice",
-       "label": "Publish support notice",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "publishSupportNotice",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "publishGate",
-       "impliedBy": "publishSupportNotice",
-       "notes": "Declares `publishSupportNotice`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The support escalation console list.",
    "error": "Could not load. Names which read failed and leaves the support escalation console untouched.",
-   "emptyFirstRun": "No support escalation console yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the support escalation console are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No support escalation console yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listSupportNotices` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -270,6 +225,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-035"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formPublishSupportNotice",
+    "component": "modal",
+    "trigger": "Publish support notice",
+    "body": "**Collects what `publishSupportNotice` sends before it is called.** Required: `id`, `supportEndsAt`, `publishedAt`. Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SupportNotice",
+    "confirm": {
+     "label": "Publish support notice",
+     "operation": "publishSupportNotice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "supportEndsAt",
+      "publishedAt",
+      "message",
+      "affectedTenantIds",
+      "publishedByPrincipalId",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract platform-ops.yaml POST /support-notices"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -314,34 +295,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "inferred": true,
    "exitTo": [
     "ADM-001",
-    "ADM-002",
-    "ADM-003"
+    "ADM-002"
    ],
    "transitions": [
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-036 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
-    },
-    {
-     "to": "ADM-003",
-     "trigger": "Cross-Tenant Health Dashboard",
-     "carries": [
-      "cellId",
-      "rightId"
-     ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-036 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     }
    ]
   },
@@ -353,13 +318,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listSupportNotices` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "Push live platform notification broadcast for this venue.",
-  "gaps": [
-   {
-    "operation": "listAnnouncements",
-    "why": "**1 declared operation reach no component on this screen**: listAnnouncements. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -369,7 +327,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every platform notification broadcast",
+       "label": "Every support notice",
        "bindsTo": "SupportNotice",
        "columns": [
         "SupportNotice.id",
@@ -382,6 +340,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listSupportNotices",
        "provenance": "contract platform-ops.yaml GET /support-notices"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every announcement",
+       "bindsTo": "Announcement",
+       "columns": [
+        "Announcement.id",
+        "Announcement.title",
+        "Announcement.body",
+        "Announcement.kind",
+        "Announcement.venueIds",
+        "Announcement.departmentIds",
+        "Announcement.roleIds",
+        "Announcement.requiresAcknowledgement",
+        "Announcement.expiresAt",
+        "Announcement.publishedByPrincipalId",
+        "Announcement.publishedAt",
+        "Announcement.locale"
+       ],
+       "operation": "listAnnouncements",
+       "provenance": "contract workforce.yaml GET /announcements"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishSupportNotice",
+       "notes": "Declares `publishSupportNotice`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -391,7 +376,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected platform notification broadcast",
+       "label": "The selected support notice",
        "bindsTo": "SupportNotice",
        "columns": [
         "SupportNotice.id",
@@ -413,13 +398,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Publish",
+       "label": "Publish support notice",
        "operation": "publishSupportNotice",
        "provenance": "contract platform-ops.yaml POST /support-notices"
       },
       {
        "kind": "secondaryButton",
-       "label": "Publish",
+       "label": "Publish announcement",
        "operation": "publishAnnouncement",
        "provenance": "contract workforce.yaml POST /announcements"
       },
@@ -430,27 +415,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "authored — required by check-screens"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "publishGate",
-       "impliedBy": "publishSupportNotice",
-       "notes": "Declares `publishSupportNotice`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The platform notification broadcast list.",
    "error": "Could not load. Names which read failed and leaves the platform notification broadcast untouched.",
-   "emptyFirstRun": "No platform notification broadcast yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the platform notification broadcast are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No platform notification broadcast yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listSupportNotices` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -499,6 +472,61 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-036"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formPublishSupportNotice",
+    "component": "modal",
+    "trigger": "Publish support notice",
+    "body": "**Collects what `publishSupportNotice` sends before it is called.** Required: `id`, `supportEndsAt`, `publishedAt`. Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SupportNotice",
+    "confirm": {
+     "label": "Publish support notice",
+     "operation": "publishSupportNotice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "supportEndsAt",
+      "publishedAt",
+      "message",
+      "affectedTenantIds",
+      "publishedByPrincipalId",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract platform-ops.yaml POST /support-notices"
+   },
+   {
+    "id": "formPublishAnnouncement",
+    "component": "modal",
+    "trigger": "Publish announcement",
+    "body": "**Collects what `publishAnnouncement` sends before it is called.** Required: `title`, `body`, `kind`, `publishedAt`. Optional: `id`, `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`, `expiresAt`, `publishedByPrincipalId`, `locale`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "Announcement",
+    "confirm": {
+     "label": "Publish announcement",
+     "operation": "publishAnnouncement"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "title",
+      "body",
+      "kind",
+      "publishedAt",
+      "id",
+      "venueIds",
+      "departmentIds",
+      "roleIds",
+      "requiresAcknowledgement",
+      "expiresAt",
+      "publishedByPrincipalId",
+      "locale"
+     ]
+    },
+    "provenance": "contract workforce.yaml POST /announcements"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -660,6 +688,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "requiresAcknowledgement": {
     "type": "boolean"
+   },
+   "deliveryChannels": {
+    "type": "array",
+    "description": "How it reaches people (29 September, build, 18.1.5). `inApp` always; `push` to the targeted people's registered staff phones (tenancy `RegisteredDevice`, kind `mobileHandset`). `emergency` is sent by both whatever is set here.\n",
+    "items": {
+     "type": "string",
+     "enum": [
+      "inApp",
+      "push"
+     ]
+    },
+    "default": [
+     "inApp",
+     "push"
+    ]
    },
    "expiresAt": {
     "type": "string",

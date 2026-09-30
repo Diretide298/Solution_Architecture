@@ -298,6 +298,13 @@
     "invalidates": [
      "listAccessSecurityFraud"
     ]
+   },
+   {
+    "operationId": "getAccessRiskScore",
+    "contract": "access",
+    "purpose": "Risk score behind an alert's identity or credential",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1431,6 +1438,13 @@
     "invalidates": [
      "listAccessRiskScoring"
     ]
+   },
+   {
+    "operationId": "getAccessRiskScore",
+    "contract": "access",
+    "purpose": "Look up the calculated score of a guest, credential or device with its signals",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {

@@ -350,6 +350,20 @@
     "purpose": "The application",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "The application being decided",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAccreditationDocuments",
+    "contract": "accreditation",
+    "purpose": "The application's documents",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -841,6 +855,27 @@
      "listAccreditationApplications",
      "listAccreditationHolders"
     ]
+   },
+   {
+    "operationId": "getAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "The rejected or returned application",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "resubmitAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "Resubmit on the applicant's behalf",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "updateAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "Amend an application returned for information",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {

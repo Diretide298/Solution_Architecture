@@ -335,10 +335,16 @@ def write_project_hld(services, lin, schema, real, owner):
         "services": {
             "count": len(services),
             "view": "diagrams/hld/02-services.yaml",
-            "note": ("Sixteen deployable services in five tiers. **The data boundary decides where "
-                     "they split** — no service spans a schema it does not own."),
+            # **Counted, not typed** (SD-006): this said "Sixteen" after WalletService made seventeen.
+            # Since 30 September the services are modules deployed as five units (ADR-0055).
+            "note": (f"{_word(len(services)).capitalize()} modules in {_word(len(TIER_ORDER)).lower()} tiers, deployed as "
+                     f"{_word(len({v.get('deployable') for v in services.values() if v.get('deployable')} | {'workers'})).lower()} "
+                     "units (ADR-0055). **The data boundary decides where they split**: a module owns its "
+                     "schemas, and other modules read them through published views."),
             "byTier": {t: sorted(n for n, v in services.items() if v["tier"] == t)
                        for t in TIER_ORDER},
+            "byDeployable": {d: sorted(n for n, v in services.items() if v.get("deployable") == d)
+                             for d in ("commerce", "access", "operations", "ticvai-ai", "workers")},
         },
         # **The store column carried a total and no edges.** `postgres 1000 operations` tells a
         # reader nothing about which service to look at when Postgres is slow. Each store now names
@@ -827,17 +833,24 @@ def main() -> int:
         "id": "HLD",
         # **Counted, not typed** (audit R043): the title said sixteen services after WalletService
         # made seventeen.
-        "title": f"TICVAI — {_word(len(services))} services in {_word(len(tiers))} tiers",
+        "title": f"TICVAI — {_word(len(services))} modules in {_word(len(tiers))} tiers, five deployables",
         "generatedBy": "tools/derive-diagrams.py",
         "about": (
             f"**What ships together.** {len(lin):,} operations and {len(real):,} tables resolve "
-            f"into {_word(len(services))} deployable services, and **the data boundary decides where they split** — no service "
-            "spans a schema it does not own, and no schema is written by two services.\n\n"
+            f"into {_word(len(services))} modules, deployed as five units (ADR-0055), and **the data boundary decides where they "
+            "split**: a module owns and migrates its schemas; another module reads them through published views and "
+            "writes them only through the owner's in-process API.\n\n"
             "**Arrows are cross-service writes.** The rule is that the owner defines the row and a "
             "foreign writer may only append to it: a till closing posts to `ledger.posting` because "
             "settling a shift *is* a ledger act."),
         "decision": "docs/adr/0028-service-decomposition.md",
         "tiers": tiers,
+        # **What is deployed** (ADR-0055): the modules above ship as five units. `workers` owns no
+        # module; it runs the outbox relay, every module's event consumers and the scheduled jobs.
+        "deployables": [
+            {"deployable": d, "note": (decomp.get("deployables") or {}).get(d, ""),
+             "modules": sorted(n for n, v in services.items() if v.get("deployable") == d)}
+            for d in ("commerce", "access", "operations", "ticvai-ai", "workers")],
         "crossServiceWrites": edges,
         "deployOrder": [
             {"order": 1, "tier": "foundation",
@@ -957,6 +970,7 @@ def main() -> int:
             "title": f"{name} — {v['operations']} operations, {v['tables']} tables",
             "generatedBy": "tools/derive-diagrams.py",
             "tier": v["tier"],
+            "deployable": v.get("deployable", ""),
             "index": "diagrams/hld/02-services.yaml",
             # **The reasoning is authored; its counts of this service are not** (audit R043).
             "why": restate_counts(v["why"], {"operations": v["operations"],

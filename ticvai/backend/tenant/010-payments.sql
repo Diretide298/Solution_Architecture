@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS payments.currency_rule (
 CREATE TABLE IF NOT EXISTS payments.deposit_activity (
     id                                uuid PRIMARY KEY,
     deposit_id                        uuid NOT NULL,
-    payment_id                        text,
+    payment_id                        uuid,
     type                              text NOT NULL CONSTRAINT deposit_activity_type_chk CHECK (char_length(type) <= 30),
     amount                            numeric(18,4) NOT NULL,
     reason                            text CONSTRAINT deposit_activity_reason_chk CHECK (char_length(reason) <= 1000),
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS payments.deposit_activity (
 CREATE TABLE IF NOT EXISTS payments.dunning_case (
     id                                uuid PRIMARY KEY NOT NULL,
     subject_id                        uuid,
-    order_id                          text,
+    order_id                          uuid,
     amount                            numeric(18,4),
     state                             text NOT NULL CONSTRAINT dunning_case_state_chk CHECK (state IN ('scheduled', 'inProgress', 'exhausted', 'recovered', 'resolvedManually')),
     decline_class                     text,
@@ -179,7 +179,7 @@ CREATE TABLE IF NOT EXISTS payments.instalment (
     due_date                          date NOT NULL,
     amount                            numeric(18,4) NOT NULL,
     status                            text NOT NULL,
-    payment_id                        text,
+    payment_id                        uuid,
     dunning_case_id                   uuid,
     attempted_at                      timestamptz,
     id                                uuid PRIMARY KEY NOT NULL
@@ -189,7 +189,7 @@ CREATE TABLE IF NOT EXISTS payments.instalment (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS payments.instalment_plan (
     id                                uuid PRIMARY KEY NOT NULL,
-    order_id                          text NOT NULL,
+    order_id                          uuid NOT NULL,
     subject_id                        uuid,
     frequency                         text NOT NULL CONSTRAINT instalment_plan_frequency_chk CHECK (frequency IN ('monthly', 'quarterly', 'custom')),
     payment_token_id                  uuid,
@@ -295,8 +295,8 @@ CREATE TABLE IF NOT EXISTS payments.mixed_tender_rules (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS payments.payment_attempt (
     id                                uuid PRIMARY KEY,
-    payment_id                        text,
-    order_id                          text,
+    payment_id                        uuid,
+    order_id                          uuid,
     provider_connection_id            uuid NOT NULL,
     payment_method_id                 uuid,
     card_type                         text,
@@ -371,7 +371,7 @@ CREATE TABLE IF NOT EXISTS payments.provider_connection (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS payments.provider_cost (
     id                                uuid PRIMARY KEY,
-    payment_id                        text,
+    payment_id                        uuid,
     provider_connection_id            uuid NOT NULL,
     cost_kind                         text NOT NULL CONSTRAINT provider_cost_cost_kind_chk CHECK (cost_kind IN ('schemeFee', 'interchange', 'acquirerMargin', 'fxSpread')),
     amount                            numeric(18,4) NOT NULL,
@@ -388,7 +388,7 @@ CREATE TABLE IF NOT EXISTS payments.provider_event (
     provider_event_id                 text NOT NULL CONSTRAINT provider_event_provider_event_id_chk CHECK (char_length(provider_event_id) <= 255),
     event_type                        text NOT NULL CONSTRAINT provider_event_event_type_chk CHECK (char_length(event_type) <= 120),
     provider_reference                text,
-    payment_id                        text,
+    payment_id                        uuid,
     payload                           jsonb,
     status                            text NOT NULL CONSTRAINT provider_event_status_chk CHECK (status IN ('received', 'processed', 'duplicate', 'unmatched', 'failed')),
     received_at                       timestamptz NOT NULL,

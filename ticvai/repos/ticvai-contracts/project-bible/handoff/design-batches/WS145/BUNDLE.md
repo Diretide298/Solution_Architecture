@@ -89,7 +89,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
-  "notes": "**Merged into P13 CMS-001 Tenant Workspace and CMS-102 Site Builder** (decided 24 September, M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds the overview of what is set up and what is left; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
+  "notes": "**Merged into P13 CMS-001 Tenant Workspace and CMS-102 Site Builder** (decided 24 September, M24-03; applied 29 September). This screen duplicates the white-label CMS, which builds the overview of what is set up and what is left; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "11",
@@ -378,7 +378,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
-  "notes": "**Merged into P13 CMS-002 Brand Kit and CMS-017 Domain & Certificate** (decided 24 September, M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds site, brand and domain set-up; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
+  "notes": "**Merged into P13 CMS-002 Brand Kit and CMS-017 Domain & Certificate** (decided 24 September, M24-03; applied 29 September). This screen duplicates the white-label CMS, which builds site, brand and domain set-up; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "11",
@@ -503,7 +503,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
-  "notes": "**Merged into P13 CMS-005 Theme Editor, CMS-002 Brand Kit and CMS-006 Component Preview** (decided 24 September, M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds the theme and the component set; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
+  "notes": "**Merged into P13 CMS-005 Theme Editor, CMS-002 Brand Kit and CMS-006 Component Preview** (decided 24 September, M24-03; applied 29 September). This screen duplicates the white-label CMS, which builds the theme and the component set; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "11",
@@ -623,7 +623,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
-  "notes": "**Merged into P13 CMS-007 Page Builder** (decided 24 September, M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds pages and landing pages from fixed sections; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
+  "notes": "**Merged into P13 CMS-007 Page Builder** (decided 24 September, M24-03; applied 29 September, the 29 September pass). This screen duplicates the white-label CMS, which builds pages and landing pages from fixed sections; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "11",
@@ -761,7 +761,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
-  "notes": "**Merged into P13 CMS-008 Content Blocks and CMS-010 Media Library** (decided 24 September, M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds content, media and forms; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
+  "notes": "**Merged into P13 CMS-008 Content Blocks and CMS-010 Media Library** (decided 24 September, M24-03; applied 29 September). This screen duplicates the white-label CMS, which builds content, media and forms; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "11",
@@ -895,7 +895,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
-  "notes": "**Merged into P13 CMS-008 Content Blocks** (decided 24 September, M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds product content blocks; dynamic product pages (matrix 22.10.18) are later, not Block A; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
+  "notes": "**Merged into P13 CMS-008 Content Blocks** (decided 24 September, M24-03; applied 29 September, the 29 September pass). This screen duplicates the white-label CMS, which builds product content blocks; dynamic product pages (matrix 22.10.18) are later, not Block A; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "11",
@@ -1015,7 +1015,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
-  "notes": "**Merged into P13 CMS-007 Page Builder, CMS-009 Navigation & Menus and CMS-104 App Build & Store Publishing** (decided 24 September, M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds the mobile app: home sections, tabs and the Buy tickets button, and store publishing; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
+  "notes": "**Merged into P13 CMS-007 Page Builder, CMS-009 Navigation & Menus and CMS-104 App Build & Store Publishing** (decided 24 September, M24-03; applied 29 September). This screen duplicates the white-label CMS, which builds the mobile app: home sections, tabs and the Buy tickets button, and store publishing; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "11",
@@ -1135,7 +1135,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
-  "notes": "**Merged into P13 CMS-011 Translations** (decided 24 September, M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds localisation; personalisation (22.10.12, 22.10.27) is later; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
+  "notes": "**Merged into P13 CMS-011 Translations** (decided 24 September, M24-03; applied 29 September, the 29 September pass). This screen duplicates the white-label CMS, which builds localisation; personalisation (22.10.12, 22.10.27) is later; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "11",
@@ -1255,7 +1255,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
-  "notes": "**Merged into P13 CMS-013 SEO & Metadata** (decided 24 September, M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds SEO and redirects; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
+  "notes": "**Merged into P13 CMS-013 SEO & Metadata** (decided 24 September, M24-03; applied 29 September, the 29 September pass). This screen duplicates the white-label CMS, which builds SEO and redirects; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "11",
@@ -1382,7 +1382,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
-  "notes": "**Merged into P13 CMS-014 Publishing Workflow and CMS-015 Version History** (decided 24 September, M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds publishing, audit and rollback; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
+  "notes": "**Merged into P13 CMS-014 Publishing Workflow and CMS-015 Version History** (decided 24 September, M24-03; applied 29 September). This screen duplicates the white-label CMS, which builds publishing, audit and rollback; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "11",

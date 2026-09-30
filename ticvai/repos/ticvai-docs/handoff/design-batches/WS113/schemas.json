@@ -100,6 +100,145 @@
    }
   }
  },
+ "AccreditationApplication": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.application",
+  "description": "Board 1.3. **Usually submitted by an organisation on behalf of its people.**",
+  "required": [
+   "programmeId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "reference": {
+    "type": "string"
+   },
+   "programmeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "categoryCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "applicantType": {
+    "type": "string"
+   },
+   "submittedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "organisationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "subject": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Name, date of birth, nationality, contact — shaped by the requirements matrix."
+   },
+   "requirementStatus": {
+    "type": "array",
+    "readOnly": true,
+    "items": {
+     "type": "object",
+     "properties": {
+      "requirementCode": {
+       "type": "string"
+      },
+      "satisfied": {
+       "type": "boolean"
+      },
+      "documentId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "submitted",
+     "underReview",
+     "informationRequested",
+     "approved",
+     "rejected",
+     "withdrawn",
+     "expired"
+    ]
+   },
+   "decisionReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "missingRequirements": {
+    "type": "array",
+    "readOnly": true,
+    "description": "The requirement codes a reviewer returned the application for, or rejected it over — what the applicant must change before resubmitting",
+    "items": {
+     "type": "string"
+    }
+   },
+   "decisionDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a decision is due — the approvals request's SLA. **A date, not a queue position**"
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "renewsHolderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "12.1.37. Set by `renewAccreditation`; approval extends this holder rather than creating one"
+   },
+   "resubmissionOfApplicationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "12.1.33. The rejected application this one resubmits, so the rejection stays in the record"
+   },
+   "resubmissionNote": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true,
+    "readOnly": true,
+    "description": "What the applicant changed, from `resubmitAccreditationApplication`"
+   },
+   "submittedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
  "AccreditationHolder": {
   "type": "object",
   "x-ticvai-persistence": "accreditation.holder",
@@ -137,6 +276,17 @@
    "nationality": {
     "type": "string",
     "nullable": true
+   },
+   "email": {
+    "type": "string",
+    "format": "email",
+    "nullable": true,
+    "description": "12.1.16. The holder's own address — where a mobile credential and renewal notices go"
+   },
+   "phone": {
+    "type": "string",
+    "nullable": true,
+    "description": "12.1.16. E.164"
    },
    "identityDocumentVerified": {
     "type": "boolean",
@@ -241,6 +391,12 @@
        "type": "integer",
        "nullable": true,
        "description": "**A cap on how many may be accredited in this category.** Without one, a category is a promise nobody counted.\n"
+      },
+      "badgeTemplateId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true,
+       "description": "The badge printed for this category; travels with the category when a programme is cloned"
       }
      }
     }
@@ -265,6 +421,24 @@
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "formId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "12.1.2. The `marketing-crm` form definition (`createForm`, BO-618) the applicant fills in. The requirements matrix's `field` rows name the form fields they check, so the form is configured without software development and what blocks approval stays in one place.\n"
+   },
+   "isTemplate": {
+    "type": "boolean",
+    "default": false,
+    "description": "12.1.56. **A reusable programme template**: never opened for applications, and what `cloneAccreditationProgramme` copies its categories, requirements, validity, notification rules and form link from.\n"
+   },
+   "templateProgrammeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The programme or template this one was cloned from"
    },
    "status": {
     "type": "string",

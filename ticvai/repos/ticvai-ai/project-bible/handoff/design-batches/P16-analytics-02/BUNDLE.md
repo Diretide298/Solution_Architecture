@@ -95,7 +95,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "ANL-010",
      "trigger": "Suggestions & Advice",
      "back": true,
-     "provenance": "29 September pass (P29 group A)"
+     "provenance": "29 September pass (group A)"
     }
    ]
   },
@@ -125,13 +125,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listAiCapabilityMaturity",
        "notes": "Stage badge, the \"Based on\" line, the share of own data and what the next stage needs.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       },
       {
        "kind": "multiSelect",
        "label": "Stage",
        "operation": "listAiCapabilityMaturity",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     },
@@ -156,7 +156,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getAiVenueSettings",
        "notes": "**The venue can correct its profile at any time** — the honest answer to a baseline that is wrong for an unusual venue in the first weeks.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       },
       {
        "kind": "dataTable",
@@ -172,7 +172,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "AiHistoryImport.rowsRejected"
        ],
        "operation": "listVenueHistoryImports",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       },
       {
        "kind": "detailPanel",
@@ -180,7 +180,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "AiHistoryImport.findings",
        "operation": "getVenueHistoryImport",
        "notes": "Each rejected row and why, so the venue can fix the export and import again.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     },
@@ -192,14 +192,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "primaryButton",
        "label": "Save venue AI profile",
        "operation": "setAiVenueSettings",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       },
       {
        "kind": "secondaryButton",
        "label": "Import history",
        "operation": "importVenueHistory",
        "notes": "**Loaded into the AI data only, never the ledger**: an imported sale teaches the forecast and is never counted as revenue. The form says so.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     }
@@ -218,14 +218,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "ai",
     "purpose": "Where each answer stands",
     "trigger": "onLoad",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "operationId": "getAiVenueSettings",
     "contract": "ai",
     "purpose": "The venue AI profile",
     "trigger": "onLoad",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "operationId": "setAiVenueSettings",
@@ -236,21 +236,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "getAiVenueSettings",
      "listAiCapabilityMaturity"
     ],
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "operationId": "listVenueHistoryImports",
     "contract": "ai",
     "purpose": "Past imports and their result",
     "trigger": "onLoad",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "operationId": "getVenueHistoryImport",
     "contract": "ai",
     "purpose": "One import's findings",
     "trigger": "onAction",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "operationId": "importVenueHistory",
@@ -260,7 +260,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listVenueHistoryImports"
     ],
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "entryState": {
@@ -308,7 +308,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       "staffProductivity"
      ]
     },
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "id": "formImportVenueHistory",
@@ -329,7 +329,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       "dryRun"
      ]
     },
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "_platform": {

@@ -1,6 +1,6 @@
 # P11-applicant-journey-01 — P11 · Applicant Journey
 
-**5 screens · 2 operations · 1 schemas · 2 permissions**
+**5 screens · 10 operations · 5 schemas · 1 permissions**
 
 Platform P11 Accreditation Web · ships as **ticvai-control** ·
 public audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `APPROVAL_ACT, APPROVAL_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 1 permissions apply here:
+  `ACCREDITATION_APPLY`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -62,7 +61,7 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `ACC-001` | Landing / Programme Overview | publicPortalLanding | 0 | 0 | — |
-| `ACC-002` | Registration Form | multiStepForm | 0 | 1 | — |
-| `ACC-003` | Application Review & Submit | multiStepForm | 0 | 1 | — |
-| `ACC-004` | Application Status Tracking | statusTracker | 0 | 1 | — |
-| `ACC-005` | Accreditation Badge | credentialView | 2 | 0 | — |
+| `ACC-002` | Registration Form | multiStepForm | 3 | 1 | — |
+| `ACC-003` | Application Review & Submit | multiStepForm | 3 | 1 | — |
+| `ACC-004` | Application Status Tracking | statusTracker | 5 | 1 | — |
+| `ACC-005` | Accreditation Badge | credentialView | 3 | 0 | — |

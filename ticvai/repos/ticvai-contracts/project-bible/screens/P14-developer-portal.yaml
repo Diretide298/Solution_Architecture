@@ -146,7 +146,7 @@ screens:
         operation: listApiVersions
         notes: '**Every operation added, changed, deprecated or removed, with breaking changes marked**
           (17 September minutes, M17-14; ADR-0026).'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
     - name: contextPanel
       slot: selection
       components:
@@ -204,7 +204,7 @@ screens:
     contract: public-api
     purpose: The module scope catalogue the reference is grouped by
     trigger: onLoad
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   entryState:
     preloaded:
     - ApiVersion.status
@@ -447,7 +447,7 @@ screens:
         operation: listApiScopes
         notes: '**A scope picker grouped by module** (M17-05): `{module}.read` and `{module}.write`, with
           unlicensed modules shown and disabled rather than hidden.'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
     - name: contextPanel
       slot: selection
       components:
@@ -488,7 +488,7 @@ screens:
         notes: '**Production keys only after certification** (M17-06). Enabled on a sandbox client whose
           integration is certified; asks for the tenants, the scopes and the IP allow-list. TICVAI issues
           the production client.'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
   overlays:
   - id: confirmRevokeApiCredential
     component: confirmDialog
@@ -551,7 +551,7 @@ screens:
       - allowedTenantIds
       - ipAllowList
       - note
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   states:
     loading: Clients, sandbox first.
     error: Could not load clients. Existing credentials keep working.
@@ -589,12 +589,12 @@ screens:
     contract: public-api
     purpose: Scopes to choose from, by module
     trigger: onLoad
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   - operationId: requestProductionAccess
     contract: public-api
     purpose: Ask for production keys for a certified integration
     trigger: onAction
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   entryState:
     params:
     - name: clientId
@@ -713,7 +713,7 @@ screens:
         operation: listProductionAccessRequests
         notes: '**Sandbox, certification, production** (17 September minutes, M17-06): where this developer
           stands, the certification and the production access request with its decision.'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
     - name: actionBar
       slot: rowActions
       components:
@@ -730,7 +730,7 @@ screens:
         operation: requestProductionAccess
         notes: Opens the production access request for the client tested here; disabled until the integration
           is certified.
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
   overlays:
   - id: confirmResetSandbox
     component: confirmDialog
@@ -769,7 +769,7 @@ screens:
       - allowedTenantIds
       - ipAllowList
       - note
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   states:
     loading: Sandboxes with their data profile.
     error: Could not load. A running sandbox is unaffected.
@@ -801,14 +801,14 @@ screens:
     contract: public-api
     purpose: The path to production and its state
     trigger: onLoad
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   - operationId: requestProductionAccess
     contract: public-api
     purpose: Promote a tested integration to production
     trigger: onAction
     invalidates:
     - listProductionAccessRequests
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   entryState:
     params:
     - name: sandboxId
@@ -1133,7 +1133,7 @@ screens:
         operation: listApiAnomalies
         notes: '**Abnormal volume on your own clients** (17 September minutes, M17-07), so a runaway integration
           is seen here before a venue calls.'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
   states:
     loading: Call volume; the current window renders first.
     error: Could not load usage. Your quota is unaffected.
@@ -1152,7 +1152,7 @@ screens:
     contract: public-api
     purpose: Abnormal traffic flagged on the developer's clients
     trigger: onLoad
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   wireframe:
     status: notStarted
     provenance: generated
@@ -1405,7 +1405,7 @@ screens:
         label: Production access requests
         bindsTo: ProductionAccessRequest
         operation: listProductionAccessRequests
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
     - name: actionBar
       slot: publish
       components:
@@ -1428,11 +1428,11 @@ screens:
       - kind: secondaryButton
         label: Decide production access
         operation: decideProductionAccess
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
       - kind: secondaryButton
         label: Save anomaly rule
         operation: setApiAnomalyRule
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
     - name: sideNav
       slot: carried
       components:
@@ -1470,19 +1470,19 @@ screens:
     contract: public-api
     purpose: The production key queue
     trigger: onLoad
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   - operationId: decideProductionAccess
     contract: public-api
     purpose: Issue or refuse production keys
     trigger: onAction
     invalidates:
     - listProductionAccessRequests
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   - operationId: setApiAnomalyRule
     contract: public-api
     purpose: When API traffic is flagged
     trigger: onAction
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   entryState:
     params:
     - name: listingId
@@ -1568,7 +1568,7 @@ screens:
       - reason
       - scopes
       - credentialTtlDays
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   - id: formSetApiAnomalyRule
     component: modal
     trigger: Save anomaly rule
@@ -1589,4 +1589,4 @@ screens:
       - windowMinutes
       - action
       - isActive
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)

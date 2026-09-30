@@ -108,7 +108,15 @@
    "loading": "The rental checkout list; the counts above it resolve separately.",
    "offline": "TODO — not decided. Rental Management does not say what a staff device does here without a connection, and no minute has decided it."
   },
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "operationId": "listRentalBookings",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Awaiting arrival",
+    "trigger": "onLoad"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 64. 0 of 7 labels bound to a contract property; 15 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "entryState": {
    "preloaded": [
@@ -250,7 +258,19 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
-   "regions": [],
+   "regions": [
+    {
+     "components": [
+      {
+       "derived": true,
+       "impliedBy": "getRentalBooking",
+       "kind": "detailPanel",
+       "notes": "One record, read-only."
+      }
+     ],
+     "name": "contentBody"
+    }
+   ],
    "template": "split"
   },
   "states": {
@@ -273,7 +293,15 @@
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "operationId": "getRentalBooking",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Retrieve by voucher scan",
+    "trigger": "onAction"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 65. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -295,6 +323,14 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-072"
+  },
+  "entryState": {
+   "params": [
+    {
+     "from": "navigation",
+     "name": "bookingId"
+    }
+   ]
   },
   "_platform": {
    "code": "P06",
@@ -342,7 +378,19 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
-   "regions": [],
+   "regions": [
+    {
+     "components": [
+      {
+       "derived": true,
+       "impliedBy": "getRentalBooking",
+       "kind": "detailPanel",
+       "notes": "One record, read-only."
+      }
+     ],
+     "name": "contentBody"
+    }
+   ],
    "template": "split"
   },
   "states": {
@@ -365,7 +413,15 @@
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "operationId": "getRentalBooking",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "What is still outstanding",
+    "trigger": "onAction"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 66. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -387,6 +443,14 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-073"
+  },
+  "entryState": {
+   "params": [
+    {
+     "from": "navigation",
+     "name": "bookingId"
+    }
+   ]
   },
   "_platform": {
    "code": "P06",
@@ -434,7 +498,27 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
-   "regions": [],
+   "regions": [
+    {
+     "components": [
+      {
+       "derived": true,
+       "impliedBy": "assignRentalEquipment",
+       "kind": "primaryButton",
+       "label": "Assign rental equipment",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "derived": true,
+       "impliedBy": "assignRentalEquipment",
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**"
+      }
+     ],
+     "name": "contentBody"
+    }
+   ],
    "template": "split"
   },
   "states": {
@@ -457,7 +541,18 @@
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "invalidates": [
+     "getRentalBooking"
+    ],
+    "operationId": "assignRentalEquipment",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Bind the assets",
+    "trigger": "onAction"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 67. 0 of 0 labels bound to a contract property; 0 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -479,6 +574,14 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-074"
+  },
+  "entryState": {
+   "params": [
+    {
+     "from": "navigation",
+     "name": "bookingId"
+    }
+   ]
   },
   "_platform": {
    "code": "P06",
@@ -526,7 +629,34 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
-   "regions": [],
+   "regions": [
+    {
+     "components": [
+      {
+       "derived": true,
+       "impliedBy": "assignRentalEquipment",
+       "kind": "primaryButton",
+       "label": "Assign rental equipment",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "derived": true,
+       "impliedBy": "lookupAsset",
+       "kind": "searchField",
+       "label": "Search",
+       "notes": "A search that returns nothing must say so differently from a search not yet run."
+      },
+      {
+       "derived": true,
+       "impliedBy": "assignRentalEquipment",
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**"
+      }
+     ],
+     "name": "contentBody"
+    }
+   ],
    "template": "split"
   },
   "states": {
@@ -549,7 +679,25 @@
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "invalidates": [
+     "getRentalBooking"
+    ],
+    "operationId": "assignRentalEquipment",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Scan to assign",
+    "trigger": "onAction"
+   },
+   {
+    "contract": "maintenance",
+    "operationId": "lookupAsset",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Resolve the scanned code",
+    "trigger": "onAction"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 68. 0 of 0 labels bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -571,6 +719,14 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-075"
+  },
+  "entryState": {
+   "params": [
+    {
+     "from": "navigation",
+     "name": "bookingId"
+    }
+   ]
   },
   "_platform": {
    "code": "P06",
@@ -628,12 +784,21 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Reservation",
+       "provenance": "pack Rental_Management.pdf, page 69 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Checkout inspection",
        "provenance": "pack Rental_Management.pdf, page 69 §Support"
       }
      ],
      "name": "actionBar",
      "slot": "rowActions"
+    },
+    {
+     "components": [],
+     "name": "contentBody"
     }
    ],
    "template": "split"
@@ -649,22 +814,28 @@
   "gaps": [
    {
     "operation": null,
-    "source": "pack Rental_Management.pdf, page 69 §Support",
-    "why": "**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved: Asset, Checkout inspection. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side."
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Rental_Management.pdf, page 69"
    },
    {
     "operation": null,
-    "source": "pack Rental_Management.pdf, page 69",
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built."
-   },
-   {
-    "operation": null,
-    "source": "pack Rental_Management.pdf, page 69",
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Rental_Management.pdf, page 69"
    }
   ],
-  "apis": [],
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 69. 0 of 0 labels bound to a contract property; 2 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apis": [
+   {
+    "contract": "rental",
+    "invalidates": [
+     "getRentalBooking"
+    ],
+    "operationId": "recordRentalInspection",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Condition before it goes out",
+    "trigger": "onAction"
+   }
+  ],
+  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 69. 0 of 0 labels bound to a contract property; 3 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Asset, Reservation, Checkout inspection are choices sent by `recordRentalInspection` (assetId, bookingId (path), phase preRental).",
   "navigation": {
    "entryFrom": [
     "EMP-071"
@@ -685,6 +856,14 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-076"
+  },
+  "entryState": {
+   "params": [
+    {
+     "from": "navigation",
+     "name": "bookingId"
+    }
+   ]
   },
   "_platform": {
    "code": "P06",
@@ -732,7 +911,26 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
-   "regions": [],
+   "regions": [
+    {
+     "components": [
+      {
+       "derived": true,
+       "impliedBy": "checkOutRental",
+       "kind": "primaryButton",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "derived": true,
+       "impliedBy": "checkOutRental",
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**"
+      }
+     ],
+     "name": "contentBody"
+    }
+   ],
    "template": "split"
   },
   "states": {
@@ -755,7 +953,20 @@
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "invalidates": [
+     "getRentalBooking",
+     "listRentalBookings",
+     "getRentalAvailability"
+    ],
+    "operationId": "checkOutRental",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Safety briefing and handover",
+    "trigger": "onAction"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 70. 0 of 0 labels bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -777,6 +988,14 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-077"
+  },
+  "entryState": {
+   "params": [
+    {
+     "from": "navigation",
+     "name": "bookingId"
+    }
+   ]
   },
   "_platform": {
    "code": "P06",
@@ -824,7 +1043,26 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
-   "regions": [],
+   "regions": [
+    {
+     "components": [
+      {
+       "derived": true,
+       "impliedBy": "checkOutRental",
+       "kind": "primaryButton",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "derived": true,
+       "impliedBy": "checkOutRental",
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**"
+      }
+     ],
+     "name": "contentBody"
+    }
+   ],
    "template": "split"
   },
   "states": {
@@ -847,7 +1085,20 @@
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "invalidates": [
+     "getRentalBooking",
+     "listRentalBookings",
+     "getRentalAvailability"
+    ],
+    "operationId": "checkOutRental",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Hold the deposit",
+    "trigger": "onAction"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 70. 0 of 0 labels bound to a contract property; 1 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -869,6 +1120,14 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-078"
+  },
+  "entryState": {
+   "params": [
+    {
+     "from": "navigation",
+     "name": "bookingId"
+    }
+   ]
   },
   "_platform": {
    "code": "P06",
@@ -916,7 +1175,27 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
-   "regions": [],
+   "regions": [
+    {
+     "components": [
+      {
+       "derived": true,
+       "impliedBy": "assignRentalEquipment",
+       "kind": "primaryButton",
+       "label": "Assign rental equipment",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "derived": true,
+       "impliedBy": "assignRentalEquipment",
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**"
+      }
+     ],
+     "name": "contentBody"
+    }
+   ],
    "template": "split"
   },
   "states": {
@@ -939,7 +1218,18 @@
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "invalidates": [
+     "getRentalBooking"
+    ],
+    "operationId": "assignRentalEquipment",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Several items at once",
+    "trigger": "onAction"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 71. 0 of 0 labels bound to a contract property; 0 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -961,6 +1251,14 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-079"
+  },
+  "entryState": {
+   "params": [
+    {
+     "from": "navigation",
+     "name": "bookingId"
+    }
+   ]
   },
   "_platform": {
    "code": "P06",
@@ -1036,7 +1334,20 @@
    "loading": "The checkout confirmation rental configuration as saved.",
    "offline": "TODO — not decided. Rental Management does not say what a staff device does here without a connection, and no minute has decided it."
   },
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "invalidates": [
+     "getRentalBooking",
+     "listRentalBookings",
+     "getRentalAvailability"
+    ],
+    "operationId": "checkOutRental",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Activate the rental",
+    "trigger": "onAction"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 72. 0 of 0 labels bound to a contract property; 2 of 96 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -1058,6 +1369,14 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-080"
+  },
+  "entryState": {
+   "params": [
+    {
+     "from": "navigation",
+     "name": "bookingId"
+    }
+   ]
   },
   "_platform": {
    "code": "P06",

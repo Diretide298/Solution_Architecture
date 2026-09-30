@@ -11,7 +11,7 @@ emittedBy:
 - acceptShiftVariance
 payload:
 - field: shiftId
-  type: string
+  type: uuid
 - field: venueId
   type: uuid
 - field: workstationId

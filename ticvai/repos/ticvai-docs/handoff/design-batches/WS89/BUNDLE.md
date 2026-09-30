@@ -1,6 +1,6 @@
 # WS89 — Rental Management board 2
 
-**10 screens · 16 operations · 18 schemas · 5 permissions**
+**10 screens · 16 operations · 26 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -2309,6 +2309,38 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "AssetDocumentInput": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "ref",
+   "kind"
+  ],
+  "properties": {
+   "ref": {
+    "type": "string",
+    "description": "The document in the media store."
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "kind": {
+    "$ref": "#/components/schemas/AssetDocumentKind"
+   }
+  }
+ },
+ "AssetDocumentKind": {
+  "type": "string",
+  "enum": [
+   "manual",
+   "sop",
+   "certificate",
+   "warranty",
+   "drawing",
+   "riskAssessment"
+  ]
+ },
  "AssetStatus": {
   "type": "string",
   "enum": [
@@ -2350,7 +2382,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "workOrderId": {
       "type": "string",
-      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "format": "uuid",
       "nullable": true
      }
     }
@@ -2391,6 +2423,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "criticality": {
     "$ref": "#/components/schemas/AssetCriticality"
+   },
+   "priorityOverride": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/WorkOrderPriority"
+     }
+    ],
+    "nullable": true,
+    "description": "**\"If this device goes down, raise this priority\"** (decided 17 September, M17-01). A corrective work order raised on this asset takes this priority instead of the score. Null means the score decides.\n"
    },
    "manufacturer": {
     "type": "string",
@@ -2452,6 +2493,84 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "CreateInventoryItemRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "sku",
+   "name",
+   "venueId",
+   "baseUnit",
+   "costingMethod"
+  ],
+  "properties": {
+   "sku": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "barcode": {
+    "type": "string",
+    "maxLength": 128
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "baseUnit": {
+    "type": "string",
+    "description": "The unit stock is held in. Immutable once movements exist."
+   },
+   "purchaseUnit": {
+    "type": "string",
+    "description": "How the supplier sells it — a case of 24 against a base unit of one."
+   },
+   "purchaseUnitFactor": {
+    "type": "number",
+    "minimum": 0,
+    "default": 1
+   },
+   "costingMethod": {
+    "$ref": "#/components/schemas/CostingMethod"
+   },
+   "reorderPoint": {
+    "type": "number",
+    "minimum": 0
+   },
+   "reorderQuantity": {
+    "type": "number",
+    "minimum": 0
+   },
+   "parLevel": {
+    "type": "number",
+    "minimum": 0
+   },
+   "preferredSupplierId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "allowNegativeStock": {
+    "type": "boolean",
+    "default": false,
+    "description": "True permits issue beyond on-hand. Occasionally needed at a bar mid-service; dangerous everywhere else.\n"
+   },
+   "isPerishable": {
+    "type": "boolean",
+    "default": false
+   },
+   "shelfLifeDays": {
+    "type": "integer",
+    "nullable": true
+   }
+  }
+ },
  "CreateStockMovementRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -2466,7 +2585,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "itemId": {
     "type": "string",
@@ -2515,7 +2634,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "fromLocationId": {
     "type": "string",
@@ -2558,6 +2677,58 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "date-time"
    }
   }
+ },
+ "InventoryItem": {
+  "x-ticvai-persistence": "inventory.item",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateInventoryItemRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "onHand",
+     "isActive"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "onHand": {
+      "type": "number",
+      "description": "Derived from movements. Not directly editable."
+     },
+     "onOrder": {
+      "type": "number"
+     },
+     "inTransit": {
+      "type": "number"
+     },
+     "available": {
+      "type": "number",
+      "description": "On-hand minus allocated, where allocated is stock reserved for orders (decided 28 September, audit R171)."
+     },
+     "averageCost": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "lastPurchasePrice": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "isBelowReorderPoint": {
+      "type": "boolean"
+     },
+     "hasMovements": {
+      "type": "boolean",
+      "description": "True locks costing method and base unit."
+     },
+     "isActive": {
+      "type": "boolean"
+     }
+    }
+   }
+  ]
  },
  "LocationKind": {
   "type": "string",
@@ -2698,6 +2869,118 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "RequisitionSuggestion": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "itemId",
+   "onHand",
+   "reorderPoint",
+   "suggestedQuantity"
+  ],
+  "properties": {
+   "itemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "itemName": {
+    "type": "string"
+   },
+   "sku": {
+    "type": "string"
+   },
+   "onHand": {
+    "type": "number"
+   },
+   "reorderPoint": {
+    "type": "number"
+   },
+   "parLevel": {
+    "type": "number"
+   },
+   "suggestedQuantity": {
+    "type": "number"
+   },
+   "averageDailyConsumption": {
+    "type": "number"
+   },
+   "daysOfCoverRemaining": {
+    "type": "number"
+   },
+   "preferredSupplierId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "leadTimeDays": {
+    "type": "integer",
+    "nullable": true
+   }
+  }
+ },
+ "SerialisedItem": {
+  "type": "object",
+  "x-ticvai-persistence": "inventory.serialised_item",
+  "description": "Retail Board 4 of the client's design set, 20 August. **`StockBatch` was added on 18 August with a lot number, and serialisation to the individual item is a step beyond it.**\nA lot answers *which delivery did this come from*. A serial answers *where is this exact one* — which is what a jewellery counter, a phone, a ticketed collectible or anything with a warranty needs.\n**Most stock is not serialised and should not be.** Turning it on for a 2 AED keyring creates a row per keyring, so it is a per-item decision rather than a policy.\n",
+  "required": [
+   "id",
+   "itemId",
+   "serial",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "itemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "batchId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The batch it arrived in, where the item is both lotted and serialised."
+   },
+   "serial": {
+    "type": "string",
+    "description": "**Unique within the item, not globally.** Two manufacturers reuse serial numbers and a global constraint would refuse the second one.\n"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "inStock",
+     "reserved",
+     "sold",
+     "returned",
+     "damaged",
+     "lost",
+     "inTransit",
+     "warranty"
+    ]
+   },
+   "soldOnOrderLineId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The link that makes serialisation worth having.** A warranty claim, a recall and a proof of purchase all start with *which sale was this exact item*.\n"
+   },
+   "warrantyUntil": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "receivedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "SetAssetStatusRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -2717,7 +3000,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "inspectionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "Required for return to service where the asset demands it."
    },
@@ -2818,6 +3101,62 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   ]
  },
+ "StockPosition": {
+  "x-ticvai-persistence": "none — derived from movements",
+  "type": "object",
+  "required": [
+   "itemId",
+   "locationId",
+   "onHand",
+   "unit"
+  ],
+  "properties": {
+   "itemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "itemName": {
+    "type": "string"
+   },
+   "sku": {
+    "type": "string"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationName": {
+    "type": "string"
+   },
+   "onHand": {
+    "type": "number"
+   },
+   "allocated": {
+    "type": "number",
+    "description": "**Reserved for orders**: the quantity under an active stock reservation for an order (decided 28 September, audit R171). A transfer is not allocation: dispatched stock has already left on-hand and sits in transit.\n"
+   },
+   "available": {
+    "type": "number",
+    "description": "**On-hand minus allocated** (decided 28 September, audit R171). What can still be sold or issued.\n"
+   },
+   "unit": {
+    "type": "string"
+   },
+   "value": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "lastCountedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastMovementAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
  "StockTransfer": {
   "x-ticvai-persistence": "inventory.transfer + inventory.transfer_line",
   "type": "object",
@@ -2832,7 +3171,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "transferNumber": {
     "type": "string"
@@ -2997,7 +3336,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "workOrderNumber": {
     "type": "string",
@@ -3028,6 +3367,34 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "priority": {
     "$ref": "#/components/schemas/WorkOrderPriority"
+   },
+   "priorityScore": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The score the venue's policy gave the fault when raised; null when a person or the asset set the priority (M17-01)."
+   },
+   "prioritySource": {
+    "type": "string",
+    "enum": [
+     "scored",
+     "assetOverride",
+     "manual"
+    ],
+    "readOnly": true,
+    "description": "Where `priority` came from (M17-01). A change through `updateWorkOrder` makes it `manual`."
+   },
+   "faultAssessment": {
+    "$ref": "#/components/schemas/WorkOrderFaultAssessment"
+   },
+   "requiredQualificationCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Skills the job needs (M17-13)."
    },
    "kind": {
     "$ref": "#/components/schemas/WorkOrderKind"
@@ -3087,12 +3454,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "sourceInspectionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "sourceIncidentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "createdAt": {
@@ -3114,6 +3481,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true
    }
   }
+ },
+ "WorkOrderPriority": {
+  "type": "string",
+  "enum": [
+   "low",
+   "normal",
+   "high",
+   "urgent",
+   "emergency"
+  ]
  }
 }
 ```

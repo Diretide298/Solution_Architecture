@@ -321,7 +321,7 @@ def _contract_rules(C: Path, H: Path, shared: set) -> None:
     # beside `/orders/{id}/reprints`.
     #
     # The mechanical parts gate: a segment that is not kebab-case, and one path parameter typed two
-    # ways in one contract — `ticketId` a ULID on one path and a uuid on the next is a client that
+    # ways in one contract — `ticketId` a uuid on one path and free text on the next is a client that
     # validates one id and rejects the other. The rest is naming, where a singleton or a genuine
     # action can be right, so it warns.
     def _pl(s: str) -> set:

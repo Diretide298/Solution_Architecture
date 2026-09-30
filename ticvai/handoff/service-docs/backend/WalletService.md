@@ -74,13 +74,13 @@ Bonus credits from a promotion are tracked separately because they are typically
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | cardCode | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes |  |
 | credits | integer | yes | (min 1) |
 | bonusCredits | integer |  | (min 0; default 0) |
 | amountPaid | Money |  | On the wire this is three fields; in the database it is one column. |
@@ -324,7 +324,7 @@ Bonus credits from a promotion are tracked separately because they are typically
 |---|---|---|---|---|
 | walletId | path | yes | string (uuid) |  |
 | If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `WalletAutoReloadSetting`
 
@@ -403,7 +403,7 @@ Bonus credits from a promotion are tracked separately because they are typically
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | walletId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -430,8 +430,8 @@ Bonus credits from a promotion are tracked separately because they are typically
 | balanceBefore.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | balanceBefore.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | balanceBefore.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| paymentId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
-| refundId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| paymentId | string (uuid) |  | (nullable) |
+| refundId | string (uuid) |  | (nullable) |
 | walletTransactionId | string |  | (nullable) |
 | reason | string |  | (nullable) |
 | settledByPrincipalId | string (uuid) |  | (nullable) |
@@ -475,7 +475,7 @@ Both wallets must belong to the same tenant. **A transfer across tenants is a pa
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | walletId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -544,7 +544,7 @@ Turns a `held` hold into a debit (SD-027): under the same balance row lock the h
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 | walletHoldId | path | yes | string (uuid) |  |
 
 **Request body**
@@ -602,7 +602,7 @@ Extension exists because a venue will want it: a goodwill gesture, a closure, a 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -723,7 +723,7 @@ Stored value belonging to a guest, distinct from a bearer gift card. Where the g
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 | walletId | path | yes | string (uuid) |  |
 
 **Request body**
@@ -846,7 +846,7 @@ Published as a version, so a change can be rolled back and so `getApprovalRecord
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -898,7 +898,7 @@ Returns a `held` hold to available under the balance row lock (SD-027); the swee
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 | walletHoldId | path | yes | string (uuid) |  |
 
 **Response**: `WalletHold`
@@ -949,7 +949,7 @@ Board 8, p.98. Copies the chosen version's configuration into the working draft 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | version | path | yes | integer |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1004,7 +1004,7 @@ Board 8, p.98. Copies the chosen version's configuration into the working draft 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `WalletFundingRules`
 
@@ -1176,7 +1176,7 @@ Boards 7.4 and 7.5. **A refund to a wallet and a refund to a card are different 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `WalletRefundPolicy`
 
@@ -1367,8 +1367,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | method | text | no |  |
 | amount | numeric(18,4) | yes |  |
 | balance_before | numeric(18,4) | no |  |
-| payment_id | text | no |  |
-| refund_id | text | no |  |
+| payment_id | uuid | no |  |
+| refund_id | uuid | no |  |
 | wallet_transaction_id | text | no |  |
 | reason | text | no |  |
 | settled_by_principal_id | uuid | no |  |
@@ -1413,7 +1413,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | wallet_hold_id | uuid | yes |  |
 | wallet_id | uuid | yes |  |
-| order_id | text | no |  |
+| order_id | uuid | no |  |
 | payment_id | uuid | no |  |
 | wallet_hold_amount | numeric | yes |  |
 | currency_code | text | yes |  |
@@ -1498,7 +1498,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | kind | text | yes |  |
 | amount | numeric(18,4) | yes |  |
 | balance_after | numeric(18,4) | yes |  |
-| order_id | text | no |  |
+| order_id | uuid | no |  |
 | venue_id | uuid | no |  |
 | reason | text | no |  |
 | principal_id | uuid | no |  |

@@ -6,7 +6,7 @@
   "summary": "Bind specific assets to the booking, by scan where required",
   "permission": "RENTAL_OPERATE",
   "offlineCapable": true,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -120,7 +120,7 @@
   "summary": "Keep it longer, if it is free and the guest accepts the price",
   "permission": "RENTAL_OPERATE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -173,6 +173,21 @@
    },
    {
     "name": "withinDays",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
     "in": "query",
     "required": null
    }
@@ -418,7 +433,7 @@
   "summary": "Condition before or after, with evidence",
   "permission": "RENTAL_OPERATE",
   "offlineCapable": true,
-  "conflictPolicy": null,
+  "conflictPolicy": "append",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -456,7 +471,7 @@
   "summary": "Operating hours, rental windows, buffers and release rules",
   "permission": "RENTAL_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -475,7 +490,7 @@
   "summary": "How much is held, how, and what happens to it",
   "permission": "RENTAL_PRICE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -494,7 +509,7 @@
   "summary": "Grace period, late fees and extension pricing",
   "permission": "RENTAL_PRICE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -513,7 +528,7 @@
   "summary": "Pooled, serialised or hybrid",
   "permission": "RENTAL_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {

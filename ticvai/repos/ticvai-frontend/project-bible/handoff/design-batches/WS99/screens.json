@@ -129,10 +129,19 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "scoreVsiAssessment",
+    "contract": "subscription",
+    "purpose": "Begin the assessment",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-379"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-379",
+   "workshopBoard": "wireframes/WS154 Subscription Licensing AI Self Service Board 2.dc.html#adm-379"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 21. 0 of 0 labels bound to a contract property; 4 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -211,7 +220,27 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "submitOnboardingApplication",
+       "label": "Submit",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "submitOnboardingApplication"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The customer organization registration list.",
@@ -220,10 +249,19 @@
    "emptyNoResults": "The filter narrowed it and the customer organization registration are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "submitOnboardingApplication",
+    "contract": "subscription",
+    "purpose": "Register the organisation",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-380"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-380",
+   "workshopBoard": "wireframes/WS154 Subscription Licensing AI Self Service Board 2.dc.html#adm-380"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 22. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -361,7 +399,15 @@
    "emptyNoResults": "The filter narrowed it and the venue type business are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "scoreVsiAssessment",
+    "contract": "subscription",
+    "purpose": "Venue type and business profile",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Museum",
@@ -374,7 +420,8 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-381"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-381",
+   "workshopBoard": "wireframes/WS154 Subscription Licensing AI Self Service Board 2.dc.html#adm-381"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 23. 0 of 12 labels bound to a contract property; 19 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -453,7 +500,26 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "scoreVsiAssessment",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "scoreVsiAssessment"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The visitor capacity operational list.",
@@ -462,10 +528,19 @@
    "emptyNoResults": "The filter narrowed it and the visitor capacity operational are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "scoreVsiAssessment",
+    "contract": "subscription",
+    "purpose": "Visitors, capacity and scale",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-382"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-382",
+   "workshopBoard": "wireframes/WS154 Subscription Licensing AI Self Service Board 2.dc.html#adm-382"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 23. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -603,10 +678,25 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listSaleChannel",
+    "contract": "catalogue",
+    "purpose": "Sales Channel Command Center",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "scoreVsiAssessment",
+    "contract": "subscription",
+    "purpose": "Record the answers and score them",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-383"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-383",
+   "workshopBoard": "wireframes/WS154 Subscription Licensing AI Self Service Board 2.dc.html#adm-383"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 24. 0 of 0 labels bound to a contract property; 11 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -764,10 +854,19 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "scoreVsiAssessment",
+    "contract": "subscription",
+    "purpose": "Ticketing and product needs",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-384"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-384",
+   "workshopBoard": "wireframes/WS154 Subscription Licensing AI Self Service Board 2.dc.html#adm-384"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 25. 0 of 0 labels bound to a contract property; 15 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -846,7 +945,26 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "scoreVsiAssessment",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "scoreVsiAssessment"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The access queue visitor list.",
@@ -855,10 +973,19 @@
    "emptyNoResults": "The filter narrowed it and the access queue visitor are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "scoreVsiAssessment",
+    "contract": "subscription",
+    "purpose": "Access, queue and experience",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-385"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-385",
+   "workshopBoard": "wireframes/WS154 Subscription Licensing AI Self Service Board 2.dc.html#adm-385"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 26. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -937,7 +1064,32 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listModuleCatalogue",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "scoreVsiAssessment",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "scoreVsiAssessment"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The additional business module list.",
@@ -946,10 +1098,26 @@
    "emptyNoResults": "The filter narrowed it and the additional business module are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listModuleCatalogue",
+    "contract": "subscription",
+    "purpose": "Additional modules",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "scoreVsiAssessment",
+    "contract": "subscription",
+    "purpose": "Record the answers",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-386"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-386",
+   "workshopBoard": "wireframes/WS154 Subscription Licensing AI Self Service Board 2.dc.html#adm-386"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 27. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1028,7 +1196,26 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "scoreVsiAssessment",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "scoreVsiAssessment"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The integration payment technical list.",
@@ -1037,10 +1224,19 @@
    "emptyNoResults": "The filter narrowed it and the integration payment technical are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "scoreVsiAssessment",
+    "contract": "subscription",
+    "purpose": "Integration and technical needs",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-387"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-387",
+   "workshopBoard": "wireframes/WS154 Subscription Licensing AI Self Service Board 2.dc.html#adm-387"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 28. 0 of 0 labels bound to a contract property; 0 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1119,7 +1315,26 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "scoreVsiAssessment",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "scoreVsiAssessment"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The assessment summary handoff list.",
@@ -1128,10 +1343,19 @@
    "emptyNoResults": "The filter narrowed it and the assessment summary handoff are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "scoreVsiAssessment",
+    "contract": "subscription",
+    "purpose": "Score and recommend",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-388"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-388",
+   "workshopBoard": "wireframes/WS154 Subscription Licensing AI Self Service Board 2.dc.html#adm-388"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 29. 0 of 0 labels bound to a contract property; 0 of 63 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

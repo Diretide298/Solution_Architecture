@@ -39,10 +39,7 @@
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-038 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-039",
@@ -101,10 +98,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Platform administrators can understand communication volume, delivery health, provider performance and operational exceptions from one centralized workspace.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide administrators and technical/operations teams with a centralized view of the health and activity of TICVAI's communication infrastructure. This is not a marketing dashboard.",
-  "purposeNote": "Platform administrators can understand communication volume, delivery health, provider performance and operational exceptions from one centralized workspace.",
   "layout": {
    "template": "split",
    "regions": [
@@ -116,18 +113,15 @@
        "kind": "dataTable",
        "label": "Every communication service",
        "columns": [
-        "CommunicationServiceCommandCenterView.messagesProcessedToday",
-        "CommunicationServiceCommandCenterView.emailSent",
-        "CommunicationServiceCommandCenterView.smsSent",
-        "CommunicationServiceCommandCenterView.whatsappSent",
-        "CommunicationServiceCommandCenterView.pushNotifications",
-        "CommunicationServiceCommandCenterView.inAppNotifications",
+        "CommunicationServiceCommandCenterView.messagesProcessed",
+        "CommunicationServiceCommandCenterView.byChannel[].sent",
         "CommunicationServiceCommandCenterView.delivered",
         "CommunicationServiceCommandCenterView.failed",
         "CommunicationServiceCommandCenterView.pending",
         "CommunicationServiceCommandCenterView.retrying",
-        "CommunicationServiceCommandCenterView.averageDeliveryTime",
-        "CommunicationServiceCommandCenterView.providerAvailability"
+        "CommunicationServiceCommandCenterView.averageDeliverySeconds",
+        "CommunicationServiceCommandCenterView.providerAvailabilityRate",
+        "CommunicationServiceCommandCenterView.byChannel[].channel"
        ],
        "bindsTo": "CommunicationServiceCommandCenterView",
        "operation": "listCommunicationService",
@@ -144,18 +138,15 @@
        "label": "The selected communication service",
        "bindsTo": "CommunicationServiceCommandCenterView",
        "columns": [
-        "CommunicationServiceCommandCenterView.messagesProcessedToday",
-        "CommunicationServiceCommandCenterView.emailSent",
-        "CommunicationServiceCommandCenterView.smsSent",
-        "CommunicationServiceCommandCenterView.whatsappSent",
-        "CommunicationServiceCommandCenterView.pushNotifications",
-        "CommunicationServiceCommandCenterView.inAppNotifications",
+        "CommunicationServiceCommandCenterView.messagesProcessed",
+        "CommunicationServiceCommandCenterView.byChannel[].sent",
         "CommunicationServiceCommandCenterView.delivered",
         "CommunicationServiceCommandCenterView.failed",
         "CommunicationServiceCommandCenterView.pending",
         "CommunicationServiceCommandCenterView.retrying",
-        "CommunicationServiceCommandCenterView.averageDeliveryTime",
-        "CommunicationServiceCommandCenterView.providerAvailability"
+        "CommunicationServiceCommandCenterView.averageDeliverySeconds",
+        "CommunicationServiceCommandCenterView.providerAvailabilityRate",
+        "CommunicationServiceCommandCenterView.byChannel[].channel"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Module Activity”, “Channel Provider Health”, “Health”, “WhatsAp Warni”.",
        "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 4 §Display"
@@ -181,18 +172,15 @@
   ],
   "entryState": {
    "preloaded": [
-    "CommunicationServiceCommandCenterView.messagesProcessedToday",
-    "CommunicationServiceCommandCenterView.emailSent",
-    "CommunicationServiceCommandCenterView.smsSent",
-    "CommunicationServiceCommandCenterView.whatsappSent",
-    "CommunicationServiceCommandCenterView.pushNotifications",
-    "CommunicationServiceCommandCenterView.inAppNotifications"
+    "CommunicationServiceCommandCenterView.messagesProcessed",
+    "CommunicationServiceCommandCenterView.byChannel[].sent"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-038"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-038",
+   "workshopBoard": "wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-038"
   },
   "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 4. 12 of 12 labels bound to a contract property; 12 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -256,15 +244,15 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized administrators can configure and test multiple communication providers without requiring individual TICVAI modules to maintain direct provider integrations.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure the external/internal services used by TICVAI to deliver communications.",
-  "purposeNote": "Authorized administrators can configure and test multiple communication providers without requiring individual TICVAI modules to maintain direct provider integrations.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Test Connection, Send Test Message, Validate Credentials, Test Webhook, Verify Delivery Receipt. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Communication & Notification Platform Services_Reference.pdf, page 6 §Actions"
+    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Legal Entity, Test Connection, Send Test Message, Validate Credentials, Test Webhook, Verify Delivery Receipt. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Communication & Notification Platform Services_Reference.pdf, page 6 §Allow different providers by"
    }
   ],
   "layout": {
@@ -312,6 +300,11 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Legal Entity",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 6 §Allow different providers by"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Test Connection",
        "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 6 §Actions"
       },
@@ -350,18 +343,16 @@
     "operationId": "setChannelProvider",
     "contract": "marketing-crm",
     "purpose": "Channel & Provider Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setChannelProvider"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-039"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-039",
+   "workshopBoard": "wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-039"
   },
-  "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 6. 0 of 0 labels bound to a contract property; 11 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 6. 0 of 0 labels bound to a contract property; 12 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -423,10 +414,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every outbound communication uses a verified and appropriately governed sender identity for the applicable brand, channel and region.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Configure/reference) and no display directory — it is settings, not a population",
   "purpose": "Manage the identities from which TICVAI communications are sent.",
-  "purposeNote": "Every outbound communication uses a verified and appropriately governed sender identity for the applicable brand, channel and region.",
   "layout": {
    "template": "form",
    "regions": [
@@ -555,16 +546,14 @@
     "operationId": "setSenderIdentityDomain",
     "contract": "marketing-crm",
     "purpose": "Sender Identity, Domain & Brand Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setSenderIdentityDomain"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-040"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-040",
+   "workshopBoard": "wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-040"
   },
   "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 19 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -628,10 +617,17 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Operational modules can use governed reusable communication templates without embedding message content directly in application code.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Maintain centralized system/transactional communication templates used by TICVAI operational modules. This screen must not replace CRM's marketing template builder.",
-  "purposeNote": "Operational modules can use governed reusable communication templates without embedding message content directly in application code.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Attachments where applicable. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Communication & Notification Platform Services_Reference.pdf, page 9 §Support"
+   }
+  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -685,6 +681,17 @@
        "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 9 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Attachments where applicable",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 9 §Support"
+      }
+     ]
     }
    ]
   },
@@ -705,9 +712,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-041"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-041",
+   "workshopBoard": "wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-041"
   },
-  "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 9 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 10 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -769,14 +777,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "appropriate operational notification according to centrally configured rules.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Map TICVAI business events to the operational communications they should generate. This is the core of the event-driven communication architecture.",
-  "purposeNote": "appropriate operational notification according to centrally configured rules.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Customer, Channel, Membership, Booking Type. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Product, Venue, Customer, Channel, Transaction Status, Membership, Booking Type. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Communication & Notification Platform Services_Reference.pdf, page 11 §Allow conditions based on"
    },
    {
@@ -799,12 +807,32 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Product",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 11 §Allow conditions based on"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Event",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 11 §Allow conditions based on"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Venue",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 11 §Allow conditions based on"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Customer",
        "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 11 §Allow conditions based on"
       },
       {
        "kind": "secondaryButton",
        "label": "Channel",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 11 §Allow conditions based on"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Transaction Status",
        "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 11 §Allow conditions based on"
       },
       {
@@ -842,9 +870,6 @@
   ],
   "entryState": {
    "preloaded": [
-    "BusinessEventNotificationTriggerMappingView.t30Days",
-    "BusinessEventNotificationTriggerMappingView.t7Days",
-    "BusinessEventNotificationTriggerMappingView.t1Day",
     "BusinessEventNotificationTriggerMappingView.eventId",
     "BusinessEventNotificationTriggerMappingView.sourceModule"
    ]
@@ -852,9 +877,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-042"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-042",
+   "workshopBoard": "wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-042"
   },
-  "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 4 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 8 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -916,10 +942,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Communication requests are dynamically routed according to priority, availability, consent, provider health and configured fallback rules.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure based on; Configure) and no display directory — it is settings, not a population",
   "purpose": "Determine how TICVAI delivers a message after a communication requirement has been created.",
-  "purposeNote": "Communication requests are dynamically routed according to priority, availability, consent, provider health and configured fallback rules.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1018,7 +1044,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-043"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-043",
+   "workshopBoard": "wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-043"
   },
   "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 13. 0 of 0 labels bound to a contract property; 14 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1082,10 +1109,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "No communication is delivered without passing the applicable centralized consent, preference and communication-policy evaluation.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Create a central enforcement layer ensuring communications respect the appropriate communication rules.",
-  "purposeNote": "No communication is delivered without passing the applicable centralized consent, preference and communication-policy evaluation.",
   "gaps": [
    {
     "operation": null,
@@ -1141,7 +1168,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-044"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-044",
+   "workshopBoard": "wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-044"
   },
   "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 0 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1205,10 +1233,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Failed communications can be identified, diagnosed, retried and resolved without losing the original business-event context.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide technical/operations teams with visibility into communications currently being processed or failing.",
-  "purposeNote": "Failed communications can be identified, diagnosed, retried and resolved without losing the original business-event context.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1220,14 +1248,7 @@
        "kind": "dataTable",
        "label": "Every delivery queue failure",
        "columns": [
-        "DeliveryQueueFailureRetryManagementView.pending",
-        "DeliveryQueueFailureRetryManagementView.processing",
-        "DeliveryQueueFailureRetryManagementView.sent",
-        "DeliveryQueueFailureRetryManagementView.delivered",
-        "DeliveryQueueFailureRetryManagementView.failed",
-        "DeliveryQueueFailureRetryManagementView.retrying",
-        "DeliveryQueueFailureRetryManagementView.deadLettered",
-        "DeliveryQueueFailureRetryManagementView.cancelled",
+        "DeliveryQueueFailureRetryManagementView.status",
         "DeliveryQueueFailureRetryManagementView.communicationId",
         "DeliveryQueueFailureRetryManagementView.sourceModule",
         "DeliveryQueueFailureRetryManagementView.businessEvent",
@@ -1236,7 +1257,7 @@
         "DeliveryQueueFailureRetryManagementView.template",
         "DeliveryQueueFailureRetryManagementView.provider",
         "DeliveryQueueFailureRetryManagementView.priority",
-        "DeliveryQueueFailureRetryManagementView.created",
+        "DeliveryQueueFailureRetryManagementView.createdAt",
         "DeliveryQueueFailureRetryManagementView.status",
         "DeliveryQueueFailureRetryManagementView.attempts"
        ],
@@ -1255,14 +1276,7 @@
        "label": "The selected delivery queue failure",
        "bindsTo": "DeliveryQueueFailureRetryManagementView",
        "columns": [
-        "DeliveryQueueFailureRetryManagementView.pending",
-        "DeliveryQueueFailureRetryManagementView.processing",
-        "DeliveryQueueFailureRetryManagementView.sent",
-        "DeliveryQueueFailureRetryManagementView.delivered",
-        "DeliveryQueueFailureRetryManagementView.failed",
-        "DeliveryQueueFailureRetryManagementView.retrying",
-        "DeliveryQueueFailureRetryManagementView.deadLettered",
-        "DeliveryQueueFailureRetryManagementView.cancelled",
+        "DeliveryQueueFailureRetryManagementView.status",
         "DeliveryQueueFailureRetryManagementView.communicationId",
         "DeliveryQueueFailureRetryManagementView.sourceModule",
         "DeliveryQueueFailureRetryManagementView.businessEvent",
@@ -1271,7 +1285,7 @@
         "DeliveryQueueFailureRetryManagementView.template",
         "DeliveryQueueFailureRetryManagementView.provider",
         "DeliveryQueueFailureRetryManagementView.priority",
-        "DeliveryQueueFailureRetryManagementView.created",
+        "DeliveryQueueFailureRetryManagementView.createdAt",
         "DeliveryQueueFailureRetryManagementView.status",
         "DeliveryQueueFailureRetryManagementView.attempts"
        ],
@@ -1299,18 +1313,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "DeliveryQueueFailureRetryManagementView.pending",
-    "DeliveryQueueFailureRetryManagementView.processing",
-    "DeliveryQueueFailureRetryManagementView.sent",
-    "DeliveryQueueFailureRetryManagementView.delivered",
-    "DeliveryQueueFailureRetryManagementView.failed",
-    "DeliveryQueueFailureRetryManagementView.retrying"
+    "DeliveryQueueFailureRetryManagementView.status"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-045"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-045",
+   "workshopBoard": "wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-045"
   },
   "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 16. 19 of 19 labels bound to a contract property; 19 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1374,10 +1384,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Management can understand provider reliability, usage and communication cost across the TICVAI platform.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Monitor the operational and commercial performance of communication providers.",
-  "purposeNote": "Management can understand provider reliability, usage and communication cost across the TICVAI platform.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1418,11 +1428,11 @@
         "ProviderHealthUsageCostMonitoringView.volume",
         "ProviderHealthUsageCostMonitoringView.successRate",
         "ProviderHealthUsageCostMonitoringView.failureRate",
-        "ProviderHealthUsageCostMonitoringView.deliveryTime",
-        "ProviderHealthUsageCostMonitoringView.apiLatency",
-        "ProviderHealthUsageCostMonitoringView.availability",
+        "ProviderHealthUsageCostMonitoringView.averageDeliverySeconds",
+        "ProviderHealthUsageCostMonitoringView.averageApiLatencySeconds",
+        "ProviderHealthUsageCostMonitoringView.availabilityRate",
         "ProviderHealthUsageCostMonitoringView.retries",
-        "ProviderHealthUsageCostMonitoringView.fallbackUsage",
+        "ProviderHealthUsageCostMonitoringView.fallbackCount",
         "ProviderHealthUsageCostMonitoringView.cost",
         "ProviderHealthUsageCostMonitoringView.costPerMessage"
        ],
@@ -1444,11 +1454,11 @@
         "ProviderHealthUsageCostMonitoringView.volume",
         "ProviderHealthUsageCostMonitoringView.successRate",
         "ProviderHealthUsageCostMonitoringView.failureRate",
-        "ProviderHealthUsageCostMonitoringView.deliveryTime",
-        "ProviderHealthUsageCostMonitoringView.apiLatency",
-        "ProviderHealthUsageCostMonitoringView.availability",
+        "ProviderHealthUsageCostMonitoringView.averageDeliverySeconds",
+        "ProviderHealthUsageCostMonitoringView.averageApiLatencySeconds",
+        "ProviderHealthUsageCostMonitoringView.availabilityRate",
         "ProviderHealthUsageCostMonitoringView.retries",
-        "ProviderHealthUsageCostMonitoringView.fallbackUsage",
+        "ProviderHealthUsageCostMonitoringView.fallbackCount",
         "ProviderHealthUsageCostMonitoringView.cost",
         "ProviderHealthUsageCostMonitoringView.costPerMessage"
        ],
@@ -1479,15 +1489,16 @@
     "ProviderHealthUsageCostMonitoringView.volume",
     "ProviderHealthUsageCostMonitoringView.successRate",
     "ProviderHealthUsageCostMonitoringView.failureRate",
-    "ProviderHealthUsageCostMonitoringView.deliveryTime",
-    "ProviderHealthUsageCostMonitoringView.apiLatency",
-    "ProviderHealthUsageCostMonitoringView.availability"
+    "ProviderHealthUsageCostMonitoringView.averageDeliverySeconds",
+    "ProviderHealthUsageCostMonitoringView.averageApiLatencySeconds",
+    "ProviderHealthUsageCostMonitoringView.availabilityRate"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-046"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-046",
+   "workshopBoard": "wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-046"
   },
   "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 18. 10 of 17 labels bound to a contract property; 17 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1543,10 +1554,10 @@
    "notes": "**Reached from ADM-038, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "reliability, scalability and cost without interfering with CRM's ownership of customer marketing strategy. Board 1 — Final Screen Register",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Analyze) and no metric row",
   "purpose": "Provide an AI intelligence layer focused specifically on communication infrastructure performance, not CRM marketing strategy.",
-  "purposeNote": "reliability, scalability and cost without interfering with CRM's ownership of customer marketing strategy. Board 1 — Final Screen Register",
   "layout": {
    "template": "split",
    "regions": [
@@ -1558,18 +1569,12 @@
        "kind": "dataTable",
        "label": "Every delivery optimization communication",
        "columns": [
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.businessEvents",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.channels",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.providers",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.queues",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.failures",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.retries",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.latency",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.delivery",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.cost",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.recipientPreferences",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.regionalPerformance",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.historicalPatterns"
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.healthSummary",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.incidents[]",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.failureGroups[]",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.recommendations[]",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.forecasts[]",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.automatedActions[]"
        ],
        "bindsTo": "AiDeliveryOptimizationCommunicationPlatformDiagnostiView",
        "operation": "listDeliveryCommunicationPlatform",
@@ -1586,18 +1591,12 @@
        "label": "The selected delivery optimization communication",
        "bindsTo": "AiDeliveryOptimizationCommunicationPlatformDiagnostiView",
        "columns": [
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.businessEvents",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.channels",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.providers",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.queues",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.failures",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.retries",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.latency",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.delivery",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.cost",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.recipientPreferences",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.regionalPerformance",
-        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.historicalPatterns"
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.healthSummary",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.incidents[]",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.failureGroups[]",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.recommendations[]",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.forecasts[]",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.automatedActions[]"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Administrators can ask”, “Potential Provider Incident”, “Automation Governance”, “Backend Screen Primary Responsibility”, “Platform communication”, “Marketing & CRM owns”.",
        "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 19 §Analyze"
@@ -1619,22 +1618,23 @@
     "contract": "marketing-crm",
     "purpose": "AI Delivery Optimization & Communication Platform Diagnostics",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "requestSuggestion",
+    "contract": "ai",
+    "purpose": "Send-time suggestion (kind sendTime): best hour and channel per recipient",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
-   "preloaded": [
-    "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.businessEvents",
-    "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.channels",
-    "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.providers",
-    "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.queues",
-    "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.failures",
-    "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.retries"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-047"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-047",
+   "workshopBoard": "wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-047"
   },
   "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 19. 12 of 12 labels bound to a contract property; 12 of 79 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

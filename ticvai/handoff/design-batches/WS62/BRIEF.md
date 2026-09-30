@@ -1,6 +1,6 @@
 # WS62 — Ticket Resale Marketplace board 1
 
-**10 screens · 10 operations · 14 schemas · 2 permissions**
+**10 screens · 18 operations · 21 schemas · 4 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `ORDER_CREATE, ORDER_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `ORDER_CREATE, ORDER_VIEW, PRICE_CONFIGURE, PRODUCT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,12 +60,12 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-278` | Resale Marketplace Command Center | commandCentre | 1 | 0 | — |
-| `ADM-279` | Resale Eligibility Rule Configuration | configEditor | 1 | 0 | — |
-| `ADM-280` | Resale Policy & Marketplace Settings | configEditor | 1 | 0 | — |
+| `ADM-278` | Resale Marketplace Command Center | commandCentre | 5 | 0 | — |
+| `ADM-279` | Resale Eligibility Rule Configuration | configEditor | 2 | 0 | — |
+| `ADM-280` | Resale Policy & Marketplace Settings | configEditor | 3 | 1 | — |
 | `ADM-281` | Listing Creation & Seller Configuration | configEditor | 1 | 0 | — |
-| `ADM-282` | Resale Pricing & Price Guardrails | configEditor | 1 | 0 | — |
-| `ADM-283` | Resale Fees, Commission & Seller Proceeds | configEditor | 1 | 0 | — |
+| `ADM-282` | Resale Pricing & Price Guardrails | configEditor | 3 | 1 | — |
+| `ADM-283` | Resale Fees, Commission & Seller Proceeds | configEditor | 4 | 0 | — |
 | `ADM-284` | Listing Approval & Moderation | listDetail | 1 | 0 | — |
 | `ADM-285` | Resale Inventory & Availability Management | listDetail | 1 | 0 | — |
 | `ADM-286` | Listing Lifecycle, Expiry & Cancellation | configEditor | 1 | 0 | — |

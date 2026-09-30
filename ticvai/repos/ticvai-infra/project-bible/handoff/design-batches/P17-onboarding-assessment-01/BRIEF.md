@@ -1,6 +1,6 @@
 # P17-onboarding-assessment-01 — P17 · Onboarding & Assessment
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 4 operations · 8 schemas · 3 permissions**
 
 Platform P17 TICVAI Sign-up · ships as **ticvai-control** ·
 public audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `PLATFORM_PLAN_MANAGE, PRODUCT_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `SGN-001` | Welcome & Start Your TICVAI Journey | configEditor | 0 | 0 | — |
-| `SGN-002` | Customer & Organization Registration | listDetail | 0 | 0 | — |
-| `SGN-003` | Venue Type & Business Profile | listDetail | 0 | 0 | — |
-| `SGN-004` | Visitor, Capacity & Operational Scale | listDetail | 0 | 0 | — |
-| `SGN-005` | Sales Channel Assessment | configEditor | 0 | 0 | — |
-| `SGN-006` | Ticketing & Product Requirements | configEditor | 0 | 0 | — |
-| `SGN-007` | Access, Queue & Visitor Experience Assessment | listDetail | 0 | 0 | — |
-| `SGN-008` | Additional Business Module Assessment | listDetail | 0 | 0 | — |
-| `SGN-009` | Integration, Payment & Technical Readiness | listDetail | 0 | 0 | — |
-| `SGN-010` | AI Assessment Summary & Handoff | listDetail | 0 | 0 | — |
+| `SGN-001` | Welcome & Start Your TICVAI Journey | configEditor | 1 | 0 | — |
+| `SGN-002` | Customer & Organization Registration | listDetail | 1 | 0 | — |
+| `SGN-003` | Venue Type & Business Profile | listDetail | 1 | 0 | — |
+| `SGN-004` | Visitor, Capacity & Operational Scale | listDetail | 1 | 0 | — |
+| `SGN-005` | Sales Channel Assessment | configEditor | 2 | 0 | — |
+| `SGN-006` | Ticketing & Product Requirements | configEditor | 1 | 0 | — |
+| `SGN-007` | Access, Queue & Visitor Experience Assessment | listDetail | 1 | 0 | — |
+| `SGN-008` | Additional Business Module Assessment | listDetail | 2 | 0 | — |
+| `SGN-009` | Integration, Payment & Technical Readiness | listDetail | 1 | 0 | — |
+| `SGN-010` | AI Assessment Summary & Handoff | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 

@@ -1,9 +1,10 @@
 id: LLD-PlatformService
-title: PlatformService — 212 operations, 102 tables
+title: PlatformService — 212 operations, 103 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
+deployable: operations
 index: diagrams/hld/02-services.yaml
-why: '**Three contracts, two schemas, 102 tables.** Subscription, platform operations and the public
+why: '**Three contracts, two schemas, 103 tables.** Subscription, platform operations and the public
   API all write `control.*` — **they are one bounded context that was split into three contracts for
   API-surface reasons, not for data reasons.**
 
@@ -20,7 +21,7 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: control
-  tables: 79
+  tables: 80
   stores:
   - postgres
   largestTable: control.partner_agreement
@@ -2186,6 +2187,12 @@ tables:
   parent: null
   writtenBy:
   - subscription
+  foreignWriters: null
+- table: control.outbox_relay
+  columns: 6
+  store: postgres
+  parent: control.cell_tenant
+  writtenBy: []
   foreignWriters: null
 - table: control.partner
   columns: 28

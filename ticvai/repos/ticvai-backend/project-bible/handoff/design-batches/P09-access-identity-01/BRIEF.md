@@ -1,6 +1,6 @@
 # P09-access-identity-01 — P09 · Access & Identity
 
-**3 screens · 14 operations · 15 schemas · 3 permissions**
+**3 screens · 18 operations · 17 schemas · 3 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 3 permissions apply here:
   `ROLE_MANAGE, SESSION_FORCE_LOGOUT, USER_MANAGE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **3 of these operations work offline**: getCurrentSession, getGuestSession, listRoles
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,9 +60,9 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-001` | Platform Login / MFA | listDetail | 8 | 2 | — |
-| `ADM-020` | Platform User Directory | listDetail | 4 | 0 | — |
-| `ADM-021` | Platform Role Management | listDetail | 2 | 0 | — |
+| `ADM-001` | Platform Login / MFA | listDetail | 12 | 6 | — |
+| `ADM-020` | Platform User Directory | listDetail | 4 | 2 | — |
+| `ADM-021` | Platform Role Management | listDetail | 2 | 1 | — |
 
 ## Thin screens in this batch
 

@@ -18,10 +18,35 @@
     "name": "channelCapacityId",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "eventId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "PerformanceAvailabilityPage"
  },
  "handoverToAgent": {
   "method": "POST",
@@ -68,6 +93,21 @@
     "required": null
    },
    {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "segmentTag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "guidedAnswerIds",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -80,6 +120,25 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "recordAnswerFeedback": {
+  "method": "POST",
+  "path": "/messages/{messageId}/feedback",
+  "contract": "ai",
+  "summary": "Say whether an answer helped",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiAnswerFeedback"
  },
  "sendAiMessage": {
   "method": "POST",

@@ -149,7 +149,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "productId"
      ],
-     "provenance": "decided 29 September 2026 (P29), W8"
+     "provenance": "decided 29 September 2026, W8"
     }
    ]
   },
@@ -242,14 +242,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getPublishedBookingFlow",
        "notes": "The steps of the published flow in their `sortOrder`, this one (tickets) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
-       "provenance": "decided 29 September 2026 (P29), W12; CMS-103 Booking Flows"
+       "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       },
       {
        "kind": "secondaryButton",
        "label": "Show everything",
        "operation": "listProducts",
        "notes": "Clears the Help me choose filter (W4).",
-       "provenance": "decided 29 September 2026 (P29), W4"
+       "provenance": "decided 29 September 2026, W4"
       }
      ]
     },
@@ -339,7 +339,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "white-label",
     "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), W12"
+    "provenance": "decided 29 September 2026, W12"
    }
   ],
   "entryState": {
@@ -636,7 +636,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getPublishedBookingFlow",
        "notes": "The steps of the published flow in their `sortOrder`, this one (date and time) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
-       "provenance": "decided 29 September 2026 (P29), W12; CMS-103 Booking Flows"
+       "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       }
      ]
     }
@@ -701,7 +701,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "white-label",
     "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), W12"
+    "provenance": "decided 29 September 2026, W12"
    }
   ],
   "wireframe": {
@@ -958,7 +958,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getPublishedBookingFlow",
        "notes": "The steps of the published flow in their `sortOrder`, this one (seats) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
-       "provenance": "decided 29 September 2026 (P29), W12; CMS-103 Booking Flows"
+       "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       }
      ]
     },
@@ -1031,7 +1031,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "white-label",
     "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), W12"
+    "provenance": "decided 29 September 2026, W12"
    }
   ],
   "entryState": {
@@ -1317,7 +1317,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getPublishedBookingFlow",
        "notes": "The steps of the published flow in their `sortOrder`, this one (extras) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
-       "provenance": "decided 29 September 2026 (P29), W12; CMS-103 Booking Flows"
+       "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       }
      ]
     },
@@ -1381,7 +1381,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "white-label",
     "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), W12"
+    "provenance": "decided 29 September 2026, W12"
    }
   ],
   "entryState": {
@@ -3008,12 +3008,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); at most 10 per sale on staff and POS (audit R080 (c)). Over the limit is 422 `seatLimitExceeded`.",
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     }
    },
    "resourceHoldId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant and `quantity` is 1. The hold is the line's capacity; no inventory lease is taken."
    },
@@ -3292,12 +3292,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "readOnly": true
    },
    "questionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "questionVersion": {
     "type": "integer",
@@ -3337,14 +3337,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "readOnly": true,
     "description": "Set by `orders.checkoutCart` when the cart becomes an order."
    },
    "orderLineId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "readOnly": true
    },
@@ -3903,12 +3903,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "maxItems": 50,
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     }
    },
    "resourceHoldId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The `resources.ResourceHold` this line buys (decided 29 September, rev 3 REV3-15). While set, `leaseExpiresAt` is the hold's `expiresAt` and `inventoryHoldId` is null."
    },
@@ -4155,8 +4155,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID, as a seat hold's."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7, as a seat hold's."
    },
    "mapId": {
     "type": "string",
@@ -4212,7 +4212,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "performanceId": {
     "type": "string",
@@ -4451,9 +4451,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "readOnly": true,
-    "description": "ULID."
+    "description": "UUIDv7."
    },
    "venueId": {
     "type": "string",
@@ -4510,9 +4510,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "properties": {
       "id": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "format": "uuid",
        "readOnly": true,
-       "description": "ULID. The row's own key."
+       "description": "UUIDv7. The row's own key."
       },
       "title": {
        "$ref": "#/components/schemas/LocalisedText"
@@ -4547,9 +4547,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
         "properties": {
          "id": {
           "type": "string",
-          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+          "format": "uuid",
           "readOnly": true,
-          "description": "ULID. The row's own key."
+          "description": "UUIDv7. The row's own key."
          },
          "title": {
           "$ref": "#/components/schemas/LocalisedText"
@@ -5939,7 +5939,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "properties": {
       "questionId": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+       "format": "uuid"
       },
       "questionVersion": {
        "type": "integer",
@@ -6005,7 +6005,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "mapId": {
     "type": "string",

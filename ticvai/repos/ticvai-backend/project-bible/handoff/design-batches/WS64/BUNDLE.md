@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 1 permissions apply here:
   `ORDER_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-298 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-299",
@@ -186,10 +182,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "An authenticated customer can immediately identify which owned tickets are eligible for resale and begin the official resale process without manually proving ticket ownership.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Depending on ticket configuration) and no display directory — it is settings, not a population",
   "purpose": "Provide the authenticated ticket holder with a simple and secure entry point into the official resale journey. The preferred starting point should be the customer's existing: My Account → My Tickets rather than asking customers to manually enter ticket numbers or upload ticket PDFs.",
-  "purposeNote": "An authenticated customer can immediately identify which owned tickets are eligible for resale and begin the official resale process without manually proving ticket ownership.",
   "layout": {
    "template": "form",
    "regions": [
@@ -253,7 +249,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-298"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-298",
+   "workshopBoard": "wireframes/WS170 Ticket Resale Marketplace Board 3.dc.html#adm-298"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 40. 0 of 0 labels bound to a contract property; 7 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -317,10 +314,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Customers receive an immediate, understandable and authoritative resale eligibility decision before entering the listing process.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Explain whether the selected ticket can be resold before allowing a listing to be created.",
-  "purposeNote": "Customers receive an immediate, understandable and authoritative resale eligibility decision before entering the listing process.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Sell selected tickets. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Ticket Resale Marketplace_Reference.pdf, page 42 §Allow applicable configurations such as"
+   }
+  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -369,6 +373,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 42 §Display"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Sell selected tickets",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 42 §Allow applicable configurations such as"
+      }
+     ]
     }
    ]
   },
@@ -400,9 +415,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-299"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-299",
+   "workshopBoard": "wireframes/WS170 Ticket Resale Marketplace Board 3.dc.html#adm-299"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 42. 7 of 8 labels bound to a contract property; 8 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 42. 7 of 8 labels bound to a contract property; 9 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -464,10 +480,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "A seller can select a valid resale price while TICVAI automatically enforces the operator's configured commercial rules.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Allow an eligible seller to select a resale price within the client's approved marketplace rules.",
-  "purposeNote": "A seller can select a valid resale price while TICVAI automatically enforces the operator's configured commercial rules.",
   "gaps": [
    {
     "operation": null,
@@ -513,17 +529,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "CreateListingResalePriceSelectionView.faceValueOnly",
-    "CreateListingResalePriceSelectionView.fixedPrice",
-    "CreateListingResalePriceSelectionView.sellerSelectedPrice",
-    "CreateListingResalePriceSelectionView.cappedPrice",
-    "CreateListingResalePriceSelectionView.operatorControlled"
+    "CreateListingResalePriceSelectionView.pricingMode"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-300"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-300",
+   "workshopBoard": "wireframes/WS170 Ticket Resale Marketplace Board 3.dc.html#adm-300"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 43. 0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -587,10 +600,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "The seller understands the resale price, applicable fees, estimated proceeds and settlement conditions before submitting the ticket for listing.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide complete financial transparency before the seller commits to publishing the listing. This is essential to prevent later disputes.",
-  "purposeNote": "The seller understands the resale price, applicable fees, estimated proceeds and settlement conditions before submitting the ticket for listing.",
   "gaps": [
    {
     "operation": null,
@@ -635,18 +648,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    }
   ],
   "entryState": {
-   "preloaded": [
-    "FeesSellerProceedsListingConfirmationView.yourSellingPrice",
-    "FeesSellerProceedsListingConfirmationView.aed2200",
-    "FeesSellerProceedsListingConfirmationView.aed000",
-    "FeesSellerProceedsListingConfirmationView.youWillReceiveAed19800",
-    "FeesSellerProceedsListingConfirmationView.clearlyExplainApplicableSettlementRules"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-301"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-301",
+   "workshopBoard": "wireframes/WS170 Ticket Resale Marketplace Board 3.dc.html#adm-301"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 45. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -710,10 +718,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Sellers can independently understand and manage the complete status of their listings and settlements without contacting venue support for routine actions.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display; Show) and a per-row directory (§Each listing shows) — counts over a population, then the population",
   "purpose": "Give sellers a dedicated self-service workspace to manage their resale activity after publishing.",
-  "purposeNote": "Sellers can independently understand and manage the complete status of their listings and settlements without contacting venue support for routine actions.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -772,13 +780,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "metricTile",
        "label": "Selling Price: AED 220",
        "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 46 §Show",
-       "bindsTo": "MyResaleListingsSellerDashboardView.sellingPriceAed220"
+       "bindsTo": "MyResaleListingsSellerDashboardView.listingPrice"
       },
       {
        "kind": "metricTile",
        "label": "Estimated Proceeds: AED 198",
        "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 46 §Show",
-       "bindsTo": "MyResaleListingsSellerDashboardView.estimatedProceedsAed198"
+       "bindsTo": "MyResaleListingsSellerDashboardView.sellerProceeds"
       },
       {
        "kind": "metricTile",
@@ -802,7 +810,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "MyResaleListingsSellerDashboardView.listingPrice",
         "MyResaleListingsSellerDashboardView.originalPrice",
         "MyResaleListingsSellerDashboardView.marketplaceStatus",
-        "MyResaleListingsSellerDashboardView.viewsWhereApplicable",
+        "MyResaleListingsSellerDashboardView.views",
         "MyResaleListingsSellerDashboardView.listingDate",
         "MyResaleListingsSellerDashboardView.expiry",
         "MyResaleListingsSellerDashboardView.sellerProceeds",
@@ -829,7 +837,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "MyResaleListingsSellerDashboardView.listingPrice",
         "MyResaleListingsSellerDashboardView.originalPrice",
         "MyResaleListingsSellerDashboardView.marketplaceStatus",
-        "MyResaleListingsSellerDashboardView.viewsWhereApplicable",
+        "MyResaleListingsSellerDashboardView.views",
         "MyResaleListingsSellerDashboardView.listingDate",
         "MyResaleListingsSellerDashboardView.expiry",
         "MyResaleListingsSellerDashboardView.sellerProceeds",
@@ -860,7 +868,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-302"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-302",
+   "workshopBoard": "wireframes/WS170 Ticket Resale Marketplace Board 3.dc.html#adm-302"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 46. 21 of 21 labels bound to a contract property; 22 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -924,14 +933,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Customers can discover legitimate resale inventory in a trusted marketplace without interacting directly with unknown sellers.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide buyers with a trusted client-branded marketplace for discovering authentic resale inventory.",
-  "purposeNote": "Customers can discover legitimate resale inventory in a trusted marketplace without interacting directly with unknown sellers.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Ticket Type, Price, Primary only. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Event, Venue, Ticket Type, Price, Quantity, Primary only. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Ticket Resale Marketplace_Reference.pdf, page 48 §Support"
    },
    {
@@ -954,12 +963,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Event",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 48 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Venue",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 48 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Ticket Type",
        "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 48 §Support"
       },
       {
        "kind": "secondaryButton",
        "label": "Price",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 48 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Quantity",
        "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 48 §Support"
       },
       {
@@ -997,8 +1021,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "OfficialResaleMarketplaceBuyerDiscoveryView.officialTicketsOfficialResale",
-    "OfficialResaleMarketplaceBuyerDiscoveryView.asASeparateMarketplacePage",
+    "OfficialResaleMarketplaceBuyerDiscoveryView.inventoryFilter",
     "OfficialResaleMarketplaceBuyerDiscoveryView.event",
     "OfficialResaleMarketplaceBuyerDiscoveryView.venue",
     "OfficialResaleMarketplaceBuyerDiscoveryView.date"
@@ -1007,9 +1030,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-303"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-303",
+   "workshopBoard": "wireframes/WS170 Ticket Resale Marketplace Board 3.dc.html#adm-303"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 48. 0 of 0 labels bound to a contract property; 4 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 48. 0 of 0 labels bound to a contract property; 7 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1071,10 +1095,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Buyers clearly understand whether a ticket is primary or resale inventory, its location/entitlements and the complete applicable price before checkout.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Allow customers to understand exactly what they are purchasing and distinguish resale inventory from primary inventory.",
-  "purposeNote": "Buyers clearly understand whether a ticket is primary or resale inventory, its location/entitlements and the complete applicable price before checkout.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1162,7 +1186,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-304"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-304",
+   "workshopBoard": "wireframes/WS170 Ticket Resale Marketplace Board 3.dc.html#adm-304"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 49. 12 of 12 labels bound to a contract property; 14 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1226,10 +1251,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "One buyer can securely purchase the resale ticket while TICVAI prevents concurrent purchase and maintains complete transaction integrity.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Select Resale Ticket) and no display directory — it is settings, not a population",
   "purpose": "Provide a normal, secure TICVAI checkout while protecting the resale listing from simultaneous purchase.",
-  "purposeNote": "One buyer can securely purchase the resale ticket while TICVAI prevents concurrent purchase and maintains complete transaction integrity.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1269,7 +1294,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-305"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-305",
+   "workshopBoard": "wireframes/WS170 Ticket Resale Marketplace Board 3.dc.html#adm-305"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 51. 0 of 0 labels bound to a contract property; 1 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1333,10 +1359,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "After successful resale, the buyer receives control of the valid entitlement and applicable credentials, while the seller can no longer use the transferred ticket.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide the customer-facing completion experience after successful payment while the backend performs the secure entitlement transfer.",
-  "purposeNote": "After successful resale, the buyer receives control of the valid entitlement and applicable credentials, while the seller can no longer use the transferred ticket.",
   "gaps": [
    {
     "operation": null,
@@ -1381,18 +1407,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    }
   ],
   "entryState": {
-   "preloaded": [
-    "ResaleConfirmationOwnershipTransferTicketDeliveryView.followedBy",
-    "ResaleConfirmationOwnershipTransferTicketDeliveryView.yourTicketIsReady",
-    "ResaleConfirmationOwnershipTransferTicketDeliveryView.currentOwnerSellerA",
-    "ResaleConfirmationOwnershipTransferTicketDeliveryView.previousOwnerSellerA",
-    "ResaleConfirmationOwnershipTransferTicketDeliveryView.currentOwnerBuyerB"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-306"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-306",
+   "workshopBoard": "wireframes/WS170 Ticket Resale Marketplace Board 3.dc.html#adm-306"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 52. 0 of 0 labels bound to a contract property; 0 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1448,14 +1469,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from ADM-298, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Each TICVAI tenant can deploy a secure, branded resale marketplace using embedded, hosted or headless architecture without requiring a separate marketplace backend implementation. Board 3 — Final Screen Register # Customer / Experience Screen Primary Responsibility 3.3.1 My Tickets & Resale Marketplace Entry Seller marketplace entry",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "This is the key architecture/configuration screen It defines how each TICVAI client chooses to expose the resale marketplace to its customers. Deployment Model A — Embedded White-Label",
-  "purposeNote": "Each TICVAI tenant can deploy a secure, branded resale marketplace using embedded, hosted or headless architecture without requiring a separate marketplace backend implementation. Board 3 — Final Screen Register # Customer / Experience Screen Primary Responsibility 3.3.1 My Tickets & Resale Marketplace Entry Seller marketplace entry",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Domain configuration, Additional client languages. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Domain configuration, Analytics, Additional client languages, Secure sessions, Fraud integration, Data protection, Session expiry, Audit logging. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Support"
    }
   ],
@@ -1574,7 +1595,37 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       },
       {
        "kind": "secondaryButton",
+       "label": "Analytics",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Additional client languages",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Secure sessions",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Fraud integration",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Data protection",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Session expiry",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Audit logging",
        "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Support"
       }
      ]
@@ -1598,9 +1649,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-307"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-307",
+   "workshopBoard": "wireframes/WS170 Ticket Resale Marketplace Board 3.dc.html#adm-307"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 54. 0 of 0 labels bound to a contract property; 21 of 131 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 54. 0 of 0 labels bound to a contract property; 27 of 131 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1643,7 +1695,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "BuyerCheckoutInventoryHoldSecurePaymentView"
  },
@@ -1656,7 +1714,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "CreateListingResalePriceSelectionView"
  },
@@ -1669,7 +1733,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "FeesSellerProceedsListingConfirmationView"
  },
@@ -1682,7 +1752,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "OfficialResaleMarketplaceBuyerDiscoveryView"
  },
@@ -1695,7 +1771,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ResaleConfirmationOwnershipTransferTicketDeliveryView"
  },
@@ -1708,7 +1790,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ResaleEligibilityTicketSelectionView"
  },
@@ -1721,7 +1809,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "MyResaleListingsSellerDashboardView"
  },
@@ -1734,7 +1828,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView"
  },
@@ -1747,7 +1847,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "MyTicketsResaleMarketplaceEntryView"
  },
@@ -1760,7 +1866,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "WhiteLabelMarketplaceDeploymentExperienceArchitecturView"
  }
@@ -1779,10 +1891,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Buyer Checkout, Inventory Hold & Secure Payment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "architecture": {
-    "type": "string",
-    "description": "architecture"
-   },
    "name": {
     "type": "string",
     "description": "Name"
@@ -1802,6 +1910,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "requiredParticipantInformation": {
     "type": "string",
     "description": "Required participant information"
+   },
+   "holdExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "When the inventory hold ends"
+   },
+   "total": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Total payable"
    }
   }
  },
@@ -1811,33 +1928,29 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Create Listing & Resale Price Selection displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "faceValueOnly": {
+   "pricingMode": {
     "type": "string",
-    "description": "Face Value Only"
+    "enum": [
+     "faceValueOnly",
+     "fixedPrice",
+     "sellerSelectedPrice",
+     "cappedPrice",
+     "operatorControlled",
+     "aiRecommendedPrice"
+    ],
+    "description": "How the seller prices the listing."
    },
-   "fixedPrice": {
+   "recommendedPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed Price"
+    "description": "Recommended price"
    },
-   "sellerSelectedPrice": {
+   "minimumPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Seller Selected Price"
+    "description": "Permitted minimum"
    },
-   "cappedPrice": {
+   "maximumPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Capped Price"
-   },
-   "operatorControlled": {
-    "type": "string",
-    "description": "Operator Controlled"
-   },
-   "aiRecommendedPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "AI Recommended Price"
-   },
-   "recommendedPriceAed215": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Recommended Price: AED 215"
+    "description": "Permitted maximum"
    }
   }
  },
@@ -1847,26 +1960,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Fees, Seller Proceeds & Listing Confirmation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "yourSellingPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Your Selling Price (the pack shows AED 220.00)"
-   },
-   "aed2200": {
-    "type": "string",
-    "description": "− AED 22.00"
-   },
-   "aed000": {
-    "type": "string",
-    "description": "− AED 0.00"
-   },
-   "youWillReceiveAed19800": {
-    "type": "string",
-    "description": "You will receive AED 198.00"
-   },
-   "clearlyExplainApplicableSettlementRules": {
-    "type": "string",
-    "description": "Clearly explain applicable settlement rules"
-   },
    "marketplaceTerms": {
     "type": "integer",
     "description": "Marketplace Terms"
@@ -1891,33 +1984,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Applicable privacy notice"
    },
-   "storeTheApplicableTermsVersionAcceptance": {
-    "type": "string",
-    "description": "Store the applicable terms/version acceptance"
-   },
-   "eventMuseumNight": {
-    "type": "string",
-    "description": "Event: Museum Night"
-   },
-   "seatA18": {
-    "type": "string",
-    "description": "Seat: A18"
-   },
-   "originalPriceAed200": {
+   "sellingPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Original Price: AED 200"
+    "description": "Selling price"
    },
-   "resalePriceAed220": {
+   "fee": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Resale Price: AED 220"
+    "description": "Fee"
    },
-   "feeAed22": {
+   "estimatedProceeds": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fee: AED 22"
+    "description": "Estimated seller proceeds"
    },
-   "estimatedProceedsAed198": {
+   "termsVersion": {
     "type": "string",
-    "description": "Estimated Proceeds: AED 198"
+    "description": "Terms version the seller accepts; stored with the acceptance"
    }
   }
  },
@@ -1980,10 +2061,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Marketplace Status"
    },
-   "viewsWhereApplicable": {
-    "type": "string",
-    "description": "Views where applicable"
-   },
    "listingDate": {
     "type": "string",
     "format": "date-time",
@@ -1998,30 +2075,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Settlement Status"
    },
-   "acceptAiPriceRecommendation": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Accept AI Price Recommendation"
-   },
-   "relist": {
-    "type": "string",
-    "description": "Relist"
-   },
-   "contactSupport": {
-    "type": "boolean",
-    "description": "Contact Support"
-   },
-   "sellingPriceAed220": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Selling Price: AED 220"
-   },
-   "estimatedProceedsAed198": {
-    "type": "string",
-    "description": "Estimated Proceeds: AED 198"
-   },
    "settlementScheduledAfterEvent": {
     "type": "string",
     "format": "date-time",
     "description": "Settlement: Scheduled after event"
+   },
+   "views": {
+    "type": "string",
+    "description": "Views where applicable"
    }
   }
  },
@@ -2072,38 +2133,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Available Actions"
    },
-   "exchange": {
-    "type": "string",
-    "description": "Exchange"
-   },
-   "resellTicket": {
-    "type": "string",
-    "description": "Resell Ticket"
-   },
-   "requestRefund": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Request Refund"
-   },
-   "customerAccount": {
-    "type": "string",
-    "description": "Customer account"
-   },
-   "sso": {
-    "type": "string",
-    "description": "SSO"
-   },
-   "passwordlessLogin": {
-    "type": "string",
-    "description": "Passwordless login"
-   },
-   "otp": {
-    "type": "string",
-    "description": "OTP"
-   },
-   "appAuthentication": {
-    "type": "string",
-    "description": "App authentication"
-   },
    "clientLogo": {
     "type": "string",
     "description": "Client logo"
@@ -2131,6 +2160,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "marketplaceName": {
     "type": "string",
     "description": "Marketplace name"
+   },
+   "authenticationMethod": {
+    "type": "string",
+    "enum": [
+     "customerAccount",
+     "sso",
+     "passwordlessLogin",
+     "otp",
+     "appAuthentication"
+    ],
+    "description": "How the guest signs in to the marketplace"
    }
   }
  },
@@ -2140,14 +2180,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Official Resale Marketplace & Buyer Discovery displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "officialTicketsOfficialResale": {
-    "type": "string",
-    "description": "Official Tickets + Official Resale"
-   },
-   "asASeparateMarketplacePage": {
-    "type": "string",
-    "description": "as a separate marketplace page"
-   },
    "event": {
     "type": "string",
     "description": "Event"
@@ -2185,18 +2217,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Accessibility"
    },
-   "resaleOnly": {
-    "type": "string",
-    "description": "Resale only"
-   },
-   "primaryOnly": {
-    "type": "string",
-    "description": "Primary only"
-   },
-   "andWhereAppropriate": {
-    "type": "string",
-    "description": "and, where appropriate"
-   },
    "name": {
     "type": "string",
     "description": "Name"
@@ -2216,6 +2236,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "paymentInformation": {
     "type": "string",
     "description": "Payment information"
+   },
+   "inventoryFilter": {
+    "type": "string",
+    "enum": [
+     "officialTicketsOfficialResale",
+     "resaleOnly",
+     "primaryOnly"
+    ],
+    "description": "Which inventory the buyer sees."
    }
   }
  },
@@ -2225,26 +2254,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Resale Confirmation, Ownership Transfer & Ticket Delivery displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "followedBy": {
-    "type": "string",
-    "description": "followed by"
-   },
-   "yourTicketIsReady": {
-    "type": "string",
-    "description": "Your Ticket Is Ready ✓"
-   },
-   "currentOwnerSellerA": {
-    "type": "string",
-    "description": "Current Owner: Seller A"
-   },
-   "previousOwnerSellerA": {
-    "type": "string",
-    "description": "Previous Owner: Seller A"
-   },
-   "currentOwnerBuyerB": {
-    "type": "string",
-    "description": "Current Owner: Buyer B"
-   },
    "dynamicQr": {
     "type": "string",
     "description": "Dynamic QR"
@@ -2261,21 +2270,29 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Google Wallet"
    },
-   "rfidNfcAssignmentWhereApplicable": {
-    "type": "string",
-    "description": "RFID/NFC assignment where applicable"
-   },
    "otherSupportedCredentialMedia": {
     "type": "string",
     "description": "Other supported credential media"
    },
-   "yourTicketHasBeenSold": {
+   "rfidNfcAssignment": {
     "type": "string",
-    "description": "Your ticket has been sold"
+    "description": "RFID/NFC assignment where applicable"
    },
-   "settlementStatusPending": {
-    "type": "integer",
-    "description": "Settlement Status: Pending"
+   "ticketId": {
+    "type": "string",
+    "description": "Ticket ID, unchanged through the resale (MoM 1 Sep)"
+   },
+   "currentOwner": {
+    "type": "string",
+    "description": "Current owner"
+   },
+   "previousOwner": {
+    "type": "string",
+    "description": "Previous owner"
+   },
+   "settlementStatus": {
+    "type": "string",
+    "description": "Seller settlement status"
    }
   }
  },
@@ -2334,10 +2351,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Fraud/security hold"
    },
-   "with": {
-    "type": "string",
-    "description": "with"
-   },
    "event": {
     "type": "string",
     "description": "Event"
@@ -2368,41 +2381,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "description": "Applicable marketplace conditions"
    },
-   "error5042": {
+   "sellingMode": {
     "type": "string",
-    "description": "Error 5042"
-   },
-   "a14": {
-    "type": "string",
-    "description": "A14 ☑"
-   },
-   "a15": {
-    "type": "string",
-    "description": "A15 ☑"
-   },
-   "a16": {
-    "type": "string",
-    "description": "A16 ☐"
-   },
-   "a17": {
-    "type": "string",
-    "description": "A17 ☐"
-   },
-   "sellIndividually": {
-    "type": "string",
-    "description": "Sell individually"
-   },
-   "sellSelectedTickets": {
-    "type": "string",
-    "description": "Sell selected tickets"
-   },
-   "sellTogetherOnly": {
-    "type": "string",
-    "description": "Sell together only"
-   },
-   "adjacentSeatGroup": {
-    "type": "string",
-    "description": "Adjacent-seat group"
+    "enum": [
+     "sellIndividually",
+     "sellSelectedTickets",
+     "sellTogetherOnly",
+     "adjacentSeatGroup"
+    ],
+    "description": "How the tickets may be sold."
    }
   }
  },
@@ -2412,10 +2399,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "integrateWithTicvaiSeatMap": {
-    "type": "string",
-    "description": "Integrate with TICVAI Seat Map"
-   },
    "event": {
     "type": "string",
     "description": "Event"
@@ -2464,25 +2447,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "description": "Applicable restrictions"
    },
-   "originalFaceValueAed200": {
-    "type": "string",
-    "description": "Original Face Value: AED 200"
-   },
-   "officialResalePriceAed220": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Official Resale Price: AED 220"
-   },
-   "theCustomerCanChoose": {
-    "type": "string",
-    "description": "The customer can choose"
-   },
    "primaryInventoryResaleInventory": {
     "type": "string",
     "description": "Primary Inventory + Resale Inventory"
    },
-   "whileMaintainingTheirBackendDistinction": {
+   "originalFaceValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Original face value"
+   },
+   "listingSource": {
     "type": "string",
-    "description": "while maintaining their backend distinction"
+    "enum": [
+     "primary",
+     "resale"
+    ],
+    "description": "Primary or resale inventory, shown distinctly"
    }
   }
  },
@@ -2536,55 +2515,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Mobile responsive behavior"
    },
-   "english": {
-    "type": "string",
-    "description": "English"
-   },
-   "arabicRtl": {
-    "type": "string",
-    "description": "Arabic RTL"
-   },
-   "additionalClientLanguages": {
-    "type": "string",
-    "description": "Additional client languages"
-   },
-   "secureSessions": {
-    "type": "string",
-    "description": "Secure sessions"
-   },
-   "authentication": {
-    "type": "string",
-    "description": "Authentication"
-   },
-   "authorization": {
-    "type": "string",
-    "description": "Authorization"
-   },
-   "rateLimiting": {
-    "type": "number",
-    "description": "Rate limiting"
-   },
-   "botProtectionWhereApplicable": {
-    "type": "string",
-    "description": "Bot protection where applicable"
-   },
-   "fraudIntegration": {
-    "type": "string",
-    "description": "Fraud integration"
-   },
-   "dataProtection": {
-    "type": "string",
-    "description": "Data protection"
-   },
-   "sessionExpiry": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Session expiry"
-   },
-   "auditLogging": {
-    "type": "string",
-    "description": "Audit logging"
-   },
    "marketplaceName": {
     "type": "string",
     "description": "Marketplace Name"
@@ -2633,25 +2563,28 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Authentication method"
    },
-   "myTickets": {
+   "deploymentModel": {
     "type": "string",
-    "description": "My Tickets"
+    "enum": [
+     "embeddedWhiteLabel",
+     "ticvaiHostedWhiteLabel",
+     "headlessApi"
+    ],
+    "description": "Deployment model (MoM 1 Sep: own B2C site, TICVAI-hosted portal, API)"
    },
-   "sell": {
-    "type": "string",
-    "description": "Sell"
-   },
-   "buy": {
-    "type": "string",
-    "description": "Buy"
-   },
-   "myListings": {
-    "type": "string",
-    "description": "My Listings"
-   },
-   "transactions": {
-    "type": "string",
-    "description": "Transactions"
+   "navigation": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "myTickets",
+      "sell",
+      "buy",
+      "myListings",
+      "transactions"
+     ]
+    },
+    "description": "Marketplace navigation"
    }
   }
  }

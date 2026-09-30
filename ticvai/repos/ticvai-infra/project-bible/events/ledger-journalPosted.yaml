@@ -11,7 +11,7 @@ emittedBy:
 - approveJournalEntry
 payload:
 - field: journalEntryId
-  type: string
+  type: uuid
 - field: legalEntityId
   type: uuid
 - field: fiscalPeriodId
@@ -20,7 +20,7 @@ payload:
   type: string
   notes: sale, refund, shift, settlement, revaluation, manual
 - field: sourceId
-  type: string
+  type: uuid
 - field: lineCount
   type: integer
 - field: totalDebit

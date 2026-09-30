@@ -1,6 +1,6 @@
-# P16-analytics-01 — P16 · Analytics
+# P16-analytics-01 — P16 · Analytics (1 of 2)
 
-**10 screens · 20 operations · 26 schemas · 11 permissions**
+**10 screens · 25 operations · 56 schemas · 10 permissions**
 
 Platform P16 Venue Analytics · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 11 permissions apply here:
-  `AI_APPROVE, AI_USE, DEVICE_VIEW, LEDGER_VIEW, MARKETING_MANAGE, MARKETING_VIEW, ORDER_VIEW, PRODUCT_VIEW, REPORT_MANAGE, REPORT_VIEW_VENUE, USER_MANAGE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 10 permissions apply here:
+  `AI_USE, DEVICE_VIEW, LEDGER_VIEW, MARKETING_MANAGE, MARKETING_VIEW, ORDER_VIEW, PRODUCT_VIEW, REPORT_MANAGE, REPORT_VIEW_VENUE, USER_MANAGE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **5 of these operations work offline**: getCountVariance, listDevices, listExpiringBatches, listOrders, listProducts
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ANL-001` | Executive Command Center | listDetail | 4 | 0 | — |
-| `ANL-002` | Sales, Revenue & Channel | statusTracker | 2 | 0 | — |
-| `ANL-003` | Operational Performance | listDetail | 5 | 0 | — |
-| `ANL-004` | Product Performance | listDetail | 3 | 0 | — |
-| `ANL-005` | Cost, Margin & Profitability | statusTracker | 3 | 0 | — |
-| `ANL-006` | Inventory & Waste Intelligence | listDetail | 4 | 0 | — |
-| `ANL-007` | Guest & Conversion Intelligence | listDetail | 5 | 0 | — |
-| `ANL-008` | Demand Forecasting | statusTracker | 2 | 0 | — |
-| `ANL-009` | AI Assistant & Action Center | approvalInbox | 8 | 0 | — |
-| `ANL-010` | Suggestions & Advice | configEditor | 2 | 0 | — |
+| `ANL-001` | Executive Command Center | listDetail | 7 | 2 | — |
+| `ANL-002` | Sales, Revenue & Channel | statusTracker | 3 | 1 | — |
+| `ANL-003` | Operational Performance | listDetail | 6 | 1 | — |
+| `ANL-004` | Product Performance | listDetail | 4 | 1 | — |
+| `ANL-005` | Cost, Margin & Profitability | statusTracker | 4 | 1 | — |
+| `ANL-006` | Inventory & Waste Intelligence | listDetail | 6 | 1 | — |
+| `ANL-007` | Guest & Conversion Intelligence | listDetail | 6 | 2 | — |
+| `ANL-008` | Demand Forecasting | statusTracker | 4 | 1 | — |
+| `ANL-009` | AI Assistant & Action Center | approvalInbox | 9 | 5 | — |
+| `ANL-010` | Suggestions & Advice | configEditor | 2 | 1 | — |
 
 ---
 
@@ -133,7 +132,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ANL-021",
      "trigger": "Dashboard Library",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026"
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "carries": [
+      "dashboardId"
+     ]
     },
     {
      "to": "ANL-031",
@@ -153,47 +155,81 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ANL-002",
      "trigger": "Sales, Revenue & Channel",
-     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher",
+     "carries": [
+      "dashboardId",
+      "reportId"
+     ]
     },
     {
      "to": "ANL-003",
      "trigger": "Operational Performance",
-     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher",
+     "carries": [
+      "dashboardId",
+      "reportId"
+     ]
     },
     {
      "to": "ANL-004",
      "trigger": "Product Performance",
-     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher",
+     "carries": [
+      "dashboardId",
+      "reportId"
+     ]
     },
     {
      "to": "ANL-005",
      "trigger": "Cost, Margin & Profitability",
-     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher",
+     "carries": [
+      "dashboardId",
+      "reportId"
+     ]
     },
     {
      "to": "ANL-006",
      "trigger": "Inventory & Waste Intelligence",
-     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher",
+     "carries": [
+      "dashboardId",
+      "reportId"
+     ]
     },
     {
      "to": "ANL-007",
      "trigger": "Guest & Conversion Intelligence",
-     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher",
+     "carries": [
+      "dashboardId",
+      "reportId"
+     ]
     },
     {
      "to": "ANL-008",
      "trigger": "Demand Forecasting",
-     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher",
+     "carries": [
+      "dashboardId"
+     ]
     },
     {
      "to": "ANL-009",
      "trigger": "AI Assistant & Action Center",
-     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher",
+     "carries": [
+      "alertId",
+      "reportId"
+     ]
     },
     {
      "to": "ANL-010",
      "trigger": "Suggestions & Advice",
-     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher",
+     "carries": [
+      "suggestionId"
+     ]
     },
     {
      "to": "ANL-012",
@@ -223,7 +259,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ANL-017",
      "trigger": "Customer, Membership & Loyalty Pulse",
-     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher",
+     "carries": [
+      "dashboardId"
+     ]
     },
     {
      "to": "ANL-018",
@@ -255,8 +294,43 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listAlerts",
+       "notes": "Sends `?status=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Severity",
+       "operation": "listAlerts",
+       "notes": "Sends `?severity=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Workstation id",
+       "operation": "listAlerts",
+       "notes": "Sends `?workstationId=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Shift id",
+       "operation": "listAlerts",
+       "notes": "Sends `?shiftId=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Item id",
+       "operation": "listAlerts",
+       "notes": "Sends `?itemId=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every executive",
+       "label": "Every alert",
        "bindsTo": "Alert",
        "columns": [
         "Alert.id",
@@ -274,6 +348,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listAlerts",
        "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Domain",
+       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "chart",
+       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -283,7 +368,43 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected executive",
+       "label": "The selected alert",
+       "bindsTo": "Alert",
+       "columns": [
+        "Alert.id",
+        "Alert.ruleId",
+        "Alert.ruleName",
+        "Alert.metric",
+        "Alert.raisedAt",
+        "Alert.severity",
+        "Alert.status",
+        "Alert.observedValue",
+        "Alert.threshold",
+        "Alert.scopePath",
+        "Alert.workstationId",
+        "Alert.shiftId",
+        "Alert.itemId",
+        "Alert.acknowledgedByPrincipalId",
+        "Alert.acknowledgedAt",
+        "Alert.acknowledgementNote"
+       ],
+       "operation": "listAlerts",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The command centre",
+       "bindsTo": "CommandCentre",
+       "columns": [
+        "CommandCentre.modules",
+        "CommandCentre.resolvedAt"
+       ],
+       "operation": "getCommandCentre",
+       "provenance": "contract reporting.yaml GET /command-centre"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The dashboard data",
        "bindsTo": "DashboardData",
        "columns": [
         "DashboardData.tileData"
@@ -299,32 +420,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Request",
+       "label": "Request suggestion",
        "operation": "requestSuggestion",
        "provenance": "contract ai.yaml POST /ai/suggestions"
       },
       {
        "kind": "secondaryButton",
-       "label": "Run",
+       "label": "Run report",
        "operation": "runReport",
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "multiSelect",
-       "label": "Domain",
-       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "chart",
-       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -338,6 +442,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "You do not have reporting permission at this scope. **Sections you cannot see are not shown** rather than greyed out."
   },
   "apis": [
+   {
+    "operationId": "getCommandCentre",
+    "contract": "reporting",
+    "purpose": "The modules this login is entitled to, and each module's dashboards",
+    "trigger": "onLoad",
+    "provenance": "command-centre decision, 22 September 2026"
+   },
    {
     "operationId": "getDashboard",
     "contract": "reporting",
@@ -367,6 +478,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listAlerts"
     ]
+   },
+   {
+    "operationId": "recordDashboardView",
+    "contract": "reporting",
+    "purpose": "Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it.",
+    "trigger": "background"
+   },
+   {
+    "operationId": "listAiInsights",
+    "contract": "ai",
+    "purpose": "Insights and anomalies",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -391,7 +515,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A bookmarked dashboard is the normal way in** — a manager opens the same view every Monday. The domain and the window come from the link where it carries them, and from the last view where it does not.",
    "preloaded": [
-    "DashboardData.tileData"
+    "Alert.id",
+    "Alert.ruleId",
+    "Alert.ruleName",
+    "Alert.metric",
+    "Alert.raisedAt"
    ]
   },
   "wireframe": {
@@ -409,6 +537,50 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 3 §The system shall display"
+   }
+  ],
+  "overlays": [
+   {
+    "id": "formRequestSuggestion",
+    "component": "modal",
+    "trigger": "Request suggestion",
+    "body": "**Collects what `requestSuggestion` sends before it is called.** Required: `kind`. Optional: `subjectRef`, `horizon`, `context`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Request suggestion",
+     "operation": "requestSuggestion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "subjectRef",
+      "horizon",
+      "context"
+     ]
+    },
+    "provenance": "contract ai.yaml POST /ai/suggestions"
+   },
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
    }
   ],
   "_platform": {
@@ -461,11 +633,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "trigger": "Executive Command Center",
      "carries": [
       "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
+      "reportId"
      ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-002 holds dashboardId, reportId, so an edge into it carries them"
     }
    ]
   },
@@ -487,32 +657,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected sales revenue channel",
+       "label": "The dashboard data",
        "bindsTo": "DashboardData",
        "columns": [
         "DashboardData.tileData"
        ],
        "operation": "getDashboard",
        "provenance": "contract reporting.yaml GET /dashboards/{dashboardId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Run",
-       "operation": "runReport",
-       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+      },
       {
        "kind": "multiSelect",
        "label": "Domain",
@@ -523,6 +675,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "chart",
        "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
        "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Run report",
+       "operation": "runReport",
+       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
       }
      ]
     }
@@ -547,6 +711,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "reporting",
     "purpose": "Run a report",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "recordDashboardView",
+    "contract": "reporting",
+    "purpose": "Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it.",
+    "trigger": "background"
    }
   ],
   "entryState": {
@@ -580,6 +750,30 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "derivedFrom": "wireframes/Retail Board 6.dc.html#ret-6l"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   }
+  ],
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -630,11 +824,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "trigger": "Executive Command Center",
      "carries": [
       "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
+      "reportId"
      ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-003 holds dashboardId, reportId, so an edge into it carries them"
     }
    ]
   },
@@ -652,13 +844,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listAlerts` reads the population and `getDashboard` reads one of them — list, select, act",
   "purpose": "Operational Performance — across F&B, retail, ticketing and frontline, filtered by domain.",
-  "gaps": [
-   {
-    "operation": "listDevices",
-    "why": "**2 declared operations reach no component on this screen**: listDevices, listPrincipals. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -667,8 +852,43 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listAlerts",
+       "notes": "Sends `?status=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Severity",
+       "operation": "listAlerts",
+       "notes": "Sends `?severity=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Workstation id",
+       "operation": "listAlerts",
+       "notes": "Sends `?workstationId=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Shift id",
+       "operation": "listAlerts",
+       "notes": "Sends `?shiftId=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Item id",
+       "operation": "listAlerts",
+       "notes": "Sends `?itemId=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every operational performance",
+       "label": "Every alert",
        "bindsTo": "Alert",
        "columns": [
         "Alert.id",
@@ -686,6 +906,56 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listAlerts",
        "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every registered device",
+       "bindsTo": "RegisteredDevice",
+       "columns": [
+        "RegisteredDevice.id",
+        "RegisteredDevice.kind",
+        "RegisteredDevice.driver",
+        "RegisteredDevice.identifier",
+        "RegisteredDevice.workstationId",
+        "RegisteredDevice.model",
+        "RegisteredDevice.pushToken",
+        "RegisteredDevice.pushPlatform",
+        "RegisteredDevice.pushFailureCount",
+        "RegisteredDevice.offlineScope",
+        "RegisteredDevice.firmwareVersion",
+        "RegisteredDevice.isRequired"
+       ],
+       "operation": "listDevices",
+       "provenance": "contract tenancy.yaml GET /devices"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every principal",
+       "bindsTo": "Principal",
+       "columns": [
+        "Principal.id",
+        "Principal.username",
+        "Principal.displayName",
+        "Principal.isActive",
+        "Principal.validFrom",
+        "Principal.validTo",
+        "Principal.primaryRoleId",
+        "Principal.roles",
+        "Principal.lastLoginAt"
+       ],
+       "operation": "listPrincipals",
+       "provenance": "contract identity.yaml GET /principals"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Domain",
+       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "chart",
+       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -695,7 +965,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected operational performance",
+       "label": "The selected alert",
+       "bindsTo": "Alert",
+       "columns": [
+        "Alert.id",
+        "Alert.ruleId",
+        "Alert.ruleName",
+        "Alert.metric",
+        "Alert.raisedAt",
+        "Alert.severity",
+        "Alert.status",
+        "Alert.observedValue",
+        "Alert.threshold",
+        "Alert.scopePath",
+        "Alert.workstationId",
+        "Alert.shiftId",
+        "Alert.itemId",
+        "Alert.acknowledgedByPrincipalId",
+        "Alert.acknowledgedAt",
+        "Alert.acknowledgementNote"
+       ],
+       "operation": "listAlerts",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The dashboard data",
        "bindsTo": "DashboardData",
        "columns": [
         "DashboardData.tileData"
@@ -711,26 +1006,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Run",
+       "label": "Run report",
        "operation": "runReport",
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "multiSelect",
-       "label": "Domain",
-       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "chart",
-       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -776,6 +1054,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "identity",
     "purpose": "List principals",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordDashboardView",
+    "contract": "reporting",
+    "purpose": "Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it.",
+    "trigger": "background"
    }
   ],
   "entryState": {
@@ -800,7 +1084,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A bookmarked dashboard is the normal way in** — a manager opens the same view every Monday. The domain and the window come from the link where it carries them, and from the last view where it does not.",
    "preloaded": [
-    "DashboardData.tileData"
+    "Alert.id",
+    "Alert.ruleId",
+    "Alert.ruleName",
+    "Alert.metric",
+    "Alert.raisedAt"
    ]
   },
   "wireframe": {
@@ -812,6 +1100,30 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "derivedFrom": "wireframes/POS Board 6.dc.html#pos-6b"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   }
+  ],
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -860,20 +1172,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
     {
-     "to": "ANL-006",
-     "trigger": "Inventory & Waste Intelligence",
-     "provenance": "flow F82 step 3→4"
-    },
-    {
      "to": "ANL-001",
      "trigger": "Executive Command Center",
      "carries": [
       "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
+      "reportId"
      ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-004 holds dashboardId, reportId, so an edge into it carries them"
+    },
+    {
+     "to": "ANL-006",
+     "trigger": "Inventory & Waste Intelligence",
+     "provenance": "flow F82 step 3→4",
+     "carries": [
+      "dashboardId",
+      "reportId"
+     ]
     }
    ]
   },
@@ -894,8 +1208,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listProducts",
+       "notes": "Sends `?venueId=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listProducts",
+       "notes": "Sends `?kind=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is sellable",
+       "operation": "listProducts",
+       "notes": "Sends `?isSellable=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every product performance",
+       "label": "Every product",
        "bindsTo": "Product",
        "columns": [
         "Product.id",
@@ -913,6 +1248,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listProducts",
        "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Domain",
+       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "chart",
+       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -922,7 +1268,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected product performance",
+       "label": "The selected product",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo",
+        "Product.categoryId",
+        "Product.lifecycleState",
+        "Product.isSellable",
+        "Product.isStockTracked"
+       ],
+       "operation": "listProducts",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The dashboard data",
        "bindsTo": "DashboardData",
        "columns": [
         "DashboardData.tileData"
@@ -938,26 +1309,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Run",
+       "label": "Run report",
        "operation": "runReport",
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "multiSelect",
-       "label": "Domain",
-       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "chart",
-       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -991,6 +1345,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "List products",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordDashboardView",
+    "contract": "reporting",
+    "purpose": "Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it.",
+    "trigger": "background"
    }
   ],
   "entryState": {
@@ -1015,7 +1375,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A bookmarked dashboard is the normal way in** — a manager opens the same view every Monday. The domain and the window come from the link where it carries them, and from the last view where it does not.",
    "preloaded": [
-    "DashboardData.tileData"
+    "Product.id",
+    "Product.code",
+    "Product.name",
+    "Product.description",
+    "Product.kind"
    ]
   },
   "wireframe": {
@@ -1027,6 +1391,30 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "derivedFrom": "wireframes/Retail Board 6.dc.html#ret-6c"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   }
+  ],
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -1074,21 +1462,23 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
     {
-     "to": "ANL-007",
-     "trigger": "Guest & Conversion Intelligence",
-     "provenance": "flow F82 step 1→2",
-     "operation": "getStockValuation"
-    },
-    {
      "to": "ANL-001",
      "trigger": "Executive Command Center",
      "carries": [
       "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
+      "reportId"
      ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-005 holds dashboardId, reportId, so an edge into it carries them"
+    },
+    {
+     "to": "ANL-007",
+     "trigger": "Guest & Conversion Intelligence",
+     "provenance": "flow F82 step 1→2",
+     "operation": "getStockValuation",
+     "carries": [
+      "dashboardId",
+      "reportId"
+     ]
     }
    ]
   },
@@ -1101,13 +1491,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "statusTracker",
   "patternReason": "`getDashboard` reads one record and nothing reads a population — the screen is about that one thing",
   "purpose": "Cost, Margin & Profitability — across F&B, retail, ticketing and frontline, filtered by domain.",
-  "gaps": [
-   {
-    "operation": "getStockValuation",
-    "why": "**1 declared operation reach no component on this screen**: getStockValuation. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "detail",
    "regions": [
@@ -1117,32 +1500,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected cost margin profitability",
+       "label": "The dashboard data",
        "bindsTo": "DashboardData",
        "columns": [
         "DashboardData.tileData"
        ],
        "operation": "getDashboard",
        "provenance": "contract reporting.yaml GET /dashboards/{dashboardId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
+      },
       {
-       "kind": "primaryButton",
-       "label": "Run",
-       "operation": "runReport",
-       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+       "kind": "detailPanel",
+       "label": "The stock valuation",
+       "bindsTo": "StockValuation",
+       "columns": [
+        "StockValuation.asAt",
+        "StockValuation.total",
+        "StockValuation.byLocation",
+        "StockValuation.byCategory"
+       ],
+       "operation": "getStockValuation",
+       "provenance": "contract inventory.yaml GET /stock/valuation"
+      },
       {
        "kind": "multiSelect",
        "label": "Domain",
@@ -1153,6 +1531,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "chart",
        "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
        "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Run report",
+       "operation": "runReport",
+       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
       }
      ]
     }
@@ -1183,6 +1573,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "inventory",
     "purpose": "Stock value by location and category",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordDashboardView",
+    "contract": "reporting",
+    "purpose": "Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it.",
+    "trigger": "background"
    }
   ],
   "entryState": {
@@ -1216,6 +1612,30 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "derivedFrom": "wireframes/Retail Board 6.dc.html#ret-6f"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   }
+  ],
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -1267,11 +1687,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "trigger": "Executive Command Center",
      "carries": [
       "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
+      "reportId"
      ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-006 holds dashboardId, reportId, so an edge into it carries them"
     },
     {
      "to": "BO-058",
@@ -1279,7 +1697,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "provenance": "flow F82 step 4→5",
      "operation": "listExpiringBatches",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "reportId"
+     ]
     }
    ]
   },
@@ -1292,13 +1713,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listExpiringBatches` reads the population and `getDashboard` reads one of them — list, select, act",
   "purpose": "Inventory & Waste Intelligence — across F&B, retail, ticketing and frontline, filtered by domain.",
-  "gaps": [
-   {
-    "operation": "getCountVariance",
-    "why": "**1 declared operation reach no component on this screen**: getCountVariance. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1307,8 +1721,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "numberField",
+       "label": "Within days",
+       "operation": "listExpiringBatches",
+       "notes": "Sends `?withinDays=` to `listExpiringBatches`.",
+       "provenance": "contract inventory.yaml GET /stock-batches/expiring"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every inventory waste intelligence",
+       "label": "Every stock batch",
        "bindsTo": "StockBatch",
        "columns": [
         "StockBatch.id",
@@ -1324,6 +1745,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listExpiringBatches",
        "provenance": "contract inventory.yaml GET /stock-batches/expiring"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Domain",
+       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "chart",
+       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1333,7 +1765,39 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected inventory waste intelligence",
+       "label": "The selected stock batch",
+       "bindsTo": "StockBatch",
+       "columns": [
+        "StockBatch.id",
+        "StockBatch.itemId",
+        "StockBatch.locationId",
+        "StockBatch.batchCode",
+        "StockBatch.lotNumber",
+        "StockBatch.quantity",
+        "StockBatch.receivedAt",
+        "StockBatch.expiresAt",
+        "StockBatch.supplierId",
+        "StockBatch.status"
+       ],
+       "operation": "listExpiringBatches",
+       "provenance": "contract inventory.yaml GET /stock-batches/expiring"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The count variance",
+       "bindsTo": "CountVariance",
+       "columns": [
+        "CountVariance.countId",
+        "CountVariance.totalVarianceValue",
+        "CountVariance.exceptionCount",
+        "CountVariance.lines"
+       ],
+       "operation": "getCountVariance",
+       "provenance": "contract inventory.yaml GET /stock-counts/{countId}/variance"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The dashboard data",
        "bindsTo": "DashboardData",
        "columns": [
         "DashboardData.tileData"
@@ -1349,26 +1813,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Run",
+       "label": "Run report",
        "operation": "runReport",
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "multiSelect",
-       "label": "Domain",
-       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "chart",
-       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1408,6 +1855,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "inventory",
     "purpose": "What is about to go out of date",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordDashboardView",
+    "contract": "reporting",
+    "purpose": "Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it.",
+    "trigger": "background"
+   },
+   {
+    "operationId": "requestSuggestion",
+    "contract": "ai",
+    "purpose": "Waste-risk suggestion (kind wasteRisk): items at risk with a recommended action",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1436,7 +1896,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A bookmarked dashboard is the normal way in** — a manager opens the same view every Monday. The domain and the window come from the link where it carries them, and from the last view where it does not.",
    "preloaded": [
-    "DashboardData.tileData"
+    "StockBatch.id",
+    "StockBatch.itemId",
+    "StockBatch.locationId",
+    "StockBatch.batchCode",
+    "StockBatch.lotNumber"
    ]
   },
   "wireframe": {
@@ -1448,6 +1912,30 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "derivedFrom": "wireframes/Retail Board 6.dc.html#ret-6d"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   }
+  ],
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -1496,20 +1984,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
    "transitions": [
     {
-     "to": "ANL-004",
-     "trigger": "Product Performance",
-     "provenance": "flow F82 step 2→3"
-    },
-    {
      "to": "ANL-001",
      "trigger": "Executive Command Center",
      "carries": [
       "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
+      "reportId"
      ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-007 holds dashboardId, reportId, so an edge into it carries them"
+    },
+    {
+     "to": "ANL-004",
+     "trigger": "Product Performance",
+     "provenance": "flow F82 step 2→3",
+     "carries": [
+      "dashboardId",
+      "reportId"
+     ]
     }
    ]
   },
@@ -1529,8 +2019,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "searchField",
+       "label": "Search",
+       "operation": "listSegments",
+       "notes": "Sends `?search=` to `listSegments`.",
+       "provenance": "contract marketing-crm.yaml GET /segments"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every guest conversion intelligence",
+       "label": "Every segment",
        "bindsTo": "Segment",
        "columns": [
         "Segment.name",
@@ -1545,6 +2042,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listSegments",
        "provenance": "contract marketing-crm.yaml GET /segments"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Domain",
+       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "chart",
+       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1554,7 +2062,25 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected guest conversion intelligence",
+       "label": "The selected segment",
+       "bindsTo": "Segment",
+       "columns": [
+        "Segment.name",
+        "Segment.description",
+        "Segment.venueId",
+        "Segment.match",
+        "Segment.criteria",
+        "Segment.excludeSegmentIds",
+        "Segment.id",
+        "Segment.lastEvaluatedSize",
+        "Segment.lastEvaluatedAt"
+       ],
+       "operation": "listSegments",
+       "provenance": "contract marketing-crm.yaml GET /segments"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The dashboard data",
        "bindsTo": "DashboardData",
        "columns": [
         "DashboardData.tileData"
@@ -1570,38 +2096,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Run",
+       "label": "Run report",
        "operation": "runReport",
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create segment",
        "operation": "createSegment",
        "provenance": "contract marketing-crm.yaml POST /segments"
       },
       {
        "kind": "secondaryButton",
-       "label": "Preview",
+       "label": "Preview segment",
        "operation": "previewSegment",
        "provenance": "contract marketing-crm.yaml POST /segments/{segmentId}/preview"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "multiSelect",
-       "label": "Domain",
-       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "chart",
-       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1653,6 +2162,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listSegments"
     ]
+   },
+   {
+    "operationId": "recordDashboardView",
+    "contract": "reporting",
+    "purpose": "Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it.",
+    "trigger": "background"
    }
   ],
   "entryState": {
@@ -1681,7 +2196,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A bookmarked dashboard is the normal way in** — a manager opens the same view every Monday. The domain and the window come from the link where it carries them, and from the last view where it does not. A segment opened from the list.",
    "preloaded": [
-    "DashboardData.tileData"
+    "Segment.name",
+    "Segment.description",
+    "Segment.venueId",
+    "Segment.match",
+    "Segment.criteria"
    ]
   },
   "wireframe": {
@@ -1693,6 +2212,53 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "derivedFrom": "wireframes/Retail Board 6.dc.html#ret-6e"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   },
+   {
+    "id": "formCreateSegment",
+    "component": "modal",
+    "trigger": "Create segment",
+    "body": "**Collects what `createSegment` sends before it is called.** Required: `name`, `criteria`. Optional: `description`, `venueId`, `match`, `excludeSegmentIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateSegmentRequest",
+    "confirm": {
+     "label": "Create segment",
+     "operation": "createSegment"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "criteria",
+      "description",
+      "venueId",
+      "match",
+      "excludeSegmentIds"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /segments"
+   }
+  ],
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -1743,11 +2309,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "trigger": "Executive Command Center",
      "carries": [
       "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
+      "reportId"
      ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-008 holds dashboardId, reportId, so an edge into it carries them"
     }
    ]
   },
@@ -1769,32 +2333,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected demand forecasting",
+       "label": "The dashboard data",
        "bindsTo": "DashboardData",
        "columns": [
         "DashboardData.tileData"
        ],
        "operation": "getDashboard",
        "provenance": "contract reporting.yaml GET /dashboards/{dashboardId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Ask",
-       "operation": "askReportingQuestion",
-       "provenance": "contract reporting.yaml POST /reports/ask"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+      },
       {
        "kind": "multiSelect",
        "label": "Domain",
@@ -1805,6 +2351,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "chart",
        "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
        "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Ask reporting question",
+       "operation": "askReportingQuestion",
+       "provenance": "contract reporting.yaml POST /reports/ask"
       }
      ]
     }
@@ -1829,6 +2387,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "reporting",
     "purpose": "Read a dashboard with tile data",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordDashboardView",
+    "contract": "reporting",
+    "purpose": "Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it.",
+    "trigger": "background"
+   },
+   {
+    "operationId": "getForecast",
+    "contract": "ai",
+    "purpose": "Forecast values",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1858,6 +2429,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "derivedFrom": "wireframes/Retail Board 6.dc.html#ret-6g"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAskReportingQuestion",
+    "component": "modal",
+    "trigger": "Ask reporting question",
+    "body": "**Collects what `askReportingQuestion` sends before it is called.** Required: `question`. Optional: `conversationId`, `venueId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Ask reporting question",
+     "operation": "askReportingQuestion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "question",
+      "conversationId",
+      "venueId"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/ask"
+   }
+  ],
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -1907,19 +2499,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "ANL-001",
      "trigger": "Executive Command Center",
      "carries": [
-      "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
+      "reportId"
      ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-009 holds reportId, so an edge into it carries them"
     },
     {
      "to": "BO-010",
      "trigger": "Promotions & Coupons",
      "provenance": "flow F77 step 3→4",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "reportId"
+     ]
     }
    ]
   },
@@ -1936,13 +2528,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "approvalInbox",
   "patternReason": "`decideProposedAction` decides items that `listAlerts` queues — every row is waiting for a person, so the empty state is success",
   "purpose": "AI Assistant & Action Center — across F&B, retail, ticketing and frontline, filtered by domain.",
-  "gaps": [
-   {
-    "operation": "listOrders",
-    "why": "**2 declared operations reach no component on this screen**: listOrders, listProposedActions. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1950,6 +2535,41 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "name": "contentBody",
      "slot": "queue",
      "components": [
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listAlerts",
+       "notes": "Sends `?status=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Severity",
+       "operation": "listAlerts",
+       "notes": "Sends `?severity=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Workstation id",
+       "operation": "listAlerts",
+       "notes": "Sends `?workstationId=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Shift id",
+       "operation": "listAlerts",
+       "notes": "Sends `?shiftId=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "textField",
+       "label": "Item id",
+       "operation": "listAlerts",
+       "notes": "Sends `?itemId=` to `listAlerts`.",
+       "provenance": "contract reporting.yaml GET /alerts"
+      },
       {
        "kind": "dataTable",
        "label": "Waiting for a decision",
@@ -1970,6 +2590,58 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listAlerts",
        "provenance": "contract reporting.yaml GET /alerts"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every order",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount",
+        "OrderSummary.principalId",
+        "OrderSummary.holdLabel",
+        "OrderSummary.heldUntil"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every proposed action",
+       "bindsTo": "ProposedAction",
+       "columns": [
+        "ProposedAction.id",
+        "ProposedAction.interactionId",
+        "ProposedAction.kind",
+        "ProposedAction.targetContract",
+        "ProposedAction.targetOperation",
+        "ProposedAction.payload",
+        "ProposedAction.summary",
+        "ProposedAction.status",
+        "ProposedAction.approvalLevel",
+        "ProposedAction.decidedByPrincipalId",
+        "ProposedAction.decisionReason",
+        "ProposedAction.proposedAt"
+       ],
+       "operation": "listProposedActions",
+       "notes": "**What a caller sees follows who may decide** (decided 28 September, audit R213 (3)): with `AI_APPROVE`, every open proposal at the scope; with `AI_USE` only, the caller's own proposals, which are the level 1 ones they may approve themselves.",
+       "provenance": "contract ai.yaml GET /proposed-actions"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Domain",
+       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "chart",
+       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1979,7 +2651,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected assistant action",
+       "label": "The selected alert",
        "bindsTo": "Alert",
        "columns": [
         "Alert.id",
@@ -2006,50 +2678,34 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Ask",
+       "label": "Ask reporting question",
        "operation": "askReportingQuestion",
        "provenance": "contract reporting.yaml POST /reports/ask"
       },
       {
        "kind": "secondaryButton",
-       "label": "Acknowledge",
+       "label": "Acknowledge alert",
        "operation": "acknowledgeAlert",
        "provenance": "contract reporting.yaml POST /alerts/{alertId}/acknowledge"
       },
       {
        "kind": "secondaryButton",
-       "label": "Run",
+       "label": "Run report",
        "operation": "runReport",
        "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save alert rule",
        "operation": "setAlertRule",
        "provenance": "contract reporting.yaml PUT /alert-rules"
       },
       {
        "kind": "secondaryButton",
-       "label": "Decide",
+       "label": "Decide proposed action",
        "operation": "decideProposedAction",
+       "notes": "Guarded as the contract is (decided 28 September, audit R213 (3)): offered on the caller's own level 1 proposals with `AI_USE`; on a level 2 proposal, or somebody else's, only with `AI_APPROVE`, and never on a level 2 proposal the caller prompted. Hidden rather than disabled where the rule already says no.",
        "provenance": "contract ai.yaml POST /proposed-actions/{actionId}/decide"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "multiSelect",
-       "label": "Domain",
-       "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "chart",
-       "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -2114,17 +2770,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "operationId": "listProposedActions",
     "contract": "ai",
-    "purpose": "What the assistant has proposed and nobody has decided",
+    "purpose": "What the assistant has proposed and nobody has decided — all of them with AI_APPROVE, the caller's own with AI_USE (audit R213 (3))",
     "trigger": "onLoad"
    },
    {
     "operationId": "decideProposedAction",
     "contract": "ai",
-    "purpose": "Approve or reject a proposal",
+    "purpose": "Approve or reject a proposal — own level 1 with AI_USE, level 2 or another's with AI_APPROVE, never one's own level 2 (audit R213 (3))",
     "trigger": "onAction",
     "invalidates": [
      "listAlerts"
     ]
+   },
+   {
+    "operationId": "getActionPlan",
+    "contract": "ai",
+    "purpose": "A plan with its steps",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -2149,6 +2812,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "actionId",
      "from": "deepLink"
+    },
+    {
+     "name": "planId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A bookmarked dashboard is the normal way in** — a manager opens the same view every Monday. The domain and the window come from the link where it carries them, and from the last view where it does not. A proposed action opened from the queue or an alert.",
@@ -2169,6 +2836,114 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "derivedFrom": "wireframes/POS Board 6.dc.html#pos-6e"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAskReportingQuestion",
+    "component": "modal",
+    "trigger": "Ask reporting question",
+    "body": "**Collects what `askReportingQuestion` sends before it is called.** Required: `question`. Optional: `conversationId`, `venueId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Ask reporting question",
+     "operation": "askReportingQuestion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "question",
+      "conversationId",
+      "venueId"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/ask"
+   },
+   {
+    "id": "formAcknowledgeAlert",
+    "component": "modal",
+    "trigger": "Acknowledge alert",
+    "body": "**Collects what `acknowledgeAlert` sends before it is called.** Nothing in the body is required. Optional: `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Acknowledge alert",
+     "operation": "acknowledgeAlert"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "note"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /alerts/{alertId}/acknowledge"
+   },
+   {
+    "id": "formRunReport",
+    "component": "modal",
+    "trigger": "Run report",
+    "body": "**Collects what `runReport` sends before it is called.** Nothing in the body is required. Optional: `parameters`, `venueId`, `dateFrom`, `dateTo`, `forceAsync`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RunReportRequest",
+    "confirm": {
+     "label": "Run report",
+     "operation": "runReport"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "parameters",
+      "venueId",
+      "dateFrom",
+      "dateTo",
+      "forceAsync"
+     ]
+    },
+    "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+   },
+   {
+    "id": "formSetAlertRule",
+    "component": "modal",
+    "trigger": "Save alert rule",
+    "body": "**Collects what `setAlertRule` sends before it is called.** Required: `id`, `name`, `metric`, `comparator`, `threshold`, `severity`, `isActive`, `scopePath`. Optional: `thresholdUpper`, `windowMinutes`, `deliverTo`, `recipientRoleIds`, `cooldownMinutes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AlertRule",
+    "confirm": {
+     "label": "Save alert rule",
+     "operation": "setAlertRule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "name",
+      "metric",
+      "comparator",
+      "threshold",
+      "severity",
+      "isActive",
+      "scopePath",
+      "thresholdUpper",
+      "windowMinutes",
+      "deliverTo",
+      "recipientRoleIds",
+      "cooldownMinutes"
+     ]
+    },
+    "provenance": "contract reporting.yaml PUT /alert-rules"
+   },
+   {
+    "id": "formDecideProposedAction",
+    "component": "modal",
+    "trigger": "Decide proposed action",
+    "body": "**Collects what `decideProposedAction` sends before it is called.** Required: `decision`. Optional: `reason` (asked for on a rejection). A refusal is a 403 named by its rule and shown as such (decided 28 September, audit R213 (3)): `approval-level-requires-manager` (level 2 needs a manager holding `AI_APPROVE`), `approver-is-requester` (a level 2 proposal cannot be approved by whoever prompted it), `not-own-proposal` (somebody else's level 1 proposal needs `AI_APPROVE`). An expired or already decided proposal is a 409. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Decide proposed action",
+     "operation": "decideProposedAction"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "decision",
+      "reason"
+     ]
+    },
+    "provenance": "contract ai.yaml POST /proposed-actions/{actionId}/decide"
+   }
+  ],
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -2209,7 +2984,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "ANL-001"
    ],
    "exitTo": [
-    "ANL-001"
+    "ANL-001",
+    "ANL-071"
    ],
    "inferred": false,
    "notes": "**Returns to ANL-001.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
@@ -2217,13 +2993,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ANL-001",
      "trigger": "Executive Command Center",
-     "carries": [
-      "dashboardId",
-      "domain",
-      "reportId",
-      "venueId"
-     ],
-     "provenance": "derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId, so an edge into it must carry them"
+     "provenance": "derived — ANL-001 declares entryState.params dashboardId, reportId and ANL-010 holds none of them, so the edge carries nothing and ANL-001 opens cold"
+    },
+    {
+     "to": "ANL-071",
+     "trigger": "AI maturity",
+     "provenance": "29 September pass (group A) — the stage badge links to the maturity page"
     }
    ]
   },
@@ -2235,13 +3010,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`requestSuggestion`, `recordSuggestionOutcome`) and no read of a population — it is settings, not a list",
   "purpose": "Every open suggestion, what it is based on, and whether the venue took it.",
-  "gaps": [
-   {
-    "operation": "requestSuggestion",
-    "why": "**`requestSuggestion` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
-    "source": "contract ai.yaml POST /ai/suggestions"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -2251,13 +3019,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Request",
+       "label": "Request suggestion",
        "operation": "requestSuggestion",
        "provenance": "contract ai.yaml POST /ai/suggestions"
       },
       {
        "kind": "secondaryButton",
-       "label": "Record",
+       "label": "Record suggestion outcome",
        "operation": "recordSuggestionOutcome",
        "provenance": "contract ai.yaml POST /ai/suggestions/{suggestionId}/outcome"
       }
@@ -2275,8 +3043,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "cardList",
        "bindsTo": "Suggestion[]",
-       "notes": "**The basis is on the card, not behind a tap.** A manager must see that today’s answer is a margin rule and next quarter’s is a model — the same screen, a different basis.",
-       "provenance": "carried from the previous definition"
+       "notes": "**The basis and the stage are on the card, not behind a tap.** Every answer shows a \"Based on\" chip (*your venue profile, UAE calendar, weather, 23 days of your sales*) and a stage badge: Starting, Learning, Established or Trained on your data (29 September, AI functions review). \"Limited historical data\" while the starting pattern carries more than half the weight. Never a bare percentage.",
+       "provenance": "carried from the previous definition",
+       "operation": "requestSuggestion"
       },
       {
        "kind": "detailPanel",
@@ -2293,6 +3062,38 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Do something else",
        "notes": "**Records the outcome either way.** A rejected suggestion is the case the current rule got wrong, which is exactly what a model is trained to beat.",
        "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "requestSuggestion",
+       "notes": "Required.",
+       "provenance": "contract ai.yaml POST /ai/suggestions"
+      },
+      {
+       "kind": "textField",
+       "label": "Subject ref",
+       "operation": "requestSuggestion",
+       "provenance": "contract ai.yaml POST /ai/suggestions"
+      },
+      {
+       "kind": "textField",
+       "label": "Horizon",
+       "operation": "requestSuggestion",
+       "provenance": "contract ai.yaml POST /ai/suggestions"
+      },
+      {
+       "kind": "textField",
+       "label": "Context",
+       "operation": "requestSuggestion",
+       "provenance": "contract ai.yaml POST /ai/suggestions"
+      },
+      {
+       "kind": "banner",
+       "label": "Missing setting",
+       "operation": "requestSuggestion",
+       "notes": "Shown only on a 422 `missing-setting`: names the setting (a current cost, a par level, the venue AI profile) and links to the screen that sets it. Little history is never this banner.",
+       "provenance": "29 September pass (group A)"
       }
      ]
     }
@@ -2301,8 +3102,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "Open suggestions, newest first, grouped by kind.",
    "error": "Could not load. **Trading is unaffected** — this advises and does not act.",
-   "emptyFirstRun": "**A venue with no history has nothing to suggest from**, and the screen says so rather than showing a rule dressed as advice. Names when there will be enough data.",
-   "emptyNoAccess": "You do not have AI permission at this venue."
+   "emptyFirstRun": "**No suggestions asked for yet.** Every kind answers from day one, from the venue AI profile and the starting pattern for the venue type, and says so; the stage badge shows how much of the answer is the venue's own data. The action asks for the first one.",
+   "emptyNoAccess": "You do not have AI permission at this venue.",
+   "emptyNoResults": "No suggestion of this kind. Names the kind filter and offers to clear it."
   },
   "apis": [
    {
@@ -2341,6 +3143,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "derivedFrom": "wireframes/POS Board 6.dc.html#pos-6f"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRecordSuggestionOutcome",
+    "component": "modal",
+    "trigger": "Record suggestion outcome",
+    "body": "**Collects what `recordSuggestionOutcome` sends before it is called.** Required: `id`, `suggestionId`, `decision`. Optional: `actualValue`, `decidedByPrincipalId`, `decidedAt`, `realisedOutcome`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SuggestionOutcome",
+    "confirm": {
+     "label": "Record suggestion outcome",
+     "operation": "recordSuggestionOutcome"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "suggestionId",
+      "decision",
+      "actualValue",
+      "decidedByPrincipalId",
+      "decidedAt",
+      "realisedOutcome",
+      "note"
+     ]
+    },
+    "provenance": "contract ai.yaml POST /ai/suggestions/{suggestionId}/outcome"
+   }
+  ],
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -2435,7 +3264,7 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/proposed-actions/{actionId}/decide",
   "contract": "ai",
   "summary": "Approve or reject a proposal",
-  "permission": "AI_APPROVE",
+  "permission": "AI_USE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -2448,6 +3277,32 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "ProposedAction"
+ },
+ "getActionPlan": {
+  "method": "GET",
+  "path": "/action-plans/{planId}",
+  "contract": "ai",
+  "summary": "A plan with its steps",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiActionPlanDetail"
+ },
+ "getCommandCentre": {
+  "method": "GET",
+  "path": "/command-centre",
+  "contract": "reporting",
+  "summary": "The dashboards this login may see, grouped by module",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CommandCentre"
  },
  "getCountVariance": {
   "method": "GET",
@@ -2481,6 +3336,60 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "DashboardData"
  },
+ "getForecast": {
+  "method": "GET",
+  "path": "/forecasts",
+  "contract": "ai",
+  "summary": "Forecast values",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "definitionKey",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "versionId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "dimensionKey",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scenarioId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "getStockValuation": {
   "method": "GET",
   "path": "/stock/valuation",
@@ -2505,6 +3414,50 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "StockValuation"
  },
+ "listAiInsights": {
+  "method": "GET",
+  "path": "/insights",
+  "contract": "ai",
+  "summary": "Insights and anomalies",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "priority",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listAlerts": {
   "method": "GET",
   "path": "/alerts",
@@ -2517,6 +3470,26 @@ Method, path, parameters, request and response for every operation these screens
   "parameters": [
    {
     "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "severity",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "shiftId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "itemId",
     "in": "query",
     "required": null
    }
@@ -2585,7 +3558,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "StockBatch"
+  "responds": "Page"
  },
  "listOrders": {
   "method": "GET",
@@ -2701,6 +3674,21 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    },
    {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "segmentTag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "guidedAnswerIds",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -2719,7 +3707,7 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/proposed-actions",
   "contract": "ai",
   "summary": "What the assistant has proposed and nobody has decided",
-  "permission": "AI_APPROVE",
+  "permission": "AI_USE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -2737,6 +3725,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -2769,6 +3762,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "SegmentPreview"
+ },
+ "recordDashboardView": {
+  "method": "POST",
+  "path": "/dashboards/{dashboardId}/views",
+  "contract": "reporting",
+  "summary": "Record that a dashboard was opened",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "recordSuggestionOutcome": {
   "method": "POST",
@@ -2855,6 +3867,696 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AiActionPlan": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.action_plan",
+  "description": "**A plan: plan, validate, simulate, approve, execute, with rollback** (design 2.2 D, 3.8; AIC-086..107). Independent of any conversation (AIC-102). Its steps are `ai.action_step`; the change set is hashed so what was approved is what runs (AIC-181).",
+  "required": [
+   "origin",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "origin": {
+    "type": "string",
+    "enum": [
+     "configurationSession",
+     "generateConfiguration",
+     "assistant",
+     "riskCase",
+     "operationalRequirement",
+     "rollback"
+    ]
+   },
+   "originRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "summary": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "validated",
+     "simulated",
+     "awaitingApproval",
+     "approved",
+     "executing",
+     "paused",
+     "completed",
+     "partiallyCompleted",
+     "failed",
+     "compensated",
+     "cancelled",
+     "rolledBack"
+    ],
+    "readOnly": true
+   },
+   "autonomyLevel": {
+    "$ref": "#/components/schemas/AiAutonomyLevel"
+   },
+   "approvalTier": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 2,
+    "description": "The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). Not an autonomy level."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `approvals` request, where tier 2 or the matrix caught the plan."
+   },
+   "proposedActionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "ai.proposed_action",
+    "description": "The `ai.proposed_action` the plan is presented as for a decision."
+   },
+   "changeSetHash": {
+    "type": "string",
+    "readOnly": true
+   },
+   "governanceOutcome": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AiGovernanceOutcome"
+     }
+    ],
+    "readOnly": true
+   },
+   "policyVersionRef": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The governance policy version that decided it."
+   },
+   "simulation": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4)."
+   },
+   "partialCompletionAllowed": {
+    "type": "boolean",
+    "default": false,
+    "description": "Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134)."
+   },
+   "rollbackOfPlanId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.action_plan"
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiActionPlanDetail": {
+  "type": "object",
+  "x-ticvai-persistence": "none — ai.action_plan with its ai.action_step rows",
+  "description": "A plan with its steps in DAG order.",
+  "required": [
+   "plan",
+   "steps"
+  ],
+  "properties": {
+   "plan": {
+    "$ref": "#/components/schemas/AiActionPlan"
+   },
+   "steps": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiActionStep"
+    }
+   }
+  }
+ },
+ "AiActionStep": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.action_step",
+  "description": "One step of a plan: a registered tool against `targetContract.targetOperation` at a contract version (AIC-095), with payload, provenance, compensation and the idempotency key `plan:{id}:step:{n}`. **Scoped through its plan** (`platform.apply_parent_rls`). Each step records its target object's version; drift pauses the plan (AIC-182).",
+  "required": [
+   "planId",
+   "stepNumber",
+   "toolKey",
+   "targetContract",
+   "targetOperation",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "ai.action_plan"
+   },
+   "stepNumber": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "dependsOn": {
+    "type": "array",
+    "items": {
+     "type": "integer",
+     "minimum": 1
+    },
+    "description": "Step numbers that must succeed first. The plan is a DAG."
+   },
+   "toolKey": {
+    "type": "string"
+   },
+   "targetContract": {
+    "type": "string"
+   },
+   "targetOperation": {
+    "type": "string"
+   },
+   "contractVersion": {
+    "type": "string"
+   },
+   "payload": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "The request body of `targetOperation`, validated against it before the plan is approved."
+   },
+   "provenance": {
+    "$ref": "#/components/schemas/AiProvenance"
+   },
+   "idempotencyKey": {
+    "type": "string",
+    "readOnly": true
+   },
+   "targetObjectRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "targetObjectVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "The version the step was planned against. A different version at execution is drift."
+   },
+   "reversible": {
+    "type": "boolean"
+   },
+   "compensation": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "validated",
+     "running",
+     "succeeded",
+     "failed",
+     "compensated",
+     "skipped",
+     "paused"
+    ],
+    "readOnly": true
+   },
+   "attempts": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 3,
+    "readOnly": true,
+    "description": "Bounded at 3 (AIC-135)."
+   },
+   "lastError": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "resultRef": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The owning service's response: success is its answer, not a model's judgement (AIC-097)."
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   }
+  }
+ },
+ "AiEvidenceItemList": {
+  "type": "array",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "The evidence of one decision record, stored with it.",
+  "items": {
+   "$ref": "#/components/schemas/AiEvidenceItem"
+  }
+ },
+ "AiForecastPoint": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.forecast_point",
+  "description": "One forecast value with its interval: 10th, 50th and 90th percentile (design 5.6: a range, never a bare percentage). Partitioned by target month. **AI log database** (design 2.4): append-only, partitioned by month, one Postgres database per tenant on the regional AI log server. The table name stays `ai.<table>`; which server holds it is a deployment matter, not a contract one.",
+  "required": [
+   "versionId",
+   "targetStart",
+   "p50"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "versionId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "ai.forecast_version"
+   },
+   "scenarioId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.forecast_scenario",
+    "description": "Set where the point belongs to a what-if scenario rather than the version itself."
+   },
+   "targetStart": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "targetEnd": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "dimensionKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "Canonical key of the breakdown, e.g. `product=…;channel=web`."
+   },
+   "p10": {
+    "type": "number",
+    "nullable": true
+   },
+   "p50": {
+    "type": "number"
+   },
+   "p90": {
+    "type": "number",
+    "nullable": true
+   },
+   "unit": {
+    "type": "string"
+   },
+   "drivers": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "Component decomposition or SHAP contributions, largest first (ADM-506)."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiForecastVersion": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.forecast_version",
+  "description": "**An immutable forecast version** (AIP-032): producer, model version, data cut-off, horizon and status. Nothing is overwritten; yesterday's actuals are scored against every earlier version.",
+  "required": [
+   "definitionId",
+   "versionNumber",
+   "status",
+   "basis"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "definitionId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "ai.forecast_definition"
+   },
+   "versionNumber": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "running",
+     "draft",
+     "awaitingApproval",
+     "published",
+     "superseded",
+     "rejected",
+     "failed"
+    ],
+    "readOnly": true
+   },
+   "basis": {
+    "$ref": "#/components/schemas/SuggestionBasis"
+   },
+   "maturity": {
+    "$ref": "#/components/schemas/AiMaturity"
+   },
+   "producerRef": {
+    "type": "string"
+   },
+   "modelVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "dataCutoffAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "The analytical replica watermark the snapshot was taken at."
+   },
+   "horizonStart": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "horizonEnd": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "qualityChecks": {
+    "type": "object",
+    "additionalProperties": true,
+    "readOnly": true,
+    "description": "Each gate and whether it passed."
+   },
+   "publishedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal",
+    "description": "Null where the definition auto-published."
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "decisionRecordId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiInsight": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.insight",
+  "description": "**An insight with a lifecycle** (AIP-181): new, reviewed, accepted or rejected, actioned, measured. Anomalies, forecast deviations, trends and opportunities land here; the narrative binds numbers to results, so a figure can only come from a query (design 8, 5.10).",
+  "required": [
+   "kind",
+   "title",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "anomaly",
+     "forecastDeviation",
+     "trend",
+     "opportunity",
+     "executiveSummary",
+     "rootCause",
+     "forecastThreshold",
+     "marketingRecommendation"
+    ]
+   },
+   "detectorId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.anomaly_detector"
+   },
+   "metricKey": {
+    "type": "string",
+    "nullable": true
+   },
+   "subjectKind": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "campaign",
+     "journey",
+     "forecastDefinition",
+     "venue"
+    ],
+    "description": "What the insight is about where it is not a KPI (29 September, build): a marketing-crm campaign or journey for `marketingRecommendation`, a forecast definition for `forecastThreshold`."
+   },
+   "subjectRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "recommendedAction": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "For `marketingRecommendation`: `{recommendation, parameters}` as `AiMarketingRecommendation`. Applied by a person in the owning module, never here."
+   },
+   "expectedImpact": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "A range on a named metric (`metric`, `low`, `high`), never a single number (design 5.6)."
+   },
+   "title": {
+    "type": "string"
+   },
+   "narrative": {
+    "type": "string",
+    "nullable": true
+   },
+   "evidence": {
+    "$ref": "#/components/schemas/AiEvidenceItemList"
+   },
+   "magnitude": {
+    "type": "number",
+    "nullable": true
+   },
+   "priority": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
+   },
+   "correlationKey": {
+    "type": "string",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "new",
+     "reviewed",
+     "accepted",
+     "rejected",
+     "actioned",
+     "measured"
+    ],
+    "readOnly": true
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "actionRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "measuredImpact": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "readOnly": true
+   },
+   "decisionRecordId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "detectedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiMaturity": {
+  "type": "object",
+  "x-ticvai-persistence": "none — embedded as jsonb on ai.suggestion and ai.forecast_version",
+  "description": "**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn). The customer sees a stage badge and a \"Based on\" chip, never a bare percentage (design 5.6), and \"Limited historical data\" while the starting pattern carries more than half the weight.",
+  "required": [
+   "stage",
+   "basedOn"
+  ],
+  "properties": {
+   "stage": {
+    "type": "string",
+    "enum": [
+     "starting",
+     "learning",
+     "established",
+     "learned"
+    ],
+    "description": "`starting`: the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, weather). `learning`: own data carries short-range patterns (about 4 weeks). `established`: own level and trend lead, the baseline fills gaps such as a holiday not yet seen (about 3 months, or at once with 12+ months imported). `learned`: a model trained on this tenant's data, promoted by an admin (AI-D16)."
+   },
+   "basedOn": {
+    "type": "string",
+    "description": "The \"Based on\" line, in words, e.g. *Based on: your venue profile, UAE calendar, weather, 23 days of your sales*. Always present."
+   },
+   "sources": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "source"
+     ],
+     "properties": {
+      "source": {
+       "type": "string",
+       "enum": [
+        "venueSettings",
+        "startingPattern",
+        "calendar",
+        "weather",
+        "bookingsOnHand",
+        "ownHistory",
+        "importedHistory",
+        "configuration",
+        "trainedModel"
+       ]
+      },
+      "detail": {
+       "type": "string",
+       "nullable": true,
+       "description": "e.g. *23 days*, *water park pattern v3*, *Eid al-Adha 2027*."
+      },
+      "observations": {
+       "type": "integer",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "ownDataShare": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "description": "The weight own data carries, `n / (k + n)`. Below 0.5 the answer is marked \"Limited historical data\"."
+   },
+   "limitedHistory": {
+    "type": "boolean"
+   },
+   "nextStage": {
+    "type": "object",
+    "nullable": true,
+    "description": "What the next stage needs, e.g. *8 more Saturdays of sales*, or *an admin promotion*.",
+    "properties": {
+     "stage": {
+      "type": "string",
+      "enum": [
+       "learning",
+       "established",
+       "learned"
+      ]
+     },
+     "needs": {
+      "type": "string"
+     },
+     "expectedBy": {
+      "type": "string",
+      "format": "date",
+      "nullable": true
+     }
+    }
+   }
+  }
+ },
  "Alert": {
   "type": "object",
   "x-ticvai-persistence": "reporting.alert",
@@ -2875,35 +4577,54 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid"
    },
+   "ruleName": {
+    "type": "string",
+    "description": "`AlertRule.name` as it stood when the alert was raised. **The line a person reads** — a list of rule ids is not an alert panel, and a screen should not need `listAlertRules` to label one.\n"
+   },
+   "metric": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricSource"
+     }
+    ],
+    "description": "The rule's metric, carried so the alert says what went out of range."
+   },
    "raisedAt": {
     "type": "string",
     "format": "date-time"
    },
    "severity": {
-    "type": "string",
-    "enum": [
-     "info",
-     "warning",
-     "critical"
-    ]
+    "$ref": "#/components/schemas/AlertSeverity"
    },
    "status": {
-    "type": "string",
-    "enum": [
-     "raised",
-     "acknowledged",
-     "resolved",
-     "expired"
-    ]
+    "$ref": "#/components/schemas/AlertStatus"
    },
    "observedValue": {
-    "type": "number"
+    "$ref": "#/components/schemas/MetricValue"
    },
    "threshold": {
-    "type": "number"
+    "$ref": "#/components/schemas/MetricValue"
    },
    "scopePath": {
     "type": "string"
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The workstation the reading was taken for, where the metric is measured per workstation (`salesByWorkstation`). Null otherwise. `listAlerts` filters on it."
+   },
+   "shiftId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The till shift (`orders.pos_shift`) the reading belongs to, where it was taken for a workstation with a shift open. Null otherwise. `listAlerts` filters on it."
+   },
+   "itemId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The inventory item the reading is about, where the metric is measured per item (`stockAgeing`, `stockTurnover`, `wastageRate`, `inventoryValuation`). Null otherwise. **What a replenishment screen prefills a requisition from.**\n"
    },
    "acknowledgedByPrincipalId": {
     "type": "string",
@@ -2914,6 +4635,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "acknowledgementNote": {
+    "type": "string",
+    "maxLength": 300,
+    "nullable": true,
+    "description": "The `note` given to `acknowledgeAlert`. Kept, because an acknowledgement that says what is being done about it is the one escalation can skip."
    },
    "resolvedAt": {
     "type": "string",
@@ -2940,7 +4667,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "comparator",
    "threshold",
    "severity",
-   "isActive"
+   "isActive",
+   "scopePath"
   ],
   "properties": {
    "id": {
@@ -2969,11 +4697,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ]
    },
    "threshold": {
-    "type": "number"
+    "$ref": "#/components/schemas/MetricValue"
    },
    "thresholdUpper": {
-    "type": "number",
-    "nullable": true
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true,
+    "description": "**Required when `comparator` is `outsideRange`** (decided 28 September, audit R158): the range is `threshold` to `thresholdUpper`, and a rule missing either, or with the upper not above the lower, is refused by `setAlertRule` with 400. Ignored for every other comparator.\n"
    },
    "windowMinutes": {
     "type": "integer",
@@ -2981,12 +4714,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "**The window is what stops an alert firing on noise.** A queue that spikes for ninety seconds is not a queue that needs a manager, and a rule with no window is a rule somebody mutes within a week.\n"
    },
    "severity": {
-    "type": "string",
-    "enum": [
-     "info",
-     "warning",
-     "critical"
-    ]
+    "$ref": "#/components/schemas/AlertSeverity"
    },
    "deliverTo": {
     "type": "array",
@@ -2997,9 +4725,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "dashboardPanel",
       "email",
       "whatsapp",
-      "sms"
+      "sms",
+      "push"
      ]
-    }
+    },
+    "x-ticvai-push-note": "**`push` added 29 September** (6.1.56, 18.1.5, build pass): delivered to every staff-app handset registered for a recipient (tenancy `RegisteredDevice`, kind `mobileHandset`, with a push token). It is how a daily revenue alert reaches a manager's phone, which a panel on a web dashboard does not.\n"
    },
    "recipientRoleIds": {
     "type": "array",
@@ -3018,7 +4748,80 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "scopePath": {
     "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**\n\n**Required, and it is the write target.** `setAlertRule` has no id in its path and a caller may hold several venues, so the rule names the venue it watches here — inside the caller's scope, or the write is refused."
+   }
+  }
+ },
+ "AlertSeverity": {
+  "type": "string",
+  "description": "How urgent an alert rule's breach is. Shared by `AlertRule`, `Alert` and the `listAlerts` filter.",
+  "enum": [
+   "info",
+   "warning",
+   "critical"
+  ]
+ },
+ "AlertStatus": {
+  "type": "string",
+  "description": "Where a raised alert is. Shared by `Alert` and the `listAlerts` filter.",
+  "enum": [
+   "raised",
+   "acknowledged",
+   "resolved",
+   "expired"
+  ]
+ },
+ "Channel": {
+  "type": "string",
+  "enum": [
+   "pos",
+   "kiosk",
+   "web",
+   "mobile",
+   "b2b",
+   "ota",
+   "callCentre"
+  ]
+ },
+ "CommandCentre": {
+  "x-ticvai-persistence": "none — computed per caller from `reporting.dashboard`, the tenant's licensed modules and the principal's permissions",
+  "type": "object",
+  "description": "**What one login sees in the command centre.** Not stored: two principals in the same venue receive different command centres, and a stored one would be wrong the moment a role or a licence changed.",
+  "required": [
+   "modules",
+   "resolvedAt"
+  ],
+  "properties": {
+   "modules": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "module",
+      "dashboards"
+     ],
+     "properties": {
+      "module": {
+       "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+      },
+      "dashboards": {
+       "type": "array",
+       "description": "Shared first, then the caller's own, each by name. Tile data is not included — `getDashboard` reads one with its data when it is opened.",
+       "items": {
+        "$ref": "#/components/schemas/Dashboard"
+       }
+      },
+      "canAuthor": {
+       "type": "boolean",
+       "description": "**Whether the caller may build a dashboard for this module** — `REPORT_MANAGE` plus entitlement to the module. Returned so the shell can offer the drag-and-drop authoring entry point only where `createDashboard` would accept it; the server still enforces it on the write."
+      }
+     }
+    }
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "When the entitlement was evaluated. A licence or role change after this is not reflected until the next read."
    }
   }
  },
@@ -3032,14 +4835,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "countId": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid"
    },
    "totalVarianceValue": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "exceptionCount": {
     "type": "integer",
-    "description": "Lines beyond tolerance, requiring review before posting."
+    "description": "Lines beyond `VenueSettings.inventory.countVarianceTolerancePercent` (proposed default 2 per cent, audit R094), requiring review before posting."
    },
    "lines": {
     "type": "array",
@@ -3170,6 +4974,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       ],
       "description": "Combined refresh load of every tile."
      },
+     "archivedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "description": "**Set by `deleteDashboard`, which archives rather than removes.** A dashboard's tiles carry `visualisation`, `parameters` and `refresh_seconds` that somebody configured, and `reporting.dashboard_tile` cascades — so a hard delete takes an afternoon's work with it and leaves nothing to say what was there.\nArchived dashboards are excluded from `listDashboards` unless asked for with `includeArchived=true`.\n"
+     },
      "createdAt": {
       "type": "string",
       "format": "date-time"
@@ -3213,45 +5024,39 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   ]
  },
- "DataSource": {
+ "DeviceCapability": {
   "type": "string",
-  "description": "What a report may be built over. **A closed set, and that is the point** — a builder that accepts any table will happily produce a report over data nobody maintains.\n**Eight sources added 18 August** (BL-143), each because the matrix asks for a report the builder could not source. `stockCounts` and `waste`: 6.1.21 wants count variance and `stockMovements` records the movement rather than **the count that found the discrepancy**. `workstations`, `devices` and `principals`: 6.1.28 — **who did what at which till** is the question an auditor asks first and it had no source. `loyalty`: 6.1.37, points earned, burned and expiring. `reviews`: 6.1.46. `queueEntries`: **wait times are already measured and nothing could report on them.**\n**Adding a source is a decision, not an omission.** `principals`, `guests`, `loyalty` and `reviews` all name a person, and `REPORT_EXPORT_PII` gates them.\n",
+  "description": "BL-179. **Something a driver reports, not something the platform provides.** The list grows as vendors are added, which is ADR-0015's whole position: adding a vendor is a driver plus configuration rather than a core change.\n**`genderClassification` is here because `VenueSettings.segregatedAccess. genderVerification` already offers `deviceAssisted` and nothing answered it** — a switch with no driver behind it. Where a venue's access hardware performs the check and the venue chooses to use it, the result is **advisory to the steward and never decisive at the turnstile** (`ValidationResult.advisory`). 3.2.45 asks for rejection; the package deviates deliberately and CF-130 records why.\n",
   "enum": [
-   "orders",
-   "orderLines",
-   "payments",
-   "refunds",
-   "shifts",
-   "scanEvents",
-   "entitlements",
-   "products",
-   "inventory",
-   "stockMovements",
-   "stockCounts",
-   "waste",
-   "workstations",
-   "devices",
-   "principals",
-   "loyalty",
-   "reviews",
-   "queueEntries",
-   "guests",
-   "campaigns",
-   "cases",
-   "ledgerEntries",
-   "workOrders",
-   "approvals",
-   "purchaseOrders",
-   "receipts",
-   "requisitions",
-   "stockBatches",
-   "resourceBookings",
-   "delegations",
-   "forms",
-   "challenges",
-   "wallets",
-   "resaleListings"
+   "genderClassification"
   ]
+ },
+ "DeviceKind": {
+  "type": "string",
+  "enum": [
+   "receiptPrinter",
+   "ticketPrinter",
+   "labelPrinter",
+   "cashDrawer",
+   "barcodeScanner",
+   "rfidReader",
+   "nfcReader",
+   "cardReader",
+   "idReader",
+   "biometricReader",
+   "accessReader",
+   "paymentTerminal",
+   "customerDisplay",
+   "signageDisplay",
+   "kitchenDisplay",
+   "turnstileController",
+   "wristbandEncoder",
+   "signaturePad",
+   "scale",
+   "camera",
+   "mobileHandset"
+  ],
+  "description": "`mobileHandset` (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation.\n"
  },
  "FieldType": {
   "type": "string",
@@ -3267,6 +5072,56 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "enum"
   ]
  },
+ "GeneratedQuery": {
+  "x-ticvai-persistence": "none — embedded; stored whole in `reporting.natural_language_query`",
+  "type": "object",
+  "description": "The structured query a natural-language question produced — data source, columns, filters, grouping. Named on 26 September so the answer and the kept copy are one shape.\n",
+  "properties": {
+   "dataSource": {
+    "$ref": "#/components/schemas/DataSource"
+   },
+   "columns": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ReportColumn"
+    }
+   },
+   "filters": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ReportFilter"
+    }
+   },
+   "groupBy": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "compiledSql": {
+    "type": "string",
+    "nullable": true,
+    "description": "The SQL the semantic spec compiled to, exactly as run on the analytical replica (29 September, design 5.7). The replica's row-level security applies beneath it, so it does not need to carry the caller's scope. Null on queries kept before the semantic compile.\n"
+   }
+  }
+ },
+ "GuestListing": {
+  "type": "string",
+  "enum": [
+   "bookable",
+   "infoOnly",
+   "hidden"
+  ],
+  "default": "bookable",
+  "description": "**How a product appears to a guest** (decided 29 September, rev 3 REV3-14). `bookable`: listed and searched while it is on sale, and added to the basket. `infoOnly`: listed and searched with its details, photo and `notBookableLabel` whether or not it is on sale, and **never added to a basket** (`addCartLine` refuses it with `409`); the screen opens its details instead. `hidden`: never listed or searched for a guest, and reachable only where a staff channel sells it. Independent of `isSellable`, which says whether a channel may sell it at all.\n"
+ },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
  "MessageChannel": {
   "type": "string",
   "enum": [
@@ -3280,7 +5135,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "MetricSource": {
   "type": "string",
-  "description": "**A named metric with a verified source.** BL-053, 75 requirement rows.\n`reporting` is a generic builder, and **a generic builder makes every reporting requirement look covered** — it will happily assemble a report over data nobody produces. That is the shape to watch across the whole walk, and this enum is the answer to it: each value below was checked against the schema before being named.\n| Metric | Source | |---|---| | `occupancy` | `catalogue.channel_capacity.sold` and `leased` against `capacity` | | `capacityUtilisation` | `catalogue.channel_capacity.remaining` over the same window | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order` | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation on the shift that took it | | `waitTime` | `queue.waiting_guest.estimated_call_at` against `called_at` | | `throughput` | `queue.waiting_guest` completions per hour | | `abandonmentRate` | Queue entries that left before being called |\n**`salesByInstructor` is deliberately absent.** It needs the staff-assignment link that CL-01 covers, and naming a metric with no source is the defect this enum exists to prevent.\n",
+  "description": "**A named metric with a verified source.** BL-053, 75 requirement rows.\n`reporting` is a generic builder, and **a generic builder makes every reporting requirement look covered** — it will happily assemble a report over data nobody produces. That is the shape to watch across the whole walk, and this enum is the answer to it: each value below was checked against the schema before being named.\n| Metric | Source | |---|---| | `occupancy` | `catalogue.channel_capacity.sold` and `leased` against `capacity` | | `capacityUtilisation` | `catalogue.channel_capacity.remaining` over the same window | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order` | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation on the shift that took it | | `waitTime` | `queue.waiting_guest.estimated_call_at` against `called_at` | | `throughput` | `queue.waiting_guest` completions per hour | | `abandonmentRate` | Queue entries that left before being called |\n**`salesByInstructor` was deliberately absent from the first cut** because it needed the staff-assignment link CL-01 covers. It was added on 18 August once `resources.Resource` produced it — see `x-ticvai-extension-note` below. Naming a metric with no source is still the defect this enum exists to prevent.\n**Money-valued metrics are listed in `x-ticvai-money-valued`.** A reading or threshold on one of them is a `Money`, never a float (`MetricValue`).\n",
   "enum": [
    "occupancy",
    "capacityUtilisation",
@@ -3310,10 +5165,47 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "assetDowntime",
    "meanTimeToRepair",
    "challengeCompletionRate",
-   "attributedRevenue"
+   "attributedRevenue",
+   "loyaltyActiveMembers",
+   "loyaltyTierDistribution",
+   "loyaltyPointsLiability",
+   "loyaltyBreakageRate",
+   "loyaltyMemberRetention",
+   "challengeParticipationRate",
+   "gamificationLoyaltyImpact",
+   "gamificationMembershipImpact",
+   "gamificationRetention",
+   "accreditationApplications",
+   "accreditationTimeToDecision",
+   "accreditationCredentialsIssued",
+   "accreditationActiveHolders",
+   "accreditationRenewalsDue",
+   "staffingShortfall"
   ],
+  "x-ticvai-money-valued": [
+   "inventoryValuation",
+   "resaleCommission",
+   "revenuePerEntitlement",
+   "revenuePerVisitor",
+   "attributedRevenue",
+   "loyaltyPointsLiability"
+  ],
+  "x-ticvai-extended-29-september": "**Fourteen metrics added 29 September (build pass)**, each checked against the schema of the contract that produces it.\n\n| Metric | Source | Requirement | |---|---|---| | `loyaltyActiveMembers` | `marketing.loyalty_position` members with a `marketing.loyalty_points` movement in the period | 5.4.27 | | `loyaltyTierDistribution` | `marketing.loyalty_position.tier_id` against `marketing.programme_tier`, members per tier | 5.4.27 | | `loyaltyPointsLiability` | the balance of `ledger.journal_line` on each programme's `pointsLiabilityAccountId`, where points post on accrual and release on redemption or expiry | 5.4.27 | | `loyaltyBreakageRate` | `marketing.loyalty_points` expiry movements over points earned, in the period | 5.4.27 | | `loyaltyMemberRetention` | members with a movement in the previous period who also have one in this period | 5.4.27 | | `challengeParticipationRate` | distinct `marketing.challenge_progress.subject_id` over active loyalty members | 22.6.20 | | `gamificationLoyaltyImpact` | points earned per member, challenge participants against non-participants (`marketing.loyalty_points` split by `marketing.challenge_progress`) | 22.6.20 | | `gamificationMembershipImpact` | joins and renewals in `identity.customer_membership`, participants against non-participants | 22.6.20 | | `gamificationRetention` | return visits (`access.scan_event`, in-direction) of participants against non-participants | 22.6.20 | | `accreditationApplications` | `accreditation.application` by `status` | 12.1.50 | | `accreditationTimeToDecision` | `accreditation.application.decided_at` minus `submitted_at` | 12.1.50 | | `accreditationCredentialsIssued` | `accreditation.credential.issued_at` | 12.1.50 | | `accreditationActiveHolders` | `accreditation.holder` `active`, by `category_code` | 12.1.50 | | `accreditationRenewalsDue` | `accreditation.holder.valid_to` inside `accreditation.validity.renewal_window_days` | 12.1.50 |\n\n**`staffingShortfall` added the same evening (build pass, group G2; 8.2.49)**: the largest gap in the window between the staff rostered and the staff the forecast requires, per venue and position, from `workforce.forecast_requirement` (the handed-over AI staff requirement) against `workforce.rota_assignment` and `workforce.open_shift`, computed as `workforce.getStaffingCoverage` with `basis` `forecastRequirement`. An `AlertRule` on it with `comparator` `above` and `threshold` 0 is the staffing shortage alert; `windowMinutes` looks ahead rather than back for this metric (the rota for the coming window), and `cooldownMinutes` stops one short shift alerting every quarter hour.\n\n**Points issued, points redeemed, campaign performance and reward redemption were already served** by the `loyalty` and `campaigns` sources, and challenge completion and revenue attribution by `challengeCompletionRate` and `attributedRevenue`.\n",
+  "x-ticvai-money-valued-note": "**`salesByOperator`, `salesByWorkstation` and `resaleVolume` are not listed because the package does not say whether they count sales or sum their value.** Until that is decided, a rule on them carries a plain number.\n",
   "x-ticvai-extended": "18 August 2026",
   "x-ticvai-extension-note": "**Nineteen metrics added when their upstream models landed**, which is how BL-053 was always going to close — not by changing `reporting` but by building the things it wanted to report on.\n`inventoryValuation`, `stockTurnover`, `stockAgeing` and `wastageRate` came from `inventory.StockBatch`; `resaleVolume` and `resaleCommission` from `orders.ResaleListing`; **`salesByInstructor` from `resources.Resource`, which was the one metric this enum deliberately refused to name in the morning** because nothing produced it. `allocationUtilisation` from `PartnerUser` and `ChannelListing`, `membershipChurn` from `Journey`, `supplierDeliveryPerformance` from `ProductionRun`, `assetDowntime` and `meanTimeToRepair` from `WorkOrder.downtimeMinutes`, `challengeCompletionRate` from `ChallengeProgress`, `attributedRevenue` from `AttributionTouch`.\n**Each was checked against the schema before being named.** That rule has not changed — naming a metric with no source is the defect this enum exists to prevent.\n"
+ },
+ "MetricValue": {
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**A reading of a metric or KPI, or a threshold on one.** A `Money` where the metric is money-valued — `MetricSource` lists those in `x-ticvai-money-valued`, and a KPI is when its `unit` is `currency` — and a plain number otherwise. naming-and-style 5.1: money is never a float, at any layer.\nStored as `numeric(18,4)` either way: a money value stores its amount, and currency and scale resolve from the scope as they do for every `Money`.\n",
+  "oneOf": [
+   {
+    "type": "number"
+   },
+   {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  ]
  },
  "NaturalLanguageAnswer": {
   "x-ticvai-persistence": "none — computed",
@@ -3323,7 +5215,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "question",
    "interpretation",
    "result",
-   "confidence"
+   "reliability"
   ],
   "properties": {
    "conversationId": {
@@ -3334,42 +5226,59 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "interpretation": {
     "type": "string",
-    "description": "What the question was understood to mean, in plain language."
+    "description": "What the question was understood to mean, in plain language. When the question is outside the semantic model, the \"not available yet\" sentence."
+   },
+   "semanticSpec": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ReportingSemanticQuerySpec"
+     }
+    ],
+    "nullable": true,
+    "description": "What the model returned instead of SQL (design 2.2 E, 5.7): metric, dimensions, filters, period, comparison, as validated against the semantic model. Null when the question is outside it. **Also kept**, on `NaturalLanguageQuery`, so a follow-up edits it.\n"
    },
    "generatedQuery": {
-    "type": "object",
-    "description": "The structured query produced — data source, columns, filters, grouping. Returned so the answer can be checked. An answer nobody can verify is worse than no answer.\n",
-    "properties": {
-     "dataSource": {
-      "$ref": "#/components/schemas/DataSource"
-     },
-     "columns": {
-      "type": "array",
-      "items": {
-       "$ref": "#/components/schemas/ReportColumn"
-      }
-     },
-     "filters": {
-      "type": "array",
-      "items": {
-       "$ref": "#/components/schemas/ReportFilter"
-      }
-     },
-     "groupBy": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      }
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/GeneratedQuery"
      }
-    }
+    ],
+    "nullable": true,
+    "description": "The query the spec compiled to: data source, columns, filters, grouping, and the compiled SQL in `compiledSql`. Returned so the answer can be checked. An answer nobody can verify is worse than no answer. **Also kept, as `NaturalLanguageQuery`**, for `saveNaturalLanguageQuery`. Null when the question is outside the semantic model.\n"
    },
    "result": {
-    "$ref": "#/components/schemas/ReportResult"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ReportResult"
+     }
+    ],
+    "nullable": true,
+    "description": "Null when the question is outside the semantic model."
+   },
+   "dataAsOf": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Replica position the answer was read at, the result's `dataAsOf`, stated beside the answer so a figure that moved is not argued about. Null when nothing was run."
+   },
+   "reliability": {
+    "$ref": "#/components/schemas/ReportingAnswerReliability"
+   },
+   "unavailableReason": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ReportingUnavailableReason"
+     }
+    ],
+    "nullable": true,
+    "description": "Set only when `reliability` is `insufficientEvidence` because the question is outside the semantic model (\"not available yet\"); names which part is not modelled."
    },
    "confidence": {
     "type": "number",
     "minimum": 0,
-    "maximum": 1
+    "maximum": 1,
+    "deprecated": true,
+    "description": "Superseded by `reliability` on 29 September (design 5.6, never a bare percentage for analytics). Returned for one release, then removed."
    },
    "suggestedFollowUps": {
     "type": "array",
@@ -3382,6 +5291,95 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "tokensUsed": {
     "type": "integer"
+   }
+  }
+ },
+ "OrderChannel": {
+  "type": "string",
+  "description": "Where the order originated. Added when guest self-ordering was contracted — an order a guest placed on their own phone is commercially and operationally different from one a cashier typed, and reporting that cannot separate them cannot answer whether self-ordering is working.\n",
+  "enum": [
+   "pos",
+   "kiosk",
+   "guestApp",
+   "guestWeb",
+   "callCentre",
+   "partner",
+   "api",
+   "backOffice"
+  ]
+ },
+ "OrderStatus": {
+  "type": "string",
+  "enum": [
+   "pending",
+   "held",
+   "paid",
+   "partiallyPaid",
+   "completed",
+   "voided",
+   "refunded",
+   "partiallyRefunded",
+   "failed"
+  ],
+  "description": "`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"
+ },
+ "OrderSummary": {
+  "x-ticvai-persistence": "none — projection",
+  "type": "object",
+  "required": [
+   "id",
+   "orderNumber",
+   "status",
+   "grossAmount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/OrderStatus"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "refundedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OrderChannel"
+     }
+    ],
+    "description": "The same vocabulary as `Order.channel`, which this projects."
+   },
+   "lineCount": {
+    "type": "integer"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The cashier who raised it — what the held-orders list shows."
+   },
+   "holdLabel": {
+    "type": "string",
+    "nullable": true,
+    "description": "As `Order.holdLabel`."
+   },
+   "heldUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "As `Order.heldUntil`, so a held-orders list can warn about the ones about to lapse."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
    }
   }
  },
@@ -3401,6 +5399,442 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "hasMore": {
     "type": "boolean"
+   }
+  }
+ },
+ "Principal": {
+  "x-ticvai-persistence": "identity.principal",
+  "type": "object",
+  "required": [
+   "id",
+   "username",
+   "displayName",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "username": {
+    "type": "string"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Past this, resolution returns DENY regardless of grants."
+   },
+   "primaryRoleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Determines the landing screen when the principal holds several roles and picks one at login.\n"
+   },
+   "roles": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/RoleSummary"
+    }
+   },
+   "lastLoginAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "Product": {
+  "x-ticvai-persistence": "catalogue.product",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "kind",
+   "venueId",
+   "scopePath",
+   "isSellable",
+   "hasVariants"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "familyKey": {
+    "type": "string",
+    "maxLength": 64,
+    "pattern": "^[A-Za-z0-9_-]+$",
+    "nullable": true,
+    "x-ticvai-unique": "venue",
+    "description": "**The same product at another location** (decided 29 September, rev 3 REV3-18). Optional. A tenant that sells one attraction at several venues gives each venue's product the same key, e.g. `aquarium-entry`; the key names the family across the tenant and each venue has at most one product in it, so a second product at the same venue with the key is refused with `409 duplicate-code`. **What it is for:** when a guest changes location on the booking screen (the 'Booking at' switcher, `BookingFlowConfig.locationSwitcher`), lines whose product shares a `familyKey` with a product at the new venue are carried over to that product, with times and prices refreshed; every other line is cleared. Null means the product belongs to no family and its lines always clear on a switch. Compared case-insensitively, like `code`.\n"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/ProductKind"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "createdByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "1.4.18. **The approval gate refuses an approver who is the author, and nothing recorded either.** `SeatBlock`, `DelegatedAccess` and `ManualDiscountRequest` all carry this and the product passing through approval did not.\n"
+   },
+   "approvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "responsibleDepartmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Who owns this product commercially. A scope node at `department` level."
+   },
+   "onSaleFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "1.4.8. **A seasonal product should not need somebody awake at midnight.** Archiving already runs on a timer in this contract, so the machinery exists; `effectiveFrom` appears on tax codes, FX rates and white-label policies and not here.\n"
+   },
+   "onSaleTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Retires the product automatically. **Retirement is not deletion** — the product stops selling and every order that referenced it still resolves.\n"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Taken from their `fnb.product` and `retail.product`, 20 September.** `catalogue.product_category` has existed since 20 August with two operations and nothing could be filed under it — a merchandise hierarchy with a tree and no leaves. Their per-domain product tables both carried this column and ours did not.\n"
+   },
+   "lifecycleState": {
+    "$ref": "#/components/schemas/ProductLifecycleState"
+   },
+   "isSellable": {
+    "type": "boolean",
+    "readOnly": true,
+    "description": "True only when live **and** carried by a published bundle. Approval and publication are different acts.\n**Derived, never set.** It changes when `transitionProductLifecycle` moves the product and when `publishBundle` carries it, so `updateProduct` does not take it — `withdraw` is how a product stops selling.\n"
+   },
+   "isStockTracked": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Taken from their `fnb.product`, 20 September.** Whether a sale decrements stock, which is not what `isSellable` asks. A ticket is sellable and tracks no stock; a bottle of water is both. Without it, an F&B sale cannot tell inventory whether to move.\n"
+   },
+   "hasVariants": {
+    "type": "boolean"
+   },
+   "variantCount": {
+    "type": "integer"
+   },
+   "segmentTags": {
+    "type": "array",
+    "description": "7.3.5. **A channel and a segment tag are mandatory and nothing required either.** A catalogue that cannot be filtered by segment is a catalogue nobody can report on.\n**Hierarchical, not flat** — `family/with-toddlers` narrows `family` without duplicating it, which is how the promotions engine already treats scope.\n**A level is a tag under `level/`** (decided 29 September, rev 3 REV3-19): `level/beginner`, `level/intermediate`, `level/advanced`, `level/expert` (proposed codes, client to correct). A guest screen filters on it with `listProducts` `segmentTag`, and the words a guest reads beside each option come from `ProductCategory.description`, not from the tag.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "codeSchema": {
+    "type": "string",
+    "readOnly": true,
+    "description": "7.3.4 specifies `[ParkCode]-[ProductType]-[Variant]`. **`Product.code` existed and nothing required a format**, so a venue with three thousand products had three thousand conventions.\nThe tenant sets the pattern and the platform generates against it. **Validation is the point, not the string** — a code typed by hand is a code that will not sort.\n"
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/Channel"
+    }
+   },
+   "entitlementTemplateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "What the buyer receives. Null for products that grant nothing — F&B and retail. Identity and entitlement are separate concerns.\n"
+   },
+   "blockedOffline": {
+    "type": "boolean",
+    "description": "True for seated and retail. Seated because a seat map is not a count; retail because stock depletes in real time.\n"
+   },
+   "dataMaskValues": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Custom fields. JSONB-backed, defined by the venue's data mask."
+   },
+   "guestListing": {
+    "$ref": "#/components/schemas/GuestListing"
+   },
+   "notBookableLabel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "The label a guest reads on an `infoOnly` product, e.g. *Info only* or *Not bookable online; ask at the desk* (decided 29 September, rev 3 REV3-14). Each value at most 60 characters. Null means the guest screen shows its default wording. Ignored unless `guestListing` is `infoOnly`.\n"
+   },
+   "salesContact": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ProductSalesContact"
+     }
+    ],
+    "nullable": true,
+    "description": "**Who a guest contacts to book a view-only product** (decided 29 September, W3), e.g. a training course listed with full details and no Book button. Shown as *Call sales* and *Email sales* on an `infoOnly` product. Null means the venue's own contact (white-label `getTenantAppStatus.contact`). Ignored unless `guestListing` is `infoOnly`.\n"
+   },
+   "bookingFlowId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
+   },
+   "displayTags": {
+    "type": "array",
+    "maxItems": 6,
+    "items": {
+     "$ref": "#/components/schemas/ProductDisplayTag"
+    },
+    "description": "**Short facts a guest reads on the ticket card and under *Read more***: *2 Hours*, *Min 1.10 m*, *Free adult entry*, *Valid 90 days*, *Emirates ID* (decided 29 September, 23SEP-3). Not `segmentTags`, which are for reporting and segmentation and which a guest never reads.\n**Derived on read when none are set.** When the venue has written no tags, a read returns tags derived from the product's duration (`clock`), entitlement validity (`calendar`) and the eligibility rule's `minHeightCm` (`height`), each marked `derived: true`; they are never stored. Once the venue writes any tag, only what it wrote is returned. Whether the guest screen shows them is `BookingFlowConfig.ticketTags` (white-label).\n"
+   },
+   "media": {
+    "type": "array",
+    "maxItems": 20,
+    "items": {
+     "$ref": "#/components/schemas/ProductMedia"
+    },
+    "description": "**The product's own photos and video** (decided 29 September, 23SEP-4). *Read more* opens on the `isPrimary` item, and a listing shows each product's primary image, so two tickets in one category no longer share the category's picture (`ProductCategory.imageAssetId`).\nEvery `assetId` names an asset of the asset library (`assets.yaml` `MediaAsset`) in status `ready` whose kind matches `kind`; anything else is a `422`. **Exactly one item is `isPrimary`** when the list is not empty, and an `assetId` appears once; otherwise `400`. Setting the list records each reference as asset usage (`MediaUsage` with `surface: product`, `referenceId` the product id, `isLive` true while the product is listed to guests), which is what stops a used asset being archived from under the product.\n"
+   },
+   "consentQuestionIds": {
+    "type": "array",
+    "maxItems": 10,
+    "uniqueItems": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "**The consent questions a guest answers when booking this product**, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*. Each id names a consent question defined in marketing-crm (`ConsentQuestion`), which owns the text, its version and whether it is asked per person or once per booking; the answer is stored there as a consent record (question version, answer, who answered, when). **One question or several, as the venue chooses.** A flow can carry its own list too (`white-label.BookingFlow.settings.consentQuestionIds`, on the product's published booking flow as `getPublishedBookingFlow` resolves it: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig` 29 September, W12); a booking asks the union of the flow's questions and those of every product in the cart, each question once (`orders.Cart.consentQuestions`). An id that names no active consent question of the tenant is a `422`.\n"
+   },
+   "requiresTimeWindow": {
+    "type": "boolean",
+    "default": false,
+    "description": "**True for a space sold by the hour**, e.g. a meeting room type (decided 29 September, rev 3 REV3-13). The product is the room type (*focus pod*, *majlis*, *boardroom*, *auditorium*), never a named room; its lengths are a `length` axis (`setProductAttributes`) whose values carry `durationMinutes`, and each length is a variant priced on its own in the price list, so price is the room rate for that length. The cart line carries the booked start and end (orders), the end being the start plus the chosen variant's `durationMinutes`; `resources.listProductStartTimes` supplies the start times for a variant and a date and `allocateResources` picks the room from the product's resource requirements (`setExperienceResourceRequirements`) at checkout. True requires every active variant to have a `durationMinutes`; otherwise `422`.\n"
+   },
+   "productOwnerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The product owner (29 September, data model DM3), set with `setProductContextOwnership`. `responsibleDepartmentId` is the owning department."
+   },
+   "operationalContact": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "A principal id or a name, as the context screen takes it."
+   },
+   "businessUnitId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A `ledger.legal_entity`, read through finance."
+   },
+   "attractionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "siteId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "brandId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The brand, as the context screen names it (a catalogue brand category)."
+   },
+   "marketCode": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "salesTerritory": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   }
+  }
+ },
+ "ProductDisplayTag": {
+  "x-ticvai-persistence": "none — jsonb column on catalogue.product",
+  "type": "object",
+  "required": [
+   "kind",
+   "label"
+  ],
+  "description": "One short fact on a ticket card (decided 29 September, 23SEP-3). `kind` picks the icon.",
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "clock",
+     "height",
+     "free",
+     "calendar",
+     "id"
+    ],
+    "description": "`clock` a duration, `height` a height rule, `free` something included free, `calendar` a validity, `id` a document the guest must bring."
+   },
+   "label": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "What the guest reads, e.g. *2 Hours*. Each language value at most 40 characters."
+   },
+   "derived": {
+    "type": "boolean",
+    "readOnly": true,
+    "default": false,
+    "description": "True on a tag the server derived on read because the venue set none. Never sent."
+   }
+  }
+ },
+ "ProductKind": {
+  "type": "string",
+  "description": "**`openDated` added 24 August** from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: **valid on any date within an eligible range, rather than for a named performance or a fixed date.**\nThe mechanism already existed — `access.entitlement` carries `valid_from`, `valid_to`, `entries_allowed` and `frozen_days`, which is exactly an open-dated pass. **What was missing was the product saying it is one**, so a catalogue could not offer it and a report could not count it.\n**`datedAdmission` is a different thing and the two were being conflated**: dated is *this Tuesday*, open-dated is *any Tuesday between March and June*. A guest buying the second and being sold the first has bought the wrong ticket.\n**Transport uses two existing kinds, not a new one** (decided 29 September, rev 3 REV3-21). A one-way trip is `timedAdmission`: `transport.createTransportRoute` creates the route's product with one variant per passenger type, and each departure is a performance. A multi-trip or unlimited pass is `openDated`: `transport.createTransportPassType` creates it, with `EntitlementTemplate.entriesAllowed` = the pass's trips (null for unlimited), the validity = `validityDays`, and `EntitlementTemplate.transportRestriction` naming the station pair the pass was bought for, so `access` refuses it on another journey. The sale path is unchanged: both are cart lines, priced by `transport.quoteTransportFare` (orders `TransportLineAttributes`).\n",
+  "enum": [
+   "admission",
+   "timedAdmission",
+   "datedAdmission",
+   "openDated",
+   "seated",
+   "membership",
+   "bundle",
+   "fnb",
+   "retail",
+   "rental",
+   "addOn",
+   "giftCard"
+  ]
+ },
+ "ProductLifecycleState": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "inReview",
+   "approved",
+   "live",
+   "withdrawn",
+   "archived"
+  ]
+ },
+ "ProductMedia": {
+  "x-ticvai-persistence": "catalogue.product_media",
+  "type": "object",
+  "required": [
+   "assetId",
+   "kind",
+   "isPrimary"
+  ],
+  "description": "One photo or video of a product, referencing the asset library (decided 29 September, 23SEP-4). One row per product and asset, so the asset library can answer which products use an asset.\n",
+  "properties": {
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "A `MediaAsset` of `assets.yaml`, in status `ready`."
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "image",
+     "video"
+    ]
+   },
+   "isPrimary": {
+    "type": "boolean",
+    "default": false,
+    "description": "The item *Read more* opens on and a listing shows. Exactly one per product."
+   },
+   "displayOrder": {
+    "type": "integer",
+    "default": 100
+   },
+   "altText": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true
+   }
+  }
+ },
+ "ProductSalesContact": {
+  "x-ticvai-persistence": "none — jsonb column on catalogue.product",
+  "type": "object",
+  "description": "Who to contact to book a view-only product (decided 29 September, W3). At least one of `phone` or `email`.\n",
+  "minProperties": 1,
+  "properties": {
+   "phone": {
+    "type": "string",
+    "maxLength": 32,
+    "nullable": true
+   },
+   "email": {
+    "type": "string",
+    "format": "email",
+    "maxLength": 254,
+    "nullable": true
+   },
+   "note": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "A line shown under the contact, e.g. *Group courses are booked by phone*. At most 200 characters per language."
    }
   }
  },
@@ -3431,8 +5865,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "promotion",
      "operational",
      "financial",
-     "configuration"
-    ]
+     "configuration",
+     "content",
+     "audience"
+    ],
+    "description": "`content` (a marketing or storefront draft from `proposeMarketingContent`) and `audience` (a lookalike segment from `proposeLookalikeSegment`) added 29 September (build); both are applied by a person in the owning screen."
    },
    "targetContract": {
     "type": "string",
@@ -3444,13 +5881,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "payload": {
     "type": "object",
     "additionalProperties": true,
-    "description": "The request body a person would submit, ready to review."
+    "description": "The request body a person would submit, ready to review. **Open on purpose: its shape is the request body of `targetOperation` in `targetContract`**, and it is validated against that operation, not restated here.\n"
    },
    "summary": {
     "type": "string"
    },
    "status": {
     "type": "string",
+    "description": "**Expiry (decided 28 September, audit R213)**: a `proposed` action expires 7 days after `proposedAt`; an `approved` action not applied expires 24 hours after `decidedAt`. Both are proposed values, client to correct, and `expiresAt` carries the one that applies.\n",
     "enum": [
      "proposed",
      "approved",
@@ -3459,9 +5897,19 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "expired"
     ]
    },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "When the expiry timer moves this action to `expired` — `proposedAt` plus 7 days while `proposed`, `decidedAt` plus 24 hours once `approved`, null once `rejected`, `applied` or `expired` (audit R213)."
+   },
    "approvalLevel": {
     "type": "integer",
-    "description": "8.3.65. Multi-level, because a discount and a pricing change differ in authority."
+    "minimum": 1,
+    "maximum": 2,
+    "description": "8.3.65. Multi-level, because a discount and a pricing change differ in authority. **Two levels (decided 28 September, audit R213)**: `2` for anything touching prices or permissions (every `pricing` and `promotion` action, and any other whose payload sets a price, a discount, a role or a permission grant), which needs a manager other than the requester; `1` for everything else, which the requester approves themselves.\n"
    },
    "decidedByPrincipalId": {
     "type": "string",
@@ -3481,93 +5929,197 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Added 29 September (AI design 3.1):** `ai.proposed_action` had no policy — its only references were nullable. The scope it was proposed at, and the partition key row-level security reads.\n"
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "ai.action_plan",
+    "description": "The plan this action presents for a decision (AI design 2.2 D, 3.8)."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `approvals` request deciding a tier 2 or matrix-caught action (AI design 2.3)."
+   },
+   "changeSetHash": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Hash of the change set approved; execution refuses a plan whose hash differs (AIC-181)."
    }
   }
  },
- "ReportColumn": {
-  "x-ticvai-persistence": "reporting.report_column",
+ "RegisteredDevice": {
+  "x-ticvai-persistence": "platform.device",
   "type": "object",
+  "description": "**The device register of record** (decided 29 September, build pass). Identity, enrolment, credential, firmware and push registration for every device in the estate live on this row. `access.access_device` places access-control devices in the gate topology and repeats serial, versions, health and lifecycle; the two are not merged yet, and where they disagree this row wins.\n",
   "required": [
-   "field"
+   "id",
+   "kind",
+   "driver"
   ],
   "properties": {
    "id": {
     "type": "string",
     "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+    "readOnly": true
    },
-   "field": {
-    "type": "string"
+   "kind": {
+    "$ref": "#/components/schemas/DeviceKind"
    },
-   "label": {
-    "type": "string"
-   },
-   "aggregation": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/Aggregation"
-     }
-    ],
-    "default": "none"
-   },
-   "sortOrder": {
-    "type": "integer"
-   },
-   "sortDirection": {
+   "driver": {
     "type": "string",
-    "enum": [
-     "asc",
-     "desc"
-    ]
+    "description": "Built to an open standard where one exists — ESC/POS, UnifiedPOS, OSDP. Adding a vendor is a driver plus configuration, not a core change (ADR-0015).\n"
    },
-   "format": {
+   "identifier": {
     "type": "string",
     "nullable": true
-   }
-  }
- },
- "ReportFilter": {
-  "x-ticvai-persistence": "reporting.report_filter",
-  "type": "object",
-  "required": [
-   "field",
-   "operator"
-  ],
-  "properties": {
-   "id": {
+   },
+   "workstationId": {
     "type": "string",
     "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+    "nullable": true,
+    "description": "Required for every kind except `mobileHandset`, which is bound to no workstation (18.1.5, 29 September); `registerDevice` refuses either mistake with `422`.\n"
    },
-   "field": {
-    "type": "string"
-   },
-   "operator": {
+   "model": {
     "type": "string",
+    "nullable": true
+   },
+   "pushToken": {
+    "type": "string",
+    "format": "password",
+    "nullable": true,
+    "writeOnly": true,
+    "description": "BL-163. **Guest devices register for push and staff devices did not** — `registerGuestDevice` exists with a token, platform and failure count, and a scanner that cannot be told anything is a scanner somebody has to walk to.\nWrite-only, and marked `writeOnly`: accepted by `registerDevice` and never returned by `listDevices` or `getDevice`. **A push token is a credential**, and the rule that no surface holds a provider key applies here too.\n"
+   },
+   "pushPlatform": {
+    "type": "string",
+    "nullable": true,
     "enum": [
-     "equals",
-     "notEquals",
-     "greaterThan",
-     "lessThan",
-     "between",
-     "in",
-     "notIn",
-     "contains",
-     "isNull",
-     "isNotNull"
+     "ios",
+     "android",
+     "web",
+     "windows"
     ]
    },
-   "value": {},
-   "values": {
-    "type": "array",
-    "items": {}
+   "pushFailureCount": {
+    "type": "integer",
+    "default": 0,
+    "readOnly": true,
+    "description": "**Consecutive failures.** A token that has failed repeatedly is a device that was wiped or reassigned, and continuing to push to it is how a notification queue fills with nothing.\n"
    },
-   "isParameter": {
+   "offlineScope": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "none",
+     "readOnly",
+     "sellAndScan",
+     "fullVenue"
+    ],
+    "description": "BL-163. **What this device may do with no connection**, which was unstated for the staff app while `venue-pos` and `venue-scanner` had it settled.\n**`fullVenue` on a personal handset is a decision, not a default** — a device that can do everything offline is a device that carries the whole venue's data in somebody's pocket.\n"
+   },
+   "firmwareVersion": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "As the device last reported it on its heartbeat."
+   },
+   "isRequired": {
     "type": "boolean",
-    "default": false,
-    "description": "Prompted at run time rather than fixed. Parameters narrow the result; they never widen scope.\n"
+    "description": "True blocks shift open when the device is unreachable."
+   },
+   "status": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "online",
+     "offline",
+     "error",
+     "consumableLow",
+     "needsAttention",
+     "unknown"
+    ],
+    "description": "What the device last said on its heartbeat; `unknown` until it has."
+   },
+   "batteryPercent": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "minimum": 0,
+    "maximum": 100,
+    "description": "Board 1 of the client's POS design set, 20 August. **A wristband encoder at 8% is a gate that stops working in an hour**, and nothing in the package carried it.\n**Null where the device has no battery**, which is most of them — a receipt printer reporting 100% forever is worse than one reporting nothing.\n"
+   },
+   "lastCheckedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Distinct from `lastHeartbeatAt`.** A heartbeat is the workstation saying the device is attached; a check is the device answering. **A printer with no paper heartbeats perfectly**, which is why the client's board shows both columns.\n"
+   },
+   "health": {
+    "type": "string",
+    "enum": [
+     "healthy",
+     "warning",
+     "degraded",
+     "offline",
+     "unknown"
+    ],
+    "default": "unknown",
+    "readOnly": true,
+    "description": "**Derived, not reported.** Computed from heartbeat age, battery, firmware currency and error rate — a device does not know whether it is healthy, and asking it produces a fleet that is 100% healthy and 12% broken.\n"
+   },
+   "lastHeartbeatAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "capabilities": {
+    "type": "array",
+    "readOnly": true,
+    "items": {
+     "$ref": "#/components/schemas/DeviceCapability"
+    },
+    "description": "BL-179. **What this driver reports it can do, beyond reading media.** ADR-0015 is standards-first — the device does what the device does — and until now a venue could switch on a feature that depended on hardware without anything being able to say whether the hardware was there.\n**A capability absent is a capability unavailable**, not a capability assumed. A venue setting that requires one is refused where no device in scope reports it, rather than silently doing nothing at the gate.\n"
+   },
+   "enrolmentState": {
+    "type": "string",
+    "enum": [
+     "registered",
+     "enrolled",
+     "provisioned",
+     "active",
+     "deactivated",
+     "retired"
+    ],
+    "default": "registered",
+    "readOnly": true,
+    "description": "BL-160. **Where the device is in its life, which is not the same question as whether it is answering.** `enrolDevice` has taken the whole matrix — registered, enrolled, provisioned, active, deactivated, retired — since 16.1.2, and until now there was no column for it to land in, so the operation read this table and wrote nothing.\n**Distinct from `status` and from `health`.** `status` is what the device last said and `health` is what we computed from it; a decommissioned turnstile still sitting on the network is `online` and `retired` at once, and neither column contradicts the other. **A device that is `retired` is refused at the gate whatever its status says.**\nThe transition itself — who moved it, from what, and why — is a `tenancy.device_audit` record. It is not repeated here, because the latest transition stored in two places is one place to go stale.\n"
+   },
+   "retiredAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Set when `enrolmentState` reaches `retired`, and null otherwise.** Derivable from `tenancy.device_audit`, and kept as a column for the same reason `maintenance.asset.retired_on` is one: a retirement date you reconstruct from an audit log is a date nobody filters a fleet by.\n"
+   },
+   "configurationProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The profile this device was provisioned with.** `enrolDevice` has accepted one since 16.1.3 and there was nowhere to keep it, so the answer to *\"what is this reader configured as\"* lived only in the request that set it.\n"
    }
   }
  },
@@ -3602,6 +6154,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "rows": {
     "type": "array",
+    "description": "**Open on purpose; the shape is `columns`.** Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a `Money`, dates, date-times and uuids as strings. A report's columns are chosen at run time, so no fixed schema can name them.\n",
     "items": {
      "type": "object",
      "additionalProperties": true
@@ -3609,7 +6162,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "totals": {
     "type": "object",
-    "additionalProperties": true
+    "additionalProperties": true,
+    "description": "Aggregated columns only, keyed and typed as a row is."
    },
    "rowCount": {
     "type": "integer"
@@ -3629,13 +6183,137 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "ReportingAnswerReliability": {
+  "type": "string",
+  "description": "**How far an analytics answer can be relied on** (decided 29 September, AI system design 5.6): a category, never a bare percentage. `grounded`: every figure comes from a result of the compiled spec. `partial`: part of the question was answered and the rest was not modelled. `conflictingSources`: the result and a cited source disagree. `insufficientEvidence`: the question could not be answered, including \"not available yet\" outside the semantic model. The same four values as `ai.yaml`'s assistant answers.\n",
+  "enum": [
+   "grounded",
+   "partial",
+   "conflictingSources",
+   "insufficientEvidence"
+  ]
+ },
+ "ReportingSemanticQuerySpec": {
+  "x-ticvai-persistence": "none — embedded; stored whole in `reporting.natural_language_query`",
+  "type": "object",
+  "description": "**A question in the semantic model's own vocabulary** (decided 29 September, AI system design 2.2 E and 5.7). What the model returns for a live-number question instead of SQL, and what `runSemanticQuery` takes. Every code is a `SemanticModel` field code or a KPI code; Reporting validates the spec against the published model and compiles it deterministically, so the same spec compiles to the same SQL for the same model version.\n",
+  "required": [
+   "metric",
+   "period"
+  ],
+  "properties": {
+   "metric": {
+    "type": "string",
+    "description": "A measure field code in the `SemanticModel`, or a `KpiDefinition.code`. The governed definition the dashboards use, so the number matches them."
+   },
+   "dimensions": {
+    "type": "array",
+    "maxItems": 5,
+    "description": "Field codes to group by. Each must be reachable from the metric's dataset through a relationship the semantic model declares.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "filters": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "field",
+      "operator"
+     ],
+     "properties": {
+      "field": {
+       "type": "string",
+       "description": "A `SemanticModel` field code."
+      },
+      "operator": {
+       "type": "string",
+       "enum": [
+        "equals",
+        "notEquals",
+        "greaterThan",
+        "lessThan",
+        "between",
+        "in",
+        "notIn",
+        "isNull",
+        "isNotNull"
+       ]
+      },
+      "values": {
+       "type": "array",
+       "description": "**Open on purpose; typed by the field.** One value for the comparison operators, exactly two (from, to) for `between`, any number for `in` and `notIn`, none for `isNull` and `isNotNull`.\n",
+       "items": {}
+      }
+     }
+    }
+   },
+   "period": {
+    "type": "string",
+    "description": "ISO 8601 interval in the venue's time zone, e.g. `2026-09-21/2026-09-27`, the form `explainMetricChange` takes."
+   },
+   "comparison": {
+    "type": "string",
+    "nullable": true,
+    "description": "As `getKpiValues` `compareTo`. With one, each row carries the metric for the comparison beside the current value.",
+    "enum": [
+     "previousPeriod",
+     "samePeriodLastYear",
+     "target",
+     "benchmark"
+    ]
+   },
+   "semanticModelVersion": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "The `SemanticModel.version` the spec was validated and compiled against. Set by Reporting."
+   }
+  }
+ },
+ "ReportingUnavailableReason": {
+  "type": "string",
+  "description": "Which part of a question is outside the semantic model, so the answer is \"not available yet\" (design 5.7). A metric or field the caller may not see is reported as not modelled, so the reason does not reveal that it exists.",
+  "enum": [
+   "metricNotModelled",
+   "dimensionNotModelled",
+   "filterNotModelled",
+   "comparisonNotAvailable",
+   "periodOutsideHistory"
+  ]
+ },
+ "RoleSummary": {
+  "x-ticvai-persistence": "none — projection over role",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "isPrimary": {
+    "type": "boolean"
+   }
+  }
+ },
  "RunReportRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
   "properties": {
    "parameters": {
     "type": "object",
-    "additionalProperties": true
+    "additionalProperties": true,
+    "description": "**Open on purpose; its shape is the report's.** Keyed by `ReportParameter.key` of the definition being run, each value of that parameter's `type`. An `isRequired` parameter with no value here and no `defaultValue` is the `400` `runReport` lists.\n"
    },
    "venueId": {
     "type": "string",
@@ -3644,11 +6322,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "dateFrom": {
     "type": "string",
-    "format": "date"
+    "format": "date",
+    "description": "Defaults to today in the venue's time zone when not sent (decided 28 September, audit R158)."
    },
    "dateTo": {
     "type": "string",
-    "format": "date"
+    "format": "date",
+    "description": "Defaults to today in the venue's time zone when not sent (audit R158)."
    },
    "forceAsync": {
     "type": "boolean",
@@ -3701,7 +6381,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "attribute": {
     "type": "string",
-    "description": "Behavioural or profile attribute — visit count, last visit, lifetime value, product purchased, membership tier, venue visited, language.\n**Free-form rather than an enum, which is why 22.14.8, 5.3.19 and 5.5.17b were readable as gaps and are not.** `walletBalance`, `engagementTier` and `portfolioScope` are expressible today; what was missing was anybody saying so.\n**Three that need saying, because the naive reading is wrong:**\n`walletBalance` should segment on **`cash` credit only**. A guest with 200 dirhams of promotional credit expiring Friday is a different campaign from one with 200 of their own money, and treating them alike sends a spend-it-now message to somebody who was given it.\n`walletBalance.expiringWithinDays` is the segment that earns the attribute — **credit about to expire unspent is a guest about to be disappointed and a venue about to book breakage**, and only one of those is worth a message.\n`portfolioScope` aggregates across a `DelegatedAccess` delegation (CF-132) and **must not message every member about a household total** — that is how a venue tells a teenager what their parent spends.\n"
+    "description": "Behavioural or profile attribute — visit count, last visit, lifetime value, product purchased, membership tier, venue visited, language.\n**Free-form rather than an enum, which is why 22.14.8, 5.3.19 and 5.5.17b were readable as gaps and are not.** `walletBalance`, `engagementTier` and `portfolioScope` are expressible today; what was missing was anybody saying so.\n**Three that need saying, because the naive reading is wrong:**\n`walletBalance` should segment on **`cash` credit only**. A guest with 200 dirhams of promotional credit expiring Friday is a different campaign from one with 200 of their own money, and treating them alike sends a spend-it-now message to somebody who was given it.\n`walletBalance.expiringWithinDays` is the segment that earns the attribute — **credit about to expire unspent is a guest about to be disappointed and a venue about to book breakage**, and only one of those is worth a message.\n`portfolioScope` aggregates across a `DelegatedAccess` delegation (CF-132) and **must not message every member about a household total** — that is how a venue tells a teenager what their parent spends.\n`entitlementExpiringWithinDays` (29 September, build pass, group G2; 5.5.30): the guest holds a ticket or pass in `issued` or `partiallyConsumed` whose `validTo` is within that many days, kept current from `entitlement.expiringSoon` and the entitlement read model. **Unused passes about to lapse** are this attribute with `entitlementRemainingUses` greater than zero.\n"
    },
    "operator": {
     "type": "string",
@@ -3899,6 +6579,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "id",
    "kind",
    "basis",
+   "maturity",
    "producedAt"
   ],
   "properties": {
@@ -3945,6 +6626,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "The rule name or the model id and version. **A model version is part of the record**: *the model said so* is not an answer to *which model, when*.\n"
    },
+   "maturity": {
+    "$ref": "#/components/schemas/AiMaturity"
+   },
    "producedAt": {
     "type": "string",
     "format": "date-time"
@@ -3970,7 +6654,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "SuggestionKind": {
   "type": "string",
-  "description": "What is being suggested. **A closed set, and the reason it is closed is the swap.** Every entry here is a question a venue asks that a model could answer better than a rule — and each one starts as a heuristic and becomes a model when there is data.\n**Six of these were drawn as their own endpoints on the client F&B boards** — `suggestPrice`, `simulateScenario`, `simulateSlaPolicy`, `suggestRequisition`, `suggestReplenishment`, `publishDemandPlan`. **Building six endpoints means six places to change when a model changes**, and the model will change more often than the venue's question does.\n",
+  "description": "What is being suggested. **A closed set, and the reason it is closed is the swap.** Every entry here is a question a venue asks that a model could answer better than a rule — and each one starts as a heuristic and becomes a model when there is data.\n**Six of these were drawn as their own endpoints on the client F&B boards** — `suggestPrice`, `simulateScenario`, `simulateSlaPolicy`, `suggestRequisition`, `suggestReplenishment`, `publishDemandPlan`. **Building six endpoints means six places to change when a model changes**, and the model will change more often than the venue's question does.\n**What each kind is based on, and when the venue's own data takes over. Proposed, client to correct (decided 28 September, audit R213; re-read 29 September, AI functions review).** The figure after each rule is **the point where own data takes over from the baseline, not a refusal**: below it the kind answers from the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, the weather) with `maturity.stage` `starting`, and between it and about three months it blends the two (`learning`). The day-one baseline per kind: `replenishment`, `requisition`, `prepPlan`, `staffing`, `demandForecast` and `scenario` from the baseline forecast (typical attendance from the venue AI settings x the venue-type month curve x the calendar x weather, bookings on hand as a floor); `menuEngineering` ranked by margin with popularity marked learning; `slaTarget` a standard default; `waitTime` people ahead / configured capacity; `upsell` the relationship map and business priority; `segmentation` known guest attributes; `anomaly` the venue's configured thresholds and actual against the forecast's low end; `sendTime` the channel's typical hour; `wasteRisk` shelf life and par against the forecast; `queueBalancing` configured capacity per queue. Only a missing setting refuses (422 `AiMissingSettingProblem`).\n- `price`: unit cost plus the category's target margin, held inside the price band. Minimum: a current cost, no history.\n- `replenishment`: par level minus on-hand plus expected use over the supplier lead time. Minimum: 14 days of stock movements.\n- `requisition`: the next service's prep-plan ingredient needs minus kitchen stock. Minimum: 14 days of sales.\n- `demandForecast`: the average of the same weekday over the last 8 weeks, adjusted by admissions already booked. Minimum: 8 weeks of sales.\n- `prepPlan`: forecast covers for the service times each item's share of the last 4 same weekdays. Minimum: 4 weeks of sales.\n- `menuEngineering`: each item placed by popularity against margin, over 90 days. Minimum: 90 days of sales.\n- `staffing`: forecast demand divided by the role's standard covers per staff hour. Minimum: 8 weeks of sales (the forecast it rests on).\n- `slaTarget`: the 80th percentile of actual times over the last 30 days. Minimum: 30 days of timed events.\n- `waitTime`: people ahead divided by the throughput of the last 30 minutes. Minimum: 30 minutes of throughput today.\n- `upsell`: the item most often bought with the basket's items over 90 days. Minimum: 90 days of orders.\n- `segmentation`: recency, frequency and spend scores over 12 months. Minimum: 90 days of orders.\n- `anomaly`: a value outside three standard deviations of the same weekday over 8 weeks. Minimum: 8 weeks of the measure.\n- `scenario`: the demand forecast re-run with the stated changes. Minimum: as `demandForecast`.\n- `sendTime` (added 29 September): per recipient, the hour inside `context.sendWindow` in which they have most often opened or clicked over the last 90 days (marketing-crm attribution touches), and where `context.channel` is `best`, the consented channel with the highest engagement. A recipient with fewer than three touches gets their segment's modal hour, and one with none the window's start. Asked with `subjectRef` a segment id or `context.subjectIds` (at most 10,000). `value` is `{recommendations: [{subjectId, sendAt, channel, basisTouches}]}`. Minimum: 90 days of message touches at the scope.\n- `wasteRisk` (added 29 September): per item at an outlet or store location, planned production and stock on hand minus forecast demand over the item's shelf life, plus batches expiring inside the horizon (`inventory.listExpiringBatches`). `value` is `{items: [{itemRef, quantityAtRisk, valueAtCost, expiresAt, recommendedAction (reducePrep, promote, transfer, useInRecipe), transferTo}]}`. Minimum: 14 days of recorded waste and of sales.\n- `queueBalancing` (added 29 September): per queue or attraction at `subjectRef` (a venue) over `horizon`, the forecast wait (the `queue` forecast definition) against throughput capacity, a recommended virtual-queue return-slot allocation by queue type, and guest redirection from over-used to under-used attractions. `value` is `{queues: [{queueId, forecastWaitMinutes, capacityPerHour, returnSlotsPerInterval, redirectTo}]}`. Minimum: 14 days of queue readings.\n- `itinerary` (added 29 September, MOB-6, guest-allowed): refines a `venue-map` visit plan the guest owns. `subjectRef` is the plan id; `value` is `{planId, baseVersion, changes, rationale}`, applied with `updateVisitPlan` as the guest. Minimum: none; the rules plan is the baseline.\n",
   "enum": [
    "price",
    "replenishment",
@@ -3984,7 +6668,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "upsell",
    "segmentation",
    "anomaly",
-   "scenario"
+   "scenario",
+   "sendTime",
+   "wasteRisk",
+   "queueBalancing",
+   "itinerary"
   ]
  },
  "SuggestionOutcome": {
@@ -4039,6 +6727,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "note": {
     "type": "string",
     "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Added 29 September (AI design 3.1):** `ai.suggestion_outcome` had no scope column and no declared owner, so no policy. The suggestion's scope, copied when the outcome is recorded.\n"
    }
   }
  }

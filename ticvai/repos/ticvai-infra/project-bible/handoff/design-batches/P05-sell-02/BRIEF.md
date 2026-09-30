@@ -1,6 +1,6 @@
 # P05-sell-02 — P05 · Sell (2 of 2)
 
-**6 screens · 10 operations · 21 schemas · 3 permissions**
+**6 screens · 10 operations · 27 schemas · 3 permissions**
 
 Platform P05 Guest Kiosk · ships as **guest** ·
 guest audience · kiosk ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 3 permissions apply here:
   `ORDER_CREATE, ORDER_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **2 of these operations work offline**: getOrder, listMerchandise
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -65,9 +64,9 @@ convincingly. It is never a caption.
 | `KSK-012` | Booking found | configEditor | 1 | 0 | — |
 | `KSK-013` | Call staff | configEditor | 1 | 0 | — |
 | `KSK-014` | Out of service | listDetail | 0 | 0 | — |
-| `KSK-016` | Order Food | statusTracker | 2 | 0 | — |
-| `KSK-017` | Shop | listDetail | 4 | 0 | — |
+| `KSK-016` | Order Food | statusTracker | 2 | 1 | — |
+| `KSK-017` | Shop | listDetail | 4 | 2 | — |
 
 ## Thin screens in this batch
 
-**KSK-012, KSK-013, KSK-014 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**KSK-011, KSK-013, KSK-014 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

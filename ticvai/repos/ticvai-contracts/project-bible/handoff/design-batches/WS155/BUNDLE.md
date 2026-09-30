@@ -984,7 +984,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "resources",
     "purpose": "Day preview of availability with cleanings placed (W10)",
     "trigger": "onAction",
-    "provenance": "decided 29 September, W10 (P29)"
+    "provenance": "decided 29 September, W10 (the 29 September pass)"
    },
    {
     "operationId": "getResource",

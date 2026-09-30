@@ -119,7 +119,7 @@
   "contract": "shift",
   "summary": "Blind close-out",
   "permission": "SHIFT_CLOSE",
-  "offlineCapable": true,
+  "offlineCapable": false,
   "conflictPolicy": "append",
   "scopeLevel": "workstation",
   "parameters": [
@@ -189,6 +189,44 @@
   "requestBody": "CreateCashMovementRequest",
   "responds": "CashMovement"
  },
+ "createMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge",
+  "contract": "identity",
+  "summary": "Second factor at staff sign-in, and step-up for a sensitive action",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "createStockReservation": {
+  "method": "POST",
+  "path": "/stock-reservations",
+  "contract": "inventory",
+  "summary": "Reserve stock for a work order or another need",
+  "permission": "PROCUREMENT_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "InventoryStockReservation",
+  "responds": "InventoryStockReservation"
+ },
  "createWorkOrder": {
   "method": "POST",
   "path": "/work-orders",
@@ -247,19 +285,6 @@
   "requestBody": null,
   "responds": "Shift"
  },
- "getGuestSession": {
-  "method": "GET",
-  "path": "/auth/guest/session",
-  "contract": "identity",
-  "summary": "Read the current guest session",
-  "permission": null,
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "GuestSession"
- },
  "getIncident": {
   "method": "GET",
   "path": "/incidents/{incidentId}",
@@ -283,6 +308,16 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "workstation",
   "parameters": [
+   {
+    "name": "sinceVersion",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "validFrom",
     "in": "query",
@@ -369,7 +404,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "CashMovement"
+  "responds": "Page"
  },
  "listIncidents": {
   "method": "GET",
@@ -553,6 +588,40 @@
   "requestBody": null,
   "responds": "SsoProvider"
  },
+ "listStockReservations": {
+  "method": "GET",
+  "path": "/stock-reservations",
+  "contract": "inventory",
+  "summary": "Soft holds on stock",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "sourceType",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "sourceId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listWorkOrders": {
   "method": "GET",
   "path": "/work-orders",
@@ -585,6 +654,21 @@
    },
    {
     "name": "overdueOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
     "in": "query",
     "required": null
    },
@@ -651,7 +735,7 @@
   "contract": "shift",
   "summary": "Open a shift",
   "permission": "SHIFT_OPEN",
-  "offlineCapable": true,
+  "offlineCapable": false,
   "conflictPolicy": "append",
   "scopeLevel": "workstation",
   "parameters": [
@@ -744,8 +828,8 @@
   "method": "POST",
   "path": "/shifts/{shiftId}/no-sale",
   "contract": "shift",
-  "summary": "Open the drawer without a sale",
-  "permission": "SHIFT_SUSPEND",
+  "summary": "Open the Deposit Box without a sale",
+  "permission": "CASH_NO_SALE",
   "offlineCapable": true,
   "conflictPolicy": "append",
   "scopeLevel": "workstation",
@@ -815,6 +899,25 @@
   ],
   "requestBody": null,
   "responds": "WorkOrder"
+ },
+ "releaseStockReservation": {
+  "method": "POST",
+  "path": "/stock-reservations/{stockReservationId}/release",
+  "contract": "inventory",
+  "summary": "Give reserved stock back",
+  "permission": "PROCUREMENT_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "InventoryStockReservation"
  },
  "reopenShift": {
   "method": "POST",
@@ -958,7 +1061,13 @@
   "offlineCapable": false,
   "conflictPolicy": "append",
   "scopeLevel": "workstation",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ScanSyncResult"
  },
@@ -1037,6 +1146,49 @@
   ],
   "requestBody": null,
   "responds": "ValidationResult"
+ },
+ "verifyAccreditationCredential": {
+  "method": "GET",
+  "path": "/accreditation-credentials/verify",
+  "contract": "accreditation",
+  "summary": "Who holds this credential, and where may they go",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "identifier",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "zoneId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationCredentialVerification"
+ },
+ "verifyMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge/{challengeId}/verify",
+  "contract": "identity",
+  "summary": "Complete a sign-in or step-up challenge",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "verifyWorkOrder": {
   "method": "POST",

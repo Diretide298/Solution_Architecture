@@ -11,13 +11,13 @@ emittedBy:
 - createPayment
 payload:
 - field: seatId
-  type: string
+  type: uuid
 - field: performanceId
   type: uuid
 - field: venueId
   type: uuid
 - field: orderId
-  type: string
+  type: uuid
 - field: categoryId
   type: uuid
 - field: soldAt

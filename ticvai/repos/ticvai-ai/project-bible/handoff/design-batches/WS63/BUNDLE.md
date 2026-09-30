@@ -1,6 +1,6 @@
 # WS63 — Ticket Resale Marketplace board 2
 
-**10 screens · 10 operations · 10 schemas · 1 permissions**
+**10 screens · 13 operations · 12 schemas · 2 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 1 permissions apply here:
-  `ORDER_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 2 permissions apply here:
+  `ORDER_VIEW, SETTLEMENT_RECONCILE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-288` | Resale Operations Command Center | commandCentre | 1 | 0 | — |
+| `ADM-288` | Resale Operations Command Center | commandCentre | 2 | 0 | — |
 | `ADM-289` | Buyer Purchase & Resale Order Management | configEditor | 1 | 0 | — |
 | `ADM-290` | Ticket Ownership Transfer Management | listDetail | 1 | 0 | — |
 | `ADM-291` | Credential Revocation & Regeneration | configEditor | 1 | 0 | — |
 | `ADM-292` | Resale Fraud & Duplicate Sale Protection | listDetail | 1 | 0 | — |
 | `ADM-293` | Capacity & Inventory Reconciliation | commandCentre | 1 | 0 | — |
-| `ADM-294` | Seller Settlement & Payout Management | listDetail | 1 | 0 | — |
-| `ADM-295` | Refunds, Disputes & Resale Exceptions | listDetail | 1 | 0 | — |
-| `ADM-296` | Resale Audit & Ownership History | configEditor | 1 | 0 | — |
-| `ADM-297` | Resale Analytics & AI Intelligence | commandCentre | 1 | 0 | — |
+| `ADM-294` | Seller Settlement & Payout Management | listDetail | 3 | 2 | — |
+| `ADM-295` | Refunds, Disputes & Resale Exceptions | listDetail | 3 | 2 | — |
+| `ADM-296` | Resale Audit & Ownership History | configEditor | 2 | 0 | — |
+| `ADM-297` | Resale Analytics & AI Intelligence | commandCentre | 2 | 0 | — |
 
 ## Thin screens in this batch
 
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-288 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-289",
@@ -186,10 +182,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Operations can monitor every resale transaction from buyer payment through final completion and immediately identify transactions requiring intervention.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each resale transaction shall show) — counts over a population, then the population",
   "purpose": "Provide operations teams with a real-time control center for all resale transactions after listings move into purchase/fulfillment.",
-  "purposeNote": "Operations can monitor every resale transaction from buyer payment through final completion and immediately identify transactions requiring intervention.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -360,6 +356,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "apis": [
    {
+    "operationId": "listResale2",
+    "contract": "orders",
+    "purpose": "Resale Analytics & AI Intelligence",
+    "trigger": "onLoad"
+   },
+   {
     "operationId": "listResale",
     "contract": "orders",
     "purpose": "Resale Operations Command Center",
@@ -369,7 +371,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-288"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-288",
+   "workshopBoard": "wireframes/WS169 Ticket Resale Marketplace Board 2.dc.html#adm-288"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 21. 30 of 30 labels bound to a contract property; 39 of 53 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -433,10 +436,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "A buyer can securely purchase a resale ticket without the same listing being sold concurrently to another buyer, and TICVAI retains the complete relationship to the original transaction.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Capture/reference) and no display directory — it is settings, not a population",
   "purpose": "Manage the buyer-side purchase transaction and ensure that a resale ticket is temporarily protected while checkout occurs.",
-  "purposeNote": "A buyer can securely purchase a resale ticket without the same listing being sold concurrently to another buyer, and TICVAI retains the complete relationship to the original transaction.",
   "layout": {
    "template": "form",
    "regions": [
@@ -530,7 +533,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-289"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-289",
+   "workshopBoard": "wireframes/WS169 Ticket Resale Marketplace Board 2.dc.html#adm-289"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 23. 0 of 0 labels bound to a contract property; 13 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -594,10 +598,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "the permanent ticket ownership history.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Securely transfer the ticket entitlement from the original seller to the resale buyer.",
-  "purposeNote": "the permanent ticket ownership history.",
   "gaps": [
    {
     "operation": null,
@@ -653,7 +657,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-290"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-290",
+   "workshopBoard": "wireframes/WS169 Ticket Resale Marketplace Board 2.dc.html#adm-290"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 25. 0 of 0 labels bound to a contract property; 0 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -717,10 +722,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Following a successful resale, the seller's credential cannot provide valid access and the buyer receives a new valid credential linked to the transferred entitlement.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Depending on TICVAI configuration; Deliver through configured channels) and no display directory — it is settings, not a population",
   "purpose": "Ensure the seller's old ticket credential cannot continue to provide access after resale. This is one of the most important security functions in the module.",
-  "purposeNote": "Following a successful resale, the seller's credential cannot provide valid access and the buyer receives a new valid credential linked to the transferred entitlement.",
   "layout": {
    "template": "form",
    "regions": [
@@ -814,7 +819,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-291"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-291",
+   "workshopBoard": "wireframes/WS169 Ticket Resale Marketplace Board 2.dc.html#adm-291"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 26. 0 of 0 labels bound to a contract property; 13 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -878,10 +884,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Potentially fraudulent resale activity is identified before or during fulfillment, with configurable intervention based on risk level.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Monitor) and no metric row",
   "purpose": "Protect TICVAI, venues, sellers and buyers from resale abuse and fraudulent ticket activity.",
-  "purposeNote": "Potentially fraudulent resale activity is identified before or during fulfillment, with configurable intervention based on risk level.",
   "layout": {
    "template": "split",
    "regions": [
@@ -904,7 +910,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "ResaleFraudDuplicateSaleProtectionView.identityMismatch",
         "ResaleFraudDuplicateSaleProtectionView.credentialReuse",
         "ResaleFraudDuplicateSaleProtectionView.repeatedFailedTransactions",
-        "ResaleFraudDuplicateSaleProtectionView.accountDeviceAnomaliesWherePermitted"
+        "ResaleFraudDuplicateSaleProtectionView.accountDeviceAnomalies"
        ],
        "bindsTo": "ResaleFraudDuplicateSaleProtectionView",
        "operation": "listResaleFraudDuplicate",
@@ -932,7 +938,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "ResaleFraudDuplicateSaleProtectionView.identityMismatch",
         "ResaleFraudDuplicateSaleProtectionView.credentialReuse",
         "ResaleFraudDuplicateSaleProtectionView.repeatedFailedTransactions",
-        "ResaleFraudDuplicateSaleProtectionView.accountDeviceAnomaliesWherePermitted"
+        "ResaleFraudDuplicateSaleProtectionView.accountDeviceAnomalies"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Each transaction can receive”, “Detect attempted use of”, “Human Review”.",
        "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 28 §Monitor"
@@ -969,7 +975,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-292"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-292",
+   "workshopBoard": "wireframes/WS169 Ticket Resale Marketplace Board 2.dc.html#adm-292"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 28. 11 of 12 labels bound to a contract property; 19 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1033,10 +1040,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "The number of valid admissions and seat assignments remains consistent with configured venue/event capacity regardless of resale activity.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Detect) and a per-row directory (§For each event show) — counts over a population, then the population",
   "purpose": "Ensure resale activity never creates additional venue capacity or corrupts primary ticket inventory.",
-  "purposeNote": "The number of valid admissions and seat assignments remains consistent with configured venue/event capacity regardless of resale activity.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -1177,7 +1184,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-293"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-293",
+   "workshopBoard": "wireframes/WS169 Ticket Resale Marketplace Board 2.dc.html#adm-293"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 29. 14 of 14 labels bound to a contract property; 23 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1241,14 +1249,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Every completed resale produces an auditable seller settlement record with accurate proceeds, deductions, payout timing and settlement status.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Manage the financial amount owed to sellers following successful resale.",
-  "purposeNote": "Every completed resale produces an auditable seller settlement record with accurate proceeds, deductions, payout timing and settlement status.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Manual hold, Compliance hold, Refund/dispute hold. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 4 actions on this screen; 1 are served since the writers pass (29 September): Manual hold by `holdResaleSettlement`.** Still unserved: Payment account verification, Compliance hold, Refund/dispute hold. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Ticket Resale Marketplace_Reference.pdf, page 30 §Support"
    }
   ],
@@ -1319,6 +1327,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Payment account verification",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Manual hold",
        "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 30 §Support"
       },
@@ -1331,6 +1344,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "secondaryButton",
        "label": "Refund/dispute hold",
        "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Hold resale settlement",
+       "operation": "holdResaleSettlement",
+       "permission": "SETTLEMENT_RECONCILE",
+       "notes": "**A person stops a payout the job would otherwise make** (DM5 open item: the settlement job writes `orders.resale_settlement` and no operation could hold or release one).",
+       "provenance": "contract orders.yaml POST /resale-settlements/{resaleSettlementId}/hold"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Release resale settlement hold",
+       "operation": "releaseResaleSettlementHold",
+       "permission": "SETTLEMENT_RECONCILE",
+       "notes": "**The release the settlement state model had no operation for** (DM5 open item).",
+       "provenance": "contract orders.yaml POST /resale-settlements/{resaleSettlementId}/release"
       }
      ]
     }
@@ -1349,6 +1378,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "orders",
     "purpose": "Seller Settlement & Payout Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "holdResaleSettlement",
+    "contract": "orders",
+    "purpose": "Put a seller's resale payout on manual hold",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSellerSettlementPayout"
+    ]
+   },
+   {
+    "operationId": "releaseResaleSettlementHold",
+    "contract": "orders",
+    "purpose": "Release a manual or compliance hold on a seller's resale payout",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSellerSettlementPayout"
+    ]
    }
   ],
   "entryState": {
@@ -1359,14 +1406,58 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "SellerSettlementPayoutManagementView.listingPrice",
     "SellerSettlementPayoutManagementView.sellerFee",
     "SellerSettlementPayoutManagementView.commission"
+   ],
+   "params": [
+    {
+     "name": "resaleSettlementId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-294"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-294",
+   "workshopBoard": "wireframes/WS169 Ticket Resale Marketplace Board 2.dc.html#adm-294"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 30. 14 of 14 labels bound to a contract property; 23 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 30. 14 of 14 labels bound to a contract property; 24 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formHoldResaleSettlement",
+    "component": "modal",
+    "trigger": "Hold resale settlement",
+    "body": "**Collects what `holdResaleSettlement` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Hold resale settlement",
+     "operation": "holdResaleSettlement"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /resale-settlements/{resaleSettlementId}/hold"
+   },
+   {
+    "id": "formReleaseResaleSettlementHold",
+    "component": "modal",
+    "trigger": "Release resale settlement hold",
+    "body": "**Collects what `releaseResaleSettlementHold` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Release resale settlement hold",
+     "operation": "releaseResaleSettlementHold"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /resale-settlements/{resaleSettlementId}/release"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1428,14 +1519,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Operations can resolve resale exceptions without breaking the original order, resale transaction, ownership, credential or financial history.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Handle exceptional scenarios that occur after a resale transaction.",
-  "purposeNote": "Operations can resolve resale exceptions without breaking the original order, resale transaction, ownership, credential or financial history.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Failed ownership transfer, Failed credential issuance, Duplicate transaction, Ticket access issue, Incorrect ticket, Venue change, Seat change. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 11 actions on this screen and the screen declares 1 operation.** Unserved: Event cancellation, Event postponement, Buyer refund, Payment chargeback, Failed ownership transfer, Failed credential issuance, Duplicate transaction, Ticket access issue …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Ticket Resale Marketplace_Reference.pdf, page 32 §Support"
    },
    {
@@ -1458,6 +1549,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Event cancellation",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 32 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Event postponement",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 32 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Buyer refund",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 32 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Payment chargeback",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 32 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Failed ownership transfer",
        "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 32 §Support"
       },
@@ -1477,25 +1588,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 32 §Support"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Incorrect ticket",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 32 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Venue change",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 32 §Support"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Seat change",
-       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 32 §Support"
-      },
-      {
        "kind": "banner",
        "label": "Permissions this screen separates",
        "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Refund buyer, Reverse settlement, Hold settlement, Reissue credential, Retry transfer, Cancel transaction, Return ownership, Provide replacement ticket, Escalate. Each needs attaching to the control it gates, or the screen needs the control.",
        "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 32 §Depending on permission"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Hold resale settlement",
+       "operation": "holdResaleSettlement",
+       "permission": "SETTLEMENT_RECONCILE",
+       "notes": "**A person stops a payout the job would otherwise make** (DM5 open item: the settlement job writes `orders.resale_settlement` and no operation could hold or release one).",
+       "provenance": "contract orders.yaml POST /resale-settlements/{resaleSettlementId}/hold"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Release resale settlement hold",
+       "operation": "releaseResaleSettlementHold",
+       "permission": "SETTLEMENT_RECONCILE",
+       "notes": "**The release the settlement state model had no operation for** (DM5 open item).",
+       "provenance": "contract orders.yaml POST /resale-settlements/{resaleSettlementId}/release"
       }
      ]
     },
@@ -1518,23 +1630,81 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "orders",
     "purpose": "Refunds, Disputes & Resale Exceptions",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "holdResaleSettlement",
+    "contract": "orders",
+    "purpose": "Put a seller's resale payout on manual hold",
+    "trigger": "onAction",
+    "invalidates": [
+     "listRefundDisputeResale"
+    ]
+   },
+   {
+    "operationId": "releaseResaleSettlementHold",
+    "contract": "orders",
+    "purpose": "Release a manual or compliance hold on a seller's resale payout",
+    "trigger": "onAction",
+    "invalidates": [
+     "listRefundDisputeResale"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "RefundsDisputesResaleExceptionsView.eventCancellation",
-    "RefundsDisputesResaleExceptionsView.eventPostponement",
-    "RefundsDisputesResaleExceptionsView.buyerRefund",
-    "RefundsDisputesResaleExceptionsView.sellerDispute",
-    "RefundsDisputesResaleExceptionsView.buyerDispute"
+    "RefundsDisputesResaleExceptionsView.issueType"
+   ],
+   "params": [
+    {
+     "name": "resaleSettlementId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-295"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-295",
+   "workshopBoard": "wireframes/WS169 Ticket Resale Marketplace Board 2.dc.html#adm-295"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 32. 0 of 0 labels bound to a contract property; 16 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 32. 0 of 0 labels bound to a contract property; 20 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formHoldResaleSettlement",
+    "component": "modal",
+    "trigger": "Hold resale settlement",
+    "body": "**Collects what `holdResaleSettlement` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Hold resale settlement",
+     "operation": "holdResaleSettlement"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /resale-settlements/{resaleSettlementId}/hold"
+   },
+   {
+    "id": "formReleaseResaleSettlementHold",
+    "component": "modal",
+    "trigger": "Release resale settlement hold",
+    "body": "**Collects what `releaseResaleSettlementHold` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Release resale settlement hold",
+     "operation": "releaseResaleSettlementHold"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /resale-settlements/{resaleSettlementId}/release"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1596,10 +1766,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "ownership transfer, credential replacement and financial settlement.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
   "purpose": "Provide complete end-to-end traceability of every ticket that enters the resale ecosystem.",
-  "purposeNote": "ownership transfer, credential replacement and financial settlement.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1622,8 +1792,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "ResaleAuditOwnershipHistoryView.resaleTransaction",
         "ResaleAuditOwnershipHistoryView.seller",
         "ResaleAuditOwnershipHistoryView.buyer",
-        "ResaleAuditOwnershipHistoryView.seat",
-        "ResaleAuditOwnershipHistoryView.event",
         "ResaleAuditOwnershipHistoryView.paymentReference"
        ],
        "notes": "The pack filters this screen by ticket id, credential, order, resale transaction, seller, buyer and 3 more — which are present is a decision the pack already made.",
@@ -1737,12 +1905,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "orders",
     "purpose": "Resale Audit & Ownership History",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listResaleConfirmationOwnership",
+    "contract": "orders",
+    "purpose": "Resale Confirmation, Ownership Transfer & Ticket Delivery",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-296"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-296",
+   "workshopBoard": "wireframes/WS169 Ticket Resale Marketplace Board 2.dc.html#adm-296"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 34. 9 of 9 labels bound to a contract property; 26 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1798,10 +1973,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from ADM-288, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Management can evaluate the commercial and operational performance of resale and use explainable AI insights to improve primary pricing, marketplace policies and future event strategy. Board 2 — Final Screen Register Screen Backend Screen Primary Responsibility",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Display) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Provide management with commercial, operational and predictive intelligence about the resale marketplace. Board 3 defines how the end customer actually accesses, uses, sells through, and buys from The existing resale architecture already defines the backend marketplace configuration and transaction processing across Boards 1 and 2. Board 3 closes the missing experience layer: Board 1 — Configure Marketplace Eligibility → Policy → Listings → Pricing → Fees → Approval → Inventory Board 2 — Execute Resale Transaction Buyer → Payment → Ownership Transfer → Credentials → Fraud → Settlement → Audit Board 3 — Customer Experience Seller Journey → Buyer Journey → White-Label Portal → Client B2C Integration → Hosted Marketplace → Headless/API",
-  "purposeNote": "Management can evaluate the commercial and operational performance of resale and use explainable AI insights to improve primary pricing, marketplace policies and future event strategy. Board 2 — Final Screen Register Screen Backend Screen Primary Responsibility",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -1927,6 +2102,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "orders",
     "purpose": "Resale Analytics & AI Intelligence",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listResale",
+    "contract": "orders",
+    "purpose": "Resale Operations Command Center",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -1942,7 +2123,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-297"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-297",
+   "workshopBoard": "wireframes/WS169 Ticket Resale Marketplace Board 2.dc.html#adm-297"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 35. 11 of 22 labels bound to a contract property; 23 of 107 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1978,6 +2160,25 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+ "holdResaleSettlement": {
+  "method": "POST",
+  "path": "/resale-settlements/{resaleSettlementId}/hold",
+  "contract": "orders",
+  "summary": "Put a seller's resale payout on manual hold",
+  "permission": "SETTLEMENT_RECONCILE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResaleSettlement"
+ },
  "listBuyerPurchaseResale": {
   "method": "GET",
   "path": "/buyer-purchase-resale",
@@ -1987,7 +2188,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "BuyerPurchaseResaleOrderManagementView"
  },
@@ -2000,7 +2207,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "CapacityInventoryReconciliationView"
  },
@@ -2013,7 +2226,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "CredentialRevocationRegenerationView"
  },
@@ -2039,7 +2258,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ResaleOperationsCommandCenterView"
  },
@@ -2053,6 +2278,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "venue",
     "in": "query",
@@ -2097,6 +2327,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "ResaleAnalyticsAiIntelligenceView"
  },
+ "listResaleConfirmationOwnership": {
+  "method": "GET",
+  "path": "/resale-confirmation-ownership",
+  "contract": "orders",
+  "summary": "Resale Confirmation, Ownership Transfer & Ticket Delivery",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResaleConfirmationOwnershipTransferTicketDeliveryView"
+ },
  "listResaleFraudDuplicate": {
   "method": "GET",
   "path": "/resale-fraud-duplicate",
@@ -2106,7 +2355,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ResaleFraudDuplicateSaleProtectionView"
  },
@@ -2119,7 +2374,63 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "ticketId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "credential",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "order",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "resaleTransaction",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "seller",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "buyer",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "seat",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "paymentReference",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "export",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "ResaleAuditOwnershipHistoryView"
  },
@@ -2132,7 +2443,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "SellerSettlementPayoutManagementView"
  },
@@ -2145,9 +2462,34 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "TicketOwnershipTransferManagementView"
+ },
+ "releaseResaleSettlementHold": {
+  "method": "POST",
+  "path": "/resale-settlements/{resaleSettlementId}/release",
+  "contract": "orders",
+  "summary": "Release a manual or compliance hold on a seller's resale payout",
+  "permission": "SETTLEMENT_RECONCILE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResaleSettlement"
  }
 }
 ```
@@ -2213,10 +2555,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Loyalty profile"
    },
-   "identityVerificationWhereRequired": {
-    "type": "boolean",
-    "description": "Identity verification where required"
-   },
    "billingInformation": {
     "type": "string",
     "description": "Billing information"
@@ -2264,6 +2602,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "failureHandling": {
     "type": "string",
     "description": "Failure handling"
+   },
+   "identityVerification": {
+    "type": "boolean",
+    "description": "Identity verification where required"
    }
   }
  },
@@ -2313,10 +2655,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "description": "Active entitlements"
    },
-   "processExplicitlyReturnsIt": {
-    "type": "string",
-    "description": "process explicitly returns it"
-   },
    "soldResaleListingStillActive": {
     "type": "integer",
     "description": "Sold resale listing still active"
@@ -2332,22 +2670,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "capacityDiscrepancy": {
     "type": "integer",
     "description": "Capacity discrepancy"
-   },
-   "investigate": {
-    "type": "string",
-    "description": "Investigate"
-   },
-   "reSync": {
-    "type": "string",
-    "description": "Re-sync"
-   },
-   "correctMapping": {
-    "type": "string",
-    "description": "Correct mapping"
-   },
-   "holdTicket": {
-    "type": "string",
-    "description": "Hold ticket"
    }
   }
  },
@@ -2360,38 +2682,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "oldCredentialRevoke": {
     "type": "string",
     "description": "Old Credential → Revoke"
-   },
-   "staticQr": {
-    "type": "string",
-    "description": "Static QR"
-   },
-   "dynamicQr": {
-    "type": "string",
-    "description": "Dynamic QR"
-   },
-   "barcode": {
-    "type": "string",
-    "description": "Barcode"
-   },
-   "nfc": {
-    "type": "string",
-    "description": "NFC"
-   },
-   "rfid": {
-    "type": "string",
-    "description": "RFID"
-   },
-   "mobileWalletPass": {
-    "type": "string",
-    "description": "Mobile Wallet pass"
-   },
-   "digitalTicket": {
-    "type": "string",
-    "description": "Digital ticket"
-   },
-   "wearableCredential": {
-    "type": "string",
-    "description": "Wearable credential"
    },
    "revokedResold": {
     "type": "string",
@@ -2417,33 +2707,37 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Original ticket relationship"
    },
-   "newSecurityKeysTokenWhereApplicable": {
+   "newSecurityKeys": {
     "type": "integer",
     "description": "New security keys/token where applicable"
    },
-   "newWalletPassWhereApplicable": {
+   "newWalletPass": {
     "type": "integer",
     "description": "New wallet pass where applicable"
    },
-   "ticvaiAccount": {
+   "credentialMedia": {
     "type": "string",
-    "description": "TICVAI account"
+    "enum": [
+     "staticQr",
+     "dynamicQr",
+     "barcode",
+     "nfc",
+     "rfid",
+     "mobileWalletPass",
+     "digitalTicket",
+     "wearableCredential"
+    ],
+    "description": "Credential media handled."
    },
-   "mobileApp": {
+   "deliveryMethod": {
     "type": "string",
-    "description": "Mobile app"
-   },
-   "email": {
-    "type": "string",
-    "description": "Email"
-   },
-   "wallet": {
-    "type": "string",
-    "description": "Wallet"
-   },
-   "otherConfiguredDeliveryMethods": {
-    "type": "string",
-    "description": "Other configured delivery methods"
+    "enum": [
+     "mobileApp",
+     "email",
+     "wallet",
+     "otherConfiguredDeliveryMethods"
+    ],
+    "description": "How the new credential is delivered."
    }
   }
  },
@@ -2453,58 +2747,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Refunds, Disputes & Resale Exceptions displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "eventCancellation": {
-    "type": "string",
-    "description": "Event cancellation"
-   },
-   "eventPostponement": {
-    "type": "string",
-    "description": "Event postponement"
-   },
-   "buyerRefund": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Buyer refund"
-   },
-   "sellerDispute": {
-    "type": "string",
-    "description": "Seller dispute"
-   },
-   "buyerDispute": {
-    "type": "string",
-    "description": "Buyer dispute"
-   },
-   "paymentChargeback": {
-    "type": "string",
-    "description": "Payment chargeback"
-   },
-   "failedOwnershipTransfer": {
-    "type": "integer",
-    "description": "Failed ownership transfer"
-   },
-   "failedCredentialIssuance": {
-    "type": "integer",
-    "description": "Failed credential issuance"
-   },
-   "ticketAccessIssue": {
-    "type": "string",
-    "description": "Ticket access issue"
-   },
-   "sellerPayoutDispute": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Seller payout dispute"
-   },
-   "incorrectTicket": {
-    "type": "string",
-    "description": "Incorrect ticket"
-   },
-   "venueChange": {
-    "type": "string",
-    "description": "Venue change"
-   },
-   "seatChange": {
-    "type": "string",
-    "description": "Seat change"
-   },
    "caseId": {
     "type": "string",
     "description": "Case ID"
@@ -2561,21 +2803,34 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Resolution"
    },
-   "holdSettlement": {
+   "issueType": {
     "type": "string",
-    "description": "Hold settlement"
+    "enum": [
+     "eventCancellation",
+     "eventPostponement",
+     "buyerRefund",
+     "sellerDispute",
+     "buyerDispute",
+     "paymentChargeback",
+     "failedOwnershipTransfer",
+     "failedCredentialIssuance",
+     "duplicateTransaction",
+     "ticketAccessIssue",
+     "sellerPayoutDispute",
+     "incorrectTicket",
+     "venueChange",
+     "seatChange"
+    ],
+    "description": "Exception type."
    },
-   "returnOwnership": {
+   "refundRecipient": {
     "type": "string",
-    "description": "Return ownership"
-   },
-   "provideReplacementTicket": {
-    "type": "string",
-    "description": "Provide replacement ticket"
-   },
-   "whoReceivesTheRefund": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Who receives the refund?"
+    "enum": [
+     "resaleBuyer",
+     "originalPurchaser",
+     "split"
+    ],
+    "description": "Who is refunded when the event is cancelled after a resale; set by the resale policy the client names (make-or-break, see the operation)"
    }
   }
  },
@@ -2611,7 +2866,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "averageDiscount": {
     "type": "number",
-    "description": "Average Discount"
+    "description": "Average discount, percent"
    },
    "sellerProceeds": {
     "type": "integer",
@@ -2637,10 +2892,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "refundDisputeRate": {
     "type": "number",
     "description": "Refund/Dispute Rate"
-   },
-   "including": {
-    "type": "string",
-    "description": "including"
    },
    "primaryAvailability": {
     "type": "string",
@@ -2670,10 +2921,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Sell-through"
    },
-   "primaryPriceForWeekendPerformances": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "primary price for weekend performances"
-   },
    "expectedResaleDemand": {
     "type": "string",
     "description": "Expected resale demand"
@@ -2693,42 +2940,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "expectedMarketplaceRevenue": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Expected marketplace revenue"
-   },
-   "policyPermitsIt": {
-    "type": "string",
-    "description": "policy permits it"
-   },
-   "monitoring": {
-    "type": "string",
-    "description": "monitoring"
-   },
-   "exceptionsAuditAnalytics": {
-    "type": "string",
-    "description": "Exceptions → Audit → Analytics"
-   },
-   "modelAEmbeddedWhiteLabel": {
-    "type": "string",
-    "description": "Model A — Embedded White-Label"
-   },
-   "modelBTicvaiHostedWhiteLabel": {
-    "type": "string",
-    "description": "Model B — TICVAI-Hosted White-Label"
-   },
-   "andCommercialPolicies": {
-    "type": "string",
-    "description": "and commercial policies"
-   },
-   "modelCHeadlessApi": {
-    "type": "string",
-    "description": "Model C — Headless/API"
-   },
-   "engine": {
-    "type": "string",
-    "description": "engine"
-   },
-   "customerProposition": {
-    "type": "string",
-    "description": "customer proposition"
    }
   }
  },
@@ -2803,10 +3014,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Approval"
    },
-   "deviceChannelWhereApplicable": {
-    "type": "string",
-    "description": "Device/channel where applicable"
-   },
    "ticketId": {
     "type": "string",
     "description": "Ticket ID"
@@ -2819,41 +3026,61 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Resale transaction"
    },
-   "seat": {
-    "type": "string",
-    "description": "Seat"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
    "paymentReference": {
     "type": "string",
     "description": "Payment reference"
    },
-   "subjectToRolePermissions": {
+   "deviceChannel": {
     "type": "string",
-    "description": "subject to role permissions"
+    "description": "Device/channel where applicable"
+   }
+  }
+ },
+ "ResaleConfirmationOwnershipTransferTicketDeliveryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Resale Confirmation, Ownership Transfer & Ticket Delivery displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "dynamicQr": {
+    "type": "string",
+    "description": "Dynamic QR"
    },
-   "finance": {
+   "mobileTicket": {
     "type": "string",
-    "description": "Finance"
+    "description": "Mobile Ticket"
    },
-   "compliance": {
+   "appleWallet": {
     "type": "string",
-    "description": "Compliance"
+    "description": "Apple Wallet"
    },
-   "fraudInvestigation": {
+   "googleWallet": {
     "type": "string",
-    "description": "Fraud investigation"
+    "description": "Google Wallet"
    },
-   "customerDispute": {
+   "otherSupportedCredentialMedia": {
     "type": "string",
-    "description": "Customer dispute"
+    "description": "Other supported credential media"
    },
-   "venueOperations": {
+   "rfidNfcAssignment": {
     "type": "string",
-    "description": "Venue operations"
+    "description": "RFID/NFC assignment where applicable"
+   },
+   "ticketId": {
+    "type": "string",
+    "description": "Ticket ID, unchanged through the resale (MoM 1 Sep)"
+   },
+   "currentOwner": {
+    "type": "string",
+    "description": "Current owner"
+   },
+   "previousOwner": {
+    "type": "string",
+    "description": "Previous owner"
+   },
+   "settlementStatus": {
+    "type": "string",
+    "description": "Seller settlement status"
    }
   }
  },
@@ -2903,30 +3130,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "description": "Repeated failed transactions"
    },
-   "accountDeviceAnomaliesWherePermitted": {
-    "type": "string",
-    "description": "Account/device anomalies where permitted"
-   },
-   "withExplainableContributingFactors": {
-    "type": "string",
-    "description": "with explainable contributing factors"
-   },
-   "allow": {
-    "type": "boolean",
-    "description": "Allow"
-   },
-   "requireVerification": {
-    "type": "boolean",
-    "description": "Require verification"
-   },
-   "holdTransaction": {
-    "type": "string",
-    "description": "Hold transaction"
-   },
-   "requireManualReview": {
-    "type": "boolean",
-    "description": "Require manual review"
-   },
    "revokedSellerCredential": {
     "type": "string",
     "description": "Revoked seller credential"
@@ -2938,6 +3141,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "invalidatedTickets": {
     "type": "string",
     "description": "Invalidated tickets"
+   },
+   "accountDeviceAnomalies": {
+    "type": "string",
+    "description": "Account/device anomalies where permitted"
+   },
+   "response": {
+    "type": "string",
+    "enum": [
+     "allow",
+     "requireVerification",
+     "holdTransaction",
+     "requireManualReview"
+    ],
+    "description": "Configured response to the signal."
    }
   }
  },
@@ -3080,10 +3297,137 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "cancelled"
     ],
     "description": "Vocabulary listed under Exception statuses."
-   },
-   "holdTransaction": {
+   }
+  }
+ },
+ "ResaleSettlement": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.resale_settlement",
+  "description": "**What one seller is owed for one sold listing, and when and how it is paid** (DM5, 29 September: data model for the agreed operations; MoM 1 Sep 4.14, Board 2: settlement to the original seller). The amounts are fixed from the listing's own fee snapshot at sale. `ResaleListing.payoutStatus` is the seller-facing summary of this row.\n**The seller is paid after the buyer is admitted, not after they pay**, so a dispute or a refund lands on a settlement that is still `pending` or `onHold`, never on money already paid out.",
+  "required": [
+   "id",
+   "resaleListingId",
+   "sellerSubjectId",
+   "listingPrice",
+   "sellerFee",
+   "sellerProceeds",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "Hold transaction"
+    "format": "uuid",
+    "readOnly": true
+   },
+   "resaleListingId": {
+    "x-ticvai-references": "orders.resale_listing",
+    "type": "string",
+    "format": "uuid",
+    "description": "Unique; one settlement per sold listing."
+   },
+   "sellerSubjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "listingPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "sellerFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "processingFee": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "tax": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "adjustments": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "sellerProceeds": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "payoutMethod": {
+    "type": "string",
+    "nullable": true,
+    "description": "Proposed values, client to correct (DM5).",
+    "enum": [
+     "originalPaymentMethod",
+     "bankTransfer",
+     "wallet"
+    ]
+   },
+   "settlementBatch": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "expectedPayoutDate": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "scheduled",
+     "onHold",
+     "paid",
+     "failed",
+     "reversed"
+    ]
+   },
+   "holdReason": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "manualHold",
+     "complianceHold",
+     "refundDisputeHold"
+    ]
+   },
+   "paidAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "failureReason": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    }
   }
  },
@@ -3160,32 +3504,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "description": "Vocabulary listed under Exception statuses."
    },
-   "immediatelyAfterResale": {
-    "type": "string",
-    "description": "Immediately after resale"
-   },
-   "xDaysAfterResale": {
-    "type": "string",
-    "description": "X days after resale"
-   },
-   "afterEventCompletion": {
-    "type": "string",
-    "description": "After event completion"
-   },
-   "xDaysAfterEvent": {
-    "type": "string",
-    "description": "X days after event"
-   },
-   "afterAccessValidation": {
-    "type": "string",
-    "description": "After access validation"
-   },
-   "operatorDefinedSettlementCycle": {
-    "type": "string",
-    "description": "Operator-defined settlement cycle"
-   },
    "minimumPayoutThreshold": {
-    "type": "integer",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Minimum payout threshold"
    },
    "settlementBatches": {
@@ -3200,17 +3520,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Payment account verification"
    },
-   "manualHold": {
+   "settlementTiming": {
     "type": "string",
-    "description": "Manual hold"
+    "enum": [
+     "immediatelyAfterResale",
+     "xDaysAfterResale",
+     "afterEventCompletion",
+     "xDaysAfterEvent",
+     "afterAccessValidation",
+     "operatorDefinedSettlementCycle"
+    ],
+    "description": "When sellers are paid (a venue may pay only after the event has taken place)."
    },
-   "complianceHold": {
+   "holdReason": {
     "type": "string",
-    "description": "Compliance hold"
-   },
-   "refundDisputeHold": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Refund/dispute hold"
+    "enum": [
+     "manualHold",
+     "complianceHold",
+     "refundDisputeHold"
+    ],
+    "description": "Why a payout is on hold."
    }
   }
  },
@@ -3268,38 +3597,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Validity"
    },
-   "buyerPaymentCompleted": {
-    "type": "string",
-    "description": "Buyer payment completed"
-   },
-   "listingRemainsValid": {
-    "type": "string",
-    "description": "Listing remains valid"
-   },
-   "sellerStillOwnsTicket": {
-    "type": "string",
-    "description": "Seller still owns ticket"
-   },
-   "ticketHasNotBeenScanned": {
-    "type": "string",
-    "description": "Ticket has not been scanned"
-   },
-   "ticketHasNotBeenRefunded": {
-    "type": "string",
-    "description": "Ticket has not been refunded"
-   },
-   "eventRemainsActive": {
-    "type": "integer",
-    "description": "Event remains active"
-   },
-   "capacityRemainsValid": {
-    "type": "integer",
-    "description": "Capacity remains valid"
-   },
-   "noFraudHoldExists": {
-    "type": "string",
-    "description": "No fraud hold exists"
-   },
    "sellerOwnershipHistoricalTransferred": {
     "type": "string",
     "description": "Seller Ownership: Historical / Transferred"
@@ -3316,10 +3613,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Seat assignment"
    },
-   "addOnsWherePermitted": {
-    "type": "string",
-    "description": "Add-ons where permitted"
-   },
    "accessRights": {
     "type": "string",
     "description": "Access rights"
@@ -3327,6 +3620,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "associatedBenefits": {
     "type": "string",
     "description": "Associated benefits"
+   },
+   "addOns": {
+    "type": "string",
+    "description": "Add-ons where permitted"
    }
   }
  }

@@ -807,7 +807,7 @@ CREATE TABLE IF NOT EXISTS catalogue.import_job (
 -- sold — CF-115 settled that contended inventory is leased rather than reserved, and the hold
 -- expires on its own. Renamed from lease, which read as a rental agreement
 CREATE TABLE IF NOT EXISTS catalogue.inventory_hold (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     channel_capacity_id               uuid NOT NULL,
     holder_kind                       text NOT NULL DEFAULT 'workstation' CONSTRAINT inventory_hold_holder_kind_chk CHECK (holder_kind IN ('workstation', 'cart')),
     holder_workstation_id             uuid,
@@ -1311,7 +1311,7 @@ CREATE TABLE IF NOT EXISTS catalogue.pricing_recommendation (
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS catalogue.pricing_recommendation_decision (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     recommendation_id                 uuid NOT NULL,
     decision                          text NOT NULL CONSTRAINT pricing_recommendation_decision_decision_chk CHECK (decision IN ('accept', 'modify', 'reject', 'schedule', 'sendForApproval')),
     rejection_reason                  text CONSTRAINT pricing_recommendation_decision_rejection_reason_chk CHECK (rejection_reason IN ('commercialJudgment', 'brandPositioning', 'customerSensitivity', 'eventStrategy', 'incorrectSignal', 'dataConcern', 'other')),

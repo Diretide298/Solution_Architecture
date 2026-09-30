@@ -6,7 +6,7 @@
   "summary": "Keep it longer, if it is free and the guest accepts the price",
   "permission": "RENTAL_OPERATE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -135,7 +135,7 @@
   "summary": "What this rental would cost, and the deposit it would hold",
   "permission": "RENTAL_VIEW",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -154,7 +154,7 @@
   "summary": "Something happened during a rental",
   "permission": "RENTAL_OPERATE",
   "offlineCapable": true,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -171,7 +171,7 @@
   "path": "/messages",
   "contract": "marketing-crm",
   "summary": "Send a transactional message",
-  "permission": null,
+  "permission": "MARKETING_SEND",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -192,7 +192,7 @@
   "summary": "Replace a faulty item mid-rental",
   "permission": "RENTAL_OPERATE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {

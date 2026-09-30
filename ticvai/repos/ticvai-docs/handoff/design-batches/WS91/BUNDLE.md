@@ -1,6 +1,6 @@
 # WS91 — Rental Management board 4
 
-**10 screens · 11 operations · 9 schemas · 5 permissions**
+**10 screens · 11 operations · 14 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -1592,7 +1592,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Define how a rental is priced",
   "permission": "RENTAL_PRICE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1611,7 +1611,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Why the price is what it is, rule by rule",
   "permission": "RENTAL_VIEW",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1777,7 +1777,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Deviate from policy, with a reason and an approver",
   "permission": "RENTAL_OVERRIDE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1796,7 +1796,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "How much is held, how, and what happens to it",
   "permission": "RENTAL_PRICE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1815,7 +1815,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Grace period, late fees and extension pricing",
   "permission": "RENTAL_PRICE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1834,7 +1834,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Test a commercial configuration before publishing it",
   "permission": "RENTAL_PRICE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1872,7 +1872,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Change a pricing profile",
   "permission": "RENTAL_PRICE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1893,6 +1893,155 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "CommercialPricingCommandCenterSummary": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Commercial Pricing Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
+  "properties": {
+   "totalPriceLists": {
+    "type": "integer",
+    "description": "Total Price Lists"
+   },
+   "activePriceLists": {
+    "type": "integer",
+    "description": "Active Price Lists"
+   },
+   "draftPriceLists": {
+    "type": "integer",
+    "description": "Draft Price Lists"
+   },
+   "priceCategories": {
+    "type": "integer",
+    "description": "Price Categories"
+   },
+   "configuredRates": {
+    "type": "integer",
+    "description": "Configured Rates"
+   },
+   "productsWithPricing": {
+    "type": "integer",
+    "description": "Products with Pricing: sellable products that reference at least one active price list rate"
+   },
+   "productsMissingPricing": {
+    "type": "integer",
+    "description": "Products Missing Pricing: active sellable products with no price list rate"
+   },
+   "markets": {
+    "type": "integer",
+    "description": "Markets"
+   },
+   "currencies": {
+    "type": "integer",
+    "description": "Currencies"
+   },
+   "pricingValidationIssues": {
+    "type": "integer",
+    "description": "Pricing Validation Issues"
+   },
+   "recentlyModifiedPriceLists": {
+    "type": "integer",
+    "description": "Recently Modified Price Lists: price lists changed in the last 7 days (decided 29 September, readiness close-out)"
+   },
+   "upcomingPriceStructures": {
+    "type": "integer",
+    "description": "Upcoming Price Structures: price lists whose effective-from date is in the future"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI observations for this screen; advisory only, never applied automatically"
+   }
+  }
+ },
+ "CommercialPricingCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Commercial Pricing Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "priceListId": {
+    "type": "string",
+    "description": "Price List ID"
+   },
+   "name": {
+    "type": "string",
+    "description": "Name"
+   },
+   "code": {
+    "type": "string",
+    "description": "Code"
+   },
+   "type": {
+    "type": "string",
+    "enum": [
+     "standardRetail",
+     "venue",
+     "attraction",
+     "event",
+     "membership",
+     "group",
+     "corporate",
+     "b2b",
+     "reseller",
+     "ota",
+     "internal",
+     "specialMarket"
+    ],
+    "description": "Price List Type (the pack's Price List Types, pp.6-7)"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency: ISO 4217 code of the default currency",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "productCount": {
+    "type": "integer",
+    "description": "Product Count"
+   },
+   "rateCount": {
+    "type": "integer",
+    "description": "Rate Count"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, configured, validated, active, inactive, expired or archived (p.7); approval and publication are Board 4's"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From (the first half of the pack's Effective Period)"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   }
+  }
+ },
  "DynamicPricingStrategy": {
   "type": "object",
   "x-ticvai-persistence": "catalogue.dynamic_pricing_strategy",
@@ -2081,6 +2230,178 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "DynamicPricingStrategyCommandCenterSummary": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Dynamic Pricing Strategy Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
+  "properties": {
+   "activeStrategies": {
+    "type": "integer",
+    "description": "Active Strategies"
+   },
+   "draftStrategies": {
+    "type": "integer",
+    "description": "Draft Strategies"
+   },
+   "productsUnderDynamicPricing": {
+    "type": "integer",
+    "description": "Products Under Dynamic Pricing"
+   },
+   "eventsUnderDynamicPricing": {
+    "type": "integer",
+    "description": "Events Under Dynamic Pricing"
+   },
+   "performancesUnderDynamicPricing": {
+    "type": "integer",
+    "description": "Performances Under Dynamic Pricing"
+   },
+   "rulesActive": {
+    "type": "integer",
+    "description": "Rules Active"
+   },
+   "currentPriceAdjustments": {
+    "type": "integer",
+    "description": "Current Price Adjustments"
+   },
+   "pricesAtMaximumGuardrail": {
+    "type": "integer",
+    "description": "Prices at Maximum Guardrail"
+   },
+   "pricesAtMinimumGuardrail": {
+    "type": "integer",
+    "description": "Prices at Minimum Guardrail"
+   },
+   "ruleConflicts": {
+    "type": "integer",
+    "description": "Rule Conflicts"
+   },
+   "frozenStrategies": {
+    "type": "integer",
+    "description": "Frozen Strategies"
+   },
+   "upcomingActivations": {
+    "type": "integer",
+    "description": "Upcoming Activations: strategies scheduled to activate within 7 days (decided 29 September, readiness close-out)"
+   },
+   "operationalAlerts": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Operational Alerts (pack p.76), e.g. performances at their upper band, strategies with unresolved conflicts, strategies activating within 48 hours"
+   }
+  }
+ },
+ "DynamicPricingStrategyCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Dynamic Pricing Strategy Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "strategyId": {
+    "type": "string",
+    "description": "Strategy ID"
+   },
+   "strategyName": {
+    "type": "string",
+    "description": "Strategy Name"
+   },
+   "strategyType": {
+    "type": "string",
+    "enum": [
+     "demandBased",
+     "occupancyBased",
+     "availabilityBased",
+     "inventoryBased",
+     "bookingVelocity",
+     "timeToEvent",
+     "seasonal",
+     "dayOfWeek",
+     "timeslot",
+     "channel",
+     "segment",
+     "location",
+     "hybrid"
+    ],
+    "description": "Strategy Type (pack pp.75-76)"
+   },
+   "productEvent": {
+    "type": "string",
+    "description": "Product or event the strategy controls"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "basePriceSource": {
+    "type": "string",
+    "description": "Base price source: the Board 1 price list and rate the strategy moves from, e.g. UAE Standard Admission -> Adult"
+   },
+   "currentPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Current resolved dynamic price (for a single-price scope)",
+    "nullable": true
+   },
+   "adjustmentRange": {
+    "type": "object",
+    "properties": {
+     "minPercent": {
+      "type": "number",
+      "description": "Lowest adjustment from base, percent"
+     },
+     "maxPercent": {
+      "type": "number",
+      "description": "Highest adjustment from base, percent"
+     }
+    },
+    "description": "Adjustment range allowed by the strategy"
+   },
+   "ruleCount": {
+    "type": "integer",
+    "description": "Rule Count"
+   },
+   "effectivePeriod": {
+    "type": "object",
+    "properties": {
+     "from": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Effective from"
+     },
+     "to": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Effective to; empty for open-ended",
+      "nullable": true
+     }
+    },
+    "description": "Effective period"
+   },
+   "automationMode": {
+    "type": "string",
+    "enum": [
+     "monitor",
+     "recommend",
+     "prepareChange",
+     "autoExecuteWithinGuardrails"
+    ],
+    "description": "Automation mode from the automation policy (listDynamicPricingAutomation); recommend by default"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, testing, ready, scheduled, active, paused, frozen, expired or retired"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -2097,6 +2418,39 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "hasMore": {
     "type": "boolean"
+   }
+  }
+ },
+ "RentalConfigurationFinding": {
+  "type": "object",
+  "description": "Boards 1.10 and 4.10. **Severity travels with the finding**, so the publish gate can distinguish a missing turnaround buffer from a missing price.\n",
+  "properties": {
+   "code": {
+    "type": "string"
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "blocking",
+     "warning",
+     "advisory"
+    ]
+   },
+   "message": {
+    "type": "string"
+   },
+   "field": {
+    "type": "string",
+    "nullable": true
+   },
+   "source": {
+    "type": "string",
+    "enum": [
+     "validation",
+     "ai"
+    ],
+    "default": "validation",
+    "description": "**AI findings are advisory unless the client configures otherwise** (board 1.10), so the origin is on the record rather than assumed by the reader.\n"
    }
   }
  },

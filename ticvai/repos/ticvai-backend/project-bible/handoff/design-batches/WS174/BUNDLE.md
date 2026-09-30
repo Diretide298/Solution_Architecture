@@ -1,6 +1,6 @@
 # WS174 — Seat Management Venue Mapping Reference v1.0 board 10
 
-**8 screens · 8 operations · 5 schemas · 3 permissions**
+**8 screens · 8 operations · 13 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `CAPACITY_CONFIGURE, PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `AI_USE, CAPACITY_CONFIGURE, PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -803,11 +803,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "apis": [
    {
-    "operationId": "getRecommendations",
-    "contract": "promotions",
-    "purpose": "Seat upsell offers",
+    "operationId": "decideRecommendations",
+    "contract": "ai",
+    "purpose": "Fill a recommendation slot",
     "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1090,17 +1090,22 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
   "responds": "SeatCategory"
  },
- "getRecommendations": {
+ "decideRecommendations": {
   "method": "POST",
-  "path": "/recommendations",
-  "contract": "promotions",
-  "summary": "What else this guest might want",
-  "permission": "PRODUCT_VIEW",
+  "path": "/recommendations/decide",
+  "contract": "ai",
+  "summary": "Fill a recommendation slot",
+  "permission": "AI_USE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -1112,7 +1117,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "AiRecommendationResult"
  },
  "listDemandBookingCurve": {
   "method": "GET",
@@ -1161,6 +1166,16 @@ Method, path, parameters, request and response for every operation these screens
    },
    {
     "name": "dateTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priceCategory",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "sectionCode",
     "in": "query",
     "required": false
    },
@@ -1323,6 +1338,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -1337,6 +1357,543 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AiDemandForecastingBookingCurveStudioView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What AI Demand Forecasting & Booking Curve Studio displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "venue": {
+    "type": "string",
+    "description": "Venue id"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product id",
+    "nullable": true
+   },
+   "event": {
+    "type": "string",
+    "description": "Event id",
+    "nullable": true
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance id",
+    "nullable": true
+   },
+   "date": {
+    "type": "string",
+    "description": "Date",
+    "format": "date"
+   },
+   "timeslot": {
+    "type": "string",
+    "description": "Timeslot",
+    "nullable": true
+   },
+   "priceCategory": {
+    "type": "string",
+    "description": "Price category",
+    "nullable": true
+   },
+   "sectionCode": {
+    "type": "string",
+    "nullable": true,
+    "description": "Seat-map section (`seating.Section.code`) the row forecasts; null for a row at price-category or performance level (29 September, build pass, group G2; 21.11.4)"
+   },
+   "channel": {
+    "$ref": "#/components/schemas/Channel",
+    "description": "Channel"
+   },
+   "confidence": {
+    "type": "number",
+    "description": "Forecast Confidence, percent"
+   },
+   "forecastFinalOccupancy": {
+    "type": "number",
+    "description": "Forecast Final Occupancy, percent"
+   },
+   "demand": {
+    "type": "integer",
+    "description": "Forecast demand"
+   },
+   "attendance": {
+    "type": "integer",
+    "description": "Forecast attendance"
+   },
+   "occupancy": {
+    "type": "number",
+    "description": "Forecast occupancy, percent"
+   },
+   "sellThrough": {
+    "type": "number",
+    "description": "Forecast sell-through, percent"
+   },
+   "expectedSellOutTime": {
+    "type": "string",
+    "description": "Expected Sell-Out Time; empty if no sell-out forecast",
+    "format": "date-time",
+    "nullable": true
+   },
+   "revenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Forecast revenue"
+   },
+   "conversion": {
+    "type": "number",
+    "description": "Forecast conversion, percent"
+   },
+   "remainingInventory": {
+    "type": "integer",
+    "description": "Forecast remaining inventory at event"
+   },
+   "mape": {
+    "type": "number",
+    "description": "MAPE over closed forecasts at this level, percent"
+   },
+   "forecastBias": {
+    "type": "number",
+    "description": "Forecast Bias (positive = over-forecast), percent"
+   },
+   "overForecast": {
+    "type": "number",
+    "description": "Share of closed forecasts that over-forecast, percent"
+   },
+   "underForecast": {
+    "type": "number",
+    "description": "Share of closed forecasts that under-forecast, percent"
+   },
+   "forecastId": {
+    "type": "string",
+    "description": "Forecast id"
+   },
+   "horizon": {
+    "type": "string",
+    "description": "Forecast Horizon",
+    "enum": [
+     "intraday",
+     "tomorrow",
+     "days7",
+     "days30",
+     "eventHorizon",
+     "seasonalHorizon"
+    ]
+   },
+   "bookingCurve": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "daysBeforeEvent": {
+       "type": "integer",
+       "description": "T minus days"
+      },
+      "historicalExpectedPercentSold": {
+       "type": "number",
+       "description": "Historical expected curve, percent sold"
+      },
+      "actualPercentSold": {
+       "type": "number",
+       "nullable": true,
+       "description": "Current actual curve, percent sold (empty for future points)"
+      },
+      "forecastPercentSold": {
+       "type": "number",
+       "description": "AI forecast curve, percent sold"
+      }
+     }
+    },
+    "description": "Booking Curve"
+   },
+   "signalContributions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "signal": {
+       "type": "string",
+       "enum": [
+        "internalSales",
+        "bookingVelocity",
+        "occupancy",
+        "historicalEvents",
+        "nearbyEvent",
+        "weather",
+        "marketTourism",
+        "competitor",
+        "priceElasticity",
+        "other"
+       ],
+       "description": "Signal category"
+      },
+      "contributionPercent": {
+       "type": "number",
+       "description": "Explanatory share of the forecast"
+      }
+     }
+    },
+    "description": "Model Inputs: which signals contributed"
+   },
+   "confidenceReasons": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "strongHistoricalData",
+      "stableBookingPattern",
+      "reliableExternalSignals",
+      "limitedHistoricalData",
+      "volatileBookingPattern",
+      "degradedExternalSignals"
+     ]
+    },
+    "description": "Reasons behind the forecast confidence"
+   },
+   "modelVersion": {
+    "type": "string",
+    "description": "Model version that produced the forecast"
+   },
+   "generatedAt": {
+    "type": "string",
+    "description": "When the forecast was produced",
+    "format": "date-time"
+   }
+  }
+ },
+ "AiRecommendationItem": {
+  "type": "object",
+  "x-ticvai-persistence": "none — held in jsonb on ai.rec_decision.items, through AiRecommendationItemList",
+  "description": "One recommended item. **Carries a Pricing price reference, never a computed price** (AIR-029).",
+  "required": [
+   "trackingId",
+   "rank"
+  ],
+  "properties": {
+   "trackingId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Echoed on every `recordRecommendationEvents` event and as `orders.addCartLine.recommendationId`, so attribution never guesses."
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The product recommended. **Exactly one of `productId`, `promotionId` or `couponRef`, `rewardId` or `challengeId` is set, by `kind`** (29 September, build): `offer` carries a promotion or coupon, `reward` a loyalty reward, `challenge` a challenge, every other kind a product."
+   },
+   "promotionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For `offer`, a published promotion the guest is eligible for. Promotions computes the discount at the basket, never the engine."
+   },
+   "couponRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "For `offer`, a coupon campaign; a code is assigned only when the guest takes it (`promotions.assignCoupon`)."
+   },
+   "rewardId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For `reward`, a marketing-crm loyalty reward the guest can redeem."
+   },
+   "challengeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For `challenge`, a marketing-crm challenge the guest can join."
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "upsell",
+     "crossSell",
+     "upgrade",
+     "bundle",
+     "addOn",
+     "membership",
+     "nextBestOffer",
+     "offer",
+     "reward",
+     "challenge"
+    ]
+   },
+   "rank": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "priceRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "The Pricing reference the channel resolves to a price. AI never computes a price."
+   },
+   "reasonTemplateKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The template reason (decided 29 September, decision 9): no model writes guest-visible reasons."
+   },
+   "reasonText": {
+    "type": "string",
+    "nullable": true,
+    "description": "The rendered template in the session locale, where the channel shows reasons."
+   },
+   "confidenceBand": {
+    "type": "string",
+    "enum": [
+     "high",
+     "medium",
+     "low"
+    ],
+    "description": "Design 5.6: a band, never a bare percentage."
+   },
+   "score": {
+    "type": "number",
+    "nullable": true,
+    "description": "Normalised score. **Returned to staff callers only**; a guest response omits it."
+   }
+  }
+ },
+ "AiRecommendationResult": {
+  "type": "object",
+  "x-ticvai-persistence": "none — written as ai.rec_decision after the response",
+  "description": "The recommendation slot's content (design 2.2 A). Empty `items` is a valid answer: the slot stays empty.",
+  "required": [
+   "decisionId",
+   "mode",
+   "items",
+   "expiresAt"
+  ],
+  "properties": {
+   "decisionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "placement": {
+    "type": "string",
+    "enum": [
+     "productPage",
+     "cart",
+     "checkout",
+     "postPurchase",
+     "preVisit",
+     "inVenue",
+     "posBasket",
+     "kioskBasket",
+     "fnbMenu",
+     "retailBasket",
+     "seatUpgrade",
+     "membership",
+     "email",
+     "homepage",
+     "loyalty"
+    ]
+   },
+   "mode": {
+    "type": "string",
+    "enum": [
+     "personalised",
+     "contextual",
+     "rulesOnly",
+     "fallback"
+    ]
+   },
+   "items": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiRecommendationItem"
+    }
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "Channel": {
+  "type": "string",
+  "enum": [
+   "pos",
+   "kiosk",
+   "web",
+   "mobile",
+   "b2b",
+   "ota",
+   "callCentre"
+  ]
+ },
+ "DynamicPricingStrategyCommandCenterSummary": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Dynamic Pricing Strategy Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
+  "properties": {
+   "activeStrategies": {
+    "type": "integer",
+    "description": "Active Strategies"
+   },
+   "draftStrategies": {
+    "type": "integer",
+    "description": "Draft Strategies"
+   },
+   "productsUnderDynamicPricing": {
+    "type": "integer",
+    "description": "Products Under Dynamic Pricing"
+   },
+   "eventsUnderDynamicPricing": {
+    "type": "integer",
+    "description": "Events Under Dynamic Pricing"
+   },
+   "performancesUnderDynamicPricing": {
+    "type": "integer",
+    "description": "Performances Under Dynamic Pricing"
+   },
+   "rulesActive": {
+    "type": "integer",
+    "description": "Rules Active"
+   },
+   "currentPriceAdjustments": {
+    "type": "integer",
+    "description": "Current Price Adjustments"
+   },
+   "pricesAtMaximumGuardrail": {
+    "type": "integer",
+    "description": "Prices at Maximum Guardrail"
+   },
+   "pricesAtMinimumGuardrail": {
+    "type": "integer",
+    "description": "Prices at Minimum Guardrail"
+   },
+   "ruleConflicts": {
+    "type": "integer",
+    "description": "Rule Conflicts"
+   },
+   "frozenStrategies": {
+    "type": "integer",
+    "description": "Frozen Strategies"
+   },
+   "upcomingActivations": {
+    "type": "integer",
+    "description": "Upcoming Activations: strategies scheduled to activate within 7 days (decided 29 September, readiness close-out)"
+   },
+   "operationalAlerts": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Operational Alerts (pack p.76), e.g. performances at their upper band, strategies with unresolved conflicts, strategies activating within 48 hours"
+   }
+  }
+ },
+ "DynamicPricingStrategyCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Dynamic Pricing Strategy Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "strategyId": {
+    "type": "string",
+    "description": "Strategy ID"
+   },
+   "strategyName": {
+    "type": "string",
+    "description": "Strategy Name"
+   },
+   "strategyType": {
+    "type": "string",
+    "enum": [
+     "demandBased",
+     "occupancyBased",
+     "availabilityBased",
+     "inventoryBased",
+     "bookingVelocity",
+     "timeToEvent",
+     "seasonal",
+     "dayOfWeek",
+     "timeslot",
+     "channel",
+     "segment",
+     "location",
+     "hybrid"
+    ],
+    "description": "Strategy Type (pack pp.75-76)"
+   },
+   "productEvent": {
+    "type": "string",
+    "description": "Product or event the strategy controls"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "basePriceSource": {
+    "type": "string",
+    "description": "Base price source: the Board 1 price list and rate the strategy moves from, e.g. UAE Standard Admission -> Adult"
+   },
+   "currentPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Current resolved dynamic price (for a single-price scope)",
+    "nullable": true
+   },
+   "adjustmentRange": {
+    "type": "object",
+    "properties": {
+     "minPercent": {
+      "type": "number",
+      "description": "Lowest adjustment from base, percent"
+     },
+     "maxPercent": {
+      "type": "number",
+      "description": "Highest adjustment from base, percent"
+     }
+    },
+    "description": "Adjustment range allowed by the strategy"
+   },
+   "ruleCount": {
+    "type": "integer",
+    "description": "Rule Count"
+   },
+   "effectivePeriod": {
+    "type": "object",
+    "properties": {
+     "from": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Effective from"
+     },
+     "to": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Effective to; empty for open-ended",
+      "nullable": true
+     }
+    },
+    "description": "Effective period"
+   },
+   "automationMode": {
+    "type": "string",
+    "enum": [
+     "monitor",
+     "recommend",
+     "prepareChange",
+     "autoExecuteWithinGuardrails"
+    ],
+    "description": "Automation mode from the automation policy (listDynamicPricingAutomation); recommend by default"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, testing, ready, scheduled, active, paused, frozen, expired or retired"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -1558,6 +2115,180 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "type": "string"
     },
     "description": "AI observations for this screen; advisory only, never applied automatically"
+   }
+  }
+ },
+ "RevenueOptimizationCommandCenterSummary": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Revenue Optimization Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
+  "properties": {
+   "revenueOpportunity": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue Opportunity"
+   },
+   "incrementalRevenueGenerated": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Incremental Revenue Generated"
+   },
+   "activeOptimizations": {
+    "type": "integer",
+    "description": "Active Optimizations"
+   },
+   "recommendationsAwaitingAction": {
+    "type": "integer",
+    "description": "Recommendations Awaiting Action"
+   },
+   "pendingSimulations": {
+    "type": "integer",
+    "description": "Pending Simulations"
+   },
+   "autoExecutedChanges": {
+    "type": "integer",
+    "description": "Auto-Executed Changes"
+   },
+   "approvalRequired": {
+    "type": "integer",
+    "description": "Approval Required: changes waiting for an approver"
+   },
+   "activeABTests": {
+    "type": "integer",
+    "description": "Active A/B Tests"
+   },
+   "pricingExceptions": {
+    "type": "integer",
+    "description": "Pricing Exceptions"
+   },
+   "revenueAtRisk": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue at Risk"
+   },
+   "forecastAccuracy": {
+    "type": "number",
+    "description": "Forecast Accuracy over the last 30 days (decided 29 September, readiness close-out), percent"
+   },
+   "optimizationSuccessRate": {
+    "type": "number",
+    "description": "Optimization Success Rate: executed changes with a positive measured outcome, percent"
+   },
+   "aiRevenueBrief": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI Revenue Brief, e.g. AED 284,000 of opportunity in the next seven days. Advisory only: generated narrative never changes a price (decided 29 September, readiness close-out)"
+   }
+  }
+ },
+ "RevenueOptimizationCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Revenue Optimization Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "eventProduct": {
+    "type": "string",
+    "description": "Event/Product"
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance",
+    "nullable": true
+   },
+   "currentPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Current Price"
+   },
+   "recommendedPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Recommended Price"
+   },
+   "forecastRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Forecast Revenue"
+   },
+   "expectedUplift": {
+    "type": "number",
+    "description": "Expected Uplift, percent"
+   },
+   "confidence": {
+    "type": "number",
+    "description": "Confidence, percent"
+   },
+   "automationMode": {
+    "type": "string",
+    "description": "Automation Mode in force for this scope",
+    "enum": [
+     "advisory",
+     "humanInTheLoop",
+     "conditionalAutonomous",
+     "autonomous"
+    ]
+   },
+   "approvalStatus": {
+    "type": "string",
+    "description": "Approval Status: notRequired, pending, approved or rejected"
+   },
+   "executionStatus": {
+    "type": "string",
+    "description": "Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack"
+   },
+   "revenueRisk": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue Risk if no action is taken"
+   },
+   "eventProximity": {
+    "type": "integer",
+    "description": "Event Proximity: days until the event"
+   },
+   "inventoryPosition": {
+    "type": "number",
+    "description": "Inventory Position: remaining inventory, percent"
+   },
+   "demandVariance": {
+    "type": "number",
+    "description": "Demand Variance against forecast, percent"
+   },
+   "urgency": {
+    "type": "string",
+    "description": "Urgency",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
+   },
+   "optimizationId": {
+    "type": "string",
+    "description": "Optimisation id"
+   },
+   "recommendationId": {
+    "type": "string",
+    "description": "Recommendation id",
+    "nullable": true
+   },
+   "revenueOpportunity": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue Opportunity"
+   },
+   "priorityRank": {
+    "type": "integer",
+    "description": "Priority rank (1 = act first)"
+   },
+   "nextAction": {
+    "type": "string",
+    "description": "Suggested next action (the pack's Action column)",
+    "enum": [
+     "review",
+     "simulate",
+     "approve"
+    ]
    }
   }
  },

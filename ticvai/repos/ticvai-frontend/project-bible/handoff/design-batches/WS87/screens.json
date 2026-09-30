@@ -569,6 +569,20 @@
     "purpose": "Balance summary",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getWalletExitBalance",
+    "contract": "wallet",
+    "purpose": "Balance due / refundable at exit",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "settleWalletAtExit",
+    "contract": "wallet",
+    "purpose": "Settle the wallet at exit",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -580,6 +594,10 @@
    "params": [
     {
      "name": "subjectId",
+     "from": "navigation"
+    },
+    {
+     "name": "walletId",
      "from": "navigation"
     }
    ]

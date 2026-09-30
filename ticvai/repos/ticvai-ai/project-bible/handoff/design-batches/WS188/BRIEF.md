@@ -1,6 +1,6 @@
 # WS188 — Wallet Configuration Backend Structure v1.0 board 3
 
-**10 screens · 11 operations · 8 schemas · 3 permissions**
+**10 screens · 11 operations · 9 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

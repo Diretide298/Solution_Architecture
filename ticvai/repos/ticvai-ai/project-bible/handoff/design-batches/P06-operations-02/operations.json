@@ -161,6 +161,16 @@
   "scopeLevel": "workstation",
   "parameters": [
    {
+    "name": "sinceVersion",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": "validFrom",
     "in": "query",
     "required": true
@@ -188,7 +198,13 @@
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Order"
  },
@@ -246,7 +262,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "AiConversation"
+  "responds": "Page"
  },
  "listAttendance": {
   "method": "GET",
@@ -281,7 +297,7 @@
   "method": "GET",
   "path": "/catalogue/bundles",
   "contract": "catalogue",
-  "summary": "List published bundles",
+  "summary": "List published catalogue bundles",
   "permission": "PRODUCT_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
@@ -312,7 +328,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "Refund"
+  "responds": "Page"
  },
  "listOrders": {
   "method": "GET",
@@ -410,7 +426,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "RotaAssignment"
+  "responds": "Page"
  },
  "listScans": {
   "method": "GET",
@@ -490,6 +506,16 @@
     "required": null
    },
    {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "resolved",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -564,6 +590,25 @@
   ],
   "requestBody": null,
   "responds": "ValidationResult"
+ },
+ "recordAnswerFeedback": {
+  "method": "POST",
+  "path": "/messages/{messageId}/feedback",
+  "contract": "ai",
+  "summary": "Say whether an answer helped",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiAnswerFeedback"
  },
  "recordAttendance": {
   "method": "POST",
@@ -707,7 +752,13 @@
   "offlineCapable": false,
   "conflictPolicy": "append",
   "scopeLevel": "workstation",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "OrderSyncResult"
  },
@@ -720,7 +771,13 @@
   "offlineCapable": false,
   "conflictPolicy": "append",
   "scopeLevel": "workstation",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "ScanSyncResult"
  },

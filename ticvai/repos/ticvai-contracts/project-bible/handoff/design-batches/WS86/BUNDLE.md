@@ -1772,6 +1772,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "revenueShare"
     ],
     "nullable": true
+   },
+   "visibility": {
+    "type": "string",
+    "enum": [
+     "public",
+     "private"
+    ],
+    "default": "public",
+    "description": "`private`: certified for production access and never shown in the marketplace (17 September minutes, M17-06). `public`: also listed once certified.\n"
    }
   }
  },

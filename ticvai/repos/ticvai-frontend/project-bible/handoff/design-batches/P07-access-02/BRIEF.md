@@ -1,6 +1,6 @@
 # P07-access-02 — P07 · Access (2 of 2)
 
-**1 screens · 3 operations · 4 schemas · 2 permissions**
+**1 screens · 4 operations · 9 schemas · 2 permissions**
 
 Platform P07 Venue Scanner · ships as **venue-staff-mobile** ·
 staff audience · handheld ·
@@ -61,4 +61,4 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `SCN-016` | Gate mode | listDetail | 3 | 0 | — |
+| `SCN-016` | Gate mode | listDetail | 4 | 2 | — |

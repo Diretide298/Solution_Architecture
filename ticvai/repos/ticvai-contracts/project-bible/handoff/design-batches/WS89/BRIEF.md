@@ -1,6 +1,6 @@
 # WS89 — Rental Management board 2
 
-**10 screens · 16 operations · 18 schemas · 5 permissions**
+**10 screens · 16 operations · 26 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

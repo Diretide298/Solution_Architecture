@@ -1,6 +1,6 @@
 # WS177 — Seat Management Venue Mapping Reference v1.0 board 13
 
-**10 screens · 9 operations · 12 schemas · 5 permissions**
+**10 screens · 11 operations · 17 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -62,8 +62,8 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `BO-1071` | Integration Command Center | listDetail | 1 | 0 | — |
 | `BO-1072` | Seat Management APIs | listDetail | 1 | 0 | — |
-| `BO-1073` | API Access & OAuth | listDetail | 2 | 0 | — |
-| `BO-1074` | Webhook Configuration | listDetail | 2 | 0 | — |
+| `BO-1073` | API Access & OAuth | listDetail | 4 | 0 | — |
+| `BO-1074` | Webhook Configuration | listDetail | 3 | 0 | — |
 | `BO-1075` | Seat Event Catalog | listDetail | 1 | 0 | — |
 | `BO-1076` | Concurrency, Idempotency & Limits | listDetail | 1 | 0 | — |
 | `BO-1077` | Mapping & Transformation | listDetail | 1 | 0 | — |
@@ -73,4 +73,4 @@ convincingly. It is never a caption.
 
 ## Thin screens in this batch
 
-**BO-1071, BO-1072, BO-1073, BO-1074, BO-1075, BO-1076, BO-1077, BO-1078, BO-1080 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-1071, BO-1072, BO-1074, BO-1075, BO-1076, BO-1077, BO-1078, BO-1080 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

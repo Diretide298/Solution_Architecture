@@ -778,7 +778,6 @@
     "ai.capability",
     "ai.capability_maturity",
     "ai.chunk_embedding",
-    "ai.chunk_ref",
     "ai.conversation",
     "ai.decision_record",
     "ai.forecast_point",
@@ -1073,7 +1072,7 @@
     "screens": 140,
     "flows": 22,
     "contracts": 22,
-    "tables": 316
+    "tables": 315
    }
   },
   "partner": {
@@ -6717,7 +6716,6 @@
     "ai.case_action",
     "ai.case_evidence",
     "ai.chunk_embedding",
-    "ai.chunk_ref",
     "ai.config_session",
     "ai.config_source",
     "ai.control",
@@ -7691,7 +7689,7 @@
     "screens": 2196,
     "flows": 135,
     "contracts": 33,
-    "tables": 1074
+    "tables": 1073
    }
   }
  }

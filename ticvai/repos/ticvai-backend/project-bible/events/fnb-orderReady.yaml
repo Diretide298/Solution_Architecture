@@ -11,7 +11,7 @@ emittedBy:
 - setKitchenTicketStatus
 payload:
 - field: orderId
-  type: string
+  type: uuid
 - field: orderNumber
   type: string
   notes: Short and readable. It gets called across a counter

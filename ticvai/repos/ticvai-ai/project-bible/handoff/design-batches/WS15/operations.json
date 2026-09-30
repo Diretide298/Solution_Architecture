@@ -1,1 +1,102 @@
-{}
+{
+ "evaluateApprovalRequirement": {
+  "method": "POST",
+  "path": "/approval-requests/evaluate",
+  "contract": "approvals",
+  "summary": "Does this need approval, and from whom",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalRequirement"
+ },
+ "listApprovalMatrices": {
+  "method": "GET",
+  "path": "/approval-matrices",
+  "contract": "approvals",
+  "summary": "What requires approval here",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "effective",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalMatrix"
+ },
+ "setApprovalControlPolicy": {
+  "method": "PUT",
+  "path": "/approval-control-policies",
+  "contract": "approvals",
+  "summary": "Require a second, independent pair of eyes",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApprovalControlPolicy",
+  "responds": "ApprovalControlPolicy"
+ },
+ "setApprovalMatrix": {
+  "method": "PUT",
+  "path": "/approval-matrices",
+  "contract": "approvals",
+  "summary": "Configure what requires approval",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApprovalMatrix",
+  "responds": "ApprovalMatrix"
+ },
+ "simulateWorkflowTestingImpact": {
+  "method": "PUT",
+  "path": "/workflow-testing-impact",
+  "contract": "approvals",
+  "summary": "Workflow Testing, Simulation & Impact Analysis",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WorkflowTestingSimulationImpactAnalysisInput",
+  "responds": "WorkflowTestingSimulationImpactAnalysisView"
+ }
+}

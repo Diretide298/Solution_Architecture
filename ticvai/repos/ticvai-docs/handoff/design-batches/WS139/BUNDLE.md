@@ -1,6 +1,6 @@
 # WS139 — Marketing CRM Configuration Reference v1.0 board 5
 
-**10 screens · 7 operations · 5 schemas · 3 permissions**
+**10 screens · 10 operations · 13 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `MARKETING_MANAGE, MARKETING_SEND, MARKETING_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `AI_USE, MARKETING_MANAGE, MARKETING_SEND, MARKETING_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -68,7 +68,7 @@ convincingly. It is never a caption.
 | `BO-779` | Lifecycle Journeys | listDetail | 1 | 0 | — |
 | `BO-780` | Guest Engagement Journeys | listDetail | 1 | 0 | — |
 | `BO-781` | Cross-Sell & Service Recovery | listDetail | 1 | 0 | — |
-| `BO-782` | AI Journey Optimization | listDetail | 1 | 0 | — |
+| `BO-782` | AI Journey Optimization | listDetail | 4 | 0 | — |
 | `BO-783` | Journey Analytics & Audit | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
@@ -1172,6 +1172,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "derived": true,
        "impliedBy": "listJourneys",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "decideAiInsight",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "decideAiInsight"
       }
      ]
     }
@@ -1190,6 +1203,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "marketing-crm",
     "purpose": "Automated journeys",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listMarketingRecommendations",
+    "contract": "ai",
+    "purpose": "AI recommendations on this campaign or journey, with expected impact and evidence",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "decideAiInsight",
+    "contract": "ai",
+    "purpose": "Accept, reject or mark a campaign or journey recommendation actioned",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "requestSuggestion",
+    "contract": "ai",
+    "purpose": "Send-time suggestion (kind sendTime): best hour and channel per recipient",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1198,6 +1232,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS74 Marketing CRM Configuration Reference v1.0 Board 5.dc.html#bo-782"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 28. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "insightId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1378,6 +1420,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "Journey",
   "responds": "Journey"
  },
+ "decideAiInsight": {
+  "method": "POST",
+  "path": "/insights/{insightId}/decide",
+  "contract": "ai",
+  "summary": "Review, accept, reject or mark an insight actioned",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiInsight"
+ },
  "getJourneyPerformance": {
   "method": "GET",
   "path": "/journeys/{journeyId}/performance",
@@ -1449,6 +1510,45 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
+ "listMarketingRecommendations": {
+  "method": "GET",
+  "path": "/marketing-recommendations",
+  "contract": "ai",
+  "summary": "Recommendations on marketing campaigns and journeys",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "targetKind",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "targetRef",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listMessageTriggers": {
   "method": "GET",
   "path": "/message-triggers",
@@ -1472,6 +1572,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "requestSuggestion": {
+  "method": "POST",
+  "path": "/ai/suggestions",
+  "contract": "ai",
+  "summary": "Ask for an answer, however it is currently produced",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Suggestion"
  },
  "setMessageTrigger": {
   "method": "POST",
@@ -1501,6 +1620,393 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AbandonedCart": {
+  "type": "object",
+  "x-ticvai-persistence": "none — a projection of orders.cart",
+  "properties": {
+   "cartId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "token": {
+    "type": "string"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "hasContactPoint": {
+    "type": "boolean",
+    "description": "**An anonymous cart with no email cannot be recovered.** Worth counting, because it sizes what a sign-in prompt earlier in the journey would be worth.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "lineCount": {
+    "type": "integer"
+   },
+   "value": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "topProductName": {
+    "type": "string"
+   },
+   "abandonedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "remindersSent": {
+    "type": "integer"
+   }
+  }
+ },
+ "AiEvidenceItemList": {
+  "type": "array",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "The evidence of one decision record, stored with it.",
+  "items": {
+   "$ref": "#/components/schemas/AiEvidenceItem"
+  }
+ },
+ "AiInsight": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.insight",
+  "description": "**An insight with a lifecycle** (AIP-181): new, reviewed, accepted or rejected, actioned, measured. Anomalies, forecast deviations, trends and opportunities land here; the narrative binds numbers to results, so a figure can only come from a query (design 8, 5.10).",
+  "required": [
+   "kind",
+   "title",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "anomaly",
+     "forecastDeviation",
+     "trend",
+     "opportunity",
+     "executiveSummary",
+     "rootCause",
+     "forecastThreshold",
+     "marketingRecommendation"
+    ]
+   },
+   "detectorId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.anomaly_detector"
+   },
+   "metricKey": {
+    "type": "string",
+    "nullable": true
+   },
+   "subjectKind": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "campaign",
+     "journey",
+     "forecastDefinition",
+     "venue"
+    ],
+    "description": "What the insight is about where it is not a KPI (29 September, build): a marketing-crm campaign or journey for `marketingRecommendation`, a forecast definition for `forecastThreshold`."
+   },
+   "subjectRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "recommendedAction": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "For `marketingRecommendation`: `{recommendation, parameters}` as `AiMarketingRecommendation`. Applied by a person in the owning module, never here."
+   },
+   "expectedImpact": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "A range on a named metric (`metric`, `low`, `high`), never a single number (design 5.6)."
+   },
+   "title": {
+    "type": "string"
+   },
+   "narrative": {
+    "type": "string",
+    "nullable": true
+   },
+   "evidence": {
+    "$ref": "#/components/schemas/AiEvidenceItemList"
+   },
+   "magnitude": {
+    "type": "number",
+    "nullable": true
+   },
+   "priority": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
+   },
+   "correlationKey": {
+    "type": "string",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "new",
+     "reviewed",
+     "accepted",
+     "rejected",
+     "actioned",
+     "measured"
+    ],
+    "readOnly": true
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "actionRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "measuredImpact": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "readOnly": true
+   },
+   "decisionRecordId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "detectedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiMarketingRecommendation": {
+  "type": "object",
+  "x-ticvai-persistence": "none — read from ai.insight (kind marketingRecommendation)",
+  "description": "One recommendation on a campaign or journey (22.1.16, 22.3.17), decided through `decideAiInsight` and applied by a person in marketing-crm.",
+  "required": [
+   "insightId",
+   "targetKind",
+   "targetRef",
+   "recommendation",
+   "status"
+  ],
+  "properties": {
+   "insightId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The `ai.insight` row; `decideAiInsight` takes it."
+   },
+   "targetKind": {
+    "type": "string",
+    "enum": [
+     "campaign",
+     "journey"
+    ]
+   },
+   "targetRef": {
+    "type": "string"
+   },
+   "recommendation": {
+    "type": "string",
+    "enum": [
+     "changeSegment",
+     "changeChannel",
+     "changeTiming",
+     "changeOffer",
+     "changeContent",
+     "addStep",
+     "removeStep",
+     "reorderSteps",
+     "startJourneyFromTemplate"
+    ]
+   },
+   "parameters": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "What to change to, e.g. the channel, the send hour, the step to drop."
+   },
+   "expectedImpact": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "metric": {
+      "type": "string"
+     },
+     "low": {
+      "type": "number"
+     },
+     "high": {
+      "type": "number"
+     }
+    },
+    "description": "A range on the named metric (conversion, open rate, revenue), never a single number (design 5.6)."
+   },
+   "rationale": {
+    "type": "string"
+   },
+   "evidence": {
+    "$ref": "#/components/schemas/AiEvidenceItemList"
+   },
+   "priority": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "new",
+     "reviewed",
+     "accepted",
+     "rejected",
+     "actioned",
+     "measured"
+    ]
+   },
+   "decisionRecordId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "detectedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "AiMaturity": {
+  "type": "object",
+  "x-ticvai-persistence": "none — embedded as jsonb on ai.suggestion and ai.forecast_version",
+  "description": "**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn). The customer sees a stage badge and a \"Based on\" chip, never a bare percentage (design 5.6), and \"Limited historical data\" while the starting pattern carries more than half the weight.",
+  "required": [
+   "stage",
+   "basedOn"
+  ],
+  "properties": {
+   "stage": {
+    "type": "string",
+    "enum": [
+     "starting",
+     "learning",
+     "established",
+     "learned"
+    ],
+    "description": "`starting`: the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, weather). `learning`: own data carries short-range patterns (about 4 weeks). `established`: own level and trend lead, the baseline fills gaps such as a holiday not yet seen (about 3 months, or at once with 12+ months imported). `learned`: a model trained on this tenant's data, promoted by an admin (AI-D16)."
+   },
+   "basedOn": {
+    "type": "string",
+    "description": "The \"Based on\" line, in words, e.g. *Based on: your venue profile, UAE calendar, weather, 23 days of your sales*. Always present."
+   },
+   "sources": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "source"
+     ],
+     "properties": {
+      "source": {
+       "type": "string",
+       "enum": [
+        "venueSettings",
+        "startingPattern",
+        "calendar",
+        "weather",
+        "bookingsOnHand",
+        "ownHistory",
+        "importedHistory",
+        "configuration",
+        "trainedModel"
+       ]
+      },
+      "detail": {
+       "type": "string",
+       "nullable": true,
+       "description": "e.g. *23 days*, *water park pattern v3*, *Eid al-Adha 2027*."
+      },
+      "observations": {
+       "type": "integer",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "ownDataShare": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "description": "The weight own data carries, `n / (k + n)`. Below 0.5 the answer is marked \"Limited historical data\"."
+   },
+   "limitedHistory": {
+    "type": "boolean"
+   },
+   "nextStage": {
+    "type": "object",
+    "nullable": true,
+    "description": "What the next stage needs, e.g. *8 more Saturdays of sales*, or *an admin promotion*.",
+    "properties": {
+     "stage": {
+      "type": "string",
+      "enum": [
+       "learning",
+       "established",
+       "learned"
+      ]
+     },
+     "needs": {
+      "type": "string"
+     },
+     "expectedBy": {
+      "type": "string",
+      "format": "date",
+      "nullable": true
+     }
+    }
+   }
+  }
+ },
  "Journey": {
   "type": "object",
   "x-ticvai-persistence": "marketing.journey + marketing.journey_step",
@@ -1661,6 +2167,24 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "x-ticvai-column": "message_template_id",
     "description": "For `send`. Channel is resolved from the guest's preference at the moment of sending."
    },
+   "sendTimeMode": {
+    "type": "string",
+    "enum": [
+     "fixed",
+     "optimised"
+    ],
+    "default": "fixed",
+    "description": "For `send` (29 September, build pass, group G2; 22.3.19). `optimised` delays the send, after the step is reached, to the recipient's suggested hour from `ai.requestSuggestion` (kind `sendTime`) within the next 24 hours and inside `waitUntil`; no suggestion or AI off sends at once, as `fixed`."
+   },
+   "channelMode": {
+    "type": "string",
+    "enum": [
+     "preference",
+     "optimised"
+    ],
+    "default": "preference",
+    "description": "For `send`. `optimised` tries first the consented channel the send-time suggestion names, then `channelPreference` in order (22.9.16)."
+   },
    "channelPreference": {
     "type": "array",
     "nullable": true,
@@ -1768,7 +2292,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "event": {
     "type": "string",
-    "description": "The platform event that fires it — `order.completed`, `access.validated`, `queue.turnApproaching`. **Named from the event catalogue** (`BusinessEvent.eventType`), so a trigger cannot bind to something nothing publishes. Its conditions are `MessageTriggerCondition` rows.\n"
+    "description": "The platform event that fires it — `order.completed`, `access.validated`, `queue.turnApproaching`. **Named from the event catalogue** (`BusinessEvent.eventType`), so a trigger cannot bind to something nothing publishes. Its conditions are `MessageTriggerCondition` rows.\n**`entitlement.expiringSoon` is in the catalogue since 29 September** (build pass, group G2; 5.5.30): the pre-expiry reminder for a ticket or pass. Its anchor is the event time; the notice period is the template's `expiryNoticeDays`, so `offsetMinutes` is normally 0.\n"
    },
    "templateId": {
     "type": "string",
@@ -1797,6 +2321,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "default": "transactional",
     "description": "**A queue-turn alert and a monthly newsletter are not the same urgency and were the same dispatch.** `operational` bypasses batching and quiet hours; `marketing` never does.\n"
+   },
+   "sendTimeMode": {
+    "type": "string",
+    "enum": [
+     "fixed",
+     "optimised"
+    ],
+    "default": "fixed",
+    "description": "**Only for `priority` `marketing`** (29 September, build pass, group G2; 22.9.16): `optimised` holds the notification to the recipient's suggested hour from `ai.requestSuggestion` (kind `sendTime`) within the next 24 hours, on the suggested consented channel. `operational` and `transactional` messages are never delayed for it, and a `setMessageTrigger` asking for it on them is refused (400)."
    },
    "isActive": {
     "type": "boolean",
@@ -1827,6 +2360,110 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "boolean"
    }
   }
+ },
+ "Suggestion": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.suggestion",
+  "description": "One answer to one question, with its reasoning and its confidence. **Built 24 August so that machine learning can be swapped in without touching a screen.**\n**A suggestion is never an action.** It proposes; `ProposedAction` and its approval path decide. A model that can order stock is a model that will order stock wrongly at three in the morning.\n**`inputs` is recorded, not just referenced.** A suggestion that cannot be reproduced cannot be defended to a finance controller asking why the system said to order four hundred.\n",
+  "required": [
+   "id",
+   "kind",
+   "basis",
+   "maturity",
+   "producedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/SuggestionKind"
+   },
+   "basis": {
+    "$ref": "#/components/schemas/SuggestionBasis"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "subjectRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "What it is about — a product, an outlet, an item, a party."
+   },
+   "value": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "The suggestion itself. Shape depends on `kind`."
+   },
+   "confidence": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 1,
+    "description": "**Null for a heuristic and that is honest.** A rule has no confidence — dressing one up with 0.85 is the fastest way to make a manager trust a number that means nothing.\n"
+   },
+   "explanation": {
+    "type": "string",
+    "description": "**Plain words, always present, whatever the basis.** *Because covers are up 12% on this day last year* — a suggestion a manager cannot explain to their own boss is a suggestion they will not action.\n"
+   },
+   "inputs": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "What went in. **Recorded so the answer can be reproduced** — and so that when a model replaces the rule, the two can be run against the same inputs and compared.\n"
+   },
+   "producerRef": {
+    "type": "string",
+    "description": "The rule name or the model id and version. **A model version is part of the record**: *the model said so* is not an answer to *which model, when*.\n"
+   },
+   "maturity": {
+    "$ref": "#/components/schemas/AiMaturity"
+   },
+   "producedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**A demand forecast for Saturday is worthless on Sunday.** An expired suggestion is hidden rather than shown stale.\n"
+   }
+  }
+ },
+ "SuggestionBasis": {
+  "type": "string",
+  "description": "**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n",
+  "enum": [
+   "heuristic",
+   "statistical",
+   "model",
+   "hybrid",
+   "manual"
+  ]
+ },
+ "SuggestionKind": {
+  "type": "string",
+  "description": "What is being suggested. **A closed set, and the reason it is closed is the swap.** Every entry here is a question a venue asks that a model could answer better than a rule — and each one starts as a heuristic and becomes a model when there is data.\n**Six of these were drawn as their own endpoints on the client F&B boards** — `suggestPrice`, `simulateScenario`, `simulateSlaPolicy`, `suggestRequisition`, `suggestReplenishment`, `publishDemandPlan`. **Building six endpoints means six places to change when a model changes**, and the model will change more often than the venue's question does.\n**What each kind is based on, and when the venue's own data takes over. Proposed, client to correct (decided 28 September, audit R213; re-read 29 September, AI functions review).** The figure after each rule is **the point where own data takes over from the baseline, not a refusal**: below it the kind answers from the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, the weather) with `maturity.stage` `starting`, and between it and about three months it blends the two (`learning`). The day-one baseline per kind: `replenishment`, `requisition`, `prepPlan`, `staffing`, `demandForecast` and `scenario` from the baseline forecast (typical attendance from the venue AI settings x the venue-type month curve x the calendar x weather, bookings on hand as a floor); `menuEngineering` ranked by margin with popularity marked learning; `slaTarget` a standard default; `waitTime` people ahead / configured capacity; `upsell` the relationship map and business priority; `segmentation` known guest attributes; `anomaly` the venue's configured thresholds and actual against the forecast's low end; `sendTime` the channel's typical hour; `wasteRisk` shelf life and par against the forecast; `queueBalancing` configured capacity per queue. Only a missing setting refuses (422 `AiMissingSettingProblem`).\n- `price`: unit cost plus the category's target margin, held inside the price band. Minimum: a current cost, no history.\n- `replenishment`: par level minus on-hand plus expected use over the supplier lead time. Minimum: 14 days of stock movements.\n- `requisition`: the next service's prep-plan ingredient needs minus kitchen stock. Minimum: 14 days of sales.\n- `demandForecast`: the average of the same weekday over the last 8 weeks, adjusted by admissions already booked. Minimum: 8 weeks of sales.\n- `prepPlan`: forecast covers for the service times each item's share of the last 4 same weekdays. Minimum: 4 weeks of sales.\n- `menuEngineering`: each item placed by popularity against margin, over 90 days. Minimum: 90 days of sales.\n- `staffing`: forecast demand divided by the role's standard covers per staff hour. Minimum: 8 weeks of sales (the forecast it rests on).\n- `slaTarget`: the 80th percentile of actual times over the last 30 days. Minimum: 30 days of timed events.\n- `waitTime`: people ahead divided by the throughput of the last 30 minutes. Minimum: 30 minutes of throughput today.\n- `upsell`: the item most often bought with the basket's items over 90 days. Minimum: 90 days of orders.\n- `segmentation`: recency, frequency and spend scores over 12 months. Minimum: 90 days of orders.\n- `anomaly`: a value outside three standard deviations of the same weekday over 8 weeks. Minimum: 8 weeks of the measure.\n- `scenario`: the demand forecast re-run with the stated changes. Minimum: as `demandForecast`.\n- `sendTime` (added 29 September): per recipient, the hour inside `context.sendWindow` in which they have most often opened or clicked over the last 90 days (marketing-crm attribution touches), and where `context.channel` is `best`, the consented channel with the highest engagement. A recipient with fewer than three touches gets their segment's modal hour, and one with none the window's start. Asked with `subjectRef` a segment id or `context.subjectIds` (at most 10,000). `value` is `{recommendations: [{subjectId, sendAt, channel, basisTouches}]}`. Minimum: 90 days of message touches at the scope.\n- `wasteRisk` (added 29 September): per item at an outlet or store location, planned production and stock on hand minus forecast demand over the item's shelf life, plus batches expiring inside the horizon (`inventory.listExpiringBatches`). `value` is `{items: [{itemRef, quantityAtRisk, valueAtCost, expiresAt, recommendedAction (reducePrep, promote, transfer, useInRecipe), transferTo}]}`. Minimum: 14 days of recorded waste and of sales.\n- `queueBalancing` (added 29 September): per queue or attraction at `subjectRef` (a venue) over `horizon`, the forecast wait (the `queue` forecast definition) against throughput capacity, a recommended virtual-queue return-slot allocation by queue type, and guest redirection from over-used to under-used attractions. `value` is `{queues: [{queueId, forecastWaitMinutes, capacityPerHour, returnSlotsPerInterval, redirectTo}]}`. Minimum: 14 days of queue readings.\n- `itinerary` (added 29 September, MOB-6, guest-allowed): refines a `venue-map` visit plan the guest owns. `subjectRef` is the plan id; `value` is `{planId, baseVersion, changes, rationale}`, applied with `updateVisitPlan` as the guest. Minimum: none; the rules plan is the baseline.\n",
+  "enum": [
+   "price",
+   "replenishment",
+   "requisition",
+   "demandForecast",
+   "prepPlan",
+   "menuEngineering",
+   "staffing",
+   "slaTarget",
+   "waitTime",
+   "upsell",
+   "segmentation",
+   "anomaly",
+   "scenario",
+   "sendTime",
+   "wasteRisk",
+   "queueBalancing",
+   "itinerary"
+  ]
  }
 }
 ```

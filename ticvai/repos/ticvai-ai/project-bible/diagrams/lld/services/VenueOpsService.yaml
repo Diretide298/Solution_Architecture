@@ -2,6 +2,7 @@ id: LLD-VenueOpsService
 title: VenueOpsService — 285 operations, 123 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
+deployable: operations
 index: diagrams/hld/02-services.yaml
 why: '**Six small domains, 285 operations, one team.** Queue, maintenance, bookable resources, venue
   mapping, media assets and arcade. None is large enough to deploy alone, all are venue-scoped, none

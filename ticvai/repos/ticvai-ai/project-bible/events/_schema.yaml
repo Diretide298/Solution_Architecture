@@ -31,8 +31,8 @@ description: >
 
   ## The envelope (system-design review SD-030, 29 September)
 
-  **Every event travels in one envelope, so no payload repeats it.** `eventId` (ULID, the consumer inbox
-  key), `name`, `version`, `tenantId`, `aggregateType`, `aggregateId` (text: order ids are ULIDs),
+  **Every event travels in one envelope, so no payload repeats it.** `eventId` (a UUIDv7, the consumer inbox
+  key), `name`, `version`, `tenantId`, `aggregateType`, `aggregateId` (a uuid, as every id is: ADR-0056),
   `sequence` (per aggregate, allocated in the writing transaction, so a consumer can order and
   de-duplicate), `occurredAt` and `traceId`. The outbox row carries the same fields; a payload field
   named `sequence` is the envelope's, repeated only where it was written before this rule.

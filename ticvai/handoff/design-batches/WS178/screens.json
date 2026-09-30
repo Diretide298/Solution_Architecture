@@ -94,6 +94,27 @@
     "purpose": "Where the money stands",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listTaxInvoices",
+    "contract": "finance",
+    "purpose": "List tax invoices",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listCreditMemos",
+    "contract": "finance",
+    "purpose": "List credit memos",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listEInvoiceTransmissions",
+    "contract": "finance",
+    "purpose": "E-invoicing transmission log and failures",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {

@@ -58,6 +58,15 @@ The holidays (National Day, New Year, Eid al-Fitr around 10 March 2027) are coun
 12. **Deep Khanvilkar takes a larger back-end share, proportional to his ratings** (.NET 2 and PostgreSQL 2
     against the owners' 3–4): about 55% of an owner's load, tasks up to 3 points. Loads otherwise follow
     skill and experience and are uneven on purpose.
+13. **Architecture, from the system-design review** (`docs/adr/`): a modular monolith of 17 modules
+    deployed as five units, `commerce`, `access`, `operations`, `ticvai-ai` and `workers` (ADR-0055); .NET 10
+    LTS from day one; one id type, UUIDv7, and monthly time partitioning, with venue partitioning deferred
+    (ADR-0056); one outbox relay per region and an inbox per tenant database (ADR-0058); vectors in Qdrant from
+    day one, one collection per tenant with a collection-scoped token (ADR-0049); AI on a baseline, learning per tenant (ADR-0051), phased per
+    ADR-0059; one autonomy scale (ADR-0050). **The event broker is RabbitMQ or Kafka, not Azure Service
+    Bus, and the client chooses** (ADR-0057, proposed): our recommendation is RabbitMQ; we need the answer
+    before sprint 1 week 2 so the relay is proven by 23 October. Until then everything is built behind the
+    kernel interface on a local RabbitMQ.
 
 ## Headcount to finish in six months
 

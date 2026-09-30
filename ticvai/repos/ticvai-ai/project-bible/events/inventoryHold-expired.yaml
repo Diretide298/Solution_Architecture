@@ -9,12 +9,12 @@ aggregate: inventoryHold
 emittedWhen: The expiry sweeper (states/lease.yaml timer) returns an active hold's units
 payload:
 - field: inventoryHoldId
-  type: string
+  type: uuid
 - field: holderKind
   type: string
   notes: workstation or cart
 - field: holderId
-  type: string
+  type: uuid
 - field: channelCapacityId
   type: uuid
 - field: units

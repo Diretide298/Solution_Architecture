@@ -1,4 +1,15 @@
 {
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
+ },
  "RentalAvailability": {
   "type": "object",
   "description": "Board 3. **A pooled product answers with a count, a serialised one with assets.**",

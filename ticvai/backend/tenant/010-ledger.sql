@@ -51,8 +51,8 @@ CREATE TABLE IF NOT EXISTS ledger.credit_memo (
     tax_invoice_number                text,
     kind                              text NOT NULL CONSTRAINT credit_memo_kind_chk CHECK (kind IN ('full', 'partial')),
     reason                            text NOT NULL CONSTRAINT credit_memo_reason_chk CHECK (reason IN ('refund', 'cancellation', 'priceAdjustment', 'returnOfGoods', 'billingError', 'other')),
-    refund_id                         text,
-    cancelled_order_id                text,
+    refund_id                         uuid,
+    cancelled_order_id                uuid,
     legal_entity_id                   uuid NOT NULL,
     buyer_subject_id                  uuid,
     issued_at                         timestamptz NOT NULL,
@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS ledger.deposit (
     reason                            text NOT NULL CONSTRAINT deposit_reason_chk CHECK (reason IN ('reservation', 'rental', 'event', 'damageBond', 'other')),
     status                            text NOT NULL CONSTRAINT deposit_status_chk CHECK (status IN ('held', 'convertedToRevenue', 'returned', 'forfeited', 'partiallyForfeited')),
     subject_id                        uuid,
-    order_id                          text,
+    order_id                          uuid,
     booking_id                        uuid,
     refundable_until                  timestamptz,
     liability_account_id              uuid,
@@ -212,8 +212,8 @@ CREATE TABLE IF NOT EXISTS ledger.inter_entity_obligation (
     id                                uuid PRIMARY KEY NOT NULL,
     from_legal_entity_id              uuid NOT NULL,
     to_legal_entity_id                uuid NOT NULL,
-    entitlement_id                    text,
-    order_id                          text,
+    entitlement_id                    uuid,
+    order_id                          uuid,
     arising_amount                    numeric(18,4) NOT NULL,
     rate_applied                      numeric(18,6),
     arising_at                        timestamptz NOT NULL,
@@ -226,7 +226,7 @@ CREATE TABLE IF NOT EXISTS ledger.inter_entity_obligation (
 -- A balanced set of postings. Append-only: a correction is another entry, never an edit, which is
 -- what makes a period closeable
 CREATE TABLE IF NOT EXISTS ledger.journal_entry (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     entry_number                      text NOT NULL,
     fiscal_period_id                  uuid NOT NULL,
     status                            text NOT NULL CONSTRAINT journal_entry_status_chk CHECK (status IN ('draft', 'pendingApproval', 'posted', 'reversed')),
@@ -238,8 +238,8 @@ CREATE TABLE IF NOT EXISTS ledger.journal_entry (
     total_credit                      numeric(18,4) NOT NULL,
     posted_by_principal_id            uuid,
     approved_by_principal_id          uuid,
-    reversal_of_entry_id              text,
-    reversed_by_entry_id              text,
+    reversal_of_entry_id              uuid,
+    reversed_by_entry_id              uuid,
     reversal_reason                   text,
     rejection_reason                  text,
     rejected_by_principal_id          uuid,
@@ -250,15 +250,17 @@ CREATE TABLE IF NOT EXISTS ledger.journal_entry (
 
 -- One side of a posting. Entries balance; lines do not
 CREATE TABLE IF NOT EXISTS ledger.journal_line (
-    journal_entry_id                  text NOT NULL,
+    journal_entry_id                  uuid NOT NULL,
     account_id                        uuid NOT NULL,
     debit                             numeric(18,4) NOT NULL,
     credit                            numeric(18,4) NOT NULL,
     venue_id                          uuid,
     cost_center_id                    uuid,
     description                       text,
-    id                                uuid PRIMARY KEY NOT NULL
-);
+    posted_at                         timestamptz NOT NULL,
+    id                                uuid NOT NULL,
+    CONSTRAINT journal_line_pkey PRIMARY KEY (id, posted_at)
+) PARTITION BY RANGE (posted_at);
 
 -- Who the money belongs to. A tenant may trade through several, which is why inter-entity rates
 -- exist
@@ -282,8 +284,8 @@ CREATE TABLE IF NOT EXISTS ledger.legal_entity (
 -- ledger.journal_entry. Reached by: 14 operations read it and 12 write it; written by 3 contracts
 -- — finance, orders, shift.
 CREATE TABLE IF NOT EXISTS ledger.posting (
-    id                                text PRIMARY KEY NOT NULL,
-    journal_entry_id                  text NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
+    journal_entry_id                  uuid NOT NULL,
     account_id                        uuid NOT NULL,
     account_code                      text,
     debit                             numeric(18,4) NOT NULL,
@@ -298,9 +300,9 @@ CREATE TABLE IF NOT EXISTS ledger.posting (
 
 -- What was expected against what was invoiced. Where a three-way match would post if it existed
 CREATE TABLE IF NOT EXISTS ledger.price_variance (
-    id                                text PRIMARY KEY NOT NULL,
-    order_id                          text NOT NULL,
-    order_line_id                     text NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
+    order_id                          uuid NOT NULL,
+    order_line_id                     uuid NOT NULL,
     venue_id                          uuid NOT NULL,
     variant_id                        uuid,
     quoted_price                      numeric(18,4) NOT NULL,
@@ -311,7 +313,7 @@ CREATE TABLE IF NOT EXISTS ledger.price_variance (
     review_status                     text CONSTRAINT price_variance_review_status_chk CHECK (review_status IN ('notRequired', 'pendingReview', 'reviewed')),
     review_outcome                    text CONSTRAINT price_variance_review_outcome_chk CHECK (review_outcome IN ('accepted', 'investigated', 'catalogueCorrected')),
     reviewed_by_principal_id          uuid,
-    journal_entry_id                  text,
+    journal_entry_id                  uuid,
     occurred_at                       timestamptz NOT NULL
 );
 
@@ -364,7 +366,7 @@ CREATE TABLE IF NOT EXISTS ledger.settlement_exception (
     settlement_id                     uuid NOT NULL,
     kind                              text NOT NULL CONSTRAINT settlement_exception_kind_chk CHECK (kind IN ('unmatchedInProvider', 'unmatchedInLedger', 'amountMismatch', 'duplicateInProvider', 'feeUnexplained')),
     provider_reference                text,
-    payment_id                        text,
+    payment_id                        uuid,
     amount                            numeric(18,4) NOT NULL,
     expected_amount                   numeric(18,4),
     resolution                        text,
@@ -451,8 +453,8 @@ CREATE TABLE IF NOT EXISTS ledger.tax_invoice (
 CREATE TABLE IF NOT EXISTS ledger.tax_invoice_line (
     tax_invoice_id                    uuid NOT NULL,
     line_number                       integer NOT NULL,
-    order_id                          text,
-    order_line_id                     text,
+    order_id                          uuid,
+    order_line_id                     uuid,
     description                       text NOT NULL,
     quantity                          numeric(18,4) NOT NULL,
     unit_price                        numeric(18,4),

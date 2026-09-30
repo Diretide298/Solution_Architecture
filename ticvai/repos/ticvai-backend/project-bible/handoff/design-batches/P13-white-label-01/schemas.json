@@ -114,8 +114,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID of the new order this creates, and its idempotency key — it must equal the `Idempotency-Key` header."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7 of the new order this creates, and its idempotency key — it must equal the `Idempotency-Key` header."
    },
    "lines": {
     "type": "array",
@@ -191,7 +191,7 @@
     "type": "array",
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     }
    }
   }
@@ -1452,7 +1452,7 @@
      "properties": {
       "entitlementId": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+       "format": "uuid"
       },
       "name": {
        "type": "string"
@@ -1472,7 +1472,7 @@
       },
       "orderId": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+       "format": "uuid"
       },
       "addedAt": {
        "type": "string",
@@ -2050,8 +2050,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "The client ULID from `CreateOrderRequest.id`."
+    "format": "uuid",
+    "description": "The client UUIDv7 from `CreateOrderRequest.id`."
    },
    "orderNumber": {
     "type": "string",
@@ -2158,7 +2158,7 @@
    },
    "shiftId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "subjectId": {

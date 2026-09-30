@@ -1,40 +1,195 @@
 {
+ "configureAssistantProfile": {
+  "method": "PUT",
+  "path": "/assistant-profiles/{profileKey}",
+  "contract": "ai",
+  "summary": "Define an assistant profile",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AiAssistantProfile",
+  "responds": "AiAssistantProfile"
+ },
  "createCaseClassificationIntelligent": {
   "method": "POST",
   "path": "/case-classification-intelligent",
   "contract": "marketing-crm",
   "summary": "Case Creation, Classification & Intelligent Routing",
-  "permission": "MARKETING_MANAGE",
+  "permission": "CASE_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "CaseCreationClassificationIntelligentRoutingInput",
   "responds": "CaseCreationClassificationIntelligentRoutingView"
+ },
+ "listAssistantProfiles": {
+  "method": "GET",
+  "path": "/assistant-profiles",
+  "contract": "ai",
+  "summary": "Assistant profiles",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "audience",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listCaseCategories": {
+  "method": "GET",
+  "path": "/case-categories",
+  "contract": "marketing-crm",
+  "summary": "List case categories and subcategories",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "parentCategoryId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "topLevelOnly",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "isActive",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listCaseResolutionClosure": {
   "method": "GET",
   "path": "/case-resolution-closure",
   "contract": "marketing-crm",
   "summary": "Case Resolution, Closure & Customer Feedback",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "caseId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "resolutionCategory",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "rootCause",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "canClose",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CaseResolutionClosureCustomerFeedbackView"
+  "responds": "Page"
  },
  "listCustomerService": {
   "method": "GET",
   "path": "/customer-service",
   "contract": "marketing-crm",
   "summary": "Customer Service Command Center",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "agentPrincipalId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "CustomerServiceCommandCenterView"
  },
@@ -43,11 +198,22 @@
   "path": "/customer-service-profile",
   "contract": "marketing-crm",
   "summary": "Customer 360° Service Profile",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": true
+   }
+  ],
   "requestBody": null,
   "responds": "Customer360ServiceProfileView"
  },
@@ -56,68 +222,140 @@
   "path": "/escalation-collaboration-internal",
   "contract": "marketing-crm",
   "summary": "Escalation, Collaboration & Internal Resolution",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "caseId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "department",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "assigneePrincipalId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "escalationType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "overdueOnly",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "EscalationCollaborationInternalResolutionView"
+  "responds": "Page"
  },
  "listUnifiedInteractionCommunication": {
   "method": "GET",
   "path": "/unified-interaction-communication",
   "contract": "marketing-crm",
   "summary": "Unified Interaction & Communication History",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": false
+   },
    {
     "name": "keyword",
     "in": "query",
     "required": false
    },
    {
-    "name": "date",
+    "name": "from",
     "in": "query",
     "required": false
    },
    {
-    "name": "agent",
+    "name": "to",
     "in": "query",
     "required": false
    },
    {
-    "name": "case",
+    "name": "channel",
     "in": "query",
     "required": false
    },
    {
-    "name": "order",
+    "name": "agentPrincipalId",
     "in": "query",
     "required": false
    },
    {
-    "name": "ticket",
+    "name": "caseId",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "orderId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ticketId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "UnifiedInteractionCommunicationHistoryView"
+  "responds": "Page"
  },
  "setCaseInvestigationResolution": {
   "method": "PUT",
   "path": "/case-investigation-resolution",
   "contract": "marketing-crm",
-  "summary": "Case Investigation & Resolution Workspace",
-  "permission": "MARKETING_MANAGE",
+  "summary": "Link a record to a case",
+  "permission": "CASE_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "CaseInvestigationResolutionWorkspaceInput",
   "responds": "CaseInvestigationResolutionWorkspaceView"
  },
@@ -125,12 +363,18 @@
   "method": "PUT",
   "path": "/customer-service-copilot",
   "contract": "marketing-crm",
-  "summary": "AI Customer Service Copilot & Knowledge Workspace",
-  "permission": "MARKETING_MANAGE",
+  "summary": "Configure the customer-service copilot",
+  "permission": "AI_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "AiCustomerServiceCopilotKnowledgeWorkspaceInput",
   "responds": "AiCustomerServiceCopilotKnowledgeWorkspaceView"
  },
@@ -138,12 +382,18 @@
   "method": "PUT",
   "path": "/order-booking-ticket",
   "contract": "marketing-crm",
-  "summary": "Order, Booking & Ticket Service Workspace",
-  "permission": "MARKETING_MANAGE",
+  "summary": "Evaluate or perform a service action on an order from a case",
+  "permission": "CASE_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "OrderBookingTicketServiceWorkspaceInput",
   "responds": "OrderBookingTicketServiceWorkspaceView"
  },
@@ -151,12 +401,18 @@
   "method": "PUT",
   "path": "/refund-compensation-service",
   "contract": "marketing-crm",
-  "summary": "Refund, Compensation & Service Exception Workspace",
-  "permission": "MARKETING_MANAGE",
+  "summary": "Raise or change a refund, compensation or policy-exception request on a case",
+  "permission": "ORDER_REFUND",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "RefundCompensationServiceExceptionWorkspaceInput",
   "responds": "RefundCompensationServiceExceptionWorkspaceView"
  }

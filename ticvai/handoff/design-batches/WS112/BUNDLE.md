@@ -1526,7 +1526,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Who this change would affect, and how",
   "permission": "ACCREDITATION_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1545,7 +1545,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Define which zones, on which dates, at which times",
   "permission": "ACCREDITATION_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1564,7 +1564,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Suspend, reactivate, revoke or expire an accreditation",
   "permission": "ACCREDITATION_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1583,7 +1583,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Assign profiles, and any exception on top",
   "permission": "ACCREDITATION_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1784,6 +1784,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "nationality": {
     "type": "string",
     "nullable": true
+   },
+   "email": {
+    "type": "string",
+    "format": "email",
+    "nullable": true,
+    "description": "12.1.16. The holder's own address — where a mobile credential and renewal notices go"
+   },
+   "phone": {
+    "type": "string",
+    "nullable": true,
+    "description": "12.1.16. E.164"
    },
    "identityDocumentVerified": {
     "type": "boolean",

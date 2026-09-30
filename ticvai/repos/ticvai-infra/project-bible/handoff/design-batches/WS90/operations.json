@@ -6,7 +6,7 @@
   "summary": "Close a product, location or window",
   "permission": "RENTAL_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -155,7 +155,7 @@
   "summary": "Operating hours, rental windows, buffers and release rules",
   "permission": "RENTAL_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -174,7 +174,7 @@
   "summary": "Minimum, maximum, increment, extension and turnaround",
   "permission": "RENTAL_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {

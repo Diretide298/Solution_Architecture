@@ -1,23 +1,4 @@
 {
- "acquireInventoryHold": {
-  "method": "POST",
-  "path": "/inventory-holds",
-  "contract": "catalogue",
-  "summary": "Acquire an inventory lease",
-  "permission": "ORDER_CREATE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "workstation",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "AcquireLeaseRequest",
-  "responds": "InventoryHold"
- },
  "addCartLine": {
   "method": "POST",
   "path": "/carts/{cartId}/lines",
@@ -113,10 +94,35 @@
     "name": "channelCapacityId",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "eventId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "PerformanceAvailabilityPage"
  },
  "getCart": {
   "method": "GET",
@@ -127,7 +133,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Cart"
  },
@@ -140,7 +152,13 @@
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Order"
  },
@@ -241,6 +259,21 @@
    },
    {
     "name": "isSellable",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "segmentTag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "guidedAnswerIds",
     "in": "query",
     "required": null
    },

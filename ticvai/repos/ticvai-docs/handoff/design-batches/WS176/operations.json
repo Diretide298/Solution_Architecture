@@ -13,6 +13,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -25,7 +30,7 @@
   "summary": "Write a policy without writing code",
   "permission": "PERMISSION_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {
@@ -37,6 +42,25 @@
   "requestBody": "AccessPolicy",
   "responds": "AccessPolicy"
  },
+ "createAccessReviewCampaign": {
+  "method": "POST",
+  "path": "/access-review-campaigns",
+  "contract": "identity",
+  "summary": "Start an access review, one item per grant in scope",
+  "permission": "PERMISSION_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "IdentityAccessReviewCampaign",
+  "responds": "IdentityAccessReviewCampaign"
+ },
  "createEmergencyAccessOverride": {
   "method": "POST",
   "path": "/access-overrides",
@@ -44,7 +68,7 @@
   "summary": "Bypass the policy, loudly",
   "permission": "PERMISSION_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -55,6 +79,25 @@
   ],
   "requestBody": null,
   "responds": "EmergencyAccessOverride"
+ },
+ "decideAccessReviewItem": {
+  "method": "POST",
+  "path": "/access-review-items/{itemId}/decision",
+  "contract": "identity",
+  "summary": "Certify a grant, or revoke it",
+  "permission": "PERMISSION_GRANT",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "IdentityAccessReviewItem"
  },
  "deployConfigurationProfile": {
   "method": "POST",
@@ -164,6 +207,131 @@
   "requestBody": null,
   "responds": "AccessPolicy"
  },
+ "listAccessPolicyEffectiveness": {
+  "method": "GET",
+  "path": "/access-policy-effectiveness",
+  "contract": "identity",
+  "summary": "How each software-permission policy has behaved over a period",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "policyId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAccessPolicyHistory": {
+  "method": "GET",
+  "path": "/access-policies/{policyId}/history",
+  "contract": "identity",
+  "summary": "Every version, who changed it and why",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AccessPolicyVersion"
+ },
+ "listAccessReviewCampaigns": {
+  "method": "GET",
+  "path": "/access-review-campaigns",
+  "contract": "identity",
+  "summary": "Access review campaigns, open first",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAccessReviewItems": {
+  "method": "GET",
+  "path": "/access-review-campaigns/{campaignId}/items",
+  "contract": "identity",
+  "summary": "The grants a campaign asks somebody to certify or revoke",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "assignedToMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "findingKind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listDenominations": {
   "method": "GET",
   "path": "/denominations",
@@ -182,6 +350,65 @@
   ],
   "requestBody": null,
   "responds": "Denomination"
+ },
+ "listPermissionFindings": {
+  "method": "GET",
+  "path": "/permission-findings",
+  "contract": "identity",
+  "summary": "Excessive, missing and conflicting permissions, per principal or role",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "roleId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "lookbackDays",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "deniedThreshold",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "draftPolicyId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listSeatMaps": {
   "method": "GET",
@@ -230,6 +457,25 @@
   "requestBody": null,
   "responds": "VenueMap"
  },
+ "restoreAccessPolicyVersion": {
+  "method": "POST",
+  "path": "/access-policies/{policyId}/restore",
+  "contract": "identity",
+  "summary": "Put a previously approved policy version back, as a new version",
+  "permission": "PERMISSION_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessPolicy"
+ },
  "setAccessPolicyState": {
   "method": "POST",
   "path": "/access-policies/{policyId}/state",
@@ -237,7 +483,7 @@
   "summary": "Submit, approve, activate or retire a policy",
   "permission": "PERMISSION_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {
@@ -351,7 +597,7 @@
   "summary": "What this policy would decide, before it decides anything",
   "permission": "PERMISSION_VIEW",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -370,7 +616,7 @@
   "summary": "Change a policy, as a new version",
   "permission": "PERMISSION_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {
@@ -411,6 +657,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

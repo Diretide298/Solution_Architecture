@@ -1,6 +1,6 @@
 # P09-releases-environments-01 — P09 · Releases & Environments
 
-**7 screens · 20 operations · 18 schemas · 6 permissions**
+**7 screens · 20 operations · 20 schemas · 6 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 6 permissions apply here:
   `DEVELOPER_ADMIN, PLATFORM_MIGRATION_APPLY, PLATFORM_MIGRATION_VIEW, PLATFORM_RELEASE_MANAGE, PLATFORM_RELEASE_PROMOTE, PLATFORM_RELEASE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-022` | Release & Version Management | listDetail | 7 | 2 | — |
-| `ADM-023` | Staging Promotion & Approval | listDetail | 7 | 2 | — |
-| `ADM-024` | Release Notification Composer | listDetail | 3 | 0 | — |
-| `ADM-025` | Tenant Upgrade Scheduler | listDetail | 2 | 0 | — |
-| `ADM-026` | End-of-Support Notice Management | listDetail | 3 | 0 | — |
-| `ADM-027` | Database Migration Console | listDetail | 6 | 0 | — |
-| `ADM-028` | Environment Registry | listDetail | 2 | 0 | — |
+| `ADM-022` | Release & Version Management | listDetail | 7 | 4 | — |
+| `ADM-023` | Staging Promotion & Approval | listDetail | 7 | 4 | — |
+| `ADM-024` | Release Notification Composer | listDetail | 3 | 1 | — |
+| `ADM-025` | Tenant Upgrade Scheduler | listDetail | 2 | 1 | — |
+| `ADM-026` | End-of-Support Notice Management | listDetail | 3 | 2 | — |
+| `ADM-027` | Database Migration Console | listDetail | 6 | 3 | — |
+| `ADM-028` | Environment Registry | listDetail | 2 | 1 | — |
 
 ## Thin screens in this batch
 
-**ADM-025 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-025, ADM-028 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -102,7 +101,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "exitTo": [
     "ADM-001",
     "ADM-002",
-    "ADM-003",
     "ADM-027"
    ],
    "flowDerived": true,
@@ -115,27 +113,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-022 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
-    },
-    {
-     "to": "ADM-003",
-     "trigger": "Cross-Tenant Health Dashboard",
-     "carries": [
-      "cellId",
-      "rightId"
-     ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-022 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     }
    ]
   },
@@ -147,13 +130,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listReleases` reads the population and `getRelease` reads one of them — list, select, act",
   "purpose": "Find release & version management for this venue.",
-  "gaps": [
-   {
-    "operation": "getReleaseReadiness",
-    "why": "**1 declared operation reach no component on this screen**: getReleaseReadiness. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -162,13 +138,28 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listReleases",
+       "notes": "Sends `?status=` to `listReleases`.",
+       "provenance": "contract platform-ops.yaml GET /releases"
+      },
+      {
+       "kind": "textField",
+       "label": "Environment",
+       "operation": "listReleases",
+       "notes": "Sends `?environment=` to `listReleases`.",
+       "provenance": "contract platform-ops.yaml GET /releases"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every release version",
+       "label": "Every release",
        "bindsTo": "Release",
        "columns": [
         "Release.components",
         "Release.requiredMigrations",
         "Release.note",
+        "Release.guestReleaseNotes",
         "Release.breakingChanges",
         "Release.id",
         "Release.status",
@@ -178,6 +169,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listReleases",
        "provenance": "contract platform-ops.yaml GET /releases"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "promoteRelease",
+       "notes": "Declares `promoteRelease`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -187,7 +184,39 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected release version",
+       "label": "The selected release",
+       "bindsTo": "Release",
+       "columns": [
+        "Release.components",
+        "Release.requiredMigrations",
+        "Release.note",
+        "Release.guestReleaseNotes",
+        "Release.breakingChanges",
+        "Release.id",
+        "Release.status",
+        "Release.createdByPrincipalId",
+        "Release.promotedToStagingAt",
+        "Release.promotedToProductionAt"
+       ],
+       "operation": "listReleases",
+       "provenance": "contract platform-ops.yaml GET /releases"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The release readiness",
+       "bindsTo": "ReleaseReadiness",
+       "columns": [
+        "ReleaseReadiness.releaseId",
+        "ReleaseReadiness.canPromote",
+        "ReleaseReadiness.targetEnvironment",
+        "ReleaseReadiness.gates"
+       ],
+       "operation": "getReleaseReadiness",
+       "provenance": "contract platform-ops.yaml GET /releases/{releaseId}/readiness"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The release",
        "bindsTo": "ReleaseDetail",
        "columns": [
         "ReleaseDetail.rollouts",
@@ -195,7 +224,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "ReleaseDetail.cellsTotal"
        ],
        "operation": "getRelease",
-       "provenance": "contract platform-ops.yaml GET /releases/{reinventoryHoldId}"
+       "provenance": "contract platform-ops.yaml GET /releases/{releaseId}"
       }
      ]
     },
@@ -205,45 +234,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create release",
        "operation": "createRelease",
        "provenance": "contract platform-ops.yaml POST /releases"
       },
       {
        "kind": "secondaryButton",
-       "label": "Promote",
+       "label": "Promote release",
        "operation": "promoteRelease",
-       "provenance": "contract platform-ops.yaml POST /releases/{reinventoryHoldId}/promote"
+       "provenance": "contract platform-ops.yaml POST /releases/{releaseId}/promote"
       },
       {
        "kind": "destructiveButton",
-       "label": "Reject",
+       "label": "Reject release",
        "operation": "rejectRelease",
-       "provenance": "contract platform-ops.yaml POST /releases/{reinventoryHoldId}/reject"
+       "provenance": "contract platform-ops.yaml POST /releases/{releaseId}/reject"
       },
       {
        "kind": "destructiveButton",
-       "label": "Withdraw",
+       "label": "Withdraw release",
        "operation": "withdrawRelease",
-       "provenance": "contract platform-ops.yaml POST /releases/{reinventoryHoldId}/withdraw"
+       "provenance": "contract platform-ops.yaml POST /releases/{releaseId}/withdraw"
       },
       {
        "kind": "publishGate",
        "label": "What publishing changes",
        "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
        "provenance": "authored — required by check-screens"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "publishGate",
-       "impliedBy": "promoteRelease",
-       "notes": "Declares `promoteRelease`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -253,24 +270,66 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmRejectRelease",
     "component": "confirmDialog",
-    "trigger": "Reject",
-    "body": "**Names what `rejectRelease` changes and what it leaves alone**, in the consequence rather than the verb. A release version this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract platform-ops.yaml POST /releases/{reinventoryHoldId}/reject"
+    "trigger": "Reject release",
+    "body": "**Names what `rejectRelease` changes and what it leaves alone**, in the consequence rather than the verb. A release version this affects should be identified in the dialog, not just counted. **Collects what `rejectRelease` sends before it is called.** Required: `reason`.",
+    "provenance": "contract platform-ops.yaml POST /releases/{releaseId}/reject"
    },
    {
     "id": "confirmWithdrawRelease",
     "component": "confirmDialog",
-    "trigger": "Withdraw",
-    "body": "**Names what `withdrawRelease` changes and what it leaves alone**, in the consequence rather than the verb. A release version this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract platform-ops.yaml POST /releases/{reinventoryHoldId}/withdraw"
+    "trigger": "Withdraw release",
+    "body": "**Names what `withdrawRelease` changes and what it leaves alone**, in the consequence rather than the verb. A release version this affects should be identified in the dialog, not just counted. **Collects what `withdrawRelease` sends before it is called.** Required: `reason`.",
+    "provenance": "contract platform-ops.yaml POST /releases/{releaseId}/withdraw"
+   },
+   {
+    "id": "formCreateRelease",
+    "component": "modal",
+    "trigger": "Create release",
+    "body": "**Collects what `createRelease` sends before it is called.** Required: `components`, `note`. Optional: `requiredMigrations`, `breakingChanges`, `guestReleaseNotes` (the public \"what's new\" for guests, one short text per locale, naming no person; decided 29 September, rev 3 GAP-B2). Guests read it on the Help screen once the release reaches their cell; `note` stays internal. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateReleaseRequest",
+    "confirm": {
+     "label": "Create release",
+     "operation": "createRelease"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "components",
+      "note",
+      "requiredMigrations",
+      "breakingChanges",
+      "guestReleaseNotes"
+     ]
+    },
+    "provenance": "contract platform-ops.yaml POST /releases"
+   },
+   {
+    "id": "formPromoteRelease",
+    "component": "modal",
+    "trigger": "Promote release",
+    "body": "**Collects what `promoteRelease` sends before it is called.** Required: `targetEnvironment`, `note`. Optional: `approverPrincipalId`, `stepUpToken`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Promote release",
+     "operation": "promoteRelease"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "targetEnvironment",
+      "note",
+      "approverPrincipalId",
+      "stepUpToken"
+     ]
+    },
+    "provenance": "contract platform-ops.yaml POST /releases/{releaseId}/promote"
    }
   ],
   "states": {
    "loading": "The release version list.",
    "error": "Could not load. Names which read failed and leaves the release version untouched.",
-   "emptyFirstRun": "No release version yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the release version are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No release version yet. Offers Create release (`createRelease`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on status, environment and the release version are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listReleases` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -283,13 +342,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getRelease",
     "contract": "platform-ops",
     "purpose": "Release detail with rollout state",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getReleaseReadiness",
     "contract": "platform-ops",
     "purpose": "Which gates pass and which block",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createRelease",
@@ -331,15 +390,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "entryState": {
    "params": [
     {
-     "name": "reinventoryHoldId",
+     "name": "releaseId",
      "from": "deepLink"
     }
    ],
-   "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `reinventoryHoldId`.",
+   "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `releaseId`.",
    "preloaded": [
-    "ReleaseDetail.rollouts",
-    "ReleaseDetail.cellsOnThisVersion",
-    "ReleaseDetail.cellsTotal"
+    "Release.components",
+    "Release.requiredMigrations",
+    "Release.note",
+    "Release.breakingChanges",
+    "Release.id"
    ]
   },
   "wireframe": {
@@ -394,41 +455,28 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "exitTo": [
     "ADM-001",
     "ADM-002",
-    "ADM-003",
     "ADM-029"
    ],
    "flowDerived": true,
    "transitions": [
     {
-     "to": "ADM-029",
-     "trigger": "Watches the rollout per cell",
-     "provenance": "flow F04 step 3→4",
-     "operation": "promoteRelease"
-    },
-    {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-023 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-023 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
-     "to": "ADM-003",
-     "trigger": "Cross-Tenant Health Dashboard",
+     "to": "ADM-029",
+     "trigger": "Watches the rollout per cell",
+     "provenance": "flow F04 step 3→4",
+     "operation": "promoteRelease",
      "carries": [
-      "cellId",
-      "rightId"
-     ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+      "rolloutId"
+     ]
     }
    ]
   },
@@ -440,13 +488,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listReleases` reads the population and `getReleaseReadiness` reads one of them — list, select, act",
   "purpose": "Work with staging promotion & approval for this venue.",
-  "gaps": [
-   {
-    "operation": "getRelease",
-    "why": "**1 declared operation reach no component on this screen**: getRelease. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -455,8 +496,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listReleases",
+       "notes": "Sends `?status=` to `listReleases`.",
+       "provenance": "contract platform-ops.yaml GET /releases"
+      },
+      {
+       "kind": "textField",
+       "label": "Environment",
+       "operation": "listReleases",
+       "notes": "Sends `?environment=` to `listReleases`.",
+       "provenance": "contract platform-ops.yaml GET /releases"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every staging promotion approval",
+       "label": "Every release",
        "bindsTo": "Release",
        "columns": [
         "Release.components",
@@ -471,6 +526,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listReleases",
        "provenance": "contract platform-ops.yaml GET /releases"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "promoteRelease",
+       "notes": "Declares `promoteRelease`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -480,16 +541,46 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected staging promotion approval",
+       "label": "The selected release",
+       "bindsTo": "Release",
+       "columns": [
+        "Release.components",
+        "Release.requiredMigrations",
+        "Release.note",
+        "Release.breakingChanges",
+        "Release.id",
+        "Release.status",
+        "Release.createdByPrincipalId",
+        "Release.promotedToStagingAt",
+        "Release.promotedToProductionAt"
+       ],
+       "operation": "listReleases",
+       "provenance": "contract platform-ops.yaml GET /releases"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The release",
+       "bindsTo": "ReleaseDetail",
+       "columns": [
+        "ReleaseDetail.rollouts",
+        "ReleaseDetail.cellsOnThisVersion",
+        "ReleaseDetail.cellsTotal"
+       ],
+       "operation": "getRelease",
+       "provenance": "contract platform-ops.yaml GET /releases/{releaseId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The release readiness",
        "bindsTo": "ReleaseReadiness",
        "columns": [
-        "ReleaseReadiness.reinventoryHoldId",
+        "ReleaseReadiness.releaseId",
         "ReleaseReadiness.canPromote",
         "ReleaseReadiness.targetEnvironment",
         "ReleaseReadiness.gates"
        ],
        "operation": "getReleaseReadiness",
-       "provenance": "contract platform-ops.yaml GET /releases/{reinventoryHoldId}/readiness"
+       "provenance": "contract platform-ops.yaml GET /releases/{releaseId}/readiness"
       }
      ]
     },
@@ -499,45 +590,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Promote",
+       "label": "Promote release",
        "operation": "promoteRelease",
-       "provenance": "contract platform-ops.yaml POST /releases/{reinventoryHoldId}/promote"
+       "provenance": "contract platform-ops.yaml POST /releases/{releaseId}/promote"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create release",
        "operation": "createRelease",
        "provenance": "contract platform-ops.yaml POST /releases"
       },
       {
        "kind": "destructiveButton",
-       "label": "Reject",
+       "label": "Reject release",
        "operation": "rejectRelease",
-       "provenance": "contract platform-ops.yaml POST /releases/{reinventoryHoldId}/reject"
+       "provenance": "contract platform-ops.yaml POST /releases/{releaseId}/reject"
       },
       {
        "kind": "destructiveButton",
-       "label": "Withdraw",
+       "label": "Withdraw release",
        "operation": "withdrawRelease",
-       "provenance": "contract platform-ops.yaml POST /releases/{reinventoryHoldId}/withdraw"
+       "provenance": "contract platform-ops.yaml POST /releases/{releaseId}/withdraw"
       },
       {
        "kind": "publishGate",
        "label": "What publishing changes",
        "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
        "provenance": "authored — required by check-screens"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "publishGate",
-       "impliedBy": "promoteRelease",
-       "notes": "Declares `promoteRelease`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -547,37 +626,78 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmRejectRelease",
     "component": "confirmDialog",
-    "trigger": "Reject",
-    "body": "**Names what `rejectRelease` changes and what it leaves alone**, in the consequence rather than the verb. A staging promotion approval this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract platform-ops.yaml POST /releases/{reinventoryHoldId}/reject"
+    "trigger": "Reject release",
+    "body": "**Names what `rejectRelease` changes and what it leaves alone**, in the consequence rather than the verb. A staging promotion approval this affects should be identified in the dialog, not just counted. **Collects what `rejectRelease` sends before it is called.** Required: `reason`.",
+    "provenance": "contract platform-ops.yaml POST /releases/{releaseId}/reject"
    },
    {
     "id": "confirmWithdrawRelease",
     "component": "confirmDialog",
-    "trigger": "Withdraw",
-    "body": "**Names what `withdrawRelease` changes and what it leaves alone**, in the consequence rather than the verb. A staging promotion approval this affects should be identified in the dialog, not just counted.",
-    "provenance": "contract platform-ops.yaml POST /releases/{reinventoryHoldId}/withdraw"
+    "trigger": "Withdraw release",
+    "body": "**Names what `withdrawRelease` changes and what it leaves alone**, in the consequence rather than the verb. A staging promotion approval this affects should be identified in the dialog, not just counted. **Collects what `withdrawRelease` sends before it is called.** Required: `reason`.",
+    "provenance": "contract platform-ops.yaml POST /releases/{releaseId}/withdraw"
+   },
+   {
+    "id": "formPromoteRelease",
+    "component": "modal",
+    "trigger": "Promote release",
+    "body": "**Collects what `promoteRelease` sends before it is called.** Required: `targetEnvironment`, `note`. Optional: `approverPrincipalId`, `stepUpToken`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Promote release",
+     "operation": "promoteRelease"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "targetEnvironment",
+      "note",
+      "approverPrincipalId",
+      "stepUpToken"
+     ]
+    },
+    "provenance": "contract platform-ops.yaml POST /releases/{releaseId}/promote"
+   },
+   {
+    "id": "formCreateRelease",
+    "component": "modal",
+    "trigger": "Create release",
+    "body": "**Collects what `createRelease` sends before it is called.** Required: `components`, `note`. Optional: `requiredMigrations`, `breakingChanges`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateReleaseRequest",
+    "confirm": {
+     "label": "Create release",
+     "operation": "createRelease"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "components",
+      "note",
+      "requiredMigrations",
+      "breakingChanges"
+     ]
+    },
+    "provenance": "contract platform-ops.yaml POST /releases"
    }
   ],
   "states": {
    "loading": "The staging promotion approval list.",
    "error": "Could not load. Names which read failed and leaves the staging promotion approval untouched.",
-   "emptyFirstRun": "No staging promotion approval yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the staging promotion approval are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No staging promotion approval yet. Offers Create release (`createRelease`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on status, environment and the staging promotion approval are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `getReleaseReadiness` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
     "operationId": "promoteRelease",
     "contract": "platform-ops",
     "purpose": "Promote with an approver",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getReleaseReadiness",
     "contract": "platform-ops",
     "purpose": "Checked before the request is offered",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createRelease",
@@ -592,7 +712,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getRelease",
     "contract": "platform-ops",
     "purpose": "Read a release with its rollout state",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listReleases",
@@ -622,16 +742,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "entryState": {
    "params": [
     {
-     "name": "reinventoryHoldId",
+     "name": "releaseId",
      "from": "deepLink"
     }
    ],
-   "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `reinventoryHoldId`.",
+   "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `releaseId`.",
    "preloaded": [
-    "ReleaseReadiness.reinventoryHoldId",
-    "ReleaseReadiness.canPromote",
-    "ReleaseReadiness.targetEnvironment",
-    "ReleaseReadiness.gates"
+    "Release.components",
+    "Release.requiredMigrations",
+    "Release.note",
+    "Release.breakingChanges",
+    "Release.id"
    ]
   },
   "wireframe": {
@@ -684,34 +805,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "inferred": true,
    "exitTo": [
     "ADM-001",
-    "ADM-002",
-    "ADM-003"
+    "ADM-002"
    ],
    "transitions": [
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-024 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
-    },
-    {
-     "to": "ADM-003",
-     "trigger": "Cross-Tenant Health Dashboard",
-     "carries": [
-      "cellId",
-      "rightId"
-     ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-024 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     }
    ]
   },
@@ -723,13 +828,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listSupportNotices` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "Push live release notification composer for this venue.",
-  "gaps": [
-   {
-    "operation": "listReleases",
-    "why": "**1 declared operation reach no component on this screen**: listReleases. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -739,7 +837,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every release notification composer",
+       "label": "Every support notice",
        "bindsTo": "SupportNotice",
        "columns": [
         "SupportNotice.id",
@@ -752,6 +850,31 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listSupportNotices",
        "provenance": "contract platform-ops.yaml GET /support-notices"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every release",
+       "bindsTo": "Release",
+       "columns": [
+        "Release.components",
+        "Release.requiredMigrations",
+        "Release.note",
+        "Release.guestReleaseNotes",
+        "Release.breakingChanges",
+        "Release.id",
+        "Release.status",
+        "Release.createdByPrincipalId",
+        "Release.promotedToStagingAt",
+        "Release.promotedToProductionAt"
+       ],
+       "operation": "listReleases",
+       "provenance": "contract platform-ops.yaml GET /releases"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishSupportNotice",
+       "notes": "Declares `publishSupportNotice`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -761,7 +884,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected release notification composer",
+       "label": "The selected support notice",
        "bindsTo": "SupportNotice",
        "columns": [
         "SupportNotice.id",
@@ -774,6 +897,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listSupportNotices",
        "provenance": "contract platform-ops.yaml GET /support-notices"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "What's new for guests",
+       "bindsTo": "Release",
+       "columns": [
+        "Release.version",
+        "Release.guestReleaseNotes",
+        "Release.promotedToProductionAt"
+       ],
+       "operation": "listReleases",
+       "notes": "**The public, localised release notes a guest reads on the Help screen** (decided 29 September, rev 3 GAP-B2; WEB-025, WEB-045, GST-040 through `getTenantAppStatus.whatsNew`, the ten newest). Written with the release on ADM-022 (`createRelease.guestReleaseNotes`); shown here beside the staff notice so the two are composed together and say the same thing. Distinct from the staff-only recent changes, which name who made each change.",
+       "provenance": "contract platform-ops.yaml GET /releases"
       }
      ]
     },
@@ -783,7 +919,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Publish",
+       "label": "Publish support notice",
        "operation": "publishSupportNotice",
        "provenance": "contract platform-ops.yaml POST /support-notices"
       },
@@ -794,34 +930,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "authored — required by check-screens"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "publishGate",
-       "impliedBy": "publishSupportNotice",
-       "notes": "Declares `publishSupportNotice`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The release notification composer list.",
    "error": "Could not load. Names which read failed and leaves the release notification composer untouched.",
-   "emptyFirstRun": "No release notification composer yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the release notification composer are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No release notification composer yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listSupportNotices` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
     "operationId": "publishSupportNotice",
     "contract": "platform-ops",
     "purpose": "Compose and publish a notice",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listSupportNotices",
@@ -851,6 +975,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-024"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formPublishSupportNotice",
+    "component": "modal",
+    "trigger": "Publish support notice",
+    "body": "**Collects what `publishSupportNotice` sends before it is called.** Required: `id`, `supportEndsAt`, `publishedAt`. Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SupportNotice",
+    "confirm": {
+     "label": "Publish support notice",
+     "operation": "publishSupportNotice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "supportEndsAt",
+      "publishedAt",
+      "message",
+      "affectedTenantIds",
+      "publishedByPrincipalId",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract platform-ops.yaml POST /support-notices"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -895,34 +1045,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "inferred": true,
    "exitTo": [
     "ADM-001",
-    "ADM-002",
-    "ADM-003"
+    "ADM-002"
    ],
    "transitions": [
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-025 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
-    },
-    {
-     "to": "ADM-003",
-     "trigger": "Cross-Tenant Health Dashboard",
-     "carries": [
-      "cellId",
-      "rightId"
-     ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-025 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     }
    ]
   },
@@ -943,7 +1077,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every tenant upgrade scheduler",
+       "label": "Every upgrade schedule",
        "bindsTo": "UpgradeSchedule",
        "columns": [
         "UpgradeSchedule.tenantName",
@@ -965,7 +1099,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected tenant upgrade scheduler",
+       "label": "The selected upgrade schedule",
        "bindsTo": "UpgradeSchedule",
        "columns": [
         "UpgradeSchedule.tenantName",
@@ -987,7 +1121,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Schedule",
+       "label": "Schedule tenant upgrade",
        "operation": "scheduleTenantUpgrade",
        "provenance": "contract platform-ops.yaml POST /upgrade-schedules"
       }
@@ -998,9 +1132,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The tenant upgrade scheduler list.",
    "error": "Could not load. Names which read failed and leaves the tenant upgrade scheduler untouched.",
-   "emptyFirstRun": "No tenant upgrade scheduler yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the tenant upgrade scheduler are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No tenant upgrade scheduler yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listUpgradeSchedules` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listUpgradeSchedules` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1013,7 +1147,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "scheduleTenantUpgrade",
     "contract": "platform-ops",
     "purpose": "Schedule or defer",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1031,6 +1165,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-025"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formScheduleTenantUpgrade",
+    "component": "modal",
+    "trigger": "Schedule tenant upgrade",
+    "body": "**Collects what `scheduleTenantUpgrade` sends before it is called.** Required: `releaseVersion`, `scheduledFor`. Optional: `tenantName`, `deferredByTenant`, `deferralReason`, `maxDeferralUntil`, `notifiedAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "UpgradeSchedule",
+    "confirm": {
+     "label": "Schedule tenant upgrade",
+     "operation": "scheduleTenantUpgrade"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "releaseVersion",
+      "scheduledFor",
+      "tenantName",
+      "deferredByTenant",
+      "deferralReason",
+      "maxDeferralUntil",
+      "notifiedAt"
+     ]
+    },
+    "provenance": "contract platform-ops.yaml POST /upgrade-schedules"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1075,34 +1235,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "inferred": true,
    "exitTo": [
     "ADM-001",
-    "ADM-002",
-    "ADM-003"
+    "ADM-002"
    ],
    "transitions": [
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-026 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
-    },
-    {
-     "to": "ADM-003",
-     "trigger": "Cross-Tenant Health Dashboard",
-     "carries": [
-      "cellId",
-      "rightId"
-     ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-026 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     }
    ]
   },
@@ -1123,7 +1267,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every end-of-support notice",
+       "label": "Every support notice",
        "bindsTo": "SupportNotice",
        "columns": [
         "SupportNotice.id",
@@ -1136,6 +1280,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listSupportNotices",
        "provenance": "contract platform-ops.yaml GET /support-notices"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishSupportNotice",
+       "notes": "Declares `publishSupportNotice`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1145,7 +1295,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected end-of-support notice",
+       "label": "The selected support notice",
        "bindsTo": "SupportNotice",
        "columns": [
         "SupportNotice.id",
@@ -1167,13 +1317,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Publish",
+       "label": "Publish support notice",
        "operation": "publishSupportNotice",
        "provenance": "contract platform-ops.yaml POST /support-notices"
       },
       {
        "kind": "secondaryButton",
-       "label": "Deprecate",
+       "label": "Deprecate API version",
        "operation": "deprecateApiVersion",
        "provenance": "contract public-api.yaml POST /api-versions/{version}/deprecate"
       },
@@ -1184,27 +1334,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "authored — required by check-screens"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "publishGate",
-       "impliedBy": "publishSupportNotice",
-       "notes": "Declares `publishSupportNotice`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The end-of-support notice list.",
    "error": "Could not load. Names which read failed and leaves the end-of-support notice untouched.",
-   "emptyFirstRun": "No end-of-support notice yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the end-of-support notice are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No end-of-support notice yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listSupportNotices` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1254,6 +1392,51 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-026"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formPublishSupportNotice",
+    "component": "modal",
+    "trigger": "Publish support notice",
+    "body": "**Collects what `publishSupportNotice` sends before it is called.** Required: `id`, `supportEndsAt`, `publishedAt`. Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SupportNotice",
+    "confirm": {
+     "label": "Publish support notice",
+     "operation": "publishSupportNotice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "supportEndsAt",
+      "publishedAt",
+      "message",
+      "affectedTenantIds",
+      "publishedByPrincipalId",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract platform-ops.yaml POST /support-notices"
+   },
+   {
+    "id": "formDeprecateApiVersion",
+    "component": "modal",
+    "trigger": "Deprecate API version",
+    "body": "**Collects what `deprecateApiVersion` sends before it is called.** Required: `sunsetAt`, `reason`. Optional: `migrationGuideUrl`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Deprecate API version",
+     "operation": "deprecateApiVersion"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "sunsetAt",
+      "reason",
+      "migrationGuideUrl"
+     ]
+    },
+    "provenance": "contract public-api.yaml POST /api-versions/{version}/deprecate"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1300,7 +1483,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "exitTo": [
     "ADM-001",
     "ADM-002",
-    "ADM-003",
     "ADM-023"
    ],
    "flowDerived": true,
@@ -1314,27 +1496,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-027 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
-    },
-    {
-     "to": "ADM-003",
-     "trigger": "Cross-Tenant Health Dashboard",
-     "carries": [
-      "cellId",
-      "rightId"
-     ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-027 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     }
    ]
   },
@@ -1346,13 +1513,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listMigrations` reads the population and `getVersionSkew` reads one of them — list, select, act",
   "purpose": "Find database migration console for this venue.",
-  "gaps": [
-   {
-    "operation": "getMigrationRun",
-    "why": "**1 declared operation reach no component on this screen**: getMigrationRun. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1361,8 +1521,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Applied to",
+       "operation": "listMigrations",
+       "notes": "Sends `?appliedTo=` to `listMigrations`.",
+       "provenance": "contract platform-ops.yaml GET /migrations"
+      },
+      {
+       "kind": "toggle",
+       "label": "Pending only",
+       "operation": "listMigrations",
+       "notes": "Sends `?pendingOnly=` to `listMigrations`.",
+       "provenance": "contract platform-ops.yaml GET /migrations"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every database migration console",
+       "label": "Every migration",
        "bindsTo": "Migration",
        "columns": [
         "Migration.module",
@@ -1386,7 +1560,50 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected database migration console",
+       "label": "The selected migration",
+       "bindsTo": "Migration",
+       "columns": [
+        "Migration.module",
+        "Migration.description",
+        "Migration.isReversible",
+        "Migration.rollbackTestedAt",
+        "Migration.checksum",
+        "Migration.estimatedLockMs",
+        "Migration.touchesPartitionedTable",
+        "Migration.appliedCellCount",
+        "Migration.pendingCellCount"
+       ],
+       "operation": "listMigrations",
+       "provenance": "contract platform-ops.yaml GET /migrations"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The migration run",
+       "bindsTo": "MigrationRun",
+       "columns": [
+        "MigrationRun.id",
+        "MigrationRun.planId",
+        "MigrationRun.status",
+        "MigrationRun.canaryCellId",
+        "MigrationRun.canaryTenantId",
+        "MigrationRun.tenantsTotal",
+        "MigrationRun.tenantsComplete",
+        "MigrationRun.tenantsFailed",
+        "MigrationRun.cellsTotal",
+        "MigrationRun.cellsComplete",
+        "MigrationRun.cellsFailed",
+        "MigrationRun.startedByPrincipalId",
+        "MigrationRun.startedAt",
+        "MigrationRun.completedAt",
+        "MigrationRun.cells",
+        "MigrationRun.tenants"
+       ],
+       "operation": "getMigrationRun",
+       "provenance": "contract platform-ops.yaml GET /migrations/runs/{runId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The version skew report",
        "bindsTo": "VersionSkewReport",
        "columns": [
         "VersionSkewReport.asAt",
@@ -1404,42 +1621,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Plan",
+       "label": "Plan migration",
        "operation": "planMigration",
        "provenance": "contract platform-ops.yaml POST /migrations/plan"
       },
       {
        "kind": "secondaryButton",
-       "label": "Apply",
+       "label": "Apply migration",
        "operation": "applyMigration",
        "provenance": "contract platform-ops.yaml POST /migrations/apply"
       },
       {
        "kind": "secondaryButton",
-       "label": "Rollback",
+       "label": "Rollback migration run",
        "operation": "rollbackMigrationRun",
        "provenance": "contract platform-ops.yaml POST /migrations/runs/{runId}/rollback"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listMigrations",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "planMigration",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1448,9 +1644,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The database migration console list.",
    "error": "Could not load. Names which read failed and leaves the database migration console untouched.",
-   "emptyFirstRun": "No database migration console yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the database migration console are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No database migration console yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on appliedTo, pendingOnly and the database migration console are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_MIGRATION_VIEW`, which `listMigrations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1463,13 +1659,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "planMigration",
     "contract": "platform-ops",
     "purpose": "Plan without applying — the safety step",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "applyMigration",
     "contract": "platform-ops",
     "purpose": "Apply a reviewed plan",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getVersionSkew",
@@ -1502,9 +1698,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `runId`.",
    "preloaded": [
-    "VersionSkewReport.asAt",
-    "VersionSkewReport.hasUnexplainedSkew",
-    "VersionSkewReport.cells"
+    "Migration.module",
+    "Migration.description",
+    "Migration.isReversible",
+    "Migration.rollbackTestedAt",
+    "Migration.checksum"
    ]
   },
   "wireframe": {
@@ -1513,6 +1711,66 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-027"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formPlanMigration",
+    "component": "modal",
+    "trigger": "Plan migration",
+    "body": "**Collects what `planMigration` sends before it is called.** Required: `targetVersion`. Optional: `cellIds`, `environment`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Plan migration",
+     "operation": "planMigration"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "targetVersion",
+      "cellIds",
+      "environment"
+     ]
+    },
+    "provenance": "contract platform-ops.yaml POST /migrations/plan"
+   },
+   {
+    "id": "formApplyMigration",
+    "component": "modal",
+    "trigger": "Apply migration",
+    "body": "**Collects what `applyMigration` sends before it is called.** Required: `planId`, `stepUpToken`. Optional: `canaryCellId`, `haltOnFirstFailure`, `maintenanceWindow`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Apply migration",
+     "operation": "applyMigration"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "planId",
+      "stepUpToken",
+      "canaryCellId",
+      "haltOnFirstFailure",
+      "maintenanceWindow"
+     ]
+    },
+    "provenance": "contract platform-ops.yaml POST /migrations/apply"
+   },
+   {
+    "id": "formRollbackMigrationRun",
+    "component": "modal",
+    "trigger": "Rollback migration run",
+    "body": "**Collects what `rollbackMigrationRun` sends before it is called.** Required: `reason`, `stepUpToken`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Rollback migration run",
+     "operation": "rollbackMigrationRun"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason",
+      "stepUpToken"
+     ]
+    },
+    "provenance": "contract platform-ops.yaml POST /migrations/runs/{runId}/rollback"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1557,34 +1815,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "inferred": true,
    "exitTo": [
     "ADM-001",
-    "ADM-002",
-    "ADM-003"
+    "ADM-002"
    ],
    "transitions": [
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-028 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
-    },
-    {
-     "to": "ADM-003",
-     "trigger": "Cross-Tenant Health Dashboard",
-     "carries": [
-      "cellId",
-      "rightId"
-     ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-028 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     }
    ]
   },
@@ -1605,7 +1847,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every environment registry",
+       "label": "Every environment",
        "bindsTo": "Environment",
        "columns": [
         "Environment.id",
@@ -1628,7 +1870,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected environment registry",
+       "label": "The selected environment",
        "bindsTo": "Environment",
        "columns": [
         "Environment.id",
@@ -1651,30 +1893,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Register",
+       "label": "Register environment",
        "operation": "registerEnvironment",
        "provenance": "contract platform-ops.yaml POST /environments"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listEnvironments",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "registerEnvironment",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1683,9 +1904,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The environment registry list.",
    "error": "Could not load. Names which read failed and leaves the environment registry untouched.",
-   "emptyFirstRun": "No environment registry yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the environment registry are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No environment registry yet. Offers Register environment (`registerEnvironment`).",
+   "emptyNoResults": "Never shown: `listEnvironments` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listEnvironments` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1698,7 +1919,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "registerEnvironment",
     "contract": "platform-ops",
     "purpose": "Register an environment",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1716,6 +1937,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-028"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRegisterEnvironment",
+    "component": "modal",
+    "trigger": "Register environment",
+    "body": "**Collects what `registerEnvironment` sends before it is called.** Required: `id`, `kind`, `name`. Optional: `cellIds`, `requiresApprovalToPromote`, `soakHours`, `currentReleaseVersion`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "Environment",
+    "confirm": {
+     "label": "Register environment",
+     "operation": "registerEnvironment"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "name",
+      "cellIds",
+      "requiresApprovalToPromote",
+      "soakHours",
+      "currentReleaseVersion",
+      "isActive"
+     ]
+    },
+    "provenance": "contract platform-ops.yaml POST /environments"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1821,7 +2069,7 @@ Method, path, parameters, request and response for every operation these screens
  },
  "getRelease": {
   "method": "GET",
-  "path": "/releases/{reinventoryHoldId}",
+  "path": "/releases/{releaseId}",
   "contract": "platform-ops",
   "summary": "Read a release with its rollout state",
   "permission": "PLATFORM_RELEASE_VIEW",
@@ -1834,7 +2082,7 @@ Method, path, parameters, request and response for every operation these screens
  },
  "getReleaseReadiness": {
   "method": "GET",
-  "path": "/releases/{reinventoryHoldId}/readiness",
+  "path": "/releases/{releaseId}/readiness",
   "contract": "platform-ops",
   "summary": "Whether a release can be promoted, and what blocks it",
   "permission": "PLATFORM_RELEASE_VIEW",
@@ -1986,7 +2234,7 @@ Method, path, parameters, request and response for every operation these screens
  },
  "promoteRelease": {
   "method": "POST",
-  "path": "/releases/{reinventoryHoldId}/promote",
+  "path": "/releases/{releaseId}/promote",
   "contract": "platform-ops",
   "summary": "Promote a release to the next environment",
   "permission": "PLATFORM_RELEASE_PROMOTE",
@@ -2043,7 +2291,7 @@ Method, path, parameters, request and response for every operation these screens
  },
  "rejectRelease": {
   "method": "POST",
-  "path": "/releases/{reinventoryHoldId}/reject",
+  "path": "/releases/{releaseId}/reject",
   "contract": "platform-ops",
   "summary": "Reject a release back a stage",
   "permission": "PLATFORM_RELEASE_PROMOTE",
@@ -2100,7 +2348,7 @@ Method, path, parameters, request and response for every operation these screens
  },
  "withdrawRelease": {
   "method": "POST",
-  "path": "/releases/{reinventoryHoldId}/withdraw",
+  "path": "/releases/{releaseId}/withdraw",
   "contract": "platform-ops",
   "summary": "Withdraw a release",
   "permission": "PLATFORM_RELEASE_MANAGE",
@@ -2173,6 +2421,41 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "activeClientCount": {
     "type": "integer",
     "readOnly": true
+   },
+   "changes": {
+    "type": "array",
+    "description": "**The developer changelog for this version** (17 September minutes, M17-14): every operation added, changed, deprecated or removed, and whether the change is breaking under ADR-0026. Generated at release from the contract diff; shown on DEV-001.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "operationId",
+      "kind"
+     ],
+     "properties": {
+      "operationId": {
+       "type": "string"
+      },
+      "contract": {
+       "type": "string"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "added",
+        "changed",
+        "deprecated",
+        "removed"
+       ]
+      },
+      "breaking": {
+       "type": "boolean",
+       "default": false
+      },
+      "summary": {
+       "type": "string"
+      }
+     }
+    }
    }
   }
  },
@@ -2230,7 +2513,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "note": {
     "type": "string",
     "minLength": 3,
-    "maxLength": 2000
+    "maxLength": 2000,
+    "description": "Internal. Never shown to guests; `guestReleaseNotes` is."
+   },
+   "guestReleaseNotes": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "**The public, localised \"what's new\" for guests** (decided 29 September, rev 3 GAP-B2), one short text per locale, written for a guest and naming no person. Public once the release reaches the tenant's cell; read by the guest Help screen (WEB-025, WEB-045, GST-040) through `white-label.getTenantAppStatus`. Distinct from the staff-only `TenantAppStatus.recentChanges`, which names the principal behind each change and stays staff only.\n"
    },
    "breakingChanges": {
     "type": "array",
@@ -2289,6 +2582,60 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "staging",
    "production"
   ]
+ },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
+ "Migration": {
+  "type": "object",
+  "x-ticvai-persistence": "control.migration",
+  "required": [
+   "version",
+   "module",
+   "isReversible",
+   "checksum"
+  ],
+  "properties": {
+   "version": {
+    "type": "string"
+   },
+   "module": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string"
+   },
+   "isReversible": {
+    "type": "boolean",
+    "description": "A rollback section exists and CI has executed it against a restored snapshot. A rollback nobody has run is a comment, not a rollback.\n"
+   },
+   "rollbackTestedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "checksum": {
+    "type": "string",
+    "description": "Compared on apply. A migration edited after it was applied somewhere is a defect the register catches, not a mystery to debug later.\n"
+   },
+   "estimatedLockMs": {
+    "type": "integer",
+    "nullable": true
+   },
+   "touchesPartitionedTable": {
+    "type": "boolean"
+   },
+   "appliedCellCount": {
+    "type": "integer"
+   },
+   "pendingCellCount": {
+    "type": "integer"
+   }
+  }
  },
  "MigrationPlan": {
   "type": "object",
@@ -2461,7 +2808,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "cells": {
     "type": "array",
     "items": {
-     "$ref": "#/components/schemas/RolloutCell"
+     "$ref": "#/components/schemas/MigrationRunCell"
     }
    },
    "tenants": {
@@ -2469,6 +2816,69 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "items": {
      "$ref": "#/components/schemas/RolloutTenant"
     }
+   }
+  }
+ },
+ "MigrationRunCell": {
+  "type": "object",
+  "x-ticvai-persistence": "none — rows of control.migration_run_cell, stored through MigrationRun",
+  "description": "One cell's rollup within one migration run. **The fields of `RolloutCell` without its `rolloutId`**: a migration run is not a rollout, and its parent key `migration_run_id` comes from `MigrationRun.cells`.\n",
+  "required": [
+   "cellId",
+   "status"
+  ],
+  "properties": {
+   "cellId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "cellName": {
+    "type": "string"
+   },
+   "regionName": {
+    "type": "string"
+   },
+   "countryCode": {
+    "type": "string"
+   },
+   "isCanary": {
+    "type": "boolean"
+   },
+   "wave": {
+    "type": "integer"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "running",
+     "complete",
+     "failed",
+     "skipped",
+     "rolledBack"
+    ]
+   },
+   "fromVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "toVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "error": {
+    "type": "string",
+    "nullable": true
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
    }
   }
  },
@@ -2563,12 +2973,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "type": "object",
   "x-ticvai-persistence": "none — computed",
   "required": [
-   "reinventoryHoldId",
+   "releaseId",
    "canPromote",
    "gates"
   ],
   "properties": {
-   "reinventoryHoldId": {
+   "releaseId": {
     "type": "string",
     "format": "uuid"
    },
@@ -2625,7 +3035,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "control.rollout",
   "required": [
    "id",
-   "reinventoryHoldId",
+   "releaseId",
    "environment",
    "status",
    "startedAt"
@@ -2635,7 +3045,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid"
    },
-   "reinventoryHoldId": {
+   "releaseId": {
     "type": "string",
     "format": "uuid"
    },
@@ -2678,72 +3088,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
- "RolloutCell": {
-  "type": "object",
-  "x-ticvai-persistence": "control.rollout_cell",
-  "required": [
-   "cellId",
-   "status"
-  ],
-  "properties": {
-   "cellId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "cellName": {
-    "type": "string"
-   },
-   "regionName": {
-    "type": "string"
-   },
-   "countryCode": {
-    "type": "string"
-   },
-   "isCanary": {
-    "type": "boolean"
-   },
-   "wave": {
-    "type": "integer"
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "pending",
-     "running",
-     "complete",
-     "failed",
-     "skipped",
-     "rolledBack"
-    ]
-   },
-   "fromVersion": {
-    "type": "string",
-    "nullable": true
-   },
-   "toVersion": {
-    "type": "string",
-    "nullable": true
-   },
-   "error": {
-    "type": "string",
-    "nullable": true
-   },
-   "startedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "completedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
  "RolloutTenant": {
   "type": "object",
   "x-ticvai-persistence": "control.rollout_tenant",
-  "description": "What happened to one tenant database during one run. **The same shape as `RolloutCell` one level down**, and it serves the per-tenant rows of both a rollout and a migration run — which is the arrangement `RolloutCell` already has with `rollout_cell` and `migration_run_cell`.\n\n**`databaseName` is denormalised on purpose.** After a drop the run record still has to say what it touched, and a join to a row that no longer exists says nothing.\n",
+  "description": "What happened to one tenant database during one run. **The same shape as `RolloutCell` one level down**, and it serves the per-tenant rows of both a rollout and a migration run — the arrangement `RolloutCell` had with `rollout_cell` and `migration_run_cell` until `rollout_cell` needed its `rolloutId` parent key and the migration run's cells moved to `MigrationRunCell`.\n\n**`databaseName` is denormalised on purpose.** After a drop the run record still has to say what it touched, and a join to a row that no longer exists says nothing.\n",
   "required": [
    "tenantId",
    "cellId",

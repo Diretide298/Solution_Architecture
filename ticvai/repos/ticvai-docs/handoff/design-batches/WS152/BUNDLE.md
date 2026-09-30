@@ -2034,14 +2034,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID of the refund, and its idempotency key — it must equal the `Idempotency-Key` header."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7 of the refund, and its idempotency key — it must equal the `Idempotency-Key` header."
    },
    "lineIds": {
     "type": "array",
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     },
     "description": "Omit to refund the whole order."
    },
@@ -2345,11 +2345,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "tender": {
     "$ref": "#/components/schemas/TenderKind"
@@ -2485,11 +2485,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "batchId": {
     "type": "string",
@@ -2570,6 +2570,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "ledgerEntryId": {
     "type": "string",
+    "format": "uuid",
     "nullable": true,
     "description": "Written before the gateway is called."
    },

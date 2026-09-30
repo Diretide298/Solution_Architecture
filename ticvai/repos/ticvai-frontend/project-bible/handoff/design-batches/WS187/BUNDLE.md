@@ -1,6 +1,6 @@
 # WS187 — Wallet Configuration Backend Structure v1.0 board 2
 
-**10 screens · 6 operations · 5 schemas · 3 permissions**
+**10 screens · 6 operations · 8 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -2267,6 +2267,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -2279,7 +2284,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Undo a top-up, in full or in part",
   "permission": "WALLET_OPERATE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -2298,9 +2303,14 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Amounts, channels, bonuses, limits and velocity",
   "permission": "WALLET_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -2319,6 +2329,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -2701,6 +2740,78 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     }
    }
   }
+ },
+ "WalletTransaction": {
+  "x-ticvai-persistence": "wallet.wallet_transaction",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "amount",
+   "balanceAfter",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "walletId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "wallet.wallet",
+    "description": "The wallet this movement is on (SD-027, 29 September). A shared wallet has many subjects, so the subject alone cannot say which balance moved."
+   },
+   "walletHoldId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "wallet.hold",
+    "description": "The hold a spend settled, where it came through `holdWalletFunds`."
+   },
+   "kind": {
+    "$ref": "#/components/schemas/WalletTransactionKind"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "balanceAfter": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "orderId": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "WalletTransactionKind": {
+  "type": "string",
+  "enum": [
+   "topUp",
+   "spend",
+   "refund",
+   "adjustment",
+   "bonus",
+   "expiry",
+   "transfer"
+  ]
  }
 }
 ```

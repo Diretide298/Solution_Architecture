@@ -104,6 +104,29 @@ PACKAGES = [
      ["AI & Intelligence"]),
 ]
 PACKAGE_OF = {m: p for p, _, ms in PACKAGES for m in ms}
+# **One build order from start to end** (30 September, Chinmay): the same service phases as the Block A tickets
+# (tools/build-service-docs.py SERVICE_PHASE). 1 Foundation: what everything reads, plus white label and
+# platform control, which Block A's storefront and tenant provisioning need. 2 Commerce: the sale path.
+# 3 Operations: licensed per module, plugged in after commerce. 4 Engagement: nothing that takes money
+# depends on it. 5 Reporting: it reports on everything else. Inside each block window, work runs in this order.
+MODULE_PHASE = {
+    FOUNDATION: 1, "Identity, Roles & Security": 1, "Tenancy, Venues & Devices": 1, "Platform Operations": 1,
+    "Subscription & Licensing": 1, "Approval Workflows": 1, "Developer Portal & Public API": 1,
+    "Digital Asset Management": 1, "White Label & CMS": 1,
+    "Ticketing Catalogue & Products": 2, "Pricing, Promotions & Bundles": 2, "Seat Management & Venue Maps": 2,
+    "Orders & Reservations": 2, "Payments": 2, "Wallet & Cashless": 2, "Admission & Access Control": 2,
+    "Finance, Ledger & Tax": 2,
+    "Food & Beverage": 3, "Retail": 3, "Rentals": 3, "Inventory & Procurement": 3, "Transport": 3,
+    "Accreditation": 3, "Resources & Capacity": 3, "Workforce & Staff": 3, "Maintenance & Safety": 3,
+    "Games & Rides": 3, "Virtual Queue": 3,
+    "Marketing & CRM": 4, "AI & Intelligence": 4,
+    "Reporting & Analytics": 5,
+}
+PHASE_NAME = {1: "Foundation", 2: "Commerce", 3: "Operations", 4: "Engagement", 5: "Reporting"}
+
+
+def module_rank(m):
+    return (MODULE_PHASE.get(m, 3), MODULES.index(m) if m in MODULES else 99)
 MODULES = [m for _, _, ms in PACKAGES for m in ms]
 PLATFORM_MODULE = {  # a screen that names no operation belongs to its app's main module
     "P01": "White Label & CMS", "P02": "White Label & CMS", "P04": "Food & Beverage", "P05": "Orders & Reservations",
@@ -245,6 +268,7 @@ def main():
             c = SCHEMA_CONTRACT.get(schema, schema)
             mod = MODULE_OF_CONTRACT.get(c or "", FOUNDATION)
         a_items.append({"key": key, "subject": r["subject"], "module": mod, "points": pts, "area": r["area"],
+                        "tier": int(r.get("tier") or 0), "track": r["track"],
                         "who": r["assignee"] or "client", "week": int(sched["start"].get(key, 0)) // 5,
                         "seq": int(r["sequence"] or 0)})
     # Each person's Block A tasks, laid end to end at their pace in the order the schedule gives
@@ -327,7 +351,7 @@ def main():
 
     # wave 3 of Venue Management and the console: first modules in B1, then B2, the rest B3, in package order
     w3 = [k for k in wps if k[0] == "W3"]
-    w3.sort(key=lambda k: (MODULES.index(k[1]) if k[1] in MODULES else 99))
+    w3.sort(key=lambda k: module_rank(k[1]))
     total_w3 = sum(wps[k]["points"] for k in w3)
     run = 0
     for k in w3:
@@ -373,7 +397,7 @@ def main():
     placed = []
     work = sorted(list(wps.values()) + engine,
                   key=lambda w: (DAY_INDEX.get(w.get("notBefore"), 0) if w.get("notBefore") else 0, order[w["phase"]],
-                                 w["pool"] == "be", MODULES.index(w["module"]) if w["module"] in MODULES else 99))
+                                 module_rank(w["module"]), w["pool"] == "be"))
     for w in work:
         left = w["points"]
         w["people"] = collections.Counter()
@@ -398,7 +422,8 @@ def main():
             w["people"][name] += chunk
             w["startIdx"] = s_idx if w["startIdx"] is None else min(w["startIdx"], s_idx)
             w["endIdx"] = e_idx if w["endIdx"] is None else max(w["endIdx"], e_idx)
-            placed.append({"who": name, "module": w["module"], "phase": w["phase"], "points": chunk, "s": s_idx, "e": e_idx})
+            placed.append({"who": name, "module": w["module"], "phase": w["phase"], "pool": w["pool"], "points": chunk,
+                           "s": s_idx, "e": e_idx})
             left -= chunk
 
     def day(i):
@@ -515,7 +540,47 @@ def main():
                                            key=lambda m: MODULES.index(m) if m in MODULES else 99),
                             blocks=("A" if sp["start"] <= BLOCK_A_END else "") + ("B" if sp["end"] > BLOCK_A_END else "")))
 
+    # **The build phases, end to end** (30 September): the same phases in Block A (the tickets' tier) and in
+    # B1 to B3 (the module's phase), split into back end and front end, so one table reads from 5 October to
+    # the last day of planned work.
+    BACK = ("Backend", "Database", "DevOps", "Setup", "AI")
+    ph_rows = collections.OrderedDict()
+    for ph in range(0, 6):
+        for side in ("back end", "front end"):
+            ph_rows[(ph, side)] = {"phase": ph, "name": "Plumbing" if ph == 0 else PHASE_NAME[ph], "side": side,
+                                   "points": 0.0, "s": None, "e": None, "modules": collections.Counter(),
+                                   "people": collections.Counter(), "aPoints": 0.0, "bPoints": 0.0}
+
+    def put(ph, side, module, who, pts, s_, e_, blk):
+        r = ph_rows[(ph, side)]
+        r["points"] += pts
+        r["aPoints" if blk == "A" else "bPoints"] += pts
+        r["s"] = s_ if r["s"] is None else min(r["s"], s_)
+        r["e"] = e_ if r["e"] is None else max(r["e"], e_)
+        r["modules"][module] += pts
+        if who and who != "client":
+            r["people"][who] += pts
+
+    for it in a_items:
+        if it["area"] == "onboard":
+            continue
+        side = "back end" if it["track"] in BACK else "front end"
+        put(it["tier"], side, it["module"], it["who"], it["points"], it["startIdx"], it["endIdx"], "A")
+    for p in placed:
+        side = "back end" if p.get("pool") in ("be", "ai") else "front end"
+        put(MODULE_PHASE.get(p["module"], 3), side, p["module"], p["who"], p["points"], p["s"], p["e"], "B")
+    phases = []
+    for (ph, side), r in ph_rows.items():
+        if not r["points"]:
+            continue
+        phases.append({"phase": ph, "name": r["name"], "side": side, "hours": round(r["points"] * hours_per_point),
+                       "aHours": round(r["aPoints"] * hours_per_point), "bHours": round(r["bPoints"] * hours_per_point),
+                       "start": day(r["s"]).isoformat(), "end": day(r["e"]).isoformat(),
+                       "modules": [m for m, _ in r["modules"].most_common(8)],
+                       "people": [n for n, _ in r["people"].most_common(6)]})
+
     out = {
+        "phases": phases,
         "generatedBy": "tools/build-plan-deck.py", "generated": dt.date.today().isoformat(),
         "basis": {"blockATaskPoints": a_total, "blockADevelopers": a_devs, "blockADays": a_days,
                   "pacePointsPerDeveloperDay": round(pace, 2), "hoursPerPoint": round(hours_per_point, 3),
@@ -630,6 +695,11 @@ def write_xlsx(plan, path):
                       "Operations in B", "Block A hours", "Block B hours", "Total hours", "Starts", "Expected completion", "Sprints", "Lead", "Team"],
           rows, [24, 32, 11, 10, 8, 8, 10, 10, 10, 10, 10, 13, 13, 9, 22, 70])
 
+    rows = [[f"{r['phase']} {r['name']}", r["side"], _d(r["start"]), _d(r["end"]), r["aHours"], r["bHours"],
+             r["hours"], ", ".join(r["modules"]), ", ".join(r["people"])] for r in plan["phases"]]
+    sheet("Build phases", ["Phase", "Side", "Starts", "Ends", "Block A hours", "Block B hours", "Hours",
+                           "Main modules", "People"], rows, [16, 10, 13, 13, 11, 11, 9, 80, 60])
+
     # Gantt: one row per package then its modules, one column per week
     ws = wb.create_sheet("Gantt")
     weeks = []
@@ -713,7 +783,7 @@ RELEASE_CHECKLIST = [
     ("Every sprint", "Deploy", "Demo to the client from staging; record accepted and rejected items in OpenProject.", "Chinmay Parab"),
     ("Every sprint", "After", "Measured pace per person recorded; the plan workbook regenerated with the real pace.", "Chinmay Parab"),
     ("Block A go-live (20 Nov 2026)", "Before", "The client has signed off every Block A wireframe batch (3 working days each, audit R252).", "Client design reviewer"),
-    ("Block A go-live", "Before", "Payment sandbox credentials in place and a full sale-refund-settlement cycle passes (CLIENT-PAY-SANDBOX).", "Client, then Tanmay Dukhande"),
+    ("Block A go-live", "Before", "Payment sandbox credentials in place and a full sale-refund-settlement cycle passes (the client's answer in the Decisions Register).", "Client, then Tanmay Dukhande"),
     ("Block A go-live", "Before", "Offline: the POS sells and the scanner admits with the network cut, and reconcile when it returns.", "Pradnya Yeram"),
     ("Block A go-live", "Before", "Tax invoice, credit note and VAT fields checked against the client's answers (make-or-break items).", "Pranay Shinde"),
     ("Block A go-live", "Before", "Load test at the burst mix (ticket on-sale) and the venue-day mix; replicas as sized in handoff/sizing.json.", "Hrushikant Patkar"),
@@ -815,8 +885,25 @@ def write_md(plan, path):
                 w(f"  {mm} ({bb['block']}) :{tag}{bb['start']}, {bb['end']}")
     w("```")
     w("")
+    w("## 6. Build phases, end to end")
+    w("")
+    w("One order from 5 October to the end: plumbing, then the foundation everything reads, the sale path, the "
+      "per-module operations, engagement, and reporting last. Block A takes it from the tickets (each ticket's phase), "
+      "B1 to B3 from each module's phase. A screen is built against the mock server and connected as its services land.")
+    w("")
+    for side in ("back end", "front end"):
+        w(f"**{side.capitalize()}**")
+        w("")
+        w("| Phase | Starts | Ends | Hours (A / B) | Main modules | People |")
+        w("|---|---|---|---|---|---|")
+        for r in plan["phases"]:
+            if r["side"] != side:
+                continue
+            w(f"| {r['phase']} {r['name']} | {_d(r['start'])} | {_d(r['end'])} | {_pp(r['aHours'])} / {_pp(r['bHours'])} | "
+              f"{', '.join(r['modules'][:5])} | {', '.join(r['people'][:4])} |")
+        w("")
     mods = {m["module"]: m for m in plan["modules"]}
-    for n, p in enumerate(plan["packages"], 6):
+    for n, p in enumerate(plan["packages"], 7):
         w(f"## {n}. {p['package']}")
         w("")
         w(p["why"])
@@ -830,7 +917,7 @@ def write_md(plan, path):
             w(f"| {mm} | {m['requirements']} | {m['aScreens']} / {m['bScreens']} | {m['aOps']} / {m['bOps']} | {_pp(m['aHours'])} / {_pp(m['bHours'])} | "
               f"{m['sprints']} | {_d(m['end'])} | {m['lead']} | {', '.join(m['team'][:4])} |")
         w("")
-    n = 6 + len(plan["packages"])
+    n = 7 + len(plan["packages"])
     w(f"## {n}. The team")
     w("")
     w("| Name | Role | Block A points | Block A work ends | Last day of planned work |")

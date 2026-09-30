@@ -71,7 +71,7 @@ also appears in `ai.interaction` if they typed their own name into a prompt, in
 `marketing.message_delivery`, in the Qdrant payload of any indexed case, and in an export sitting
 on a signed URL.
 
-**ADR-0020 named the AI half. `removeIndexEntry` exists for the vector half.** The rest is
+**ADR-0020 (amended by ADR-0049: vectors live in a Qdrant collection per tenant) named the AI half. `removeIndexEntry` exists for the vector half.** The rest is
 `createDsarRequest` fanning out, and its state model is explicit that **`partiallyFailed` is not
 a synonym for completed** — under PDPL a cell that did not answer means the honest answer is no.
 

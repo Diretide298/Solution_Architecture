@@ -1,8 +1,24 @@
 # ADR-0033: Every asynchronous handoff has an outbox and a place to fail
 
-**Status:** Accepted
+**Status:** Accepted · amended by [ADR-0058](0058-one-relay-per-region-and-an-inbox-per-tenant-database.md), 30 September 2026: one relay per region with a loop per tenant database, and an inbox for every consumer. The broker is named by [ADR-0057](0057-events-travel-on-rabbitmq-or-kafka.md) (proposed: RabbitMQ or Kafka, the client's choice)
 **Date:** 31 August 2026
-**Related:** [ADR-0013](0013-local-first-point-of-sale.md) · [ADR-0032](0032-load-shedding-and-pooling.md) · CF-165
+**Related:** [ADR-0013](0013-local-first-point-of-sale.md) · [ADR-0032](0032-load-shedding-and-pooling.md) (pooling half amended by ADR-0038) · CF-165
+
+---
+
+## Amended 30 September 2026
+
+- **The relay.** "A relay process per cell" (Consequences) was written before a database per tenant
+  (ADR-0038, amended by ADR-0040). It is now **one relay per region**, in the `workers` deployable, with a
+  polling loop and a lease per tenant database (ADR-0058).
+- **The inbox.** Every consumer records the events it has handled in `kernel.inbox` (or `ai.inbox`) in the
+  same transaction as its effect. At-least-once delivery is made safe by that row, not by Redis.
+- **The broker.** "To the broker" is RabbitMQ or Kafka, behind the kernel's `IEventPublisher` and
+  `IEventSubscriber`; the cloud choice is the client's (ADR-0057, proposed). Local development and the
+  venue-local profile run RabbitMQ. Dead letters from either broker drain into `platform.dead_letter`.
+- **CDC.** The rejection under "Alternatives" is of CDC on business tables. CDC on the **outbox table**
+  publishes what happened, not what changed, so it is not rejected: it is ADR-0058's growth path past about
+  200 tenant databases per region.
 
 ---
 
@@ -78,7 +94,8 @@ for those two it never is.
 
 ## Consequences
 
-**A relay process per cell** — one more thing to deploy, monitor and reason about at 6 a.m.
+**A relay process per cell** — one more thing to deploy, monitor and reason about at 6 a.m. *No
+longer per cell: one relay per region, a loop per tenant database (amended by ADR-0058).*
 
 **Three failure tables somebody has to actually work.** A dead-letter table nobody reads is worse
 than no table, because it converts a visible outage into an invisible backlog. **The dashboard for

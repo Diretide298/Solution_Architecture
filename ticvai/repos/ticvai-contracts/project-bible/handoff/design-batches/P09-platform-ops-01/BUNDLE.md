@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 2 permissions apply here:
   `PLATFORM_CELL_MANAGE, PLATFORM_CELL_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -97,10 +96,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-318 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     }
    ]
   },
@@ -117,8 +113,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Consumer",
+       "operation": "listDeadLetters",
+       "notes": "Sends `?consumer=` to `listDeadLetters`.",
+       "provenance": "contract platform-ops.yaml GET /dead-letters"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Since",
+       "operation": "listDeadLetters",
+       "notes": "Sends `?since=` to `listDeadLetters`.",
+       "provenance": "contract platform-ops.yaml GET /dead-letters"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every dead letters",
+       "label": "Every dead letter",
        "bindsTo": "DeadLetter",
        "columns": [
         "DeadLetter.id",
@@ -143,7 +153,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected dead letters",
+       "label": "The selected dead letter",
        "bindsTo": "DeadLetter",
        "columns": [
         "DeadLetter.id",
@@ -168,30 +178,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Replay",
+       "label": "Replay dead letter",
        "operation": "replayDeadLetter",
        "provenance": "contract platform-ops.yaml POST /dead-letters/{deadLetterId}/replay"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listDeadLetters",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, and this table is written by the retry path while it is read. **Filtered by consumer and by age** - 47 consumers declare `retryThenDeadLetter` and all 47 are `isCritical`, so an unfiltered list is 47 different problems wearing one shape.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "replayDeadLetter",
-       "label": "Replay",
-       "notes": "**The act the screen exists for.** Replay is idempotent at the consumer; the screen still confirms, because a replay of a payment event is not a refresh.",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -200,9 +189,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The dead letters list.",
    "error": "Could not load. Names which read failed and leaves the dead letters untouched.",
-   "emptyFirstRun": "No dead letters yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the dead letters are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No dead letters yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on consumer, since and the dead letters are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listDeadLetters` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -334,6 +323,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
  "DeadLetter": {
+  "x-ticvai-append-only": "createdAt",
   "type": "object",
   "x-ticvai-persistence": "platform.dead_letter",
   "description": "ADR-0033. **An outbox row whose delivery failed after its retry budget.**\n\n**A financial posting is never dead-lettered** — `ledger.journal_entry` is append-only and a failed posting is an incident. **Nor is a DSAR**: `platform.dsar_request` carries a legal clock, and a dead-lettered erasure nobody works is a regulatory failure with a timestamp on it. Both halt and alert.",

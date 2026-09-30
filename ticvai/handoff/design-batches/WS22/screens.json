@@ -22,7 +22,6 @@
     "PTR-001"
    ],
    "exitTo": [
-    "PTR-001",
     "PTR-033",
     "PTR-034",
     "PTR-035",
@@ -37,15 +36,6 @@
    "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
    "transitions": [
     {
-     "to": "PTR-001",
-     "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId",
-      "sessionId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
-    },
-    {
      "to": "PTR-033",
      "trigger": "Works in Agreement & Contract Terms Builder",
      "provenance": "flow F131 step 1→2",
@@ -55,18 +45,6 @@
      "to": "PTR-034",
      "trigger": "Works in Partner Rate & Net Pricing Configuration",
      "provenance": "flow F131 step 3→4",
-     "operation": "listCommercialAgreement"
-    },
-    {
-     "to": "PTR-035",
-     "trigger": "Works in Commission, Margin & Incentive Management",
-     "provenance": "flow F131 step 5→6",
-     "operation": "listCommercialAgreement"
-    },
-    {
-     "to": "PTR-036",
-     "trigger": "Works in Credit Limit & Exposure Management",
-     "provenance": "flow F131 step 7→8",
      "operation": "listCommercialAgreement"
     },
     {
@@ -82,12 +60,6 @@
      "operation": "listCommercialAgreement"
     },
     {
-     "to": "PTR-039",
-     "trigger": "Works in Commercial Allocation, Quota & Commitment Management",
-     "provenance": "flow F131 step 13→14",
-     "operation": "listCommercialAgreement"
-    },
-    {
      "to": "PTR-040",
      "trigger": "Works in Booking Limits, Commercial Exceptions & Approval",
      "provenance": "flow F131 step 15→16",
@@ -98,14 +70,41 @@
      "trigger": "Works in Commercial Agreement 360°, Health & AI Review",
      "provenance": "flow F131 step 17→18",
      "operation": "listCommercialAgreement"
+    },
+    {
+     "to": "PTR-035",
+     "trigger": "Works in Commission, Margin & Incentive Management",
+     "provenance": "flow F131 step 5→6",
+     "operation": "listCommercialAgreement",
+     "carries": [
+      "agreementId"
+     ]
+    },
+    {
+     "to": "PTR-036",
+     "trigger": "Works in Credit Limit & Exposure Management",
+     "provenance": "flow F131 step 7→8",
+     "operation": "listCommercialAgreement",
+     "carries": [
+      "agreementId"
+     ]
+    },
+    {
+     "to": "PTR-039",
+     "trigger": "Works in Commercial Allocation, Quota & Commitment Management",
+     "provenance": "flow F131 step 13→14",
+     "operation": "listCommercialAgreement",
+     "carries": [
+      "agreementId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Commercial management can understand the status, exposure, expiry and major commercial terms of every partner agreement from one central workspace.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each agreement should show) — counts over a population, then the population",
   "purpose": "Provide commercial and finance teams with a centralized view of all partner agreements and their current commercial health.",
-  "purposeNote": "Commercial management can understand the status, exposure, expiry and major commercial terms of every partner agreement from one central workspace.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -147,73 +146,73 @@
        "kind": "metricTile",
        "label": "Active Agreements",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "CommercialAgreementCommandCenterView.activeAgreements"
+       "bindsTo": "CommercialAgreementCommandCenterSummary.activeAgreements"
       },
       {
        "kind": "metricTile",
        "label": "Draft Agreements",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "CommercialAgreementCommandCenterView.draftAgreements"
+       "bindsTo": "CommercialAgreementCommandCenterSummary.draftAgreements"
       },
       {
        "kind": "metricTile",
        "label": "Pending Approval",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "CommercialAgreementCommandCenterView.pendingApproval"
+       "bindsTo": "CommercialAgreementCommandCenterSummary.pendingApproval"
       },
       {
        "kind": "metricTile",
        "label": "Agreements Expiring Soon",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "CommercialAgreementCommandCenterView.agreementsExpiringSoon"
+       "bindsTo": "CommercialAgreementCommandCenterSummary.agreementsExpiringSoon"
       },
       {
        "kind": "metricTile",
        "label": "Expired Agreements",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "CommercialAgreementCommandCenterView.expiredAgreements"
+       "bindsTo": "CommercialAgreementCommandCenterSummary.expiredAgreements"
       },
       {
        "kind": "metricTile",
        "label": "Partners on Credit Hold",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "CommercialAgreementCommandCenterView.partnersOnCreditHold"
+       "bindsTo": "CommercialAgreementCommandCenterSummary.partnersOnCreditHold"
       },
       {
        "kind": "metricTile",
        "label": "Total Approved Credit",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "CommercialAgreementCommandCenterView.totalApprovedCredit"
+       "bindsTo": "CommercialAgreementCommandCenterSummary.totalApprovedCredit"
       },
       {
        "kind": "metricTile",
        "label": "Current Credit Exposure",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "CommercialAgreementCommandCenterView.currentCreditExposure"
+       "bindsTo": "CommercialAgreementCommandCenterSummary.currentCreditExposure"
       },
       {
        "kind": "metricTile",
        "label": "Outstanding Receivables",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "CommercialAgreementCommandCenterView.outstandingReceivables"
+       "bindsTo": "CommercialAgreementCommandCenterSummary.outstandingReceivables"
       },
       {
        "kind": "metricTile",
        "label": "Active Commercial Allocations",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "CommercialAgreementCommandCenterView.activeCommercialAllocations"
+       "bindsTo": "CommercialAgreementCommandCenterSummary.activeCommercialAllocations"
       },
       {
        "kind": "metricTile",
        "label": "Agreements With Exceptions",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "CommercialAgreementCommandCenterView.agreementsWithExceptions"
+       "bindsTo": "CommercialAgreementCommandCenterSummary.agreementsWithExceptions"
       },
       {
        "kind": "metricTile",
        "label": "Commercial Risk Alerts",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "CommercialAgreementCommandCenterView.commercialRiskAlerts"
+       "bindsTo": "CommercialAgreementCommandCenterSummary.commercialRiskAlerts"
       }
      ]
     },
@@ -230,11 +229,11 @@
         "CommercialAgreementCommandCenterView.agreementType",
         "CommercialAgreementCommandCenterView.brandVenue",
         "CommercialAgreementCommandCenterView.market",
-        "CommercialAgreementCommandCenterView.effectiveFrom",
-        "CommercialAgreementCommandCenterView.effectiveTo",
+        "CommercialAgreementCommandCenterView.validFrom",
+        "CommercialAgreementCommandCenterView.validTo",
         "CommercialAgreementCommandCenterView.pricingModel",
         "CommercialAgreementCommandCenterView.commissionModel",
-        "CommercialAgreementCommandCenterView.paymentTerms",
+        "CommercialAgreementCommandCenterView.creditTermDays",
         "CommercialAgreementCommandCenterView.creditLimit",
         "CommercialAgreementCommandCenterView.currentExposure",
         "CommercialAgreementCommandCenterView.allocationModel",
@@ -261,11 +260,11 @@
         "CommercialAgreementCommandCenterView.agreementType",
         "CommercialAgreementCommandCenterView.brandVenue",
         "CommercialAgreementCommandCenterView.market",
-        "CommercialAgreementCommandCenterView.effectiveFrom",
-        "CommercialAgreementCommandCenterView.effectiveTo",
+        "CommercialAgreementCommandCenterView.validFrom",
+        "CommercialAgreementCommandCenterView.validTo",
         "CommercialAgreementCommandCenterView.pricingModel",
         "CommercialAgreementCommandCenterView.commissionModel",
-        "CommercialAgreementCommandCenterView.paymentTerms",
+        "CommercialAgreementCommandCenterView.creditTermDays",
         "CommercialAgreementCommandCenterView.creditLimit",
         "CommercialAgreementCommandCenterView.currentExposure",
         "CommercialAgreementCommandCenterView.allocationModel",
@@ -292,12 +291,19 @@
     "contract": "subscription",
     "purpose": "Commercial Agreement Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCommercialAgreementHealth",
+    "contract": "subscription",
+    "purpose": "Commercial Agreement 360°, Health & AI Review",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-032"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-032",
+   "workshopBoard": "wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-032"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 23. 30 of 38 labels bound to a contract property; 38 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -361,14 +367,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "every governed partner relationship.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Configure/reference) and no display directory — it is settings, not a population",
   "purpose": "Create the structured commercial agreement governing the partner relationship.",
-  "purposeNote": "every governed partner relationship.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Renewal Approval. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Manual Renewal, Renewal Notice Period, Renewal Approval. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Support"
    }
   ],
@@ -517,6 +523,16 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Manual Renewal",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Renewal Notice Period",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Renewal Approval",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Support"
       }
@@ -535,18 +551,16 @@
     "operationId": "setAgreementContractTerm",
     "contract": "subscription",
     "purpose": "Agreement & Contract Terms Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setAgreementContractTerm"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-033"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-033",
+   "workshopBoard": "wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-033"
   },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 25. 0 of 0 labels bound to a contract property; 27 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 25. 0 of 0 labels bound to a contract property; 29 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -608,10 +622,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "the authoritative calculation service.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure by) and no display directory — it is settings, not a population",
   "purpose": "Define the commercial pricing basis available to a partner without recreating TICVAI's Pricing Engine.",
-  "purposeNote": "the authoritative calculation service.",
   "layout": {
    "template": "form",
    "regions": [
@@ -695,16 +709,14 @@
     "operationId": "setPartnerRateNet",
     "contract": "subscription",
     "purpose": "Partner Rate & Net Pricing Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setPartnerRateNet"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-034"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-034",
+   "workshopBoard": "wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-034"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 27. 0 of 0 labels bound to a contract property; 10 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -774,11 +786,6 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Campaign Incentive. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 29 §Support"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 29"
    },
@@ -799,6 +806,14 @@
        "kind": "primaryButton",
        "label": "Campaign Incentive",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 29 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save partner commission rules",
+       "operation": "setPartnerCommissionRules",
+       "permission": "PARTNER_MANAGE",
+       "notes": "The writer for PTR-035 (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml PUT /partner-agreements/{agreementId}/commission-rules"
       }
      ]
     },
@@ -828,14 +843,52 @@
     "contract": "subscription",
     "purpose": "Commission, Margin & Incentive Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPartnerCommissionRules",
+    "contract": "subscription",
+    "purpose": "Replace the commission and incentive rules of an agreement",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCommissionMarginIncentive"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-035"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-035",
+   "workshopBoard": "wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-035"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 29. 0 of 0 labels bound to a contract property; 1 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetPartnerCommissionRules",
+    "component": "modal",
+    "trigger": "Save partner commission rules",
+    "body": "**Collects what `setPartnerCommissionRules` sends before it is called.** Required: `rules`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save partner commission rules",
+     "operation": "setPartnerCommissionRules"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "rules"
+     ]
+    },
+    "provenance": "contract subscription.yaml PUT /partner-agreements/{agreementId}/commission-rules"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "agreementId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -897,10 +950,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "time visibility of available and utilized credit.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Control the financial exposure TICVAI permits for partners buying on account. This should be one of the strongest finance-control screens in the B2B module.",
-  "purposeNote": "time visibility of available and utilized credit.",
   "layout": {
    "template": "form",
    "regions": [
@@ -974,6 +1027,14 @@
        "label": "Permissions this screen separates",
        "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Increase Limit, Reduce Limit, Temporary Increase, Place Credit Hold, Release Hold, Block Credit Transactions. Each needs attaching to the control it gates, or the screen needs the control.",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Authorized users can"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save partner credit profile",
+       "operation": "setPartnerCreditProfile",
+       "permission": "CREDIT_MANAGE",
+       "notes": "The writer for PTR-036 (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml PUT /partner-agreements/{agreementId}/credit-profile"
       }
      ]
     }
@@ -991,23 +1052,75 @@
     "contract": "subscription",
     "purpose": "Credit Limit & Exposure Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPartnerCreditProfile",
+    "contract": "subscription",
+    "purpose": "Set the credit controls of an agreement",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCreditLimitExposure"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "CreditLimitExposureManagementView.approvedCreditLimitAed500000",
     "Open Invoices: AED 210,000",
-    "CreditLimitExposureManagementView.unbilledTransactionsAed95000",
-    "CreditLimitExposureManagementView.activeHoldsReservationsAed40000",
-    "CreditLimitExposureManagementView.availableCreditAed155000"
+    "CreditLimitExposureManagementView.unbilledTransactions",
+    "CreditLimitExposureManagementView.activeHoldsReservations",
+    "CreditLimitExposureManagementView.availableCredit"
+   ],
+   "params": [
+    {
+     "name": "agreementId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-036"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-036",
+   "workshopBoard": "wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-036"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 30. 0 of 0 labels bound to a contract property; 22 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetPartnerCreditProfile",
+    "component": "modal",
+    "trigger": "Save partner credit profile",
+    "body": "**Collects what `setPartnerCreditProfile` sends before it is called.** Required: `id`, `partnerId`, `agreementId`, `creditEnabled`, `creditStatus`. Optional: `temporaryCreditLimit`, `temporaryLimitUntil`, `creditOwnerPrincipalId`, `approvalAuthority`, `riskClassification`, `warningThresholdPercent`, `highRiskThresholdPercent`, `blockThresholdPercent`, `effectiveFrom`, `effectiveTo`, `approvalRequestId`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PartnerCreditProfile",
+    "confirm": {
+     "label": "Save partner credit profile",
+     "operation": "setPartnerCreditProfile"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "partnerId",
+      "agreementId",
+      "creditEnabled",
+      "creditStatus",
+      "temporaryCreditLimit",
+      "temporaryLimitUntil",
+      "creditOwnerPrincipalId",
+      "approvalAuthority",
+      "riskClassification",
+      "warningThresholdPercent",
+      "highRiskThresholdPercent",
+      "blockThresholdPercent",
+      "effectiveFrom",
+      "effectiveTo",
+      "approvalRequestId",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract subscription.yaml PUT /partner-agreements/{agreementId}/credit-profile"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1069,17 +1182,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Finance can track all financial securities supporting partner exposure and automatically enforce configured controls when security becomes insufficient or expires.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Manage financial security required to support partner credit or commercial access.",
-  "purposeNote": "Finance can track all financial securities supporting partner exposure and automatically enforce configured controls when security becomes insufficient or expires.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Security Deposit. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Support"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1091,9 +1197,9 @@
        "kind": "dataTable",
        "label": "Every deposit guarantee financial",
        "columns": [
-        "DepositGuaranteeFinancialSecurityManagementView.creditExposureAed500000",
-        "DepositGuaranteeFinancialSecurityManagementView.guaranteeAed300000",
-        "DepositGuaranteeFinancialSecurityManagementView.unsecuredExposureAed200000"
+        "DepositGuaranteeFinancialSecurityManagementView.creditExposure",
+        "DepositGuaranteeFinancialSecurityManagementView.securityCoverage",
+        "DepositGuaranteeFinancialSecurityManagementView.unsecuredExposure"
        ],
        "bindsTo": "DepositGuaranteeFinancialSecurityManagementView",
        "operation": "listDepositGuaranteeFinancial",
@@ -1110,9 +1216,9 @@
        "label": "The selected deposit guarantee financial",
        "bindsTo": "DepositGuaranteeFinancialSecurityManagementView",
        "columns": [
-        "DepositGuaranteeFinancialSecurityManagementView.creditExposureAed500000",
-        "DepositGuaranteeFinancialSecurityManagementView.guaranteeAed300000",
-        "DepositGuaranteeFinancialSecurityManagementView.unsecuredExposureAed200000"
+        "DepositGuaranteeFinancialSecurityManagementView.creditExposure",
+        "DepositGuaranteeFinancialSecurityManagementView.securityCoverage",
+        "DepositGuaranteeFinancialSecurityManagementView.unsecuredExposure"
        ],
        "notes": null,
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Display"
@@ -1125,8 +1231,31 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Cash Deposit",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Security Deposit",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Prepayment Balance",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Other Approved Security",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save partner security",
+       "operation": "setPartnerSecurity",
+       "permission": "CREDIT_MANAGE",
+       "notes": "The writer for PTR-037 (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml PUT /partners/{partnerId}/securities"
       }
      ]
     }
@@ -1145,21 +1274,70 @@
     "contract": "subscription",
     "purpose": "Deposit, Guarantee & Financial Security Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPartnerSecurity",
+    "contract": "subscription",
+    "purpose": "Record, amend, verify or reject a partner's deposit or guarantee",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDepositGuaranteeFinancial"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "DepositGuaranteeFinancialSecurityManagementView.creditExposureAed500000",
-    "DepositGuaranteeFinancialSecurityManagementView.guaranteeAed300000",
-    "DepositGuaranteeFinancialSecurityManagementView.unsecuredExposureAed200000"
+    "DepositGuaranteeFinancialSecurityManagementView.creditExposure",
+    "DepositGuaranteeFinancialSecurityManagementView.securityCoverage",
+    "DepositGuaranteeFinancialSecurityManagementView.unsecuredExposure"
+   ],
+   "params": [
+    {
+     "name": "partnerId",
+     "from": "session"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-037"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-037",
+   "workshopBoard": "wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-037"
   },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 32. 3 of 3 labels bound to a contract property; 21 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 32. 3 of 3 labels bound to a contract property; 24 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetPartnerSecurity",
+    "component": "modal",
+    "trigger": "Save partner security",
+    "body": "**Collects what `setPartnerSecurity` sends before it is called.** Required: `id`, `partnerId`, `securityType`, `amount`, `currency`, `effectiveDate`, `verificationStatus`. Optional: `agreementId`, `issuingInstitution`, `reference`, `expiryDate`, `documentId`, `expiryAction`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PartnerSecurity",
+    "confirm": {
+     "label": "Save partner security",
+     "operation": "setPartnerSecurity"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "partnerId",
+      "securityType",
+      "amount",
+      "currency",
+      "effectiveDate",
+      "verificationStatus",
+      "agreementId",
+      "issuingInstitution",
+      "reference",
+      "expiryDate",
+      "documentId",
+      "expiryAction",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract subscription.yaml PUT /partners/{partnerId}/securities"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1221,10 +1399,17 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every partner transaction can be routed to the correct approved payment and billing model based on its commercial agreement.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Define how the partner pays TICVAI and how transactions are financially grouped.",
-  "purposeNote": "Every partner transaction can be routed to the correct approved payment and billing model based on its commercial agreement.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Immediate Payment, Credit Account, Deposit Balance, Bank Transfer, Card, Prepaid Balance, Other approved method. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Support"
+   }
+  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1278,7 +1463,42 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Immediate Payment",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Credit Account",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Deposit Balance",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Bank Transfer",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Card",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Payment Link",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Prepaid Balance",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Other approved method",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference"
       }
      ]
@@ -1297,10 +1517,7 @@
     "operationId": "setPaymentTermBilling",
     "contract": "subscription",
     "purpose": "Payment Terms, Billing & Account Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setPaymentTermBilling"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1316,9 +1533,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-038"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-038",
+   "workshopBoard": "wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-038"
   },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 33. 7 of 7 labels bound to a contract property; 17 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 33. 7 of 7 labels bound to a contract property; 24 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1380,17 +1598,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "permitted availability with central capacity management.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Define the commercial commitment of inventory to a partner. This differs from Area 4's operational channel allocation.",
-  "purposeNote": "permitted availability with central capacity management.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Guaranteed Allocation, On-Request Allocation, Shared Allocation, Percentage Allocation, Rolling Allocation, Seasonal Allocation. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1459,6 +1670,11 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Fixed Quantity",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Percentage Allocation",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support"
       },
@@ -1471,6 +1687,19 @@
        "kind": "secondaryButton",
        "label": "Seasonal Allocation",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Take-or-pay where commercially applicable",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save partner allocations",
+       "operation": "setPartnerAllocations",
+       "permission": "PARTNER_MANAGE",
+       "notes": "The writer for PTR-039 (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml PUT /partner-agreements/{agreementId}/allocations"
       }
      ]
     }
@@ -1489,6 +1718,15 @@
     "contract": "subscription",
     "purpose": "Commercial Allocation, Quota & Commitment Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPartnerAllocations",
+    "contract": "subscription",
+    "purpose": "Replace the allocations of an agreement",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCommercialAllocationQuota"
+    ]
    }
   ],
   "entryState": {
@@ -1499,14 +1737,41 @@
     "CommercialAllocationQuotaCommitmentManagementView.returned",
     "CommercialAllocationQuotaCommitmentManagementView.remaining",
     "CommercialAllocationQuotaCommitmentManagementView.utilization"
+   ],
+   "params": [
+    {
+     "name": "agreementId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-039"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-039",
+   "workshopBoard": "wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-039"
   },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 35. 7 of 7 labels bound to a contract property; 25 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 35. 7 of 7 labels bound to a contract property; 27 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetPartnerAllocations",
+    "component": "modal",
+    "trigger": "Save partner allocations",
+    "body": "**Collects what `setPartnerAllocations` sends before it is called.** Required: `allocations`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save partner allocations",
+     "operation": "setPartnerAllocations"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "allocations"
+     ]
+    },
+    "provenance": "contract subscription.yaml PUT /partner-agreements/{agreementId}/allocations"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1568,14 +1833,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Transactions outside standard partner commercial rules cannot proceed without the appropriate documented exception and approval.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Capture) and no display directory — it is settings, not a population",
   "purpose": "Control transaction limits and provide a governed mechanism for commercial exceptions.",
-  "purposeNote": "Transactions outside standard partner commercial rules cannot proceed without the appropriate documented exception and approval.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Price Exception, Allocation Exception. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Price Exception, Credit Exception, Allocation Exception. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Support"
    }
   ],
@@ -1689,6 +1954,11 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Credit Exception",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Allocation Exception",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Support"
       },
@@ -1712,18 +1982,16 @@
     "operationId": "approveBookingLimitCommercial",
     "contract": "subscription",
     "purpose": "Booking Limits, Commercial Exceptions & Approval",
-    "trigger": "onAction",
-    "invalidates": [
-     "approveBookingLimitCommercial"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-040"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-040",
+   "workshopBoard": "wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-040"
   },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 37. 0 of 0 labels bound to a contract property; 21 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 37. 0 of 0 labels bound to a contract property; 22 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1777,10 +2045,10 @@
    "notes": "**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Management can evaluate the complete commercial relationship, financial exposure, performance and upcoming risks from a single Partner Commercial 360 workspace. Board 2 — Final Screen Register Screen Backend Screen Primary Responsibility",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Give management a single consolidated view of the complete commercial relationship with a partner. Board 3 manages the day-to-day operational and financial relationship with active B2B, reseller and OTA partners. The three boards now form a clean lifecycle: Board 1 — Who is the partner? Onboarding → Organization → Users → Territory → Compliance → Permissions → Activation Board 2 — Under what commercial terms can they transact? Agreement → Rates → Commission → Credit → Security → Billing → Allocation → Limits Board 3 — What happens once the partner starts doing business? Orders → Reservations → Cancellations → Statements → Reconciliation → Commission Settlement → Disputes → Performance → Risk → AI Optimization A key principle for Board 3 is that it should provide a Partner Operations 360° without rebuilding functionality already owned by Orders, Finance, Ticketing, Payment or Channel Management.",
-  "purposeNote": "Management can evaluate the complete commercial relationship, financial exposure, performance and upcoming risks from a single Partner Commercial 360 workspace. Board 2 — Final Screen Register Screen Backend Screen Primary Responsibility",
   "gaps": [
    {
     "operation": null,
@@ -1839,7 +2107,6 @@
   "entryState": {
    "preloaded": [
     "CommercialAgreement360HealthAiReviewView.contractStatus",
-    "CommercialAgreement360HealthAiReviewView.effectiveDates",
     "CommercialAgreement360HealthAiReviewView.renewal",
     "CommercialAgreement360HealthAiReviewView.rateModel",
     "CommercialAgreement360HealthAiReviewView.averageDiscount"
@@ -1848,7 +2115,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-041"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-041",
+   "workshopBoard": "wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-041"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 38. 0 of 0 labels bound to a contract property; 6 of 109 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

@@ -1,6 +1,6 @@
 # P08-stock-supply-02 — P08 · Stock & Supply (2 of 2)
 
-**6 screens · 18 operations · 19 schemas · 7 permissions**
+**6 screens · 19 operations · 28 schemas · 8 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 7 permissions apply here:
-  `ORDER_MODIFY, PROCUREMENT_REQUEST, PROCUREMENT_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE, TENANT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 8 permissions apply here:
+  `AI_USE, ORDER_MODIFY, PROCUREMENT_REQUEST, PROCUREMENT_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE, TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -62,7 +62,7 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `BO-105` | Stock & Supply | listDetail | 5 | 1 | — |
 | `BO-137` | Recipe Consumption & Theoretical Inventory | listDetail | 4 | 0 | — |
-| `BO-138` | Production Execution & Batch Management | listDetail | 3 | 2 | — |
-| `BO-139` | Wastage, Spoilage, Returns & Write-Off | configEditor | 1 | 0 | — |
+| `BO-138` | Production Execution & Batch Management | listDetail | 4 | 2 | — |
+| `BO-139` | Wastage, Spoilage, Returns & Write-Off | configEditor | 2 | 0 | — |
 | `BO-140` | Product Availability, 86 & Operational Food Safety | listDetail | 3 | 1 | — |
 | `BO-141` | Operational Alerts, AI Replenishment & Action Center | listDetail | 3 | 2 | — |

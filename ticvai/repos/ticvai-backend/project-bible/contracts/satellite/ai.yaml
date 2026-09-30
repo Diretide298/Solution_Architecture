@@ -9430,6 +9430,33 @@ components:
       description: Cell-to-cell, as `../shared/common.yaml` `serviceAuth`. Used by `evaluateAiGovernance`,
         `scoreTransactionRisk` and `simulateRecommendationDecision`.
   schemas:
+    AiInboxEntry:
+      type: object
+      x-ticvai-persistence: ai.inbox
+      x-ticvai-primary-key:
+      - consumer
+      - eventId
+      x-ticvai-append-only: eventId
+      description: '**The consumer''s record of every event it has processed** (ADR-0058). Inserted in the same
+        transaction as the effect, with `ON CONFLICT DO NOTHING`; no row inserted means already processed, so skip
+        and acknowledge. AI consumers write this rather than `kernel.inbox`, because only AI writes AI tables (ADR-0020). Kept 30 days, longer than any redelivery window, and dropped a month at a
+        time: partitioned by month on `eventId`, which is a UUIDv7 and so sorts by time (ADR-0056).'
+      required:
+      - consumer
+      - eventId
+      - processedAt
+      properties:
+        consumer:
+          type: string
+          maxLength: 200
+          description: The consumer's stable name (`<service>.<handler>`); one event is processed once per consumer.
+        eventId:
+          type: string
+          format: uuid
+          description: The envelope's `eventId`, which is the producing outbox row's id (UUIDv7).
+        processedAt:
+          type: string
+          format: date-time
     AiMaturity:
       type: object
       x-ticvai-persistence: none — embedded as jsonb on ai.suggestion and ai.forecast_version
@@ -11497,14 +11524,26 @@ components:
     AiChunkEmbedding:
       type: object
       x-ticvai-persistence: ai.chunk_embedding
-      description: '**Vectors live in the tenant database** (design 5.8, ADR-0049): pgvector, dense `halfvec(1024)`
-        and learned sparse `sparsevec` from BGE-M3 in one pass, one table per embedding model. **Scoped through
-        its document** (`platform.apply_parent_rls`), so retrieval inherits venue scope from RLS. Replaces the Qdrant
-        point map `ai.chunk_ref`, which is retired with Qdrant.'
+      x-ticvai-retired-columns:
+      - dense
+      - sparse
+      description: '**The tenant database''s record of one chunk''s point in Qdrant** (decided 30 September:
+        vectors go to Qdrant from day one). The vectors themselves live in the tenant''s own Qdrant collection,
+        one per embedding model behind the alias `tenant_<tenantId>`, reached with a JWT scoped to that
+        collection; venue scope is a payload filter the retrieval client always adds. **This row is how erasure
+        and a re-embed are tracked where the rest of the tenant''s data is**: which point, in which collection,
+        from which model and which content, indexed when. It holds no vector. **Scoped through its document**
+        (`platform.apply_parent_rls`).
+
+        **It absorbed `ai.chunk_ref`** (30 September). That older table mapped a Qdrant point back to its
+        document and scope, which is this row''s job; its only columns, a key and `document_id`, are here
+        already. One table answers which points a document has, so erasure checks against one list.'
       required:
       - documentId
       - chunkIndex
       - embeddingModel
+      - collectionAlias
+      - pointId
       properties:
         id:
           type: string
@@ -11521,25 +11560,35 @@ components:
           type: string
           format: uuid
           nullable: true
-          description: The parent section, where the source uses `parentChild` chunking.
+          x-ticvai-references: ai.chunk_embedding
+          description: The parent section's own row, where the source uses `parentChild` chunking.
         content:
           type: string
           description: The chunk text. Kept so an answer can cite it.
         embeddingModel:
           type: string
-        dense:
+          description: The model that produced the point; a model change re-embeds into a new collection.
+        collectionAlias:
           type: string
+          maxLength: 200
           readOnly: true
-          description: Dense vector, `halfvec(1024)` in the DDL. Never returned by an operation.
-        sparse:
-          type: object
-          additionalProperties: true
+          description: 'The Qdrant collection alias the point is in: `tenant_<tenantId>` for the current model.'
+        pointId:
+          type: string
+          format: uuid
           readOnly: true
-          description: Learned sparse weights, `sparsevec` in the DDL. Never returned by an operation.
+          description: The Qdrant point id. Deleting the chunk deletes this point; erasure reads it from here.
         tokenCount:
           type: integer
         contentHash:
           type: string
+          description: Hash of `content`; a chunk whose hash is unchanged is not re-embedded.
+        indexedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the point was last written to Qdrant; null until it has been.
         createdAt:
           type: string
           format: date-time

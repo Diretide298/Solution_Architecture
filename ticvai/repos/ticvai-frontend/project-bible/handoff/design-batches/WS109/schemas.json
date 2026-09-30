@@ -167,6 +167,17 @@
     "type": "string",
     "nullable": true
    },
+   "email": {
+    "type": "string",
+    "format": "email",
+    "nullable": true,
+    "description": "12.1.16. The holder's own address — where a mobile credential and renewal notices go"
+   },
+   "phone": {
+    "type": "string",
+    "nullable": true,
+    "description": "12.1.16. E.164"
+   },
    "identityDocumentVerified": {
     "type": "boolean",
     "default": false
@@ -290,6 +301,25 @@
    },
    "scopePath": {
     "type": "string"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
    }
   }
  }

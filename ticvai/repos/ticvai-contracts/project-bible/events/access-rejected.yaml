@@ -10,8 +10,8 @@ emittedWhen: validateAccess returns outcome denied, or syncScans accepts a repla
   denied at the gate or that the server downgraded from admitted to denied
 payload:
 - field: scanId
-  type: string
-  notes: ULID. The idempotency key for every consumer, and the key `access.validated` uses
+  type: uuid
+  notes: UUIDv7. The idempotency key for every consumer, and the key `access.validated` uses
 - field: credentialRef
   type: string
   required: false

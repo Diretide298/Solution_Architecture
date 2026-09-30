@@ -2,6 +2,7 @@ id: LLD-MarketingService
 title: MarketingService — 264 operations, 130 tables
 generatedBy: tools/derive-diagrams.py
 tier: engagement
+deployable: operations
 index: diagrams/hld/02-services.yaml
 why: '**264 operations and 130 tables — the biggest thing in the package, and probably two services
   eventually.** CRM and campaigns have different write patterns: a guest profile is read constantly

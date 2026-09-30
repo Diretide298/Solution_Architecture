@@ -8,7 +8,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "UpgradeExecutionCredentialRegenerationChannelControlInput",
   "responds": "UpgradeExecutionCredentialRegenerationChannelControlView"
  },
@@ -21,7 +27,53 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "order",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "reservation",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "group",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "performance",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ticketType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "seatSection",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerSegment",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "BulkGroupAssistedUpgradeOperationsView"
  },
@@ -34,7 +86,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "PersonTypeProductEntitlementConversionRulesView"
  },
@@ -48,6 +106,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "event",
     "in": "query",
@@ -72,6 +135,21 @@
     "name": "effectiveDate",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "transactionType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -86,7 +164,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "UpgradeEligibilityQualificationRulesView"
  },
@@ -100,6 +184,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "ticket",
     "in": "query",
@@ -124,6 +213,31 @@
     "name": "exception",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "order",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customer",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "agent",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "transactionType",
+    "in": "query",
+    "required": false
    }
   ],
   "requestBody": null,
@@ -138,7 +252,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "UpgradeFinancialTreatmentPriceDifferenceRulesView"
  },
@@ -151,7 +271,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "UpgradeTimingUsageTicketStatusRulesView"
  },
@@ -164,7 +290,18 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ProRataResidualValueEntitlementCreditConfigurationInput",
   "responds": "ProRataResidualValueEntitlementCreditConfigurationView"
  },
@@ -177,7 +314,18 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "UpgradeConversionPathBuilderInput",
   "responds": "UpgradeConversionPathBuilderView"
  }

@@ -4078,7 +4078,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "array",
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     }
    },
    "supplierName": {
@@ -4234,10 +4234,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderLineId": {
     "type": "string",
+    "format": "uuid",
     "nullable": true
    },
    "description": {

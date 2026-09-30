@@ -71,7 +71,7 @@
  },
  "getRelease": {
   "method": "GET",
-  "path": "/releases/{reinventoryHoldId}",
+  "path": "/releases/{releaseId}",
   "contract": "platform-ops",
   "summary": "Read a release with its rollout state",
   "permission": "PLATFORM_RELEASE_VIEW",
@@ -84,7 +84,7 @@
  },
  "getReleaseReadiness": {
   "method": "GET",
-  "path": "/releases/{reinventoryHoldId}/readiness",
+  "path": "/releases/{releaseId}/readiness",
   "contract": "platform-ops",
   "summary": "Whether a release can be promoted, and what blocks it",
   "permission": "PLATFORM_RELEASE_VIEW",
@@ -236,7 +236,7 @@
  },
  "promoteRelease": {
   "method": "POST",
-  "path": "/releases/{reinventoryHoldId}/promote",
+  "path": "/releases/{releaseId}/promote",
   "contract": "platform-ops",
   "summary": "Promote a release to the next environment",
   "permission": "PLATFORM_RELEASE_PROMOTE",
@@ -293,7 +293,7 @@
  },
  "rejectRelease": {
   "method": "POST",
-  "path": "/releases/{reinventoryHoldId}/reject",
+  "path": "/releases/{releaseId}/reject",
   "contract": "platform-ops",
   "summary": "Reject a release back a stage",
   "permission": "PLATFORM_RELEASE_PROMOTE",
@@ -350,7 +350,7 @@
  },
  "withdrawRelease": {
   "method": "POST",
-  "path": "/releases/{reinventoryHoldId}/withdraw",
+  "path": "/releases/{releaseId}/withdraw",
   "contract": "platform-ops",
   "summary": "Withdraw a release",
   "permission": "PLATFORM_RELEASE_MANAGE",

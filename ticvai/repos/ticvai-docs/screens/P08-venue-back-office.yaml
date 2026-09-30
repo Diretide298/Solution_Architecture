@@ -2853,7 +2853,8 @@ screens:
         notes: The venue's booking flows from CMS-103 (`white-label.listBookingFlows`). Empty means the
           category's flow, then the venue's flow for the product kind (W8, W12). Saved with `createProduct`
           or `updateProduct`.
-        provenance: decided 29 September, W12; agreed name white-label listBookingFlows (P29 brief)
+        provenance: decided 29 September, W12; agreed name white-label listBookingFlows (the 29 September
+          pass brief)
   states:
     loading: The product list.
     error: Could not load. Names which read failed and leaves the product untouched.
@@ -2869,7 +2870,7 @@ screens:
     contract: white-label
     purpose: The booking flows a product can be sold through (W12)
     trigger: onAction
-    provenance: decided 29 September, W12 (P29)
+    provenance: decided 29 September, W12 (the 29 September pass)
   - operationId: listProducts
     contract: catalogue
     purpose: List products
@@ -3279,7 +3280,8 @@ screens:
           CMS-103, e.g. *workshop: product first, then date and time*. Empty means the category''s flow,
           then the venue''s flow for the product kind; the screen shows which one applies. Saved with
           `updateProduct`.'
-        provenance: decided 29 September, W12; agreed name white-label listBookingFlows (P29 brief)
+        provenance: decided 29 September, W12; agreed name white-label listBookingFlows (the 29 September
+          pass brief)
       - kind: textField
         label: Sales phone
         bindsTo: Product.salesContact.phone
@@ -3314,7 +3316,7 @@ screens:
     contract: white-label
     purpose: The booking flows a product can be sold through (W12)
     trigger: onAction
-    provenance: decided 29 September, W12 (P29)
+    provenance: decided 29 September, W12 (the 29 September pass)
   - operationId: getProduct
     contract: catalogue
     purpose: Read a product
@@ -4679,7 +4681,7 @@ screens:
     contract: fnb
     purpose: The menu item an F&B bundle component entitles the guest to (MOB-4)
     trigger: onAction
-    provenance: decided 29 September, MOB-4 (P29)
+    provenance: decided 29 September, MOB-4 (the 29 September pass)
   - operationId: getGroupPackageDefinition
     contract: catalogue
     purpose: A school-trip format or party package
@@ -22542,24 +22544,24 @@ screens:
     contract: maintenance
     purpose: Technicians ranked by skill, shift and load (M17-13)
     trigger: onAction
-    provenance: decided 17 September, M17-13 (P29)
+    provenance: decided 17 September, M17-13 (the 29 September pass)
   - operationId: listVendorServiceRequests
     contract: maintenance
     purpose: Outside vendors on this work order (M17-13)
     trigger: onAction
-    provenance: decided 17 September, M17-13 (P29)
+    provenance: decided 17 September, M17-13 (the 29 September pass)
   - operationId: createVendorServiceRequest
     contract: maintenance
     purpose: Engage an outside vendor (M17-13)
     trigger: onAction
-    provenance: decided 17 September, M17-13 (P29)
+    provenance: decided 17 September, M17-13 (the 29 September pass)
     invalidates:
     - listVendorServiceRequests
   - operationId: updateVendorServiceRequest
     contract: maintenance
     purpose: Move a vendor request along (M17-13)
     trigger: onAction
-    provenance: decided 17 September, M17-13 (P29)
+    provenance: decided 17 September, M17-13 (the 29 September pass)
     invalidates:
     - listVendorServiceRequests
   - operationId: listWorkOrders
@@ -28216,13 +28218,13 @@ screens:
         operation: setVenuePoint
         notes: '**What the guest reads on Item Detail** (decided 29 September, MOB-4): rides, shows, restaurants
           and shops. Per language.'
-        provenance: agreed name venue-map VenuePoint.description (P29 brief)
+        provenance: agreed name venue-map VenuePoint.description (the 29 September pass brief)
       - kind: multiSelect
         label: Photos and video
         bindsTo: VenuePoint.media
         operation: searchMedia
         notes: From the asset library; the first is the gallery cover on GST-004 Item Detail (MOB-4).
-        provenance: agreed name venue-map VenuePoint.media (P29 brief)
+        provenance: agreed name venue-map VenuePoint.media (the 29 September pass brief)
       - kind: selectField
         label: Featured offer
         bindsTo: VenuePoint.featuredOffer
@@ -28230,26 +28232,26 @@ screens:
         notes: '**The product or bundle the item detail proposes** (decided 29 September, MOB-4), on any
           kind of point, e.g. a restaurant''s *meal combo with admission* (a bundle from BO-011). Products
           from `listProducts`, bundles from `listCatalogueBundles`.'
-        provenance: agreed name venue-map VenuePoint.featuredOffer (P29 brief)
+        provenance: agreed name venue-map VenuePoint.featuredOffer (the 29 September pass brief)
       - kind: numberField
         label: Typical visit (minutes)
         bindsTo: VenuePoint.typicalDurationMinutes
         operation: setVenuePoint
         notes: What the Plan tab's planner allows for this stop (MOB-6).
-        provenance: agreed name venue-map VenuePoint.typicalDurationMinutes (P29 brief)
+        provenance: agreed name venue-map VenuePoint.typicalDurationMinutes (the 29 September pass brief)
       - kind: multiSelect
         label: Interests
         bindsTo: VenuePoint.interestTags
         operation: setVenuePoint
         notes: Matched against the guest's interests on the Plan tab (MOB-6).
-        provenance: agreed name venue-map VenuePoint.interestTags (P29 brief)
+        provenance: agreed name venue-map VenuePoint.interestTags (the 29 September pass brief)
       - kind: multiSelect
         label: Cuisine
         bindsTo: VenuePoint.cuisineTags
         operation: setVenuePoint
         notes: For restaurants and kiosks; matched against the guest's cuisine choice on the Plan tab
           (MOB-6).
-        provenance: agreed name venue-map VenuePoint.cuisineTags (P29 brief)
+        provenance: agreed name venue-map VenuePoint.cuisineTags (the 29 September pass brief)
   states:
     loading: The map editor publish, read by `getVenueMap`.
     error: Could not load. Names which read failed and leaves the map editor publish untouched.
@@ -28263,17 +28265,17 @@ screens:
     contract: assets
     purpose: Pick an item's photos and video (MOB-4)
     trigger: onAction
-    provenance: decided 29 September, MOB-4 (P29)
+    provenance: decided 29 September, MOB-4 (the 29 September pass)
   - operationId: listProducts
     contract: catalogue
     purpose: Products a point can feature (MOB-4)
     trigger: onAction
-    provenance: decided 29 September, MOB-4 (P29)
+    provenance: decided 29 September, MOB-4 (the 29 September pass)
   - operationId: listCatalogueBundles
     contract: catalogue
     purpose: Bundles a point can feature, e.g. a meal combo (MOB-4)
     trigger: onAction
-    provenance: decided 29 September, MOB-4 (P29)
+    provenance: decided 29 September, MOB-4 (the 29 September pass)
   - operationId: getVenueMap
     contract: venue-map
     purpose: The draft
@@ -33000,7 +33002,8 @@ screens:
         operation: listBookingFlows
         notes: '**Every product filed here that names no flow of its own is sold through this one** (decided
           29 September, W12). Empty means the venue''s flow for each product''s kind. Saved with `setProductCategories`.'
-        provenance: decided 29 September, W12; agreed name white-label listBookingFlows (P29 brief)
+        provenance: decided 29 September, W12; agreed name white-label listBookingFlows (the 29 September
+          pass brief)
   states:
     loading: The category brand merchandise list.
     error: Could not load. Names which read failed and leaves the category brand merchandise untouched.
@@ -33015,7 +33018,7 @@ screens:
     contract: white-label
     purpose: The booking flows a category can default to (W12)
     trigger: onAction
-    provenance: decided 29 September, W12 (P29)
+    provenance: decided 29 September, W12 (the 29 September pass)
   - operationId: listProductCategories
     contract: catalogue
     purpose: listProductCategories
@@ -88126,36 +88129,36 @@ screens:
     contract: maintenance
     purpose: The venue's priority weights and bands (M17-01)
     trigger: onAction
-    provenance: decided 17 September, M17-01 (P29)
+    provenance: decided 17 September, M17-01 (the 29 September pass)
   - operationId: setWorkOrderPriorityPolicy
     contract: maintenance
     purpose: Change the priority weights and bands (M17-01)
     trigger: onAction
-    provenance: decided 17 September, M17-01 (P29)
+    provenance: decided 17 September, M17-01 (the 29 September pass)
     invalidates:
     - getWorkOrderPriorityPolicy
   - operationId: suggestWorkOrderAssignee
     contract: maintenance
     purpose: Technicians ranked by skill, shift and load (M17-13)
     trigger: onAction
-    provenance: decided 17 September, M17-13 (P29)
+    provenance: decided 17 September, M17-13 (the 29 September pass)
   - operationId: listVendorServiceRequests
     contract: maintenance
     purpose: Outside vendors on this work order (M17-13)
     trigger: onAction
-    provenance: decided 17 September, M17-13 (P29)
+    provenance: decided 17 September, M17-13 (the 29 September pass)
   - operationId: createVendorServiceRequest
     contract: maintenance
     purpose: Engage an outside vendor (M17-13)
     trigger: onAction
-    provenance: decided 17 September, M17-13 (P29)
+    provenance: decided 17 September, M17-13 (the 29 September pass)
     invalidates:
     - listVendorServiceRequests
   - operationId: updateVendorServiceRequest
     contract: maintenance
     purpose: Move a vendor request along (M17-13)
     trigger: onAction
-    provenance: decided 17 September, M17-13 (P29)
+    provenance: decided 17 September, M17-13 (the 29 September pass)
     invalidates:
     - listVendorServiceRequests
   - operationId: listWorkOrders
@@ -88396,19 +88399,19 @@ screens:
     contract: inventory
     purpose: Parts reserved for the work order (M17-02)
     trigger: onAction
-    provenance: decided 17 September, M17-02 (P29)
+    provenance: decided 17 September, M17-02 (the 29 September pass)
   - operationId: createStockReservation
     contract: inventory
     purpose: Reserve parts for the work order (M17-02)
     trigger: onAction
-    provenance: decided 17 September, M17-02 (P29)
+    provenance: decided 17 September, M17-02 (the 29 September pass)
     invalidates:
     - listStockReservations
   - operationId: releaseStockReservation
     contract: inventory
     purpose: Give reserved parts back (M17-02)
     trigger: onAction
-    provenance: decided 17 September, M17-02 (P29)
+    provenance: decided 17 September, M17-02 (the 29 September pass)
     invalidates:
     - listStockReservations
   - operationId: recordWorkOrderParts
@@ -113117,7 +113120,7 @@ screens:
   requiresModule: marketing
   wave: 3
   notes: '**Merged into P13 CMS-001 Tenant Workspace and CMS-102 Site Builder** (decided 24 September,
-    M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds the overview
+    M24-03; applied 29 September). This screen duplicates the white-label CMS, which builds the overview
     of what is set up and what is left; the minute says to consolidate rather than build both. **One implementation,
     both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and
     nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies
@@ -113331,11 +113334,11 @@ screens:
   requiresModule: marketing
   wave: 3
   notes: '**Merged into P13 CMS-002 Brand Kit and CMS-017 Domain & Certificate** (decided 24 September,
-    M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds site,
-    brand and domain set-up; the minute says to consolidate rather than build both. **One implementation,
-    both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and
-    nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies
-    of each other.'
+    M24-03; applied 29 September). This screen duplicates the white-label CMS, which builds site, brand
+    and domain set-up; the minute says to consolidate rather than build both. **One implementation, both
+    ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing
+    on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each
+    other.'
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '11'
@@ -113428,11 +113431,11 @@ screens:
   requiresModule: marketing
   wave: 3
   notes: '**Merged into P13 CMS-005 Theme Editor, CMS-002 Brand Kit and CMS-006 Component Preview** (decided
-    24 September, M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which
-    builds the theme and the component set; the minute says to consolidate rather than build both. **One
-    implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the
-    P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these
-    are not copies of each other.'
+    24 September, M24-03; applied 29 September). This screen duplicates the white-label CMS, which builds
+    the theme and the component set; the minute says to consolidate rather than build both. **One implementation,
+    both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and
+    nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies
+    of each other.'
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '11'
@@ -113521,10 +113524,11 @@ screens:
   requiresModule: marketing
   wave: 3
   notes: '**Merged into P13 CMS-007 Page Builder** (decided 24 September, M24-03; applied 29 September,
-    P29). This screen duplicates the white-label CMS, which builds pages and landing pages from fixed
-    sections; the minute says to consolidate rather than build both. **One implementation, both ids kept**,
-    as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is
-    built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.'
+    the 29 September pass). This screen duplicates the white-label CMS, which builds pages and landing
+    pages from fixed sections; the minute says to consolidate rather than build both. **One implementation,
+    both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and
+    nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies
+    of each other.'
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '11'
@@ -113627,11 +113631,10 @@ screens:
   requiresModule: marketing
   wave: 3
   notes: '**Merged into P13 CMS-008 Content Blocks and CMS-010 Media Library** (decided 24 September,
-    M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds content,
-    media and forms; the minute says to consolidate rather than build both. **One implementation, both
-    ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing
-    on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each
-    other.'
+    M24-03; applied 29 September). This screen duplicates the white-label CMS, which builds content, media
+    and forms; the minute says to consolidate rather than build both. **One implementation, both ids kept**,
+    as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is
+    built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.'
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '11'
@@ -113729,11 +113732,11 @@ screens:
   requiresModule: marketing
   wave: 3
   notes: '**Merged into P13 CMS-008 Content Blocks** (decided 24 September, M24-03; applied 29 September,
-    P29). This screen duplicates the white-label CMS, which builds product content blocks; dynamic product
-    pages (matrix 22.10.18) are later, not Block A; the minute says to consolidate rather than build both.
-    **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to
-    the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and
-    these are not copies of each other.'
+    the 29 September pass). This screen duplicates the white-label CMS, which builds product content blocks;
+    dynamic product pages (matrix 22.10.18) are later, not Block A; the minute says to consolidate rather
+    than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability
+    and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means
+    twin, and these are not copies of each other.'
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '11'
@@ -113822,12 +113825,11 @@ screens:
   requiresModule: marketing
   wave: 3
   notes: '**Merged into P13 CMS-007 Page Builder, CMS-009 Navigation & Menus and CMS-104 App Build & Store
-    Publishing** (decided 24 September, M24-03; applied 29 September, P29). This screen duplicates the
-    white-label CMS, which builds the mobile app: home sections, tabs and the Buy tickets button, and
-    store publishing; the minute says to consolidate rather than build both. **One implementation, both
-    ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing
-    on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each
-    other.'
+    Publishing** (decided 24 September, M24-03; applied 29 September). This screen duplicates the white-label
+    CMS, which builds the mobile app: home sections, tabs and the Buy tickets button, and store publishing;
+    the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3
+    does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately.
+    Not `source.sameAs` - that means twin, and these are not copies of each other.'
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '11'
@@ -113915,11 +113917,11 @@ screens:
   requiresModule: marketing
   wave: 3
   notes: '**Merged into P13 CMS-011 Translations** (decided 24 September, M24-03; applied 29 September,
-    P29). This screen duplicates the white-label CMS, which builds localisation; personalisation (22.10.12,
-    22.10.27) is later; the minute says to consolidate rather than build both. **One implementation, both
-    ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing
-    on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each
-    other.'
+    the 29 September pass). This screen duplicates the white-label CMS, which builds localisation; personalisation
+    (22.10.12, 22.10.27) is later; the minute says to consolidate rather than build both. **One implementation,
+    both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and
+    nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies
+    of each other.'
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '11'
@@ -114007,10 +114009,10 @@ screens:
   requiresModule: marketing
   wave: 3
   notes: '**Merged into P13 CMS-013 SEO & Metadata** (decided 24 September, M24-03; applied 29 September,
-    P29). This screen duplicates the white-label CMS, which builds SEO and redirects; the minute says
-    to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this
-    id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not
-    `source.sameAs` - that means twin, and these are not copies of each other.'
+    the 29 September pass). This screen duplicates the white-label CMS, which builds SEO and redirects;
+    the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3
+    does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately.
+    Not `source.sameAs` - that means twin, and these are not copies of each other.'
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '11'
@@ -114102,7 +114104,7 @@ screens:
   requiresModule: marketing
   wave: 3
   notes: '**Merged into P13 CMS-014 Publishing Workflow and CMS-015 Version History** (decided 24 September,
-    M24-03; applied 29 September, P29). This screen duplicates the white-label CMS, which builds publishing,
+    M24-03; applied 29 September). This screen duplicates the white-label CMS, which builds publishing,
     audit and rollback; the minute says to consolidate rather than build both. **One implementation, both
     ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing
     on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each
@@ -115684,7 +115686,7 @@ screens:
     contract: resources
     purpose: Day preview of availability with cleanings placed (W10)
     trigger: onAction
-    provenance: decided 29 September, W10 (P29)
+    provenance: decided 29 September, W10 (the 29 September pass)
   - operationId: getResource
     contract: resources
     purpose: The resource being edited
@@ -116907,12 +116909,12 @@ screens:
     contract: resources
     purpose: Day preview of availability with cleanings placed (W10)
     trigger: onAction
-    provenance: decided 29 September, W10 (P29)
+    provenance: decided 29 September, W10 (the 29 September pass)
   - operationId: updateResource
     contract: resources
     purpose: Save the cleaning policy (W10)
     trigger: onAction
-    provenance: decided 29 September, W10 (P29)
+    provenance: decided 29 September, W10 (the 29 September pass)
     invalidates:
     - getResourceAvailability
   - operationId: getResourceSchedule

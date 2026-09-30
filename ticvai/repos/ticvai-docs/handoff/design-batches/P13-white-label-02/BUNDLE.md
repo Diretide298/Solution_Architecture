@@ -3703,12 +3703,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "readOnly": true
    },
    "questionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "questionVersion": {
     "type": "integer",
@@ -3748,14 +3748,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "readOnly": true,
     "description": "Set by `orders.checkoutCart` when the cart becomes an order."
    },
    "orderLineId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "readOnly": true
    },
@@ -4670,7 +4670,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "readOnly": true
    },
    "kind": {
@@ -5107,9 +5107,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "readOnly": true,
-    "description": "ULID."
+    "description": "UUIDv7."
    },
    "venueId": {
     "type": "string",
@@ -5166,9 +5166,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "properties": {
       "id": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "format": "uuid",
        "readOnly": true,
-       "description": "ULID. The row's own key."
+       "description": "UUIDv7. The row's own key."
       },
       "title": {
        "$ref": "#/components/schemas/LocalisedText"
@@ -5203,9 +5203,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
         "properties": {
          "id": {
           "type": "string",
-          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+          "format": "uuid",
           "readOnly": true,
-          "description": "ULID. The row's own key."
+          "description": "UUIDv7. The row's own key."
          },
          "title": {
           "$ref": "#/components/schemas/LocalisedText"

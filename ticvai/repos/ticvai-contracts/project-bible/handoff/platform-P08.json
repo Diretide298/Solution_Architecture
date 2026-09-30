@@ -161,11 +161,11 @@
    "operations": 57
   },
   {
-   "contract": "wallet",
+   "contract": "finance",
    "operations": 56
   },
   {
-   "contract": "finance",
+   "contract": "wallet",
    "operations": 56
   },
   {
@@ -213,11 +213,11 @@
    "operations": 29
   },
   {
-   "contract": "approvals",
+   "contract": "subscription",
    "operations": 27
   },
   {
-   "contract": "subscription",
+   "contract": "approvals",
    "operations": 27
   },
   {
@@ -233,11 +233,11 @@
    "operations": 18
   },
   {
-   "contract": "queue",
+   "contract": "venue-map",
    "operations": 13
   },
   {
-   "contract": "venue-map",
+   "contract": "queue",
    "operations": 13
   },
   {

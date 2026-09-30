@@ -6,20 +6,20 @@
   "description": "**What Channel-Based Pricing Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "channel": {
-    "type": "string",
-    "description": "Channel"
+    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel",
+    "description": "Channel (Supported Channels, p.29)"
    },
    "product": {
     "type": "string",
     "description": "Product"
    },
    "priceList": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "type": "string",
     "description": "Price List"
    },
    "rate": {
-    "type": "number",
-    "description": "Rate"
+    "type": "string",
+    "description": "Rate: code of the rate, e.g. Trade Adult"
    },
    "market": {
     "type": "string",
@@ -29,22 +29,46 @@
     "type": "string",
     "description": "Venue"
    },
-   "effectiveDates": {
-    "type": "string",
-    "description": "Effective Dates"
-   },
    "priority": {
-    "type": "string",
-    "description": "Priority"
+    "type": "integer",
+    "description": "Priority within the configurable pricing hierarchy (MoM 1 Sep §4.4): the lower number wins"
    },
-   "relationshipWithSalesChannelManagement": {
+   "ruleId": {
     "type": "string",
-    "description": "Relationship with Sales Channel Management"
+    "description": "Rule ID"
    },
-   "startDate": {
+   "ruleName": {
     "type": "string",
-    "format": "date-time",
-    "description": "Start Date"
+    "description": "Rule Name"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "isOverride": {
+    "type": "boolean",
+    "description": "Channel Override (pp.29-30): a controlled, time-boxed override of the channel's normal rate"
+   },
+   "overrideReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Reason, required for an override"
+   },
+   "fallbackRate": {
+    "type": "string",
+    "nullable": true,
+    "description": "Fallback Rate once the override ends"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, active, disabled or expired"
    }
   }
  },
@@ -54,93 +78,81 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Customer Segment & Profile Pricing Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "customerType": {
-    "type": "string",
-    "description": "Customer Type"
-   },
-   "customerSegment": {
-    "type": "string",
-    "description": "Customer Segment"
-   },
-   "accountType": {
-    "type": "string",
-    "description": "Account Type"
-   },
-   "crmSegment": {
-    "type": "string",
-    "description": "CRM Segment"
-   },
-   "vipStatus": {
-    "type": "string",
-    "description": "VIP Status"
-   },
-   "corporateCustomer": {
-    "type": "string",
-    "description": "Corporate Customer"
-   },
-   "employeeStaff": {
-    "type": "string",
-    "description": "Employee/Staff"
-   },
-   "partnerCustomer": {
-    "type": "string",
-    "description": "Partner Customer"
-   },
-   "guestRegisteredUser": {
-    "type": "string",
-    "description": "Guest/Registered User"
-   },
-   "crm": {
-    "type": "string",
-    "description": "CRM"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "b2bPartner": {
-    "type": "string",
-    "description": "B2B Partner"
-   },
-   "corporateAccount": {
-    "type": "string",
-    "description": "Corporate Account"
-   },
-   "customerProfile": {
-    "type": "string",
-    "description": "Customer Profile"
-   },
    "ruleName": {
     "type": "string",
     "description": "Rule Name"
    },
    "segment": {
     "type": "string",
-    "description": "Segment"
+    "description": "Segment: the value the dimension must equal, e.g. VIP"
    },
    "applicableProducts": {
-    "type": "string",
-    "description": "Applicable Products"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Applicable Products: product ids or product category codes"
    },
    "priceList": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price List"
+    "type": "string",
+    "description": "Price List: the list whose rate the rule selects"
    },
    "rate": {
-    "type": "number",
-    "description": "Rate"
+    "type": "string",
+    "description": "Rate: code of the rate used when the rule matches, e.g. VIP Adult"
    },
    "priority": {
-    "type": "string",
-    "description": "Priority"
-   },
-   "effectiveDates": {
-    "type": "string",
-    "description": "Effective Dates"
+    "type": "integer",
+    "description": "Priority within the configurable pricing hierarchy (MoM 1 Sep §4.4): the lower number wins"
    },
    "status": {
     "type": "string",
-    "description": "Status"
+    "description": "Status: draft, active, disabled or expired"
+   },
+   "ruleId": {
+    "type": "string",
+    "description": "Rule ID"
+   },
+   "dimension": {
+    "type": "string",
+    "enum": [
+     "customerType",
+     "customerSegment",
+     "accountType",
+     "crmSegment",
+     "vipStatus",
+     "corporateCustomer",
+     "employeeStaff",
+     "partnerCustomer",
+     "guestRegisteredUser"
+    ],
+    "description": "Supported Dimension (p.25) the rule tests"
+   },
+   "segmentSource": {
+    "type": "string",
+    "enum": [
+     "crm",
+     "membership",
+     "b2bPartner",
+     "corporateAccount",
+     "customerProfile"
+    ],
+    "description": "Customer Segment Source (p.26) the segment is read from"
+   },
+   "fallbackRate": {
+    "type": "string",
+    "description": "Fallback (p.26): rate used when the customer no longer qualifies; the standard rate by default (decided 29 September, readiness close-out)"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
    }
   }
  },
@@ -152,58 +164,129 @@
   "properties": {
    "effectiveFrom": {
     "type": "string",
+    "format": "date",
     "description": "Effective From"
    },
    "effectiveTo": {
     "type": "string",
-    "description": "Effective To"
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
    },
    "salesStart": {
     "type": "string",
-    "description": "Sales Start"
+    "format": "date-time",
+    "nullable": true,
+    "description": "Sales Start: purchases from this moment get the rule"
    },
    "salesEnd": {
     "type": "string",
-    "description": "Sales End"
-   },
-   "visitDateRange": {
-    "type": "string",
     "format": "date-time",
-    "description": "Visit Date Range"
+    "nullable": true,
+    "description": "Sales End"
    },
    "season": {
     "type": "string",
-    "description": "Season"
+    "nullable": true,
+    "description": "Season name, e.g. Low, Regular, Peak (Seasonal Pricing, p.33)"
    },
-   "holidayPeriod": {
+   "ruleId": {
     "type": "string",
-    "format": "date-time",
-    "description": "Holiday Period"
+    "description": "Rule ID"
    },
-   "eventPeriod": {
+   "ruleName": {
     "type": "string",
-    "format": "date-time",
-    "description": "Event Period"
+    "description": "Rule Name"
    },
-   "publicHolidays": {
+   "dateRuleType": {
     "type": "string",
-    "description": "Public Holidays"
+    "enum": [
+     "effectivePeriod",
+     "season",
+     "dayOfWeek",
+     "holidayPeriod",
+     "eventPeriod",
+     "publicHoliday",
+     "schoolHoliday",
+     "specialDate",
+     "blackoutDate",
+     "peakDate"
+    ],
+    "description": "Kind of date rule (Effective Dating and Calendar Rules, pp.32-33)"
    },
-   "schoolHolidays": {
+   "visitFrom": {
     "type": "string",
-    "description": "School Holidays"
+    "format": "date",
+    "description": "Visit Date Range start",
+    "nullable": true
    },
-   "specialDates": {
+   "visitTo": {
     "type": "string",
-    "description": "Special Dates"
+    "format": "date",
+    "description": "Visit Date Range end",
+    "nullable": true
    },
-   "blackoutDates": {
-    "type": "string",
-    "description": "Blackout Dates"
+   "daysOfWeek": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "mon",
+      "tue",
+      "wed",
+      "thu",
+      "fri",
+      "sat",
+      "sun"
+     ]
+    },
+    "description": "Day-of-Week Pricing (p.33); empty for every day"
    },
-   "peakDates": {
+   "specificDates": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "date"
+    },
+    "description": "Special, blackout, peak or holiday dates the rule covers"
+   },
+   "product": {
     "type": "string",
-    "description": "Peak Dates"
+    "description": "Product"
+   },
+   "priceList": {
+    "type": "string",
+    "description": "Price List"
+   },
+   "rate": {
+    "type": "string",
+    "description": "Rate code"
+   },
+   "priority": {
+    "type": "integer",
+    "description": "Priority within the configurable pricing hierarchy (MoM 1 Sep §4.4): the lower number wins"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, active, disabled or expired"
+   },
+   "validationIssues": {
+    "type": "array",
+    "description": "Overlap Detection (p.33), e.g. Peak Season and Public Holiday overlap with different rates",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "overlappingRules"
+       ]
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
    }
   }
  },
@@ -213,85 +296,74 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Location, Venue & Event Pricing Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "country": {
-    "type": "string",
-    "description": "Country"
-   },
-   "city": {
-    "type": "string",
-    "description": "City"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "attraction": {
-    "type": "string",
-    "description": "Attraction"
-   },
-   "location": {
-    "type": "string",
-    "description": "Location"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "performance": {
-    "type": "string",
-    "description": "Performance"
-   },
-   "zone": {
-    "type": "string",
-    "description": "Zone"
-   },
-   "experience": {
-    "type": "string",
-    "description": "Experience"
-   },
-   "popUpVenue": {
-    "type": "string",
-    "description": "Pop-up Venue"
-   },
-   "exhibition": {
-    "type": "string",
-    "description": "Exhibition"
-   },
-   "seasonalSite": {
-    "type": "string",
-    "description": "Seasonal Site"
-   },
-   "temporaryEventLocation": {
-    "type": "string",
-    "description": "Temporary Event Location"
-   },
-   "globalRateAed250": {
-    "type": "number",
-    "description": "Global Rate → AED 250"
-   },
-   "dubaiVenueAed275": {
-    "type": "string",
-    "description": "Dubai Venue → AED 275"
-   },
-   "specialEventAed320": {
-    "type": "string",
-    "description": "Special Event → AED 320"
-   },
    "product": {
     "type": "string",
     "description": "Product"
    },
    "rate": {
-    "type": "number",
-    "description": "Rate"
-   },
-   "effectiveDates": {
     "type": "string",
-    "description": "Effective Dates"
+    "description": "Rate: code of the rate used in this context"
    },
    "priority": {
+    "type": "integer",
+    "description": "Priority within the configurable pricing hierarchy (MoM 1 Sep §4.4): the lower number wins"
+   },
+   "ruleId": {
     "type": "string",
-    "description": "Priority"
+    "description": "Rule ID"
+   },
+   "ruleName": {
+    "type": "string",
+    "description": "Rule Name"
+   },
+   "contextLevel": {
+    "type": "string",
+    "enum": [
+     "country",
+     "city",
+     "venue",
+     "attraction",
+     "location",
+     "event",
+     "performance",
+     "zone",
+     "experience"
+    ],
+    "description": "Pricing Context (p.30) the rule is keyed on"
+   },
+   "contextRefId": {
+    "type": "string",
+    "description": "The country, city, venue, attraction, location, event, performance, zone or experience"
+   },
+   "temporaryLocationType": {
+    "type": "string",
+    "enum": [
+     "popUpVenue",
+     "exhibition",
+     "seasonalSite",
+     "temporaryEventLocation"
+    ],
+    "description": "Temporary Location Pricing (p.30); empty for a permanent location",
+    "nullable": true
+   },
+   "priceList": {
+    "type": "string",
+    "description": "Price List"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, active, disabled or expired"
    }
   }
  },
@@ -301,69 +373,130 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Membership & Loyalty Pricing Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "membershipProduct": {
+   "ruleId": {
     "type": "string",
-    "description": "Membership Product"
+    "description": "Rule ID"
    },
-   "membershipStatus": {
+   "ruleName": {
     "type": "string",
-    "description": "Membership Status"
+    "description": "Rule Name"
    },
-   "membershipTier": {
+   "conditions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "dimension": {
+       "type": "string",
+       "enum": [
+        "membershipProduct",
+        "membershipStatus",
+        "membershipTier",
+        "annualPassType",
+        "membershipLevel",
+        "loyaltyTier",
+        "loyaltyProgram",
+        "pointsBand",
+        "customerStatus"
+       ]
+      },
+      "value": {
+       "type": "string",
+       "description": "e.g. active, Gold, Platinum"
+      }
+     }
+    },
+    "description": "Conditions, all of which must hold (Membership = Active AND Tier = Gold)"
+   },
+   "priceList": {
     "type": "string",
-    "description": "Membership Tier"
+    "description": "Price List"
    },
-   "annualPassType": {
+   "rate": {
     "type": "string",
-    "description": "Annual Pass Type"
+    "description": "Rate: code of the rate used when the rule matches, e.g. Gold Member Rate"
    },
-   "membershipLevel": {
+   "benefitScope": {
     "type": "string",
-    "description": "Membership Level"
+    "enum": [
+     "memberOnly",
+     "memberPlusOneGuest",
+     "memberPlusFamily",
+     "selectedQuantity"
+    ],
+    "description": "Member + Guest Rules (p.27): who in the booking receives the member rate"
    },
-   "activeSuspendedStatus": {
+   "benefitQuantity": {
     "type": "integer",
-    "description": "Active/Suspended Status"
+    "nullable": true,
+    "description": "Number of tickets at the member rate when benefitScope is selectedQuantity"
    },
-   "loyaltyTier": {
-    "type": "string",
-    "description": "Loyalty Tier"
-   },
-   "loyaltyProgram": {
-    "type": "string",
-    "description": "Loyalty Program"
-   },
-   "pointsBand": {
-    "type": "string",
-    "description": "Points Band"
-   },
-   "customerStatus": {
-    "type": "string",
-    "description": "Customer Status"
-   },
-   "memberOnly": {
-    "type": "string",
-    "description": "Member Only"
-   },
-   "member1Guest": {
-    "type": "string",
-    "description": "Member + 1 Guest"
-   },
-   "memberFamily": {
-    "type": "string",
-    "description": "Member + Family"
-   },
-   "selectedQuantity": {
+   "priority": {
     "type": "integer",
-    "description": "Selected Quantity"
+    "description": "Priority within the configurable pricing hierarchy (MoM 1 Sep §4.4): the lower number wins"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, active, disabled or expired"
+   },
+   "validationIssues": {
+    "type": "array",
+    "description": "Validation (p.27)",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "inactiveMembership",
+        "expiredMembership",
+        "missingTierRate",
+        "conflictingLoyaltyMemberRates"
+       ]
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
    }
   }
  },
- "PricingRuleCommandCenterView": {
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PricingRuleCommandCenterSummary": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What Pricing Rule Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Pricing Rule Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
   "properties": {
    "activePricingRules": {
     "type": "integer",
@@ -410,8 +543,120 @@
     "description": "Rule Conflicts"
    },
    "rulesExpiringSoon": {
+    "type": "integer",
+    "description": "Rules Expiring Soon: active rules whose effective-to date falls within the next 30 days (decided 29 September, readiness close-out)"
+   }
+  }
+ },
+ "PricingRuleCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Pricing Rule Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ruleId": {
     "type": "string",
-    "description": "Rules Expiring Soon"
+    "description": "Rule ID"
+   },
+   "ruleName": {
+    "type": "string",
+    "description": "Rule Name"
+   },
+   "ruleType": {
+    "type": "string",
+    "enum": [
+     "customerSegment",
+     "membership",
+     "loyalty",
+     "residency",
+     "nationality",
+     "channel",
+     "location",
+     "quantity",
+     "group",
+     "seasonal",
+     "dayOfWeek",
+     "timeslot",
+     "event",
+     "corporateB2b",
+     "custom"
+    ],
+    "description": "Rule Type (the pack's Rule Types list, pp.24-25)"
+   },
+   "priceList": {
+    "type": "string",
+    "description": "Price List: the name of the price list whose rate this rule selects"
+   },
+   "productScope": {
+    "type": "string",
+    "description": "Product Scope: the products or product categories the rule covers"
+   },
+   "customerScope": {
+    "type": "string",
+    "description": "Customer Scope: the customer segment, membership or partner the rule covers"
+   },
+   "channel": {
+    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel",
+    "description": "Channel the rule is limited to; empty for all channels"
+   },
+   "venueLocation": {
+    "type": "string",
+    "description": "Venue/Location"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "Effective To; empty for open-ended"
+   },
+   "priority": {
+    "type": "integer",
+    "description": "Priority within the configurable pricing hierarchy (MoM 1 Sep §4.4): the lower number wins"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, active, disabled or expired"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI Capability (p.25): e.g. three rules may return different prices for the same Adult ticket on Saturday through B2C; advisory"
+   }
+  }
+ },
+ "PricingRulePriorityConflictResolutionTestingView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Pricing Rule Priority, Conflict Resolution & Testing displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "priority": {
+    "type": "integer",
+    "description": "Priority within the configurable pricing hierarchy (MoM 1 Sep §4.4): the lower number wins"
+   },
+   "specificity": {
+    "type": "integer",
+    "description": "Specificity: number of conditions the rule tests; breaks ties within a priority"
+   },
+   "fallbackBehavior": {
+    "type": "string",
+    "enum": [
+     "useStandardRate",
+     "useNextMatchingRule",
+     "blockSale"
+    ],
+    "description": "Fallback Behavior when the rule matches but its rate is unavailable"
    },
    "ruleId": {
     "type": "string",
@@ -423,263 +668,234 @@
    },
    "ruleType": {
     "type": "string",
+    "enum": [
+     "customerSegment",
+     "membership",
+     "loyalty",
+     "residency",
+     "nationality",
+     "channel",
+     "location",
+     "quantity",
+     "group",
+     "seasonal",
+     "dayOfWeek",
+     "timeslot",
+     "event",
+     "corporateB2b",
+     "custom"
+    ],
     "description": "Rule Type"
    },
-   "priceList": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price List"
-   },
-   "productScope": {
+   "hierarchyLevel": {
     "type": "string",
-    "description": "Product Scope"
+    "enum": [
+     "contractPartner",
+     "customerMember",
+     "eventPerformance",
+     "venueLocation",
+     "channel",
+     "quantityGroup",
+     "seasonDate",
+     "standardRate"
+    ],
+    "description": "Rule Resolution level (p.35): Contract/Partner -> Customer/Member -> Event/Performance -> Venue/Location -> Channel -> Quantity/Group -> Season/Date -> Standard Rate; the order is configurable"
    },
-   "customerScope": {
+   "onMatch": {
     "type": "string",
-    "description": "Customer Scope"
+    "enum": [
+     "stopProcessing",
+     "continueProcessing"
+    ],
+    "description": "Stop or Continue Processing once this rule matches"
    },
-   "channel": {
+   "overrideAllowed": {
+    "type": "boolean",
+    "description": "Override Allowed"
+   },
+   "validationIssues": {
+    "type": "array",
+    "description": "Conflict Detection (p.35)",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "samePriorityMatches",
+        "contradictoryRates",
+        "circularFallback",
+        "unreachableRule",
+        "missingFallback",
+        "overlappingTimeDateConditions"
+       ]
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "simulationOutcome": {
     "type": "string",
-    "description": "Channel"
+    "enum": [
+     "selected",
+     "matched",
+     "rejected",
+     "notMatched"
+    ],
+    "description": "Pricing Rule Simulator result for this rule; empty when no simulator parameters were sent",
+    "nullable": true
    },
-   "venueLocation": {
+   "candidateRate": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Candidate rate the rule would give in the simulated context (Gold Member - AED 190)"
+   },
+   "outcomeReason": {
     "type": "string",
-    "description": "Venue/Location"
-   },
-   "effectiveFrom": {
-    "type": "string",
-    "description": "Effective From"
-   },
-   "effectiveTo": {
-    "type": "string",
-    "description": "Effective To"
-   },
-   "priority": {
-    "type": "string",
-    "description": "Priority"
-   },
-   "status": {
-    "type": "integer",
-    "description": "Status"
-   },
-   "owner": {
-    "type": "string",
-    "description": "Owner"
-   },
-   "customerSegment": {
-    "type": "string",
-    "description": "Customer Segment"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "loyalty": {
-    "type": "string",
-    "description": "Loyalty"
-   },
-   "residency": {
-    "type": "string",
-    "description": "Residency"
-   },
-   "nationality": {
-    "type": "string",
-    "description": "Nationality"
-   },
-   "location": {
-    "type": "string",
-    "description": "Location"
-   },
-   "quantity": {
-    "type": "integer",
-    "description": "Quantity"
-   },
-   "group": {
-    "type": "string",
-    "description": "Group"
-   },
-   "seasonal": {
-    "type": "string",
-    "description": "Seasonal"
-   },
-   "dayOfWeek": {
-    "type": "string",
-    "description": "Day-of-Week"
-   },
-   "timeslot": {
-    "type": "string",
-    "description": "Timeslot"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "corporateB2b": {
-    "type": "string",
-    "description": "Corporate/B2B"
-   },
-   "custom": {
-    "type": "string",
-    "description": "Custom"
-   },
-   "testRule": {
-    "type": "string",
-    "description": "Test Rule"
+    "nullable": true,
+    "description": "Why it was selected or rejected, e.g. member pricing priority exceeds resident, day and standard pricing"
    }
   }
  },
- "PricingRulePriorityConflictResolutionTestingView": {
+ "PricingRuleTestInput": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What Pricing Rule Priority, Conflict Resolution & Testing displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — request only; a dry run stores nothing",
+  "description": "The sample booking `testPricingRule` prices (decided 29 September, readiness close-out). The inputs are the ones `listPricingRulePriority` filters its test rows by.",
+  "required": [
+   "productId",
+   "channel",
+   "date"
+  ],
   "properties": {
-   "priority": {
+   "productId": {
     "type": "string",
-    "description": "Priority"
+    "format": "uuid"
    },
-   "specificity": {
+   "variantId": {
     "type": "string",
-    "description": "Specificity"
+    "format": "uuid",
+    "nullable": true
    },
-   "stopProcessing": {
+   "venueId": {
     "type": "string",
-    "description": "Stop Processing"
-   },
-   "continueProcessing": {
-    "type": "string",
-    "description": "Continue Processing"
-   },
-   "fallbackBehavior": {
-    "type": "string",
-    "description": "Fallback Behavior"
-   },
-   "samePriorityMatches": {
-    "type": "string",
-    "description": "Same-priority matches"
-   },
-   "contradictoryRates": {
-    "type": "string",
-    "description": "Contradictory rates"
-   },
-   "circularFallback": {
-    "type": "string",
-    "description": "Circular fallback"
-   },
-   "unreachableRule": {
-    "type": "string",
-    "description": "Unreachable rule"
-   },
-   "missingFallback": {
-    "type": "string",
-    "description": "Missing fallback"
-   },
-   "overlappingTimeDateConditions": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Overlapping time/date conditions"
-   },
-   "customer": {
-    "type": "string",
-    "description": "Customer"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "residency": {
-    "type": "string",
-    "description": "Residency"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "quantity": {
-    "type": "integer",
-    "description": "Quantity"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
+    "format": "uuid",
+    "nullable": true,
+    "description": "Absent means the product's own venue."
    },
    "channel": {
-    "type": "string",
-    "description": "Channel"
+    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
    },
    "date": {
     "type": "string",
-    "format": "date-time",
-    "description": "Date"
+    "format": "date",
+    "description": "Visit or event date."
    },
-   "timeslot": {
+   "time": {
     "type": "string",
-    "description": "Timeslot"
+    "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+    "nullable": true,
+    "description": "Visit time or timeslot start, venue local."
    },
-   "customerGoldMember": {
+   "customerSegment": {
     "type": "string",
-    "description": "Customer: Gold Member"
+    "nullable": true
    },
-   "residencyUae": {
+   "customerId": {
     "type": "string",
-    "description": "Residency: UAE"
+    "format": "uuid",
+    "nullable": true
    },
-   "productAdultAdmission": {
+   "membershipId": {
     "type": "string",
-    "description": "Product: Adult Admission"
+    "format": "uuid",
+    "nullable": true
    },
-   "channelB2c": {
+   "residency": {
     "type": "string",
-    "description": "Channel: B2C"
+    "nullable": true
    },
-   "venueDubai": {
+   "quantity": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 500,
+    "default": 1
+   }
+  }
+ },
+ "PricingRuleTestResult": {
+  "type": "object",
+  "x-ticvai-persistence": "none — response only; a dry run stores nothing",
+  "description": "What `testPricingRule` returns. `matched` answers the question the button asks; the rest is the calculation the checkout would run.",
+  "required": [
+   "ruleId",
+   "matched",
+   "basePrice",
+   "finalPrice"
+  ],
+  "properties": {
+   "ruleId": {
+    "type": "string"
+   },
+   "matched": {
+    "type": "boolean",
+    "description": "Whether the tested rule's conditions match the sample booking."
+   },
+   "notMatchedReasons": {
+    "type": "array",
+    "description": "The conditions that failed when `matched` is false, e.g. `channel not in rule`.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "appliedByPriority": {
+    "type": "boolean",
+    "description": "Matched and actually applied after priority and conflict resolution; a matching rule can still lose to a higher-priority one."
+   },
+   "basePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "finalPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "rulesApplied": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "ruleId": {
+       "type": "string"
+      },
+      "ruleName": {
+       "type": "string"
+      },
+      "priority": {
+       "type": "integer"
+      },
+      "adjustment": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "applied": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "calculationPath": {
+    "type": "array",
+    "description": "Each step from base price to final price, in order, in words.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "testedAt": {
     "type": "string",
-    "description": "Venue: Dubai"
-   },
-   "dateSaturday": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date: Saturday"
-   },
-   "time1800": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Time: 18:00"
-   },
-   "standardAdultAed250": {
-    "type": "string",
-    "description": "Standard Adult — AED 250"
-   },
-   "uaeResidentAed220": {
-    "type": "string",
-    "description": "UAE Resident — AED 220"
-   },
-   "saturdayPeakAed280": {
-    "type": "string",
-    "description": "Saturday Peak — AED 280"
-   },
-   "goldMemberAed190": {
-    "type": "string",
-    "description": "Gold Member — AED 190"
-   },
-   "backendScreen": {
-    "type": "string",
-    "description": "# Backend Screen"
-   },
-   "channelBasedPricingRulesChannelPricing": {
-    "type": "string",
-    "description": "Channel-Based Pricing Rules Channel pricing"
-   },
-   "whatTaxApplies": {
-    "type": "string",
-    "description": "“What tax applies?”"
-   },
-   "whatServiceFeeApplies": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "“What service fee applies?”"
-   },
-   "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "amount?"
+    "format": "date-time"
    }
   }
  },
@@ -689,65 +905,123 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Quantity, Group & Volume Pricing Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "minimumQuantity": {
-    "type": "integer",
-    "description": "Minimum Quantity"
-   },
-   "quantityBands": {
-    "type": "integer",
-    "description": "Quantity Bands"
-   },
-   "groupSize": {
-    "type": "string",
-    "description": "Group Size"
-   },
-   "volumeThreshold": {
-    "type": "integer",
-    "description": "Volume Threshold"
-   },
-   "buyXRate": {
-    "type": "number",
-    "description": "Buy-X Rate"
-   },
-   "perPersonGroupRate": {
-    "type": "number",
-    "description": "Per-Person Group Rate"
-   },
    "groupMinimum": {
-    "type": "string",
-    "description": "Group Minimum"
+    "type": "integer",
+    "nullable": true,
+    "description": "Group Minimum: smallest party the group rate applies to"
    },
    "maximumGroupSize": {
-    "type": "string",
+    "type": "integer",
+    "nullable": true,
     "description": "Maximum Group Size"
    },
    "groupType": {
     "type": "string",
-    "description": "Group Type"
+    "enum": [
+     "school",
+     "corporate",
+     "tour",
+     "family",
+     "b2b",
+     "custom"
+    ],
+    "description": "Group Type (p.31)",
+    "nullable": true
    },
-   "school": {
+   "ruleId": {
     "type": "string",
-    "description": "School"
+    "description": "Rule ID"
    },
-   "corporate": {
+   "ruleName": {
     "type": "string",
-    "description": "Corporate"
+    "description": "Rule Name"
    },
-   "tour": {
+   "quantityModel": {
     "type": "string",
-    "description": "Tour"
+    "enum": [
+     "minimumQuantity",
+     "quantityBands",
+     "groupSize",
+     "volumeThreshold",
+     "buyXRate",
+     "perPersonGroupRate"
+    ],
+    "description": "Quantity Model (p.31)"
    },
-   "family": {
+   "product": {
     "type": "string",
-    "description": "Family"
+    "description": "Product or product family the rule covers"
    },
-   "b2b": {
+   "priceList": {
     "type": "string",
-    "description": "B2B"
+    "description": "Price List"
    },
-   "custom": {
+   "bands": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "minQuantity": {
+       "type": "integer"
+      },
+      "maxQuantity": {
+       "type": "integer",
+       "nullable": true
+      },
+      "rate": {
+       "type": "string",
+       "description": "Rate code for the band"
+      }
+     }
+    },
+    "description": "Tiered Rate Matrix (p.32): 1-9, 10-24, 25-49, 50+ each with its rate; the last band has no maximum"
+   },
+   "quantityBasis": {
     "type": "string",
-    "description": "Custom"
+    "enum": [
+     "perProduct",
+     "perProductFamily",
+     "perOrder",
+     "perGroupBooking",
+     "cumulativePartnerVolume"
+    ],
+    "description": "Mixed Products (p.32): what quantity is counted; cumulativePartnerVolume counts a partner's sales over its agreement period (MoM 1 Sep §4.3)"
+   },
+   "complimentary": {
+    "type": "object",
+    "nullable": true,
+    "description": "Complimentary Logic (p.32): freeQuantity complimentary per paidQuantity paid; empty for none",
+    "properties": {
+     "freeQuantity": {
+      "type": "integer"
+     },
+     "paidQuantity": {
+      "type": "integer"
+     },
+     "label": {
+      "type": "string",
+      "description": "e.g. coordinator"
+     }
+    }
+   },
+   "priority": {
+    "type": "integer",
+    "description": "Priority within the configurable pricing hierarchy (MoM 1 Sep §4.4): the lower number wins"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, active, disabled or expired"
    }
   }
  },
@@ -757,57 +1031,83 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Residency, Nationality & Market Pricing Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "residency": {
+   "ruleId": {
     "type": "string",
-    "description": "Residency"
+    "description": "Rule ID"
    },
-   "nationality": {
+   "ruleName": {
     "type": "string",
-    "description": "Nationality"
+    "description": "Rule Name"
    },
-   "country": {
+   "marketLabel": {
     "type": "string",
-    "description": "Country"
+    "description": "Market pricing label, e.g. UAE Resident, GCC Resident, International Visitor"
    },
-   "market": {
+   "eligibilityBasis": {
     "type": "string",
-    "description": "Market"
+    "enum": [
+     "residency",
+     "nationality",
+     "country",
+     "market",
+     "region",
+     "customerAddress",
+     "verifiedId",
+     "governmentId"
+    ],
+    "description": "Eligibility Input (pp.27-28) the rule tests"
    },
-   "region": {
-    "type": "string",
-    "description": "Region"
+   "eligibleValues": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Values that qualify, e.g. ISO country codes AE, SA, or market codes"
    },
-   "customerAddress": {
-    "type": "string",
-    "description": "Customer Address"
+   "verificationRequired": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "customerDeclaration",
+      "accountProfile",
+      "idUpload",
+      "governmentIdentityVerification",
+      "staffVerification"
+     ]
+    },
+    "description": "Verification Requirements (p.28) that must be satisfied; empty means none"
    },
-   "verifiedId": {
+   "priceList": {
     "type": "string",
-    "description": "Verified ID"
+    "description": "Price List"
    },
-   "governmentIdIntegrationWhereApplicable": {
+   "rate": {
     "type": "string",
-    "description": "Government ID Integration where applicable"
+    "description": "Rate used when eligible, e.g. UAE Resident Adult"
    },
-   "customerDeclaration": {
+   "fallbackRate": {
     "type": "string",
-    "description": "Customer Declaration"
+    "description": "Fallback (p.28): rate used when eligibility cannot be verified; the Non-Resident rate by default (decided 29 September, readiness close-out)"
    },
-   "accountProfile": {
-    "type": "string",
-    "description": "Account Profile"
+   "priority": {
+    "type": "integer",
+    "description": "Priority within the configurable pricing hierarchy (MoM 1 Sep §4.4): the lower number wins"
    },
-   "idUpload": {
+   "effectiveFrom": {
     "type": "string",
-    "description": "ID Upload"
+    "format": "date",
+    "description": "Effective From"
    },
-   "governmentIdentityVerification": {
+   "effectiveTo": {
     "type": "string",
-    "description": "Government/Identity Verification"
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
    },
-   "staffVerification": {
+   "status": {
     "type": "string",
-    "description": "Staff Verification"
+    "description": "Status: draft, active, disabled or expired"
    }
   }
  },
@@ -819,62 +1119,25 @@
   "properties": {
    "timeslot": {
     "type": "string",
-    "description": "Timeslot"
+    "nullable": true,
+    "description": "Timeslot the rule is limited to; empty for any"
    },
    "performance": {
     "type": "string",
-    "description": "Performance"
-   },
-   "startTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Start Time"
-   },
-   "arrivalWindow": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Arrival Window"
-   },
-   "session": {
-    "type": "string",
-    "description": "Session"
+    "nullable": true,
+    "description": "Performance the rule is limited to (Matinee, Evening, Final Performance); empty for any"
    },
    "timeOfDayBand": {
     "type": "string",
-    "format": "date-time",
-    "description": "Time-of-Day Band"
-   },
-   "peak": {
-    "type": "string",
-    "description": "Peak"
-   },
-   "standard": {
-    "type": "string",
-    "description": "Standard"
-   },
-   "offPeak": {
-    "type": "string",
-    "description": "Off-Peak"
-   },
-   "lateEntry": {
-    "type": "string",
-    "description": "Late Entry"
-   },
-   "earlyEntry": {
-    "type": "string",
-    "description": "Early Entry"
-   },
-   "matineeAed350": {
-    "type": "string",
-    "description": "Matinee → AED 350"
-   },
-   "eveningAed450": {
-    "type": "string",
-    "description": "Evening → AED 450"
-   },
-   "finalPerformanceAed550": {
-    "type": "string",
-    "description": "Final Performance → AED 550"
+    "enum": [
+     "peak",
+     "standard",
+     "offPeak",
+     "lateEntry",
+     "earlyEntry"
+    ],
+    "description": "Time-of-Day Band (Peak/Off-Peak, p.34)",
+    "nullable": true
    },
    "product": {
     "type": "string",
@@ -882,41 +1145,84 @@
    },
    "event": {
     "type": "string",
+    "nullable": true,
     "description": "Event"
    },
    "priceList": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "type": "string",
     "description": "Price List"
    },
    "rate": {
-    "type": "number",
-    "description": "Rate"
-   },
-   "timeRange": {
     "type": "string",
-    "format": "date-time",
-    "description": "Time Range"
-   },
-   "effectiveDates": {
-    "type": "string",
-    "description": "Effective Dates"
+    "description": "Rate code"
    },
    "priority": {
-    "type": "string",
-    "description": "Priority"
+    "type": "integer",
+    "description": "Priority within the configurable pricing hierarchy (MoM 1 Sep §4.4): the lower number wins"
    },
-   "overlappingTimeRanges": {
+   "ruleId": {
     "type": "string",
-    "format": "date-time",
-    "description": "Overlapping time ranges"
+    "description": "Rule ID"
    },
-   "missingTimeslotRate": {
-    "type": "number",
-    "description": "Missing timeslot rate"
-   },
-   "conflictingPerformanceRule": {
+   "ruleName": {
     "type": "string",
-    "description": "Conflicting performance rule"
+    "description": "Rule Name"
+   },
+   "timeBasis": {
+    "type": "string",
+    "enum": [
+     "timeslotStart",
+     "performanceStart",
+     "arrivalWindow"
+    ],
+    "description": "Which time the range is tested against (Supported Contexts, p.33)"
+   },
+   "timeFrom": {
+    "type": "string",
+    "nullable": true,
+    "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+    "description": "Time Range start, local HH:mm (09:00)"
+   },
+   "timeTo": {
+    "type": "string",
+    "nullable": true,
+    "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+    "description": "Time Range end, local HH:mm, exclusive (12:00)"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, active, disabled or expired"
+   },
+   "validationIssues": {
+    "type": "array",
+    "description": "Validation (p.34)",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "overlappingTimeRanges",
+        "missingTimeslotRate",
+        "conflictingPerformanceRule"
+       ]
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
    }
   }
  }

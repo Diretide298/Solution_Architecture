@@ -1,6 +1,6 @@
 # WS176 — Seat Management Venue Mapping Reference v1.0 board 12
 
-**10 screens · 23 operations · 23 schemas · 12 permissions**
+**10 screens · 31 operations · 30 schemas · 13 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 12 permissions apply here:
-  `APPROVAL_CONFIGURE, CAPACITY_CONFIGURE, DEVICE_VIEW, PERMISSION_MANAGE, PERMISSION_VIEW, PRODUCT_VIEW, REGION_CONFIGURE, SCOPE_VIEW, SHIFT_OPEN, TENANT_CONFIGURE, TENANT_VIEW, VENUE_MAP_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 13 permissions apply here:
+  `APPROVAL_CONFIGURE, CAPACITY_CONFIGURE, DEVICE_VIEW, PERMISSION_GRANT, PERMISSION_MANAGE, PERMISSION_VIEW, PRODUCT_VIEW, REGION_CONFIGURE, SCOPE_VIEW, SHIFT_OPEN, TENANT_CONFIGURE, TENANT_VIEW`…. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -65,7 +65,7 @@ convincingly. It is never a caption.
 | `BO-1063` | Venue-Specific Configuration | listDetail | 2 | 0 | — |
 | `BO-1064` | Naming, Numbering & Localization | listDetail | 2 | 0 | — |
 | `BO-1065` | Currency, Timezone & Channels | listDetail | 3 | 0 | — |
-| `BO-1066` | Roles, Permissions & Masking | listDetail | 6 | 0 | — |
+| `BO-1066` | Roles, Permissions & Masking | listDetail | 14 | 0 | — |
 | `BO-1067` | Seat Approval Workflows | listDetail | 1 | 0 | — |
 | `BO-1068` | Lifecycle & Environment Promotion | listDetail | 1 | 0 | — |
 | `BO-1069` | Platform Health & Observability | listDetail | 1 | 0 | — |
@@ -1020,6 +1020,62 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listAccessPolicies"
     ]
+   },
+   {
+    "operationId": "listAccessPolicyHistory",
+    "contract": "identity",
+    "purpose": "Versions of a policy, to compare and pick one to restore",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "restoreAccessPolicyVersion",
+    "contract": "identity",
+    "purpose": "Restore an approved version as a new version",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAccessPolicyEffectiveness",
+    "contract": "identity",
+    "purpose": "How each permission policy has behaved over a period",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listPermissionFindings",
+    "contract": "identity",
+    "purpose": "Excessive, missing and conflicting permissions, or those a draft would create",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAccessReviewCampaigns",
+    "contract": "identity",
+    "purpose": "Access review campaigns and progress",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "createAccessReviewCampaign",
+    "contract": "identity",
+    "purpose": "Start a periodic access review",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAccessReviewItems",
+    "contract": "identity",
+    "purpose": "Items of a campaign with their findings",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "decideAccessReviewItem",
+    "contract": "identity",
+    "purpose": "Certify or revoke a grant",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1032,6 +1088,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "params": [
     {
      "name": "policyId",
+     "from": "navigation"
+    },
+    {
+     "name": "campaignId",
+     "from": "navigation"
+    },
+    {
+     "name": "itemId",
      "from": "navigation"
     }
    ]
@@ -1590,6 +1654,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -1602,7 +1671,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Write a policy without writing code",
   "permission": "PERMISSION_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {
@@ -1614,6 +1683,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "AccessPolicy",
   "responds": "AccessPolicy"
  },
+ "createAccessReviewCampaign": {
+  "method": "POST",
+  "path": "/access-review-campaigns",
+  "contract": "identity",
+  "summary": "Start an access review, one item per grant in scope",
+  "permission": "PERMISSION_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "IdentityAccessReviewCampaign",
+  "responds": "IdentityAccessReviewCampaign"
+ },
  "createEmergencyAccessOverride": {
   "method": "POST",
   "path": "/access-overrides",
@@ -1621,7 +1709,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Bypass the policy, loudly",
   "permission": "PERMISSION_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1632,6 +1720,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "EmergencyAccessOverride"
+ },
+ "decideAccessReviewItem": {
+  "method": "POST",
+  "path": "/access-review-items/{itemId}/decision",
+  "contract": "identity",
+  "summary": "Certify a grant, or revoke it",
+  "permission": "PERMISSION_GRANT",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "IdentityAccessReviewItem"
  },
  "deployConfigurationProfile": {
   "method": "POST",
@@ -1741,6 +1848,131 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "AccessPolicy"
  },
+ "listAccessPolicyEffectiveness": {
+  "method": "GET",
+  "path": "/access-policy-effectiveness",
+  "contract": "identity",
+  "summary": "How each software-permission policy has behaved over a period",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "policyId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAccessPolicyHistory": {
+  "method": "GET",
+  "path": "/access-policies/{policyId}/history",
+  "contract": "identity",
+  "summary": "Every version, who changed it and why",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AccessPolicyVersion"
+ },
+ "listAccessReviewCampaigns": {
+  "method": "GET",
+  "path": "/access-review-campaigns",
+  "contract": "identity",
+  "summary": "Access review campaigns, open first",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAccessReviewItems": {
+  "method": "GET",
+  "path": "/access-review-campaigns/{campaignId}/items",
+  "contract": "identity",
+  "summary": "The grants a campaign asks somebody to certify or revoke",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "assignedToMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "findingKind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listDenominations": {
   "method": "GET",
   "path": "/denominations",
@@ -1759,6 +1991,65 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "Denomination"
+ },
+ "listPermissionFindings": {
+  "method": "GET",
+  "path": "/permission-findings",
+  "contract": "identity",
+  "summary": "Excessive, missing and conflicting permissions, per principal or role",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "roleId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "lookbackDays",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "deniedThreshold",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "draftPolicyId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listSeatMaps": {
   "method": "GET",
@@ -1807,6 +2098,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "VenueMap"
  },
+ "restoreAccessPolicyVersion": {
+  "method": "POST",
+  "path": "/access-policies/{policyId}/restore",
+  "contract": "identity",
+  "summary": "Put a previously approved policy version back, as a new version",
+  "permission": "PERMISSION_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessPolicy"
+ },
  "setAccessPolicyState": {
   "method": "POST",
   "path": "/access-policies/{policyId}/state",
@@ -1814,7 +2124,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Submit, approve, activate or retire a policy",
   "permission": "PERMISSION_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {
@@ -1928,7 +2238,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "What this policy would decide, before it decides anything",
   "permission": "PERMISSION_VIEW",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1947,7 +2257,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Change a policy, as a new version",
   "permission": "PERMISSION_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {
@@ -1988,6 +2298,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -2077,6 +2392,58 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "AccessContext": {
+  "type": "object",
+  "description": "**Everything the decision is allowed to depend on.** Stated as one object so a simulation and a live decision see the same shape — a simulator that takes different inputs from the evaluator is testing something else.\n",
+  "properties": {
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "permission": {
+    "type": "string"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "attractionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "attributes": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "**Deliberately an open map**, keyed by attribute (the `AccessCondition.attribute` vocabulary, with `key` for the `*.attribute` forms), each value the one a condition compares against. **Supplied attributes are a fallback, not the source.** The evaluator resolves what it can itself; a caller that could assert its own membership tier could assert any membership tier.\n"
+   }
+  }
+ },
  "AccessDecision": {
   "type": "object",
   "x-ticvai-persistence": "identity.access_decision",
@@ -2163,7 +2530,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "AccessPolicy": {
   "type": "object",
   "x-ticvai-persistence": "identity.access_policy",
-  "description": "3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n",
+  "description": "3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). The package has two: this one, and the access contract's `AccessDynamicPolicy` (`access.dynamic_policy`). **This one governs who may do what in the software**: a principal's permissions on operations and screens (`permissions` names them), narrowed or extended by who, where, when and on what device, and decided by `evaluateAccess`. **`AccessDynamicPolicy` governs who may pass which gate**: a guest's, holder's or employee's admission at an access point, decided in the gate's validation with results such as `requireId` or `requireSupervisor` that mean nothing to a permission check. A staff member's badge opening a staff door is a gate decision (access); the same staff member approving a refund is a permission decision (here). The overlap that remains is listed in the build readiness open items rather than merged in this pass.\n",
   "required": [
    "code",
    "name",
@@ -2269,6 +2636,46 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "format": "uuid"
     },
     "description": "3.3.35. **Who may edit this policy without being a platform administrator.** A venue manager tuning their own opening-hours rule should not need someone who can edit every tenant's.\n"
+   }
+  }
+ },
+ "AccessPolicyVersion": {
+  "type": "object",
+  "x-ticvai-persistence": "identity.access_policy_version",
+  "description": "3.3.36 and 3.3.39. **Who changed what, from what, and why.**",
+  "properties": {
+   "policyId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "version": {
+    "type": "integer"
+   },
+   "changedBy": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "changedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "approvedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "previous": {
+    "$ref": "#/components/schemas/AccessPolicy"
+   },
+   "current": {
+    "$ref": "#/components/schemas/AccessPolicy"
+   },
+   "scopePath": {
+    "type": "string"
    }
   }
  },
@@ -2469,6 +2876,395 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "type": "string",
      "format": "uuid"
     }
+   }
+  }
+ },
+ "IdentityAccessPolicyEffectiveness": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed from identity.access_decision and identity.access_override over the requested period",
+  "description": "One `AccessPolicy` over a period (3.3.48; decided 29 September, build pass).",
+  "required": [
+   "policyId",
+   "evaluations"
+  ],
+  "properties": {
+   "policyId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "pendingApproval",
+     "active",
+     "suspended",
+     "retired"
+    ]
+   },
+   "versionsInPeriod": {
+    "type": "array",
+    "items": {
+     "type": "integer"
+    },
+    "description": "The versions that decided anything in the period."
+   },
+   "evaluations": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Decisions that evaluated this policy."
+   },
+   "matched": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Evaluations in which every condition held (or one, for `anyMayMatch`)."
+   },
+   "decisivePermits": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Permits this policy decided."
+   },
+   "decisiveDenies": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Denies this policy decided, deny winning over any permit."
+   },
+   "overridesAtScope": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Emergency overrides opened in the period at or beneath the policy's scope for a permission it speaks to - the times people had to go around it."
+   },
+   "lastMatchedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "neverMatched": {
+    "type": "boolean",
+    "description": "True when the policy was evaluated and never matched in the period, the usual sign of a condition written backwards or a policy nobody needs."
+   },
+   "trend": {
+    "type": "array",
+    "description": "One point per day in the period.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "date": {
+       "type": "string",
+       "format": "date"
+      },
+      "evaluations": {
+       "type": "integer"
+      },
+      "decisiveDenies": {
+       "type": "integer"
+      }
+     }
+    }
+   }
+  }
+ },
+ "IdentityAccessReviewCampaign": {
+  "type": "object",
+  "x-ticvai-persistence": "identity.access_review_campaign",
+  "description": "**A periodic access review** (7.1.35, 7.1.56; decided 29 September, build pass, group G2): which grants, reviewed by whom, by when. Its items are `identity.access_review_item`. Lifecycle in `states/access-review-campaign.yaml`.",
+  "required": [
+   "name",
+   "scopePath",
+   "reviewerMode",
+   "dueAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005), and what is reviewed: every grant at or below it. Inside the caller's own scope. Operations write it at `venue` scope."
+   },
+   "roleIds": {
+    "type": "array",
+    "nullable": true,
+    "description": "Only grants of these roles; null reviews every grant in scope.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "reviewerMode": {
+    "type": "string",
+    "enum": [
+     "lineManager",
+     "named"
+    ],
+    "description": "`lineManager`: each item goes to the holder's manager from their primary work assignment, falling back to the named reviewers where none is found. `named`: the named reviewers share the items."
+   },
+   "reviewerPrincipalIds": {
+    "type": "array",
+    "nullable": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "dueAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recurrence": {
+    "type": "string",
+    "enum": [
+     "none",
+     "quarterly",
+     "semiAnnual",
+     "annual"
+    ],
+    "default": "none"
+   },
+   "prefillFromFindings": {
+    "type": "boolean",
+    "default": true
+   },
+   "lookbackDays": {
+    "type": "integer",
+    "minimum": 7,
+    "maximum": 365,
+    "default": 90
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "completed",
+     "expired"
+    ],
+    "readOnly": true
+   },
+   "itemCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "decidedCount": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "Kept by `decideAccessReviewItem` in the same write, so the campaign list needs no count query."
+   },
+   "revokedCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "createdByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "closedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   }
+  }
+ },
+ "IdentityAccessReviewItem": {
+  "type": "object",
+  "x-ticvai-persistence": "identity.access_review_item",
+  "description": "One grant under review in a campaign, with the finding that pre-filled it and the reviewer's decision (decided 29 September, build pass, group G2). Lifecycle in `states/access-review-item.yaml`.",
+  "required": [
+   "campaignId",
+   "delegatedAccessId",
+   "principalId",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "campaignId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "identity.access_review_campaign"
+   },
+   "delegatedAccessId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "identity.delegated_access",
+    "description": "The grant under review."
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "identity.principal"
+   },
+   "roleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "identity.role"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The grant's scope. **The partition key** (ADR-0005)."
+   },
+   "reviewerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "findingKind": {
+    "type": "string",
+    "enum": [
+     "none",
+     "excessive",
+     "conflicting"
+    ],
+    "default": "none"
+   },
+   "lastUsedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "recommendation": {
+    "type": "string",
+    "enum": [
+     "certify",
+     "revoke",
+     "review"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "certified",
+     "revoked",
+     "notReviewed"
+    ],
+    "readOnly": true
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   }
+  }
+ },
+ "IdentityPermissionFinding": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed from grants (roles, delegations, policies) against identity.access_decision and identity.segregation_rule",
+  "description": "One excessive, missing or conflicting permission (7.1.47; decided 29 September, build pass).",
+  "required": [
+   "kind",
+   "principalId",
+   "permission"
+  ],
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "excessive",
+     "missing",
+     "conflicting"
+    ]
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "roleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The role that grants it, for excessive and conflicting; the role whose peers hold it, for missing."
+   },
+   "permission": {
+    "type": "string"
+   },
+   "conflictingPermission": {
+    "type": "string",
+    "nullable": true,
+    "description": "The other half of the pair, for conflicting."
+   },
+   "segregationRuleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "grantedBy": {
+    "type": "string",
+    "enum": [
+     "role",
+     "delegation",
+     "policy"
+    ],
+    "nullable": true
+   },
+   "lastUsedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The last permit that used it; null when never used in the window."
+   },
+   "deniedCount": {
+    "type": "integer",
+    "nullable": true,
+    "description": "For missing, the denials in the window."
+   },
+   "peersHoldingPercent": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "For missing, the share of the role's holders at the same scope who hold the permission."
+   },
+   "recommendation": {
+    "type": "string",
+    "enum": [
+     "revoke",
+     "grant",
+     "review"
+    ]
+   },
+   "asDraft": {
+    "type": "boolean",
+    "default": false,
+    "description": "True when the finding exists only because of the `draftPolicyId` evaluated."
    }
   }
  },
@@ -2838,6 +3634,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   ]
  },
+ "SeatMapStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "validated",
+   "published",
+   "archived"
+  ]
+ },
  "SeatMapSummary": {
   "x-ticvai-persistence": "seating.seat_map",
   "type": "object",
@@ -3153,6 +3958,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid",
     "readOnly": true,
     "description": "From the path of `setVenueSettings`."
+   },
+   "calendarDayStartHour": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 23,
+    "nullable": true,
+    "default": 6,
+    "description": "**Where the venue's calendar day starts** (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (`calendarView` in `screens/_components.yaml`), so a venue open 06:00 to 02:00 sees its night on the day it belongs to. Display only: it moves no booking, slot or business date. Null inherits the tenant default (proposed 6, client to correct).\n"
    },
    "currencyCode": {
     "type": "string",

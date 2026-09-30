@@ -572,12 +572,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "productId"
      ],
-     "provenance": "decided 29 September 2026 (P29), MOB-3, MOB-4"
+     "provenance": "decided 29 September 2026, MOB-3, MOB-4"
     },
     {
      "to": "GST-051",
      "trigger": "Plan tab",
-     "provenance": "decided 29 September 2026 (P29), MOB-1, MOB-6"
+     "provenance": "decided 29 September 2026, MOB-1, MOB-6"
     }
    ],
    "entryFrom": [
@@ -687,7 +687,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "TenantConfig.homepage",
        "operation": "getTenantConfig",
        "notes": "The venue hero in the style the venue set on the Home section (`heroStyle`: carousel, video, poster or split). Video heroes stream; a missing asset falls back to the poster image.",
-       "provenance": "decided 29 September 2026 (P29), MOB-3"
+       "provenance": "decided 29 September 2026, MOB-3"
       },
       {
        "kind": "detailPanel",
@@ -695,21 +695,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "TenantAppStatus.venues",
        "operation": "getTenantAppStatus",
        "notes": "**Home is a venue overview** (MOB-3): the venue description, today's opening hours (from `getTenantAppStatus.venues`), getting here and before-you-go info.",
-       "provenance": "decided 29 September 2026 (P29), MOB-3"
+       "provenance": "decided 29 September 2026, MOB-3"
       },
       {
        "kind": "cardList",
        "label": "Type tiles",
        "operation": "listProductCategories",
        "notes": "Rides, dining, events and shops (the venue's own categories). A tile opens Explore (GST-002) on that type.",
-       "provenance": "decided 29 September 2026 (P29), MOB-3"
+       "provenance": "decided 29 September 2026, MOB-3"
       },
       {
        "kind": "cardList",
        "label": "Highlights per type",
        "operation": "listProducts",
        "notes": "One or two items per type (`itemsPerSection`, 1-2, set on CMS-007); a highlight opens Item Detail (GST-004). Each card shows its own primary image or clip (`Product.media`).",
-       "provenance": "decided 29 September 2026 (P29), MOB-3"
+       "provenance": "decided 29 September 2026, MOB-3"
       }
      ]
     },
@@ -904,14 +904,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "One or two highlights per type (rides, dining, events, shops) for the Home sections (MOB-3)",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), MOB-3"
+    "provenance": "decided 29 September 2026, MOB-3"
    },
    {
     "operationId": "listProductCategories",
     "contract": "catalogue",
     "purpose": "The type tiles on Home (rides, dining, events, shops)",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), MOB-3"
+    "provenance": "decided 29 September 2026, MOB-3"
    }
   ],
   "entryState": {
@@ -937,9 +937,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "prototype": {
     "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-29",
+    "verified": "2026-09-30",
     "match": "exact",
-    "view": "Home tab (launch → venue → Home); intro video on first launch",
+    "view": "Home tab (Summit Peaks, after the intro)",
     "differences": "The v4 home shows no ticket strip; `listMyEntitlements` feeds the visit-day venue suggestion only."
    }
   },
@@ -959,7 +959,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       "the rest of the video"
      ]
     },
-    "provenance": "decided 29 September 2026 (P29), MOB-5; mobile v4 prototype, launch screen"
+    "provenance": "decided 29 September 2026, MOB-5; mobile v4 prototype, launch screen"
    }
   ],
   "_platform": {
@@ -1039,7 +1039,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "GST-063",
      "trigger": "Searches (results in place)",
-     "provenance": "decided 29 September 2026 (P29), MOB-1"
+     "provenance": "decided 29 September 2026, MOB-1"
     }
    ],
    "uses": [
@@ -1113,14 +1113,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Search the venue",
        "operation": "searchCatalogue",
        "notes": "Sends `?q=` to `searchCatalogue`; results replace the tiles in place (GST-063, the same implementation).",
-       "provenance": "decided 29 September 2026 (P29), MOB-1"
+       "provenance": "decided 29 September 2026, MOB-1"
       },
       {
        "kind": "cardList",
        "label": "Inline video previews",
        "operation": "listProducts",
        "notes": "Cards play the product's own short clip muted in place (`Product.media` kind video, M17-10) and show the primary image otherwise; a card opens Item Detail (GST-004).",
-       "provenance": "decided 29 September 2026 (P29), MOB-1"
+       "provenance": "decided 29 September 2026, MOB-1"
       }
      ]
     },
@@ -1183,7 +1183,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Search from the top of Explore; results are GST-063, a state of this screen",
     "trigger": "onAction",
-    "provenance": "decided 29 September 2026 (P29), MOB-1"
+    "provenance": "decided 29 September 2026, MOB-1"
    }
   ],
   "entryState": {
@@ -1202,7 +1202,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "prototype": {
     "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-29",
+    "verified": "2026-09-30",
     "match": "exact",
     "view": "Explore tab"
    }
@@ -1289,7 +1289,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "productId"
      ],
-     "provenance": "decided 29 September 2026 (P29), MOB-2"
+     "provenance": "decided 29 September 2026, MOB-2"
     },
     {
      "to": "GST-008",
@@ -1297,7 +1297,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "productId"
      ],
-     "provenance": "decided 29 September 2026 (P29), MOB-2, W8"
+     "provenance": "decided 29 September 2026, MOB-2, W8"
     },
     {
      "to": "GST-074",
@@ -1305,7 +1305,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "productId"
      ],
-     "provenance": "decided 29 September 2026 (P29), MOB-2, W6"
+     "provenance": "decided 29 September 2026, MOB-2, W6"
     },
     {
      "to": "GST-075",
@@ -1313,12 +1313,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "productId"
      ],
-     "provenance": "decided 29 September 2026 (P29), MOB-2, W9"
+     "provenance": "decided 29 September 2026, MOB-2, W9"
     },
     {
      "to": "GST-056",
      "trigger": "Book a bundle (e.g. meal combo with admission)",
-     "provenance": "decided 29 September 2026 (P29), MOB-2, MOB-4"
+     "provenance": "decided 29 September 2026, MOB-2, MOB-4"
     },
     {
      "to": "BO-005",
@@ -1421,14 +1421,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Help me choose",
        "operation": "getPublishedGuidedChoice",
        "notes": "**Help me choose filters the list** (W4): the answers are sent as `guidedAnswerIds` to `listProducts` and only the suitable products stay; `GuidedChoice.behaviour` `recommend` opens one product instead. It is never a consent step.",
-       "provenance": "decided 29 September 2026 (P29), W4"
+       "provenance": "decided 29 September 2026, W4"
       },
       {
        "kind": "secondaryButton",
        "label": "Show everything",
        "operation": "listProducts",
        "notes": "Clears the Help me choose filter and lists every product again (`GuidedChoice.showEverything`, on by default).",
-       "provenance": "decided 29 September 2026 (P29), W4"
+       "provenance": "decided 29 September 2026, W4"
       },
       {
        "kind": "cardList",
@@ -1436,7 +1436,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "Product.salesContact",
        "operation": "listProducts",
        "notes": "**View-only products** (W3): a product with `guestListing` `infoOnly` shows its details and, instead of Book, **Call sales** and **Email sales** from `Product.salesContact` (the venue contact when it has none). Hidden when `showInfoOnly` is off.",
-       "provenance": "decided 29 September 2026 (P29), W3"
+       "provenance": "decided 29 September 2026, W3"
       }
      ]
     },
@@ -1531,7 +1531,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "white-label",
     "purpose": "Help me choose: the venue's questions whose answers filter this list (W4)",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), W4"
+    "provenance": "decided 29 September 2026, W4"
    }
   ],
   "entryState": {
@@ -1561,9 +1561,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "prototype": {
     "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-29",
+    "verified": "2026-09-30",
     "match": "exact",
-    "view": "Buy tickets (the centre button, any screen)"
+    "view": "Buy tickets (the centre tab)"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -1690,12 +1690,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "bundleId"
      ],
-     "provenance": "decided 29 September 2026 (P29), MOB-4"
+     "provenance": "decided 29 September 2026, MOB-4"
     },
     {
      "to": "GST-038",
      "trigger": "Show on the map (At the Venue, Map view)",
-     "provenance": "decided 29 September 2026 (P29), MOB-4"
+     "provenance": "decided 29 September 2026, MOB-4"
     }
    ]
   },
@@ -1777,14 +1777,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getVenueMap",
        "notes": "Photos and clips from `VenuePoint.media` (else `Product.media`), with the point's description.",
-       "provenance": "decided 29 September 2026 (P29), MOB-4"
+       "provenance": "decided 29 September 2026, MOB-4"
       },
       {
        "kind": "seatMap",
        "label": "Where it is",
        "operation": "getVenueMap",
        "notes": "The item's pin on the venue map, 2D or 3D per the venue; tapping it opens At the Venue on the Map view (GST-038 / GST-021) with directions.",
-       "provenance": "decided 29 September 2026 (P29), MOB-4"
+       "provenance": "decided 29 September 2026, MOB-4"
       },
       {
        "kind": "cardList",
@@ -1792,7 +1792,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "VenuePoint.featuredOffer",
        "operation": "getBundle",
        "notes": "**The right product** (MOB-4): `VenuePoint.featuredOffer` names a product (`getProduct`) or a bundle (`getBundle`), on any kind of point. A restaurant proposes **Buy meal combo**: a bundle with an admission component and a meal component, so the park ticket is included and checkout is about three steps (GST-056 → GST-041).",
-       "provenance": "decided 29 September 2026 (P29), MOB-4"
+       "provenance": "decided 29 September 2026, MOB-4"
       },
       {
        "kind": "secondaryButton",
@@ -1800,7 +1800,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "Product.salesContact",
        "operation": "getProduct",
        "notes": "**View-only product** (W3): with `guestListing` `infoOnly` there is no Book; the sales contact from `Product.salesContact` (phone, email, note; the venue contact when absent) is shown instead.",
-       "provenance": "decided 29 September 2026 (P29), W3"
+       "provenance": "decided 29 September 2026, W3"
       }
      ]
     },
@@ -1942,14 +1942,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "venue-map",
     "purpose": "The item's point on the 2D/3D venue map, with its description, media and featured offer (MOB-4)",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), MOB-4"
+    "provenance": "decided 29 September 2026, MOB-4"
    },
    {
     "operationId": "getBundle",
     "contract": "promotions",
     "purpose": "The featured offer when it is a bundle, e.g. meal combo with admission (MOB-4)",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), MOB-4"
+    "provenance": "decided 29 September 2026, MOB-4"
    }
   ],
   "entryState": {
@@ -1989,9 +1989,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "prototype": {
     "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-29",
+    "verified": "2026-09-30",
     "match": "exact",
-    "view": "Explore or Home → any item (Item detail)"
+    "view": "Explore → Summit Coaster (Item detail)"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -2289,7 +2289,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "productId"
      ],
-     "provenance": "decided 29 September 2026 (P29), MOB-4, W12"
+     "provenance": "decided 29 September 2026, MOB-4, W12"
     }
    ]
   },
@@ -2393,9 +2393,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "prototype": {
     "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-29",
+    "verified": "2026-09-30",
     "match": "exact",
-    "view": "Explore → an event (Item detail)"
+    "view": "Explore → Shows → Night of Nine → More info (Item detail, an event)"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -4462,8 +4462,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "A ULID, matching `TicketStatus.ticketId` — **stable for the life of the ticket and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement with a new `mediaCode`.\n**This is the ticket id.** Wherever an operation takes a `ticketId` or `ticketIds` — `lookupTicket`, `listScans`, `ScanEvent`, the offline package and `transferOrderTickets` — it is this value. An order line's `entitlementIds` are the ticket ids of that line.\n"
+    "format": "uuid",
+    "description": "A UUIDv7, matching `TicketStatus.ticketId` — **stable for the life of the ticket and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement with a new `mediaCode`.\n**This is the ticket id.** Wherever an operation takes a `ticketId` or `ticketIds` — `lookupTicket`, `listScans`, `ScanEvent`, the offline package and `transferOrderTickets` — it is this value. An order line's `entitlementIds` are the ticket ids of that line.\n"
    },
    "templateId": {
     "type": "string",
@@ -4476,8 +4476,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "The order's id, a ULID as in `/orders/{orderId}` (`orders.sales_order.id`)."
+    "format": "uuid",
+    "description": "The order's id, a UUIDv7 as in `/orders/{orderId}` (`orders.sales_order.id`)."
    },
    "orderLineId": {
     "type": "string",
@@ -4596,7 +4596,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "supersedesEntitlementId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "For a reissue or a resale. **The chain is traceable** — a ticket appearing from nowhere is indistinguishable from a fraudulent one.\n"
    },
@@ -4955,9 +4955,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "readOnly": true,
-    "description": "ULID."
+    "description": "UUIDv7."
    },
    "venueId": {
     "type": "string",
@@ -5014,9 +5014,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "properties": {
       "id": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "format": "uuid",
        "readOnly": true,
-       "description": "ULID. The row's own key."
+       "description": "UUIDv7. The row's own key."
       },
       "title": {
        "$ref": "#/components/schemas/LocalisedText"
@@ -5051,9 +5051,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
         "properties": {
          "id": {
           "type": "string",
-          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+          "format": "uuid",
           "readOnly": true,
-          "description": "ULID. The row's own key."
+          "description": "UUIDv7. The row's own key."
          },
          "title": {
           "$ref": "#/components/schemas/LocalisedText"
@@ -7818,8 +7818,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "batchId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "ULID minted by the runtime; a retried beacon repeats it."
+    "format": "uuid",
+    "description": "UUIDv7 minted by the runtime; a retried beacon repeats it."
    },
    "sessionRef": {
     "type": "string",

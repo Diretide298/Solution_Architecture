@@ -1,6 +1,6 @@
 # WS100 — Subscription Licensing AI Self Service board 3
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 9 operations · 10 schemas · 3 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `PLATFORM_BILLING_MANAGE, PLATFORM_PLAN_MANAGE, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-389` | Commercial Rules Engine Overview | commandCentre | 0 | 0 | — |
-| `ADM-390` | VSI Model Builder | configEditor | 0 | 0 | — |
-| `ADM-391` | VSI Scoring & Tier Threshold Configuration | listDetail | 0 | 0 | — |
-| `ADM-392` | Subscription Tier Configuration | listDetail | 0 | 0 | — |
-| `ADM-393` | Tier Included Allowances | configEditor | 0 | 0 | — |
-| `ADM-394` | Commercial & Licensing Model Configuration | configEditor | 0 | 0 | — |
-| `ADM-395` | Billable Unit, Minimum Guarantee & Enforcement Rules | configEditor | 0 | 0 | — |
-| `ADM-396` | Overage Pricing & Capacity Packs | configEditor | 0 | 0 | — |
-| `ADM-397` | Commercial Model & Rule Simulation | listDetail | 0 | 0 | — |
-| `ADM-398` | Rule Versioning, Approval & Publication | listDetail | 0 | 0 | — |
+| `ADM-389` | Commercial Rules Engine Overview | commandCentre | 1 | 0 | — |
+| `ADM-390` | VSI Model Builder | configEditor | 2 | 0 | — |
+| `ADM-391` | VSI Scoring & Tier Threshold Configuration | listDetail | 1 | 0 | — |
+| `ADM-392` | Subscription Tier Configuration | listDetail | 2 | 0 | — |
+| `ADM-393` | Tier Included Allowances | configEditor | 1 | 0 | — |
+| `ADM-394` | Commercial & Licensing Model Configuration | configEditor | 1 | 0 | — |
+| `ADM-395` | Billable Unit, Minimum Guarantee & Enforcement Rules | configEditor | 1 | 0 | — |
+| `ADM-396` | Overage Pricing & Capacity Packs | configEditor | 2 | 0 | — |
+| `ADM-397` | Commercial Model & Rule Simulation | listDetail | 1 | 0 | — |
+| `ADM-398` | Rule Versioning, Approval & Publication | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
@@ -244,10 +243,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the commercial rules overview are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listLicensingModels",
+    "contract": "subscription",
+    "purpose": "The rules engine",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-389"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-389",
+   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-389"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 31. 0 of 0 labels bound to a contract property; 10 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -387,10 +395,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getVsiModel",
+    "contract": "subscription",
+    "purpose": "The VSI model",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setVsiModel",
+    "contract": "subscription",
+    "purpose": "Build it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getVsiModel"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-390"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-390",
+   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-390"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 32. 0 of 0 labels bound to a contract property; 10 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -469,7 +496,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setVsiModel",
+       "label": "Save VSI model",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setVsiModel"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The vsi scoring tier list.",
@@ -478,10 +525,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the vsi scoring tier are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setVsiModel",
+    "contract": "subscription",
+    "purpose": "Scoring and tier thresholds",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getVsiModel"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-391"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-391",
+   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-391"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 33. 0 of 0 labels bound to a contract property; 0 of 1 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -560,7 +619,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createPlan",
+       "label": "Create plan",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listPlans",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createPlan"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The subscription tier list.",
@@ -569,10 +654,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the subscription tier are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createPlan",
+    "contract": "subscription",
+    "purpose": "Tier configuration",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listPlans",
+    "contract": "subscription",
+    "purpose": "Tiers defined",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-392"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-392",
+   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-392"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 34. 0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -700,10 +801,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setLicensingModel",
+    "contract": "subscription",
+    "purpose": "Tier allowances",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listLicensingModels"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-393"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-393",
+   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-393"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 35. 0 of 0 labels bound to a contract property; 9 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -901,10 +1014,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setLicensingModel",
+    "contract": "subscription",
+    "purpose": "Commercial and licensing model",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listLicensingModels"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-394"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-394",
+   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-394"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 36. 0 of 0 labels bound to a contract property; 23 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1072,10 +1197,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setLicensingModel",
+    "contract": "subscription",
+    "purpose": "Billable unit and minimum guarantee",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listLicensingModels"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-395"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-395",
+   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-395"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 38. 0 of 0 labels bound to a contract property; 17 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1213,10 +1350,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setLicensingModel",
+    "contract": "subscription",
+    "purpose": "Overage pricing",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listLicensingModels"
+    ]
+   },
+   {
+    "operationId": "addCapacityPack",
+    "contract": "subscription",
+    "purpose": "Capacity packs",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getLicenceEnforcement",
+     "getEntitlementUsage"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-396"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-396",
+   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-396"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 39. 0 of 0 labels bound to a contract property; 11 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1346,7 +1506,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the commercial model rule are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "simulateCommercialPackage",
+    "contract": "subscription",
+    "purpose": "Simulate the model",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Customer Annual Cost",
@@ -1359,7 +1527,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-397"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-397",
+   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-397"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 40. 0 of 8 labels bound to a contract property; 8 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1459,6 +1628,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 41 §Actions"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -1469,12 +1642,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyNoResults": "The filter narrowed it and the rule versioning approval are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createPlanVersion",
+    "contract": "subscription",
+    "purpose": "Publish a version",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-398"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-398",
+   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-398"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 41. 0 of 0 labels bound to a contract property; 2 of 73 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "planId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1507,7 +1697,172 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
 Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
 
 ```json
-{}
+{
+ "addCapacityPack": {
+  "method": "POST",
+  "path": "/capacity-packs",
+  "contract": "subscription",
+  "summary": "Buy headroom without changing tier",
+  "permission": "PLATFORM_BILLING_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CapacityPack",
+  "responds": "CapacityPack"
+ },
+ "createPlan": {
+  "method": "POST",
+  "path": "/plans",
+  "contract": "subscription",
+  "summary": "Create a subscription plan",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePlanRequest",
+  "responds": "Plan"
+ },
+ "createPlanVersion": {
+  "method": "POST",
+  "path": "/plans/{planId}",
+  "contract": "subscription",
+  "summary": "Publish a new version of a plan",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePlanRequest",
+  "responds": "Plan"
+ },
+ "getVsiModel": {
+  "method": "GET",
+  "path": "/vsi-models",
+  "contract": "subscription",
+  "summary": "How a customer's scale is scored into a tier",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VsiModel"
+ },
+ "listLicensingModels": {
+  "method": "GET",
+  "path": "/licensing-models",
+  "contract": "subscription",
+  "summary": "Billable units, minimum guarantees and overage",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "LicensingModel"
+ },
+ "listPlans": {
+  "method": "GET",
+  "path": "/plans",
+  "contract": "subscription",
+  "summary": "List subscription plans",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "offeredToTenantId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "packageKind",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "Plan"
+ },
+ "setLicensingModel": {
+  "method": "PUT",
+  "path": "/licensing-models",
+  "contract": "subscription",
+  "summary": "Define the billable unit and what happens at the edges",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "LicensingModel",
+  "responds": "LicensingModel"
+ },
+ "setVsiModel": {
+  "method": "PUT",
+  "path": "/vsi-models",
+  "contract": "subscription",
+  "summary": "Weights, thresholds and the tiers they map to",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VsiModel",
+  "responds": "VsiModel"
+ },
+ "simulateCommercialPackage": {
+  "method": "POST",
+  "path": "/package-simulations",
+  "contract": "subscription",
+  "summary": "What this package would cost, and what it would provision",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PackageSimulationRequest",
+  "responds": "PackageSimulation"
+ }
+}
 ```
 
 ## `schemas.json`
@@ -1515,5 +1870,506 @@ Method, path, parameters, request and response for every operation these screens
 The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
 
 ```json
-{}
+{
+ "CapacityPack": {
+  "type": "object",
+  "x-ticvai-persistence": "subscription.capacity_pack",
+  "description": "Board 3.8. **A good season should not require renegotiating a contract in August.**\n",
+  "required": [
+   "tenantId",
+   "unit",
+   "quantity"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "unit": {
+    "type": "string"
+   },
+   "quantity": {
+    "type": "integer"
+   },
+   "price": {
+    "x-ticvai-column": "list_price",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "temporary": {
+    "type": "boolean",
+    "default": true
+   },
+   "approvedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "invoiceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
+ "CellTier": {
+  "type": "string",
+  "enum": [
+   "shared",
+   "dedicated",
+   "isolated",
+   "clientHosted"
+  ]
+ },
+ "CreatePlanRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "code",
+   "name",
+   "cellTier",
+   "licensedModules",
+   "limits",
+   "basePrice"
+  ],
+  "properties": {
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "cellTier": {
+    "$ref": "#/components/schemas/CellTier"
+   },
+   "licensedModules": {
+    "type": "array",
+    "minItems": 1,
+    "description": "**A closed set as of 24 August.** `moduleKey` was a free string, so nothing could join a licence to a screen — **a tenant without an F&B licence was still served every F&B screen**, because no screen said which module it belonged to in a form the licence could match.\n**The key is the join.** `screen.requiresModule` names one of these, and navigation is built from the intersection of what a tenant licensed and what their role permits.\n",
+    "items": {
+     "$ref": "#/components/schemas/ModuleKey"
+    }
+   },
+   "limits": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/EntitlementLimit"
+    }
+   },
+   "basePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "billingPeriod": {
+    "type": "string",
+    "enum": [
+     "monthly",
+     "quarterly",
+     "annual"
+    ]
+   },
+   "includesBrandedApp": {
+    "type": "boolean",
+    "description": "Branded native publishing carries per-tenant operational cost and is priced, not absorbed.\n"
+   },
+   "includedAiTokens": {
+    "type": "integer",
+    "nullable": true,
+    "description": "AI tokens the package includes per billing period. Usage beyond it is a `metered` invoice line at the AI module's price (decided 29 September)."
+   },
+   "packageKind": {
+    "type": "string",
+    "enum": [
+     "standard",
+     "custom"
+    ],
+    "default": "standard",
+    "description": "**Three standard packages, and custom ones allowed** (decided 29 September, Chinmay)."
+   },
+   "offeredToTenantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Private to one tenant** (decided 29 September, Chinmay): a custom package offered only to this tenant; `listPlans` shows it to no other tenant and `setSubscription` refuses it for any other (422 `plan-not-offered`). Null for a package any tenant may buy. Custom packages only."
+   }
+  }
+ },
+ "EntitlementLimit": {
+  "type": "object",
+  "required": [
+   "metric",
+   "limit"
+  ],
+  "properties": {
+   "metric": {
+    "$ref": "#/components/schemas/UsageMetric"
+   },
+   "limit": {
+    "type": "integer",
+    "nullable": true,
+    "x-ticvai-column": "limit_value",
+    "description": "Null means unlimited. Stored as `limit_value` — `limit` is a reserved word, and `subscription.tier_allowance` already names the same figure `limit_value`."
+   },
+   "overageAllowed": {
+    "type": "boolean",
+    "default": false
+   },
+   "overageUnitPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  }
+ },
+ "LicensingModel": {
+  "type": "object",
+  "x-ticvai-persistence": "subscription.licensing_model",
+  "description": "Boards 3.6 and 3.7. **The single most consequential commercial decision in the product.**\n",
+  "required": [
+   "code",
+   "billableUnit"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "billableUnit": {
+    "type": "string",
+    "enum": [
+     "perVenue",
+     "perAdmission",
+     "perTransaction",
+     "perActiveUser",
+     "perDevice",
+     "perModule",
+     "flatFee",
+     "revenueShare"
+    ]
+   },
+   "unitPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "revenueSharePercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "minimumGuarantee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "minimumGuaranteePeriod": {
+    "type": "string",
+    "enum": [
+     "monthly",
+     "quarterly",
+     "annual"
+    ],
+    "nullable": true
+   },
+   "onBelowMinimum": {
+    "type": "string",
+    "enum": [
+     "chargeMinimum",
+     "carryForward",
+     "waive"
+    ],
+    "default": "chargeMinimum",
+    "description": "**A minimum guarantee with no enforcement rule is a number in a contract.**"
+   },
+   "includedAllowances": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "integer"
+    }
+   },
+   "overagePricing": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "unit": {
+       "type": "string"
+      },
+      "fromQuantity": {
+       "type": "integer"
+      },
+      "unitPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "tierCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   }
+  }
+ },
+ "ModuleKey": {
+  "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+ },
+ "PackageSimulation": {
+  "type": "object",
+  "description": "Boards 3.9 and 4.8. **Refused at quote time rather than at go-live.**",
+  "properties": {
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "baseTier",
+        "module",
+        "addOn",
+        "capacityPack",
+        "overage",
+        "professionalServices",
+        "discount"
+       ]
+      },
+      "label": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "number",
+       "nullable": true
+      },
+      "unitPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "amount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "recurringTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "oneOffTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "contractTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "minimumGuarantee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "findings": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "severity": {
+       "type": "string",
+       "enum": [
+        "blocking",
+        "warning",
+        "advisory"
+       ]
+      },
+      "code": {
+       "type": "string"
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "provisionable": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PackageSimulationRequest": {
+  "type": "object",
+  "required": [
+   "tierCode"
+  ],
+  "properties": {
+   "tierCode": {
+    "type": "string"
+   },
+   "licensingModelId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "moduleCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "venueCount": {
+    "type": "integer",
+    "default": 1
+   },
+   "projectedVolumes": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "integer"
+    }
+   },
+   "contractMonths": {
+    "type": "integer",
+    "default": 12
+   },
+   "billingCycle": {
+    "type": "string",
+    "nullable": true
+   },
+   "currency": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "Plan": {
+  "x-ticvai-persistence": "subscription.plan + subscription.plan_module + subscription.plan_limit",
+  "description": "**A plan's modules and limits are rows, keyed on `plan_id`.** `licensedModules` and `limits` are required on every plan, and `subscription.plan` alone had no column for either — so the licence position, the downgrade check and every module gate had nothing to read. `plan_module` holds one row per licensed `ModuleKey`; `plan_limit` one row per `EntitlementLimit`. Both belong to the plan version the row is, so a subscriber on an earlier version keeps the modules and limits they were sold.",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreatePlanRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "version",
+     "isActive",
+     "subscriberCount"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "version": {
+      "type": "string",
+      "description": "Existing subscribers stay on the version they were sold. A price change never applies retroactively.\n"
+     },
+     "isActive": {
+      "type": "boolean"
+     },
+     "subscriberCount": {
+      "type": "integer"
+     },
+     "publishedAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  ]
+ },
+ "VsiModel": {
+  "type": "object",
+  "x-ticvai-persistence": "subscription.vsi_model",
+  "description": "Board 3.2. **The number the whole commercial model hangs on**, and configurable so a prospect reaches a package without a sales call.\n",
+  "properties": {
+   "version": {
+    "type": "integer"
+   },
+   "factors": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "annualVisitors",
+        "peakDailyCapacity",
+        "venueCount",
+        "salesChannels",
+        "moduleCount",
+        "integrationComplexity",
+        "seasonality",
+        "operatingHours",
+        "staffCount"
+       ]
+      },
+      "label": {
+       "type": "string"
+      },
+      "weight": {
+       "type": "number"
+      },
+      "bands": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "properties": {
+         "upTo": {
+          "type": "number",
+          "nullable": true
+         },
+         "points": {
+          "type": "number"
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "tiers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string"
+      },
+      "name": {
+       "type": "string"
+      },
+      "minimumScore": {
+       "type": "number"
+      },
+      "maximumScore": {
+       "type": "number",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ }
+}
 ```

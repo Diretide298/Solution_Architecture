@@ -175,9 +175,9 @@ paths:
               properties:
                 id:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                   description: '**Created on the device**, so a retry after a dropped connection carries
-                    the same id and is the same case. A ULID, like every id created at the edge. Raising
+                    the same id and is the same case. A UUIDv7, like every id created at the edge. Raising
                     needs the connection (audit R148).
 
                     '
@@ -233,7 +233,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: replyToMyCase
       x-ticvai-consumed-by:
@@ -651,7 +651,7 @@ paths:
               properties:
                 id:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                   description: Created on the device, because a note written offline exists before it syncs.
                 recordedAt:
                   type: string
@@ -4975,7 +4975,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: getMessageStatus
       x-ticvai-consumed-by:
@@ -5130,7 +5130,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: getCase
       x-ticvai-consumed-by:
@@ -5229,7 +5229,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: addCaseMessage
       x-ticvai-consumed-by:
@@ -5271,7 +5271,7 @@ paths:
               properties:
                 id:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                 body:
                   type: string
                   minLength: 1
@@ -5304,7 +5304,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: reopenCase
       x-ticvai-consumed-by:
@@ -5369,7 +5369,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: escalateCase
       x-ticvai-consumed-by:
@@ -5696,7 +5696,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: respondToReview
       x-ticvai-consumed-by:
@@ -8932,13 +8932,13 @@ paths:
           required: false
           schema:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         - name: orderId
           in: query
           required: false
           schema:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         - name: ticketId
           in: query
           required: false
@@ -9086,7 +9086,7 @@ paths:
           required: true
           schema:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
       responses:
         '200':
           description: The case workspace
@@ -9251,7 +9251,7 @@ paths:
           required: false
           schema:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         - name: department
           in: query
           required: false
@@ -9396,7 +9396,7 @@ paths:
           required: false
           schema:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         - name: venueId
           in: query
           required: false
@@ -10111,7 +10111,7 @@ paths:
                             maxItems: 50
                             items:
                               type: string
-                              pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                              format: uuid
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
   /quality-agent-evaluation:
@@ -12039,13 +12039,13 @@ paths:
           description: The booking.
           schema:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         - name: ticketId
           in: query
           required: false
           schema:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         - name: groupBookingId
           in: query
           required: false
@@ -12325,7 +12325,7 @@ paths:
           required: false
           schema:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         - name: method
           in: query
           required: false
@@ -12413,7 +12413,7 @@ paths:
           required: false
           schema:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         - name: performanceId
           in: query
           required: false
@@ -12548,7 +12548,7 @@ paths:
           required: false
           schema:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -12798,7 +12798,7 @@ paths:
           required: false
           schema:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         - name: mediaCode
           in: query
           required: false
@@ -12811,7 +12811,7 @@ paths:
           required: false
           schema:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         - name: customerSubjectId
           in: query
           required: false
@@ -12963,13 +12963,13 @@ paths:
           required: false
           schema:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         - name: orderId
           in: query
           required: false
           schema:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         - name: eventId
           in: query
           required: false
@@ -14840,7 +14840,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     patch:
       operationId: updateConsentQuestion
       x-ticvai-consumed-by:
@@ -14906,7 +14906,7 @@ paths:
         in: query
         schema:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
       - name: subjectId
         in: query
         schema:
@@ -14916,7 +14916,7 @@ paths:
         in: query
         schema:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       x-ticvai-permission: GUEST_VIEW
@@ -16600,7 +16600,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           readOnly: true
         kind:
           $ref: '#/components/schemas/ConsentQuestionKind'
@@ -16665,6 +16665,7 @@ components:
       properties:
         questionId:
           type: string
+          format: uuid
         version:
           type: integer
           minimum: 1
@@ -16702,7 +16703,7 @@ components:
             properties:
               questionId:
                 type: string
-                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                format: uuid
               questionVersion:
                 type: integer
                 minimum: 1
@@ -16757,11 +16758,11 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           readOnly: true
         questionId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         questionVersion:
           type: integer
           minimum: 1
@@ -16791,13 +16792,13 @@ components:
           nullable: true
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           readOnly: true
           description: Set by `orders.checkoutCart` when the cart becomes an order.
         orderLineId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           readOnly: true
         personIndex:
@@ -16857,7 +16858,7 @@ components:
             type: array
             items:
               type: string
-              pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+              format: uuid
     MarketingProgrammeTier:
       type: object
       x-ticvai-persistence: marketing.programme_tier
@@ -19634,7 +19635,7 @@ components:
             by `unmatch`, on both items.
         caseId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: The case the guest raised about it (`raiseMyCase` with `kind` `lostProperty`), where there
             is one.
@@ -21109,8 +21110,9 @@ components:
             nullable: true
           orderId:
             type: string
+            format: uuid
             nullable: true
-            description: 'The order whose checkout carried the opt-in (source `checkout`, M18-15): the ULID
+            description: 'The order whose checkout carried the opt-in (source `checkout`, M18-15): the UUIDv7
               of orders.sales_order. Null for every other source.'
             x-ticvai-references: orders.sales_order
           verifiedContactRef:
@@ -21601,7 +21603,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         subjectId:
           type: string
           format: uuid
@@ -22175,6 +22177,7 @@ components:
             version is in `MessageTemplateVersion`. (decided 29 September, data model for the agreed
             operations)'
     MessageDispatch:
+      x-ticvai-append-only: queuedAt
       x-ticvai-persistence: marketing.message_dispatch
       type: object
       required:
@@ -22310,7 +22313,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         subjectId:
           type: string
           format: uuid
@@ -22369,8 +22372,8 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a ULID.
+          format: uuid
+          description: Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7.
         caseNumber:
           type: string
           readOnly: true
@@ -22730,7 +22733,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         subjectId:
           type: string
           format: uuid
@@ -27417,7 +27420,7 @@ components:
             properties:
               caseId:
                 type: string
-                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                format: uuid
               caseNumber:
                 type: string
               customer:
@@ -27511,7 +27514,7 @@ components:
                   - requestSupervisorApproval
               caseId:
                 type: string
-                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                format: uuid
               referenceId:
                 type: string
                 nullable: true
@@ -27541,7 +27544,7 @@ components:
                   - approvalDecided
               caseId:
                 type: string
-                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                format: uuid
               message:
                 type: string
               raisedAt:
@@ -27765,7 +27768,7 @@ components:
           nullable: true
         relatedCaseId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         relatedOrderId:
           type: string
@@ -27889,7 +27892,7 @@ components:
             properties:
               caseId:
                 type: string
-                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                format: uuid
               caseNumber:
                 type: string
               subject:
@@ -27996,7 +27999,7 @@ components:
       properties:
         caseId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         caseNumber:
           type: string
         subjectId:
@@ -28139,7 +28142,7 @@ components:
           description: '**The partition key** (ADR-0005).'
         caseId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         kind:
           type: string
           enum:
@@ -28183,7 +28186,7 @@ components:
       properties:
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         order:
           type: string
           description: The order number shown to the guest.
@@ -28314,8 +28317,8 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: Client-generated ULID; equals the `Idempotency-Key` header.
+          format: uuid
+          description: Client-generated UUIDv7; equals the `Idempotency-Key` header.
         scopePath:
           type: string
           readOnly: true
@@ -28327,16 +28330,16 @@ components:
             - execute
         caseId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: Required with `execute`; the action is recorded on this case.
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         lineIds:
           type: array
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
           description: Omit for the whole order.
         action:
           type: string
@@ -28470,24 +28473,24 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: Client-generated ULID; equals the `Idempotency-Key` header.
+          format: uuid
+          description: Client-generated UUIDv7; equals the `Idempotency-Key` header.
         scopePath:
           type: string
           readOnly: true
           description: '**The partition key** (ADR-0005).'
         caseId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: Required for `fullRefund`, `partialRefund`, `feeWaiver`, `upgrade` and `discount`.
         lineIds:
           type: array
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         requestType:
           type: string
           enum:
@@ -28571,15 +28574,15 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: Client-generated ULID; equals the `Idempotency-Key` header on the write.
+          format: uuid
+          description: Client-generated UUIDv7; equals the `Idempotency-Key` header on the write.
         scopePath:
           type: string
           readOnly: true
           description: '**The partition key** (ADR-0005).'
         caseId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         department:
           type: string
           enum:
@@ -28699,7 +28702,7 @@ components:
           description: '**The partition key** (ADR-0005).'
         caseId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         caseNumber:
           type: string
           readOnly: true
@@ -28741,7 +28744,7 @@ components:
           description: The case's compensation requests (`setRefundCompensationService`) this resolution relied on.
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         rootCause:
           type: string
           enum:
@@ -28757,7 +28760,7 @@ components:
             - unknown
         duplicateOfCaseId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: Required when `resolutionCategory` is `duplicate`.
         customerNotification:
@@ -29652,7 +29655,7 @@ components:
       properties:
         caseId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         caseNumber:
           type: string
         subjectId:
@@ -29765,7 +29768,7 @@ components:
           - complaint
         caseId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         conversationId:
           type: string
@@ -30117,7 +30120,7 @@ components:
                 nullable: true
               caseId:
                 type: string
-                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                format: uuid
                 nullable: true
               agentPrincipalId:
                 type: string
@@ -30133,7 +30136,7 @@ components:
                 nullable: true
               followUpCaseId:
                 type: string
-                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                format: uuid
                 nullable: true
     ServiceAnalyticsRootCauseIntelligenceView:
       type: object
@@ -32437,11 +32440,11 @@ components:
               type: string
         booking:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: The order id.
         ticket:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: The ticket (entitlement) id.
         product:
@@ -32711,7 +32714,7 @@ components:
                   resolves it under GUEST_VIEW_PII.
               booking:
                 type: string
-                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                format: uuid
               formName:
                 type: string
               formVersion:
@@ -32752,7 +32755,7 @@ components:
               nullable: true
         booking:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: The order id.
         visitDate:
           type: string
@@ -32840,7 +32843,7 @@ components:
               description: The leader's email or mobile.
             groupBooking:
               type: string
-              pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+              format: uuid
               description: The group's order id.
             responsibility:
               type: string
@@ -32910,7 +32913,7 @@ components:
           description: The form version signed.
         booking:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         signatory:
           type: object
@@ -33138,7 +33141,7 @@ components:
               type: boolean
         booking:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         groupBookingId:
           type: string
           format: uuid
@@ -33280,10 +33283,10 @@ components:
               type: string
         booking:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         ticket:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         groupBookingId:
           type: string
@@ -33414,7 +33417,7 @@ components:
           - timeLimited
         ticketId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: Required for `ticketSpecific`.
         performanceId:
@@ -33639,11 +33642,11 @@ components:
               nullable: true
         relatedBooking:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         relatedTicket:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         applicableProductId:
           type: string
@@ -34559,7 +34562,7 @@ components:
           readOnly: true
         caseId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         reason:
           type: string
           maxLength: 500
@@ -34642,10 +34645,11 @@ components:
           nullable: true
         reviewId:
           type: string
+          format: uuid
           nullable: true
         caseId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         sentiment:
           type: string
@@ -34705,14 +34709,15 @@ components:
           format: uuid
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: The booking.
         orderLineId:
           type: string
+          format: uuid
           nullable: true
         ticketId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: The ticket (entitlement) id.
         productId:

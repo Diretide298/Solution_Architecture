@@ -35,7 +35,7 @@
    },
    "entitlementId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The credential the Face Pass belongs to"
    },
@@ -266,7 +266,7 @@
   "properties": {
    "policyId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "Absent creates a retention rule"
    },
    "venueId": {
@@ -524,8 +524,8 @@
    },
    "profileId": {
     "type": "string",
-    "description": "The profile row's key (access.biometric_profile.id, a ULID); absent creates one (decided 29 September, writers pass)",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "description": "The profile row's key (access.biometric_profile.id, a UUIDv7); absent creates one (decided 29 September, writers pass)",
+    "format": "uuid"
    },
    "selectType": {
     "type": "string",
@@ -738,7 +738,7 @@
   "properties": {
    "profileId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "Absent creates a threshold profile"
    },
    "venueId": {
@@ -1025,7 +1025,7 @@
   "properties": {
    "profileId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "Absent creates a Face Tag profile"
    },
    "venueId": {

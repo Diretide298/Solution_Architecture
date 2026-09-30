@@ -18,6 +18,25 @@
   "requestBody": "MembershipProductValidationApprovalPublicationVersioInput",
   "responds": "MembershipProductValidationApprovalPublicationVersioView"
  },
+ "createEntitlementTemplate": {
+  "method": "POST",
+  "path": "/entitlement-templates",
+  "contract": "catalogue",
+  "summary": "Create an entitlement template",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "EntitlementTemplate",
+  "responds": "EntitlementTemplate"
+ },
  "listEntitlementTemplates": {
   "method": "GET",
   "path": "/entitlement-templates",
@@ -392,6 +411,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

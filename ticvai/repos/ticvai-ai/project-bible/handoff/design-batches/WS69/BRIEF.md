@@ -1,6 +1,6 @@
 # WS69 — Unified BI Reporting and AI Analytics Platform board 4
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 11 operations · 16 schemas · 8 permissions**
 
 Platform P16 Venue Analytics · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 8 permissions apply here:
+  `APPROVAL_CONFIGURE, PERMISSION_VIEW, REPORT_EXPORT, REPORT_SCHEDULE, REPORT_VIEW_TENANT, REPORT_VIEW_VENUE, TENANT_CONFIGURE, TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ANL-041` | Reporting Governance Command Center | listDetail | 0 | 0 | — |
-| `ANL-042` | Report Scheduler | configEditor | 0 | 0 | — |
-| `ANL-043` | Subscription Manager | listDetail | 0 | 0 | — |
-| `ANL-044` | Distribution & Delivery Configuration | configEditor | 0 | 0 | — |
-| `ANL-045` | Export & Download Center | listDetail | 0 | 0 | — |
-| `ANL-046` | Report API & Data Delivery Manager | configEditor | 0 | 0 | — |
-| `ANL-047` | Report Access & Sharing Control | listDetail | 0 | 0 | — |
-| `ANL-048` | Delivery Monitoring & Failure Management | listDetail | 0 | 1 | — |
-| `ANL-049` | Report Audit Trail & Compliance | configEditor | 0 | 0 | — |
-| `ANL-050` | Retention, Archive & Governance Policy | configEditor | 0 | 0 | — |
+| `ANL-041` | Reporting Governance Command Center | listDetail | 2 | 0 | — |
+| `ANL-042` | Report Scheduler | configEditor | 2 | 0 | — |
+| `ANL-043` | Subscription Manager | listDetail | 2 | 0 | — |
+| `ANL-044` | Distribution & Delivery Configuration | configEditor | 1 | 0 | — |
+| `ANL-045` | Export & Download Center | listDetail | 2 | 0 | — |
+| `ANL-046` | Report API & Data Delivery Manager | configEditor | 1 | 0 | — |
+| `ANL-047` | Report Access & Sharing Control | listDetail | 1 | 0 | — |
+| `ANL-048` | Delivery Monitoring & Failure Management | listDetail | 1 | 1 | — |
+| `ANL-049` | Report Audit Trail & Compliance | configEditor | 1 | 0 | — |
+| `ANL-050` | Retention, Archive & Governance Policy | configEditor | 3 | 0 | — |
 
 ## Thin screens in this batch
 

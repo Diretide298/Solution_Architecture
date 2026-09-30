@@ -1,6 +1,6 @@
 # P06-operations-04 — P06 · Operations (4 of 5)
 
-**10 screens · 19 operations · 27 schemas · 9 permissions**
+**10 screens · 25 operations · 33 schemas · 9 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -50,7 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 9 permissions apply here:
   `AI_USE, ANNOUNCEMENT_PUBLISH, ASSET_LIBRARY_VIEW, DEVICE_CONFIGURE, DEVICE_VIEW, ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW, WORKFORCE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **9 of these operations work offline**: acknowledgeAnnouncement, addTip, createPayment, getCurrentSession, getGuestSession, getMediaAsset, getMediaEntitlements, listAnnouncements
+- **12 of these operations work offline**: acknowledgeAnnouncement, addTip, createPayment, getCurrentSession, getMediaAsset, getMediaEntitlements, listAnnouncements, listDevices
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
@@ -61,17 +61,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `EMP-035` | Payment on device | configEditor | 4 | 0 | — |
-| `EMP-036` | Issue media | statusTracker | 3 | 0 | — |
-| `EMP-037` | Notifications | listDetail | 4 | 0 | — |
-| `EMP-039` | Announcements | listDetail | 4 | 0 | — |
-| `EMP-038` | Broadcast to team | listDetail | 4 | 0 | — |
+| `EMP-035` | Payment on device | configEditor | 4 | 2 | — |
+| `EMP-036` | Issue media | statusTracker | 3 | 1 | — |
+| `EMP-037` | Notifications | listDetail | 8 | 1 | — |
+| `EMP-039` | Announcements | listDetail | 4 | 1 | — |
+| `EMP-038` | Broadcast to team | listDetail | 4 | 1 | — |
 | `EMP-040` | Knowledge base | configEditor | 1 | 0 | — |
-| `EMP-041` | Training | listDetail | 2 | 0 | — |
-| `EMP-042` | Profile | listDetail | 4 | 0 | — |
-| `EMP-043` | Device settings | listDetail | 2 | 0 | — |
+| `EMP-041` | Training | listDetail | 2 | 1 | — |
+| `EMP-042` | Profile | listDetail | 6 | 3 | — |
+| `EMP-043` | Device settings | listDetail | 2 | 1 | — |
 | `EMP-044` | Accessibility | listDetail | 0 | 0 | — |
 
 ## Thin screens in this batch
 
-**EMP-040, EMP-044 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**EMP-036, EMP-041, EMP-044 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

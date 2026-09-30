@@ -1,6 +1,6 @@
 # P17-package-builder-01 — P17 · Package Builder
 
-**7 screens · 0 operations · 0 schemas · 0 permissions**
+**7 screens · 5 operations · 7 schemas · 3 permissions**
 
 Platform P17 TICVAI Sign-up · ships as **ticvai-control** ·
 public audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `PLATFORM_BILLING_MANAGE, PLATFORM_PLAN_MANAGE, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,13 +60,13 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `SGN-011` | Recommended Package Overview | listDetail | 0 | 0 | — |
-| `SGN-012` | Commercial Model & Tier Selection | listDetail | 0 | 0 | — |
-| `SGN-013` | Module Marketplace | listDetail | 0 | 0 | — |
-| `SGN-014` | AI Module & Package Recommendations | listDetail | 0 | 0 | — |
-| `SGN-015` | Module Detail & Commercial Treatment | listDetail | 0 | 0 | — |
-| `SGN-016` | Module Dependency & Compatibility Manager | listDetail | 0 | 0 | — |
-| `SGN-017` | Add-Ons, Capacity & Commercial Options | listDetail | 0 | 0 | — |
+| `SGN-011` | Recommended Package Overview | listDetail | 1 | 0 | — |
+| `SGN-012` | Commercial Model & Tier Selection | listDetail | 2 | 0 | — |
+| `SGN-013` | Module Marketplace | listDetail | 1 | 0 | — |
+| `SGN-014` | AI Module & Package Recommendations | listDetail | 1 | 0 | — |
+| `SGN-015` | Module Detail & Commercial Treatment | listDetail | 1 | 0 | — |
+| `SGN-016` | Module Dependency & Compatibility Manager | listDetail | 2 | 0 | — |
+| `SGN-017` | Add-Ons, Capacity & Commercial Options | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
@@ -111,7 +110,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "simulateCommercialPackage",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "simulateCommercialPackage"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The recommended package overview list.",
@@ -132,7 +150,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 44"
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "simulateCommercialPackage",
+    "contract": "subscription",
+    "purpose": "The recommended package",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 44. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -253,7 +279,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listPlans",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "simulateCommercialPackage",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "simulateCommercialPackage"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The commercial model tier list.",
@@ -274,7 +325,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 45"
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listPlans",
+    "contract": "subscription",
+    "purpose": "Tiers to choose from",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "simulateCommercialPackage",
+    "contract": "subscription",
+    "purpose": "Price the choice",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 45. 0 of 0 labels bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -411,7 +477,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 46 §Each module displays"
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listModuleCatalogue",
+    "contract": "subscription",
+    "purpose": "The marketplace",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 46. 0 of 9 labels bound to a contract property; 9 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "entryState": {
    "preloaded": [
@@ -554,7 +628,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 48 §Each recommendation shows"
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listModuleCatalogue",
+    "contract": "subscription",
+    "purpose": "Recommended modules",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 48. 0 of 7 labels bound to a contract property; 7 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "entryState": {
    "preloaded": [
@@ -636,7 +718,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listModuleCatalogue",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The module detail commercial list.",
@@ -657,7 +751,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 49"
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listModuleCatalogue",
+    "contract": "subscription",
+    "purpose": "One module in detail",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 49. 0 of 0 labels bound to a contract property; 0 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -729,7 +831,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setModuleListing",
+       "label": "Save module listing",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listModuleCatalogue",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setModuleListing"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The module dependency compatibility list.",
@@ -755,7 +883,25 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 49"
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setModuleListing",
+    "contract": "subscription",
+    "purpose": "Dependencies and compatibility",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listModuleCatalogue"
+    ]
+   },
+   {
+    "operationId": "listModuleCatalogue",
+    "contract": "subscription",
+    "purpose": "What depends on what",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 49. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -827,7 +973,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "addCapacityPack",
+       "label": "Add capacity pack",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "addCapacityPack"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The add-ons capacity commercial list.",
@@ -848,7 +1014,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 50"
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "addCapacityPack",
+    "contract": "subscription",
+    "purpose": "Add-ons and capacity",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getLicenceEnforcement",
+     "getEntitlementUsage"
+    ]
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 50. 0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -898,7 +1076,102 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
 Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
 
 ```json
-{}
+{
+ "addCapacityPack": {
+  "method": "POST",
+  "path": "/capacity-packs",
+  "contract": "subscription",
+  "summary": "Buy headroom without changing tier",
+  "permission": "PLATFORM_BILLING_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CapacityPack",
+  "responds": "CapacityPack"
+ },
+ "listModuleCatalogue": {
+  "method": "GET",
+  "path": "/module-catalogue",
+  "contract": "subscription",
+  "summary": "Modules, their dependencies and their commercial treatment",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ModuleListing"
+ },
+ "listPlans": {
+  "method": "GET",
+  "path": "/plans",
+  "contract": "subscription",
+  "summary": "List subscription plans",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "offeredToTenantId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "packageKind",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "Plan"
+ },
+ "setModuleListing": {
+  "method": "PUT",
+  "path": "/module-catalogue",
+  "contract": "subscription",
+  "summary": "Define a module's dependencies, incompatibilities and price",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ModuleListing",
+  "responds": "ModuleListing"
+ },
+ "simulateCommercialPackage": {
+  "method": "POST",
+  "path": "/package-simulations",
+  "contract": "subscription",
+  "summary": "What this package would cost, and what it would provision",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PackageSimulationRequest",
+  "responds": "PackageSimulation"
+ }
+}
 ```
 
 ## `schemas.json`
@@ -906,5 +1179,399 @@ Method, path, parameters, request and response for every operation these screens
 The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
 
 ```json
-{}
+{
+ "CapacityPack": {
+  "type": "object",
+  "x-ticvai-persistence": "subscription.capacity_pack",
+  "description": "Board 3.8. **A good season should not require renegotiating a contract in August.**\n",
+  "required": [
+   "tenantId",
+   "unit",
+   "quantity"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "unit": {
+    "type": "string"
+   },
+   "quantity": {
+    "type": "integer"
+   },
+   "price": {
+    "x-ticvai-column": "list_price",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "temporary": {
+    "type": "boolean",
+    "default": true
+   },
+   "approvedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "invoiceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
+ "CreatePlanRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "code",
+   "name",
+   "cellTier",
+   "licensedModules",
+   "limits",
+   "basePrice"
+  ],
+  "properties": {
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "cellTier": {
+    "$ref": "#/components/schemas/CellTier"
+   },
+   "licensedModules": {
+    "type": "array",
+    "minItems": 1,
+    "description": "**A closed set as of 24 August.** `moduleKey` was a free string, so nothing could join a licence to a screen — **a tenant without an F&B licence was still served every F&B screen**, because no screen said which module it belonged to in a form the licence could match.\n**The key is the join.** `screen.requiresModule` names one of these, and navigation is built from the intersection of what a tenant licensed and what their role permits.\n",
+    "items": {
+     "$ref": "#/components/schemas/ModuleKey"
+    }
+   },
+   "limits": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/EntitlementLimit"
+    }
+   },
+   "basePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "billingPeriod": {
+    "type": "string",
+    "enum": [
+     "monthly",
+     "quarterly",
+     "annual"
+    ]
+   },
+   "includesBrandedApp": {
+    "type": "boolean",
+    "description": "Branded native publishing carries per-tenant operational cost and is priced, not absorbed.\n"
+   },
+   "includedAiTokens": {
+    "type": "integer",
+    "nullable": true,
+    "description": "AI tokens the package includes per billing period. Usage beyond it is a `metered` invoice line at the AI module's price (decided 29 September)."
+   },
+   "packageKind": {
+    "type": "string",
+    "enum": [
+     "standard",
+     "custom"
+    ],
+    "default": "standard",
+    "description": "**Three standard packages, and custom ones allowed** (decided 29 September, Chinmay)."
+   },
+   "offeredToTenantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Private to one tenant** (decided 29 September, Chinmay): a custom package offered only to this tenant; `listPlans` shows it to no other tenant and `setSubscription` refuses it for any other (422 `plan-not-offered`). Null for a package any tenant may buy. Custom packages only."
+   }
+  }
+ },
+ "ModuleListing": {
+  "type": "object",
+  "x-ticvai-persistence": "subscription.module_listing",
+  "description": "Board 4.6. **A marketplace without a dependency graph sells combinations that cannot be provisioned.**\n**TICVAI configures each module's price here, and tenants are billed per module (decided 29 September, Chinmay).** A usage-priced module (the AI module's tokens) has `pricingBasis` `metered`: `price` is then per `meteredUnitSize` units of `meteredMetric`, and the invoice carries it as a `metered` line.\n",
+  "required": [
+   "moduleCode"
+  ],
+  "properties": {
+   "moduleCode": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "category": {
+    "type": "string",
+    "nullable": true
+   },
+   "requiresModules": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "incompatibleWithModules": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "includedInTiers": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "price": {
+    "x-ticvai-column": "list_price",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "pricingBasis": {
+    "type": "string",
+    "enum": [
+     "included",
+     "flatFee",
+     "perVenue",
+     "perUnit",
+     "revenueShare",
+     "metered"
+    ]
+   },
+   "meteredMetric": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/UsageMetric"
+     }
+    ],
+    "nullable": true,
+    "description": "For `metered`, what is counted (`aiTokens` for the AI module). Null otherwise."
+   },
+   "meteredUnitSize": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "For `metered`, how many units `price` buys (e.g. 1000 tokens). Null otherwise."
+   },
+   "provisioningMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "requiresProfessionalServices": {
+    "type": "boolean",
+    "default": false
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "available",
+     "beta",
+     "deprecated",
+     "withdrawn"
+    ]
+   }
+  }
+ },
+ "PackageSimulation": {
+  "type": "object",
+  "description": "Boards 3.9 and 4.8. **Refused at quote time rather than at go-live.**",
+  "properties": {
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "baseTier",
+        "module",
+        "addOn",
+        "capacityPack",
+        "overage",
+        "professionalServices",
+        "discount"
+       ]
+      },
+      "label": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "number",
+       "nullable": true
+      },
+      "unitPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "amount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "recurringTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "oneOffTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "contractTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "minimumGuarantee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "findings": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "severity": {
+       "type": "string",
+       "enum": [
+        "blocking",
+        "warning",
+        "advisory"
+       ]
+      },
+      "code": {
+       "type": "string"
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "provisionable": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PackageSimulationRequest": {
+  "type": "object",
+  "required": [
+   "tierCode"
+  ],
+  "properties": {
+   "tierCode": {
+    "type": "string"
+   },
+   "licensingModelId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "moduleCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "venueCount": {
+    "type": "integer",
+    "default": 1
+   },
+   "projectedVolumes": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "integer"
+    }
+   },
+   "contractMonths": {
+    "type": "integer",
+    "default": 12
+   },
+   "billingCycle": {
+    "type": "string",
+    "nullable": true
+   },
+   "currency": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "Plan": {
+  "x-ticvai-persistence": "subscription.plan + subscription.plan_module + subscription.plan_limit",
+  "description": "**A plan's modules and limits are rows, keyed on `plan_id`.** `licensedModules` and `limits` are required on every plan, and `subscription.plan` alone had no column for either — so the licence position, the downgrade check and every module gate had nothing to read. `plan_module` holds one row per licensed `ModuleKey`; `plan_limit` one row per `EntitlementLimit`. Both belong to the plan version the row is, so a subscriber on an earlier version keeps the modules and limits they were sold.",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreatePlanRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "version",
+     "isActive",
+     "subscriberCount"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "version": {
+      "type": "string",
+      "description": "Existing subscribers stay on the version they were sold. A price change never applies retroactively.\n"
+     },
+     "isActive": {
+      "type": "boolean"
+     },
+     "subscriberCount": {
+      "type": "integer"
+     },
+     "publishedAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  ]
+ },
+ "UsageMetric": {
+  "type": "string",
+  "enum": [
+   "venues",
+   "workstations",
+   "activeUsers",
+   "devices",
+   "brandedApps",
+   "aiTokens",
+   "apiCalls",
+   "storageGb",
+   "transactions",
+   "guestProfiles"
+  ]
+ }
+}
 ```

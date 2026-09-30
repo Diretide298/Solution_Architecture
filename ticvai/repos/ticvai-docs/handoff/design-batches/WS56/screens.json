@@ -39,10 +39,7 @@
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-248 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-249",
@@ -101,13 +98,103 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can understand the real-time state and health of workflow execution across the entire TICVAI platform.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide administrators and operational managers with a real-time view of all workflow activity across TICVAI.",
-  "purposeNote": "Authorized users can understand the real-time state and health of workflow execution across the entire TICVAI platform.",
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Workflows Running",
+       "bindsTo": "WorkflowOperationsCommandCenterViewSummary.workflowsRunning",
+       "operation": "listWorkflow",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Started Today",
+       "bindsTo": "WorkflowOperationsCommandCenterViewSummary.startedToday",
+       "operation": "listWorkflow",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Completed Today",
+       "bindsTo": "WorkflowOperationsCommandCenterViewSummary.completedToday",
+       "operation": "listWorkflow",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pending Approvals",
+       "bindsTo": "WorkflowOperationsCommandCenterViewSummary.pendingApprovals",
+       "operation": "listWorkflow",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Waiting Tasks",
+       "bindsTo": "WorkflowOperationsCommandCenterViewSummary.waitingTasks",
+       "operation": "listWorkflow",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "SLA At Risk",
+       "bindsTo": "WorkflowOperationsCommandCenterViewSummary.slaAtRisk",
+       "operation": "listWorkflow",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "SLA Breached",
+       "bindsTo": "WorkflowOperationsCommandCenterViewSummary.slaBreached",
+       "operation": "listWorkflow",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Failed Workflows",
+       "bindsTo": "WorkflowOperationsCommandCenterViewSummary.failedWorkflows",
+       "operation": "listWorkflow",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Escalated",
+       "bindsTo": "WorkflowOperationsCommandCenterViewSummary.escalated",
+       "operation": "listWorkflow",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Automated Executions",
+       "bindsTo": "WorkflowOperationsCommandCenterViewSummary.automatedExecutions",
+       "operation": "listWorkflow",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Minutes",
+       "bindsTo": "WorkflowOperationsCommandCenterViewSummary.averageCompletionTime",
+       "operation": "listWorkflow",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Automation Success Rate",
+       "bindsTo": "WorkflowOperationsCommandCenterViewSummary.automationSuccessRate",
+       "operation": "listWorkflow",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -116,18 +203,6 @@
        "kind": "dataTable",
        "label": "Every workflow operations",
        "columns": [
-        "WorkflowOperationsCommandCenterView.workflowsRunning",
-        "WorkflowOperationsCommandCenterView.startedToday",
-        "WorkflowOperationsCommandCenterView.completedToday",
-        "WorkflowOperationsCommandCenterView.pendingApprovals",
-        "WorkflowOperationsCommandCenterView.waitingTasks",
-        "WorkflowOperationsCommandCenterView.slaAtRisk",
-        "WorkflowOperationsCommandCenterView.slaBreached",
-        "WorkflowOperationsCommandCenterView.failedWorkflows",
-        "WorkflowOperationsCommandCenterView.escalated",
-        "WorkflowOperationsCommandCenterView.automatedExecutions",
-        "WorkflowOperationsCommandCenterView.averageCompletionTime",
-        "WorkflowOperationsCommandCenterView.automationSuccessRate",
         "WorkflowOperationsCommandCenterView.workflowInstanceId",
         "WorkflowOperationsCommandCenterView.workflow",
         "WorkflowOperationsCommandCenterView.module",
@@ -155,18 +230,6 @@
        "label": "The selected workflow operations",
        "bindsTo": "WorkflowOperationsCommandCenterView",
        "columns": [
-        "WorkflowOperationsCommandCenterView.workflowsRunning",
-        "WorkflowOperationsCommandCenterView.startedToday",
-        "WorkflowOperationsCommandCenterView.completedToday",
-        "WorkflowOperationsCommandCenterView.pendingApprovals",
-        "WorkflowOperationsCommandCenterView.waitingTasks",
-        "WorkflowOperationsCommandCenterView.slaAtRisk",
-        "WorkflowOperationsCommandCenterView.slaBreached",
-        "WorkflowOperationsCommandCenterView.failedWorkflows",
-        "WorkflowOperationsCommandCenterView.escalated",
-        "WorkflowOperationsCommandCenterView.automatedExecutions",
-        "WorkflowOperationsCommandCenterView.averageCompletionTime",
-        "WorkflowOperationsCommandCenterView.automationSuccessRate",
         "WorkflowOperationsCommandCenterView.workflowInstanceId",
         "WorkflowOperationsCommandCenterView.workflow",
         "WorkflowOperationsCommandCenterView.module",
@@ -203,18 +266,19 @@
   ],
   "entryState": {
    "preloaded": [
-    "WorkflowOperationsCommandCenterView.workflowsRunning",
-    "WorkflowOperationsCommandCenterView.startedToday",
-    "WorkflowOperationsCommandCenterView.completedToday",
-    "WorkflowOperationsCommandCenterView.pendingApprovals",
-    "WorkflowOperationsCommandCenterView.waitingTasks",
-    "WorkflowOperationsCommandCenterView.slaAtRisk"
+    "WorkflowOperationsCommandCenterViewSummary.workflowsRunning",
+    "WorkflowOperationsCommandCenterViewSummary.startedToday",
+    "WorkflowOperationsCommandCenterViewSummary.completedToday",
+    "WorkflowOperationsCommandCenterViewSummary.pendingApprovals",
+    "WorkflowOperationsCommandCenterViewSummary.waitingTasks",
+    "WorkflowOperationsCommandCenterViewSummary.slaAtRisk"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-248"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-248",
+   "workshopBoard": "wireframes/WS137 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-248"
   },
   "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 23. 23 of 23 labels bound to a contract property; 23 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -272,16 +336,15 @@
     {
      "to": "ADM-248",
      "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F165 step 2→3",
-     "operation": "approveUnifiedDecision"
+     "provenance": "flow F165 step 2→3"
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized approvers can review and action approval requests from all TICVAI modules through one governed inbox.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide users with one approval inbox across all TICVAI modules. This is extremely important. A manager should not need to open Finance for one approval, Pricing for another, Procurement for another, and Customer Service for another.",
-  "purposeNote": "Authorized approvers can review and action approval requests from all TICVAI modules through one governed inbox.",
   "layout": {
    "template": "split",
    "regions": [
@@ -293,19 +356,18 @@
        "kind": "dataTable",
        "label": "Every unified approval decision",
        "columns": [
-        "UnifiedApprovalInboxDecisionWorkspaceView.approvalId",
-        "UnifiedApprovalInboxDecisionWorkspaceView.requestType",
-        "UnifiedApprovalInboxDecisionWorkspaceView.sourceModule",
-        "UnifiedApprovalInboxDecisionWorkspaceView.requester",
-        "UnifiedApprovalInboxDecisionWorkspaceView.amountImpact",
-        "UnifiedApprovalInboxDecisionWorkspaceView.priority",
-        "UnifiedApprovalInboxDecisionWorkspaceView.submitted",
-        "UnifiedApprovalInboxDecisionWorkspaceView.slaRemaining",
-        "UnifiedApprovalInboxDecisionWorkspaceView.approvalLevel",
-        "UnifiedApprovalInboxDecisionWorkspaceView.status"
+        "ApprovalRequest.id",
+        "ApprovalRequest.kind",
+        "ApprovalRequest.subjectContract",
+        "ApprovalRequest.requestedByPrincipalId",
+        "ApprovalRequest.amount",
+        "ApprovalRequest.requestedAt",
+        "ApprovalRequest.slaDueAt",
+        "ApprovalRequest.currentLevel",
+        "ApprovalRequest.status"
        ],
-       "bindsTo": "UnifiedApprovalInboxDecisionWorkspaceView",
-       "operation": "approveUnifiedDecision",
+       "bindsTo": "ApprovalRequest",
+       "operation": "listApprovalRequests",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 25 §Display"
       }
      ]
@@ -317,18 +379,17 @@
       {
        "kind": "detailPanel",
        "label": "The selected unified approval decision",
-       "bindsTo": "UnifiedApprovalInboxDecisionWorkspaceView",
+       "bindsTo": "ApprovalRequest",
        "columns": [
-        "UnifiedApprovalInboxDecisionWorkspaceView.approvalId",
-        "UnifiedApprovalInboxDecisionWorkspaceView.requestType",
-        "UnifiedApprovalInboxDecisionWorkspaceView.sourceModule",
-        "UnifiedApprovalInboxDecisionWorkspaceView.requester",
-        "UnifiedApprovalInboxDecisionWorkspaceView.amountImpact",
-        "UnifiedApprovalInboxDecisionWorkspaceView.priority",
-        "UnifiedApprovalInboxDecisionWorkspaceView.submitted",
-        "UnifiedApprovalInboxDecisionWorkspaceView.slaRemaining",
-        "UnifiedApprovalInboxDecisionWorkspaceView.approvalLevel",
-        "UnifiedApprovalInboxDecisionWorkspaceView.status"
+        "ApprovalRequest.id",
+        "ApprovalRequest.kind",
+        "ApprovalRequest.subjectContract",
+        "ApprovalRequest.requestedByPrincipalId",
+        "ApprovalRequest.amount",
+        "ApprovalRequest.requestedAt",
+        "ApprovalRequest.slaDueAt",
+        "ApprovalRequest.currentLevel",
+        "ApprovalRequest.status"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Pricing”, “Customer Service”, “Procurement”, “Resource Management”, “Request”, “Context”.",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 25 §Display"
@@ -342,7 +403,8 @@
       {
        "kind": "primaryButton",
        "label": "Approve",
-       "provenance": "contract operation approveUnifiedDecision"
+       "operation": "decideApprovalRequest",
+       "provenance": "contract operation decideApprovalRequest"
       }
      ]
     }
@@ -357,29 +419,55 @@
   },
   "apis": [
    {
-    "operationId": "approveUnifiedDecision",
+    "operationId": "listApprovalRequests",
     "contract": "approvals",
-    "purpose": "Unified Approval Inbox & Decision Workspace",
+    "purpose": "The approval inbox",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, readiness close-out (QA wiring note)"
+   },
+   {
+    "operationId": "decideApprovalRequest",
+    "contract": "approvals",
+    "purpose": "Approve, reject, return or ask for more",
     "trigger": "onAction",
+    "provenance": "decided 29 September, readiness close-out (QA wiring note)",
     "invalidates": [
-     "approveUnifiedDecision"
+     "listApprovalRequests"
     ]
+   },
+   {
+    "operationId": "getApprovalRequestScore",
+    "contract": "ai",
+    "purpose": "Risk band, priority and suggested escalation for the request, as context only (no approve/reject suggestion)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
    "preloaded": [
-    "UnifiedApprovalInboxDecisionWorkspaceView.approvalId",
-    "UnifiedApprovalInboxDecisionWorkspaceView.requestType",
-    "UnifiedApprovalInboxDecisionWorkspaceView.sourceModule",
-    "UnifiedApprovalInboxDecisionWorkspaceView.requester",
-    "UnifiedApprovalInboxDecisionWorkspaceView.amountImpact",
+    "ApprovalRequest.id",
+    "ApprovalRequest.kind",
+    "ApprovalRequest.subjectContract",
+    "ApprovalRequest.requestedByPrincipalId",
+    "ApprovalRequest.amount",
     "UnifiedApprovalInboxDecisionWorkspaceView.priority"
+   ],
+   "params": [
+    {
+     "name": "requestId",
+     "from": "navigation"
+    },
+    {
+     "name": "approvalRequestId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-249"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-249",
+   "workshopBoard": "wireframes/WS137 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-249"
   },
   "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 25. 10 of 10 labels bound to a contract property; 10 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -443,10 +531,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can reconstruct exactly how a workflow reached its current state and why every major decision or action occurred.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§For each step show) — counts over a population, then the population",
   "purpose": "Allow administrators to inspect exactly what is happening inside an individual running workflow.",
-  "purposeNote": "Administrators can reconstruct exactly how a workflow reached its current state and why every major decision or action occurred.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -575,6 +663,14 @@
        "label": "Permissions this screen separates",
        "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Reassign, Retry Step, Skip Step where explicitly allowed, Cancel Workflow, Resume, Escalate, Open Source Record. Each needs attaching to the control it gates, or the screen needs the control.",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 27 §Subject to permissions"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Act on workflow instance",
+       "operation": "actOnWorkflowInstance",
+       "permission": "APPROVAL_ACT",
+       "notes": "**The monitors' action buttons, as one operation** (decided 29 September, writers pass).",
+       "provenance": "contract approvals.yaml POST /workflow-instances/{instanceId}/actions"
       }
      ]
     }
@@ -593,14 +689,61 @@
     "contract": "approvals",
     "purpose": "Workflow Instance Monitor & Process Timeline",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "actOnWorkflowInstance",
+    "contract": "approvals",
+    "purpose": "An operator's intervention in a running workflow",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkflowInstanceProcess"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-250"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-250",
+   "workshopBoard": "wireframes/WS137 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-250"
   },
   "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 27. 20 of 20 labels bound to a contract property; 27 of 52 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formActOnWorkflowInstance",
+    "component": "modal",
+    "trigger": "Act on workflow instance",
+    "body": "**Collects what `actOnWorkflowInstance` sends before it is called.** Required: `action`, `reason`. Optional: `workflowStepExecutionId`, `workflowExceptionId`, `assigneePrincipalId`, `alternativeNodeId`, `correctedInput`, `extendByMinutes`, `priority`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "WorkflowInstanceActionInput",
+    "confirm": {
+     "label": "Act on workflow instance",
+     "operation": "actOnWorkflowInstance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "action",
+      "reason",
+      "workflowStepExecutionId",
+      "workflowExceptionId",
+      "assigneePrincipalId",
+      "alternativeNodeId",
+      "correctedInput",
+      "extendByMinutes",
+      "priority"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /workflow-instances/{instanceId}/actions"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "instanceId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -662,14 +805,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Failed workflows can be identified, investigated, recovered or safely compensated without losing business context or audit history.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide one controlled workspace for failed workflow executions.",
-  "purposeNote": "Failed workflows can be identified, investigated, recovered or safely compensated without losing business context or audit history.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Business Rule Failure, Duplicate Event, Configuration Error, Retry, Retry From Step, Resume, Cancel, Escalate. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 15 actions on this screen and the screen declares 1 operation.** Unserved: Business Rule Failure, Missing Data, Permission Failure, Integration Failure, Action Failure, Duplicate Event, Service Unavailable, Configuration Error …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Support"
    }
   ],
@@ -739,7 +882,32 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Missing Data",
+       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Permission Failure",
+       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Integration Failure",
+       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Action Failure",
+       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Duplicate Event",
+       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Service Unavailable",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Support"
       },
       {
@@ -749,42 +917,16 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Retry",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Allow"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Retry From Step",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Allow"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Resume",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Allow"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Cancel",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Allow"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Escalate",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Allow"
+       "label": "Act on workflow instance",
+       "operation": "actOnWorkflowInstance",
+       "permission": "APPROVAL_ACT",
+       "notes": "**The monitors' action buttons, as one operation** (decided 29 September, writers pass).",
+       "provenance": "contract approvals.yaml POST /workflow-instances/{instanceId}/actions"
       }
      ]
     }
    ]
   },
-  "overlays": [
-   {
-    "id": "confirmCancel",
-    "component": "confirmDialog",
-    "trigger": "Cancel",
-    "body": "**Cancel on a workflow exception failure is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
-    "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 28 §Allow"
-   }
-  ],
   "states": {
    "loading": "The workflow exception failure list.",
    "error": "Could not load. Names which read failed and leaves the workflow exception failure untouched.",
@@ -798,6 +940,15 @@
     "contract": "approvals",
     "purpose": "Workflow Exception, Failure & Recovery Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "actOnWorkflowInstance",
+    "contract": "approvals",
+    "purpose": "An operator's intervention in a running workflow",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkflowExceptionFailure"
+    ]
    }
   ],
   "entryState": {
@@ -808,14 +959,50 @@
     "WorkflowExceptionFailureRecoveryCenterView.module",
     "WorkflowExceptionFailureRecoveryCenterView.failedStep",
     "WorkflowExceptionFailureRecoveryCenterView.errorType"
+   ],
+   "params": [
+    {
+     "name": "instanceId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-251"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-251",
+   "workshopBoard": "wireframes/WS137 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-251"
   },
-  "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 28. 10 of 11 labels bound to a contract property; 19 of 46 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 28. 10 of 11 labels bound to a contract property; 26 of 46 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formActOnWorkflowInstance",
+    "component": "modal",
+    "trigger": "Act on workflow instance",
+    "body": "**Collects what `actOnWorkflowInstance` sends before it is called.** Required: `action`, `reason`. Optional: `workflowStepExecutionId`, `workflowExceptionId`, `assigneePrincipalId`, `alternativeNodeId`, `correctedInput`, `extendByMinutes`, `priority`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "WorkflowInstanceActionInput",
+    "confirm": {
+     "label": "Act on workflow instance",
+     "operation": "actOnWorkflowInstance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "action",
+      "reason",
+      "workflowStepExecutionId",
+      "workflowExceptionId",
+      "assigneePrincipalId",
+      "alternativeNodeId",
+      "correctedInput",
+      "extendByMinutes",
+      "priority"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /workflow-instances/{instanceId}/actions"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -877,13 +1064,68 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Management can identify and resolve workflow bottlenecks before they materially impact business operations.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Show) and no metric row",
   "purpose": "Monitor workflows approaching or exceeding configured time limits.",
-  "purposeNote": "Management can identify and resolve workflow bottlenecks before they materially impact business operations.",
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Within SLA",
+       "bindsTo": "SlaEscalationBottleneckMonitorViewSummary.withinSla",
+       "operation": "listSlaEscalationBottleneck",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "At Risk",
+       "bindsTo": "SlaEscalationBottleneckMonitorViewSummary.atRisk",
+       "operation": "listSlaEscalationBottleneck",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Breached",
+       "bindsTo": "SlaEscalationBottleneckMonitorViewSummary.breached",
+       "operation": "listSlaEscalationBottleneck",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Escalated",
+       "bindsTo": "SlaEscalationBottleneckMonitorViewSummary.escalated",
+       "operation": "listSlaEscalationBottleneck",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Minutes",
+       "bindsTo": "SlaEscalationBottleneckMonitorViewSummary.averageProcessingTime",
+       "operation": "listSlaEscalationBottleneck",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Minutes",
+       "bindsTo": "SlaEscalationBottleneckMonitorViewSummary.averageApprovalTime",
+       "operation": "listSlaEscalationBottleneck",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Longest Waiting Step",
+       "bindsTo": "SlaEscalationBottleneckMonitorViewSummary.longestWaitingStep",
+       "operation": "listSlaEscalationBottleneck",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -892,13 +1134,6 @@
        "kind": "dataTable",
        "label": "Every sla escalation bottleneck",
        "columns": [
-        "SlaEscalationBottleneckMonitorView.withinSla",
-        "SlaEscalationBottleneckMonitorView.atRisk",
-        "SlaEscalationBottleneckMonitorView.breached",
-        "SlaEscalationBottleneckMonitorView.escalated",
-        "SlaEscalationBottleneckMonitorView.averageProcessingTime",
-        "SlaEscalationBottleneckMonitorView.averageApprovalTime",
-        "SlaEscalationBottleneckMonitorView.longestWaitingStep",
         "SlaEscalationBottleneckMonitorView.workflow",
         "SlaEscalationBottleneckMonitorView.instance",
         "SlaEscalationBottleneckMonitorView.currentStep",
@@ -929,13 +1164,6 @@
        "label": "The selected sla escalation bottleneck",
        "bindsTo": "SlaEscalationBottleneckMonitorView",
        "columns": [
-        "SlaEscalationBottleneckMonitorView.withinSla",
-        "SlaEscalationBottleneckMonitorView.atRisk",
-        "SlaEscalationBottleneckMonitorView.breached",
-        "SlaEscalationBottleneckMonitorView.escalated",
-        "SlaEscalationBottleneckMonitorView.averageProcessingTime",
-        "SlaEscalationBottleneckMonitorView.averageApprovalTime",
-        "SlaEscalationBottleneckMonitorView.longestWaitingStep",
         "SlaEscalationBottleneckMonitorView.workflow",
         "SlaEscalationBottleneckMonitorView.instance",
         "SlaEscalationBottleneckMonitorView.currentStep",
@@ -965,6 +1193,14 @@
        "label": "Permissions this screen separates",
        "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Reassign, Escalate, Extend SLA, Add Backup Approver, Change Priority. Each needs attaching to the control it gates, or the screen needs the control.",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 30 §Authorized users can"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Act on workflow instance",
+       "operation": "actOnWorkflowInstance",
+       "permission": "APPROVAL_ACT",
+       "notes": "**The monitors' action buttons, as one operation** (decided 29 September, writers pass).",
+       "provenance": "contract approvals.yaml POST /workflow-instances/{instanceId}/actions"
       }
      ]
     }
@@ -983,24 +1219,69 @@
     "contract": "approvals",
     "purpose": "SLA, Escalation & Bottleneck Monitor",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "actOnWorkflowInstance",
+    "contract": "approvals",
+    "purpose": "An operator's intervention in a running workflow",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSlaEscalationBottleneck"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "SlaEscalationBottleneckMonitorView.withinSla",
-    "SlaEscalationBottleneckMonitorView.atRisk",
-    "SlaEscalationBottleneckMonitorView.breached",
-    "SlaEscalationBottleneckMonitorView.escalated",
-    "SlaEscalationBottleneckMonitorView.averageProcessingTime",
-    "SlaEscalationBottleneckMonitorView.averageApprovalTime"
+    "SlaEscalationBottleneckMonitorViewSummary.withinSla",
+    "SlaEscalationBottleneckMonitorViewSummary.atRisk",
+    "SlaEscalationBottleneckMonitorViewSummary.breached",
+    "SlaEscalationBottleneckMonitorViewSummary.escalated",
+    "SlaEscalationBottleneckMonitorViewSummary.averageProcessingTime",
+    "SlaEscalationBottleneckMonitorViewSummary.averageApprovalTime"
+   ],
+   "params": [
+    {
+     "name": "instanceId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-252"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-252",
+   "workshopBoard": "wireframes/WS137 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-252"
   },
   "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 30. 21 of 21 labels bound to a contract property; 26 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formActOnWorkflowInstance",
+    "component": "modal",
+    "trigger": "Act on workflow instance",
+    "body": "**Collects what `actOnWorkflowInstance` sends before it is called.** Required: `action`, `reason`. Optional: `workflowStepExecutionId`, `workflowExceptionId`, `assigneePrincipalId`, `alternativeNodeId`, `correctedInput`, `extendByMinutes`, `priority`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "WorkflowInstanceActionInput",
+    "confirm": {
+     "label": "Act on workflow instance",
+     "operation": "actOnWorkflowInstance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "action",
+      "reason",
+      "workflowStepExecutionId",
+      "workflowExceptionId",
+      "assigneePrincipalId",
+      "alternativeNodeId",
+      "correctedInput",
+      "extendByMinutes",
+      "priority"
+     ]
+    },
+    "provenance": "contract approvals.yaml POST /workflow-instances/{instanceId}/actions"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1062,10 +1343,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "immediate suspension where required.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide visibility and governance over actions executed automatically by TICVAI. This becomes especially important as TICVAI becomes more AI-driven.",
-  "purposeNote": "immediate suspension where required.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1158,10 +1439,7 @@
     "operationId": "createAutomationAutonomouAction",
     "contract": "approvals",
     "purpose": "Automation Execution & Autonomous Action Monitor",
-    "trigger": "onAction",
-    "invalidates": [
-     "createAutomationAutonomouAction"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1177,7 +1455,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-253"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-253",
+   "workshopBoard": "wireframes/WS137 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-253"
   },
   "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 31. 16 of 17 labels bound to a contract property; 17 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1241,10 +1520,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Complex cross-module business processes can be monitored as one business workflow rather than requiring administrators to inspect individual microservices independently.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Monitor complex workflows involving multiple TICVAI services. Example — Group Booking Confirmation",
-  "purposeNote": "Complex cross-module business processes can be monitored as one business workflow rather than requiring administrators to inspect individual microservices independently.",
   "gaps": [
    {
     "operation": null,
@@ -1290,17 +1569,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "CrossModuleOrchestrationMonitorView.bookingConfirmed",
-    "CrossModuleOrchestrationMonitorView.reserve420Tickets",
-    "CrossModuleOrchestrationMonitorView.reserve4Guides",
-    "CrossModuleOrchestrationMonitorView.reserve420Meals",
     "CrossModuleOrchestrationMonitorView.service"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-254"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-254",
+   "workshopBoard": "wireframes/WS137 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-254"
   },
   "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 33. 0 of 0 labels bound to a contract property; 0 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1364,10 +1640,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Management can quantitatively evaluate whether workflows and automation are improving operational efficiency.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Analyze; Measure; Compare) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Measure how effectively TICVAI's business workflows are performing.",
-  "purposeNote": "Management can quantitatively evaluate whether workflows and automation are improving operational efficiency.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -1487,12 +1763,6 @@
        "label": "Delegation Rate",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 34 §Measure",
        "bindsTo": "WorkflowAnalyticsProcessPerformanceView.delegationRate"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Workflow v1.4 vs v1.5",
-       "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 34 §Compare",
-       "bindsTo": "WorkflowAnalyticsProcessPerformanceView.workflowV14VsV15"
       }
      ]
     }
@@ -1516,7 +1786,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-255"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-255",
+   "workshopBoard": "wireframes/WS137 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-255"
   },
   "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 34. 15 of 25 labels bound to a contract property; 25 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1580,10 +1851,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "operational evidence rather than assumptions.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Identify; Display) and no metric row",
   "purpose": "Identify business processes that should be simplified, redesigned or automated. This is where TICVAI moves beyond simply running workflows.",
-  "purposeNote": "operational evidence rather than assumptions.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1595,15 +1866,8 @@
        "kind": "dataTable",
        "label": "Every process optimization automation",
        "columns": [
-        "ProcessOptimizationAutomationOpportunityCenterView.repetitiveApproval",
-        "ProcessOptimizationAutomationOpportunityCenterView.unnecessaryApproval",
-        "ProcessOptimizationAutomationOpportunityCenterView.highManualWork",
-        "ProcessOptimizationAutomationOpportunityCenterView.excessiveRework",
-        "ProcessOptimizationAutomationOpportunityCenterView.longWaitingTime",
+        "ProcessOptimizationAutomationOpportunityCenterView.opportunityType",
         "Duplicate Steps",
-        "ProcessOptimizationAutomationOpportunityCenterView.highFailureRate",
-        "ProcessOptimizationAutomationOpportunityCenterView.lowRiskManualAction",
-        "ProcessOptimizationAutomationOpportunityCenterView.processBottleneck",
         "ProcessOptimizationAutomationOpportunityCenterView.process",
         "ProcessOptimizationAutomationOpportunityCenterView.module",
         "ProcessOptimizationAutomationOpportunityCenterView.monthlyVolume",
@@ -1629,15 +1893,8 @@
        "label": "The selected process optimization automation",
        "bindsTo": "ProcessOptimizationAutomationOpportunityCenterView",
        "columns": [
-        "ProcessOptimizationAutomationOpportunityCenterView.repetitiveApproval",
-        "ProcessOptimizationAutomationOpportunityCenterView.unnecessaryApproval",
-        "ProcessOptimizationAutomationOpportunityCenterView.highManualWork",
-        "ProcessOptimizationAutomationOpportunityCenterView.excessiveRework",
-        "ProcessOptimizationAutomationOpportunityCenterView.longWaitingTime",
+        "ProcessOptimizationAutomationOpportunityCenterView.opportunityType",
         "Duplicate Steps",
-        "ProcessOptimizationAutomationOpportunityCenterView.highFailureRate",
-        "ProcessOptimizationAutomationOpportunityCenterView.lowRiskManualAction",
-        "ProcessOptimizationAutomationOpportunityCenterView.processBottleneck",
         "ProcessOptimizationAutomationOpportunityCenterView.process",
         "ProcessOptimizationAutomationOpportunityCenterView.module",
         "ProcessOptimizationAutomationOpportunityCenterView.monthlyVolume",
@@ -1672,18 +1929,15 @@
   ],
   "entryState": {
    "preloaded": [
-    "ProcessOptimizationAutomationOpportunityCenterView.repetitiveApproval",
-    "ProcessOptimizationAutomationOpportunityCenterView.unnecessaryApproval",
-    "ProcessOptimizationAutomationOpportunityCenterView.highManualWork",
-    "ProcessOptimizationAutomationOpportunityCenterView.excessiveRework",
-    "ProcessOptimizationAutomationOpportunityCenterView.longWaitingTime",
+    "ProcessOptimizationAutomationOpportunityCenterView.opportunityType",
     "Duplicate Steps"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-256"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-256",
+   "workshopBoard": "wireframes/WS137 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-256"
   },
   "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 36. 17 of 18 labels bound to a contract property; 18 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1739,10 +1993,10 @@
    "notes": "**Reached from ADM-248, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "explainability, human governance, version control and immediate operational control. Board 2 — Final Screen Register",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Analyze) and no metric row",
   "purpose": "Create the AI intelligence layer across TICVAI's entire rules, workflow and automation ecosystem. This is the management-level AI brain for Area 13.",
-  "purposeNote": "explainability, human governance, version control and immediate operational control. Board 2 — Final Screen Register",
   "layout": {
    "template": "split",
    "regions": [
@@ -1753,19 +2007,6 @@
       {
        "kind": "dataTable",
        "label": "Every workflow intelligence autonomous",
-       "columns": [
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.rules",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.workflows",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.approvals",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.executionHistory",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.sla",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.exceptions",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.automation",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.processPerformance",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.approverBehavior",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.moduleActivity",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.businessOutcomes"
-       ],
        "bindsTo": "AiWorkflowIntelligenceAutonomousGovernanceCenterView",
        "operation": "listWorkflowAutonomouGovernance",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 37 §Analyze"
@@ -1780,19 +2021,6 @@
        "kind": "detailPanel",
        "label": "The selected workflow intelligence autonomous",
        "bindsTo": "AiWorkflowIntelligenceAutonomousGovernanceCenterView",
-       "columns": [
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.rules",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.workflows",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.approvals",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.executionHistory",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.sla",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.exceptions",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.automation",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.processPerformance",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.approverBehavior",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.moduleActivity",
-        "AiWorkflowIntelligenceAutonomousGovernanceCenterView.businessOutcomes"
-       ],
        "notes": "The pack groups this record's detail under its own headings: “Natural-Language Questions”, “Actual common process”, “Automation”, “Approval Simplification”, “SLA”, “Workflow Redesign”.",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 37 §Analyze"
       }
@@ -1816,19 +2044,13 @@
    }
   ],
   "entryState": {
-   "preloaded": [
-    "AiWorkflowIntelligenceAutonomousGovernanceCenterView.rules",
-    "AiWorkflowIntelligenceAutonomousGovernanceCenterView.workflows",
-    "AiWorkflowIntelligenceAutonomousGovernanceCenterView.approvals",
-    "AiWorkflowIntelligenceAutonomousGovernanceCenterView.executionHistory",
-    "AiWorkflowIntelligenceAutonomousGovernanceCenterView.sla",
-    "AiWorkflowIntelligenceAutonomousGovernanceCenterView.exceptions"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-257"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-257",
+   "workshopBoard": "wireframes/WS137 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-257"
   },
   "apisNote": "Regenerated 9 September 2026 from Rules__Workflow__Approval___Automation_Engine_Reference.pdf page 37. 11 of 11 labels bound to a contract property; 12 of 108 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

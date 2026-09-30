@@ -696,8 +696,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a ULID."
+    "format": "uuid",
+    "description": "Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7."
    },
    "caseNumber": {
     "type": "string",

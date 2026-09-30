@@ -1670,7 +1670,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Take a registered device through enrolment to activation",
   "permission": "DEVICE_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1851,8 +1851,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "wristbandEncoder",
    "signaturePad",
    "scale",
-   "camera"
-  ]
+   "camera",
+   "mobileHandset"
+  ],
+  "description": "`mobileHandset` (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation.\n"
  },
  "Reader": {
   "type": "object",
@@ -2068,11 +2070,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "RegisteredDevice": {
   "x-ticvai-persistence": "platform.device",
   "type": "object",
+  "description": "**The device register of record** (decided 29 September, build pass). Identity, enrolment, credential, firmware and push registration for every device in the estate live on this row. `access.access_device` places access-control devices in the gate topology and repeats serial, versions, health and lifecycle; the two are not merged yet, and where they disagree this row wins.\n",
   "required": [
    "id",
    "kind",
-   "driver",
-   "workstationId"
+   "driver"
   ],
   "properties": {
    "id": {
@@ -2093,7 +2095,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "workstationId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "nullable": true,
+    "description": "Required for every kind except `mobileHandset`, which is bound to no workstation (18.1.5, 29 September); `registerDevice` refuses either mistake with `422`.\n"
    },
    "model": {
     "type": "string",

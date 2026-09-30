@@ -185,6 +185,16 @@
     "required": false
    },
    {
+    "name": "priceCategory",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "sectionCode",
+    "in": "query",
+    "required": false
+   },
+   {
     "name": null,
     "in": null,
     "required": null

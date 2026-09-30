@@ -141,6 +141,10 @@ python3 tools/index-boards.py
 # The Claude Design work list, and what each shipped app demands of a signed-in user.
 # Both are derived from the screens and both go stale the moment a screen changes.
 python3 tools/derive-design-manifest.py
+# **Every design-batch folder rebuilt from today's package** (30 September). Claude Design reads a batch
+# folder and nothing else; one exported before a contract changed hands a design session yesterday's
+# fields and data. Existing folders only, never a locked batch; the special folders are not batches.
+python3 tools/export-design-batch.py --all
 python3 tools/derive-app-roles.py
 # **The grant checklist, derived rather than authored** (21 September). Per module, what a person
 # can be allowed to do: the 167-key vocabulary crossed with every contract's
@@ -175,6 +179,8 @@ python3 tools/build-service-docs.py
 # **The Block A schedule is derived, not patched** (30 September): build order, dependencies and each
 # person's pace give every task a start day. op-descriptions.py reads it when ticket text is written.
 python3 tools/derive-block-a-schedule.py
+# How the tickets are linked: layers, services, module builds, reports (handoff/service-docs/TICKET-LINKS.md).
+python3 tools/build-ticket-links.py
 # **The client questions, flagged by what the first release needs** (23 September). Reads the
 # slice, so it runs after it; before this it was run by hand and went stale within a day.
 python3 tools/build-client-questions-workbook.py
@@ -357,7 +363,7 @@ splice-contract apply-p04-transitions
 retire-answered-questions                                          # never run: the answers are the reasoning
 retest-gap-rows                                                    # reports review candidates; a verdict is a judgement, not a rebuild
 build-provisional-review                                           # its sheets carry people's decisions; a rebuild would erase them
-bench derive-services export-design-batch render-screens           # deliberate, not a rebuild
+bench derive-services render-screens                               # deliberate, not a rebuild
 build-plan-deck                                                    # the presentation plan, run by hand after a refresh
 build-mom-digest build-review-responses scan-domain-drift find-capability
 "

@@ -528,7 +528,7 @@ paths:
       - name: workOrderId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     get:
       operationId: getWorkOrder
       x-ticvai-consumed-by:
@@ -606,7 +606,7 @@ paths:
       - name: workOrderId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: recordWorkOrderTime
       x-ticvai-consumed-by:
@@ -638,7 +638,7 @@ paths:
               type: object
               required: [id, action, recordedAt]
               properties:
-                id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                id: { type: string, format: uuid }
                 action:
                   type: string
                   enum: [start, pause, resume, stop]
@@ -674,7 +674,7 @@ paths:
       - name: workOrderId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: recordWorkOrderParts
       x-ticvai-consumed-by:
@@ -739,7 +739,7 @@ paths:
       - name: workOrderId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: cancelWorkOrder
       x-ticvai-consumed-by:
@@ -775,7 +775,7 @@ paths:
                   type: string
                   enum: [raisedInError, duplicate, superseded, noLongerRequired]
                 note: { type: string, maxLength: 300 }
-                supersededByWorkOrderId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                supersededByWorkOrderId: { type: string, format: uuid }
       responses:
         '200':
           headers:
@@ -796,7 +796,7 @@ paths:
       - name: workOrderId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: completeWorkOrder
       x-ticvai-consumed-by:
@@ -857,7 +857,7 @@ paths:
       - name: workOrderId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: verifyWorkOrder
       x-ticvai-consumed-by:
@@ -916,7 +916,7 @@ paths:
       - name: workOrderId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: acceptWorkOrder
       x-ticvai-consumed-by:
@@ -959,7 +959,7 @@ paths:
       - name: workOrderId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: rejectWorkOrder
       x-ticvai-consumed-by:
@@ -1016,7 +1016,7 @@ paths:
       - name: workOrderId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: startWorkOrder
       x-ticvai-consumed-by:
@@ -1066,7 +1066,7 @@ paths:
       - name: workOrderId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: pauseWorkOrder
       x-ticvai-consumed-by:
@@ -1110,7 +1110,7 @@ paths:
                     so the common ones become real reasons.
                 requisitionId:
                   type: string
-                  pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+                  format: uuid
                   description: Where a part was ordered, so the two are linked.
       responses:
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
@@ -1128,7 +1128,7 @@ paths:
       - name: workOrderId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: resumeWorkOrder
       x-ticvai-consumed-by:
@@ -1160,7 +1160,7 @@ paths:
       - name: workOrderId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: closeWorkOrder
       x-ticvai-consumed-by:
@@ -1200,7 +1200,7 @@ paths:
                   enum: [completedAndVerified, notReproducible, supersededByReplacement,
                          noLongerApplicable, duplicate]
                 note: { type: string, maxLength: 500 }
-                duplicateOfWorkOrderId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                duplicateOfWorkOrderId: { type: string, format: uuid }
       responses:
         '200':
           headers:
@@ -1216,7 +1216,7 @@ paths:
       - name: workOrderId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: attachWorkOrderEvidence
       x-ticvai-consumed-by:
@@ -1334,7 +1334,7 @@ paths:
       - name: workOrderId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     get:
       operationId: suggestWorkOrderAssignee
       x-ticvai-consumed-by:
@@ -1392,7 +1392,7 @@ paths:
       parameters:
         - name: workOrderId
           in: query
-          schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+          schema: { type: string, format: uuid }
         - name: supplierId
           in: query
           schema: { type: string, format: uuid }
@@ -1917,7 +1917,7 @@ paths:
       - name: incidentId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     get:
       operationId: getIncident
       x-ticvai-consumed-by:
@@ -1989,7 +1989,7 @@ paths:
                     overwriting the last (audit R106 (5)).
                 rootCause: { type: string, maxLength: 2000 }
                 correctiveActions: { type: string, maxLength: 5000 }
-                correctiveWorkOrderId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                correctiveWorkOrderId: { type: string, format: uuid }
                 attachmentRefs:
                   type: array
                   items: { type: string }
@@ -2013,7 +2013,7 @@ paths:
       - name: incidentId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: recordAuthorityNotification
       x-ticvai-consumed-by:
@@ -2094,7 +2094,7 @@ components:
       required: [id, inspectionId, itemKey]
       properties:
         id: { type: string, format: uuid }
-        inspectionId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        inspectionId: { type: string, format: uuid }
         templateItemId:
           type: string
           format: uuid
@@ -2385,7 +2385,7 @@ components:
         reason: { type: string, minLength: 3, maxLength: 1000 }
         inspectionId:
           type: string
-          pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+          format: uuid
           nullable: true
           description: Required for return to service where the asset demands it.
         raiseWorkOrder: { type: boolean, default: false }
@@ -2408,7 +2408,7 @@ components:
               items: { type: string, format: uuid }
             accessPointBlocked: { type: boolean }
             performancesAffected: { type: integer }
-            workOrderId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$', nullable: true }
+            workOrderId: { type: string, format: uuid, nullable: true }
 
     AssetStatusChange:
       x-ticvai-persistence: maintenance.asset_status_change
@@ -2431,12 +2431,12 @@ components:
         reason: { type: string, maxLength: 1000 }
         workOrderId:
           type: string
-          pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+          format: uuid
           nullable: true
           description: The work order that took the asset out, where one did.
         inspectionId:
           type: string
-          pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+          format: uuid
           nullable: true
           description: The inspection that took it out, or that allowed its return to service.
         changedByPrincipalId: { type: string, format: uuid, nullable: true }
@@ -2461,10 +2461,11 @@ components:
           enum: [workOrder, inspection, incident, statusChange, partReplaced, planCompleted]
         referenceId:
           type: string
+          format: uuid
           nullable: true
           description: >
-            The source row's id: a work-order, inspection or incident ULID, or an
-            `asset_status_change` id.
+            The source row's id: a work order, inspection or incident, or an
+            `asset_status_change` id. A uuid, as every id is (ADR-0056).
         summary: { type: string }
         principalId: { type: string, format: uuid, nullable: true }
         occurredAt: { type: string, format: date-time }
@@ -2490,7 +2491,7 @@ components:
       type: object
       required: [id, title, venueId, recordedAt]
       properties:
-        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        id: { type: string, format: uuid }
         title: { type: string, maxLength: 200 }
         description: { type: string, maxLength: 5000 }
         venueId: { type: string, format: uuid }
@@ -2534,7 +2535,7 @@ components:
       required: [id, workOrderId, kind, capturedAt]
       properties:
         id: { type: string, format: uuid }
-        workOrderId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        workOrderId: { type: string, format: uuid }
         kind: { type: string, enum: [photo, video, document, note, signature] }
         assetRef: { type: string, format: uuid, nullable: true }
         text: { type: string, nullable: true }
@@ -2588,7 +2589,7 @@ components:
             **Escalation is a clock, not a decision.** A work order on a ride nobody has
             accepted after twenty minutes escalates itself, because the alternative is somebody
             noticing.
-        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        id: { type: string, format: uuid }
         workOrderNumber:
           type: string
           readOnly: true
@@ -2670,8 +2671,8 @@ components:
             clock. `listWorkOrders?overdueOnly` applies the same test to `due_at`.
         requiresVerification: { type: boolean }
         sourcePlanId: { type: string, format: uuid, nullable: true }
-        sourceInspectionId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$', nullable: true }
-        sourceIncidentId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$', nullable: true }
+        sourceInspectionId: { type: string, format: uuid, nullable: true }
+        sourceIncidentId: { type: string, format: uuid, nullable: true }
         createdAt: { type: string, format: date-time }
         recordedAt: { type: string, format: date-time }
         completedAt: { type: string, format: date-time, nullable: true }
@@ -2743,7 +2744,7 @@ components:
             cancelNote: { type: string, maxLength: 300, nullable: true }
             supersededByWorkOrderId:
               type: string
-              pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+              format: uuid
               nullable: true
               description: Set by `cancelWorkOrder` where the reason is `superseded`.
             cancelledAt: { type: string, format: date-time, nullable: true }
@@ -2755,7 +2756,7 @@ components:
             closeNote: { type: string, maxLength: 500, nullable: true }
             duplicateOfWorkOrderId:
               type: string
-              pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+              format: uuid
               nullable: true
               description: Set by `closeWorkOrder` where the outcome is `duplicate`.
             closedAt: { type: string, format: date-time, nullable: true }
@@ -2834,7 +2835,7 @@ components:
       properties:
         id: { type: string, format: uuid, readOnly: true }
         venueId: { type: string, format: uuid, readOnly: true }
-        workOrderId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        workOrderId: { type: string, format: uuid }
         supplierId: { type: string, format: uuid }
         scope: { type: string, maxLength: 2000, description: What the vendor is asked to do. }
         status:
@@ -2911,7 +2912,7 @@ components:
         triggeredBy:
           type: string
           enum: [interval, usage]
-        workOrderId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$', nullable: true }
+        workOrderId: { type: string, format: uuid, nullable: true }
 
     InspectionItemKind:
       type: string
@@ -2975,7 +2976,7 @@ components:
       type: object
       required: [id, templateId, venueId, responses, recordedAt]
       properties:
-        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        id: { type: string, format: uuid }
         templateId: { type: string, format: uuid }
         venueId: { type: string, format: uuid }
         assetId: { type: string, format: uuid }
@@ -3011,7 +3012,7 @@ components:
       type: object
       required: [id, templateId, venueId, outcome, performedByPrincipalId, performedAt]
       properties:
-        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        id: { type: string, format: uuid }
         templateId: { type: string, format: uuid }
         templateName: { type: string }
         venueId: { type: string, format: uuid }
@@ -3050,7 +3051,7 @@ components:
             assetTakenOutOfService: { type: boolean }
             workOrdersRaised:
               type: array
-              items: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+              items: { type: string, format: uuid }
             productsSuspended:
               type: array
               items: { type: string, format: uuid }
@@ -3083,7 +3084,7 @@ components:
       type: object
       required: [id, kind, severity, venueId, description, occurredAt, recordedAt]
       properties:
-        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        id: { type: string, format: uuid }
         kind: { $ref: '#/components/schemas/IncidentKind' }
         severity: { $ref: '#/components/schemas/IncidentSeverity' }
         venueId: { type: string, format: uuid }
@@ -3113,7 +3114,7 @@ components:
       type: object
       required: [id, incidentNumber, kind, severity, status, venueId, occurredAt, reportedByPrincipalId]
       properties:
-        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        id: { type: string, format: uuid }
         incidentNumber:
           type: string
           readOnly: true
@@ -3142,7 +3143,7 @@ components:
             `maintenance.incident_authority_notification`.
         assignedToPrincipalId: { type: string, format: uuid, nullable: true }
         reportedByPrincipalId: { type: string, format: uuid }
-        correctiveWorkOrderId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$', nullable: true }
+        correctiveWorkOrderId: { type: string, format: uuid, nullable: true }
         occurredAt: { type: string, format: date-time }
         recordedAt: { type: string, format: date-time }
         closedAt: { type: string, format: date-time, nullable: true }
@@ -3199,7 +3200,7 @@ components:
       required: [id, incidentId, kind]
       properties:
         id: { type: string, format: uuid }
-        incidentId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        incidentId: { type: string, format: uuid }
         kind: { type: string, enum: [subject, staff] }
         subjectId:
           type: string
@@ -3222,7 +3223,7 @@ components:
       required: [id, incidentId, note, recordedAt]
       properties:
         id: { type: string, format: uuid }
-        incidentId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        incidentId: { type: string, format: uuid }
         note: { type: string, maxLength: 10000 }
         writtenByPrincipalId: { type: string, format: uuid }
         recordedAt: { type: string, format: date-time }
@@ -3238,7 +3239,7 @@ components:
       required: [id, incidentId, authority, notifiedAt]
       properties:
         id: { type: string, format: uuid }
-        incidentId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        incidentId: { type: string, format: uuid }
         authority: { type: string, maxLength: 200 }
         reference: { type: string, maxLength: 128, nullable: true }
         notifiedAt: { type: string, format: date-time }

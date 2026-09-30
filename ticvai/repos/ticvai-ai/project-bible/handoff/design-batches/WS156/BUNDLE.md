@@ -672,14 +672,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "resources",
     "purpose": "Day preview of availability with cleanings placed (W10)",
     "trigger": "onAction",
-    "provenance": "decided 29 September, W10 (P29)"
+    "provenance": "decided 29 September, W10 (the 29 September pass)"
    },
    {
     "operationId": "updateResource",
     "contract": "resources",
     "purpose": "Save the cleaning policy (W10)",
     "trigger": "onAction",
-    "provenance": "decided 29 September, W10 (P29)",
+    "provenance": "decided 29 September, W10 (the 29 September pass)",
     "invalidates": [
      "getResourceAvailability"
     ]
@@ -2469,7 +2469,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "holdId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The `ResourceHold` this booking was converted from, where a guest picked the resource on a venue map (rev 3 REV3-15). Null for a staff booking or an allocation.\n"
    },

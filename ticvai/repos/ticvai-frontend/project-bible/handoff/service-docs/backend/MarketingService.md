@@ -117,7 +117,7 @@ Created in draft. One-off, scheduled, or triggered by an event such as a booking
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateCampaignRequest`
 
@@ -266,7 +266,7 @@ Evaluates the segment, applies consent and suppression, and queues the send. The
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | campaignId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -320,7 +320,7 @@ Halts remaining sends immediately. Messages already dispatched cannot be recalle
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | campaignId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -424,7 +424,7 @@ Content and audience are editable only in draft. A live campaign may be paused, 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | campaignId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -538,13 +538,13 @@ Staff, partner or guest raise it; `channel` records how the guest reached the ve
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateCaseRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes |  |
 | subjectId | string (uuid) |  |  |
 | subject | string | yes | (max length 200) |
 | description | string | yes | (max length 10000) |
@@ -562,7 +562,7 @@ Staff, partner or guest raise it; `channel` records how the guest reached the ve
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Created on the device (CreateCaseRequest.id, raiseMyCase), so a ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Created on the device (CreateCaseRequest.id, raiseMyCase), so a UUIDv7. |
 | caseNumber | string | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). (read-only) |
 | subjectId | string (uuid) |  | (nullable) |
 | guestName | string |  | Resolved from pii.subject when the case is read, never stored on the case. (read-only; nullable) |
@@ -626,7 +626,7 @@ Staff, partner or guest raise it; `channel` records how the guest reached the ve
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of Case | yes |  |
-| items[].id | string | yes | Created on the device (CreateCaseRequest.id, raiseMyCase), so a ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].id | string (uuid) | yes | Created on the device (CreateCaseRequest.id, raiseMyCase), so a UUIDv7. |
 | items[].caseNumber | string | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). (read-only) |
 | items[].subjectId | string (uuid) |  | (nullable) |
 | items[].guestName | string |  | Resolved from pii.subject when the case is read, never stored on the case. (read-only; nullable) |
@@ -687,7 +687,7 @@ Writes one `ConsentRecord` per affected purpose through the `recordConsent` path
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | subjectId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ClaimDeviceConsentRequest`
 
@@ -739,13 +739,13 @@ Writes one `ConsentRecord` per affected purpose through the `recordConsent` path
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ConsentQuestion`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| id | string (uuid) | yes | (read-only) |
 | kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
 | text | object | yes | The question as the guest reads it, per locale. |
 | helpText | object |  | (nullable) |
@@ -761,7 +761,7 @@ Writes one `ConsentRecord` per affected purpose through the `recordConsent` path
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| id | string (uuid) | yes | (read-only) |
 | kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
 | text | object | yes | The question as the guest reads it, per locale. |
 | helpText | object |  | (nullable) |
@@ -1019,9 +1019,9 @@ Current position per purpose and channel, with the version of the notice consent
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| orderId | query |  | string |  |
+| orderId | query |  | string (uuid) |  |
 | subjectId | query |  | string (uuid) |  |
-| questionId | query |  | string |  |
+| questionId | query |  | string (uuid) |  |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
@@ -1030,8 +1030,8 @@ Current position per purpose and channel, with the version of the notice consent
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of BookingConsentRecord | yes |  |
-| items[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
-| items[].questionId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].id | string (uuid) | yes | (read-only) |
+| items[].questionId | string (uuid) | yes |  |
 | items[].questionVersion | integer | yes | (min 1) |
 | items[].questionKind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
 | items[].answer | enum (yes, no) | yes |  |
@@ -1039,8 +1039,8 @@ Current position per purpose and channel, with the version of the notice consent
 | items[].blocksBooking | boolean |  | The answer is the question's blockingAnswer at that version. (read-only) |
 | items[].cartId | string (uuid) |  | (nullable) |
 | items[].cartLineId | string (uuid) |  | (nullable) |
-| items[].orderId | string |  | Set by orders.checkoutCart when the cart becomes an order. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
-| items[].orderLineId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+| items[].orderId | string (uuid) |  | Set by orders.checkoutCart when the cart becomes an order. (read-only; nullable) |
+| items[].orderLineId | string (uuid) |  | (read-only; nullable) |
 | items[].personIndex | integer |  | (min 0; nullable) |
 | items[].personName | string |  | (max length 120; nullable) |
 | items[].personSubjectId | string (uuid) |  | (nullable) |
@@ -1138,7 +1138,7 @@ Current position per purpose and channel, with the version of the notice consent
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of ConsentQuestion | yes |  |
-| items[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| items[].id | string (uuid) | yes | (read-only) |
 | items[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
 | items[].text | object | yes | The question as the guest reads it, per locale. |
 | items[].helpText | object |  | (nullable) |
@@ -1236,7 +1236,7 @@ Every record captures the notice version, the channel, the purpose, the source a
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | subjectId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `RecordConsentRequest`
 
@@ -1294,7 +1294,7 @@ Every record captures the notice version, the channel, the purpose, the source a
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `RecordConsentAnswersRequest`
 
@@ -1302,7 +1302,7 @@ Every record captures the notice version, the channel, the purpose, the source a
 |---|---|---|---|
 | cartId | string (uuid) | yes | The cart the answers are given for. |
 | answers | array of object | yes | (min items 1; max items 200) |
-| answers[].questionId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| answers[].questionId | string (uuid) | yes |  |
 | answers[].questionVersion | integer | yes | The version the guest was shown, from Cart.consentQuestions. (min 1) |
 | answers[].answer | enum (yes, no) | yes |  |
 | answers[].cartLineId | string (uuid) |  | For a perPerson question, the line the person is on. (nullable) |
@@ -1317,8 +1317,8 @@ Every record captures the notice version, the channel, the purpose, the source a
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of BookingConsentRecord | yes |  |
-| items[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
-| items[].questionId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].id | string (uuid) | yes | (read-only) |
+| items[].questionId | string (uuid) | yes |  |
 | items[].questionVersion | integer | yes | (min 1) |
 | items[].questionKind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
 | items[].answer | enum (yes, no) | yes |  |
@@ -1326,8 +1326,8 @@ Every record captures the notice version, the channel, the purpose, the source a
 | items[].blocksBooking | boolean |  | The answer is the question's blockingAnswer at that version. (read-only) |
 | items[].cartId | string (uuid) |  | (nullable) |
 | items[].cartLineId | string (uuid) |  | (nullable) |
-| items[].orderId | string |  | Set by orders.checkoutCart when the cart becomes an order. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
-| items[].orderLineId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only; nullable) |
+| items[].orderId | string (uuid) |  | Set by orders.checkoutCart when the cart becomes an order. (read-only; nullable) |
+| items[].orderLineId | string (uuid) |  | (read-only; nullable) |
 | items[].personIndex | integer |  | (min 0; nullable) |
 | items[].personName | string |  | (max length 120; nullable) |
 | items[].personSubjectId | string (uuid) |  | (nullable) |
@@ -1372,7 +1372,7 @@ Every record captures the notice version, the channel, the purpose, the source a
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `RecordDeviceConsentRequest`
 
@@ -1448,7 +1448,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1492,7 +1492,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CookieBannerPreferenceCenterDesignerView`
 
@@ -1591,7 +1591,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CookieTrackingDigitalTechnologyRegistryView`
 
@@ -1678,14 +1678,14 @@ Each purpose names the channels it covers, whether it is required for service, a
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| questionId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| questionId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ConsentQuestion`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| id | string (uuid) | yes | (read-only) |
 | kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
 | text | object | yes | The question as the guest reads it, per locale. |
 | helpText | object |  | (nullable) |
@@ -1701,7 +1701,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| id | string (uuid) | yes | (read-only) |
 | kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
 | text | object | yes | The question as the guest reads it, per locale. |
 | helpText | object |  | (nullable) |
@@ -1746,13 +1746,13 @@ Guest-facing. A low rating may open a service case automatically where the venue
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `SubmitReviewRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes |  |
 | subjectId | string (uuid) |  |  |
 | venueId | string (uuid) | yes |  |
 | relatedOrderId | string |  |  |
@@ -1765,7 +1765,7 @@ Guest-facing. A low rating may open a service case automatically where the venue
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes |  |
 | subjectId | string (uuid) |  |  |
 | venueId | string (uuid) | yes |  |
 | relatedOrderId | string |  |  |
@@ -1813,7 +1813,7 @@ Idempotent on the variant and performance — saving twice is one entry, not two
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | subjectId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2070,7 +2070,7 @@ Called on install and again whenever the provider rotates the token — which ha
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | subjectId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2131,7 +2131,7 @@ Called on install and again whenever the provider rotates the token — which ha
 |---|---|---|---|---|
 | subjectId | path | yes | string (uuid) |  |
 | itemId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Responses**
 
@@ -2166,7 +2166,7 @@ Sign-out, uninstall, or a guest removing a device they no longer have. Revoked r
 |---|---|---|---|---|
 | subjectId | path | yes | string (uuid) |  |
 | deviceId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Responses**
 
@@ -2265,7 +2265,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `LoyaltyProgramme`
 
@@ -2418,7 +2418,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | programmeId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `LoyaltyRuleSet`
 
@@ -2538,7 +2538,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `Challenge`
 
@@ -2620,7 +2620,7 @@ Published as a version. **A change creates a new version and the old one stays r
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `FormDefinition`
 
@@ -2716,7 +2716,7 @@ BL-150 and CF-74's issuance half. **A campaign broadcasts; an invitation is addr
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `InvitationCampaign`
 
@@ -2780,7 +2780,7 @@ BL-034. **The reward fires on the referee's qualifying act, not on the sign-up**
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `Referral`
 
@@ -2986,7 +2986,7 @@ Triggered by the guest asking, by the assistant refusing or failing, by sentimen
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | conversationId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -3069,7 +3069,7 @@ Takes a token of any kind: a QR payload, an RFID or NFC serial, a membership car
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -3146,7 +3146,7 @@ Found writing F54: `GST-034 Lost & Found` declared exactly one operation and it 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of Case | yes |  |
-| items[].id | string | yes | Created on the device (CreateCaseRequest.id, raiseMyCase), so a ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].id | string (uuid) | yes | Created on the device (CreateCaseRequest.id, raiseMyCase), so a UUIDv7. |
 | items[].caseNumber | string | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). (read-only) |
 | items[].subjectId | string (uuid) |  | (nullable) |
 | items[].guestName | string |  | Resolved from pii.subject when the case is read, never stored on the case. (read-only; nullable) |
@@ -3203,13 +3203,13 @@ Found writing F54: `GST-034 Lost & Found` declared exactly one operation and it 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Created on the device, so a retry after a dropped connection carries the same id and is the same case. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Created on the device, so a retry after a dropped connection carries the same id and is the same case. |
 | kind | CaseKind: enum (lostProperty, complaint, question, accessibility, refundRequest, other) | yes | What the guest says the case is about, in their words rather than the venue's taxonomy — raiseMyCase asks for it and categoryId is what staff file it under. |
 | summary | string | yes | Lands in Case.subject — the case's one-line title. (max length 200) |
 | recordedAt | string (date-time) | yes | Device time when the guest raised it. |
@@ -3221,7 +3221,7 @@ Found writing F54: `GST-034 Lost & Found` declared exactly one operation and it 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Created on the device (CreateCaseRequest.id, raiseMyCase), so a ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Created on the device (CreateCaseRequest.id, raiseMyCase), so a UUIDv7. |
 | caseNumber | string | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). (read-only) |
 | subjectId | string (uuid) |  | (nullable) |
 | guestName | string |  | Resolved from pii.subject when the case is read, never stored on the case. (read-only; nullable) |
@@ -3276,7 +3276,7 @@ Holds against the balance through `authoriseStoredValue` rather than deducting d
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -3337,8 +3337,8 @@ The reply is written as a `CaseMessage` with `authorKind: guest` and `isInternal
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| caseId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| caseId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -3350,7 +3350,7 @@ The reply is written as a `CaseMessage` with `authorKind: guest` and `isInternal
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Created on the device (CreateCaseRequest.id, raiseMyCase), so a ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Created on the device (CreateCaseRequest.id, raiseMyCase), so a UUIDv7. |
 | caseNumber | string | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). (read-only) |
 | subjectId | string (uuid) |  | (nullable) |
 | guestName | string |  | Resolved from pii.subject when the case is read, never stored on the case. (read-only; nullable) |
@@ -3418,7 +3418,7 @@ The reply is written as a `CaseMessage` with `authorKind: guest` and `isInternal
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | token | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -3474,7 +3474,7 @@ The reply is written as a `CaseMessage` with `authorKind: guest` and `isInternal
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | conversationId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -3529,7 +3529,7 @@ An agent who forgets to go offline is an agent conversations queue for. **Availa
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -3580,7 +3580,7 @@ An agent who forgets to go offline is an agent conversations queue for. **Availa
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `MarketingSubscription`
 
@@ -3637,7 +3637,7 @@ An agent who forgets to go offline is an agent conversations queue for. **Availa
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `SeoMetadata`
 
@@ -3711,7 +3711,7 @@ Board 4G. **Table, drink, dietary needs, contact channel.** A guest who states a
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | subjectId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `GuestPreferences`
 
@@ -3771,7 +3771,7 @@ CF-96 fixed this class for 28 guest screens and the underlying pattern was never
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -3840,7 +3840,7 @@ BL-133. **Deliberately not `assets`.** A guest's passport scan is not a marketin
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `GuestDocument`
 
@@ -3902,7 +3902,7 @@ Per-language bodies with named merge fields. A template missing a version in an 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `MessageTemplate`
 
@@ -4019,7 +4019,7 @@ Marks the given notifications, or all of them when `all` is true, as opened. Onl
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -4065,7 +4065,7 @@ Marks the given notifications, or all of them when `all` is true, as opened. Onl
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateSegmentRequest`
 
@@ -4135,14 +4135,14 @@ Every table this service owns that the slice reads or writes, with its columns a
 | touched_at | timestamptz | yes |  |
 | channel | text | yes |  |
 | interaction | text | no |  |
-| order_id | text | no | Set on the converting touch. |
+| order_id | uuid | no | Set on the converting touch. |
 
 ### `marketing.booking_consent_record`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes |  |
-| question_id | text | yes |  |
+| id | uuid | yes |  |
+| question_id | uuid | yes |  |
 | question_version | integer | yes |  |
 | question_kind | text | yes |  |
 | answer | text | yes |  |
@@ -4150,8 +4150,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | blocks_booking | boolean | no | The answer is the question's blockingAnswer at that version. |
 | cart_id | uuid | no |  |
 | cart_line_id | uuid | no |  |
-| order_id | text | no | Set by orders.checkoutCart when the cart becomes an order. |
-| order_line_id | text | no |  |
+| order_id | uuid | no | Set by orders.checkoutCart when the cart becomes an order. |
+| order_line_id | uuid | no |  |
 | person_index | integer | no |  |
 | person_name | text | no |  |
 | person_subject_id | uuid | no |  |
@@ -4220,7 +4220,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes | Created on the device (CreateCaseRequest.id, raiseMyCase), so a ULID. |
+| id | uuid | yes | Created on the device (CreateCaseRequest.id, raiseMyCase), so a UUIDv7. |
 | case_number | text | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | subject_id | uuid | no |  |
 | title | text | yes | The case's one-line title, not a person. |
@@ -4235,7 +4235,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | priority | text | yes |  |
 | assigned_to_principal_id | uuid | no |  |
 | venue_id | uuid | no |  |
-| related_order_id | text | no |  |
+| related_order_id | uuid | no |  |
 | sla_due_at | timestamptz | no |  |
 | sla_paused_seconds | integer | no | Accrued only while awaiting the guest. |
 | escalation_count | integer | no |  |
@@ -4258,7 +4258,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | attachment_refs | text[] | no |  |
 | recorded_at | timestamptz | yes | Device time — addCaseMessage is offline-capable. |
 | synced_at | timestamptz | no | Server time the message arrived. |
-| case_id | text | no | Points at marketing.case. |
+| case_id | uuid | no | Points at marketing.case. |
 
 ### `marketing.challenge`
 
@@ -4332,7 +4332,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes |  |
+| id | uuid | yes |  |
 | kind | text | yes |  |
 | text | jsonb | yes | The question as the guest reads it, per locale. |
 | help_text | jsonb | no |  |
@@ -4348,7 +4348,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| question_id | text | yes |  |
+| question_id | uuid | yes |  |
 | version | integer | yes |  |
 | text | jsonb | yes |  |
 | published_at | timestamptz | yes |  |
@@ -4367,7 +4367,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | text | yes |  |
 | subject_id | uuid | yes |  |
 | recorded_by_principal_id | uuid | no |  |
-| order_id | text | no | The order whose checkout carried the opt-in (source checkout, M18-15): the ULID of orders.sales_order. |
+| order_id | uuid | no | The order whose checkout carried the opt-in (source checkout, M18-15): the UUIDv7 of orders.sales_order. |
 | verified_contact_ref | text | no | The verified contact the checkout opt-in was given against (ADR-0045), as the keyed hash the guest match policy uses; never the raw address. |
 | superseded_at | timestamptz | no |  |
 
@@ -4391,7 +4391,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | sentiment | text | no | 22.8.16. |
 | intent | text | no | 22.8.13. |
 | locale | text | no |  |
-| case_id | text | no | 22.8.12. |
+| case_id | uuid | no | 22.8.12. |
 | first_response_seconds | integer | no |  |
 | started_at | timestamptz | no |  |
 | closed_at | timestamptz | no |  |
@@ -4593,7 +4593,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | phone | text | no |  |
 | preferred_language | text | no |  |
 | preferred_channel | text | no |  |
-| guest_link_id | text | no | Present where the guest is linked across cells. |
+| guest_link_id | uuid | no | Present where the guest is linked across cells. |
 | tags | text[] | no |  |
 | engagement_score | integer | no | 22.2.20 and 22.2.21. |
 | engagement_tier | text | no | 5.3.19. |
@@ -4812,10 +4812,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes |  |
+| id | uuid | yes |  |
 | subject_id | uuid | no |  |
 | venue_id | uuid | yes |  |
-| related_order_id | text | no |  |
+| related_order_id | uuid | no |  |
 | rating | integer | yes |  |
 | body | text | no |  |
 | aspects | text[] | no | Aspect chips — the closed set the description always named. |
@@ -4824,7 +4824,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | response | text | no |  |
 | response_is_public | boolean | no |  |
 | responded_by_principal_id | uuid | no |  |
-| opened_case_id | text | no | Case raised automatically where the rating fell below the venue's threshold. |
+| opened_case_id | uuid | no | Case raised automatically where the rating fell below the venue's threshold. |
 
 ### `marketing.segment`
 

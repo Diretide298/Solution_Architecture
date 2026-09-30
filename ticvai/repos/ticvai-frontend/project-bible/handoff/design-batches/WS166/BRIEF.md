@@ -1,6 +1,6 @@
 # WS166 — Seat Management Venue Mapping Reference v1.0 board 2
 
-**10 screens · 10 operations · 14 schemas · 2 permissions**
+**10 screens · 13 operations · 20 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `CAPACITY_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `AI_USE, CAPACITY_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -67,7 +67,7 @@ convincingly. It is never a caption.
 | `BO-967` | AI Section Recognition | listDetail | 2 | 0 | — |
 | `BO-968` | AI Row & Seat Recognition | listDetail | 2 | 0 | — |
 | `BO-969` | AI Aisle, VIP & Accessibility | listDetail | 2 | 0 | — |
-| `BO-970` | AI Numbering & Labeling | listDetail | 1 | 0 | — |
+| `BO-970` | AI Numbering & Labeling | listDetail | 4 | 0 | — |
 | `BO-971` | Validation & Correction | listDetail | 2 | 0 | — |
 | `BO-972` | AI Venue Designer & Publish | listDetail | 2 | 0 | — |
 

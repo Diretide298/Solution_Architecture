@@ -73,8 +73,8 @@ CREATE TABLE IF NOT EXISTS maintenance.asset_status_change (
     from_status                       text,
     to_status                         text NOT NULL CONSTRAINT asset_status_change_to_status_chk CHECK (to_status IN ('inService', 'outOfService', 'underMaintenance', 'awaitingParts', 'retired', 'disposed')),
     reason                            text NOT NULL CONSTRAINT asset_status_change_reason_chk CHECK (char_length(reason) <= 1000),
-    work_order_id                     text,
-    inspection_id                     text,
+    work_order_id                     uuid,
+    inspection_id                     uuid,
     changed_by_principal_id           uuid,
     recorded_at                       timestamptz NOT NULL,
     synced_at                         timestamptz
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS maintenance.asset_status_change (
 -- Something that happened and needs recording — distinct from a work order, which is something to
 -- do
 CREATE TABLE IF NOT EXISTS maintenance.incident (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     incident_number                   text NOT NULL,
     kind                              text NOT NULL CONSTRAINT incident_kind_chk CHECK (kind IN ('guestInjury', 'staffInjury', 'nearMiss', 'propertyDamage', 'equipmentFailure', 'securityIncident', 'fireOrEvacuation', 'foodSafety', 'environmental', 'other')),
     severity                          text NOT NULL CONSTRAINT incident_severity_chk CHECK (severity IN ('nearMiss', 'minor', 'moderate', 'major', 'critical')),
@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS maintenance.incident (
     notified_at                       timestamptz,
     assigned_to_principal_id          uuid,
     reported_by_principal_id          uuid NOT NULL,
-    corrective_work_order_id          text,
+    corrective_work_order_id          uuid,
     occurred_at                       timestamptz NOT NULL,
     recorded_at                       timestamptz,
     closed_at                         timestamptz,
@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS maintenance.incident (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS maintenance.incident_authority_notification (
     id                                uuid PRIMARY KEY NOT NULL,
-    incident_id                       text NOT NULL,
+    incident_id                       uuid NOT NULL,
     authority                         text NOT NULL CONSTRAINT incident_authority_notification_authority_chk CHECK (char_length(authority) <= 200),
     reference                         text CONSTRAINT incident_authority_notification_reference_chk CHECK (char_length(reference) <= 128),
     notified_at                       timestamptz NOT NULL,
@@ -128,7 +128,7 @@ CREATE TABLE IF NOT EXISTS maintenance.incident_authority_notification (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS maintenance.incident_investigation_note (
     id                                uuid PRIMARY KEY NOT NULL,
-    incident_id                       text NOT NULL,
+    incident_id                       uuid NOT NULL,
     note                              text NOT NULL CONSTRAINT incident_investigation_note_note_chk CHECK (char_length(note) <= 10000),
     written_by_principal_id           uuid,
     recorded_at                       timestamptz NOT NULL
@@ -138,7 +138,7 @@ CREATE TABLE IF NOT EXISTS maintenance.incident_investigation_note (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS maintenance.incident_involved_party (
     id                                uuid PRIMARY KEY NOT NULL,
-    incident_id                       text NOT NULL,
+    incident_id                       uuid NOT NULL,
     kind                              text NOT NULL CONSTRAINT incident_involved_party_kind_chk CHECK (kind IN ('subject', 'staff')),
     subject_id                        uuid,
     principal_id                      uuid
@@ -154,7 +154,7 @@ CREATE TABLE IF NOT EXISTS maintenance.inspection (
     performed_at                      timestamptz NOT NULL,
     synced_at                         timestamptz,
     retain_until                      date,
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     template_id                       uuid NOT NULL,
     venue_id                          uuid NOT NULL,
     asset_id                          uuid,
@@ -168,7 +168,7 @@ CREATE TABLE IF NOT EXISTS maintenance.inspection_item (
     key                               text NOT NULL,
     attachment_refs                   text[],
     id                                uuid PRIMARY KEY NOT NULL,
-    inspection_id                     text NOT NULL,
+    inspection_id                     uuid NOT NULL,
     template_item_id                  uuid,
     item_key                          text NOT NULL CONSTRAINT inspection_item_item_key_chk CHECK (char_length(item_key) <= 120),
     label                             text,
@@ -239,7 +239,7 @@ CREATE TABLE IF NOT EXISTS maintenance.priority_scoring_model (
 CREATE TABLE IF NOT EXISTS maintenance.vendor_service_request (
     id                                uuid PRIMARY KEY,
     venue_id                          uuid,
-    work_order_id                     text NOT NULL,
+    work_order_id                     uuid NOT NULL,
     supplier_id                       uuid NOT NULL,
     scope                             text NOT NULL CONSTRAINT vendor_service_request_scope_chk CHECK (char_length(scope) <= 2000),
     status                            text DEFAULT 'draft',
@@ -261,7 +261,7 @@ CREATE TABLE IF NOT EXISTS maintenance.work_order (
     root_cause_note                   text,
     escalated_at                      timestamptz,
     escalation_level                  integer DEFAULT 0,
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     work_order_number                 text NOT NULL,
     title                             text NOT NULL,
     venue_id                          uuid NOT NULL,
@@ -283,8 +283,8 @@ CREATE TABLE IF NOT EXISTS maintenance.work_order (
     due_at                            timestamptz,
     requires_verification             boolean,
     source_plan_id                    uuid,
-    source_inspection_id              text,
-    source_incident_id                text,
+    source_inspection_id              uuid,
+    source_incident_id                uuid,
     created_at                        timestamptz NOT NULL,
     recorded_at                       timestamptz,
     completed_at                      timestamptz,
@@ -305,11 +305,11 @@ CREATE TABLE IF NOT EXISTS maintenance.work_order (
     verified_by_principal_id          uuid,
     cancel_reason                     text CONSTRAINT work_order_cancel_reason_chk CHECK (cancel_reason IN ('raisedInError', 'duplicate', 'superseded', 'noLongerRequired')),
     cancel_note                       text CONSTRAINT work_order_cancel_note_chk CHECK (char_length(cancel_note) <= 300),
-    superseded_by_work_order_id       text,
+    superseded_by_work_order_id       uuid,
     cancelled_at                      timestamptz,
     close_outcome                     text CONSTRAINT work_order_close_outcome_chk CHECK (close_outcome IN ('completedAndVerified', 'notReproducible', 'supersededByReplacement', 'noLongerApplicable', 'duplicate')),
     close_note                        text CONSTRAINT work_order_close_note_chk CHECK (char_length(close_note) <= 500),
-    duplicate_of_work_order_id        text,
+    duplicate_of_work_order_id        uuid,
     closed_at                         timestamptz,
     closed_by_principal_id            uuid
 );
@@ -320,7 +320,7 @@ CREATE TABLE IF NOT EXISTS maintenance.work_order (
 -- maintenance.work_order. Reached by: 1 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS maintenance.work_order_attachment (
     id                                uuid PRIMARY KEY NOT NULL,
-    work_order_id                     text NOT NULL,
+    work_order_id                     uuid NOT NULL,
     kind                              text NOT NULL CONSTRAINT work_order_attachment_kind_chk CHECK (kind IN ('photo', 'video', 'document', 'note', 'signature')),
     asset_ref                         uuid,
     text                              text,

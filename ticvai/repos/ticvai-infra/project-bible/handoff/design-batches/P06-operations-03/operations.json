@@ -79,7 +79,7 @@
   "method": "POST",
   "path": "/channel-capacities",
   "contract": "catalogue",
-  "summary": "Create a capacity envelope",
+  "summary": "Create a channel capacity",
   "permission": "CAPACITY_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -218,7 +218,13 @@
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Order"
  },
@@ -273,6 +279,11 @@
   "parameters": [
    {
     "name": "version",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "draft",
     "in": "query",
     "required": null
    }
@@ -409,6 +420,11 @@
     "required": null
    },
    {
+    "name": "membershipId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -426,7 +442,7 @@
   "method": "GET",
   "path": "/channel-capacities",
   "contract": "catalogue",
-  "summary": "List capacity envelopes",
+  "summary": "List channel capacities",
   "permission": "PRODUCT_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -483,7 +499,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "DeliveryLocation"
+  "responds": "Page"
  },
  "listDiningOutlets": {
   "method": "GET",
@@ -517,7 +533,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "DiningOutlet"
+  "responds": "Page"
  },
  "listIncidents": {
   "method": "GET",
@@ -580,7 +596,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "Refund"
+  "responds": "Page"
  },
  "listOrders": {
   "method": "GET",
@@ -682,6 +698,21 @@
    },
    {
     "name": "isSellable",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "segmentTag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "guidedAnswerIds",
     "in": "query",
     "required": null
    },
@@ -855,7 +886,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Case"
  },
  "reportIncident": {
   "method": "POST",
@@ -894,6 +925,25 @@
   ],
   "requestBody": null,
   "responds": null
+ },
+ "requestSuggestion": {
+  "method": "POST",
+  "path": "/ai/suggestions",
+  "contract": "ai",
+  "summary": "Ask for an answer, however it is currently produced",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Suggestion"
  },
  "rescheduleOrder": {
   "method": "POST",
@@ -980,7 +1030,7 @@
   "method": "PUT",
   "path": "/channel-capacities/{channelCapacityId}/channel-allocations",
   "contract": "catalogue",
-  "summary": "Allocate envelope capacity across channels",
+  "summary": "Allocate a channel capacity across sales channels",
   "permission": "CAPACITY_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -1052,6 +1102,25 @@
   "requestBody": null,
   "responds": "WaitTime"
  },
+ "splitOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/split",
+  "contract": "orders",
+  "summary": "Break one order into independent orders",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "transitionProductLifecycle": {
   "method": "POST",
   "path": "/products/{productId}/lifecycle",
@@ -1094,7 +1163,7 @@
   "method": "PATCH",
   "path": "/channel-capacities/{channelCapacityId}",
   "contract": "catalogue",
-  "summary": "Amend an envelope",
+  "summary": "Amend a channel capacity",
   "permission": "CAPACITY_CONFIGURE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",

@@ -192,7 +192,7 @@ CREATE TABLE IF NOT EXISTS whitelabel.footer_config_social_link (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS whitelabel.guided_choice (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     venue_id                          uuid NOT NULL,
     name                              text NOT NULL CONSTRAINT guided_choice_name_chk CHECK (char_length(name) <= 80),
     mode                              text NOT NULL DEFAULT 'button' CONSTRAINT guided_choice_mode_chk CHECK (mode IN ('button', 'popupOnArrival', 'off')),
@@ -210,8 +210,8 @@ CREATE TABLE IF NOT EXISTS whitelabel.guided_choice (
 -- Holds 4 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS whitelabel.guided_choice_answer (
-    guided_choice_id                  text NOT NULL,
-    id                                text PRIMARY KEY,
+    guided_choice_id                  uuid NOT NULL,
+    id                                uuid PRIMARY KEY,
     title                             jsonb NOT NULL,
     kind                              text,
     sort_order                        integer NOT NULL
@@ -220,8 +220,8 @@ CREATE TABLE IF NOT EXISTS whitelabel.guided_choice_answer (
 -- Holds 4 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS whitelabel.guided_choice_question (
-    guided_choice_id                  text NOT NULL,
-    id                                text PRIMARY KEY,
+    guided_choice_id                  uuid NOT NULL,
+    id                                uuid PRIMARY KEY,
     title                             jsonb NOT NULL,
     kind                              text,
     sort_order                        integer NOT NULL

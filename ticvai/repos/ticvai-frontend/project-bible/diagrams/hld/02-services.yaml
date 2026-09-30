@@ -1,9 +1,10 @@
 id: HLD
-title: TICVAI — seventeen services in five tiers
+title: TICVAI — seventeen modules in five tiers, five deployables
 generatedBy: tools/derive-diagrams.py
-about: '**What ships together.** 2,660 operations and 1,095 tables resolve into seventeen deployable
-  services, and **the data boundary decides where they split** — no service spans a schema it does not
-  own, and no schema is written by two services.
+about: '**What ships together.** 2,660 operations and 1,097 tables resolve into seventeen modules, deployed
+  as five units (ADR-0055), and **the data boundary decides where they split**: a module owns and migrates
+  its schemas; another module reads them through published views and writes them only through the owner''s
+  in-process API.
 
 
   **Arrows are cross-service writes.** The rule is that the owner defines the row and a foreign writer
@@ -212,7 +213,7 @@ tiers:
   services:
   - service: PlatformService
     operations: 212
-    tables: 102
+    tables: 103
     schemas:
     - control
     - subscription
@@ -257,6 +258,42 @@ tiers:
     scale: Low volume, high scrutiny.
     ifDown: Down blocks cross-region entitlements. Each region continues alone.
     ref: diagrams/lld/services/CrossRegionService.yaml
+deployables:
+- deployable: commerce
+  note: 'The sale path: order, payment and ledger commit in one transaction. Autoscales on requests
+    per second.'
+  modules:
+  - CatalogueService
+  - IdentityService
+  - LedgerService
+  - OrderService
+  - TenancyService
+  - WalletService
+- deployable: access
+  note: The gate hot path, flat high rate, offline package. The same module code builds the venue edge
+    node.
+  modules:
+  - AccessService
+- deployable: operations
+  note: Back office and engagement. Nothing that takes money waits on it.
+  modules:
+  - CrossRegionService
+  - FnbService
+  - InventoryService
+  - MarketingService
+  - PlatformService
+  - ReportingService
+  - RetailService
+  - VenueOpsService
+  - WhiteLabelService
+- deployable: ticvai-ai
+  note: 'AI, in Python, isolated (ADR-0020): three process groups, read-only on the transactional schemas.'
+  modules:
+  - AiService
+- deployable: workers
+  note: 'No module of its own: the outbox relay (one per region, ADR-0058), every module''s event consumers
+    and scheduled jobs. Scales on queue depth.'
+  modules: []
 crossServiceWrites:
 - from: OrderService
   to: TenancyService

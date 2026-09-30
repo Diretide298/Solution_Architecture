@@ -1,9 +1,21 @@
 # ADR-0021 — Qdrant: one collection per embedding model, tenant is the shard, scope is the filter
 
-**Status:** Proposed · 17 August 2026
+**Status:** Accepted in part · amended by [ADR-0049](0049-vectors-live-in-qdrant-one-collection-per-tenant.md), 30 September 2026: **a collection per tenant** (per embedding model, behind an alias) replaces the tenant-as-shard with a scope filter, and each tenant has a JWT scoped to its collection. Kept: one collection per embedding model, the single retrieval client with no scope parameter, venue scope as a filter inside the tenant, shadow re-embed, the two-stage evaluation. Proposed 17 August 2026
 **Supersedes:** the "tenant isolation is partition-level, never filter-level" rule as it applied to Qdrant
 **Relates to:** ADR-0001 (cells — **superseded in part by ADR-0014**), ADR-0014 (cell per region),
 ADR-0017 (placement — amended by ADR-0038, which makes a cell a region holding many tenant databases), ADR-0020 (AI isolation), CF-97
+
+---
+
+## Amended 30 September 2026 by ADR-0049
+
+**The tenant is a collection, not a shard.** Qdrant 1.16 removed the payload-filter RBAC, so no token
+can be limited to one tenant's points inside a shared collection: a shared collection could be
+isolated only by the application. So each tenant gets its own collection per embedding model, read
+through the alias `tenant_<tenantId>`, and its own JWT scoped to that collection. A model change is a
+shadow collection and an alias swap. **Scope inside a tenant is still a filter** that the single
+retrieval client always adds; the rules below on the client and the filter stand. Where they speak of
+the tenant as a shard in a shared collection, they no longer hold.
 
 ---
 
@@ -70,7 +82,7 @@ created by different embedding models.*
 **Collection count equals the number of distinct embedding models in an installation.** That is
 one, or two if catalogue and knowledge diverge — not one per tenant.
 
-**But it is not always one.** ADR-0009 and ADR-0020 mean **a tenant in a region with no adequacy
+**But it is not always one.** ADR-0009 and ADR-0020 (both amended by ADR-0049) mean **a tenant in a region with no adequacy
 finding, or on-premise, gets a locally hosted model.** Its vectors are a different size in a
 different space, so **that tenant has its own collection whether we like it or not.** That is
 forced by the model, not chosen for isolation — and it is the case where the naive

@@ -70,6 +70,58 @@
    }
   }
  },
+ "AccessContext": {
+  "type": "object",
+  "description": "**Everything the decision is allowed to depend on.** Stated as one object so a simulation and a live decision see the same shape — a simulator that takes different inputs from the evaluator is testing something else.\n",
+  "properties": {
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "permission": {
+    "type": "string"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "attractionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "at": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "attributes": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "**Deliberately an open map**, keyed by attribute (the `AccessCondition.attribute` vocabulary, with `key` for the `*.attribute` forms), each value the one a condition compares against. **Supplied attributes are a fallback, not the source.** The evaluator resolves what it can itself; a caller that could assert its own membership tier could assert any membership tier.\n"
+   }
+  }
+ },
  "AccessDecision": {
   "type": "object",
   "x-ticvai-persistence": "identity.access_decision",
@@ -156,7 +208,7 @@
  "AccessPolicy": {
   "type": "object",
   "x-ticvai-persistence": "identity.access_policy",
-  "description": "3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n",
+  "description": "3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). The package has two: this one, and the access contract's `AccessDynamicPolicy` (`access.dynamic_policy`). **This one governs who may do what in the software**: a principal's permissions on operations and screens (`permissions` names them), narrowed or extended by who, where, when and on what device, and decided by `evaluateAccess`. **`AccessDynamicPolicy` governs who may pass which gate**: a guest's, holder's or employee's admission at an access point, decided in the gate's validation with results such as `requireId` or `requireSupervisor` that mean nothing to a permission check. A staff member's badge opening a staff door is a gate decision (access); the same staff member approving a refund is a permission decision (here). The overlap that remains is listed in the build readiness open items rather than merged in this pass.\n",
   "required": [
    "code",
    "name",
@@ -262,6 +314,46 @@
      "format": "uuid"
     },
     "description": "3.3.35. **Who may edit this policy without being a platform administrator.** A venue manager tuning their own opening-hours rule should not need someone who can edit every tenant's.\n"
+   }
+  }
+ },
+ "AccessPolicyVersion": {
+  "type": "object",
+  "x-ticvai-persistence": "identity.access_policy_version",
+  "description": "3.3.36 and 3.3.39. **Who changed what, from what, and why.**",
+  "properties": {
+   "policyId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "version": {
+    "type": "integer"
+   },
+   "changedBy": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "changedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "approvedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "previous": {
+    "$ref": "#/components/schemas/AccessPolicy"
+   },
+   "current": {
+    "$ref": "#/components/schemas/AccessPolicy"
+   },
+   "scopePath": {
+    "type": "string"
    }
   }
  },
@@ -462,6 +554,395 @@
      "type": "string",
      "format": "uuid"
     }
+   }
+  }
+ },
+ "IdentityAccessPolicyEffectiveness": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed from identity.access_decision and identity.access_override over the requested period",
+  "description": "One `AccessPolicy` over a period (3.3.48; decided 29 September, build pass).",
+  "required": [
+   "policyId",
+   "evaluations"
+  ],
+  "properties": {
+   "policyId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "pendingApproval",
+     "active",
+     "suspended",
+     "retired"
+    ]
+   },
+   "versionsInPeriod": {
+    "type": "array",
+    "items": {
+     "type": "integer"
+    },
+    "description": "The versions that decided anything in the period."
+   },
+   "evaluations": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Decisions that evaluated this policy."
+   },
+   "matched": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Evaluations in which every condition held (or one, for `anyMayMatch`)."
+   },
+   "decisivePermits": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Permits this policy decided."
+   },
+   "decisiveDenies": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Denies this policy decided, deny winning over any permit."
+   },
+   "overridesAtScope": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Emergency overrides opened in the period at or beneath the policy's scope for a permission it speaks to - the times people had to go around it."
+   },
+   "lastMatchedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "neverMatched": {
+    "type": "boolean",
+    "description": "True when the policy was evaluated and never matched in the period, the usual sign of a condition written backwards or a policy nobody needs."
+   },
+   "trend": {
+    "type": "array",
+    "description": "One point per day in the period.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "date": {
+       "type": "string",
+       "format": "date"
+      },
+      "evaluations": {
+       "type": "integer"
+      },
+      "decisiveDenies": {
+       "type": "integer"
+      }
+     }
+    }
+   }
+  }
+ },
+ "IdentityAccessReviewCampaign": {
+  "type": "object",
+  "x-ticvai-persistence": "identity.access_review_campaign",
+  "description": "**A periodic access review** (7.1.35, 7.1.56; decided 29 September, build pass, group G2): which grants, reviewed by whom, by when. Its items are `identity.access_review_item`. Lifecycle in `states/access-review-campaign.yaml`.",
+  "required": [
+   "name",
+   "scopePath",
+   "reviewerMode",
+   "dueAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005), and what is reviewed: every grant at or below it. Inside the caller's own scope. Operations write it at `venue` scope."
+   },
+   "roleIds": {
+    "type": "array",
+    "nullable": true,
+    "description": "Only grants of these roles; null reviews every grant in scope.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "reviewerMode": {
+    "type": "string",
+    "enum": [
+     "lineManager",
+     "named"
+    ],
+    "description": "`lineManager`: each item goes to the holder's manager from their primary work assignment, falling back to the named reviewers where none is found. `named`: the named reviewers share the items."
+   },
+   "reviewerPrincipalIds": {
+    "type": "array",
+    "nullable": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "dueAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recurrence": {
+    "type": "string",
+    "enum": [
+     "none",
+     "quarterly",
+     "semiAnnual",
+     "annual"
+    ],
+    "default": "none"
+   },
+   "prefillFromFindings": {
+    "type": "boolean",
+    "default": true
+   },
+   "lookbackDays": {
+    "type": "integer",
+    "minimum": 7,
+    "maximum": 365,
+    "default": 90
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "completed",
+     "expired"
+    ],
+    "readOnly": true
+   },
+   "itemCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "decidedCount": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "Kept by `decideAccessReviewItem` in the same write, so the campaign list needs no count query."
+   },
+   "revokedCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "createdByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "closedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   }
+  }
+ },
+ "IdentityAccessReviewItem": {
+  "type": "object",
+  "x-ticvai-persistence": "identity.access_review_item",
+  "description": "One grant under review in a campaign, with the finding that pre-filled it and the reviewer's decision (decided 29 September, build pass, group G2). Lifecycle in `states/access-review-item.yaml`.",
+  "required": [
+   "campaignId",
+   "delegatedAccessId",
+   "principalId",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "campaignId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "identity.access_review_campaign"
+   },
+   "delegatedAccessId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "identity.delegated_access",
+    "description": "The grant under review."
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "identity.principal"
+   },
+   "roleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "identity.role"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The grant's scope. **The partition key** (ADR-0005)."
+   },
+   "reviewerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "findingKind": {
+    "type": "string",
+    "enum": [
+     "none",
+     "excessive",
+     "conflicting"
+    ],
+    "default": "none"
+   },
+   "lastUsedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "recommendation": {
+    "type": "string",
+    "enum": [
+     "certify",
+     "revoke",
+     "review"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "certified",
+     "revoked",
+     "notReviewed"
+    ],
+    "readOnly": true
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   }
+  }
+ },
+ "IdentityPermissionFinding": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed from grants (roles, delegations, policies) against identity.access_decision and identity.segregation_rule",
+  "description": "One excessive, missing or conflicting permission (7.1.47; decided 29 September, build pass).",
+  "required": [
+   "kind",
+   "principalId",
+   "permission"
+  ],
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "excessive",
+     "missing",
+     "conflicting"
+    ]
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "roleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The role that grants it, for excessive and conflicting; the role whose peers hold it, for missing."
+   },
+   "permission": {
+    "type": "string"
+   },
+   "conflictingPermission": {
+    "type": "string",
+    "nullable": true,
+    "description": "The other half of the pair, for conflicting."
+   },
+   "segregationRuleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "grantedBy": {
+    "type": "string",
+    "enum": [
+     "role",
+     "delegation",
+     "policy"
+    ],
+    "nullable": true
+   },
+   "lastUsedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The last permit that used it; null when never used in the window."
+   },
+   "deniedCount": {
+    "type": "integer",
+    "nullable": true,
+    "description": "For missing, the denials in the window."
+   },
+   "peersHoldingPercent": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "For missing, the share of the role's holders at the same scope who hold the permission."
+   },
+   "recommendation": {
+    "type": "string",
+    "enum": [
+     "revoke",
+     "grant",
+     "review"
+    ]
+   },
+   "asDraft": {
+    "type": "boolean",
+    "default": false,
+    "description": "True when the finding exists only because of the `draftPolicyId` evaluated."
    }
   }
  },
@@ -831,6 +1312,15 @@
    }
   ]
  },
+ "SeatMapStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "validated",
+   "published",
+   "archived"
+  ]
+ },
  "SeatMapSummary": {
   "x-ticvai-persistence": "seating.seat_map",
   "type": "object",
@@ -1146,6 +1636,14 @@
     "format": "uuid",
     "readOnly": true,
     "description": "From the path of `setVenueSettings`."
+   },
+   "calendarDayStartHour": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 23,
+    "nullable": true,
+    "default": 6,
+    "description": "**Where the venue's calendar day starts** (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (`calendarView` in `screens/_components.yaml`), so a venue open 06:00 to 02:00 sees its night on the day it belongs to. Display only: it moves no booking, slot or business date. Null inherits the tenant default (proposed 6, client to correct).\n"
    },
    "currencyCode": {
     "type": "string",

@@ -33,27 +33,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-035 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-035 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-035 holds none of them, so the edge carries nothing and EMP-003 opens cold"
     }
    ]
   },
@@ -96,7 +86,7 @@
       {
        "kind": "textField",
        "label": "tenderedAmount",
-       "bindsTo": "CreatePaymentRequest.tenderedAmount",
+       "bindsTo": "CreatePaymentRequest.tenderAmount",
        "provenance": "contract orders.yaml POST /payments"
       },
       {
@@ -125,53 +115,27 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create payment",
        "operation": "createPayment",
        "provenance": "contract orders.yaml POST /payments"
       },
       {
        "kind": "secondaryButton",
-       "label": "Inquire",
+       "label": "Inquire payment status",
        "operation": "inquirePaymentStatus",
        "provenance": "contract orders.yaml POST /payments/{paymentId}/inquiry"
       },
       {
        "kind": "secondaryButton",
-       "label": "Add",
+       "label": "Add tip",
        "operation": "addTip",
        "provenance": "contract orders.yaml POST /payments/{paymentId}/tip"
       },
       {
        "kind": "secondaryButton",
-       "label": "Capture",
+       "label": "Capture payment",
        "operation": "capturePayment",
        "provenance": "contract orders.yaml POST /payments/{paymentId}/capture"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createPayment",
-       "label": "Create payment",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createPayment",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -180,8 +144,8 @@
   "states": {
    "loading": "The saved payment device.",
    "error": "Could not load. Names which read failed and leaves the payment device untouched.",
-   "emptyFirstRun": "No payment device configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No payment device configured. The form opens empty and `createPayment` saves the first one; it says what the platform does in the meantime.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_CREATE`, which `createPayment` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Not available for card"
   },
   "apis": [
@@ -225,6 +189,45 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-035"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAddTip",
+    "component": "modal",
+    "trigger": "Add tip",
+    "body": "**Collects what `addTip` sends before it is called.** Required: `amount`, `source`, `recordedAt`. Optional: `allocateToPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Add tip",
+     "operation": "addTip"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "amount",
+      "source",
+      "recordedAt",
+      "allocateToPrincipalId"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /payments/{paymentId}/tip"
+   },
+   {
+    "id": "formCapturePayment",
+    "component": "modal",
+    "trigger": "Capture payment",
+    "body": "**Collects what `capturePayment` sends before it is called.** Required: `amount`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Capture payment",
+     "operation": "capturePayment"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "amount"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /payments/{paymentId}/capture"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -275,27 +278,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-036 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-036 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-036 holds none of them, so the edge carries nothing and EMP-003 opens cold"
     }
    ]
   },
@@ -304,13 +297,6 @@
   "pattern": "statusTracker",
   "patternReason": "`getMediaEntitlements` reads one record and nothing reads a population — the screen is about that one thing",
   "purpose": "Give the guest something the gate can read.",
-  "gaps": [
-   {
-    "operation": "getMediaAsset",
-    "why": "**1 declared operation reach no component on this screen**: getMediaAsset. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "detail",
    "regions": [
@@ -320,7 +306,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected issue media",
+       "label": "The media entitlements",
        "bindsTo": "MediaEntitlements",
        "columns": [
         "MediaEntitlements.mediaCode",
@@ -333,6 +319,31 @@
        ],
        "operation": "getMediaEntitlements",
        "provenance": "contract orders.yaml GET /media/{mediaCode}/entitlements"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The media asset",
+       "bindsTo": "MediaAssetDetail",
+       "columns": [
+        "MediaAssetDetail.id",
+        "MediaAssetDetail.kind",
+        "MediaAssetDetail.status",
+        "MediaAssetDetail.filename",
+        "MediaAssetDetail.contentType",
+        "MediaAssetDetail.sizeBytes",
+        "MediaAssetDetail.title",
+        "MediaAssetDetail.description",
+        "MediaAssetDetail.altText",
+        "MediaAssetDetail.width",
+        "MediaAssetDetail.height",
+        "MediaAssetDetail.durationSeconds",
+        "MediaAssetDetail.customMetadata",
+        "MediaAssetDetail.sharedWithTenantIds",
+        "MediaAssetDetail.tags",
+        "MediaAssetDetail.venueId"
+       ],
+       "operation": "getMediaAsset",
+       "provenance": "contract assets.yaml GET /media/{mediaId}"
       }
      ]
     },
@@ -342,39 +353,19 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Append",
+       "label": "Append entitlement to media",
        "operation": "appendEntitlementToMedia",
        "provenance": "contract orders.yaml POST /media/{mediaCode}/entitlements"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "appendEntitlementToMedia",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The issue media list.",
+   "loading": "The issue media, read by `getMediaEntitlements`.",
    "error": "Could not load. Names which read failed and leaves the issue media untouched.",
-   "emptyFirstRun": "No issue media yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the issue media are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No issue media yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Issues from the local range allocated at shift start"
   },
   "apis": [
@@ -416,6 +407,30 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-036"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAppendEntitlementToMedia",
+    "component": "modal",
+    "trigger": "Append entitlement to media",
+    "body": "**Collects what `appendEntitlementToMedia` sends before it is called.** Required: `id`, `lines`, `recordedAt`. Optional: `paymentMethod`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AppendEntitlementRequest",
+    "confirm": {
+     "label": "Append entitlement to media",
+     "operation": "appendEntitlementToMedia"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "lines",
+      "recordedAt",
+      "paymentMethod",
+      "note"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /media/{mediaCode}/entitlements"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -465,27 +480,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-037 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-037 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-037 holds none of them, so the edge carries nothing and EMP-003 opens cold"
     }
    ]
   },
@@ -502,8 +507,15 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "toggle",
+       "label": "Unacknowledged only",
+       "operation": "listAnnouncements",
+       "notes": "Sends `?unacknowledgedOnly=` to `listAnnouncements`.",
+       "provenance": "contract workforce.yaml GET /announcements"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every notifications",
+       "label": "Every announcement",
        "bindsTo": "Announcement",
        "columns": [
         "Announcement.id",
@@ -521,6 +533,12 @@
        ],
        "operation": "listAnnouncements",
        "provenance": "contract workforce.yaml GET /announcements"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishAnnouncement",
+       "notes": "Declares `publishAnnouncement`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -530,7 +548,28 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected notifications",
+       "label": "The selected announcement",
+       "bindsTo": "Announcement",
+       "columns": [
+        "Announcement.id",
+        "Announcement.title",
+        "Announcement.body",
+        "Announcement.kind",
+        "Announcement.venueIds",
+        "Announcement.departmentIds",
+        "Announcement.roleIds",
+        "Announcement.requiresAcknowledgement",
+        "Announcement.expiresAt",
+        "Announcement.publishedByPrincipalId",
+        "Announcement.publishedAt",
+        "Announcement.locale"
+       ],
+       "operation": "listAnnouncements",
+       "provenance": "contract workforce.yaml GET /announcements"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The announcement reach",
        "bindsTo": "AnnouncementReach",
        "columns": [
         "AnnouncementReach.announcementId",
@@ -550,13 +589,13 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Acknowledge",
+       "label": "Acknowledge announcement",
        "operation": "acknowledgeAnnouncement",
        "provenance": "contract workforce.yaml POST /announcements/{announcementId}/acknowledge"
       },
       {
        "kind": "secondaryButton",
-       "label": "Publish",
+       "label": "Publish announcement",
        "operation": "publishAnnouncement",
        "provenance": "contract workforce.yaml POST /announcements"
       },
@@ -567,47 +606,15 @@
        "provenance": "authored — required by check-screens"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAnnouncements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "acknowledgeAnnouncement",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "publishGate",
-       "impliedBy": "publishAnnouncement",
-       "notes": "Declares `publishAnnouncement`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The notifications list.",
    "error": "Could not load. Names which read failed and leaves the notifications untouched.",
-   "emptyFirstRun": "No notifications yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the notifications are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No notifications yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on unacknowledgedOnly and the notifications are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `WORKFORCE_VIEW`, which `listAnnouncements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Cached, with age. Acknowledgements queue"
   },
   "apis": [
@@ -630,7 +637,7 @@
     "operationId": "getAnnouncementReach",
     "contract": "workforce",
     "purpose": "Who has acknowledged, and who has not",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "publishAnnouncement",
@@ -640,6 +647,34 @@
     "invalidates": [
      "listAnnouncements"
     ]
+   },
+   {
+    "operationId": "listStaffConversations",
+    "contract": "workforce",
+    "purpose": "My conversations with colleagues, unread first",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listStaffMessages",
+    "contract": "workforce",
+    "purpose": "Open a conversation",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "sendStaffMessage",
+    "contract": "workforce",
+    "purpose": "Message a colleague or a small group",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "markStaffConversationRead",
+    "contract": "workforce",
+    "purpose": "Mark a conversation read",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -647,15 +682,19 @@
     {
      "name": "announcementId",
      "from": "deepLink"
+    },
+    {
+     "name": "conversationId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `announcementId`.",
    "preloaded": [
-    "AnnouncementReach.announcementId",
-    "AnnouncementReach.targeted",
-    "AnnouncementReach.delivered",
-    "AnnouncementReach.acknowledged",
-    "AnnouncementReach.outstanding"
+    "Announcement.id",
+    "Announcement.title",
+    "Announcement.body",
+    "Announcement.kind",
+    "Announcement.venueIds"
    ]
   },
   "wireframe": {
@@ -664,6 +703,37 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-037"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formPublishAnnouncement",
+    "component": "modal",
+    "trigger": "Publish announcement",
+    "body": "**Collects what `publishAnnouncement` sends before it is called.** Required: `title`, `body`, `kind`, `publishedAt`. Optional: `id`, `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`, `expiresAt`, `publishedByPrincipalId`, `locale`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "Announcement",
+    "confirm": {
+     "label": "Publish announcement",
+     "operation": "publishAnnouncement"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "title",
+      "body",
+      "kind",
+      "publishedAt",
+      "id",
+      "venueIds",
+      "departmentIds",
+      "roleIds",
+      "requiresAcknowledgement",
+      "expiresAt",
+      "publishedByPrincipalId",
+      "locale"
+     ]
+    },
+    "provenance": "contract workforce.yaml POST /announcements"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -713,27 +783,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-039 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-039 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-039 holds none of them, so the edge carries nothing and EMP-003 opens cold"
     }
    ]
   },
@@ -750,8 +810,15 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "toggle",
+       "label": "Unacknowledged only",
+       "operation": "listAnnouncements",
+       "notes": "Sends `?unacknowledgedOnly=` to `listAnnouncements`.",
+       "provenance": "contract workforce.yaml GET /announcements"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every announcements",
+       "label": "Every announcement",
        "bindsTo": "Announcement",
        "columns": [
         "Announcement.id",
@@ -769,6 +836,12 @@
        ],
        "operation": "listAnnouncements",
        "provenance": "contract workforce.yaml GET /announcements"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishAnnouncement",
+       "notes": "Declares `publishAnnouncement`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -778,7 +851,28 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected announcements",
+       "label": "The selected announcement",
+       "bindsTo": "Announcement",
+       "columns": [
+        "Announcement.id",
+        "Announcement.title",
+        "Announcement.body",
+        "Announcement.kind",
+        "Announcement.venueIds",
+        "Announcement.departmentIds",
+        "Announcement.roleIds",
+        "Announcement.requiresAcknowledgement",
+        "Announcement.expiresAt",
+        "Announcement.publishedByPrincipalId",
+        "Announcement.publishedAt",
+        "Announcement.locale"
+       ],
+       "operation": "listAnnouncements",
+       "provenance": "contract workforce.yaml GET /announcements"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The announcement reach",
        "bindsTo": "AnnouncementReach",
        "columns": [
         "AnnouncementReach.announcementId",
@@ -798,13 +892,13 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Acknowledge",
+       "label": "Acknowledge announcement",
        "operation": "acknowledgeAnnouncement",
        "provenance": "contract workforce.yaml POST /announcements/{announcementId}/acknowledge"
       },
       {
        "kind": "secondaryButton",
-       "label": "Publish",
+       "label": "Publish announcement",
        "operation": "publishAnnouncement",
        "provenance": "contract workforce.yaml POST /announcements"
       },
@@ -815,47 +909,15 @@
        "provenance": "authored — required by check-screens"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAnnouncements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "acknowledgeAnnouncement",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "publishGate",
-       "impliedBy": "publishAnnouncement",
-       "notes": "Declares `publishAnnouncement`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The announcements list.",
    "error": "Could not load. Names which read failed and leaves the announcements untouched.",
-   "emptyFirstRun": "No announcements yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the announcements are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No announcements yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on unacknowledgedOnly and the announcements are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `WORKFORCE_VIEW`, which `listAnnouncements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Cached. **Acknowledgement queues** — an emergency acknowledgement needing a network does not arrive when it matters"
   },
   "apis": [
@@ -878,7 +940,7 @@
     "operationId": "getAnnouncementReach",
     "contract": "workforce",
     "purpose": "Who has acknowledged, and who has not",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "publishAnnouncement",
@@ -899,11 +961,11 @@
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `announcementId`.",
    "preloaded": [
-    "AnnouncementReach.announcementId",
-    "AnnouncementReach.targeted",
-    "AnnouncementReach.delivered",
-    "AnnouncementReach.acknowledged",
-    "AnnouncementReach.outstanding"
+    "Announcement.id",
+    "Announcement.title",
+    "Announcement.body",
+    "Announcement.kind",
+    "Announcement.venueIds"
    ]
   },
   "wireframe": {
@@ -912,6 +974,37 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-039"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formPublishAnnouncement",
+    "component": "modal",
+    "trigger": "Publish announcement",
+    "body": "**Collects what `publishAnnouncement` sends before it is called.** Required: `title`, `body`, `kind`, `publishedAt`. Optional: `id`, `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`, `expiresAt`, `publishedByPrincipalId`, `locale`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "Announcement",
+    "confirm": {
+     "label": "Publish announcement",
+     "operation": "publishAnnouncement"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "title",
+      "body",
+      "kind",
+      "publishedAt",
+      "id",
+      "venueIds",
+      "departmentIds",
+      "roleIds",
+      "requiresAcknowledgement",
+      "expiresAt",
+      "publishedByPrincipalId",
+      "locale"
+     ]
+    },
+    "provenance": "contract workforce.yaml POST /announcements"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -961,27 +1054,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-038 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-038 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-038 holds none of them, so the edge carries nothing and EMP-003 opens cold"
     }
    ]
   },
@@ -998,8 +1081,15 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "toggle",
+       "label": "Unacknowledged only",
+       "operation": "listAnnouncements",
+       "notes": "Sends `?unacknowledgedOnly=` to `listAnnouncements`.",
+       "provenance": "contract workforce.yaml GET /announcements"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every broadcast team",
+       "label": "Every announcement",
        "bindsTo": "Announcement",
        "columns": [
         "Announcement.id",
@@ -1017,6 +1107,12 @@
        ],
        "operation": "listAnnouncements",
        "provenance": "contract workforce.yaml GET /announcements"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishAnnouncement",
+       "notes": "Declares `publishAnnouncement`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1026,7 +1122,28 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected broadcast team",
+       "label": "The selected announcement",
+       "bindsTo": "Announcement",
+       "columns": [
+        "Announcement.id",
+        "Announcement.title",
+        "Announcement.body",
+        "Announcement.kind",
+        "Announcement.venueIds",
+        "Announcement.departmentIds",
+        "Announcement.roleIds",
+        "Announcement.requiresAcknowledgement",
+        "Announcement.expiresAt",
+        "Announcement.publishedByPrincipalId",
+        "Announcement.publishedAt",
+        "Announcement.locale"
+       ],
+       "operation": "listAnnouncements",
+       "provenance": "contract workforce.yaml GET /announcements"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The announcement reach",
        "bindsTo": "AnnouncementReach",
        "columns": [
         "AnnouncementReach.announcementId",
@@ -1046,13 +1163,14 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Publish",
+       "label": "Publish announcement",
        "operation": "publishAnnouncement",
-       "provenance": "contract workforce.yaml POST /announcements"
+       "provenance": "contract workforce.yaml POST /announcements",
+       "notes": "Kind `emergency` needs ANNOUNCEMENT_EMERGENCY, not ANNOUNCEMENT_PUBLISH; without it the emergency kind is not offered and a publish is refused 403 `emergency-permission-required` (decided 28 September, audit R091 (1))."
       },
       {
        "kind": "secondaryButton",
-       "label": "Acknowledge",
+       "label": "Acknowledge announcement",
        "operation": "acknowledgeAnnouncement",
        "provenance": "contract workforce.yaml POST /announcements/{announcementId}/acknowledge"
       },
@@ -1063,54 +1181,15 @@
        "provenance": "authored — required by check-screens"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "publishAnnouncement",
-       "label": "Publish announcement",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAnnouncements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "publishAnnouncement",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "publishGate",
-       "impliedBy": "publishAnnouncement",
-       "notes": "Declares `publishAnnouncement`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The broadcast team list.",
    "error": "Could not load. Names which read failed and leaves the broadcast team untouched.",
-   "emptyFirstRun": "No broadcast team yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the broadcast team are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No broadcast team yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on unacknowledgedOnly and the broadcast team are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `WORKFORCE_VIEW`, which `getAnnouncementReach` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Queues, and states that it has not gone yet"
   },
   "apis": [
@@ -1127,7 +1206,7 @@
     "operationId": "getAnnouncementReach",
     "contract": "workforce",
     "purpose": "Who has acknowledged, and who has not",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "acknowledgeAnnouncement",
@@ -1154,11 +1233,11 @@
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `announcementId`.",
    "preloaded": [
-    "AnnouncementReach.announcementId",
-    "AnnouncementReach.targeted",
-    "AnnouncementReach.delivered",
-    "AnnouncementReach.acknowledged",
-    "AnnouncementReach.outstanding"
+    "Announcement.id",
+    "Announcement.title",
+    "Announcement.body",
+    "Announcement.kind",
+    "Announcement.venueIds"
    ]
   },
   "wireframe": {
@@ -1167,6 +1246,37 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-038"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formPublishAnnouncement",
+    "component": "modal",
+    "trigger": "Publish announcement",
+    "body": "**Collects what `publishAnnouncement` sends before it is called.** Required: `title`, `body`, `kind`, `publishedAt`. Optional: `id`, `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`, `expiresAt`, `publishedByPrincipalId`, `locale`. **An `emergency` kind requires ANNOUNCEMENT_EMERGENCY** (audit R091 (1)). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "Announcement",
+    "confirm": {
+     "label": "Publish announcement",
+     "operation": "publishAnnouncement"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "title",
+      "body",
+      "kind",
+      "publishedAt",
+      "id",
+      "venueIds",
+      "departmentIds",
+      "roleIds",
+      "requiresAcknowledgement",
+      "expiresAt",
+      "publishedByPrincipalId",
+      "locale"
+     ]
+    },
+    "provenance": "contract workforce.yaml POST /announcements"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -1205,7 +1315,8 @@
    "exitTo": [
     "EMP-001",
     "EMP-002",
-    "EMP-003"
+    "EMP-003",
+    "EMP-041"
    ],
    "inferred": false,
    "entryFrom": [
@@ -1217,27 +1328,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-040 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-040 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-040 holds none of them, so the edge carries nothing and EMP-003 opens cold"
     }
    ]
   },
@@ -1246,13 +1347,6 @@
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`semanticSearch`) and no read of a population — it is settings, not a list",
   "purpose": "Look up the rule rather than guess it.",
-  "gaps": [
-   {
-    "operation": "semanticSearch",
-    "why": "**`semanticSearch` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
-    "source": "contract ai.yaml POST /search"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1262,7 +1356,7 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Semantic",
+       "label": "Semantic search",
        "operation": "semanticSearch",
        "provenance": "contract ai.yaml POST /search"
       }
@@ -1273,17 +1367,23 @@
      "slot": "carried",
      "components": [
       {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
+       "kind": "searchField",
+       "label": "Query",
+       "operation": "semanticSearch",
+       "notes": "Required.",
+       "provenance": "contract ai.yaml POST /search"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "semanticSearch",
-       "provenance": "carried from the previous definition"
+       "kind": "multiSelect",
+       "label": "Kinds",
+       "operation": "semanticSearch",
+       "provenance": "contract ai.yaml POST /search"
+      },
+      {
+       "kind": "numberField",
+       "label": "Limit",
+       "operation": "semanticSearch",
+       "provenance": "contract ai.yaml POST /search"
       }
      ]
     }
@@ -1292,8 +1392,8 @@
   "states": {
    "loading": "The saved knowledge base.",
    "error": "Could not load. Names which read failed and leaves the knowledge base untouched.",
-   "emptyFirstRun": "No knowledge base configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No knowledge base configured. The form opens empty and `semanticSearch` saves the first one; it says what the platform does in the meantime.",
+   "emptyNoAccess": "Shown when the caller lacks `AI_USE`, which `semanticSearch` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Cached articles only**, with a note that newer ones may exist"
   },
   "apis": [
@@ -1359,27 +1459,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-041 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-041 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-041 holds none of them, so the edge carries nothing and EMP-003 opens cold"
     }
    ]
   },
@@ -1443,28 +1533,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Semantic",
+       "label": "Semantic search",
        "operation": "semanticSearch",
        "provenance": "contract ai.yaml POST /search"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "semanticSearch",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1473,9 +1544,9 @@
   "states": {
    "loading": "The training list.",
    "error": "Could not load. Names which read failed and leaves the training untouched.",
-   "emptyFirstRun": "No training yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the training are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No training yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listTrainingRecords` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `WORKFORCE_VIEW`, which `listTrainingRecords` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Cached progress; completions queue"
   },
   "apis": [
@@ -1510,6 +1581,27 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-041"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSemanticSearch",
+    "component": "modal",
+    "trigger": "Semantic search",
+    "body": "**Collects what `semanticSearch` sends before it is called.** Required: `query`. Optional: `kinds`, `limit`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Semantic search",
+     "operation": "semanticSearch"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "query",
+      "kinds",
+      "limit"
+     ]
+    },
+    "provenance": "contract ai.yaml POST /search"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -1559,27 +1651,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-042 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-042 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-042 holds none of them, so the edge carries nothing and EMP-003 opens cold"
     }
    ]
   },
@@ -1590,8 +1672,8 @@
   "purpose": "Change what this person controls about themselves.",
   "gaps": [
    {
-    "operation": "getGuestSession",
-    "why": "**2 declared operations reach no component on this screen**: getGuestSession, listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
+    "operation": "listSsoProviders",
+    "why": "**1 declared operation reaches no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
     "source": "the screen's own declarations"
    }
   ],
@@ -1604,7 +1686,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every profile",
+       "label": "Every MFA method",
        "bindsTo": "MfaMethod",
        "columns": [
         "MfaMethod.id",
@@ -1618,6 +1700,21 @@
        ],
        "operation": "listMfaMethods",
        "provenance": "contract identity.yaml GET /auth/mfa/methods"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every SSO provider",
+       "bindsTo": "SsoProvider",
+       "columns": [
+        "SsoProvider.id",
+        "SsoProvider.displayName",
+        "SsoProvider.protocol",
+        "SsoProvider.iconAssetRef",
+        "SsoProvider.isEnforced",
+        "SsoProvider.scopePath"
+       ],
+       "operation": "listSsoProviders",
+       "provenance": "contract identity.yaml GET /auth/sso/providers"
       }
      ]
     },
@@ -1627,7 +1724,24 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected profile",
+       "label": "The selected MFA method",
+       "bindsTo": "MfaMethod",
+       "columns": [
+        "MfaMethod.id",
+        "MfaMethod.kind",
+        "MfaMethod.label",
+        "MfaMethod.maskedTarget",
+        "MfaMethod.isActive",
+        "MfaMethod.isPrimary",
+        "MfaMethod.enrolledAt",
+        "MfaMethod.lastUsedAt"
+       ],
+       "operation": "listMfaMethods",
+       "provenance": "contract identity.yaml GET /auth/mfa/methods"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The session",
        "bindsTo": "Session",
        "columns": [
         "Session.sessionId",
@@ -1648,20 +1762,29 @@
      ]
     },
     {
-     "name": "contentBody",
-     "slot": "carried",
+     "name": "actionBar",
+     "slot": "rowActions",
      "components": [
       {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
+       "kind": "primaryButton",
+       "label": "Add a sign-in method",
+       "operation": "enrolMfaMethod",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods",
+       "notes": "Offers only an authenticator app (`totp`) and email (`emailOtp`, the fallback); any other kind is refused 422 `mfa-kind-not-allowed` (decided 28 September, audit R126 (5))."
       },
       {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listMfaMethods",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
+       "kind": "secondaryButton",
+       "label": "Verify the new method",
+       "operation": "verifyMfaEnrolment",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}",
+       "notes": "The method is not active until a code from it is verified."
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove this method",
+       "operation": "removeMfaMethod",
+       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}",
+       "notes": "Removing the last active method is refused 409 while the person holds a permission that requires MFA (ROLE_MANAGE, LEDGER_APPROVE, or one the tenant added) (decided 28 September, audit R135)."
       }
      ]
     }
@@ -1670,9 +1793,8 @@
   "states": {
    "loading": "The profile list.",
    "error": "Could not load. Names which read failed and leaves the profile untouched.",
-   "emptyFirstRun": "No profile yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the profile are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No profile yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listMfaMethods` takes no filter, so an empty list is always the first-run state above.",
    "offline": "Cached"
   },
   "apis": [
@@ -1689,10 +1811,31 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "getGuestSession",
+    "operationId": "enrolMfaMethod",
     "contract": "identity",
-    "purpose": "Read the current guest session",
-    "trigger": "onLoad"
+    "purpose": "Start enrolling an authenticator app, or email as the fallback (audit R126 (5), R135)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaEnrolment",
+    "contract": "identity",
+    "purpose": "Activate the new method with a code from it",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "removeMfaMethod",
+    "contract": "identity",
+    "purpose": "Remove a method; the last one is refused 409 while a permission requiring MFA is held (audit R135)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
    },
    {
     "operationId": "listSsoProviders",
@@ -1706,15 +1849,19 @@
     {
      "name": "sessionId",
      "from": "session"
+    },
+    {
+     "name": "methodId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "Session.sessionId",
-    "Session.principalId",
-    "Session.roleId",
-    "Session.displayName",
-    "Session.scope"
+    "MfaMethod.id",
+    "MfaMethod.kind",
+    "MfaMethod.label",
+    "MfaMethod.maskedTarget",
+    "MfaMethod.isActive"
    ]
   },
   "wireframe": {
@@ -1723,6 +1870,59 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-042"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formEnrolMfaMethod",
+    "component": "modal",
+    "trigger": "Add a sign-in method",
+    "body": "**Collects what `enrolMfaMethod` sends before it is called.** Required: `kind`, offered as authenticator app (`totp`) or email (`emailOtp`) only (audit R126 (5)). Optional: `target`, the email address for the email method. The response carries the secret and QR code for an authenticator app. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "MfaEnrolment",
+    "confirm": {
+     "label": "Add method",
+     "operation": "enrolMfaMethod"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "target"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /auth/mfa/methods"
+   },
+   {
+    "id": "formVerifyMfaEnrolment",
+    "component": "modal",
+    "trigger": "Verify the new method",
+    "body": "**Collects what `verifyMfaEnrolment` sends before it is called.** Required: `code`. The method is active only after this. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Verify",
+     "operation": "verifyMfaEnrolment"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
+   },
+   {
+    "id": "confirmRemoveMfaMethod",
+    "component": "confirmDialog",
+    "trigger": "Remove this method",
+    "body": "**Names the method being removed.** Removing the last active method is refused 409 while the person holds a permission in `PasswordPolicy.mfaRequiredForPermissions`, and the dialog says so before the call rather than after (decided 28 September, audit R135).",
+    "confirm": {
+     "label": "Remove method",
+     "operation": "removeMfaMethod"
+    },
+    "dismiss": {
+     "label": "Keep it",
+     "discards": []
+    },
+    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -1762,7 +1962,9 @@
     "EMP-001",
     "EMP-002",
     "EMP-003",
-    "EMP-018"
+    "EMP-018",
+    "EMP-044",
+    "EMP-045"
    ],
    "inferred": false,
    "entryFrom": [
@@ -1779,27 +1981,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-043 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-043 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-043 holds none of them, so the edge carries nothing and EMP-003 opens cold"
     }
    ]
   },
@@ -1816,8 +2008,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Workstation id",
+       "operation": "listDevices",
+       "notes": "Sends `?workstationId=` to `listDevices`.",
+       "provenance": "contract tenancy.yaml GET /devices"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listDevices",
+       "notes": "Sends `?kind=` to `listDevices`.",
+       "provenance": "contract tenancy.yaml GET /devices"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every device settings",
+       "label": "Every registered device",
        "bindsTo": "RegisteredDevice",
        "columns": [
         "RegisteredDevice.id",
@@ -1844,7 +2050,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected device settings",
+       "label": "The selected registered device",
        "bindsTo": "RegisteredDevice",
        "columns": [
         "RegisteredDevice.id",
@@ -1875,35 +2081,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Register",
+       "label": "Register device",
        "operation": "registerDevice",
        "provenance": "contract tenancy.yaml POST /devices"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listDevices",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "registerDevice",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1912,9 +2092,9 @@
   "states": {
    "loading": "The device settings list.",
    "error": "Could not load. Names which read failed and leaves the device settings untouched.",
-   "emptyFirstRun": "No device settings yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the device settings are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No device settings yet. Offers Register device (`registerDevice`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on workstationId, kind and the device settings are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Fully offline** — device settings are local by definition"
   },
   "apis": [
@@ -1956,6 +2136,43 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-043"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRegisterDevice",
+    "component": "modal",
+    "trigger": "Register device",
+    "body": "**Collects what `registerDevice` sends before it is called.** Required: `id`, `kind`, `driver`, `workstationId`. Optional: `identifier`, `model`, `pushToken`, `pushPlatform`, `pushFailureCount`, `offlineScope`, `firmwareVersion`, `isRequired`, `status`, `batteryPercent`, `lastCheckedAt`, `health` and 5 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RegisteredDevice",
+    "confirm": {
+     "label": "Register device",
+     "operation": "registerDevice"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "driver",
+      "workstationId",
+      "identifier",
+      "model",
+      "pushToken",
+      "pushPlatform",
+      "pushFailureCount",
+      "offlineScope",
+      "firmwareVersion",
+      "isRequired",
+      "status",
+      "batteryPercent",
+      "lastCheckedAt",
+      "health",
+      "lastHeartbeatAt",
+      "capabilities"
+     ]
+    },
+    "provenance": "contract tenancy.yaml POST /devices"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -2005,27 +2222,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-044 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-044 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-044 holds none of them, so the edge carries nothing and EMP-003 opens cold"
     }
    ]
   },
@@ -2046,14 +2253,7 @@
    "regions": [
     {
      "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
+     "components": []
     }
    ]
   },
@@ -2061,8 +2261,6 @@
    "loading": "—",
    "error": "—",
    "emptyFirstRun": "—",
-   "emptyNoResults": "The filter narrowed it and the accessibility are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Fully offline.** Accessibility settings are device-local and must never depend on a network"
   },
   "apis": [],

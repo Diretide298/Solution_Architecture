@@ -1,4 +1,23 @@
 {
+ "createMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge",
+  "contract": "identity",
+  "summary": "Second factor at staff sign-in, and step-up for a sensitive action",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "forceLogout": {
   "method": "POST",
   "path": "/auth/sessions/{sessionId}/force-logout",
@@ -36,19 +55,6 @@
   "requestBody": null,
   "responds": "Session"
  },
- "getGuestSession": {
-  "method": "GET",
-  "path": "/auth/guest/session",
-  "contract": "identity",
-  "summary": "Read the current guest session",
-  "permission": null,
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "GuestSession"
- },
  "listActiveSessions": {
   "method": "GET",
   "path": "/auth/sessions",
@@ -66,6 +72,11 @@
    },
    {
     "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "workstationId",
     "in": "query",
     "required": null
    },
@@ -155,6 +166,25 @@
   "permission": "CASE_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AgentAvailability"
+ },
+ "verifyMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge/{challengeId}/verify",
+  "contract": "identity",
+  "summary": "Complete a sign-in or step-up challenge",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {

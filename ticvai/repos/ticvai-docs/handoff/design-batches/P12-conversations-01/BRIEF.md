@@ -1,6 +1,6 @@
 # P12-conversations-01 — P12 · Conversations
 
-**2 screens · 13 operations · 12 schemas · 2 permissions**
+**2 screens · 13 operations · 13 schemas · 2 permissions**
 
 Platform P12 Venue Support · ships as **venue-management** ·
 staff audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 2 permissions apply here:
   `CASE_MANAGE, CASE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **2 of these operations work offline**: addCaseMessage, createCase
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,5 +60,5 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `SUP-004` | Conversation Queue | listDetail | 10 | 0 | — |
-| `SUP-005` | Live Chat Workspace | listDetail | 11 | 1 | — |
+| `SUP-004` | Conversation Queue | listDetail | 10 | 6 | — |
+| `SUP-005` | Live Chat Workspace | listDetail | 11 | 8 | — |

@@ -3,7 +3,7 @@
 > **Updated:** 30 September 2026, after the 29 September pass.
 > **Return route (decided 30 September): one working file per app.** Each app folder under `apps/` has `return/<app>.dc.html`; every batch of that app extends the same file. Claude Code captures the screens from it as frames. The B2B options (two files, one per option) and the demo site are separate, because they are not apps.
 >
-> **What is here:** one folder per design batch (`BRIEF.md` and `BUNDLE.md`), one folder per app under `apps/` (six apps: Guest App, POS, Scanner, Staff App, Venue Management, TICVAI main controller; each README covers the screen sets that make up the app), and three special folders.
+> **What is here:** one folder per design batch (`BRIEF.md` and `BUNDLE.md`), one folder per app under `apps/` (seven apps: Guest App, POS, Scanner, Staff App, Venue Management, TICVAI main controller, Partner Portal; each README covers the screen sets that make up the app), and three special folders.
 > **How a session runs:** `VENUE-MANAGEMENT.md` (one session per batch) and `docs/active/claude-design-runbook.md` (the standing prompt and the import).
 
 ## Where to start for each app
@@ -20,7 +20,7 @@ Each platform folder says what the app is, who uses it, the reference design to 
 | P07 Venue scanner | [`apps/3-scanner`](apps/3-scanner/README.md) | 11 | 0 | 0 | 0 |
 | P08 Venue management | [`apps/5-venue-management`](apps/5-venue-management/README.md) | 1,186 | 66 | 0 | 0 |
 | P09 TICVAI web console | [`apps/6-ticvai-controller`](apps/6-ticvai-controller/README.md) | 676 | 44 | 0 | 0 |
-| P10 Partner reseller portal | [`B2B-OPTIONS`](B2B-OPTIONS/P10-BATCHES.md) | 51 | 0 | 0 | 0 |
+| P10 Partner reseller portal | [`apps/7-partner-portal`](apps/7-partner-portal/README.md) | 51 | 0 | 0 | 0 |
 | P11 Accreditation web | [`apps/5-venue-management`](apps/5-venue-management/README.md) | 8 | 0 | 0 | 0 |
 | P12 Venue support | [`apps/5-venue-management`](apps/5-venue-management/README.md) | 28 | 1 | 0 | 0 |
 | P13 Venue CMS | [`apps/5-venue-management`](apps/5-venue-management/README.md) | 103 | 25 | 0 | 0 |
@@ -45,7 +45,7 @@ Run top to bottom. Within a platform, its README gives the batch order.
 
 ### 2. B2B options
 
-[`B2B-OPTIONS/`](B2B-OPTIONS/BRIEF.md). The reseller portal drawn two ways, POS-style and website-style, with a one-page comparison. The client chooses (MoM 29 September, section 3). The P10 batches wait for that choice.
+[`B2B-OPTIONS/`](B2B-OPTIONS/BRIEF.md). The reseller portal drawn two ways, POS-style and website-style, with a one-page comparison. The client chooses (MoM 29 September, section 3). The chosen file becomes the start of the Partner Portal's working file ([`apps/7-partner-portal`](apps/7-partner-portal/README.md)), and the P10 batches wait for that choice.
 
 ### 3. Demo site
 

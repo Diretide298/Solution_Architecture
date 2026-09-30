@@ -76,11 +76,11 @@
    "operations": 4
   },
   {
-   "contract": "white-label",
+   "contract": "queue",
    "operations": 1
   },
   {
-   "contract": "queue",
+   "contract": "white-label",
    "operations": 1
   },
   {

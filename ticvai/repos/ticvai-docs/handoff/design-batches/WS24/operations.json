@@ -8,9 +8,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "sourceModule",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "BusinessEventNotificationTriggerMappingView"
+  "responds": "Page"
  },
  "listCommunicationService": {
   "method": "GET",
@@ -21,7 +47,28 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "CommunicationServiceCommandCenterView"
  },
@@ -30,13 +77,54 @@
   "path": "/consent-preference-communication",
   "contract": "marketing-crm",
   "summary": "Consent, Preference & Communication Policy Enforcement",
-  "permission": "MARKETING_VIEW",
+  "permission": "GUEST_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "decision",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "messageClass",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ConsentPreferenceCommunicationPolicyEnforcementView"
+  "responds": "Page"
  },
  "listDeliveryCommunicationPlatform": {
   "method": "GET",
@@ -47,7 +135,33 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "AiDeliveryOptimizationCommunicationPlatformDiagnostiView"
  },
@@ -60,9 +174,70 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "sourceModule",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "businessEvent",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "providerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priority",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "failureCategory",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "DeliveryQueueFailureRetryManagementView"
+  "responds": "Page"
  },
  "listProviderHealthUsage": {
   "method": "GET",
@@ -75,22 +250,27 @@
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
     "name": "channel",
     "in": "query",
     "required": false
    },
    {
-    "name": "provider",
+    "name": "providerId",
     "in": "query",
     "required": false
    },
    {
-    "name": "brand",
+    "name": "brandId",
     "in": "query",
     "required": false
    },
    {
-    "name": "venue",
+    "name": "venueId",
     "in": "query",
     "required": false
    },
@@ -105,7 +285,22 @@
     "required": false
    },
    {
-    "name": "messageType",
+    "name": "messageClass",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
     "in": "query",
     "required": false
    }
@@ -122,9 +317,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brandId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priorityClass",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "RoutingPriorityThrottlingFallbackRulesView"
+  "responds": "Page"
  },
  "listSystemTransactionalTemplate": {
   "method": "GET",
@@ -135,9 +361,74 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "ownership",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "sourceModule",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "businessEvent",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brandId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "language",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "SystemTransactionalTemplateRegistryView"
+  "responds": "Page"
+ },
+ "requestSuggestion": {
+  "method": "POST",
+  "path": "/ai/suggestions",
+  "contract": "ai",
+  "summary": "Ask for an answer, however it is currently produced",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Suggestion"
  },
  "setChannelProvider": {
   "method": "PUT",
@@ -148,7 +439,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ChannelProviderConfigurationInput",
   "responds": "ChannelProviderConfigurationView"
  },
@@ -161,7 +458,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "SenderIdentityDomainBrandConfigurationInput",
   "responds": "SenderIdentityDomainBrandConfigurationView"
  }

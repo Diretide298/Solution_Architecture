@@ -1,6 +1,6 @@
 # WS17 — Approval Workflows and Governance board 5
 
-**10 screens · 9 operations · 11 schemas · 5 permissions**
+**10 screens · 11 operations · 18 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `APPROVAL_ACT, APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_VIEW, GUEST_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `APPROVAL_ACT, APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_REQUEST, APPROVAL_VIEW, GUEST_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -69,7 +69,7 @@ convincingly. It is never a caption.
 | `BO-390` | Escalation Policy Builder | listDetail | 1 | 0 | — |
 | `BO-391` | Live Escalation Operations Center | listDetail | 2 | 1 | — |
 | `BO-392` | SLA & Escalation Performance Analytics | listDetail | 1 | 0 | — |
-| `BO-393` | AI SLA & Escalation Advisor | listDetail | 1 | 0 | — |
+| `BO-393` | AI SLA & Escalation Advisor | listDetail | 3 | 0 | — |
 
 ## Thin screens in this batch
 

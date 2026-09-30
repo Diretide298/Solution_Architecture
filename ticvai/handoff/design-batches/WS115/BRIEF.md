@@ -1,6 +1,6 @@
 # WS115 — ACCREDITATION board 8
 
-**10 screens · 6 operations · 7 schemas · 3 permissions**
+**10 screens · 10 operations · 11 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `ACCREDITATION_VIEW, DEVELOPER_VIEW, REPORT_VIEW_VENUE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `ACCREDITATION_VIEW, DEVELOPER_MANAGE, DEVELOPER_VIEW, REPORT_VIEW_VENUE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -60,15 +60,15 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-684` | Accreditation Executive Dashboard | listDetail | 1 | 0 | — |
-| `BO-685` | Accreditation Status & Portfolio Reporting | listDetail | 1 | 0 | — |
+| `BO-684` | Accreditation Executive Dashboard | listDetail | 2 | 0 | — |
+| `BO-685` | Accreditation Status & Portfolio Reporting | listDetail | 2 | 0 | — |
 | `BO-686` | Accreditation Utilization Analytics | listDetail | 1 | 0 | — |
 | `BO-687` | Accreditation Access Activity Reporting | listDetail | 1 | 0 | — |
 | `BO-688` | Accreditation Trend & Comparative Analysis | listDetail | 1 | 0 | — |
 | `BO-689` | Accreditation Audit Reporting | listDetail | 1 | 0 | — |
 | `BO-690` | Immutable Accreditation Audit Log | configEditor | 1 | 0 | — |
 | `BO-691` | Accreditation API Management | listDetail | 1 | 0 | — |
-| `BO-692` | Accreditation Webhook Management | configEditor | 1 | 0 | — |
+| `BO-692` | Accreditation Webhook Management | configEditor | 5 | 0 | — |
 | `BO-693` | Integration & Data Exchange Monitor | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch

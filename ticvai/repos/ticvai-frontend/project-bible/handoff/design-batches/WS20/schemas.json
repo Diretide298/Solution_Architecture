@@ -1,1 +1,627 @@
-{}
+{
+ "AiApprovalRequestScore": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.approval_request_score",
+  "description": "**Context for an approval reviewer** (11.1.73..75): risk, priority and a suggested escalation for one pending request, the latest per request. **There is no approve or reject field, by design** (minutes of 8 September: AI in approvals never recommends or influences approve or reject).",
+  "required": [
+   "approvalRequestId",
+   "riskScore",
+   "riskBand",
+   "priorityScore",
+   "escalationSuggestion"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "approvals.request"
+   },
+   "trigger": {
+    "type": "string",
+    "enum": [
+     "submitted",
+     "resubmitted",
+     "slaTick",
+     "escalated"
+    ]
+   },
+   "riskScore": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100
+   },
+   "riskBand": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
+    "description": "Design 5.6: a risk score and band, never a probability."
+   },
+   "priorityScore": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "description": "For ordering work in an inbox; higher first."
+   },
+   "escalationSuggestion": {
+    "type": "object",
+    "required": [
+     "action"
+    ],
+    "properties": {
+     "action": {
+      "type": "string",
+      "enum": [
+       "escalate",
+       "addBackupApprover",
+       "none"
+      ]
+     },
+     "reason": {
+      "type": "string",
+      "nullable": true
+     }
+    },
+    "description": "A suggestion for an SLA problem, carried out if at all by a person or the tenant's SLA policy."
+   },
+   "signals": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "description": "e.g. `amountAboveRequesterNorm`, `requesterEntityRisk`, `outOfHours`, `irreversibleAction`, `slaDueSoon`, `stepBreachRate`, `approverUnavailable`."
+      },
+      "contribution": {
+       "type": "number"
+      },
+      "detail": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "basis": {
+    "$ref": "#/components/schemas/SuggestionBasis"
+   },
+   "decisionRecordId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scoredAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "ApprovalAnalytics": {
+  "type": "object",
+  "x-ticvai-persistence": "none — aggregated from approvals.request",
+  "properties": {
+   "from": {
+    "type": "string",
+    "format": "date"
+   },
+   "to": {
+    "type": "string",
+    "format": "date"
+   },
+   "groupBy": {
+    "type": "string",
+    "description": "The grouping asked for, as the `groupBy` query parameter; each row's `key` is one value of it.",
+    "enum": [
+     "kind",
+     "approver",
+     "venue",
+     "day",
+     "week"
+    ]
+   },
+   "rows": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "key": {
+       "type": "string"
+      },
+      "raised": {
+       "type": "integer"
+      },
+      "approved": {
+       "type": "integer"
+      },
+      "rejected": {
+       "type": "integer"
+      },
+      "withdrawn": {
+       "type": "integer"
+      },
+      "expired": {
+       "type": "integer",
+       "description": "**Requests nobody answered.** Usually a routing defect rather than a busy approver, and the number that says the matrix names the wrong person.\n"
+      },
+      "escalated": {
+       "type": "integer"
+      },
+      "slaBreached": {
+       "type": "integer"
+      },
+      "medianMinutes": {
+       "type": "number"
+      },
+      "p95Minutes": {
+       "type": "number"
+      }
+     }
+    }
+   }
+  }
+ },
+ "GovernanceAuditAiRiskLaunchReadinessView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Governance Audit, AI Risk & Launch Readiness displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "promotionConfiguration": {
+    "type": "string",
+    "description": "Promotion Configuration ✓"
+   },
+   "eligibility": {
+    "type": "string",
+    "description": "Eligibility ✓"
+   },
+   "stackingRules": {
+    "type": "string",
+    "description": "Stacking Rules ✓"
+   },
+   "budget": {
+    "type": "string",
+    "description": "Budget ✓"
+   },
+   "redemptionLimits": {
+    "type": "string",
+    "description": "Redemption Limits ✓"
+   },
+   "marginGuardrail": {
+    "type": "number",
+    "description": "Margin Guardrail ✓"
+   },
+   "simulationCompleted": {
+    "type": "string",
+    "description": "Simulation Completed ✓"
+   },
+   "requiredApproval": {
+    "type": "string",
+    "description": "Required Approval ✓"
+   },
+   "channelPublication": {
+    "type": "string",
+    "description": "Channel Publication ✓"
+   },
+   "auditRequirements": {
+    "type": "string",
+    "description": "Audit Requirements ✓"
+   },
+   "budgetCreation": {
+    "type": "string",
+    "description": "Budget creation"
+   },
+   "budgetChange": {
+    "type": "string",
+    "description": "Budget change"
+   },
+   "limitChanges": {
+    "type": "integer",
+    "description": "Limit changes"
+   },
+   "approvalSubmissions": {
+    "type": "string",
+    "description": "Approval submissions"
+   },
+   "approvalDecisions": {
+    "type": "string",
+    "description": "Approval decisions"
+   },
+   "overrides": {
+    "type": "string",
+    "description": "Overrides"
+   },
+   "automaticSuspension": {
+    "type": "string",
+    "description": "Automatic suspension"
+   },
+   "reactivation": {
+    "type": "string",
+    "description": "Reactivation"
+   },
+   "simulationResults": {
+    "type": "string",
+    "description": "Simulation results"
+   },
+   "experimentChanges": {
+    "type": "string",
+    "description": "Experiment changes"
+   },
+   "campaignLaunch": {
+    "type": "string",
+    "description": "Campaign launch"
+   }
+  }
+ },
+ "GovernanceRiskAiMonitoringControlCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Governance Risk, AI Monitoring & Control Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "risk": {
+    "type": "string",
+    "enum": [
+     "productWithoutOwner",
+     "missingApproval",
+     "outdatedPricing",
+     "conflictingValidity",
+     "missingChannelConfiguration",
+     "orphanedDependency",
+     "unusedProduct",
+     "duplicateProduct",
+     "unusualConfigurationChange",
+     "highOverrideLevel",
+     "scheduledPublicationConflict",
+     "expiredCommercialConfiguration",
+     "activeAfterEventEnd",
+     "brokenDependency"
+    ],
+    "description": "Risk detected (AI Monitoring, pack p.26)"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product name"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue name"
+   },
+   "businessImpact": {
+    "type": "string",
+    "description": "Business impact, in plain language"
+   },
+   "recommendedAction": {
+    "type": "string",
+    "description": "Recommended action; advisory"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner (display name)",
+    "nullable": true
+   },
+   "dueDate": {
+    "type": "string",
+    "description": "Due date",
+    "format": "date",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: open, acknowledged, inRemediation, resolved or dismissed (decided 29 September, readiness close-out)"
+   },
+   "riskId": {
+    "type": "string",
+    "description": "Risk id",
+    "format": "uuid"
+   },
+   "productId": {
+    "type": "string",
+    "description": "Product id",
+    "format": "uuid",
+    "nullable": true
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "critical",
+     "high",
+     "medium",
+     "low"
+    ],
+    "description": "Severity (Risk Dashboard)"
+   },
+   "explanation": {
+    "type": "string",
+    "description": "AI explanation, e.g. the two products share 96% of their configuration; advisory"
+   },
+   "detectedAt": {
+    "type": "string",
+    "description": "Detected",
+    "format": "date-time"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "SlaEscalationBottleneckMonitorView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over approvals.workflow_instance, whose SLA and reminder timestamps it lists (data model for the agreed operations, 29 September)",
+  "description": "**What SLA, Escalation & Bottleneck Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "workflow": {
+    "type": "string",
+    "description": "Workflow"
+   },
+   "instance": {
+    "type": "string",
+    "description": "Instance"
+   },
+   "currentStep": {
+    "type": "string",
+    "description": "Current Step"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "started": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Started"
+   },
+   "target": {
+    "type": "string",
+    "format": "date-time",
+    "description": "SLA deadline"
+   },
+   "timeRemaining": {
+    "type": "integer",
+    "description": "Minutes until breach; negative once breached"
+   },
+   "risk": {
+    "type": "string",
+    "description": "Risk"
+   },
+   "escalationLevel": {
+    "type": "string",
+    "description": "Escalation Level"
+   },
+   "firstReminder": {
+    "type": "string",
+    "format": "date-time",
+    "description": "First Reminder"
+   },
+   "secondReminder": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Second Reminder"
+   },
+   "managerEscalation": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Manager Escalation"
+   },
+   "executiveEscalation": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Executive Escalation"
+   },
+   "finalOutcome": {
+    "type": "string",
+    "description": "Final Outcome"
+   }
+  },
+  "required": [
+   "instance"
+  ]
+ },
+ "SlaEscalationBottleneckMonitorViewSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none - aggregate computed at read time over the rows the page lists",
+  "description": "The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).",
+  "properties": {
+   "withinSla": {
+    "type": "integer",
+    "description": "Within SLA"
+   },
+   "atRisk": {
+    "type": "integer",
+    "description": "At Risk"
+   },
+   "breached": {
+    "type": "integer",
+    "description": "Breached"
+   },
+   "escalated": {
+    "type": "integer",
+    "description": "Escalated"
+   },
+   "averageProcessingTime": {
+    "type": "integer",
+    "description": "Minutes"
+   },
+   "averageApprovalTime": {
+    "type": "integer",
+    "description": "Minutes"
+   },
+   "longestWaitingStep": {
+    "type": "string",
+    "description": "Longest Waiting Step"
+   }
+  }
+ },
+ "SuggestionBasis": {
+  "type": "string",
+  "description": "**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n",
+  "enum": [
+   "heuristic",
+   "statistical",
+   "model",
+   "hybrid",
+   "manual"
+  ]
+ },
+ "WorkflowTestingSimulationImpactAnalysisInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; the outcome is recorded as approvals.workflow_version test results (data model for the agreed operations, 29 September)",
+  "description": "**What Workflow Testing, Simulation & Impact Analysis submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "workflowId": {
+    "type": "string",
+    "description": "Workflow under test"
+   },
+   "testMode": {
+    "type": "string",
+    "enum": [
+     "manualTestCase",
+     "sampleTransaction",
+     "historicalReplay",
+     "scenarioSimulation",
+     "batchTest"
+    ],
+    "description": "How the workflow is tested"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version under test"
+   },
+   "compareWithVersion": {
+    "type": "string",
+    "description": "Existing version to compare against for regression"
+   },
+   "inputPayload": {
+    "type": "string",
+    "description": "Sample transaction as a JSON document, for manual and sample tests"
+   },
+   "replayFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Historical replay start"
+   },
+   "replayTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Historical replay end"
+   }
+  },
+  "required": [
+   "workflowId",
+   "testMode"
+  ]
+ },
+ "WorkflowTestingSimulationImpactAnalysisView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — computed by simulation over approvals.workflow_version and the rules it calls; never executes actions (data model for the agreed operations, 29 September)",
+  "description": "**What Workflow Testing, Simulation & Impact Analysis displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "workflowId": {
+    "type": "string",
+    "description": "Workflow under test"
+   },
+   "testMode": {
+    "type": "string",
+    "enum": [
+     "manualTestCase",
+     "sampleTransaction",
+     "historicalReplay",
+     "scenarioSimulation",
+     "batchTest"
+    ],
+    "description": "How the workflow is tested"
+   },
+   "rulesEvaluated": {
+    "type": "integer",
+    "description": "Rules Evaluated"
+   },
+   "conditionsMatched": {
+    "type": "integer",
+    "description": "Conditions Matched"
+   },
+   "decisions": {
+    "type": "integer",
+    "description": "Decisions"
+   },
+   "approvalPath": {
+    "type": "string",
+    "description": "Approval Path"
+   },
+   "actions": {
+    "type": "integer",
+    "description": "Actions"
+   },
+   "notifications": {
+    "type": "integer",
+    "description": "Notifications"
+   },
+   "sla": {
+    "type": "string",
+    "description": "SLA"
+   },
+   "expectedOutcome": {
+    "type": "string",
+    "description": "Expected Outcome"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version under test"
+   },
+   "compareWithVersion": {
+    "type": "string",
+    "description": "Existing version to compare against for regression"
+   },
+   "inputPayload": {
+    "type": "string",
+    "description": "Sample transaction as a JSON document, for manual and sample tests"
+   },
+   "replayFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Historical replay start"
+   },
+   "replayTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Historical replay end"
+   }
+  },
+  "required": [
+   "workflowId",
+   "testMode"
+  ]
+ }
+}

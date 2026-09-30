@@ -10,7 +10,7 @@ aggregate: order
 emittedWhen: exchangeOrderLines succeeds
 payload:
 - field: orderId
-  type: string
+  type: uuid
 - field: lines
   type: array
   notes: direction (out or in), productId, quantity, amount — the lines given up and the lines that

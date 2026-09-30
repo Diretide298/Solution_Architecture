@@ -485,6 +485,13 @@
     "contract": "marketing-crm",
     "purpose": "Consent Evidence, History & Withdrawal Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listDeviceConsents",
+    "contract": "marketing-crm",
+    "purpose": "Visitors' cookie decisions as evidence",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1517,6 +1524,13 @@
     "contract": "marketing-crm",
     "purpose": "Privacy Audit, Evidence & Compliance Reporting",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listDeviceConsents",
+    "contract": "marketing-crm",
+    "purpose": "Cookie consent log for compliance reports",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {

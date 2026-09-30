@@ -1,4 +1,100 @@
 {
+ "AiSeatMapProposal": {
+  "type": "object",
+  "x-ticvai-persistence": "none — the plan is ai.action_plan and ai.action_step, presented as one ai.proposed_action; the findings are the evidence of its decision record",
+  "description": "What `proposeSeatMapChanges` proposed: findings with the seats they concern, and except for `consistency` the plan a person approves (1.4.23, 1.4.25, 1.4.26, 1.4.29).",
+  "required": [
+   "kind",
+   "findings"
+  ],
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "categories",
+     "numbering",
+     "stageVariant",
+     "consistency"
+    ]
+   },
+   "seatMapId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `ai.action_plan`, readable with `getActionPlan`. Null for `consistency`."
+   },
+   "proposedActionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `ai.proposed_action` a person decides. Null for `consistency`."
+   },
+   "summary": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Counts: seats re-categorised or relabelled, seats blocked, capacity by category before and after."
+   },
+   "findings": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "code",
+      "severity"
+     ],
+     "properties": {
+      "code": {
+       "type": "string",
+       "description": "e.g. `accessibleSeatWithoutAccessiblePrice`, `restrictedViewInPremium`, `companionWithoutWheelchairSpace`, `sightLineLost`, `behindStage`, `numberingGap`, `duplicateLabel`, `categoryChange`, `labelChange`."
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "blocking",
+        "warning",
+        "info"
+       ]
+      },
+      "seatIds": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "uuid"
+       }
+      },
+      "sectionId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "current": {
+       "type": "string",
+       "nullable": true
+      },
+      "proposed": {
+       "type": "string",
+       "nullable": true
+      },
+      "reason": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "basis": {
+    "$ref": "#/components/schemas/SuggestionBasis"
+   },
+   "decisionRecordId": {
+    "type": "string",
+    "format": "uuid"
+   }
+  }
+ },
  "BulkUpdateSeatsRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -410,6 +506,63 @@
    }
   }
  },
+ "Seat": {
+  "x-ticvai-persistence": "seating.seat",
+  "type": "object",
+  "required": [
+   "id",
+   "sectionCode",
+   "rowLabel",
+   "seatNumber",
+   "attribute"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "**Stable for the life of the seat.** Section, row and number are display labels that change on a refit; this does not. A ticket sold today must still resolve after a renumbering.\n"
+   },
+   "sectionCode": {
+    "type": "string"
+   },
+   "rowLabel": {
+    "type": "string"
+   },
+   "seatNumber": {
+    "type": "string"
+   },
+   "displayLabel": {
+    "type": "string",
+    "description": "What the guest sees, e.g. `A2-7-11`."
+   },
+   "position": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/Point"
+     }
+    ],
+    "nullable": true
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "attribute": {
+    "$ref": "#/components/schemas/SeatAttribute"
+   },
+   "companionSeatIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Present on accessible seats. Sold together, released together."
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
  "SeatAttribute": {
   "type": "string",
   "description": "BL-168. **Extended from eight values on 18 August.** Amenity and view filters needed attributes the original set did not carry, and a guest filtering for *aisle seat with power* was filtering on something the model could not express.\n",
@@ -480,6 +633,15 @@
      }
     }
    }
+  ]
+ },
+ "SeatMapStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "validated",
+   "published",
+   "archived"
   ]
  },
  "SeatMapSummary": {
@@ -627,6 +789,17 @@
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
    }
   }
+ },
+ "SuggestionBasis": {
+  "type": "string",
+  "description": "**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n",
+  "enum": [
+   "heuristic",
+   "statistical",
+   "model",
+   "hybrid",
+   "manual"
+  ]
  },
  "UploadTicket": {
   "x-ticvai-persistence": "assets.media_upload",

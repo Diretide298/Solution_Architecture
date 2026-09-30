@@ -2688,7 +2688,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "properties": {
       "orderId": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+       "format": "uuid"
       },
       "amount": {
        "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -2923,6 +2923,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ]
  },
  "MessageDispatch": {
+  "x-ticvai-append-only": "queuedAt",
   "x-ticvai-persistence": "marketing.message_dispatch",
   "type": "object",
   "required": [

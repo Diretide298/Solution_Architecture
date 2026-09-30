@@ -8,9 +8,53 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PricingApprovalWorkflowAuthorityMatrixInput",
   "responds": "PricingApprovalWorkflowAuthorityMatrixView"
+ },
+ "cancelPricingRollback": {
+  "method": "POST",
+  "path": "/pricing-rollback-emergency/{actionId}/cancel",
+  "contract": "catalogue",
+  "summary": "Cancel a rollback that has not started",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CatalogueRollbackAction"
+ },
+ "decidePricingChangeRequest": {
+  "method": "POST",
+  "path": "/pricing-change-request/{changeId}/decision",
+  "contract": "catalogue",
+  "summary": "Approve, reject or return a pricing change request",
+  "permission": "PRODUCT_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PricingChangeRequestDecisionInput",
+  "responds": "PricingChangeRequestWorkspaceView"
  },
  "listBulkPricingUpdate": {
   "method": "GET",
@@ -21,9 +65,74 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "jobKind",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "operation",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "BulkPricingUpdateImportMassMaintenanceView"
+  "responds": "Page"
+ },
+ "listChangeImpactAnalysis": {
+  "method": "GET",
+  "path": "/change-impact-analysi",
+  "contract": "catalogue",
+  "summary": "Change Impact Analysis",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "changeRequestId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "area",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "minRisk",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "ChangeImpactAnalysisView"
  },
  "listPricingChangeImpact": {
   "method": "GET",
@@ -34,9 +143,30 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "changeRequestId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "riskLevel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PricingChangeImpactAnalysisView"
+  "responds": "Page"
  },
  "listPricingCompliance": {
   "method": "GET",
@@ -87,10 +217,50 @@
     "name": "market",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "transaction",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "approval",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "auditType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "PricingHistoryAuditComplianceExplorerView"
+  "responds": "Page"
  },
  "listPricingDistributionSynchronization": {
   "method": "GET",
@@ -101,9 +271,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "publicationVersion",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "target",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "outOfSyncOnly",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PricingDistributionSynchronizationPublicationMonitorView"
+  "responds": "Page"
  },
  "listPricingGovernance": {
   "method": "GET",
@@ -146,18 +347,53 @@
     "required": false
    },
    {
+    "name": "owner",
+    "in": "query",
+    "required": false
+   },
+   {
     "name": "changeType",
     "in": "query",
     "required": false
    },
    {
-    "name": "owner",
+    "name": "approver",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "riskLevel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "effectiveFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "effectiveTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "PricingGovernanceCommandCenterView"
+  "responds": "Page"
  },
  "listPricingRollbackEmergency": {
   "method": "GET",
@@ -168,9 +404,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "actionType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PricingRollbackEmergencyControlCenterView"
+  "responds": "Page"
  },
  "listPricingVersionBaseline": {
   "method": "GET",
@@ -181,9 +448,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "priceList",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "compareTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "effectiveOn",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PricingVersionBaselineManagementView"
+  "responds": "Page"
  },
  "publishPricingEffectiveDate": {
   "method": "PUT",
@@ -194,9 +492,34 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PricingPublicationEffectiveDateSchedulerInput",
   "responds": "PricingPublicationEffectiveDateSchedulerView"
+ },
+ "requestPricingRollback": {
+  "method": "POST",
+  "path": "/pricing-rollback-emergency",
+  "contract": "catalogue",
+  "summary": "Roll pricing back, or take an emergency pricing action",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CatalogueRollbackAction",
+  "responds": "CatalogueRollbackAction"
  },
  "setPricingChangeRequest": {
   "method": "PUT",
@@ -207,8 +530,33 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PricingChangeRequestWorkspaceInput",
+  "responds": "PricingChangeRequestWorkspaceView"
+ },
+ "submitPricingChangeRequest": {
+  "method": "POST",
+  "path": "/pricing-change-request/{changeId}/submit",
+  "contract": "catalogue",
+  "summary": "Submit a draft pricing change for validation and approval",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
   "responds": "PricingChangeRequestWorkspaceView"
  }
 }

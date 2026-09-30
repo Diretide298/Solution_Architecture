@@ -1,6 +1,6 @@
 # WS135 — Marketing CRM Configuration Reference v1.0 board 1
 
-**10 screens · 19 operations · 22 schemas · 8 permissions**
+**10 screens · 21 operations · 28 schemas · 8 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -65,7 +65,7 @@ convincingly. It is never a caption.
 | `BO-736` | Guest Master Configuration | listDetail | 3 | 0 | — |
 | `BO-737` | Customer 360 Profile | listDetail | 2 | 0 | — |
 | `BO-738` | Activity Timeline | listDetail | 3 | 0 | — |
-| `BO-739` | Contact & Preferences | listDetail | 1 | 0 | — |
+| `BO-739` | Contact & Preferences | listDetail | 3 | 0 | — |
 | `BO-740` | Family & Guardians | listDetail | 2 | 0 | — |
 | `BO-741` | Corporate & Groups | listDetail | 2 | 0 | — |
 | `BO-742` | Commerce & Documents | listDetail | 1 | 0 | — |
@@ -73,7 +73,7 @@ convincingly. It is never a caption.
 
 ## Thin screens in this batch
 
-**BO-734, BO-736, BO-737, BO-738, BO-739, BO-740, BO-741, BO-742, BO-743 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-734, BO-736, BO-737, BO-738, BO-740, BO-741, BO-742, BO-743 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -1006,6 +1006,25 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "derived": true,
        "impliedBy": "getGuestTimeline",
        "notes": "One record, read-only."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listGuestIdentityVerifications",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "decideGuestIdentityVerification",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "decideGuestIdentityVerification"
       }
      ]
     }
@@ -1025,6 +1044,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Everything they did, in order",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listGuestIdentityVerifications",
+    "contract": "identity",
+    "purpose": "Guest ID documents awaiting review",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "decideGuestIdentityVerification",
+    "contract": "identity",
+    "purpose": "Verify, reject or ask for resubmission",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1037,6 +1070,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "params": [
     {
      "name": "guestId",
+     "from": "navigation"
+    },
+    {
+     "name": "verificationId",
      "from": "navigation"
     }
    ]
@@ -1649,6 +1686,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "AdjustLoyaltyPointsRequest",
   "responds": "LoyaltyAdjustmentResult"
  },
+ "decideGuestIdentityVerification": {
+  "method": "POST",
+  "path": "/guest-identity-verifications/{verificationId}/decision",
+  "contract": "identity",
+  "summary": "Verify or refuse a guest's identity document",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "IdentityGuestVerification"
+ },
  "getConsentHistory": {
   "method": "GET",
   "path": "/guests/{subjectId}/consents/history",
@@ -1845,6 +1901,40 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "Customer360ServiceProfileView"
+ },
+ "listGuestIdentityVerifications": {
+  "method": "GET",
+  "path": "/guest-identity-verifications",
+  "contract": "identity",
+  "summary": "Guest identity verifications, the review queue first",
+  "permission": "GUEST_VIEW_PII",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listSegments": {
   "method": "GET",
@@ -2115,6 +2205,53 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "transactional"
   ]
  },
+ "ConsentRecord": {
+  "x-ticvai-persistence": "marketing.consent_record + marketing.consent_record_channel",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/RecordConsentRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "subjectId"
+    ],
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "subjectId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "recordedByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     },
+     "orderId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "The order whose checkout carried the opt-in (source `checkout`, M18-15): the UUIDv7 of orders.sales_order. Null for every other source.",
+      "x-ticvai-references": "orders.sales_order"
+     },
+     "verifiedContactRef": {
+      "type": "string",
+      "nullable": true,
+      "maxLength": 128,
+      "description": "The verified contact the checkout opt-in was given against (ADR-0045), as the keyed hash the guest match policy uses; never the raw address. It is how a checkout consent given without an account is attached to the profile when the contact later matches one."
+     },
+     "supersededAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
+   }
+  ]
+ },
  "ConsentState": {
   "x-ticvai-persistence": "none — projection over consent_record",
   "type": "object",
@@ -2163,6 +2300,50 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        "nullable": true
       }
      }
+    }
+   }
+  }
+ },
+ "CreateSegmentRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "name",
+   "criteria"
+  ],
+  "properties": {
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "match": {
+    "type": "string",
+    "enum": [
+     "all",
+     "any"
+    ],
+    "default": "all"
+   },
+   "criteria": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "$ref": "#/components/schemas/SegmentCriterion"
+    }
+   },
+   "excludeSegmentIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
     }
    }
   }
@@ -2362,6 +2543,90 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "format": "date-time"
      }
     }
+   }
+  }
+ },
+ "CustomerSegmentProfilePricingRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Customer Segment & Profile Pricing Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ruleName": {
+    "type": "string",
+    "description": "Rule Name"
+   },
+   "segment": {
+    "type": "string",
+    "description": "Segment: the value the dimension must equal, e.g. VIP"
+   },
+   "applicableProducts": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Applicable Products: product ids or product category codes"
+   },
+   "priceList": {
+    "type": "string",
+    "description": "Price List: the list whose rate the rule selects"
+   },
+   "rate": {
+    "type": "string",
+    "description": "Rate: code of the rate used when the rule matches, e.g. VIP Adult"
+   },
+   "priority": {
+    "type": "integer",
+    "description": "Priority within the configurable pricing hierarchy (MoM 1 Sep §4.4): the lower number wins"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, active, disabled or expired"
+   },
+   "ruleId": {
+    "type": "string",
+    "description": "Rule ID"
+   },
+   "dimension": {
+    "type": "string",
+    "enum": [
+     "customerType",
+     "customerSegment",
+     "accountType",
+     "crmSegment",
+     "vipStatus",
+     "corporateCustomer",
+     "employeeStaff",
+     "partnerCustomer",
+     "guestRegisteredUser"
+    ],
+    "description": "Supported Dimension (p.25) the rule tests"
+   },
+   "segmentSource": {
+    "type": "string",
+    "enum": [
+     "crm",
+     "membership",
+     "b2bPartner",
+     "corporateAccount",
+     "customerProfile"
+    ],
+    "description": "Customer Segment Source (p.26) the segment is read from"
+   },
+   "fallbackRate": {
+    "type": "string",
+    "description": "Fallback (p.26): rate used when the customer no longer qualifies; the standard rate by default (decided 29 September, readiness close-out)"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
    }
   }
  },
@@ -3033,6 +3298,109 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "IdentityGuestVerification": {
+  "type": "object",
+  "x-ticvai-persistence": "identity.guest_identity_verification",
+  "description": "**One guest identity-document verification** (5.3.21; decided 29 September, build pass): the document it checks, its status, the method and who decided. The document itself is `pii.subject_document`; this row holds no document number.",
+  "required": [
+   "id",
+   "subjectId",
+   "status",
+   "submittedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectDocumentId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The `pii.subject_document` row submitted."
+   },
+   "documentKind": {
+    "type": "string",
+    "enum": [
+     "passport",
+     "emiratesId",
+     "nationalId",
+     "drivingLicence",
+     "residencePermit",
+     "other"
+    ]
+   },
+   "documentNumberLast4": {
+    "type": "string",
+    "maxLength": 4,
+    "nullable": true,
+    "readOnly": true
+   },
+   "reason": {
+    "type": "string",
+    "enum": [
+     "policyRequired",
+     "ageRestrictedPurchase",
+     "residentPricing",
+     "accountRecovery"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "verified",
+     "rejected",
+     "resubmissionRequested"
+    ],
+    "readOnly": true
+   },
+   "method": {
+    "type": "string",
+    "enum": [
+     "manualReview",
+     "documentScanner",
+     "provider"
+    ],
+    "nullable": true,
+    "readOnly": true
+   },
+   "decisionReason": {
+    "type": "string",
+    "maxLength": 300,
+    "nullable": true,
+    "readOnly": true
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "submittedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "documentImageDeletedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the scan (and any selfie) was deleted under the policy's retention."
+   }
+  }
+ },
  "LoyaltyAdjustmentResult": {
   "type": "object",
   "x-ticvai-persistence": "none — composed from the entry posted and the resulting position",
@@ -3381,6 +3749,76 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "boolean"
    }
   }
+ },
+ "RecordConsentRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "purpose",
+   "decision",
+   "noticeVersion",
+   "source",
+   "recordedAt"
+  ],
+  "properties": {
+   "purpose": {
+    "$ref": "#/components/schemas/ConsentPurpose"
+   },
+   "decision": {
+    "$ref": "#/components/schemas/ConsentDecision"
+   },
+   "channels": {
+    "type": "array",
+    "description": "Omit to apply to every channel the purpose covers.",
+    "items": {
+     "$ref": "#/components/schemas/MessageChannel"
+    }
+   },
+   "noticeVersion": {
+    "type": "string"
+   },
+   "source": {
+    "$ref": "#/components/schemas/ConsentSource"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "Segment": {
+  "x-ticvai-persistence": "marketing.segment + marketing.segment_criterion",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateSegmentRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "createdAt"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "lastEvaluatedSize": {
+      "type": "integer",
+      "nullable": true
+     },
+     "lastEvaluatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "createdAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  ]
  }
 }
 ```

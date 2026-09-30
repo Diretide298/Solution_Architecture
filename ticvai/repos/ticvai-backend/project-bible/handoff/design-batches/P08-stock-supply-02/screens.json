@@ -81,7 +81,7 @@
      "carries": [
       "supplierId"
      ],
-     "provenance": "derived — BO-083 declares entryState.params supplierId and BO-105 holds supplierId, so an edge into it carries them"
+     "provenance": "derived — BO-083 declares entryState.params contractId, supplierId and BO-105 holds supplierId, so an edge into it carries them"
     },
     {
      "to": "BO-137",
@@ -817,6 +817,13 @@
     "contract": "inventory",
     "purpose": "What is about to go out of date",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "requestSuggestion",
+    "contract": "ai",
+    "purpose": "Waste-risk suggestion (kind wasteRisk): items at risk with a recommended action",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1028,6 +1035,13 @@
     "contract": "fnb",
     "purpose": "Record waste",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "requestSuggestion",
+    "contract": "ai",
+    "purpose": "Waste-risk suggestion (kind wasteRisk): items at risk with a recommended action",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {

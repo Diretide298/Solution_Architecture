@@ -432,6 +432,13 @@
     "purpose": "Collections to file into",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "semanticSearch",
+    "contract": "ai",
+    "purpose": "Natural-language search of the media library (kind media)",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {

@@ -988,6 +988,13 @@
     "invalidates": [
      "getSeatMap"
     ]
+   },
+   {
+    "operationId": "proposeSeatMapChanges",
+    "contract": "ai",
+    "purpose": "Propose categories, numbering, a stage variant or consistency findings for this map",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {

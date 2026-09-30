@@ -1,6 +1,6 @@
 # WS94 — Rental Management board 7
 
-**10 screens · 9 operations · 6 schemas · 2 permissions**
+**10 screens · 9 operations · 7 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `RENTAL_OPERATE, RENTAL_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `MARKETING_SEND, RENTAL_OPERATE, RENTAL_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -1519,7 +1519,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Keep it longer, if it is free and the guest accepts the price",
   "permission": "RENTAL_OPERATE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1648,7 +1648,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "What this rental would cost, and the deposit it would hold",
   "permission": "RENTAL_VIEW",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1667,7 +1667,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Something happened during a rental",
   "permission": "RENTAL_OPERATE",
   "offlineCapable": true,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1684,7 +1684,7 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/messages",
   "contract": "marketing-crm",
   "summary": "Send a transactional message",
-  "permission": null,
+  "permission": "MARKETING_SEND",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -1705,7 +1705,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Replace a faulty item mid-rental",
   "permission": "RENTAL_OPERATE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1726,6 +1726,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
+ },
  "RentalAvailability": {
   "type": "object",
   "description": "Board 3. **A pooled product answers with a count, a serialised one with assets.**",

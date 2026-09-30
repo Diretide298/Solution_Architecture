@@ -159,10 +159,19 @@
    "emptyNoResults": "The filter narrowed it and the commercial rules overview are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listLicensingModels",
+    "contract": "subscription",
+    "purpose": "The rules engine",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-389"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-389",
+   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-389"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 31. 0 of 0 labels bound to a contract property; 10 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -302,10 +311,29 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getVsiModel",
+    "contract": "subscription",
+    "purpose": "The VSI model",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "setVsiModel",
+    "contract": "subscription",
+    "purpose": "Build it",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getVsiModel"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-390"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-390",
+   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-390"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 32. 0 of 0 labels bound to a contract property; 10 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -384,7 +412,27 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setVsiModel",
+       "label": "Save VSI model",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setVsiModel"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The vsi scoring tier list.",
@@ -393,10 +441,22 @@
    "emptyNoResults": "The filter narrowed it and the vsi scoring tier are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setVsiModel",
+    "contract": "subscription",
+    "purpose": "Scoring and tier thresholds",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getVsiModel"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-391"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-391",
+   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-391"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 33. 0 of 0 labels bound to a contract property; 0 of 1 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -475,7 +535,33 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createPlan",
+       "label": "Create plan",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listPlans",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createPlan"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The subscription tier list.",
@@ -484,10 +570,26 @@
    "emptyNoResults": "The filter narrowed it and the subscription tier are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createPlan",
+    "contract": "subscription",
+    "purpose": "Tier configuration",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listPlans",
+    "contract": "subscription",
+    "purpose": "Tiers defined",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-392"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-392",
+   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-392"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 34. 0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -615,10 +717,22 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setLicensingModel",
+    "contract": "subscription",
+    "purpose": "Tier allowances",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listLicensingModels"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-393"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-393",
+   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-393"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 35. 0 of 0 labels bound to a contract property; 9 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -816,10 +930,22 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setLicensingModel",
+    "contract": "subscription",
+    "purpose": "Commercial and licensing model",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listLicensingModels"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-394"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-394",
+   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-394"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 36. 0 of 0 labels bound to a contract property; 23 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -987,10 +1113,22 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setLicensingModel",
+    "contract": "subscription",
+    "purpose": "Billable unit and minimum guarantee",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listLicensingModels"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-395"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-395",
+   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-395"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 38. 0 of 0 labels bound to a contract property; 17 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1128,10 +1266,33 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setLicensingModel",
+    "contract": "subscription",
+    "purpose": "Overage pricing",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listLicensingModels"
+    ]
+   },
+   {
+    "operationId": "addCapacityPack",
+    "contract": "subscription",
+    "purpose": "Capacity packs",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getLicenceEnforcement",
+     "getEntitlementUsage"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-396"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-396",
+   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-396"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 39. 0 of 0 labels bound to a contract property; 11 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1261,7 +1422,15 @@
    "emptyNoResults": "The filter narrowed it and the commercial model rule are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "simulateCommercialPackage",
+    "contract": "subscription",
+    "purpose": "Simulate the model",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Customer Annual Cost",
@@ -1274,7 +1443,8 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-397"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-397",
+   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-397"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 40. 0 of 8 labels bound to a contract property; 8 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1374,6 +1544,10 @@
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 41 §Actions"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -1384,12 +1558,29 @@
    "emptyNoResults": "The filter narrowed it and the rule versioning approval are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createPlanVersion",
+    "contract": "subscription",
+    "purpose": "Publish a version",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-398"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-398",
+   "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-398"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 41. 0 of 0 labels bound to a contract property; 2 of 73 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "planId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

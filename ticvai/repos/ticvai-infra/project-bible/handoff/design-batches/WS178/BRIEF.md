@@ -1,6 +1,6 @@
 # WS178 — TICVAI Finance Backend Structure Reference v1.0 board 1
 
-**1 screens · 2 operations · 3 schemas · 2 permissions**
+**1 screens · 5 operations · 13 schemas · 2 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -60,7 +60,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-1081` | Finance Dashboard | listDetail | 2 | 0 | — |
+| `BO-1081` | Finance Dashboard | listDetail | 5 | 0 | — |
 
 ## Thin screens in this batch
 

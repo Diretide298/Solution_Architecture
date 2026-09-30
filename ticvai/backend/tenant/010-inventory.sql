@@ -4,7 +4,7 @@
 -- A stock take. Its lines carry both the counted number and the recount, because two counts that
 -- agree is a different fact from one nobody checked
 CREATE TABLE IF NOT EXISTS inventory.count (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     location_id                       uuid NOT NULL,
     location_name                     text,
     kind                              text NOT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS inventory.count (
     variance_value                    numeric(18,4),
     started_by_principal_id           uuid,
     posted_by_principal_id            uuid,
-    journal_entry_id                  text,
+    journal_entry_id                  uuid,
     started_at                        timestamptz NOT NULL,
     closed_at                         timestamptz,
     posted_at                         timestamptz,
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS inventory.count (
 -- different number from the one the counter was looking at
 CREATE TABLE IF NOT EXISTS inventory.count_line (
     id                                uuid PRIMARY KEY NOT NULL,
-    count_id                          text NOT NULL,
+    count_id                          uuid NOT NULL,
     item_id                           uuid NOT NULL,
     location_id                       uuid,
     batch_id                          uuid,
@@ -48,14 +48,14 @@ CREATE TABLE IF NOT EXISTS inventory.count_line (
 
 -- Stock arriving against a purchase order. Where a three-way match would begin
 CREATE TABLE IF NOT EXISTS inventory.goods_receipt (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     receipt_number                    text NOT NULL,
-    purchase_order_id                 text NOT NULL,
+    purchase_order_id                 uuid NOT NULL,
     location_id                       uuid NOT NULL,
     delivery_note_reference           text,
     net_value_amount                  numeric(18,4),
     received_by_principal_id          uuid NOT NULL,
-    journal_entry_id                  text,
+    journal_entry_id                  uuid,
     created_at                        timestamptz NOT NULL,
     recorded_at                       timestamptz,
     synced_at                         timestamptz
@@ -63,8 +63,8 @@ CREATE TABLE IF NOT EXISTS inventory.goods_receipt (
 
 -- One line received, which may differ from what was ordered
 CREATE TABLE IF NOT EXISTS inventory.goods_receipt_line (
-    goods_receipt_id                  text NOT NULL,
-    line_id                           text,
+    goods_receipt_id                  uuid NOT NULL,
+    line_id                           uuid,
     item_id                           uuid,
     item_name                         text,
     ordered_quantity                  numeric(18,4),
@@ -132,7 +132,7 @@ CREATE TABLE IF NOT EXISTS inventory.location (
 -- Every change in stock, and the only truth about a level — stock_level is computed from these and
 -- never stored
 CREATE TABLE IF NOT EXISTS inventory.movement (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     item_id                           uuid NOT NULL,
     location_id                       uuid NOT NULL,
     kind                              text NOT NULL CONSTRAINT movement_kind_chk CHECK (kind IN ('receipt', 'issue', 'saleDepletion', 'waste', 'adjustmentIn', 'adjustmentOut', 'transferOut', 'transferIn', 'countGain', 'countLoss', 'supplierReturn', 'production')),
@@ -147,20 +147,20 @@ CREATE TABLE IF NOT EXISTS inventory.movement (
     principal_id                      uuid NOT NULL,
     source_type                       text,
     source_id                         text,
-    journal_entry_id                  text,
+    journal_entry_id                  uuid,
     created_at                        timestamptz NOT NULL
 );
 
 -- A commitment to buy, priced in the supplier’s currency
 CREATE TABLE IF NOT EXISTS inventory.purchase_order (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     purchase_order_number             text NOT NULL,
-    requisition_id                    text,
+    requisition_id                    uuid,
     quotation_id                      uuid,
     supplier_id                       uuid NOT NULL,
     supplier_name                     text,
     kind                              text DEFAULT 'standard' CONSTRAINT purchase_order_kind_chk CHECK (kind IN ('standard', 'blanket', 'release', 'rfqAward')),
-    blanket_parent_id                 text,
+    blanket_parent_id                 uuid,
     contract_price_valid_until        date,
     rfq_id                            uuid,
     supplier_invoice_ref              text,
@@ -186,7 +186,7 @@ CREATE TABLE IF NOT EXISTS inventory.purchase_order (
 
 -- One item ordered, at a unit price
 CREATE TABLE IF NOT EXISTS inventory.purchase_order_line (
-    purchase_order_id                 text NOT NULL,
+    purchase_order_id                 uuid NOT NULL,
     line_id                           text,
     item_id                           uuid,
     item_name                         text,
@@ -202,7 +202,7 @@ CREATE TABLE IF NOT EXISTS inventory.purchase_order_line (
 
 -- A supplier’s price, comparable against others
 CREATE TABLE IF NOT EXISTS inventory.quotation (
-    requisition_id                    text NOT NULL,
+    requisition_id                    uuid NOT NULL,
     reference                         text CONSTRAINT quotation_reference_chk CHECK (char_length(reference) <= 128),
     lead_time_days                    integer,
     valid_until                       date NOT NULL,
@@ -231,7 +231,7 @@ CREATE TABLE IF NOT EXISTS inventory.quotation_line (
 -- A department asking for stock, which becomes a movement when fulfilled. The line items are
 -- children
 CREATE TABLE IF NOT EXISTS inventory.requisition (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     requisition_number                text NOT NULL,
     venue_id                          uuid NOT NULL,
     department_id                     uuid,
@@ -257,7 +257,7 @@ CREATE TABLE IF NOT EXISTS inventory.requisition (
 -- its keys; references inventory.item, inventory.requisition. Reached by: 7 operations read it and
 -- 2 write it.
 CREATE TABLE IF NOT EXISTS inventory.requisition_line (
-    requisition_id                    text NOT NULL,
+    requisition_id                    uuid NOT NULL,
     line_id                           text,
     item_id                           uuid,
     item_name                         text,
@@ -310,7 +310,7 @@ CREATE TABLE IF NOT EXISTS inventory.stock_reservation (
     location_id                       uuid NOT NULL,
     quantity                          numeric(18,4) NOT NULL,
     source_type                       text NOT NULL CONSTRAINT stock_reservation_source_type_chk CHECK (source_type IN ('workOrder', 'rentalAgreement', 'order', 'transfer', 'other')),
-    source_id                         text NOT NULL CONSTRAINT stock_reservation_source_id_chk CHECK (char_length(source_id) <= 64),
+    source_id                         uuid NOT NULL,
     status                            text NOT NULL CONSTRAINT stock_reservation_status_chk CHECK (status IN ('active', 'consumed', 'released', 'expired')),
     expires_at                        timestamptz,
     created_at                        timestamptz NOT NULL,
@@ -357,7 +357,7 @@ CREATE TABLE IF NOT EXISTS inventory.supplier_contract (
 
 -- Stock moving between locations. In transit is a state, not a gap
 CREATE TABLE IF NOT EXISTS inventory.transfer (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     transfer_number                   text,
     from_location_id                  uuid NOT NULL,
     to_location_id                    uuid NOT NULL,
@@ -376,7 +376,7 @@ CREATE TABLE IF NOT EXISTS inventory.transfer (
 
 -- One item moving, which is in neither location until it arrives
 CREATE TABLE IF NOT EXISTS inventory.transfer_line (
-    transfer_id                       text NOT NULL,
+    transfer_id                       uuid NOT NULL,
     item_id                           uuid,
     item_name                         text,
     dispatched_quantity               numeric(18,4),

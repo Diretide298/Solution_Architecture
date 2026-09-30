@@ -18,4 +18,4 @@ export type {
 export { registerDriver, openDatabase } from './sqlite';
 export type { SQLiteDatabase, SQLiteDriver, RunResult } from './sqlite';
 
-export { newUlid, isValidUlid, ulidTimestamp } from './ulid';
+export { newId, isVersion7Id, isUuid } from './id';

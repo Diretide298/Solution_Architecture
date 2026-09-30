@@ -253,6 +253,25 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "semanticSearch": {
+  "method": "POST",
+  "path": "/search",
+  "contract": "ai",
+  "summary": "Search meaning, not words",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SearchResult"
+ },
  "setMediaAssetTags": {
   "method": "PUT",
   "path": "/media-assets/{assetId}/tags",

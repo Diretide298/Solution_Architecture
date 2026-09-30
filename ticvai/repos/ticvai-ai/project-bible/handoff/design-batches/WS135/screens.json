@@ -922,6 +922,25 @@
        "derived": true,
        "impliedBy": "getGuestTimeline",
        "notes": "One record, read-only."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listGuestIdentityVerifications",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "decideGuestIdentityVerification",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "decideGuestIdentityVerification"
       }
      ]
     }
@@ -941,6 +960,20 @@
     "purpose": "Everything they did, in order",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listGuestIdentityVerifications",
+    "contract": "identity",
+    "purpose": "Guest ID documents awaiting review",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "decideGuestIdentityVerification",
+    "contract": "identity",
+    "purpose": "Verify, reject or ask for resubmission",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -953,6 +986,10 @@
    "params": [
     {
      "name": "guestId",
+     "from": "navigation"
+    },
+    {
+     "name": "verificationId",
      "from": "navigation"
     }
    ]

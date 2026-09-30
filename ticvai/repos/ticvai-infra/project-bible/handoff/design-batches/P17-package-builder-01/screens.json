@@ -29,7 +29,26 @@
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "simulateCommercialPackage",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "simulateCommercialPackage"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The recommended package overview list.",
@@ -50,7 +69,15 @@
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 44"
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "simulateCommercialPackage",
+    "contract": "subscription",
+    "purpose": "The recommended package",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 44. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -171,7 +198,32 @@
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listPlans",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "simulateCommercialPackage",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "simulateCommercialPackage"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The commercial model tier list.",
@@ -192,7 +244,22 @@
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 45"
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listPlans",
+    "contract": "subscription",
+    "purpose": "Tiers to choose from",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "simulateCommercialPackage",
+    "contract": "subscription",
+    "purpose": "Price the choice",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 45. 0 of 0 labels bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -329,7 +396,15 @@
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 46 §Each module displays"
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listModuleCatalogue",
+    "contract": "subscription",
+    "purpose": "The marketplace",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 46. 0 of 9 labels bound to a contract property; 9 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "entryState": {
    "preloaded": [
@@ -472,7 +547,15 @@
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 48 §Each recommendation shows"
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listModuleCatalogue",
+    "contract": "subscription",
+    "purpose": "Recommended modules",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 48. 0 of 7 labels bound to a contract property; 7 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "entryState": {
    "preloaded": [
@@ -554,7 +637,19 @@
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listModuleCatalogue",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The module detail commercial list.",
@@ -575,7 +670,15 @@
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 49"
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listModuleCatalogue",
+    "contract": "subscription",
+    "purpose": "One module in detail",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 49. 0 of 0 labels bound to a contract property; 0 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -647,7 +750,33 @@
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setModuleListing",
+       "label": "Save module listing",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listModuleCatalogue",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setModuleListing"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The module dependency compatibility list.",
@@ -673,7 +802,25 @@
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 49"
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setModuleListing",
+    "contract": "subscription",
+    "purpose": "Dependencies and compatibility",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listModuleCatalogue"
+    ]
+   },
+   {
+    "operationId": "listModuleCatalogue",
+    "contract": "subscription",
+    "purpose": "What depends on what",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 49. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -745,7 +892,27 @@
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "addCapacityPack",
+       "label": "Add capacity pack",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "addCapacityPack"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The add-ons capacity commercial list.",
@@ -766,7 +933,19 @@
     "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 50"
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "addCapacityPack",
+    "contract": "subscription",
+    "purpose": "Add-ons and capacity",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "getLicenceEnforcement",
+     "getEntitlementUsage"
+    ]
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 50. 0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [

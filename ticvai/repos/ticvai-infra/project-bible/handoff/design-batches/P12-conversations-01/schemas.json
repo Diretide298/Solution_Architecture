@@ -1,6 +1,11 @@
 {
  "Case": {
   "x-ticvai-persistence": "marketing.case",
+  "x-ticvai-retired-columns": [
+   "guest_name",
+   "subject",
+   "is_sla_breached"
+  ],
   "type": "object",
   "required": [
    "id",
@@ -12,10 +17,14 @@
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid",
+    "description": "Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7."
    },
    "caseNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity. Assigned when the case reaches the server, so a retry with the same `id` keeps its number.\n"
    },
    "subjectId": {
     "type": "string",
@@ -24,15 +33,60 @@
    },
    "guestName": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from `pii.subject` when the case is read, never stored on the case.** A name copied onto a case row is personal data outside the erasable store (ADR-0023), and it had no source anyway — no request carries it. Returned only to callers holding `GUEST_VIEW_PII`, as `searchGuests` does.\n"
    },
    "subject": {
-    "type": "string"
+    "type": "string",
+    "x-ticvai-column": "title",
+    "description": "**The case's one-line title**, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps `subject` because screens bind it.\n"
+   },
+   "kind": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CaseKind"
+     }
+    ],
+    "nullable": true,
+    "description": "What the guest said it was about, where the guest raised it."
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MessageChannel"
+     }
+    ],
+    "description": "How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`."
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Device time the case was raised — the start of the SLA clock."
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "Server time the case arrived. Equal to `recordedAt` for a case raised online."
    },
    "categoryId": {
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "queueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `ServiceQueue` the case waits in, set by routing (`CaseRoutingRule.queueId`). Null once routed straight to an agent. (decided 29 September, data model for the agreed operations)"
+   },
+   "membershipId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The identity membership this case concerns (`identity.customer_membership`); member case notes are cases with this set. (decided 29 September, coordinator decision DM4, writers pass)"
    },
    "status": {
     "$ref": "#/components/schemas/CaseStatus"
@@ -60,7 +114,10 @@
     "nullable": true
    },
    "isSlaBreached": {
-    "type": "boolean"
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Computed when read, never stored.** True once the case has been open longer than its SLA allows — the time from `recordedAt` to `resolvedAt` (or to now, while unresolved), less `slaPausedSeconds`, is past the target that set `slaDueAt`. A stored flag would need a job to flip it at the moment of breach, and no such job is designed; `listCases?breachedSla` filters on the same computation.\n"
    },
    "slaPausedSeconds": {
     "type": "integer",
@@ -106,6 +163,18 @@
    }
   ]
  },
+ "CaseKind": {
+  "type": "string",
+  "description": "**What the guest says the case is about**, in their words rather than the venue's taxonomy — `raiseMyCase` asks for it and `categoryId` is what staff file it under. Stored on the case, because a lost-property report that forgets it was one cannot be routed to the lost and found desk.\n**`other` only with a note (decided 28 September, audit R222).** A case raised as `other` must carry a non-empty `detail` (`raiseMyCase`), or it is refused with 400; the notes are reviewed quarterly to add the real kinds they reveal.\n",
+  "enum": [
+   "lostProperty",
+   "complaint",
+   "question",
+   "accessibility",
+   "refundRequest",
+   "other"
+  ]
+ },
  "CaseMessage": {
   "x-ticvai-persistence": "marketing.case_message",
   "type": "object",
@@ -117,6 +186,10 @@
    "recordedAt"
   ],
   "properties": {
+   "resolution": {
+    "type": "string",
+    "description": "**What was actually done about it.** Indexed for retrieval: an agent facing a complaint benefits more from how the last one was resolved than from a policy. Without this column `marketing.case` can only embed its subject line.\n"
+   },
    "id": {
     "type": "string"
    },
@@ -151,7 +224,14 @@
    },
    "recordedAt": {
     "type": "string",
-    "format": "date-time"
+    "format": "date-time",
+    "description": "Device time — `addCaseMessage` is offline-capable."
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "Server time the message arrived."
    }
   }
  },
@@ -264,12 +344,16 @@
    "queuePosition": {
     "type": "integer",
     "nullable": true,
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "Place among the unclaimed conversations in `queueId`, from the live agent queue (audit R149). Null once claimed."
    },
    "estimatedWaitSeconds": {
     "type": "integer",
     "nullable": true,
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "From the live agent queue — the conversations ahead divided across that queue's agents online now (audit R149). Null once claimed."
    },
    "handoverReason": {
     "type": "string",
@@ -361,7 +445,7 @@
  },
  "ConversationMessage": {
   "type": "object",
-  "x-ticvai-persistence": "marketing.conversation_message",
+  "x-ticvai-persistence": "marketing.conversation_message + marketing.conversation_message_attachment",
   "required": [
    "id",
    "sender",
@@ -457,7 +541,7 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "subjectId": {
     "type": "string",
@@ -475,6 +559,12 @@
     "type": "string",
     "format": "uuid"
    },
+   "membershipId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The identity membership this case concerns (`identity.customer_membership`); member case notes are cases with this set. Must belong to `subjectId` when both are given (422). (decided 29 September, coordinator decision DM4, writers pass)"
+   },
    "priority": {
     "allOf": [
      {
@@ -482,6 +572,9 @@
      }
     ],
     "default": "normal"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/CaseKind"
    },
    "channel": {
     "$ref": "#/components/schemas/MessageChannel"
@@ -495,13 +588,15 @@
    },
    "attachmentRefs": {
     "type": "array",
+    "description": "Stored on the opening `CaseMessage`, not on the case.",
     "items": {
      "type": "string"
     }
    },
    "recordedAt": {
     "type": "string",
-    "format": "date-time"
+    "format": "date-time",
+    "description": "Device time the case was raised. The server stamps `Case.syncedAt` on arrival."
    }
   }
  },

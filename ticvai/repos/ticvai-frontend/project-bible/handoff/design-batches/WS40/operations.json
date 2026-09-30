@@ -8,9 +8,34 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "LiveDynamicPriceExecutionDeploymentMonitorInput",
   "responds": "LiveDynamicPriceExecutionDeploymentMonitorView"
+ },
+ "decidePricingRecommendation": {
+  "method": "POST",
+  "path": "/recommendation-review-decision/{recommendationId}/decision",
+  "contract": "catalogue",
+  "summary": "Record a human decision on an AI pricing recommendation",
+  "permission": "AI_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PricingRecommendationDecisionInput",
+  "responds": "PricingRecommendationDecision"
  },
  "listAutomationPolicyAutonomous": {
   "method": "GET",
@@ -21,9 +46,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "automationLevel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "strategy",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "paused",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "AutomationPolicyAutonomousPricingOrchestratorView"
+  "responds": "Page"
  },
  "listDynamicPricingPerformance": {
   "method": "GET",
@@ -34,9 +90,60 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "level",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "market",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "compareBy",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "DynamicPricingPerformanceOptimizationAnalyticsView"
+  "responds": "Page"
  },
  "listLearningModelPerformance": {
   "method": "GET",
@@ -47,9 +154,60 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "modelName",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "eventType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "season",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "market",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "forecastHorizon",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "AiLearningModelPerformanceOptimizationFeedbackView"
+  "responds": "Page"
  },
  "listRecommendationReviewDecision": {
   "method": "GET",
@@ -60,9 +218,45 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "urgency",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "decision",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "governanceLevel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "AiRecommendationReviewDecisionQueueView"
+  "responds": "Page"
  },
  "listRevenue": {
   "method": "GET",
@@ -73,9 +267,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "automationMode",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "urgency",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "rankBy",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "RevenueOptimizationCommandCenterView"
+  "responds": "Page"
  },
  "listRevenueDemandImpact": {
   "method": "GET",
@@ -86,9 +311,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "recommendationId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "simulationId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "RevenueDemandImpactForecastingView"
+  "responds": "Page"
  },
  "listScenarioModelingWhat": {
   "method": "GET",
@@ -99,9 +355,54 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "scenarioType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ScenarioModelingWhatIfAnalysisView"
+  "responds": "Page"
+ },
+ "setDynamicPricingGuardrailPolicy": {
+  "method": "PUT",
+  "path": "/dynamic-pricing-controls",
+  "contract": "catalogue",
+  "summary": "Set the guardrails and automation level of dynamic pricing at one scope",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DynamicPricingControl",
+  "responds": "DynamicPricingControl"
  },
  "setPricing": {
   "method": "PUT",
@@ -112,7 +413,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PricingSimulationStudioInput",
   "responds": "PricingSimulationStudioView"
  },
@@ -125,8 +432,33 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ABPricingExperimentStudioInput",
   "responds": "ABPricingExperimentStudioView"
+ },
+ "setSignalRegistryPolicy": {
+  "method": "PUT",
+  "path": "/signal-registry",
+  "contract": "catalogue",
+  "summary": "Register a signal or model and set how far AI may trust it",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SignalRegistryEntry",
+  "responds": "SignalRegistryEntry"
  }
 }

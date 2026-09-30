@@ -39,10 +39,7 @@
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-208 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-209",
@@ -215,7 +212,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-208"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-208",
+   "workshopBoard": "wireframes/WS113 Promotions   Bundles Management Board 8.dc.html#adm-208"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 109. 12 of 12 labels bound to a contract property; 12 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -342,7 +340,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-209"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-209",
+   "workshopBoard": "wireframes/WS113 Promotions   Bundles Management Board 8.dc.html#adm-209"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 110. 0 of 0 labels bound to a contract property; 0 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -461,16 +460,20 @@
     "operationId": "setPromotionStackingRule",
     "contract": "promotions",
     "purpose": "Promotion Stacking Rule Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setPromotionStackingRule"
-    ]
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "setPromotionRule",
+    "contract": "promotions",
+    "purpose": "Promotion Rule Builder",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-210"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-210",
+   "workshopBoard": "wireframes/WS113 Promotions   Bundles Management Board 8.dc.html#adm-210"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 111. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -616,7 +619,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-211"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-211",
+   "workshopBoard": "wireframes/WS113 Promotions   Bundles Management Board 8.dc.html#adm-211"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 112. 8 of 8 labels bound to a contract property; 8 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -741,7 +745,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-212"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-212",
+   "workshopBoard": "wireframes/WS113 Promotions   Bundles Management Board 8.dc.html#adm-212"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 113. 0 of 0 labels bound to a contract property; 6 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -852,18 +857,13 @@
    }
   ],
   "entryState": {
-   "preloaded": [
-    "BestOfferCustomerBenefitResolverView.useTheHighestRankedPromotion",
-    "BestOfferCustomerBenefitResolverView.favorAStrategicallySelectedCampaign",
-    "BestOfferCustomerBenefitResolverView.honorContractualCustomerSpecificPricingFirst",
-    "BestOfferCustomerBenefitResolverView.family15Aed",
-    "BestOfferCustomerBenefitResolverView.bank1011750"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-213"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-213",
+   "workshopBoard": "wireframes/WS113 Promotions   Bundles Management Board 8.dc.html#adm-213"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 114. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1003,7 +1003,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-214"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-214",
+   "workshopBoard": "wireframes/WS113 Promotions   Bundles Management Board 8.dc.html#adm-214"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 115. 0 of 0 labels bound to a contract property; 9 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1088,15 +1089,7 @@
        "kind": "dataTable",
        "label": "Every conflict detection resolution",
        "columns": [
-        "ConflictDetectionResolutionCenterView.sameProduct",
-        "ConflictDetectionResolutionCenterView.sameAudience",
-        "ConflictDetectionResolutionCenterView.sameChannel",
-        "ConflictDetectionResolutionCenterView.sameValidity",
-        "ConflictDetectionResolutionCenterView.incompatiblePromotions",
-        "ConflictDetectionResolutionCenterView.missingHierarchy",
-        "ConflictDetectionResolutionCenterView.missingStackingRule",
-        "ConflictDetectionResolutionCenterView.discountCapBreach",
-        "ConflictDetectionResolutionCenterView.circularDependency"
+        "ConflictDetectionResolutionCenterView.conflictType"
        ],
        "bindsTo": "ConflictDetectionResolutionCenterView",
        "operation": "listConflictDetectionResolution",
@@ -1113,15 +1106,7 @@
        "label": "The selected conflict detection resolution",
        "bindsTo": "ConflictDetectionResolutionCenterView",
        "columns": [
-        "ConflictDetectionResolutionCenterView.sameProduct",
-        "ConflictDetectionResolutionCenterView.sameAudience",
-        "ConflictDetectionResolutionCenterView.sameChannel",
-        "ConflictDetectionResolutionCenterView.sameValidity",
-        "ConflictDetectionResolutionCenterView.incompatiblePromotions",
-        "ConflictDetectionResolutionCenterView.missingHierarchy",
-        "ConflictDetectionResolutionCenterView.missingStackingRule",
-        "ConflictDetectionResolutionCenterView.discountCapBreach",
-        "ConflictDetectionResolutionCenterView.circularDependency"
+        "ConflictDetectionResolutionCenterView.conflictType"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Customer qualifies for”, “Eligibility”, “Compatibility”, “Priority”, “Calculation sequence”, “Discount cap”.",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 116 §Detect"
@@ -1172,18 +1157,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "ConflictDetectionResolutionCenterView.sameProduct",
-    "ConflictDetectionResolutionCenterView.sameAudience",
-    "ConflictDetectionResolutionCenterView.sameChannel",
-    "ConflictDetectionResolutionCenterView.sameValidity",
-    "ConflictDetectionResolutionCenterView.incompatiblePromotions",
-    "ConflictDetectionResolutionCenterView.missingHierarchy"
+    "ConflictDetectionResolutionCenterView.conflictType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-215"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-215",
+   "workshopBoard": "wireframes/WS113 Promotions   Bundles Management Board 8.dc.html#adm-215"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 116. 9 of 9 labels bound to a contract property; 11 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1294,18 +1275,13 @@
    }
   ],
   "entryState": {
-   "preloaded": [
-    "PromotionDecisionTraceTransactionExplainerView.family20",
-    "PromotionDecisionTraceTransactionExplainerView.summer25",
-    "PromotionDecisionTraceTransactionExplainerView.bank10",
-    "PromotionDecisionTraceTransactionExplainerView.loyalty5",
-    "PromotionDecisionTraceTransactionExplainerView.family20Eligible"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-216"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-216",
+   "workshopBoard": "wireframes/WS113 Promotions   Bundles Management Board 8.dc.html#adm-216"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 117. 0 of 0 labels bound to a contract property; 0 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1431,7 +1407,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-217"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-217",
+   "workshopBoard": "wireframes/WS113 Promotions   Bundles Management Board 8.dc.html#adm-217"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 118. 0 of 0 labels bound to a contract property; 8 of 112 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

@@ -647,6 +647,20 @@
     "purpose": "Gaps, by severity",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listAlerts",
+    "contract": "reporting",
+    "purpose": "Staffing shortage alerts (metric staffingShortfall)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setAlertRule",
+    "contract": "reporting",
+    "purpose": "Configure the shortage alert (metric staffingShortfall, above 0, window, recipients)",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {

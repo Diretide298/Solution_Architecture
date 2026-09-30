@@ -5,74 +5,32 @@
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Approval Review & Decision Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "onD": {
+   "decision": {
     "type": "string",
-    "description": "on d"
+    "enum": [
+     "approve",
+     "reject",
+     "requestChanges",
+     "reassign",
+     "delegate",
+     "escalate"
+    ],
+    "description": "Approver action (pack p.18)"
    },
-   "refundableLe": {
+   "assignToPrincipalId": {
     "type": "string",
-    "description": "refundable le"
+    "description": "New approver for reassign/delegate/escalate",
+    "nullable": true
    },
-   "requestChanges": {
+   "changeRequestId": {
     "type": "string",
-    "description": "Request Changes"
+    "description": "Change request id",
+    "format": "uuid"
    },
-   "reassign": {
+   "comment": {
     "type": "string",
-    "description": "Reassign"
-   },
-   "delegate": {
-    "type": "string",
-    "description": "Delegate"
-   },
-   "requester": {
-    "type": "string",
-    "description": "Requester"
-   },
-   "reasonForChange": {
-    "type": "string",
-    "description": "Reason for change"
-   },
-   "businessJustification": {
-    "type": "string",
-    "description": "Business justification"
-   },
-   "attachments": {
-    "type": "string",
-    "description": "Attachments"
-   },
-   "effectiveDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Effective date"
-   },
-   "currentSales": {
-    "type": "string",
-    "description": "Current sales"
-   },
-   "futureReservations": {
-    "type": "string",
-    "description": "Future reservations"
-   },
-   "channelsAffected": {
-    "type": "string",
-    "description": "Channels affected"
-   },
-   "pricingImpact": {
-    "type": "string",
-    "description": "Pricing impact"
-   },
-   "capacityImpact": {
-    "type": "integer",
-    "description": "Capacity impact"
-   },
-   "financeImpact": {
-    "type": "string",
-    "description": "Finance impact"
-   },
-   "accessImpact": {
-    "type": "string",
-    "description": "Access impact"
+    "description": "Comment; required for reject and requestChanges",
+    "nullable": true
    }
   }
  },
@@ -82,29 +40,13 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Approval Review & Decision Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "onD": {
+   "approvalStatus": {
     "type": "string",
-    "description": "on d"
-   },
-   "refundableLe": {
-    "type": "string",
-    "description": "refundable le"
-   },
-   "requestChanges": {
-    "type": "string",
-    "description": "Request Changes"
-   },
-   "reassign": {
-    "type": "string",
-    "description": "Reassign"
-   },
-   "delegate": {
-    "type": "string",
-    "description": "Delegate"
+    "description": "Approval status after this decision: pending, changesRequested, approved, rejected, escalated or withdrawn"
    },
    "requester": {
     "type": "string",
-    "description": "Requester"
+    "description": "Requester (display name)"
    },
    "reasonForChange": {
     "type": "string",
@@ -115,41 +57,114 @@
     "description": "Business justification"
    },
    "attachments": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "fileId": {
+       "type": "string"
+      },
+      "name": {
+       "type": "string"
+      }
+     }
+    },
     "description": "Attachments"
    },
    "effectiveDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "Effective date"
+    "description": "Effective date; empty = on approval",
+    "format": "date",
+    "nullable": true
    },
    "currentSales": {
-    "type": "string",
-    "description": "Current sales"
+    "type": "integer",
+    "description": "Tickets sold under the current version"
    },
    "futureReservations": {
-    "type": "string",
-    "description": "Future reservations"
+    "type": "integer",
+    "description": "Future reservations of the product"
    },
    "channelsAffected": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/Channel"
+    },
     "description": "Channels affected"
    },
    "pricingImpact": {
     "type": "string",
-    "description": "Pricing impact"
+    "description": "Pricing impact in plain language; the figures are in comparison"
    },
    "capacityImpact": {
     "type": "integer",
-    "description": "Capacity impact"
+    "description": "Change in capacity units (negative = reduction)"
    },
    "financeImpact": {
-    "type": "string",
-    "description": "Finance impact"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Estimated revenue difference over future reservations and forecast sales; advisory"
    },
    "accessImpact": {
     "type": "string",
-    "description": "Access impact"
+    "description": "Access impact in plain language"
+   },
+   "changeRequestId": {
+    "type": "string",
+    "description": "Change request id",
+    "format": "uuid"
+   },
+   "productId": {
+    "type": "string",
+    "description": "Product id",
+    "format": "uuid"
+   },
+   "comparison": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "configurationArea": {
+       "type": "string",
+       "enum": [
+        "basicInformation",
+        "validity",
+        "pricing",
+        "capacity",
+        "entitlements",
+        "eligibility",
+        "media",
+        "channels",
+        "policies",
+        "relationships",
+        "lifecycle"
+       ]
+      },
+      "field": {
+       "type": "string"
+      },
+      "currentValue": {
+       "type": "string",
+       "nullable": true
+      },
+      "proposedValue": {
+       "type": "string",
+       "nullable": true
+      },
+      "changed": {
+       "type": "boolean"
+      }
+     }
+    },
+    "description": "Change comparison, current vs proposed; changed rows are highlighted"
+   },
+   "aiSummary": {
+    "type": "string",
+    "description": "AI summary of the proposed change; advisory, the AI does not approve",
+    "nullable": true
    }
   }
  },
@@ -164,68 +179,114 @@
     "description": "Workflow name"
    },
    "applicableProductTypes": {
-    "type": "string",
-    "description": "Applicable product types"
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ProductKind"
+    },
+    "description": "Applicable product types; empty = all"
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue id; empty = all venues",
+    "nullable": true
    },
    "department": {
     "type": "string",
-    "description": "Department"
+    "description": "Department",
+    "nullable": true
    },
-   "changeType": {
-    "type": "string",
-    "description": "Change type"
+   "changeTypes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "newProduct",
+      "description",
+      "price",
+      "validity",
+      "capacity",
+      "entitlement",
+      "eligibility",
+      "tax",
+      "channel",
+      "media",
+      "policy",
+      "relationship",
+      "retirement"
+     ]
+    },
+    "description": "Change types routed to this workflow (Conditional Approval: e.g. price -> Commercial + Finance)"
    },
    "approvalStages": {
-    "type": "string",
-    "description": "Approval stages"
-   },
-   "approverRole": {
-    "type": "string",
-    "description": "Approver role"
-   },
-   "specificApprover": {
-    "type": "string",
-    "description": "Specific approver"
-   },
-   "approvalGroup": {
-    "type": "string",
-    "description": "Approval group"
-   },
-   "sequentialParallelApproval": {
-    "type": "string",
-    "description": "Sequential/parallel approval"
-   },
-   "mandatoryOptionalStage": {
-    "type": "string",
-    "description": "Mandatory/optional stage"
-   },
-   "sla": {
-    "type": "string",
-    "description": "SLA"
-   },
-   "escalation": {
-    "type": "string",
-    "description": "Escalation"
-   },
-   "delegation": {
-    "type": "string",
-    "description": "Delegation"
-   },
-   "reminderFrequency": {
-    "type": "string",
-    "description": "Reminder frequency"
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "order": {
+       "type": "integer",
+       "description": "Stage order; stages sharing an order run in parallel, otherwise sequential"
+      },
+      "name": {
+       "type": "string"
+      },
+      "approverRole": {
+       "type": "string",
+       "nullable": true
+      },
+      "specificApproverId": {
+       "type": "string",
+       "nullable": true
+      },
+      "approvalGroupId": {
+       "type": "string",
+       "nullable": true
+      },
+      "mandatory": {
+       "type": "boolean"
+      },
+      "slaHours": {
+       "type": "integer",
+       "description": "SLA in hours"
+      },
+      "escalateToRole": {
+       "type": "string",
+       "nullable": true,
+       "description": "Escalation when the SLA is missed"
+      },
+      "delegationAllowed": {
+       "type": "boolean"
+      },
+      "reminderEveryHours": {
+       "type": "integer",
+       "nullable": true,
+       "description": "Reminder frequency"
+      }
+     }
+    },
+    "description": "Approval stages, e.g. Product Manager -> Commercial Manager -> Operations -> Finance -> Final Approval; each stage names a role, a specific approver or a group"
    },
    "rejectionBehavior": {
     "type": "string",
-    "description": "Rejection behavior"
+    "enum": [
+     "returnToDraft",
+     "returnToPreviousStage",
+     "closeRequest"
+    ],
+    "description": "What happens on rejection; default returnToDraft (decided 29 September, readiness close-out)"
    },
    "resubmissionBehavior": {
     "type": "string",
-    "description": "Resubmission behavior"
+    "enum": [
+     "restartFromFirstStage",
+     "resumeAtRejectingStage"
+    ],
+    "description": "Where a resubmitted request re-enters; default restartFromFirstStage (decided 29 September, readiness close-out)"
+   },
+   "workflowId": {
+    "type": "string",
+    "description": "Existing workflow to change; empty to create",
+    "format": "uuid",
+    "nullable": true
    }
   }
  },
@@ -240,68 +301,259 @@
     "description": "Workflow name"
    },
    "applicableProductTypes": {
-    "type": "string",
-    "description": "Applicable product types"
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ProductKind"
+    },
+    "description": "Applicable product types; empty = all"
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue id; empty = all venues",
+    "nullable": true
    },
    "department": {
     "type": "string",
-    "description": "Department"
+    "description": "Department",
+    "nullable": true
    },
-   "changeType": {
-    "type": "string",
-    "description": "Change type"
+   "changeTypes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "newProduct",
+      "description",
+      "price",
+      "validity",
+      "capacity",
+      "entitlement",
+      "eligibility",
+      "tax",
+      "channel",
+      "media",
+      "policy",
+      "relationship",
+      "retirement"
+     ]
+    },
+    "description": "Change types routed to this workflow (Conditional Approval: e.g. price -> Commercial + Finance)"
    },
    "approvalStages": {
-    "type": "string",
-    "description": "Approval stages"
-   },
-   "approverRole": {
-    "type": "string",
-    "description": "Approver role"
-   },
-   "specificApprover": {
-    "type": "string",
-    "description": "Specific approver"
-   },
-   "approvalGroup": {
-    "type": "string",
-    "description": "Approval group"
-   },
-   "sequentialParallelApproval": {
-    "type": "string",
-    "description": "Sequential/parallel approval"
-   },
-   "mandatoryOptionalStage": {
-    "type": "string",
-    "description": "Mandatory/optional stage"
-   },
-   "sla": {
-    "type": "string",
-    "description": "SLA"
-   },
-   "escalation": {
-    "type": "string",
-    "description": "Escalation"
-   },
-   "delegation": {
-    "type": "string",
-    "description": "Delegation"
-   },
-   "reminderFrequency": {
-    "type": "string",
-    "description": "Reminder frequency"
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "order": {
+       "type": "integer",
+       "description": "Stage order; stages sharing an order run in parallel, otherwise sequential"
+      },
+      "name": {
+       "type": "string"
+      },
+      "approverRole": {
+       "type": "string",
+       "nullable": true
+      },
+      "specificApproverId": {
+       "type": "string",
+       "nullable": true
+      },
+      "approvalGroupId": {
+       "type": "string",
+       "nullable": true
+      },
+      "mandatory": {
+       "type": "boolean"
+      },
+      "slaHours": {
+       "type": "integer",
+       "description": "SLA in hours"
+      },
+      "escalateToRole": {
+       "type": "string",
+       "nullable": true,
+       "description": "Escalation when the SLA is missed"
+      },
+      "delegationAllowed": {
+       "type": "boolean"
+      },
+      "reminderEveryHours": {
+       "type": "integer",
+       "nullable": true,
+       "description": "Reminder frequency"
+      }
+     }
+    },
+    "description": "Approval stages, e.g. Product Manager -> Commercial Manager -> Operations -> Finance -> Final Approval; each stage names a role, a specific approver or a group"
    },
    "rejectionBehavior": {
     "type": "string",
-    "description": "Rejection behavior"
+    "enum": [
+     "returnToDraft",
+     "returnToPreviousStage",
+     "closeRequest"
+    ],
+    "description": "What happens on rejection; default returnToDraft (decided 29 September, readiness close-out)"
    },
    "resubmissionBehavior": {
     "type": "string",
-    "description": "Resubmission behavior"
+    "enum": [
+     "restartFromFirstStage",
+     "resumeAtRejectingStage"
+    ],
+    "description": "Where a resubmitted request re-enters; default restartFromFirstStage (decided 29 September, readiness close-out)"
+   },
+   "workflowId": {
+    "type": "string",
+    "description": "Workflow id",
+    "format": "uuid"
+   }
+  }
+ },
+ "CatalogueAiFinding": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.ai_finding",
+  "description": "**Something the AI noticed about the catalogue or its channels, for a person to act on** (29 September, data model DM3). Merges governance risks (ADM-137) and channel optimisation recommendations (ADM-272). Advisory only: a finding never changes configuration; acting on it goes through the ordinary operations and their approvals. **Created by the AI monitoring job** (29 September, writers pass); a person acknowledges, accepts, dismisses or resolves it with `decideCatalogueAiFinding`, and the job resolves one whose condition has cleared (`states/catalogue-ai-finding.yaml`).",
+  "required": [
+   "id",
+   "scopePath",
+   "domain",
+   "findingType",
+   "status",
+   "detectedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "domain": {
+    "type": "string",
+    "enum": [
+     "productGovernance",
+     "channel"
+    ]
+   },
+   "findingType": {
+    "type": "string",
+    "maxLength": 60,
+    "description": "Governance: the `risk` value; channel: the recommendation `category`."
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "salesChannelIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "critical",
+     "high",
+     "medium",
+     "low",
+     null
+    ],
+    "nullable": true
+   },
+   "confidence": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 1
+   },
+   "summary": {
+    "type": "string",
+    "description": "The recommendation, or the risk in one line."
+   },
+   "explanation": {
+    "type": "string",
+    "nullable": true
+   },
+   "businessImpact": {
+    "type": "string",
+    "nullable": true
+   },
+   "recommendedAction": {
+    "type": "string",
+    "nullable": true
+   },
+   "constraints": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "signals": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "simulation": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "Channel findings: `{expectedUnitsSold, revenueImpact, channelUtilization, risk, contractualConstraints}`."
+   },
+   "requiredApproval": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "dueDate": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "acknowledged",
+     "accepted",
+     "dismissed",
+     "resolved"
+    ],
+    "default": "open"
+   },
+   "modelVersion": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true
+   },
+   "detectedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
    }
   }
  },
@@ -311,97 +563,54 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Change Impact Analysis displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "futureOrders": {
+   "area": {
     "type": "string",
-    "description": "Future orders"
+    "enum": [
+     "futureOrders",
+     "reservations",
+     "issuedTickets",
+     "capacity",
+     "pricing",
+     "tax",
+     "promotions",
+     "membership",
+     "entitlements",
+     "accessControl",
+     "salesChannels",
+     "b2bPartners",
+     "otas",
+     "pos",
+     "b2c",
+     "kiosk",
+     "media",
+     "finance",
+     "reporting"
+    ],
+    "description": "Impact area (pack p.21-22)"
    },
-   "reservations": {
+   "changeRequestId": {
     "type": "string",
-    "description": "Reservations"
+    "description": "Change request analysed",
+    "format": "uuid"
    },
-   "issuedTickets": {
-    "type": "string",
-    "description": "Issued tickets"
-   },
-   "capacity": {
+   "affectedCount": {
     "type": "integer",
-    "description": "Capacity"
+    "description": "How many items in this area are affected (orders, reservations, agreements, channels...)"
    },
-   "pricing": {
+   "riskLevel": {
     "type": "string",
-    "description": "Pricing"
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
+    "description": "Risk classification"
    },
-   "tax": {
+   "explanation": {
     "type": "string",
-    "description": "Tax"
-   },
-   "promotions": {
-    "type": "string",
-    "description": "Promotions"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "entitlements": {
-    "type": "string",
-    "description": "Entitlements"
-   },
-   "accessControl": {
-    "type": "string",
-    "description": "Access control"
-   },
-   "salesChannels": {
-    "type": "string",
-    "description": "Sales channels"
-   },
-   "b2bPartners": {
-    "type": "string",
-    "description": "B2B partners"
-   },
-   "otas": {
-    "type": "string",
-    "description": "OTAs"
-   },
-   "pos": {
-    "type": "string",
-    "description": "POS"
-   },
-   "b2c": {
-    "type": "string",
-    "description": "B2C"
-   },
-   "kiosk": {
-    "type": "string",
-    "description": "Kiosk"
-   },
-   "media": {
-    "type": "string",
-    "description": "Media"
-   },
-   "finance": {
-    "type": "string",
-    "description": "Finance"
-   },
-   "reporting": {
-    "type": "string",
-    "description": "Reporting"
-   },
-   "low": {
-    "type": "string",
-    "description": "Low"
-   },
-   "medium": {
-    "type": "string",
-    "description": "Medium"
-   },
-   "high": {
-    "type": "string",
-    "description": "High"
-   },
-   "critical": {
-    "type": "string",
-    "description": "Critical"
+    "description": "AI explanation in business language; advisory",
+    "nullable": true
    }
   }
  },
@@ -411,7 +620,7 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Change Propagation & Dependency Control displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "typesType": {
+   "dependencyType": {
     "type": "string",
     "enum": [
      "parentProduct",
@@ -428,33 +637,54 @@
      "salesChannel",
      "mediaTemplate"
     ],
-    "description": "Vocabulary listed under Dependency Types."
+    "description": "Dependency type (pack pp.22-23)"
    },
-   "adultAdmission": {
-    "type": "string",
-    "description": "Adult Admission"
+   "propagate": {
+    "type": "boolean",
+    "description": "Whether the change will propagate to this linked object"
    },
-   "childAdmission": {
-    "type": "string",
-    "description": "Child Admission"
+   "localOverrideConflict": {
+    "type": "boolean",
+    "description": "The linked object has a local override the change would overwrite"
    },
-   "seniorAdmission": {
+   "linkId": {
     "type": "string",
-    "description": "Senior Admission"
+    "description": "Link id",
+    "format": "uuid"
    },
-   "residentAdmission": {
+   "sourceProductId": {
     "type": "string",
-    "description": "Resident Admission"
+    "description": "Master product",
+    "format": "uuid"
    },
-   "propagates": {
+   "linkedObjectId": {
     "type": "string",
-    "description": "propagates"
+    "description": "Linked product or configuration id"
    },
-   "overwritten": {
+   "linkedObjectName": {
     "type": "string",
-    "description": "overwritten"
+    "description": "Linked object name"
+   },
+   "overriddenFields": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Fields the linked object overrides locally"
    }
   }
+ },
+ "Channel": {
+  "type": "string",
+  "enum": [
+   "pos",
+   "kiosk",
+   "web",
+   "mobile",
+   "b2b",
+   "ota",
+   "callCentre"
+  ]
  },
  "GovernanceRiskAiMonitoringControlCenterView": {
   "type": "object",
@@ -462,50 +692,105 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Governance Risk, AI Monitoring & Control Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "with": {
-    "type": "string",
-    "description": "with"
-   },
    "risk": {
     "type": "string",
-    "description": "Risk"
+    "enum": [
+     "productWithoutOwner",
+     "missingApproval",
+     "outdatedPricing",
+     "conflictingValidity",
+     "missingChannelConfiguration",
+     "orphanedDependency",
+     "unusedProduct",
+     "duplicateProduct",
+     "unusualConfigurationChange",
+     "highOverrideLevel",
+     "scheduledPublicationConflict",
+     "expiredCommercialConfiguration",
+     "activeAfterEventEnd",
+     "brokenDependency"
+    ],
+    "description": "Risk detected (AI Monitoring, pack p.26)"
    },
    "product": {
     "type": "string",
-    "description": "Product"
+    "description": "Product name"
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue name"
    },
    "businessImpact": {
     "type": "string",
-    "description": "Business impact"
+    "description": "Business impact, in plain language"
    },
    "recommendedAction": {
     "type": "string",
-    "description": "Recommended action"
+    "description": "Recommended action; advisory"
    },
    "owner": {
     "type": "string",
-    "description": "Owner"
+    "description": "Owner (display name)",
+    "nullable": true
    },
    "dueDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "Due date"
+    "description": "Due date",
+    "format": "date",
+    "nullable": true
    },
    "status": {
-    "type": "integer",
-    "description": "Status"
-   },
-   "configurations": {
     "type": "string",
-    "description": "configurations"
+    "description": "Status: open, acknowledged, inRemediation, resolved or dismissed (decided 29 September, readiness close-out)"
    },
-   "assessment": {
+   "riskId": {
     "type": "string",
-    "description": "assessment"
+    "description": "Risk id",
+    "format": "uuid"
+   },
+   "productId": {
+    "type": "string",
+    "description": "Product id",
+    "format": "uuid",
+    "nullable": true
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "critical",
+     "high",
+     "medium",
+     "low"
+    ],
+    "description": "Severity (Risk Dashboard)"
+   },
+   "explanation": {
+    "type": "string",
+    "description": "AI explanation, e.g. the two products share 96% of their configuration; advisory"
+   },
+   "detectedAt": {
+    "type": "string",
+    "description": "Detected",
+    "format": "date-time"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
    }
   }
  },
@@ -517,83 +802,161 @@
   "properties": {
    "dateTime": {
     "type": "string",
-    "format": "date-time",
-    "description": "Date/time"
+    "description": "Date/time",
+    "format": "date-time"
    },
    "user": {
     "type": "string",
-    "description": "User"
+    "description": "User (display name)"
    },
    "role": {
     "type": "string",
-    "description": "Role"
+    "description": "Role at the time"
    },
    "product": {
     "type": "string",
-    "description": "Product"
+    "description": "Product name"
    },
    "version": {
-    "type": "string",
-    "description": "Version"
+    "type": "integer",
+    "nullable": true,
+    "description": "Product version"
    },
    "action": {
     "type": "string",
-    "description": "Action"
+    "enum": [
+     "created",
+     "updated",
+     "submitted",
+     "approved",
+     "rejected",
+     "changesRequested",
+     "scheduled",
+     "published",
+     "rolledBack",
+     "suspended",
+     "retired",
+     "archived",
+     "imported",
+     "exported",
+     "duplicated"
+    ],
+    "description": "Action (decided 29 September, readiness close-out)"
    },
    "configurationArea": {
     "type": "string",
+    "enum": [
+     "basicInformation",
+     "validity",
+     "pricing",
+     "capacity",
+     "entitlements",
+     "eligibility",
+     "media",
+     "channels",
+     "policies",
+     "relationships",
+     "lifecycle"
+    ],
     "description": "Configuration area"
    },
    "previousValue": {
     "type": "string",
-    "description": "Previous value"
+    "description": "Previous value",
+    "nullable": true
    },
    "newValue": {
-    "type": "integer",
-    "description": "New value"
+    "type": "string",
+    "description": "New value",
+    "nullable": true
    },
    "reason": {
     "type": "string",
-    "description": "Reason"
+    "description": "Reason",
+    "nullable": true
    },
    "approvalReference": {
     "type": "string",
-    "description": "Approval reference"
+    "description": "Approval reference (change request id)",
+    "nullable": true
    },
    "sourceChannel": {
     "type": "string",
-    "description": "Source channel"
+    "enum": [
+     "backOffice",
+     "api",
+     "bulkImport",
+     "environmentTransfer",
+     "scheduler",
+     "aiAssistant"
+    ],
+    "description": "Where the change was made (decided 29 September, readiness close-out)"
    },
    "environment": {
     "type": "string",
+    "enum": [
+     "development",
+     "sandbox",
+     "uat",
+     "staging",
+     "production"
+    ],
     "description": "Environment"
    },
-   "ipDeviceMetadataWhereApplicable": {
-    "type": "string",
+   "deviceMetadata": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "ipAddress": {
+      "type": "string"
+     },
+     "userAgent": {
+      "type": "string"
+     },
+     "deviceId": {
+      "type": "string",
+      "nullable": true
+     }
+    },
     "description": "IP/device metadata where applicable"
+   },
+   "auditId": {
+    "type": "string",
+    "description": "Audit entry id",
+    "format": "uuid"
+   },
+   "productId": {
+    "type": "string",
+    "description": "Product id",
+    "format": "uuid"
+   },
+   "userId": {
+    "type": "string",
+    "description": "User principal id",
+    "format": "uuid"
    }
   }
  },
- "ProductGovernanceCommandCenterView": {
+ "ProductGovernanceCommandCenterSummary": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What Product Governance Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Product Governance Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
   "properties": {
    "productsAwaitingApproval": {
-    "type": "string",
+    "type": "integer",
     "description": "Products awaiting approval"
    },
    "changesAwaitingApproval": {
-    "type": "string",
+    "type": "integer",
     "description": "Changes awaiting approval"
    },
    "rejectedChanges": {
     "type": "integer",
-    "description": "Rejected changes"
+    "description": "Rejected changes (last 30 days) (decided 29 September, readiness close-out)"
    },
    "productsWithGovernanceWarnings": {
-    "type": "string",
+    "type": "integer",
     "description": "Products with governance warnings"
    },
    "scheduledChanges": {
@@ -601,20 +964,20 @@
     "description": "Scheduled changes"
    },
    "productsWithUnpublishedChanges": {
-    "type": "string",
+    "type": "integer",
     "description": "Products with unpublished changes"
    },
    "productsWithDependencyConflicts": {
-    "type": "string",
+    "type": "integer",
     "description": "Products with dependency conflicts"
    },
    "productsApproachingRetirement": {
-    "type": "string",
-    "description": "Products approaching retirement"
+    "type": "integer",
+    "description": "Products approaching retirement: retirement date within 30 days (decided 29 September, readiness close-out)"
    },
    "recentlyPublishedVersions": {
     "type": "integer",
-    "description": "Recently published versions"
+    "description": "Recently published versions: published in the last 7 days (decided 29 September, readiness close-out)"
    },
    "failedPublications": {
     "type": "integer",
@@ -626,61 +989,225 @@
    },
    "highRiskConfigurationChanges": {
     "type": "integer",
-    "description": "High-risk configuration changes"
-   },
+    "description": "High-risk configuration changes (riskLevel high or critical) awaiting decision"
+   }
+  }
+ },
+ "ProductGovernanceCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Product Governance Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
    "product": {
     "type": "string",
-    "description": "Product"
+    "description": "Product name"
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue name"
    },
    "productOwner": {
     "type": "string",
-    "description": "Product owner"
+    "description": "Product owner (display name)"
    },
    "changeType": {
     "type": "string",
-    "description": "Change type"
+    "enum": [
+     "newProduct",
+     "description",
+     "price",
+     "validity",
+     "capacity",
+     "entitlement",
+     "eligibility",
+     "tax",
+     "channel",
+     "media",
+     "policy",
+     "relationship",
+     "retirement"
+    ],
+    "description": "Change type (decided 29 September, readiness close-out)"
    },
    "currentVersion": {
-    "type": "string",
-    "description": "Current version"
+    "type": "integer",
+    "nullable": true,
+    "description": "Current version number (ProductVersion.version); empty for a new product"
    },
    "proposedVersion": {
-    "type": "string",
-    "description": "Proposed version"
+    "type": "integer",
+    "description": "Proposed version number"
    },
    "requestedBy": {
     "type": "string",
-    "description": "Requested by"
+    "description": "Requested by (display name)"
    },
    "requestedDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "Requested date"
+    "description": "Requested date-time",
+    "format": "date-time"
    },
    "riskLevel": {
     "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
     "description": "Risk level"
    },
    "approvalStatus": {
     "type": "string",
-    "description": "Approval status"
+    "description": "Approval status: pending, changesRequested, approved, rejected, escalated or withdrawn"
    },
    "effectiveDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "Effective date"
+    "description": "Effective date of the change; empty = on approval",
+    "format": "date",
+    "nullable": true
    },
    "impactedChannels": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/Channel"
+    },
     "description": "Impacted channels"
    },
    "assignedApprover": {
     "type": "string",
-    "description": "Assigned approver"
+    "description": "Assigned approver (display name)",
+    "nullable": true
+   },
+   "changeRequestId": {
+    "type": "string",
+    "description": "Change request id",
+    "format": "uuid"
+   },
+   "productId": {
+    "type": "string",
+    "description": "Product id",
+    "format": "uuid"
+   },
+   "lifecycleState": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ProductLifecycleState"
+     }
+    ],
+    "description": "Product's current lifecycle state"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI insights: advisory only; the AI never approves, publishes, retires or changes a product (pack p.26-27)"
+   }
+  }
+ },
+ "ProductKind": {
+  "type": "string",
+  "description": "**`openDated` added 24 August** from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: **valid on any date within an eligible range, rather than for a named performance or a fixed date.**\nThe mechanism already existed — `access.entitlement` carries `valid_from`, `valid_to`, `entries_allowed` and `frozen_days`, which is exactly an open-dated pass. **What was missing was the product saying it is one**, so a catalogue could not offer it and a report could not count it.\n**`datedAdmission` is a different thing and the two were being conflated**: dated is *this Tuesday*, open-dated is *any Tuesday between March and June*. A guest buying the second and being sold the first has bought the wrong ticket.\n**Transport uses two existing kinds, not a new one** (decided 29 September, rev 3 REV3-21). A one-way trip is `timedAdmission`: `transport.createTransportRoute` creates the route's product with one variant per passenger type, and each departure is a performance. A multi-trip or unlimited pass is `openDated`: `transport.createTransportPassType` creates it, with `EntitlementTemplate.entriesAllowed` = the pass's trips (null for unlimited), the validity = `validityDays`, and `EntitlementTemplate.transportRestriction` naming the station pair the pass was bought for, so `access` refuses it on another journey. The sale path is unchanged: both are cart lines, priced by `transport.quoteTransportFare` (orders `TransportLineAttributes`).\n",
+  "enum": [
+   "admission",
+   "timedAdmission",
+   "datedAdmission",
+   "openDated",
+   "seated",
+   "membership",
+   "bundle",
+   "fnb",
+   "retail",
+   "rental",
+   "addOn",
+   "giftCard"
+  ]
+ },
+ "ProductLifecycleState": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "inReview",
+   "approved",
+   "live",
+   "withdrawn",
+   "archived"
+  ]
+ },
+ "ProductLink": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.product_link",
+  "description": "**What depends on a product, so a change can be propagated or held** (29 September, data model DM3). ADM-134. `propagatesChanges` says whether an approved change to the source flows to the linked object; `overriddenFields` are the local overrides a propagation must not overwrite (a conflict is reported, not resolved silently).",
+  "required": [
+   "id",
+   "scopePath",
+   "sourceProductId",
+   "dependencyType",
+   "linkedObjectId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "sourceProductId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "dependencyType": {
+    "type": "string",
+    "enum": [
+     "parentProduct",
+     "childProduct",
+     "bundle",
+     "addOn",
+     "upgrade",
+     "membership",
+     "package",
+     "promotion",
+     "priceProfile",
+     "capacityPool",
+     "entitlement",
+     "salesChannel",
+     "mediaTemplate"
+    ]
+   },
+   "linkedObjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "linkedObjectName": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "propagatesChanges": {
+    "type": "boolean",
+    "default": true
+   },
+   "overriddenFields": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -690,86 +1217,96 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Product Retirement, Suspension & Archive displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "temporarilyDisable": {
+   "action": {
     "type": "string",
-    "description": "Temporarily Disable"
-   },
-   "endSale": {
-    "type": "string",
-    "description": "End Sale"
-   },
-   "retire": {
-    "type": "string",
-    "description": "Retire"
+    "enum": [
+     "suspendSales",
+     "temporarilyDisable",
+     "endSale",
+     "retire",
+     "archive"
+    ],
+    "description": "End-of-life action (Available Actions, pack pp.23-24)"
    },
    "retirementDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "Retirement date"
+    "description": "Retirement date",
+    "format": "date",
+    "nullable": true
    },
    "endOfSaleDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "End-of-sale date"
+    "description": "End-of-sale date",
+    "format": "date",
+    "nullable": true
    },
    "channels": {
-    "type": "string",
-    "description": "Channels"
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/Channel"
+    },
+    "description": "Channels the action applies to; empty = all"
    },
    "reason": {
     "type": "string",
     "description": "Reason"
    },
-   "replacementProduct": {
+   "replacementProductId": {
     "type": "string",
-    "description": "Replacement product"
+    "description": "Replacement product",
+    "format": "uuid",
+    "nullable": true
    },
    "existingReservationTreatment": {
     "type": "string",
-    "description": "Existing reservation treatment"
+    "enum": [
+     "honour",
+     "moveToReplacement",
+     "cancel"
+    ],
+    "description": "Existing reservation treatment; default honour (decided 29 September, readiness close-out)"
    },
    "existingTicketTreatment": {
     "type": "string",
-    "description": "Existing ticket treatment"
+    "enum": [
+     "remainValid",
+     "exchangeForReplacement",
+     "invalidate"
+    ],
+    "description": "Existing ticket treatment; default remainValid, and invalidate needs its own governed approval (decided 29 September, readiness close-out)"
    },
    "communicationRequirements": {
     "type": "string",
-    "description": "Communication requirements"
+    "description": "Communication requirements to holders and staff",
+    "nullable": true
    },
    "reportingTreatment": {
     "type": "string",
-    "description": "Reporting treatment"
-   },
-   "from": {
-    "type": "string",
-    "description": "from"
-   },
-   "validityOfPreviouslyIssuedTickets": {
-    "type": "string",
-    "description": "validity of previously issued tickets"
-   },
-   "validityOfPreviouslyIssuedEntitlements": {
-    "type": "string",
-    "description": "validity of previously issued entitlements"
+    "enum": [
+     "keepInReports",
+     "reportUnderReplacement",
+     "historicalOnly"
+    ],
+    "description": "Reporting treatment; default keepInReports (decided 29 September, readiness close-out)"
    },
    "activePromotions": {
     "type": "integer",
     "description": "Active promotions"
    },
    "bundles": {
-    "type": "string",
+    "type": "integer",
     "description": "Bundles"
    },
    "membershipBenefits": {
-    "type": "string",
+    "type": "integer",
     "description": "Membership benefits"
    },
    "resellerAgreements": {
-    "type": "string",
+    "type": "integer",
     "description": "Reseller agreements"
    },
    "futureReservations": {
-    "type": "string",
+    "type": "integer",
     "description": "Future reservations"
    },
    "activePriceLists": {
@@ -777,8 +1314,29 @@
     "description": "Active price lists"
    },
    "channelAssignments": {
-    "type": "string",
+    "type": "integer",
     "description": "Channel assignments"
+   },
+   "productId": {
+    "type": "string",
+    "description": "Product id",
+    "format": "uuid"
+   },
+   "productName": {
+    "type": "string",
+    "description": "Product name"
+   },
+   "lifecycleState": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ProductLifecycleState"
+     }
+    ],
+    "description": "Current lifecycle state"
+   },
+   "upgradePaths": {
+    "type": "integer",
+    "description": "Upgrade paths"
    }
   }
  },
@@ -831,57 +1389,96 @@
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Rollback & Recovery Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "identifyDependencies": {
-    "type": "string",
-    "description": "Identify dependencies"
+   "dependencies": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Dependencies identified for the rollback"
    },
-   "enterRollbackReason": {
+   "reason": {
     "type": "string",
-    "description": "Enter rollback reason"
+    "description": "Rollback reason (mandatory)"
    },
-   "executeImmediateRollbackWhereAuthorized": {
+   "executionMode": {
     "type": "string",
-    "description": "Execute immediate rollback where authorized"
+    "enum": [
+     "immediate",
+     "scheduled"
+    ],
+    "description": "Immediate (where authorised) or scheduled"
    },
-   "monitorRollbackStatus": {
+   "status": {
     "type": "string",
-    "description": "Monitor rollback status"
+    "description": "Rollback status: requested, awaitingApproval, scheduled, executing, completed, failed or cancelled"
    },
-   "entireProduct": {
-    "type": "string",
-    "description": "Entire product"
+   "scope": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "entireProduct",
+      "pricingAssociation",
+      "channelAssociation",
+      "validityConfiguration",
+      "media",
+      "policy",
+      "entitlementConfiguration"
+     ]
+    },
+    "description": "Rollback scope"
    },
-   "pricingAssociation": {
+   "rollbackId": {
     "type": "string",
-    "description": "Pricing association"
+    "description": "Rollback id",
+    "format": "uuid"
    },
-   "channelAssociation": {
+   "productId": {
     "type": "string",
-    "description": "Channel association"
+    "description": "Product id",
+    "format": "uuid"
    },
-   "validityConfiguration": {
+   "productName": {
     "type": "string",
-    "description": "Validity configuration"
+    "description": "Product name"
    },
-   "media": {
-    "type": "string",
-    "description": "Media"
+   "fromVersion": {
+    "type": "integer",
+    "description": "Current version rolled back from"
    },
-   "policy": {
-    "type": "string",
-    "description": "Policy"
+   "toVersion": {
+    "type": "integer",
+    "description": "Earlier version restored"
    },
-   "entitlementConfiguration": {
-    "type": "string",
-    "description": "Entitlement configuration"
+   "emergency": {
+    "type": "boolean",
+    "description": "Emergency rollback"
    },
-   "subjectToSystemGovernance": {
+   "scheduledAt": {
     "type": "string",
-    "description": "subject to system governance"
+    "description": "Scheduled time",
+    "format": "date-time",
+    "nullable": true
    },
-   "enhancedAuditLogging": {
+   "requestedBy": {
     "type": "string",
-    "description": "enhanced audit logging"
+    "description": "Requested by (display name)"
+   },
+   "requestedAt": {
+    "type": "string",
+    "description": "Requested",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "description": "Completed",
+    "format": "date-time",
+    "nullable": true
+   },
+   "approvalReference": {
+    "type": "string",
+    "description": "Approval reference",
+    "nullable": true
    }
   }
  }

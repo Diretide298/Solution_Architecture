@@ -9,6 +9,9 @@
     "typecheck": "nx run-many -t typecheck",
     "graph": "nx graph"
   },
+  "dependencies": {
+    "uuid": "^11.1.0"
+  },
   "devDependencies": {
     "@nx/js": "^20.0.0",
     "@nx/react": "^20.0.0",

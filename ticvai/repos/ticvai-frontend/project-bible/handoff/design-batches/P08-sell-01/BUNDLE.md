@@ -374,7 +374,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "Product.bookingFlowId",
        "operation": "listBookingFlows",
        "notes": "The venue's booking flows from CMS-103 (`white-label.listBookingFlows`). Empty means the category's flow, then the venue's flow for the product kind (W8, W12). Saved with `createProduct` or `updateProduct`.",
-       "provenance": "decided 29 September, W12; agreed name white-label listBookingFlows (P29 brief)"
+       "provenance": "decided 29 September, W12; agreed name white-label listBookingFlows (the 29 September pass brief)"
       }
      ]
     }
@@ -393,7 +393,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "white-label",
     "purpose": "The booking flows a product can be sold through (W12)",
     "trigger": "onAction",
-    "provenance": "decided 29 September, W12 (P29)"
+    "provenance": "decided 29 September, W12 (the 29 September pass)"
    },
    {
     "operationId": "listProducts",
@@ -2281,7 +2281,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "fnb",
     "purpose": "The menu item an F&B bundle component entitles the guest to (MOB-4)",
     "trigger": "onAction",
-    "provenance": "decided 29 September, MOB-4 (P29)"
+    "provenance": "decided 29 September, MOB-4 (the 29 September pass)"
    },
    {
     "operationId": "getGroupPackageDefinition",
@@ -9546,12 +9546,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "properties": {
      "fromStationId": {
       "type": "string",
-      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "format": "uuid",
       "description": "A `transport.Station`."
      },
      "toStationId": {
       "type": "string",
-      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      "format": "uuid"
      },
      "bothDirections": {
       "type": "boolean",
@@ -9563,7 +9563,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "description": "The routes it may be used on. Empty means any active route serving both stations.",
       "items": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+       "format": "uuid"
       }
      }
     }

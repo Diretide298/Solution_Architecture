@@ -1,6 +1,6 @@
 # WS97 — Rental Management board 10
 
-**10 screens · 8 operations · 12 schemas · 6 permissions**
+**10 screens · 8 operations · 18 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

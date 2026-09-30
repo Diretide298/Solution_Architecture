@@ -1,6 +1,6 @@
 # WS165 — Seat Management Venue Mapping Reference v1.0 board 1
 
-**10 screens · 13 operations · 18 schemas · 3 permissions**
+**10 screens · 14 operations · 22 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -66,7 +66,7 @@ convincingly. It is never a caption.
 | `BO-956` | Rows & Seats | listDetail | 2 | 0 | — |
 | `BO-957` | Standing Zones | listDetail | 1 | 0 | — |
 | `BO-958` | Suites & Boxes | listDetail | 1 | 0 | — |
-| `BO-959` | Stage & Focal Point | listDetail | 1 | 0 | — |
+| `BO-959` | Stage & Focal Point | listDetail | 2 | 0 | — |
 | `BO-960` | Entrances, Exits & Aisles | listDetail | 1 | 0 | — |
 | `BO-961` | Amenities & Obstructions | listDetail | 1 | 0 | — |
 | `BO-962` | Templates, Validation & Publish | listDetail | 4 | 0 | — |

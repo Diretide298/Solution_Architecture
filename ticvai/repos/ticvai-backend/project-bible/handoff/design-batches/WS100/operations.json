@@ -1,1 +1,166 @@
-{}
+{
+ "addCapacityPack": {
+  "method": "POST",
+  "path": "/capacity-packs",
+  "contract": "subscription",
+  "summary": "Buy headroom without changing tier",
+  "permission": "PLATFORM_BILLING_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CapacityPack",
+  "responds": "CapacityPack"
+ },
+ "createPlan": {
+  "method": "POST",
+  "path": "/plans",
+  "contract": "subscription",
+  "summary": "Create a subscription plan",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePlanRequest",
+  "responds": "Plan"
+ },
+ "createPlanVersion": {
+  "method": "POST",
+  "path": "/plans/{planId}",
+  "contract": "subscription",
+  "summary": "Publish a new version of a plan",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePlanRequest",
+  "responds": "Plan"
+ },
+ "getVsiModel": {
+  "method": "GET",
+  "path": "/vsi-models",
+  "contract": "subscription",
+  "summary": "How a customer's scale is scored into a tier",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VsiModel"
+ },
+ "listLicensingModels": {
+  "method": "GET",
+  "path": "/licensing-models",
+  "contract": "subscription",
+  "summary": "Billable units, minimum guarantees and overage",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "LicensingModel"
+ },
+ "listPlans": {
+  "method": "GET",
+  "path": "/plans",
+  "contract": "subscription",
+  "summary": "List subscription plans",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "offeredToTenantId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "packageKind",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "Plan"
+ },
+ "setLicensingModel": {
+  "method": "PUT",
+  "path": "/licensing-models",
+  "contract": "subscription",
+  "summary": "Define the billable unit and what happens at the edges",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "LicensingModel",
+  "responds": "LicensingModel"
+ },
+ "setVsiModel": {
+  "method": "PUT",
+  "path": "/vsi-models",
+  "contract": "subscription",
+  "summary": "Weights, thresholds and the tiers they map to",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VsiModel",
+  "responds": "VsiModel"
+ },
+ "simulateCommercialPackage": {
+  "method": "POST",
+  "path": "/package-simulations",
+  "contract": "subscription",
+  "summary": "What this package would cost, and what it would provision",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PackageSimulationRequest",
+  "responds": "PackageSimulation"
+ }
+}

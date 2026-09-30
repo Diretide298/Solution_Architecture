@@ -46,6 +46,13 @@
      "slot": "record",
      "components": [
       {
+       "kind": "calendarView",
+       "label": "Calendar",
+       "operation": "getResourceAvailability",
+       "notes": "Each resource's bookings, blocks and cleanings placed by hour. Day, week, month and agenda views; the day starts at the venue's `calendarDayStartHour`. Filters the category on what it read.",
+       "provenance": "decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)"
+      },
+      {
        "kind": "detailPanel",
        "label": "The resource availability",
        "bindsTo": "ResourceAvailability",

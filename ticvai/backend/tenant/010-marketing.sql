@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS marketing.attribution_touch (
     touched_at                        timestamptz NOT NULL,
     channel                           text NOT NULL CONSTRAINT attribution_touch_channel_chk CHECK (channel IN ('email', 'sms', 'whatsapp', 'push', 'web', 'app', 'paidSearch', 'paidSocial', 'organic', 'referral', 'direct')),
     interaction                       text CONSTRAINT attribution_touch_interaction_chk CHECK (interaction IN ('delivered', 'opened', 'clicked', 'viewed', 'converted')),
-    order_id                          text
+    order_id                          uuid
 );
 
 -- Holds 16 columns. No description has been written for this table — the name is the only thing
@@ -104,8 +104,8 @@ CREATE TABLE IF NOT EXISTS marketing.badge (
 -- Holds 20 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.booking_consent_record (
-    id                                text PRIMARY KEY NOT NULL,
-    question_id                       text NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
+    question_id                       uuid NOT NULL,
     question_version                  integer NOT NULL,
     question_kind                     text NOT NULL CONSTRAINT booking_consent_record_question_kind_chk CHECK (question_kind IN ('swim', 'scuba', 'risk', 'custom')),
     answer                            text NOT NULL CONSTRAINT booking_consent_record_answer_chk CHECK (answer IN ('yes', 'no')),
@@ -113,8 +113,8 @@ CREATE TABLE IF NOT EXISTS marketing.booking_consent_record (
     blocks_booking                    boolean,
     cart_id                           uuid,
     cart_line_id                      uuid,
-    order_id                          text,
-    order_line_id                     text,
+    order_id                          uuid,
+    order_line_id                     uuid,
     person_index                      integer,
     person_name                       text CONSTRAINT booking_consent_record_person_name_chk CHECK (char_length(person_name) <= 120),
     person_subject_id                 uuid,
@@ -197,7 +197,7 @@ CREATE TABLE IF NOT EXISTS marketing.campaign_variant (
 -- A guest problem with a lifecycle — raised, assigned, answered, closed. The messages are
 -- children; the SLA is not yet modelled
 CREATE TABLE IF NOT EXISTS marketing."case" (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     case_number                       text NOT NULL,
     subject_id                        uuid,
     title                             text NOT NULL,
@@ -212,7 +212,7 @@ CREATE TABLE IF NOT EXISTS marketing."case" (
     priority                          text NOT NULL CONSTRAINT case_priority_chk CHECK (priority IN ('low', 'normal', 'high', 'urgent')),
     assigned_to_principal_id          uuid,
     venue_id                          uuid,
-    related_order_id                  text,
+    related_order_id                  uuid,
     sla_due_at                        timestamptz,
     sla_paused_seconds                integer,
     escalation_count                  integer,
@@ -239,10 +239,10 @@ CREATE TABLE IF NOT EXISTS marketing.case_category (
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.case_compensation_request (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     scope_path                        ltree NOT NULL,
-    case_id                           text NOT NULL,
-    order_id                          text,
+    case_id                           uuid NOT NULL,
+    order_id                          uuid,
     line_ids                          text[],
     request_type                      text NOT NULL CONSTRAINT case_compensation_request_request_type_chk CHECK (request_type IN ('fullRefund', 'partialRefund', 'serviceCredit', 'walletCredit', 'voucher', 'complimentaryTicket', 'feeWaiver', 'upgrade', 'discount', 'policyException')),
     value                             numeric(18,4) NOT NULL,
@@ -251,7 +251,7 @@ CREATE TABLE IF NOT EXISTS marketing.case_compensation_request (
     exception_reason                  text CONSTRAINT case_compensation_request_exception_reason_chk CHECK (char_length(exception_reason) <= 1000),
     is_submit                         boolean DEFAULT false,
     status                            text CONSTRAINT case_compensation_request_status_chk CHECK (status IN ('draft', 'pendingApproval', 'approved', 'declined', 'fulfilled', 'failed', 'withdrawn')),
-    approval_request_id               text,
+    approval_request_id               uuid,
     fulfilment_operation              text,
     fulfilment_reference              text,
     requested_by_principal_id         uuid,
@@ -262,7 +262,7 @@ CREATE TABLE IF NOT EXISTS marketing.case_compensation_request (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.case_escalation (
     id                                uuid PRIMARY KEY NOT NULL,
-    case_id                           text NOT NULL,
+    case_id                           uuid NOT NULL,
     reason                            text NOT NULL CONSTRAINT case_escalation_reason_chk CHECK (char_length(reason) <= 500),
     reason_category                   text CONSTRAINT case_escalation_reason_category_chk CHECK (reason_category IN ('slaRisk', 'customerComplaint', 'repeatedContact', 'highValue', 'refundException', 'operationalFailure', 'systemFailure', 'legalCompliance', 'vipCustomer', 'supervisorRequested', 'other')),
     is_automatic                      boolean DEFAULT false,
@@ -277,9 +277,9 @@ CREATE TABLE IF NOT EXISTS marketing.case_escalation (
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.case_internal_request (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     scope_path                        ltree NOT NULL,
-    case_id                           text NOT NULL,
+    case_id                           uuid NOT NULL,
     department                        text NOT NULL CONSTRAINT case_internal_request_department_chk CHECK (department IN ('ticketing', 'finance', 'operations', 'accessControl', 'membership', 'crm', 'fnb', 'retail', 'groupSales', 'technicalSupport', 'venueManagement', 'management')),
     assignee_principal_id             uuid,
     request                           text NOT NULL CONSTRAINT case_internal_request_request_chk CHECK (char_length(request) <= 2000),
@@ -301,7 +301,7 @@ CREATE TABLE IF NOT EXISTS marketing.case_internal_request (
 CREATE TABLE IF NOT EXISTS marketing.case_linked_record (
     id                                uuid PRIMARY KEY,
     scope_path                        ltree NOT NULL,
-    case_id                           text NOT NULL,
+    case_id                           uuid NOT NULL,
     kind                              text NOT NULL CONSTRAINT case_linked_record_kind_chk CHECK (kind IN ('order', 'ticket', 'payment', 'refund', 'membership', 'walletTransaction', 'groupBooking', 'accessEvent')),
     reference_id                      text NOT NULL CONSTRAINT case_linked_record_reference_id_chk CHECK (char_length(reference_id) <= 64),
     note                              text CONSTRAINT case_linked_record_note_chk CHECK (char_length(note) <= 500),
@@ -313,7 +313,7 @@ CREATE TABLE IF NOT EXISTS marketing.case_linked_record (
 -- One exchange in a case, from either side
 CREATE TABLE IF NOT EXISTS marketing.case_message (
     resolution                        text,
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     body                              text NOT NULL,
     is_internal                       boolean NOT NULL,
     author_kind                       text NOT NULL CONSTRAINT case_message_author_kind_chk CHECK (author_kind IN ('agent', 'guest', 'system', 'ai')),
@@ -322,7 +322,7 @@ CREATE TABLE IF NOT EXISTS marketing.case_message (
     attachment_refs                   text[],
     recorded_at                       timestamptz NOT NULL,
     synced_at                         timestamptz,
-    case_id                           text
+    case_id                           uuid
 );
 
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
@@ -330,14 +330,14 @@ CREATE TABLE IF NOT EXISTS marketing.case_message (
 CREATE TABLE IF NOT EXISTS marketing.case_resolution (
     id                                uuid PRIMARY KEY,
     scope_path                        ltree NOT NULL,
-    case_id                           text NOT NULL,
+    case_id                           uuid NOT NULL,
     resolution_category               text NOT NULL CONSTRAINT case_resolution_resolution_category_chk CHECK (resolution_category IN ('informationProvided', 'ticketReissued', 'bookingChanged', 'refundProcessed', 'compensationIssued', 'technicalIssueResolved', 'customerError', 'policyApplied', 'duplicate', 'noActionRequired', 'other')),
     resolution_summary                text NOT NULL CONSTRAINT case_resolution_resolution_summary_chk CHECK (char_length(resolution_summary) <= 2000),
     action_taken                      text CONSTRAINT case_resolution_action_taken_chk CHECK (char_length(action_taken) <= 2000),
     financial_impact                  numeric(18,4),
     compensation_request_ids          text[],
     root_cause                        text NOT NULL CONSTRAINT case_resolution_root_cause_chk CHECK (root_cause IN ('customer', 'product', 'payment', 'system', 'integration', 'operational', 'content', 'policy', 'staff', 'unknown')),
-    duplicate_of_case_id              text,
+    duplicate_of_case_id              uuid,
     customer_notification             jsonb,
     resolved_by                       uuid,
     resolution_date                   timestamptz,
@@ -369,11 +369,11 @@ CREATE TABLE IF NOT EXISTS marketing.case_routing_rule (
 -- Holds 17 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.case_service_action (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     scope_path                        ltree NOT NULL,
     mode                              text NOT NULL CONSTRAINT case_service_action_mode_chk CHECK (mode IN ('evaluate', 'execute')),
-    case_id                           text,
-    order_id                          text NOT NULL,
+    case_id                           uuid,
+    order_id                          uuid NOT NULL,
     line_ids                          text[],
     action                            text CONSTRAINT case_service_action_action_chk CHECK (action IN ('resendTicket', 'downloadTicket', 'reissue', 'transfer', 'changeName', 'reschedule', 'exchange', 'upgrade', 'cancel')),
     target_performance_id             uuid,
@@ -533,7 +533,7 @@ CREATE TABLE IF NOT EXISTS marketing.consent_capture_point (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.consent_propagation (
     id                                uuid PRIMARY KEY NOT NULL,
-    consent_record_id                 text NOT NULL,
+    consent_record_id                 uuid NOT NULL,
     target                            text NOT NULL CONSTRAINT consent_propagation_target_chk CHECK (target IN ('crm', 'marketing', 'campaignAudience', 'connectedSystem')),
     target_name                       text CONSTRAINT consent_propagation_target_name_chk CHECK (char_length(target_name) <= 200),
     status                            text NOT NULL DEFAULT 'requested' CONSTRAINT consent_propagation_status_chk CHECK (status IN ('requested', 'processed', 'propagated', 'acknowledged', 'failed', 'retryRequired')),
@@ -566,7 +566,7 @@ CREATE TABLE IF NOT EXISTS marketing.consent_purpose_channel (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.consent_question (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     kind                              text NOT NULL CONSTRAINT consent_question_kind_chk CHECK (kind IN ('swim', 'scuba', 'risk', 'custom')),
     text                              jsonb NOT NULL,
     help_text                         jsonb,
@@ -582,7 +582,7 @@ CREATE TABLE IF NOT EXISTS marketing.consent_question (
 -- Holds 6 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.consent_question_version (
-    question_id                       text NOT NULL,
+    question_id                       uuid NOT NULL,
     version                           integer NOT NULL,
     text                              jsonb NOT NULL,
     published_at                      timestamptz NOT NULL,
@@ -597,10 +597,10 @@ CREATE TABLE IF NOT EXISTS marketing.consent_record (
     notice_version                    text NOT NULL,
     source                            text NOT NULL CONSTRAINT consent_record_source_chk CHECK (source IN ('guestApp', 'website', 'kiosk', 'pos', 'callCentre', 'import', 'agentRecorded', 'cookieBanner', 'checkout')),
     recorded_at                       timestamptz NOT NULL,
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     subject_id                        uuid NOT NULL,
     recorded_by_principal_id          uuid,
-    order_id                          text,
+    order_id                          uuid,
     verified_contact_ref              text CONSTRAINT consent_record_verified_contact_ref_chk CHECK (char_length(verified_contact_ref) <= 128),
     superseded_at                     timestamptz
 );
@@ -608,7 +608,7 @@ CREATE TABLE IF NOT EXISTS marketing.consent_record (
 -- Holds 3 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.consent_record_channel (
-    consent_record_id                 text NOT NULL,
+    consent_record_id                 uuid NOT NULL,
     channel                           text NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL
 );
@@ -662,7 +662,7 @@ CREATE TABLE IF NOT EXISTS marketing.conversation (
     sentiment                         text CONSTRAINT conversation_sentiment_chk CHECK (sentiment IN ('positive', 'neutral', 'negative', 'escalating')),
     intent                            text,
     locale                            text,
-    case_id                           text,
+    case_id                           uuid,
     first_response_seconds            integer,
     started_at                        timestamptz,
     closed_at                         timestamptz,
@@ -819,8 +819,8 @@ CREATE TABLE IF NOT EXISTS marketing.feedback_classification (
     id                                uuid PRIMARY KEY NOT NULL,
     source                            text NOT NULL CONSTRAINT feedback_classification_source_chk CHECK (source IN ('csatSurvey', 'serviceRating', 'nps', 'postCaseSurvey', 'complaint', 'appFeedback', 'webFeedback', 'directComment')),
     form_submission_id                uuid,
-    review_id                         text,
-    case_id                           text,
+    review_id                         uuid,
+    case_id                           uuid,
     sentiment                         text CONSTRAINT feedback_classification_sentiment_chk CHECK (sentiment IN ('positive', 'neutral', 'negative')),
     topic                             text CONSTRAINT feedback_classification_topic_chk CHECK (char_length(topic) <= 100),
     confidence                        numeric(18,4),
@@ -996,7 +996,7 @@ CREATE TABLE IF NOT EXISTS marketing.guest_match_policy (
 -- Holds 9 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.guest_note (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     subject_id                        uuid NOT NULL,
     kind                              text NOT NULL CONSTRAINT guest_note_kind_chk CHECK (kind IN ('allergy', 'dietary', 'seatingPreference', 'occasion', 'serviceRecovery', 'vip', 'general')),
     text                              text NOT NULL,
@@ -1030,7 +1030,7 @@ CREATE TABLE IF NOT EXISTS marketing.guest_profile (
     phone                             text,
     preferred_language                text,
     preferred_channel                 text CONSTRAINT guest_profile_preferred_channel_chk CHECK (preferred_channel IN ('email', 'sms', 'whatsapp', 'push', 'inApp', 'post')),
-    guest_link_id                     text,
+    guest_link_id                     uuid,
     tags                              text[],
     engagement_score                  integer,
     engagement_tier                   text CONSTRAINT guest_profile_engagement_tier_chk CHECK (engagement_tier IN ('new', 'active', 'occasional', 'lapsing', 'lapsed', 'dormant')),
@@ -1223,7 +1223,7 @@ CREATE TABLE IF NOT EXISTS marketing.lost_item (
     status                            text CONSTRAINT lost_item_status_chk CHECK (status IN ('open', 'matched', 'claimed', 'disposed', 'returned')),
     photo_asset_ids                   text[],
     matched_item_id                   uuid,
-    case_id                           text,
+    case_id                           uuid,
     dispose_after                     date
 );
 
@@ -1311,7 +1311,7 @@ CREATE TABLE IF NOT EXISTS marketing.message_delivery (
 
 -- One message to one person. Consent was checked here, which is why it is a row and not a log line
 CREATE TABLE IF NOT EXISTS marketing.message_dispatch (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid NOT NULL,
     subject_id                        uuid NOT NULL,
     campaign_id                       uuid,
     channel                           text NOT NULL CONSTRAINT message_dispatch_channel_chk CHECK (channel IN ('email', 'sms', 'whatsapp', 'push', 'inApp', 'post')),
@@ -1328,14 +1328,15 @@ CREATE TABLE IF NOT EXISTS marketing.message_dispatch (
     opened_at                         timestamptz,
     clicked_at                        timestamptz,
     complained_at                     timestamptz,
-    unsubscribed_at                   timestamptz
-);
+    unsubscribed_at                   timestamptz,
+    CONSTRAINT message_dispatch_pkey PRIMARY KEY (id, queued_at)
+) PARTITION BY RANGE (queued_at);
 
 -- Holds 15 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS marketing.message_dispatch_attempt (
     id                                uuid PRIMARY KEY NOT NULL,
-    message_dispatch_id               text NOT NULL,
+    message_dispatch_id               uuid NOT NULL,
     attempt_number                    integer NOT NULL,
     communication_provider_id         uuid NOT NULL,
     channel                           text NOT NULL CONSTRAINT message_dispatch_attempt_channel_chk CHECK (channel IN ('email', 'sms', 'whatsapp', 'push', 'inApp', 'post')),
@@ -1509,7 +1510,7 @@ CREATE TABLE IF NOT EXISTS marketing.privacy_audit_event (
 CREATE TABLE IF NOT EXISTS marketing.privacy_change_set (
     change_set_id                     uuid NOT NULL,
     status                            text NOT NULL CONSTRAINT privacy_change_set_status_chk CHECK (status IN ('draft', 'validated', 'submitted', 'approved', 'scheduled', 'published', 'rolledBack', 'rejected')),
-    approval_request_id               text,
+    approval_request_id               uuid,
     publish_at                        timestamptz,
     published_at                      timestamptz,
     scope_path                        ltree NOT NULL,
@@ -1709,7 +1710,7 @@ CREATE TABLE IF NOT EXISTS marketing.quality_evaluation (
     agent_principal_id                uuid NOT NULL,
     evaluator_principal_id            uuid,
     source_type                       text NOT NULL CONSTRAINT quality_evaluation_source_type_chk CHECK (source_type IN ('call', 'chat', 'email', 'whatsapp', 'case', 'complaint')),
-    case_id                           text,
+    case_id                           uuid,
     conversation_id                   uuid,
     evaluated_by                      text NOT NULL CONSTRAINT quality_evaluation_evaluated_by_chk CHECK (evaluated_by IN ('human', 'ai')),
     status                            text NOT NULL CONSTRAINT quality_evaluation_status_chk CHECK (status IN ('draft', 'scored', 'acknowledged')),
@@ -1774,10 +1775,10 @@ CREATE TABLE IF NOT EXISTS marketing.retention_run (
 
 -- What a guest said afterwards, with the venue’s response and whether it is public
 CREATE TABLE IF NOT EXISTS marketing.review (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     subject_id                        uuid,
     venue_id                          uuid NOT NULL,
-    related_order_id                  text,
+    related_order_id                  uuid,
     rating                            integer NOT NULL,
     body                              text CONSTRAINT review_body_chk CHECK (char_length(body) <= 5000),
     aspects                           text[],
@@ -1786,7 +1787,7 @@ CREATE TABLE IF NOT EXISTS marketing.review (
     response                          text,
     response_is_public                boolean,
     responded_by_principal_id         uuid,
-    opened_case_id                    text
+    opened_case_id                    uuid
 );
 
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
@@ -1965,7 +1966,7 @@ CREATE TABLE IF NOT EXISTS marketing.touch_point (
     channel                           text NOT NULL,
     kind                              text CONSTRAINT touch_point_kind_chk CHECK (kind IN ('impression', 'open', 'click', 'visit', 'conversion')),
     occurred_at                       timestamptz NOT NULL,
-    order_id                          text
+    order_id                          uuid
 );
 
 -- Holds 23 columns. No description has been written for this table — the name is the only thing
@@ -2027,7 +2028,7 @@ CREATE TABLE IF NOT EXISTS marketing.waiver_exception (
     supervisor_staff_id               uuid,
     status                            text NOT NULL DEFAULT 'requested' CONSTRAINT waiver_exception_status_chk CHECK (status IN ('requested', 'approved', 'rejected', 'revoked', 'expired')),
     scope                             text NOT NULL CONSTRAINT waiver_exception_scope_chk CHECK (scope IN ('oneTime', 'ticketSpecific', 'activitySpecific', 'timeLimited')),
-    ticket_id                         text,
+    ticket_id                         uuid,
     performance_id                    uuid,
     valid_until                       timestamptz,
     decision_note                     text CONSTRAINT waiver_exception_decision_note_chk CHECK (char_length(decision_note) <= 1000),
@@ -2110,9 +2111,9 @@ CREATE TABLE IF NOT EXISTS marketing.waiver_master (
 CREATE TABLE IF NOT EXISTS marketing.waiver_requirement (
     id                                uuid PRIMARY KEY NOT NULL,
     participant_subject_id            uuid NOT NULL,
-    order_id                          text NOT NULL,
-    order_line_id                     text,
-    ticket_id                         text,
+    order_id                          uuid NOT NULL,
+    order_line_id                     uuid,
+    ticket_id                         uuid,
     product_id                        uuid,
     performance_id                    uuid,
     group_booking_id                  uuid,
@@ -2149,7 +2150,7 @@ CREATE TABLE IF NOT EXISTS marketing.waiver_requirement_event (
     actor                             text NOT NULL CONSTRAINT waiver_requirement_event_actor_chk CHECK (actor IN ('participant', 'guardian', 'staff', 'system')),
     staff_id                          uuid,
     channel                           text,
-    message_dispatch_id               text,
+    message_dispatch_id               uuid,
     reason                            text CONSTRAINT waiver_requirement_event_reason_chk CHECK (char_length(reason) <= 500),
     occurred_at                       timestamptz NOT NULL,
     scope_path                        ltree NOT NULL

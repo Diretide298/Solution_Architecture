@@ -39,23 +39,12 @@
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-138 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-145",
      "trigger": "Promotion Approval Inbox",
-     "carries": [
-      "requestId"
-     ],
-     "provenance": "derived — ADM-145 declares entryState.params requestId, so an edge into it must carry them"
-    },
-    {
-     "to": "ADM-139",
-     "trigger": "Works in Promotion & Campaign Directory",
-     "provenance": "flow F154 step 1→2"
+     "provenance": "derived — ADM-145 declares entryState.params requestId and ADM-138 holds none of them, so the edge carries nothing and ADM-145 opens cold"
     },
     {
      "to": "ADM-140",
@@ -98,6 +87,14 @@
      "trigger": "Works in Promotion Audit, Activity & Version History",
      "provenance": "flow F154 step 17→18",
      "operation": "listPromotions"
+    },
+    {
+     "to": "ADM-139",
+     "trigger": "Works in Promotion & Campaign Directory",
+     "provenance": "flow F154 step 1→2",
+     "carries": [
+      "campaignId"
+     ]
     }
    ]
   },
@@ -265,7 +262,7 @@
     "operationId": "getPromotionUsage",
     "contract": "promotions",
     "purpose": "Redemption and spend against a promotion",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -288,7 +285,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-138"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-138",
+   "workshopBoard": "wireframes/WS106 Promotions   Bundles Management Board 1.dc.html#adm-138"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 6. 0 of 9 labels bound to a contract property; 24 of 56 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -349,7 +347,7 @@
      "carries": [
       "promotionId"
      ],
-     "provenance": "derived — ADM-138 declares entryState.params promotionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-138 declares entryState.params promotionId and ADM-139 holds promotionId, so an edge into it carries them"
     }
    ]
   },
@@ -376,25 +374,60 @@
         "PromotionCampaignDirectoryView.promotionType",
         "PromotionCampaignDirectoryView.campaign",
         "PromotionCampaignDirectoryView.product",
-        "PromotionCampaignDirectoryView.productCategory",
         "PromotionCampaignDirectoryView.venue",
-        "PromotionCampaignDirectoryView.attraction",
-        "PromotionCampaignDirectoryView.event",
-        "PromotionCampaignDirectoryView.fB",
-        "PromotionCampaignDirectoryView.retail",
-        "PromotionCampaignDirectoryView.membership",
         "PromotionCampaignDirectoryView.channel",
-        "PromotionCampaignDirectoryView.partner",
-        "PromotionCampaignDirectoryView.customerSegment",
-        "PromotionCampaignDirectoryView.date",
         "PromotionCampaignDirectoryView.status",
-        "PromotionCampaignDirectoryView.owner",
-        "PromotionCampaignDirectoryView.approvalState",
-        "PromotionCampaignDirectoryView.promotionValue",
-        "PromotionCampaignDirectoryView.budgetStatus"
+        "PromotionCampaignDirectoryView.owner"
        ],
        "notes": "The pack filters this screen by promotion type, campaign, product, product category, venue, attraction and 13 more — which are present is a decision the pack already made.",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 8 §Allow filtering by"
+      },
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?venueId=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Active at",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?activeAt=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "textField",
+       "label": "Owner principal id",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?ownerPrincipalId=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "searchField",
+       "label": "Q",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?q=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every commercial campaign",
+       "bindsTo": "CommercialCampaign",
+       "columns": [
+        "CommercialCampaign.id",
+        "CommercialCampaign.venueId",
+        "CommercialCampaign.code",
+        "CommercialCampaign.name",
+        "CommercialCampaign.description",
+        "CommercialCampaign.ownerPrincipalId",
+        "CommercialCampaign.legalEntityId",
+        "CommercialCampaign.validFrom",
+        "CommercialCampaign.validTo",
+        "CommercialCampaign.budgets"
+       ],
+       "operation": "listCommercialCampaigns",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
       }
      ]
     },
@@ -479,6 +512,22 @@
        "label": "Permissions this screen separates",
        "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Activate, Pause, Extend, Duplicate, Archive, Export, Assign owner, Submit for approval. Each needs attaching to the control it gates, or the screen needs the control.",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 8 §Authorized users may"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Create commercial campaign",
+       "operation": "createCommercialCampaign",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "Creates the campaign header (`promotions.campaign`) without budget lines, so a promotion, coupon campaign or bundle can name it by `campaignId` before its budget is set.",
+       "provenance": "contract promotions.yaml POST /commercial-campaigns"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save commercial campaign",
+       "operation": "updateCommercialCampaign",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "Amends the campaign header (`promotions.campaign`): name, code, description, owner, business entity and dates.",
+       "provenance": "contract promotions.yaml PATCH /commercial-campaigns/{campaignId}"
       }
      ]
     }
@@ -497,6 +546,40 @@
     "contract": "promotions",
     "purpose": "Promotion & Campaign Directory",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCampaignPromotionPerformance",
+    "contract": "promotions",
+    "purpose": "Campaign & Promotion Performance Explorer",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCommercialCampaigns",
+    "contract": "promotions",
+    "purpose": "List commercial campaigns",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createCommercialCampaign",
+    "contract": "promotions",
+    "purpose": "Create a commercial campaign",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPromotionCampaign",
+     "listCampaignPromotionPerformance",
+     "listCommercialCampaigns"
+    ]
+   },
+   {
+    "operationId": "updateCommercialCampaign",
+    "contract": "promotions",
+    "purpose": "Amend a commercial campaign",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPromotionCampaign",
+     "listCampaignPromotionPerformance",
+     "listCommercialCampaigns"
+    ]
    }
   ],
   "entryState": {
@@ -507,14 +590,71 @@
     "PromotionCampaignDirectoryView.campaign",
     "PromotionCampaignDirectoryView.status",
     "PromotionCampaignDirectoryView.businessEntity"
+   ],
+   "params": [
+    {
+     "name": "campaignId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-139"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-139",
+   "workshopBoard": "wireframes/WS106 Promotions   Bundles Management Board 1.dc.html#adm-139"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 8. 40 of 40 labels bound to a contract property; 48 of 63 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreateCommercialCampaign",
+    "component": "modal",
+    "trigger": "Create commercial campaign",
+    "body": "**Collects what `createCommercialCampaign` sends before it is called.** Required: `venueId`, `name`. Optional: `code`, `description`, `ownerPrincipalId`, `legalEntityId`, `validFrom`, `validTo`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateCommercialCampaignRequest",
+    "confirm": {
+     "label": "Create commercial campaign",
+     "operation": "createCommercialCampaign"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueId",
+      "name",
+      "code",
+      "description",
+      "ownerPrincipalId",
+      "legalEntityId",
+      "validFrom",
+      "validTo"
+     ]
+    },
+    "provenance": "contract promotions.yaml POST /commercial-campaigns"
+   },
+   {
+    "id": "formUpdateCommercialCampaign",
+    "component": "modal",
+    "trigger": "Save commercial campaign",
+    "body": "**Collects what `updateCommercialCampaign` sends before it is called.** Nothing in the body is required. Optional: `code`, `name`, `description`, `ownerPrincipalId`, `legalEntityId`, `validFrom`, `validTo`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save commercial campaign",
+     "operation": "updateCommercialCampaign"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "description",
+      "ownerPrincipalId",
+      "legalEntityId",
+      "validFrom",
+      "validTo"
+     ]
+    },
+    "provenance": "contract promotions.yaml PATCH /commercial-campaigns/{campaignId}"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -573,7 +713,7 @@
      "carries": [
       "promotionId"
      ],
-     "provenance": "derived — ADM-138 declares entryState.params promotionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-138 declares entryState.params promotionId and ADM-140 holds promotionId, so an edge into it carries them"
     }
    ]
   },
@@ -715,7 +855,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-140"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-140",
+   "workshopBoard": "wireframes/WS106 Promotions   Bundles Management Board 1.dc.html#adm-140"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 9. 0 of 32 labels bound to a contract property; 32 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -776,7 +917,7 @@
      "carries": [
       "promotionId"
      ],
-     "provenance": "derived — ADM-138 declares entryState.params promotionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-138 declares entryState.params promotionId and ADM-141 holds promotionId, so an edge into it carries them"
     }
    ]
   },
@@ -846,17 +987,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "PromotionLifecycleStatusManagerView.pausedSuspendedExpiredArchived",
-    "PromotionLifecycleStatusManagerView.terminate",
-    "PromotionLifecycleStatusManagerView.requiredConfigurationIsCompleted",
-    "PromotionLifecycleStatusManagerView.validProductsExist",
-    "PromotionLifecycleStatusManagerView.datesAreValid"
+    "PromotionLifecycleStatusManagerView.failedActivationChecks"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-141"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-141",
+   "workshopBoard": "wireframes/WS106 Promotions   Bundles Management Board 1.dc.html#adm-141"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 15 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -917,16 +1055,16 @@
      "carries": [
       "promotionId"
      ],
-     "provenance": "derived — ADM-138 declares entryState.params promotionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-138 declares entryState.params promotionId and ADM-142 holds promotionId, so an edge into it carries them"
     }
    ]
   },
   "density": "compact",
   "pattern": "listDetail",
-  "patternReason": "the pack gives this screen a display directory (§Identify) and no metric row",
+  "patternReason": "the pack gives this screen a display directory (§Identify) and no metric row Rendered on the calendar template (M17-03, 29 September).",
   "purpose": "Provide a calendar-based operational view of promotions.",
   "layout": {
-   "template": "split",
+   "template": "calendar",
    "regions": [
     {
      "name": "contentBody",
@@ -936,17 +1074,77 @@
        "kind": "dataTable",
        "label": "Every campaign calendar timeline",
        "columns": [
-        "CampaignCalendarTimelineView.active",
-        "CampaignCalendarTimelineView.upcoming",
-        "CampaignCalendarTimelineView.endingSoon",
-        "CampaignCalendarTimelineView.expired",
-        "CampaignCalendarTimelineView.pendingApproval",
-        "CampaignCalendarTimelineView.conflicting",
-        "CampaignCalendarTimelineView.suspended"
+        "CampaignCalendarTimelineView.calendarState"
        ],
        "bindsTo": "CampaignCalendarTimelineView",
        "operation": "listCampaignCalendarTimeline",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 12 §Identify"
+      },
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?venueId=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Active at",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?activeAt=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "textField",
+       "label": "Owner principal id",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?ownerPrincipalId=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "searchField",
+       "label": "Q",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?q=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every commercial campaign",
+       "bindsTo": "CommercialCampaign",
+       "columns": [
+        "CommercialCampaign.id",
+        "CommercialCampaign.venueId",
+        "CommercialCampaign.code",
+        "CommercialCampaign.name",
+        "CommercialCampaign.description",
+        "CommercialCampaign.ownerPrincipalId",
+        "CommercialCampaign.legalEntityId",
+        "CommercialCampaign.validFrom",
+        "CommercialCampaign.validTo",
+        "CommercialCampaign.budgets"
+       ],
+       "operation": "listCommercialCampaigns",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "selectField",
+       "label": "View: day, week or month",
+       "notes": "**Every calendar has day, week and month views, and the day view is broken into hours from the venue's day start hour** (17 September minutes, M17-03). Built on the shared calendar view (`calendarView`, to be added to the component library); until then a timeline per view.",
+       "provenance": "29 September pass (group A)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Category",
+       "notes": "**Filtered by category, so a team sees only what is theirs** (M17-03).",
+       "provenance": "29 September pass (group A)"
+      },
+      {
+       "kind": "calendarView",
+       "label": "Calendar",
+       "operation": "listCampaignCalendarTimeline",
+       "notes": "Entries of the view in force, placed by date and hour.",
+       "provenance": "29 September pass (group A)"
       }
      ]
     },
@@ -959,13 +1157,7 @@
        "label": "The selected campaign calendar timeline",
        "bindsTo": "CampaignCalendarTimelineView",
        "columns": [
-        "CampaignCalendarTimelineView.active",
-        "CampaignCalendarTimelineView.upcoming",
-        "CampaignCalendarTimelineView.endingSoon",
-        "CampaignCalendarTimelineView.expired",
-        "CampaignCalendarTimelineView.pendingApproval",
-        "CampaignCalendarTimelineView.conflicting",
-        "CampaignCalendarTimelineView.suspended"
+        "CampaignCalendarTimelineView.calendarState"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Views”, “Show promotions by”, “Users may”, “Conflict Detection”.",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 12 §Identify"
@@ -987,22 +1179,24 @@
     "contract": "promotions",
     "purpose": "Campaign Calendar & Timeline",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCommercialCampaigns",
+    "contract": "promotions",
+    "purpose": "List commercial campaigns",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
    "preloaded": [
-    "CampaignCalendarTimelineView.active",
-    "CampaignCalendarTimelineView.upcoming",
-    "CampaignCalendarTimelineView.endingSoon",
-    "CampaignCalendarTimelineView.expired",
-    "CampaignCalendarTimelineView.pendingApproval",
-    "CampaignCalendarTimelineView.conflicting"
+    "CampaignCalendarTimelineView.calendarState"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-142"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-142",
+   "workshopBoard": "wireframes/WS106 Promotions   Bundles Management Board 1.dc.html#adm-142"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 12. 7 of 7 labels bound to a contract property; 7 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1060,10 +1254,7 @@
     {
      "to": "ADM-138",
      "trigger": "Promotion Command Center Dashboard",
-     "carries": [
-      "promotionId"
-     ],
-     "provenance": "derived — ADM-138 declares entryState.params promotionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-138 declares entryState.params promotionId and ADM-143 holds none of them, so the edge carries nothing and ADM-138 opens cold"
     }
    ]
   },
@@ -1137,13 +1328,7 @@
        "kind": "dataTable",
        "label": "Every promotion channel publication",
        "columns": [
-        "PromotionChannelPublicationMonitorView.notAssigned",
-        "PromotionChannelPublicationMonitorView.pendingPublication",
-        "PromotionChannelPublicationMonitorView.published",
-        "PromotionChannelPublicationMonitorView.synchronizing",
-        "PromotionChannelPublicationMonitorView.publicationFailed",
-        "PromotionChannelPublicationMonitorView.outOfSync",
-        "PromotionChannelPublicationMonitorView.suspended"
+        "PromotionChannelPublicationMonitorView.publicationStatus"
        ],
        "bindsTo": "PromotionChannelPublicationMonitorView",
        "operation": "listPromotionChannel",
@@ -1160,13 +1345,7 @@
        "label": "The selected promotion channel publication",
        "bindsTo": "PromotionChannelPublicationMonitorView",
        "columns": [
-        "PromotionChannelPublicationMonitorView.notAssigned",
-        "PromotionChannelPublicationMonitorView.pendingPublication",
-        "PromotionChannelPublicationMonitorView.published",
-        "PromotionChannelPublicationMonitorView.synchronizing",
-        "PromotionChannelPublicationMonitorView.publicationFailed",
-        "PromotionChannelPublicationMonitorView.outOfSync",
-        "PromotionChannelPublicationMonitorView.suspended"
+        "PromotionChannelPublicationMonitorView.publicationStatus"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Supported Channels”.",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 13 §For each channel display"
@@ -1233,7 +1412,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-143"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-143",
+   "workshopBoard": "wireframes/WS106 Promotions   Bundles Management Board 1.dc.html#adm-143"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 13. 14 of 14 labels bound to a contract property; 19 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1294,7 +1474,7 @@
      "carries": [
       "promotionId"
      ],
-     "provenance": "derived — ADM-138 declares entryState.params promotionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-138 declares entryState.params promotionId and ADM-144 holds promotionId, so an edge into it carries them"
     }
    ]
   },
@@ -1305,7 +1485,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Assign alert, Suspend campaign, Open related configuration. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Assign alert, Acknowledge, Resolve, Suspend campaign, Open related configuration, Add internal comment. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Promotions___Bundles_Management_Reference.pdf, page 14 §Users can"
    }
   ],
@@ -1358,6 +1538,16 @@
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 14 §Users can"
       },
       {
+       "kind": "secondaryButton",
+       "label": "Acknowledge",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 14 §Users can"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resolve",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 14 §Users can"
+      },
+      {
        "kind": "destructiveButton",
        "label": "Suspend campaign",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 14 §Users can"
@@ -1365,6 +1555,11 @@
       {
        "kind": "secondaryButton",
        "label": "Open related configuration",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 14 §Users can"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Add internal comment",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 14 §Users can"
       }
      ]
@@ -1397,9 +1592,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-144"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-144",
+   "workshopBoard": "wireframes/WS106 Promotions   Bundles Management Board 1.dc.html#adm-144"
   },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 9 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 12 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1458,7 +1654,7 @@
      "carries": [
       "promotionId"
      ],
-     "provenance": "derived — ADM-138 declares entryState.params promotionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-138 declares entryState.params promotionId and ADM-145 holds promotionId, so an edge into it carries them"
     }
    ]
   },
@@ -1620,7 +1816,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-145"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-145",
+   "workshopBoard": "wireframes/WS106 Promotions   Bundles Management Board 1.dc.html#adm-145"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 15. 0 of 11 labels bound to a contract property; 16 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1678,10 +1875,7 @@
     {
      "to": "ADM-138",
      "trigger": "Promotion Command Center Dashboard",
-     "carries": [
-      "promotionId"
-     ],
-     "provenance": "derived — ADM-138 declares entryState.params promotionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-138 declares entryState.params promotionId and ADM-146 holds none of them, so the edge carries nothing and ADM-138 opens cold"
     }
    ]
   },
@@ -1845,6 +2039,12 @@
     "contract": "promotions",
     "purpose": "Promotion Health & Performance Monitor",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPromotionPerformance",
+    "contract": "promotions",
+    "purpose": "Promotion Performance Command Center",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -1860,7 +2060,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-146"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-146",
+   "workshopBoard": "wireframes/WS106 Promotions   Bundles Management Board 1.dc.html#adm-146"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 16. 22 of 22 labels bound to a contract property; 22 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1921,7 +2122,7 @@
      "carries": [
       "promotionId"
      ],
-     "provenance": "derived — ADM-138 declares entryState.params promotionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-138 declares entryState.params promotionId and ADM-147 holds promotionId, so an edge into it carries them"
     }
    ]
   },
@@ -1949,6 +2150,11 @@
      "slot": "rowActions",
      "components": [
       {
+       "kind": "primaryButton",
+       "label": "Version 2.3 ↔ Version 2.4",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 17 §Users can compare"
+      },
+      {
        "kind": "banner",
        "label": "Permissions this screen separates",
        "notes": "**The pack separates these permissions and no action on the screen claims them yet:** View, Create, Edit, Submit, Approve, Activate, Pause, Suspend, Change budget, Archive, Export. Each needs attaching to the control it gates, or the screen needs the control.",
@@ -1958,14 +2164,7 @@
     },
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listPromotionActivityVersion",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
+     "components": []
     }
    ]
   },
@@ -1986,19 +2185,16 @@
   ],
   "entryState": {
    "preloaded": [
-    "PromotionAuditActivityVersionHistoryView.promotionCreated",
-    "PromotionAuditActivityVersionHistoryView.promotionEdited",
-    "PromotionAuditActivityVersionHistoryView.ruleChanged",
-    "PromotionAuditActivityVersionHistoryView.discountChanged",
-    "PromotionAuditActivityVersionHistoryView.productAdded"
+    "PromotionAuditActivityVersionHistoryView.eventType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-147"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-147",
+   "workshopBoard": "wireframes/WS106 Promotions   Bundles Management Board 1.dc.html#adm-147"
   },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 17. 0 of 0 labels bound to a contract property; 11 of 142 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 17. 0 of 0 labels bound to a contract property; 12 of 142 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

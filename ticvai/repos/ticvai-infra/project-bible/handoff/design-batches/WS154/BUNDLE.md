@@ -3292,7 +3292,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "paymentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "providerId": {
     "type": "string",
@@ -3411,13 +3411,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "debitJournalEntryId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The `chargebackDebit` (and `chargebackFee`) entry posted at intake."
    },
    "outcomeJournalEntryId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The `chargebackReversal` entry posted when the case is won, or the additional fee when lost."
    }

@@ -8,9 +8,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "isOverride",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ChannelBasedPricingRulesView"
+  "responds": "Page"
  },
  "listCustomerSegmentProfile": {
   "method": "GET",
@@ -21,9 +52,45 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "dimension",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "segmentSource",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CustomerSegmentProfilePricingRulesView"
+  "responds": "Page"
  },
  "listEffectiveDateSeason": {
   "method": "GET",
@@ -34,9 +101,45 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "dateRuleType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "visitFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "visitTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "EffectiveDateSeasonDayBasedPricingRulesView"
+  "responds": "Page"
  },
  "listLocationVenueEvent": {
   "method": "GET",
@@ -47,9 +150,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "contextLevel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "contextRefId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "LocationVenueEventPricingRulesView"
+  "responds": "Page"
  },
  "listMembershipLoyaltyPricing": {
   "method": "GET",
@@ -60,9 +189,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "dimension",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "MembershipLoyaltyPricingRulesView"
+  "responds": "Page"
  },
  "listPricingRule": {
   "method": "GET",
@@ -73,9 +228,45 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "ruleType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueLocation",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PricingRuleCommandCenterView"
+  "responds": "Page"
  },
  "listPricingRulePriority": {
   "method": "GET",
@@ -86,9 +277,75 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "ruleType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "hasConflict",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "membershipId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "residency",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "quantity",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "time",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PricingRulePriorityConflictResolutionTestingView"
+  "responds": "Page"
  },
  "listQuantityGroupVolume": {
   "method": "GET",
@@ -99,9 +356,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "quantityModel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "groupType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "QuantityGroupVolumePricingRulesView"
+  "responds": "Page"
  },
  "listResidencyNationalityMarket": {
   "method": "GET",
@@ -112,9 +395,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "eligibilityBasis",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ResidencyNationalityMarketPricingRulesView"
+  "responds": "Page"
  },
  "listTimeslotPerformanceTime": {
   "method": "GET",
@@ -125,8 +434,47 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "timeOfDayBand",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "TimeslotPerformanceTimeOfDayPricingRulesView"
+  "responds": "Page"
+ },
+ "testPricingRule": {
+  "method": "POST",
+  "path": "/pricing-rule/{ruleId}/test",
+  "contract": "catalogue",
+  "summary": "Test one pricing rule against a sample booking, on demand",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "PricingRuleTestInput",
+  "responds": "PricingRuleTestResult"
  }
 }

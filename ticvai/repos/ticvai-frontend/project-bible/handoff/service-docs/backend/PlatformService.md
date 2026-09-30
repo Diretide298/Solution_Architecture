@@ -71,7 +71,7 @@ A module or limit increase sold separately. Add-ons survive a plan change unless
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | tenantId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `LicenceAddOn`
 
@@ -147,7 +147,7 @@ A plan bundles licensed modules, entitlement limits and a cell tier. Plans are v
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreatePlanRequest`
 
@@ -238,7 +238,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | planId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreatePlanRequest`
 
@@ -334,7 +334,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | listingId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -392,7 +392,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ApiClient`
 
@@ -465,7 +465,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | requestId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -528,7 +528,7 @@ Notifies every client using the version, and **the notification names which oper
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | version | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -587,7 +587,7 @@ A developer account is **not a tenant and not a partner.** A partner resells tic
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `DeveloperAccount`
 
@@ -645,7 +645,7 @@ A developer account is **not a tenant and not a partner.** A partner resells tic
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | clientId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -692,7 +692,7 @@ A developer account is **not a tenant and not a partner.** A partner resells tic
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ApiLicence`
 
@@ -762,7 +762,7 @@ A developer account is **not a tenant and not a partner.** A partner resells tic
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | developerId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -809,7 +809,7 @@ Silently switching off a module a venue is trading on is not an acceptable conse
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | tenantId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `SetSubscriptionRequest`
 
@@ -877,7 +877,7 @@ Creates the record only. **No cell exists until a region is provisioned** — a 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateTenantRequest`
 
@@ -1009,7 +1009,7 @@ Creates the record only. **No cell exists until a region is provisioned** — a 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | tenantId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Response**: `Tenant`
 
@@ -1070,7 +1070,7 @@ Graceful and reversible. Data is retained, cells stay provisioned, and the behav
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | tenantId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1139,7 +1139,7 @@ A tenant with unsettled ledger balances cannot be terminated — the money has t
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | tenantId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1192,7 +1192,7 @@ A tenant with unsettled ledger balances cannot be terminated — the money has t
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | tenantId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 

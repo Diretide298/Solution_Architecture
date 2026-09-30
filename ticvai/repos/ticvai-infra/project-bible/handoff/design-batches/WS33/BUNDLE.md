@@ -1,6 +1,6 @@
 # WS33 — Order   Reservation Management board 3
 
-**10 screens · 19 operations · 22 schemas · 7 permissions**
+**10 screens · 21 operations · 25 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -60,7 +60,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-324` | Payment & Order Financial Command Center | listDetail | 1 | 0 | — |
+| `BO-324` | Payment & Order Financial Command Center | listDetail | 3 | 0 | — |
 | `BO-325` | Order Payment Detail & Transaction Ledger | listDetail | 1 | 1 | — |
 | `BO-326` | Multi-Payment, Split Tender & Payment Allocation Configuration | configEditor | 2 | 0 | — |
 | `BO-327` | Deposit, Partial Payment & Outstanding Balance Management | listDetail | 5 | 1 | — |
@@ -337,6 +337,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "orders",
     "purpose": "Payment & Order Financial Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listInstalmentPlans",
+    "contract": "payments",
+    "purpose": "Instalment plans and schedule",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "createInstalmentPlan",
+    "contract": "payments",
+    "purpose": "Pay in instalments",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -2093,6 +2107,25 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+ "createInstalmentPlan": {
+  "method": "POST",
+  "path": "/instalment-plans",
+  "contract": "payments",
+  "summary": "Split an order's payment into scheduled instalments on a stored card",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PayInstalmentPlan"
+ },
  "getDepositPolicy": {
   "method": "GET",
   "path": "/deposit-policy",
@@ -2210,6 +2243,40 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "FinancialTraceabilityControlAuditExplorerView"
+ },
+ "listInstalmentPlans": {
+  "method": "GET",
+  "path": "/instalment-plans",
+  "contract": "payments",
+  "summary": "Instalment plans and their schedules",
+  "permission": "PAYMENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "orderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listOrderFinancialReconciliation": {
   "method": "GET",
@@ -2490,7 +2557,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Record a movement on a deposit",
   "permission": "PAYMENT_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "append",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -2540,6 +2607,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "DepositPolicy",
@@ -2555,6 +2627,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -2862,7 +2939,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "DiningDepositPolicy": {
   "type": "object",
-  "x-ticvai-persistence": "orders.deposit_policy (dining_* columns)",
+  "x-ticvai-persistence": "none — embedded as the dining jsonb column of orders.deposit_policy",
   "description": "**The table deposit hold: a venue option, off unless the venue enables it** (decided 29 September, rev 3 REV3-8b, superseding audit R077 (a) \"no table deposit in the first release\"; the capability ships, disabled by default). Set in Venue Management through `setDepositPolicy` and read by `fnb.createTableReservation`. **Nothing about the amount is in code**: the AED 100 per guest in the rev 3 prototype is an example a venue may type, not a default. With `enabled` false a table booking takes no payment and never enters the cart (rev 3 REV3-8).\n",
   "properties": {
    "enabled": {
@@ -3070,7 +3147,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "paymentId": {
     "type": "string",
@@ -3357,8 +3434,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "The client ULID from `CreateOrderRequest.id`."
+    "format": "uuid",
+    "description": "The client UUIDv7 from `CreateOrderRequest.id`."
    },
    "orderNumber": {
     "type": "string",
@@ -3465,7 +3542,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "shiftId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "subjectId": {
@@ -3585,7 +3662,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   }
  },
  "OrderLine": {
-  "x-ticvai-persistence": "orders.order_line + orders.order_line_eligibility",
+  "x-ticvai-persistence": "orders.order_line + orders.order_line_eligibility + orders.order_line_discount",
+  "x-ticvai-retired-columns": [
+   "promotion_id",
+   "name",
+   "reason"
+  ],
   "allOf": [
    {
     "$ref": "#/components/schemas/CreateOrderLine"
@@ -3629,7 +3711,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "description": "The entitlements this line issued. **These are the ticket ids** — `transferOrderTickets.ticketIds` and `reprintOrder.reissuedTicketIds` take and return them.",
       "items": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+       "format": "uuid"
       }
      },
      "crossRegionRightIds": {
@@ -3645,6 +3727,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "default": 0,
       "readOnly": true,
       "description": "How many times this line's tickets were reprinted or resent. `reprintOrder` increments it; repeated reprints are the signal worth surfacing."
+     },
+     "venueId": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order."
+     },
+     "discounts": {
+      "type": "array",
+      "readOnly": true,
+      "description": "**The discounts applied to this line, one row each** (system-design review SD-008, 29 September). Until then a discount object was flattened into the line as `promotion_id NOT NULL`, so a line with no promotion could not be inserted. A line with no discount has none.",
+      "items": {
+       "$ref": "#/components/schemas/OrderLineDiscount"
+      }
      }
     }
    }
@@ -3862,6 +3958,129 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "PayInstalment": {
+  "type": "object",
+  "description": "One scheduled charge in an instalment plan.",
+  "required": [
+   "sequence",
+   "dueDate",
+   "amount",
+   "status"
+  ],
+  "properties": {
+   "sequence": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "dueDate": {
+    "type": "string",
+    "format": "date"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "scheduled",
+     "paid",
+     "failed",
+     "waived",
+     "cancelled"
+    ]
+   },
+   "paymentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "dunningCaseId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "attemptedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "PayInstalmentPlan": {
+  "type": "object",
+  "x-ticvai-persistence": "payments.instalment_plan + payments.instalment",
+  "description": "4.2.17. A schedule of charges for one order, independent of the product's term.",
+  "required": [
+   "id",
+   "orderId",
+   "frequency",
+   "status",
+   "total",
+   "instalments"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "frequency": {
+    "type": "string",
+    "enum": [
+     "monthly",
+     "quarterly",
+     "custom"
+    ]
+   },
+   "paymentTokenId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "completed",
+     "inArrears",
+     "cancelled"
+    ]
+   },
+   "total": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "paidToDate": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "nextDueDate": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "instalments": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/PayInstalment"
+    }
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Written at the scope of the venue the order was sold at."
+   }
+  }
+ },
  "Payment": {
   "x-ticvai-persistence": "orders.payment",
   "type": "object",
@@ -3876,11 +4095,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "tender": {
     "$ref": "#/components/schemas/TenderKind"
@@ -3947,7 +4166,45 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "providerReference": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "The provider's own id for the charge (Stripe PaymentIntent, NI order reference). What `payments.receivePaymentProviderWebhook` matches an incoming event on (SD-034)."
+   },
+   "providerIdempotencyKey": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The idempotency key sent to the provider, which is this payment's `id` (SD-034, 29 September). A retried provider call cannot charge twice."
+   },
+   "terminalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The card terminal a till payment ran on (ECR flow, SD-034)."
+   },
+   "nextAction": {
+    "type": "object",
+    "nullable": true,
+    "x-ticvai-persisted": false,
+    "description": "**What the caller does while the payment is `pendingConfirmation`** (SD-034, 29 September). `redirect`: send the browser to `url` (3-D Secure challenge or hosted page); the provider returns the guest to `returnUrl` and the result arrives by webhook. `terminal`: the card terminal has been instructed; wait for its result. Null once the payment has an outcome.",
+    "properties": {
+     "kind": {
+      "type": "string",
+      "enum": [
+       "redirect",
+       "terminal"
+      ]
+     },
+     "url": {
+      "type": "string",
+      "format": "uri",
+      "nullable": true
+     },
+     "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
    },
    "lastInquiryAt": {
     "type": "string",
@@ -3962,6 +4219,79 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "nullable": true
+   }
+  }
+ },
+ "PaymentAllocationRule": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.payment_allocation_rule",
+  "description": "**At what level a split-tender payment is allocated, per channel, terminal, product, order type or customer type** (DM5, 29 September: data model for the agreed operations; written by `setMultiPaymentSplit`). The tender limits themselves stay in `payments.mixed_tender_rules`; this row says what each tender is allocated against. Narrowest match wins; a row naming nothing is the venue default.",
+  "required": [
+   "id",
+   "allocationLevel",
+   "isActive",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "channel": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "terminalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "orderType": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "customerType": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "allocationLevel": {
+    "type": "string",
+    "enum": [
+     "orderLevel",
+     "orderLineLevel",
+     "productLevel",
+     "taxFeeComponent",
+     "specificTicket",
+     "deposit"
+    ]
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    }
   }
  },

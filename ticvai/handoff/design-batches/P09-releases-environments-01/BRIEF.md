@@ -1,6 +1,6 @@
 # P09-releases-environments-01 — P09 · Releases & Environments
 
-**7 screens · 20 operations · 18 schemas · 6 permissions**
+**7 screens · 20 operations · 20 schemas · 6 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 6 permissions apply here:
   `DEVELOPER_ADMIN, PLATFORM_MIGRATION_APPLY, PLATFORM_MIGRATION_VIEW, PLATFORM_RELEASE_MANAGE, PLATFORM_RELEASE_PROMOTE, PLATFORM_RELEASE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,14 +60,14 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-022` | Release & Version Management | listDetail | 7 | 2 | — |
-| `ADM-023` | Staging Promotion & Approval | listDetail | 7 | 2 | — |
-| `ADM-024` | Release Notification Composer | listDetail | 3 | 0 | — |
-| `ADM-025` | Tenant Upgrade Scheduler | listDetail | 2 | 0 | — |
-| `ADM-026` | End-of-Support Notice Management | listDetail | 3 | 0 | — |
-| `ADM-027` | Database Migration Console | listDetail | 6 | 0 | — |
-| `ADM-028` | Environment Registry | listDetail | 2 | 0 | — |
+| `ADM-022` | Release & Version Management | listDetail | 7 | 4 | — |
+| `ADM-023` | Staging Promotion & Approval | listDetail | 7 | 4 | — |
+| `ADM-024` | Release Notification Composer | listDetail | 3 | 1 | — |
+| `ADM-025` | Tenant Upgrade Scheduler | listDetail | 2 | 1 | — |
+| `ADM-026` | End-of-Support Notice Management | listDetail | 3 | 2 | — |
+| `ADM-027` | Database Migration Console | listDetail | 6 | 3 | — |
+| `ADM-028` | Environment Registry | listDetail | 2 | 1 | — |
 
 ## Thin screens in this batch
 
-**ADM-025 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-025, ADM-028 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

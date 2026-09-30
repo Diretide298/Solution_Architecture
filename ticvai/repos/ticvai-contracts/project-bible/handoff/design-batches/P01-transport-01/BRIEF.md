@@ -1,6 +1,6 @@
 # P01-transport-01 — P01 · Transport
 
-**1 screens · 13 operations · 25 schemas · 0 permissions**
+**1 screens · 13 operations · 24 schemas · 0 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·

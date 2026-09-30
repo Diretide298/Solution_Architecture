@@ -1,6 +1,6 @@
 # WS04 — Access Control board 4
 
-**10 screens · 16 operations · 17 schemas · 2 permissions**
+**10 screens · 16 operations · 21 schemas · 2 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -2152,7 +2152,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "integrationId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "Absent creates an integration"
    },
    "name": {
@@ -2358,6 +2358,104 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "venueId"
   ]
  },
+ "MediaCredentialCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Media & Credential Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "mediaProfileId": {
+    "type": "string",
+    "description": "Media profile identifier"
+   },
+   "mediaProfile": {
+    "type": "string",
+    "description": "Media profile name, e.g. Mobile Dynamic QR"
+   },
+   "technology": {
+    "type": "string",
+    "description": "Technology, e.g. QR, RFID, NFC, Wallet"
+   },
+   "credentialType": {
+    "type": "string",
+    "description": "Credential type, e.g. Digital Ticket, Wristband, Membership, External Ticket"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "inactive"
+    ]
+   },
+   "offlineSupport": {
+    "type": "string",
+    "enum": [
+     "yes",
+     "no",
+     "conditional"
+    ],
+    "description": "Whether the medium validates offline"
+   }
+  }
+ },
+ "MediaCredentialCommandCenterViewSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none - aggregate computed at read time over the rows the page lists",
+  "description": "The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).",
+  "properties": {
+   "activeMediaProfiles": {
+    "type": "integer",
+    "description": "Active Media Profiles"
+   },
+   "qrCredentials": {
+    "type": "integer",
+    "description": "QR Credentials"
+   },
+   "rfidCredentials": {
+    "type": "integer",
+    "description": "RFID Credentials"
+   },
+   "nfcCredentials": {
+    "type": "integer",
+    "description": "NFC Credentials"
+   },
+   "walletCredentials": {
+    "type": "integer",
+    "description": "Wallet Credentials"
+   },
+   "biometricCredentials": {
+    "type": "integer",
+    "description": "Biometric Credentials"
+   },
+   "externalCredentials": {
+    "type": "integer",
+    "description": "External Credentials"
+   },
+   "mediaSwapsToday": {
+    "type": "integer",
+    "description": "Media Swaps Today"
+   },
+   "failedMediaReads": {
+    "type": "integer",
+    "description": "Failed Media Reads"
+   },
+   "unknownCredentials": {
+    "type": "integer",
+    "description": "Unknown Credentials"
+   },
+   "verificationExceptions": {
+    "type": "integer",
+    "description": "Verification Exceptions"
+   },
+   "ai": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Advisory AI highlights (failing media profiles, unusual read errors, duplicate identifiers, obsolete media, incompatible device/media combinations). Read-only; AI does not change ticket validity."
+   }
+  }
+ },
  "MediaIssuanceEncodingProfileInput": {
   "type": "object",
   "x-ticvai-persistence": "none — request only; the write configures the rules the matching View reads back (decided 29 September, VM close-out)",
@@ -2370,7 +2468,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "encodingProfileId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "Absent creates a profile"
    },
    "name": {
@@ -2469,6 +2567,54 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "duplicatePreventionEnabled": {
     "type": "boolean",
     "description": "Duplicate prevention"
+   }
+  }
+ },
+ "MediaSwapReplacementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Media Swap & Replacement displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "reason": {
+    "type": "string",
+    "enum": [
+     "lost",
+     "damaged",
+     "deviceChange",
+     "upgrade",
+     "guestRequest",
+     "operationalReplacement",
+     "fraudSecurity",
+     "accessibility"
+    ],
+    "description": "Vocabulary listed under Swap Reasons."
+   },
+   "swapId": {
+    "type": "string"
+   },
+   "virtualTicketId": {
+    "type": "string",
+    "description": "Unchanged by the swap"
+   },
+   "fromMediaType": {
+    "type": "string"
+   },
+   "fromMediaId": {
+    "type": "string"
+   },
+   "toMediaType": {
+    "type": "string"
+   },
+   "toMediaId": {
+    "type": "string"
+   },
+   "swappedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "operatorId": {
+    "type": "string"
    }
   }
  },
@@ -2589,7 +2735,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "mediaTypeId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "Absent adds a media type"
    },
    "name": {
@@ -3334,6 +3480,51 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "supervisorApproval"
     ],
     "description": "Who may change the method once locked; guests may not"
+   }
+  }
+ },
+ "VirtualCredentialMediaAssociationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Virtual Credential & Media Association displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ticketId": {
+    "type": "string",
+    "description": "Ticket"
+   },
+   "guestId": {
+    "type": "string",
+    "description": "Guest"
+   },
+   "entitlements": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Entitlement ids on the ticket"
+   },
+   "consumptionState": {
+    "type": "string",
+    "description": "Current consumption state of the entitlement"
+   },
+   "virtualCredentialId": {
+    "type": "string",
+    "description": "The single virtual credential every medium resolves to"
+   },
+   "linkedMedia": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Media identifiers linked to this credential (QR, RFID, wallet, NFC, Face Pass)"
+   },
+   "activeMedia": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Linked media currently allowed to be used; linked does not mean usable at the same time"
    }
   }
  }

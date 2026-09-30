@@ -1,6 +1,6 @@
 # WS39 — Pricing   Revenue Management board 6
 
-**10 screens · 10 operations · 10 schemas · 1 permissions**
+**10 screens · 12 operations · 15 schemas · 3 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 1 permissions apply here:
-  `PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `AI_CONFIGURE, PRICE_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -63,18 +62,18 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `ADM-098` | AI Pricing Intelligence Command Center | commandCentre | 1 | 0 | — |
 | `ADM-099` | Internal Demand & Booking Signal Hub | listDetail | 1 | 0 | — |
-| `ADM-100` | Weather Intelligence & Demand Impact Configuration | commandCentre | 1 | 0 | — |
-| `ADM-101` | Nearby Event, Exhibition & Local Demand Intelligence | configEditor | 1 | 0 | — |
-| `ADM-102` | Competitor Pricing & Market Position Intelligence | listDetail | 1 | 0 | — |
-| `ADM-103` | Market, Tourism, Holiday & Contextual Signal Hub | listDetail | 1 | 0 | — |
+| `ADM-100` | Weather Intelligence & Demand Impact Configuration | commandCentre | 2 | 1 | — |
+| `ADM-101` | Nearby Event, Exhibition & Local Demand Intelligence | configEditor | 2 | 1 | — |
+| `ADM-102` | Competitor Pricing & Market Position Intelligence | listDetail | 2 | 1 | — |
+| `ADM-103` | Market, Tourism, Holiday & Contextual Signal Hub | listDetail | 2 | 1 | — |
 | `ADM-104` | AI Demand Forecasting & Booking Curve Studio | listDetail | 1 | 0 | — |
 | `ADM-105` | Price Elasticity & Revenue Response Intelligence | listDetail | 1 | 0 | — |
 | `ADM-106` | AI Pricing Recommendation & Explainability Center | listDetail | 1 | 0 | — |
-| `ADM-107` | AI Signal Registry, Data Quality & Model Governance | listDetail | 1 | 0 | — |
+| `ADM-107` | AI Signal Registry, Data Quality & Model Governance | listDetail | 2 | 1 | — |
 
 ## Thin screens in this batch
 
-**ADM-099, ADM-100, ADM-102, ADM-103, ADM-104, ADM-105, ADM-106, ADM-107 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-099, ADM-102, ADM-103, ADM-104, ADM-105, ADM-106 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-098 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-099",
@@ -186,10 +182,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Revenue teams can understand all significant AI pricing opportunities, risks, forecasts and external demand drivers from one centralized intelligence workspace.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each opportunity displays) — counts over a population, then the population",
   "purpose": "Provide Revenue Managers with a single operational view of all AI signals, forecasts, opportunities and risks influencing pricing.",
-  "purposeNote": "Revenue teams can understand all significant AI pricing opportunities, risks, forecasts and external demand drivers from one centralized intelligence workspace.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -201,73 +197,73 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "metricTile",
        "label": "Active AI Recommendations",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 94 §Display",
-       "bindsTo": "AiPricingIntelligenceCommandCenterView.activeAiRecommendations"
+       "bindsTo": "AiPricingIntelligenceCommandCenterSummary.activeAiRecommendations"
       },
       {
        "kind": "metricTile",
        "label": "High-Priority Opportunities",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 94 §Display",
-       "bindsTo": "AiPricingIntelligenceCommandCenterView.highPriorityOpportunities"
+       "bindsTo": "AiPricingIntelligenceCommandCenterSummary.highPriorityOpportunities"
       },
       {
        "kind": "metricTile",
        "label": "Estimated Revenue Opportunity",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 94 §Display",
-       "bindsTo": "AiPricingIntelligenceCommandCenterView.estimatedRevenueOpportunity"
+       "bindsTo": "AiPricingIntelligenceCommandCenterSummary.estimatedRevenueOpportunity"
       },
       {
        "kind": "metricTile",
        "label": "Demand Surges Detected",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 94 §Display",
-       "bindsTo": "AiPricingIntelligenceCommandCenterView.demandSurgesDetected"
+       "bindsTo": "AiPricingIntelligenceCommandCenterSummary.demandSurgesDetected"
       },
       {
        "kind": "metricTile",
        "label": "Demand Risks Detected",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 94 §Display",
-       "bindsTo": "AiPricingIntelligenceCommandCenterView.demandRisksDetected"
+       "bindsTo": "AiPricingIntelligenceCommandCenterSummary.demandRisksDetected"
       },
       {
        "kind": "metricTile",
        "label": "External Signals Active",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 94 §Display",
-       "bindsTo": "AiPricingIntelligenceCommandCenterView.externalSignalsActive"
+       "bindsTo": "AiPricingIntelligenceCommandCenterSummary.externalSignalsActive"
       },
       {
        "kind": "metricTile",
        "label": "Nearby Events Detected",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 94 §Display",
-       "bindsTo": "AiPricingIntelligenceCommandCenterView.nearbyEventsDetected"
+       "bindsTo": "AiPricingIntelligenceCommandCenterSummary.nearbyEventsDetected"
       },
       {
        "kind": "metricTile",
        "label": "Weather Impacts",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 94 §Display",
-       "bindsTo": "AiPricingIntelligenceCommandCenterView.weatherImpacts"
+       "bindsTo": "AiPricingIntelligenceCommandCenterSummary.weatherImpacts"
       },
       {
        "kind": "metricTile",
        "label": "Competitor Movements",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 94 §Display",
-       "bindsTo": "AiPricingIntelligenceCommandCenterView.competitorMovements"
+       "bindsTo": "AiPricingIntelligenceCommandCenterSummary.competitorMovements"
       },
       {
        "kind": "metricTile",
        "label": "Forecast Accuracy",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 94 §Display",
-       "bindsTo": "AiPricingIntelligenceCommandCenterView.forecastAccuracy"
+       "bindsTo": "AiPricingIntelligenceCommandCenterSummary.forecastAccuracy"
       },
       {
        "kind": "metricTile",
        "label": "Average AI Confidence",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 94 §Display",
-       "bindsTo": "AiPricingIntelligenceCommandCenterView.averageAiConfidence"
+       "bindsTo": "AiPricingIntelligenceCommandCenterSummary.averageAiConfidence"
       },
       {
        "kind": "metricTile",
        "label": "Data Quality Issues",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 94 §Display",
-       "bindsTo": "AiPricingIntelligenceCommandCenterView.dataQualityIssues"
+       "bindsTo": "AiPricingIntelligenceCommandCenterSummary.dataQualityIssues"
       }
      ]
     },
@@ -286,7 +282,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "AiPricingIntelligenceCommandCenterView.adjustment",
         "AiPricingIntelligenceCommandCenterView.demandForecast",
         "AiPricingIntelligenceCommandCenterView.revenueOpportunity",
-        "AiPricingIntelligenceCommandCenterView.primaryDrivers",
         "AiPricingIntelligenceCommandCenterView.confidence",
         "AiPricingIntelligenceCommandCenterView.risk",
         "AiPricingIntelligenceCommandCenterView.urgency"
@@ -313,7 +308,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "AiPricingIntelligenceCommandCenterView.adjustment",
         "AiPricingIntelligenceCommandCenterView.demandForecast",
         "AiPricingIntelligenceCommandCenterView.revenueOpportunity",
-        "AiPricingIntelligenceCommandCenterView.primaryDrivers",
         "AiPricingIntelligenceCommandCenterView.confidence",
         "AiPricingIntelligenceCommandCenterView.risk",
         "AiPricingIntelligenceCommandCenterView.urgency"
@@ -343,7 +337,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-098"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-098",
+   "workshopBoard": "wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-098"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 94. 23 of 23 labels bound to a contract property; 23 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -407,10 +402,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "pricing intelligence.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Centralize the internal TICVAI signals used by forecasting and AI pricing models. These are generally the highest-confidence signals because they come directly from TICVAI transactions.",
-  "purposeNote": "pricing intelligence.",
   "gaps": [
    {
     "operation": null,
@@ -466,7 +461,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-099"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-099",
+   "workshopBoard": "wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-099"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 95. 0 of 0 labels bound to a contract property; 0 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -530,10 +526,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Weather conditions are converted into venue-specific, explainable demand signals rather than directly changing prices.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Show) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Allow TICVAI to understand how weather conditions affect demand for different venues and experiences. This should be much more sophisticated than simply connecting a weather API.",
-  "purposeNote": "Weather conditions are converted into venue-specific, explainable demand signals rather than directly changing prices.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -545,13 +541,37 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "metricTile",
        "label": "Weather Forecast Confidence: 93%",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 97 §Show",
-       "bindsTo": "WeatherIntelligenceDemandImpactConfigurationView.weatherForecastConfidence93"
+       "bindsTo": "WeatherIntelligenceDemandImpactConfigurationView.weatherForecastConfidence"
       },
       {
        "kind": "metricTile",
        "label": "Estimated Demand Impact: +8–12%",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 97 §Show",
-       "bindsTo": "WeatherIntelligenceDemandImpactConfigurationView.estimatedDemandImpact812"
+       "bindsTo": "WeatherIntelligenceDemandImpactConfigurationView.estimatedDemandImpactMin"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Hourly Forecast",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 97 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Daily Forecast",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 97 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save demand signal configuration",
+       "operation": "setDemandSignalConfiguration",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**The person's half of `catalogue.demand_signal`** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /demand-signals/{signalId}"
       }
      ]
     }
@@ -570,20 +590,74 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Weather Intelligence & Demand Impact Configuration",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setDemandSignalConfiguration",
+    "contract": "catalogue",
+    "purpose": "Enter a calendar signal or configure how a demand signal is used",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWeatherDemandImpact"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "WeatherIntelligenceDemandImpactConfigurationView.weatherForecastConfidence93",
-    "WeatherIntelligenceDemandImpactConfigurationView.estimatedDemandImpact812"
+    "WeatherIntelligenceDemandImpactConfigurationView.weatherForecastConfidence",
+    "WeatherIntelligenceDemandImpactConfigurationView.estimatedDemandImpactMin"
+   ],
+   "params": [
+    {
+     "name": "signalId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-100"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-100",
+   "workshopBoard": "wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-100"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 97. 2 of 2 labels bound to a contract property; 2 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 97. 2 of 2 labels bound to a contract property; 4 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetDemandSignalConfiguration",
+    "component": "modal",
+    "trigger": "Save demand signal configuration",
+    "body": "**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `id`, `scopePath`, `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "DemandSignal",
+    "confirm": {
+     "label": "Save demand signal configuration",
+     "operation": "setDemandSignalConfiguration"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "signalKind",
+      "source",
+      "signalType",
+      "name",
+      "venueId",
+      "productId",
+      "geography",
+      "marketCode",
+      "periodStart",
+      "periodEnd",
+      "currentValue",
+      "unit",
+      "reading",
+      "configuration",
+      "weight",
+      "reliability"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /demand-signals/{signalId}"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -645,10 +719,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "impact signals for AI pricing decisions.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Detect/configure; Capture; Configure per TICVAI venue) and no display directory — it is settings, not a population",
   "purpose": "Detect external events around TICVAI venues that could materially affect visitor demand. This directly addresses the exhibition-near-the-venue scenario.",
-  "purposeNote": "impact signals for AI pricing decisions.",
   "layout": {
    "template": "form",
    "regions": [
@@ -767,6 +841,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 99 §Capture"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save demand signal configuration",
+       "operation": "setDemandSignalConfiguration",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**The person's half of `catalogue.demand_signal`** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /demand-signals/{signalId}"
+      }
+     ]
     }
    ]
   },
@@ -782,14 +870,70 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Nearby Event, Exhibition & Local Demand Intelligence",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setDemandSignalConfiguration",
+    "contract": "catalogue",
+    "purpose": "Enter a calendar signal or configure how a demand signal is used",
+    "trigger": "onAction",
+    "invalidates": [
+     "listNearbyEventExhibition"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-101"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-101",
+   "workshopBoard": "wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-101"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 99. 0 of 0 labels bound to a contract property; 22 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetDemandSignalConfiguration",
+    "component": "modal",
+    "trigger": "Save demand signal configuration",
+    "body": "**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `id`, `scopePath`, `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "DemandSignal",
+    "confirm": {
+     "label": "Save demand signal configuration",
+     "operation": "setDemandSignalConfiguration"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "signalKind",
+      "source",
+      "signalType",
+      "name",
+      "venueId",
+      "productId",
+      "geography",
+      "marketCode",
+      "periodStart",
+      "periodEnd",
+      "currentValue",
+      "unit",
+      "reading",
+      "configuration",
+      "weight",
+      "reliability"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /demand-signals/{signalId}"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "signalId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -851,10 +995,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "competitor data alone to determine the selling price.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Track) and no metric row",
   "purpose": "Allow TICVAI to understand its commercial position relative to relevant competitors.",
-  "purposeNote": "competitor data alone to determine the selling price.",
   "layout": {
    "template": "split",
    "regions": [
@@ -905,6 +1049,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 100 §Track"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save demand signal configuration",
+       "operation": "setDemandSignalConfiguration",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**The person's half of `catalogue.demand_signal`** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /demand-signals/{signalId}"
+      }
+     ]
     }
    ]
   },
@@ -921,6 +1079,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Competitor Pricing & Market Position Intelligence",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setDemandSignalConfiguration",
+    "contract": "catalogue",
+    "purpose": "Enter a calendar signal or configure how a demand signal is used",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCompetitorPricingMarket"
+    ]
    }
   ],
   "entryState": {
@@ -931,14 +1098,59 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "CompetitorPricingMarketPositionIntelligenceView.peakPrice",
     "CompetitorPricingMarketPositionIntelligenceView.residentPrice",
     "CompetitorPricingMarketPositionIntelligenceView.memberPriceWherePubliclyAvailable"
+   ],
+   "params": [
+    {
+     "name": "signalId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-102"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-102",
+   "workshopBoard": "wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-102"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 100. 9 of 9 labels bound to a contract property; 18 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetDemandSignalConfiguration",
+    "component": "modal",
+    "trigger": "Save demand signal configuration",
+    "body": "**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `id`, `scopePath`, `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "DemandSignal",
+    "confirm": {
+     "label": "Save demand signal configuration",
+     "operation": "setDemandSignalConfiguration"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "signalKind",
+      "source",
+      "signalType",
+      "name",
+      "venueId",
+      "productId",
+      "geography",
+      "marketCode",
+      "periodStart",
+      "periodEnd",
+      "currentValue",
+      "unit",
+      "reading",
+      "configuration",
+      "weight",
+      "reliability"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /demand-signals/{signalId}"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1000,10 +1212,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "demand-intelligence layer.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Capture broader external factors that may affect visitor demand beyond weather and nearby events.",
-  "purposeNote": "demand-intelligence layer.",
   "gaps": [
    {
     "operation": null,
@@ -1029,6 +1241,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save demand signal configuration",
+       "operation": "setDemandSignalConfiguration",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**The person's half of `catalogue.demand_signal`** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /demand-signals/{signalId}"
+      }
+     ]
     }
    ]
   },
@@ -1045,23 +1271,73 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Market, Tourism, Holiday & Contextual Signal Hub",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setDemandSignalConfiguration",
+    "contract": "catalogue",
+    "purpose": "Enter a calendar signal or configure how a demand signal is used",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMarketTourismHoliday"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "MarketTourismHolidayContextualSignalHubView.publicHolidays",
-    "MarketTourismHolidayContextualSignalHubView.schoolHolidays",
-    "MarketTourismHolidayContextualSignalHubView.ramadan",
-    "MarketTourismHolidayContextualSignalHubView.eid",
-    "MarketTourismHolidayContextualSignalHubView.christmas"
+    "MarketTourismHolidayContextualSignalHubView.signalType"
+   ],
+   "params": [
+    {
+     "name": "signalId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-103"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-103",
+   "workshopBoard": "wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-103"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 102. 0 of 0 labels bound to a contract property; 0 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetDemandSignalConfiguration",
+    "component": "modal",
+    "trigger": "Save demand signal configuration",
+    "body": "**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `id`, `scopePath`, `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "DemandSignal",
+    "confirm": {
+     "label": "Save demand signal configuration",
+     "operation": "setDemandSignalConfiguration"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "signalKind",
+      "source",
+      "signalType",
+      "name",
+      "venueId",
+      "productId",
+      "geography",
+      "marketCode",
+      "periodStart",
+      "periodEnd",
+      "currentValue",
+      "unit",
+      "reading",
+      "configuration",
+      "weight",
+      "reliability"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /demand-signals/{signalId}"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1123,11 +1399,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "approved external signals.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Track) and no metric row",
   "purpose": "Predict future demand at a granular commercial level. This is the core predictive engine behind intelligent dynamic pricing.",
-  "purposeNote": "approved external signals.",
   "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Event Horizon. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 103 §Support"
+   },
    {
     "operation": null,
     "why": "**AI Demand Forecasting & Booking Curve Studio declares no operation that writes anything** — its only declared call is `listDemandBookingCurve`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
@@ -1145,10 +1426,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every demand forecasting booking",
        "columns": [
-        "AiDemandForecastingBookingCurveStudioView.confidence91",
-        "AiDemandForecastingBookingCurveStudioView.strongHistoricalData",
-        "AiDemandForecastingBookingCurveStudioView.stableBookingPattern",
-        "AiDemandForecastingBookingCurveStudioView.reliableExternalSignals",
+        "AiDemandForecastingBookingCurveStudioView.confidence",
+        "AiDemandForecastingBookingCurveStudioView.confidenceReasons",
         "AiDemandForecastingBookingCurveStudioView.mape",
         "AiDemandForecastingBookingCurveStudioView.forecastBias",
         "AiDemandForecastingBookingCurveStudioView.overForecast",
@@ -1169,10 +1448,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected demand forecasting booking",
        "bindsTo": "AiDemandForecastingBookingCurveStudioView",
        "columns": [
-        "AiDemandForecastingBookingCurveStudioView.confidence91",
-        "AiDemandForecastingBookingCurveStudioView.strongHistoricalData",
-        "AiDemandForecastingBookingCurveStudioView.stableBookingPattern",
-        "AiDemandForecastingBookingCurveStudioView.reliableExternalSignals",
+        "AiDemandForecastingBookingCurveStudioView.confidence",
+        "AiDemandForecastingBookingCurveStudioView.confidenceReasons",
         "AiDemandForecastingBookingCurveStudioView.mape",
         "AiDemandForecastingBookingCurveStudioView.forecastBias",
         "AiDemandForecastingBookingCurveStudioView.overForecast",
@@ -1180,6 +1457,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "notes": "The pack groups this record's detail under its own headings: “Historical Expected Curve”, “Current Actual Curve”, “Saturday Performance”, “Actual”, “Provide”, “Clearly show which signals contributed”.",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 103 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Event Horizon",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 103 §Support"
       }
      ]
     }
@@ -1202,10 +1490,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "AiDemandForecastingBookingCurveStudioView.confidence91",
-    "AiDemandForecastingBookingCurveStudioView.strongHistoricalData",
-    "AiDemandForecastingBookingCurveStudioView.stableBookingPattern",
-    "AiDemandForecastingBookingCurveStudioView.reliableExternalSignals",
+    "AiDemandForecastingBookingCurveStudioView.confidence",
+    "AiDemandForecastingBookingCurveStudioView.confidenceReasons",
     "AiDemandForecastingBookingCurveStudioView.mape",
     "AiDemandForecastingBookingCurveStudioView.forecastBias"
    ]
@@ -1213,9 +1499,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-104"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-104",
+   "workshopBoard": "wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-104"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 103. 8 of 8 labels bound to a contract property; 8 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 103. 8 of 8 labels bound to a contract property; 9 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1277,10 +1564,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "visible confidence and supporting evidence.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Analyze) and no metric row",
   "purpose": "Estimate how customers are likely to respond to different prices.",
-  "purposeNote": "visible confidence and supporting evidence.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1364,7 +1651,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-105"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-105",
+   "workshopBoard": "wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-105"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 105. 10 of 10 labels bound to a contract property; 10 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1428,10 +1716,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Every AI pricing recommendation is accompanied by understandable evidence, expected commercial impact, confidence and human-governance actions.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Convert all intelligence generated by Board 6 into actionable pricing recommendations. This is the central AI recommendation screen.",
-  "purposeNote": "Every AI pricing recommendation is accompanied by understandable evidence, expected commercial impact, confidence and human-governance actions.",
   "gaps": [
    {
     "operation": null,
@@ -1492,14 +1780,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "AiPricingRecommendationExplainabilityCenterView.expectedRevenueImpact",
     "AiPricingRecommendationExplainabilityCenterView.expectedOccupancy",
     "AiPricingRecommendationExplainabilityCenterView.confidence",
-    "AiPricingRecommendationExplainabilityCenterView.bookingVelocity",
-    "AiPricingRecommendationExplainabilityCenterView.nearbyExhibition"
+    "AiPricingRecommendationExplainabilityCenterView.drivers"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-106"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-106",
+   "workshopBoard": "wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-106"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 107. 0 of 0 labels bound to a contract property; 7 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1555,10 +1843,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from ADM-098, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "signals and predictive models used by AI pricing. Board 6 — Final Screen Register # Backend Screen Core Responsibility 10.6. AI Pricing Intelligence Command Center AI opportunity overview 1 10.6. TICVAI transactional Internal Demand & Booking Signal Hub 2 intelligence 10.6. Weather Intelligence & Demand Impact",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Monitor; Track) and no metric row",
   "purpose": "Govern the complete data and intelligence ecosystem behind AI pricing. This is critical. Without this screen, Development team could connect many external sources without giving TICVAI proper control over them.",
-  "purposeNote": "signals and predictive models used by AI pricing. Board 6 — Final Screen Register # Backend Screen Core Responsibility 10.6. AI Pricing Intelligence Command Center AI opportunity overview 1 10.6. TICVAI transactional Internal Demand & Booking Signal Hub 2 intelligence 10.6. Weather Intelligence & Demand Impact",
   "layout": {
    "template": "split",
    "regions": [
@@ -1649,6 +1937,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Permissions this screen separates",
        "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Forecasting, Recommendations, Simulation, Automated Pricing. Each needs attaching to the control it gates, or the screen needs the control.",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 108 §AI Use Permission"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save signal registry policy",
+       "operation": "setSignalRegistryPolicy",
+       "permission": "AI_CONFIGURE",
+       "notes": "**AI governance of signals and models** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /signal-registry"
       }
      ]
     }
@@ -1667,6 +1963,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "AI Signal Registry, Data Quality & Model Governance",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setSignalRegistryPolicy",
+    "contract": "catalogue",
+    "purpose": "Register a signal or model and set how far AI may trust it",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSignalDataQuality"
+    ]
    }
   ],
   "entryState": {
@@ -1682,9 +1987,47 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-107"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-107",
+   "workshopBoard": "wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-107"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 108. 23 of 24 labels bound to a contract property; 32 of 121 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetSignalRegistryPolicy",
+    "component": "modal",
+    "trigger": "Save signal registry policy",
+    "body": "**Collects what `setSignalRegistryPolicy` sends before it is called.** Required: `id`, `scopePath`, `registryKind`, `name`, `trustLevel`. Optional: `category`, `provider`, `source`, `internalExternal`, `marketCode`, `refreshFrequency`, `aiUsePermissions`, `fallbackPolicy`, `status`, `ownerPrincipalId`, `purpose`, `deployedAt` and 5 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SignalRegistryEntry",
+    "confirm": {
+     "label": "Save signal registry policy",
+     "operation": "setSignalRegistryPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "registryKind",
+      "name",
+      "trustLevel",
+      "category",
+      "provider",
+      "source",
+      "internalExternal",
+      "marketCode",
+      "refreshFrequency",
+      "aiUsePermissions",
+      "fallbackPolicy",
+      "status",
+      "ownerPrincipalId",
+      "purpose",
+      "deployedAt",
+      "trainingWindow"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /signal-registry"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1727,9 +2070,45 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "competitor",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "market",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "comparableTicvaiProduct",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CompetitorPricingMarketPositionIntelligenceView"
+  "responds": "Page"
  },
  "listDemandBookingCurve": {
   "method": "GET",
@@ -1740,9 +2119,70 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "performance",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "horizon",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priceCategory",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "sectionCode",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "AiDemandForecastingBookingCurveStudioView"
+  "responds": "Page"
  },
  "listInternalDemandBooking": {
   "method": "GET",
@@ -1753,9 +2193,65 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "granularity",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "performance",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "compareTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "InternalDemandBookingSignalHubView"
+  "responds": "Page"
  },
  "listMarketTourismHoliday": {
   "method": "GET",
@@ -1766,9 +2262,40 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "category",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "signalType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "geography",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "active",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "MarketTourismHolidayContextualSignalHubView"
+  "responds": "Page"
  },
  "listNearbyEventExhibition": {
   "method": "GET",
@@ -1779,9 +2306,45 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "ticvaiVenue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "eventType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "radiusKm",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "NearbyEventExhibitionLocalDemandIntelligenceView"
+  "responds": "Page"
  },
  "listPriceElasticityRevenue": {
   "method": "GET",
@@ -1817,10 +2380,35 @@ Method, path, parameters, request and response for every operation these screens
     "name": "venue",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerSegment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "PriceElasticityRevenueResponseIntelligenceView"
+  "responds": "Page"
  },
  "listPricing": {
   "method": "GET",
@@ -1831,9 +2419,40 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "urgency",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "risk",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "minConfidence",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "AiPricingIntelligenceCommandCenterView"
+  "responds": "Page"
  },
  "listPricingRecommendationExplainability": {
   "method": "GET",
@@ -1844,9 +2463,55 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "reviewOutcome",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "minConfidence",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "recommendationType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "objective",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priceCategory",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "AiPricingRecommendationExplainabilityCenterView"
+  "responds": "Page"
  },
  "listSignalDataQuality": {
   "method": "GET",
@@ -1857,9 +2522,40 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "registryKind",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "internalExternal",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "trustLevel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "AiSignalRegistryDataQualityModelGovernanceView"
+  "responds": "Page"
  },
  "listWeatherDemandImpact": {
   "method": "GET",
@@ -1870,9 +2566,73 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueExposure",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "forecastHorizon",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "WeatherIntelligenceDemandImpactConfigurationView"
+  "responds": "Page"
+ },
+ "setDemandSignalConfiguration": {
+  "method": "PUT",
+  "path": "/demand-signals/{signalId}",
+  "contract": "catalogue",
+  "summary": "Enter a calendar signal or configure how a demand signal is used",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DemandSignal",
+  "responds": "DemandSignal"
+ },
+ "setSignalRegistryPolicy": {
+  "method": "PUT",
+  "path": "/signal-registry",
+  "contract": "catalogue",
+  "summary": "Register a signal or model and set how far AI may trust it",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SignalRegistryEntry",
+  "responds": "SignalRegistryEntry"
  }
 }
 ```
@@ -1891,161 +2651,207 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue id"
    },
    "product": {
     "type": "string",
-    "description": "Product"
+    "description": "Product id",
+    "nullable": true
    },
    "event": {
     "type": "string",
-    "description": "Event"
+    "description": "Event id",
+    "nullable": true
    },
    "performance": {
     "type": "string",
-    "description": "Performance"
+    "description": "Performance id",
+    "nullable": true
    },
    "date": {
     "type": "string",
-    "format": "date-time",
-    "description": "Date"
+    "description": "Date",
+    "format": "date"
    },
    "timeslot": {
     "type": "string",
-    "description": "Timeslot"
+    "description": "Timeslot",
+    "nullable": true
    },
    "priceCategory": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price Category"
+    "type": "string",
+    "description": "Price category",
+    "nullable": true
+   },
+   "sectionCode": {
+    "type": "string",
+    "nullable": true,
+    "description": "Seat-map section (`seating.Section.code`) the row forecasts; null for a row at price-category or performance level (29 September, build pass, group G2; 21.11.4)"
    },
    "channel": {
-    "type": "string",
+    "$ref": "#/components/schemas/Channel",
     "description": "Channel"
    },
-   "intraday": {
-    "type": "string",
-    "description": "Intraday"
-   },
-   "tomorrow": {
-    "type": "string",
-    "description": "Tomorrow"
-   },
-   "eventHorizon": {
-    "type": "string",
-    "description": "Event Horizon"
-   },
-   "seasonalHorizon": {
-    "type": "string",
-    "description": "Seasonal Horizon"
-   },
-   "confidence91": {
+   "confidence": {
     "type": "number",
-    "description": "Confidence: 91%"
-   },
-   "strongHistoricalData": {
-    "type": "string",
-    "description": "Strong Historical Data"
-   },
-   "stableBookingPattern": {
-    "type": "string",
-    "description": "Stable Booking Pattern"
-   },
-   "reliableExternalSignals": {
-    "type": "integer",
-    "description": "Reliable External Signals"
-   },
-   "expectedAtT7": {
-    "type": "string",
-    "description": "Expected at T−7"
+    "description": "Forecast Confidence, percent"
    },
    "forecastFinalOccupancy": {
-    "type": "integer",
-    "description": "Forecast Final Occupancy (the pack shows 97%)"
+    "type": "number",
+    "description": "Forecast Final Occupancy, percent"
    },
    "demand": {
-    "type": "string",
-    "description": "Demand"
+    "type": "integer",
+    "description": "Forecast demand"
    },
    "attendance": {
     "type": "integer",
-    "description": "Attendance"
+    "description": "Forecast attendance"
    },
    "occupancy": {
-    "type": "integer",
-    "description": "Occupancy"
+    "type": "number",
+    "description": "Forecast occupancy, percent"
    },
    "sellThrough": {
-    "type": "string",
-    "description": "Sell-Through"
+    "type": "number",
+    "description": "Forecast sell-through, percent"
    },
    "expectedSellOutTime": {
     "type": "string",
+    "description": "Expected Sell-Out Time; empty if no sell-out forecast",
     "format": "date-time",
-    "description": "Expected Sell-Out Time"
+    "nullable": true
    },
    "revenue": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue"
+    "description": "Forecast revenue"
    },
    "conversion": {
     "type": "number",
-    "description": "Conversion"
+    "description": "Forecast conversion, percent"
    },
    "remainingInventory": {
-    "type": "string",
-    "description": "Remaining Inventory"
-   },
-   "internalSales35": {
-    "type": "number",
-    "description": "Internal Sales: 35%"
-   },
-   "bookingVelocity20": {
-    "type": "number",
-    "description": "Booking Velocity: 20%"
-   },
-   "historicalEvents15": {
-    "type": "number",
-    "description": "Historical Events: 15%"
-   },
-   "nearbyExhibition10": {
-    "type": "number",
-    "description": "Nearby Exhibition: 10%"
-   },
-   "weather8": {
-    "type": "number",
-    "description": "Weather: 8%"
-   },
-   "marketTourism7": {
-    "type": "number",
-    "description": "Market/Tourism: 7%"
-   },
-   "competitor5": {
-    "type": "number",
-    "description": "Competitor: 5%"
+    "type": "integer",
+    "description": "Forecast remaining inventory at event"
    },
    "mape": {
-    "type": "string",
-    "description": "MAPE"
+    "type": "number",
+    "description": "MAPE over closed forecasts at this level, percent"
    },
    "forecastBias": {
-    "type": "integer",
-    "description": "Forecast Bias"
+    "type": "number",
+    "description": "Forecast Bias (positive = over-forecast), percent"
    },
    "overForecast": {
-    "type": "string",
-    "description": "Over-Forecast"
+    "type": "number",
+    "description": "Share of closed forecasts that over-forecast, percent"
    },
    "underForecast": {
+    "type": "number",
+    "description": "Share of closed forecasts that under-forecast, percent"
+   },
+   "forecastId": {
     "type": "string",
-    "description": "Under-Forecast"
+    "description": "Forecast id"
+   },
+   "horizon": {
+    "type": "string",
+    "description": "Forecast Horizon",
+    "enum": [
+     "intraday",
+     "tomorrow",
+     "days7",
+     "days30",
+     "eventHorizon",
+     "seasonalHorizon"
+    ]
+   },
+   "bookingCurve": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "daysBeforeEvent": {
+       "type": "integer",
+       "description": "T minus days"
+      },
+      "historicalExpectedPercentSold": {
+       "type": "number",
+       "description": "Historical expected curve, percent sold"
+      },
+      "actualPercentSold": {
+       "type": "number",
+       "nullable": true,
+       "description": "Current actual curve, percent sold (empty for future points)"
+      },
+      "forecastPercentSold": {
+       "type": "number",
+       "description": "AI forecast curve, percent sold"
+      }
+     }
+    },
+    "description": "Booking Curve"
+   },
+   "signalContributions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "signal": {
+       "type": "string",
+       "enum": [
+        "internalSales",
+        "bookingVelocity",
+        "occupancy",
+        "historicalEvents",
+        "nearbyEvent",
+        "weather",
+        "marketTourism",
+        "competitor",
+        "priceElasticity",
+        "other"
+       ],
+       "description": "Signal category"
+      },
+      "contributionPercent": {
+       "type": "number",
+       "description": "Explanatory share of the forecast"
+      }
+     }
+    },
+    "description": "Model Inputs: which signals contributed"
+   },
+   "confidenceReasons": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "strongHistoricalData",
+      "stableBookingPattern",
+      "reliableExternalSignals",
+      "limitedHistoricalData",
+      "volatileBookingPattern",
+      "degradedExternalSignals"
+     ]
+    },
+    "description": "Reasons behind the forecast confidence"
+   },
+   "modelVersion": {
+    "type": "string",
+    "description": "Model version that produced the forecast"
+   },
+   "generatedAt": {
+    "type": "string",
+    "description": "When the forecast was produced",
+    "format": "date-time"
    }
   }
  },
- "AiPricingIntelligenceCommandCenterView": {
+ "AiPricingIntelligenceCommandCenterSummary": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What AI Pricing Intelligence Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on AI Pricing Intelligence Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
   "properties": {
    "activeAiRecommendations": {
     "type": "integer",
@@ -2060,20 +2866,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Estimated Revenue Opportunity"
    },
    "demandSurgesDetected": {
-    "type": "string",
-    "description": "Demand Surges Detected"
+    "type": "integer",
+    "description": "Demand Surges Detected: granules forecast materially above baseline"
    },
    "demandRisksDetected": {
-    "type": "string",
-    "description": "Demand Risks Detected"
+    "type": "integer",
+    "description": "Demand Risks Detected: granules forecast materially below baseline"
    },
    "externalSignalsActive": {
     "type": "integer",
     "description": "External Signals Active"
    },
    "nearbyEventsDetected": {
-    "type": "string",
-    "description": "Nearby Events Detected"
+    "type": "integer",
+    "description": "Nearby Events Detected within the configured monitoring radius"
    },
    "weatherImpacts": {
     "type": "integer",
@@ -2084,24 +2890,39 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Competitor Movements"
    },
    "forecastAccuracy": {
-    "type": "string",
-    "description": "Forecast Accuracy"
+    "type": "number",
+    "description": "Forecast Accuracy (100 - MAPE over the last 30 days (decided 29 September, readiness close-out)), percent"
    },
    "averageAiConfidence": {
     "type": "number",
-    "description": "Average AI Confidence"
+    "description": "Average AI Confidence across active recommendations, percent"
    },
    "dataQualityIssues": {
     "type": "integer",
     "description": "Data Quality Issues"
    },
+   "aiSummary": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI Summary (pack p.95), e.g. demand forecast 19% above baseline and its drivers. Advisory only: generated narrative never changes a price (decided 29 September, readiness close-out)"
+   }
+  }
+ },
+ "AiPricingIntelligenceCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What AI Pricing Intelligence Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
    "productEvent": {
     "type": "string",
-    "description": "Product/Event"
+    "description": "Product/Event name the opportunity applies to"
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue name"
    },
    "currentPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
@@ -2113,91 +2934,79 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "adjustment": {
     "type": "number",
-    "description": "Adjustment %"
+    "description": "Adjustment % from current to recommended price, percent"
    },
    "demandForecast": {
-    "type": "string",
-    "description": "Demand Forecast"
+    "type": "integer",
+    "description": "Demand Forecast: forecast demand (admissions) for the period"
    },
    "revenueOpportunity": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Revenue Opportunity"
    },
-   "primaryDrivers": {
-    "type": "string",
-    "description": "Primary Drivers"
-   },
    "confidence": {
-    "type": "string",
-    "description": "Confidence"
+    "type": "number",
+    "description": "AI confidence in the recommendation, 0-100, percent"
    },
    "risk": {
     "type": "string",
-    "description": "Risk"
+    "description": "Risk of acting on the recommendation",
+    "enum": [
+     "low",
+     "medium",
+     "high"
+    ]
    },
    "urgency": {
     "type": "string",
-    "description": "Urgency"
+    "description": "Urgency (time to event and velocity)",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
    },
-   "currentAed250": {
+   "recommendationId": {
     "type": "string",
-    "description": "Current: AED 250"
+    "description": "Recommendation id; drill-down key into listPricingRecommendationExplainability"
    },
-   "recommendedAed270": {
-    "type": "string",
-    "description": "Recommended: AED 270"
-   },
-   "expectedRevenueUpliftAed73400": {
-    "type": "number",
-    "description": "Expected Revenue Uplift: +AED 73,400"
-   },
-   "confidence91": {
-    "type": "number",
-    "description": "Confidence: 91%"
-   },
-   "nearbyExhibition": {
-    "type": "string",
-    "description": "↑ Nearby Exhibition"
-   },
-   "bookingVelocity": {
-    "type": "string",
-    "description": "↑ Booking Velocity"
-   },
-   "competitorPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "↑ Competitor Price"
-   },
-   "remainingCapacity": {
-    "type": "integer",
-    "description": "↓ Remaining Capacity"
-   },
-   "exhibitions": {
-    "type": "string",
-    "description": "Exhibitions"
-   },
-   "conferences": {
-    "type": "string",
-    "description": "Conferences"
-   },
-   "concerts": {
-    "type": "string",
-    "description": "Concerts"
-   },
-   "sportsEvents": {
-    "type": "string",
-    "description": "Sports Events"
-   },
-   "festivals": {
-    "type": "string",
-    "description": "Festivals"
-   },
-   "tourismEvents": {
-    "type": "string",
-    "description": "Tourism Events"
-   },
-   "weatherConditions": {
-    "type": "string",
-    "description": "Weather Conditions"
+   "drivers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "signal": {
+       "type": "string",
+       "enum": [
+        "internalSales",
+        "bookingVelocity",
+        "occupancy",
+        "historicalEvents",
+        "nearbyEvent",
+        "weather",
+        "marketTourism",
+        "competitor",
+        "priceElasticity",
+        "other"
+       ],
+       "description": "Signal category behind the driver"
+      },
+      "direction": {
+       "type": "string",
+       "enum": [
+        "up",
+        "down"
+       ],
+       "description": "Whether the driver pushes the price up or down"
+      },
+      "explanation": {
+       "type": "string",
+       "description": "Business-language evidence, e.g. booking velocity 31% above forecast"
+      }
+     }
+    },
+    "description": "Primary drivers of the recommendation (pack's up/down driver list); explanatory, not literal model weights"
    }
   }
  },
@@ -2209,59 +3018,200 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "expectedRevenueImpact": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Expected Revenue Impact (the pack shows +AED 73,400)"
+    "description": "Expected Revenue Impact"
    },
    "expectedOccupancy": {
-    "type": "integer",
-    "description": "Expected Occupancy (the pack shows 96%)"
+    "type": "number",
+    "description": "Expected Occupancy, percent"
    },
    "confidence": {
-    "type": "string",
-    "description": "Confidence (the pack shows 91%)"
-   },
-   "bookingVelocity": {
-    "type": "string",
-    "description": "+ Booking Velocity"
-   },
-   "nearbyExhibition": {
-    "type": "string",
-    "description": "+ Nearby Exhibition"
-   },
-   "weather": {
-    "type": "string",
-    "description": "+ Weather"
-   },
-   "occupancy": {
-    "type": "integer",
-    "description": "+ Occupancy"
-   },
-   "competitorPricing": {
-    "type": "string",
-    "description": "+ Competitor Pricing"
-   },
-   "priceElasticity": {
     "type": "number",
-    "description": "− Price Elasticity"
+    "description": "Overall confidence, percent"
    },
-   "overall": {
+   "recommendationId": {
     "type": "string",
-    "description": "Overall (the pack shows 91%)"
+    "description": "Recommendation id"
    },
-   "accept": {
+   "productEvent": {
     "type": "string",
-    "description": "Accept"
+    "description": "Product/event/performance the card applies to"
    },
-   "modify": {
+   "venue": {
     "type": "string",
-    "description": "Modify"
+    "description": "Venue"
    },
-   "ignore": {
-    "type": "string",
-    "description": "Ignore"
+   "currentPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Current Price"
    },
-   "executionBelongsDownstream": {
+   "recommendedPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "AI Recommended Price"
+   },
+   "adjustmentPercent": {
+    "type": "number",
+    "description": "Change from current price, percent"
+   },
+   "demandImpact": {
+    "type": "number",
+    "description": "Demand Impact, percent"
+   },
+   "drivers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "signal": {
+       "type": "string",
+       "enum": [
+        "internalSales",
+        "bookingVelocity",
+        "occupancy",
+        "historicalEvents",
+        "nearbyEvent",
+        "weather",
+        "marketTourism",
+        "competitor",
+        "priceElasticity",
+        "conversionRate",
+        "other"
+       ],
+       "description": "Signal category behind the driver; `conversionRate` (carts reaching the price against orders placed) added 29 September for `objective` `conversion` (build pass, group G2; 8.5.37)"
+      },
+      "direction": {
+       "type": "string",
+       "enum": [
+        "up",
+        "down"
+       ],
+       "description": "Whether the driver pushes the price up or down"
+      },
+      "explanation": {
+       "type": "string",
+       "description": "Business-language evidence, e.g. booking velocity 31% above forecast"
+      }
+     }
+    },
+    "description": "Primary drivers of the recommendation (pack's up/down driver list); explanatory, not literal model weights"
+   },
+   "counterfactuals": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "condition": {
+       "type": "string",
+       "description": "e.g. if the nearby exhibition were not occurring"
+      },
+      "recommendedPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money",
+       "description": "Price the model would recommend then"
+      }
+     }
+    },
+    "description": "Counterfactual Explanation"
+   },
+   "confidenceBreakdown": {
+    "type": "object",
+    "properties": {
+     "dataQuality": {
+      "type": "number",
+      "description": "Data Quality, percent"
+     },
+     "forecastConfidence": {
+      "type": "number",
+      "description": "Forecast Confidence, percent"
+     },
+     "elasticityConfidence": {
+      "type": "number",
+      "description": "Elasticity Confidence, percent"
+     },
+     "externalSignalConfidence": {
+      "type": "number",
+      "description": "External Signal Confidence, percent"
+     }
+    },
+    "description": "Confidence Breakdown"
+   },
+   "explanation": {
     "type": "string",
-    "description": "Execution belongs downstream"
+    "description": "Natural-language explanation in business language (advisory)",
+    "nullable": true
+   },
+   "reviewOutcome": {
+    "type": "string",
+    "description": "Where the human decision on the card stands; every card starts pending (decided 29 September, readiness close-out)",
+    "enum": [
+     "pending",
+     "accepted",
+     "rejected",
+     "modified",
+     "ignored",
+     "sentToSimulation",
+     "sentForApproval"
+    ]
+   },
+   "modelVersion": {
+    "type": "string",
+    "description": "Model version (auditability chain)"
+   },
+   "generatedAt": {
+    "type": "string",
+    "description": "When the recommendation was generated",
+    "format": "date-time"
+   },
+   "priceCategoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The price (seat) category the card is for, `PricingRecommendation.priceCategoryId`; null for a product priced without categories (29 September, build pass, group G2; 1.4.27)"
+   },
+   "priceCategory": {
+    "type": "string",
+    "nullable": true,
+    "description": "The price category's name, for the card"
+   },
+   "recommendationType": {
+    "type": "string",
+    "enum": [
+     "standard",
+     "earlyBird",
+     "lastMinute",
+     "volumeDiscount",
+     "conversion"
+    ],
+    "description": "`PricingRecommendation.recommendationType` (29 September, build pass, group G2; 8.5.31 to 8.5.33, 8.5.37)"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "quantityTier": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "minQuantity": {
+      "type": "integer"
+     },
+     "maxQuantity": {
+      "type": "integer",
+      "nullable": true
+     }
+    }
+   },
+   "objective": {
+    "type": "string",
+    "enum": [
+     "revenue",
+     "occupancy",
+     "conversion"
+    ]
    }
   }
  },
@@ -2273,168 +3223,227 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "signal": {
     "type": "string",
-    "description": "Signal"
+    "description": "Signal name (signal rows)",
+    "nullable": true
    },
    "category": {
     "type": "string",
-    "description": "Category"
+    "description": "Category",
+    "enum": [
+     "internalSales",
+     "inventory",
+     "weather",
+     "nearbyEvents",
+     "competitor",
+     "tourism",
+     "calendar",
+     "transport",
+     "market",
+     "other"
+    ]
    },
    "provider": {
     "type": "string",
-    "description": "Provider"
+    "description": "Provider name (vendor-neutral, data)",
+    "nullable": true
    },
    "source": {
     "type": "string",
-    "description": "Source"
+    "description": "Source / feed name",
+    "nullable": true
    },
    "internalExternal": {
     "type": "string",
-    "description": "Internal/External"
+    "description": "Internal/External",
+    "enum": [
+     "internal",
+     "external"
+    ]
    },
    "market": {
     "type": "string",
-    "description": "Market"
+    "description": "Market",
+    "nullable": true
    },
    "refreshFrequency": {
     "type": "string",
-    "description": "Refresh Frequency"
+    "description": "Refresh Frequency",
+    "enum": [
+     "realTime",
+     "minutes10",
+     "hourly",
+     "daily",
+     "weekly",
+     "manual"
+    ]
    },
    "lastUpdate": {
     "type": "string",
+    "description": "Last Update",
     "format": "date-time",
-    "description": "Last Update"
+    "nullable": true
    },
    "freshness": {
     "type": "string",
-    "description": "Freshness"
+    "description": "Freshness, e.g. live, 10 min, 8 hr",
+    "nullable": true
    },
    "reliability": {
-    "type": "string",
-    "description": "Reliability"
+    "type": "number",
+    "description": "Reliability, percent"
    },
    "historicalCorrelation": {
-    "type": "string",
-    "description": "Historical Correlation"
+    "type": "number",
+    "description": "Historical correlation with demand, -1..1",
+    "nullable": true
    },
    "status": {
-    "type": "integer",
-    "description": "Status"
-   },
-   "ssTy": {
     "type": "string",
-    "description": "ss ty"
-   },
-   "weather10Min97": {
-    "type": "number",
-    "description": "Weather 10 min 97%"
-   },
-   "nearbyEvents1Hr91": {
-    "type": "number",
-    "description": "Nearby Events 1 hr 91%"
-   },
-   "competitorA8Hr83": {
-    "type": "number",
-    "description": "Competitor A 8 hr 83%"
-   },
-   "daily88": {
-    "type": "number",
-    "description": "Daily 88%"
+    "description": "Status: healthy, delayed, failed or disabled for signals; candidate, validation, approved, production, monitored or retired for models"
    },
    "missingData": {
-    "type": "string",
-    "description": "Missing Data"
+    "type": "integer",
+    "description": "Missing Data issues in the last 24 hours"
    },
    "delayedData": {
-    "type": "string",
-    "description": "Delayed Data"
+    "type": "integer",
+    "description": "Delayed Data issues in the last 24 hours"
    },
    "outliers": {
     "type": "integer",
-    "description": "Outliers"
+    "description": "Outliers in the last 24 hours"
    },
    "invalidValues": {
     "type": "integer",
-    "description": "Invalid Values"
+    "description": "Invalid Values in the last 24 hours"
    },
    "unexpectedChanges": {
     "type": "integer",
-    "description": "Unexpected Changes"
+    "description": "Unexpected Changes in the last 24 hours"
    },
    "sourceFailure": {
-    "type": "string",
-    "description": "Source Failure"
-   },
-   "approved": {
     "type": "integer",
-    "description": "Approved"
-   },
-   "experimental": {
-    "type": "string",
-    "description": "Experimental"
-   },
-   "advisoryOnly": {
-    "type": "string",
-    "description": "Advisory Only"
-   },
-   "blocked": {
-    "type": "string",
-    "description": "Blocked"
+    "description": "Source Failures in the last 24 hours"
    },
    "modelName": {
     "type": "string",
-    "description": "Model Name"
+    "description": "Model Name (model rows)",
+    "nullable": true
    },
    "version": {
     "type": "string",
-    "description": "Version"
+    "description": "Version (model rows)",
+    "nullable": true
    },
    "purpose": {
     "type": "string",
-    "description": "Purpose"
+    "description": "Purpose (model rows)",
+    "nullable": true
    },
    "deploymentDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "Deployment Date"
+    "description": "Deployment Date",
+    "format": "date",
+    "nullable": true
    },
    "trainingWindow": {
     "type": "string",
-    "format": "date-time",
-    "description": "Training Window"
+    "description": "Training Window, e.g. 24 months to 2026-08-31",
+    "nullable": true
    },
    "validationResult": {
     "type": "string",
-    "description": "Validation Result"
+    "description": "Validation Result summary",
+    "nullable": true
    },
    "owner": {
     "type": "string",
-    "description": "Owner"
+    "description": "Owner (user id)",
+    "nullable": true
    },
    "forecastAccuracy": {
-    "type": "string",
-    "description": "Forecast Accuracy"
+    "type": "number",
+    "description": "Forecast Accuracy, percent"
    },
    "bias": {
-    "type": "integer",
-    "description": "Bias"
+    "type": "number",
+    "description": "Bias, percent"
    },
    "recommendationAccuracy": {
-    "type": "string",
-    "description": "Recommendation Accuracy"
+    "type": "number",
+    "description": "Recommendation Accuracy, percent"
    },
    "revenuePerformance": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue Performance"
+    "description": "Revenue Performance attributed to the model's accepted recommendations"
    },
    "drift": {
-    "type": "string",
-    "description": "Drift"
+    "type": "number",
+    "description": "Drift: change in accuracy over the last 30 days, percent"
    },
-   "confidenceExplanation": {
+   "registryId": {
     "type": "string",
-    "description": "Confidence → Explanation"
+    "description": "Registry entry id"
+   },
+   "registryKind": {
+    "type": "string",
+    "description": "Signal or model row",
+    "enum": [
+     "signal",
+     "model"
+    ]
+   },
+   "duplicateData": {
+    "type": "integer",
+    "description": "Duplicate Data issues in the last 24 hours"
+   },
+   "trustLevel": {
+    "type": "string",
+    "description": "Signal Trust; external signals default advisoryOnly (decided 29 September, readiness close-out)",
+    "enum": [
+     "approved",
+     "experimental",
+     "advisoryOnly",
+     "blocked"
+    ]
+   },
+   "aiUsePermissions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "forecasting",
+      "recommendations",
+      "simulation",
+      "automatedPricing"
+     ]
+    },
+    "description": "AI Use Permission; automatedPricing is never granted by default (decided 29 September, readiness close-out)"
+   },
+   "fallbackPolicy": {
+    "type": "string",
+    "description": "Fallback Policy; default reduceConfidence (decided 29 September, readiness close-out)",
+    "enum": [
+     "useHistoricalValue",
+     "ignore",
+     "substitute",
+     "reduceConfidence",
+     "stopAiRecommendation"
+    ]
    }
   }
+ },
+ "Channel": {
+  "type": "string",
+  "enum": [
+   "pos",
+   "kiosk",
+   "web",
+   "mobile",
+   "b2b",
+   "ota",
+   "callCentre"
+  ]
  },
  "CompetitorPricingMarketPositionIntelligenceView": {
   "type": "object",
@@ -2444,7 +3453,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "competitor": {
     "type": "string",
-    "description": "Competitor"
+    "description": "Competitor name"
    },
    "market": {
     "type": "string",
@@ -2452,31 +3461,44 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "venueProduct": {
     "type": "string",
-    "description": "Venue/Product"
+    "description": "Competitor venue/product"
    },
    "comparableTicvaiProduct": {
     "type": "string",
-    "description": "Comparable TICVAI Product"
+    "description": "Comparable TICVAI product id"
    },
    "source": {
     "type": "string",
-    "description": "Source"
+    "description": "Source name (vendor-neutral: website, feed or partner, as data)"
    },
    "currency": {
     "type": "string",
-    "description": "Currency"
+    "description": "Currency, ISO 4217"
    },
    "collectionMethod": {
     "type": "string",
-    "description": "Collection Method"
+    "description": "Collection Method (decided 29 September, readiness close-out)",
+    "enum": [
+     "manualEntry",
+     "dataFeed",
+     "publishedWebsite",
+     "partnerSupplied"
+    ]
    },
    "refreshFrequency": {
     "type": "string",
-    "description": "Refresh Frequency"
+    "description": "Refresh Frequency",
+    "enum": [
+     "realTime",
+     "hourly",
+     "daily",
+     "weekly",
+     "manual"
+    ]
    },
    "reliability": {
-    "type": "string",
-    "description": "Reliability"
+    "type": "number",
+    "description": "Reliability of the source, percent"
    },
    "publishedPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
@@ -2504,36 +3526,238 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "availability": {
     "type": "string",
-    "description": "Availability"
+    "description": "Availability as published",
+    "enum": [
+     "available",
+     "limited",
+     "soldOut",
+     "unknown"
+    ]
    },
    "date": {
     "type": "string",
-    "format": "date-time",
-    "description": "Date"
+    "description": "Date the price applies to",
+    "format": "date"
    },
    "timeslot": {
     "type": "string",
-    "description": "Timeslot"
+    "description": "Timeslot",
+    "nullable": true
    },
-   "against": {
+   "observationId": {
     "type": "string",
-    "description": "against"
+    "description": "Observation id"
    },
-   "vipPremiumPackage": {
+   "observedAt": {
     "type": "string",
-    "description": "VIP Premium Package"
+    "description": "When the price was collected",
+    "format": "date-time"
    },
-   "demand": {
-    "type": "string",
-    "description": "Demand"
-   },
-   "conversion": {
-    "type": "number",
-    "description": "Conversion"
-   },
-   "priceSensitivity": {
+   "marketMedianPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price Sensitivity"
+    "description": "Market median price for the comparable set"
+   },
+   "positionVsMedian": {
+    "type": "number",
+    "description": "TICVAI position against the market median (-9.1 = below), percent"
+   },
+   "movementPercent": {
+    "type": "number",
+    "description": "Competitor Movement: change against the previous observation, percent"
+   },
+   "historicalCorrelation": {
+    "type": "object",
+    "properties": {
+     "demand": {
+      "type": "number",
+      "description": "Correlation with TICVAI demand, -1..1"
+     },
+     "conversion": {
+      "type": "number",
+      "description": "Correlation with TICVAI conversion, -1..1"
+     },
+     "priceSensitivity": {
+      "type": "number",
+      "description": "Correlation with TICVAI price sensitivity, -1..1"
+     }
+    },
+    "description": "Historical Correlation of competitor changes with TICVAI outcomes"
+   },
+   "comparabilityApproved": {
+    "type": "boolean",
+    "description": "An administrator confirmed the products are genuinely comparable"
+   },
+   "sourceApproved": {
+    "type": "boolean",
+    "description": "Source approved as legally permissible; unapproved sources are ignored by AI"
+   }
+  }
+ },
+ "DemandSignal": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.demand_signal",
+  "description": "**An external or calendar signal that moves demand** (29 September, data model DM3). Merges weather (ADM-101), nearby events (ADM-102), competitor prices (ADM-103), tourism, holiday and market signals (ADM-104) and the tenant's special calendar (Ramadan, Eid, school breaks) used by temporal rules. `signalKind` says which; the readings specific to a kind are in `reading`, and a venue's sensitivity settings in `configuration`. A signal informs forecasts and recommendations; it never sets a price.",
+  "required": [
+   "id",
+   "scopePath",
+   "signalKind",
+   "source"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "signalKind": {
+    "type": "string",
+    "enum": [
+     "weather",
+     "nearbyEvent",
+     "competitorPrice",
+     "calendar",
+     "tourism",
+     "transport",
+     "market"
+    ]
+   },
+   "signalType": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true,
+    "description": "E.g. `publicHoliday`, `ramadan`, an event type, a weather condition."
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "source": {
+    "type": "string",
+    "maxLength": 100,
+    "description": "Provider, feed or `tenant` for manual entries."
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Competitor observations: the comparable TICVAI product."
+   },
+   "geography": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "marketCode": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "periodStart": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "periodEnd": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "currentValue": {
+    "type": "number",
+    "nullable": true
+   },
+   "unit": {
+    "type": "string",
+    "maxLength": 20,
+    "nullable": true
+   },
+   "reading": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "Kind-specific values: weather conditions and forecasts, event attendance and distance, competitor prices."
+   },
+   "configuration": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "Weather: `{venueExposure, weatherSensitivity, conditionImpacts, forecastHorizon, dataFailurePolicy}`; events: `{monitoringRadiusKm}`."
+   },
+   "weight": {
+    "type": "number",
+    "nullable": true
+   },
+   "reliability": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 1
+   },
+   "historicalCorrelation": {
+    "type": "number",
+    "nullable": true
+   },
+   "confidence": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 1
+   },
+   "impactMinPercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "impactMaxPercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "refreshFrequency": {
+    "type": "string",
+    "enum": [
+     "realTime",
+     "hourly",
+     "daily",
+     "weekly",
+     "manual",
+     null
+    ],
+    "nullable": true
+   },
+   "isApproved": {
+    "type": "boolean",
+    "default": false,
+    "description": "Competitor sources and comparability approved for use."
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   },
+   "observedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastUpdatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -2544,11 +3768,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "description": "**What Internal Demand & Booking Signal Hub displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "ticketsSold": {
-    "type": "string",
+    "type": "integer",
     "description": "Tickets Sold"
    },
    "orders": {
-    "type": "string",
+    "type": "integer",
     "description": "Orders"
    },
    "revenue": {
@@ -2556,125 +3780,222 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Revenue"
    },
    "averageSellingPrice": {
-    "type": "number",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Average Selling Price"
    },
    "conversionRate": {
     "type": "number",
-    "description": "Conversion Rate"
+    "description": "Conversion Rate, percent"
    },
    "cartAbandonment": {
-    "type": "string",
-    "description": "Cart Abandonment"
+    "type": "number",
+    "description": "Cart Abandonment rate, percent"
    },
    "searchToPurchaseConversion": {
     "type": "number",
-    "description": "Search-to-Purchase Conversion"
+    "description": "Search-to-Purchase Conversion, percent"
    },
    "capacity": {
     "type": "integer",
     "description": "Capacity"
    },
    "remainingInventory": {
-    "type": "string",
-    "description": "Remaining Inventory"
+    "type": "integer",
+    "description": "Remaining Inventory (units)"
    },
    "availability": {
-    "type": "string",
-    "description": "Availability"
+    "type": "number",
+    "description": "Availability: remaining inventory as a share of capacity, percent"
    },
    "occupancy": {
-    "type": "integer",
-    "description": "Occupancy"
+    "type": "number",
+    "description": "Occupancy, percent"
    },
    "seatZoneAvailability": {
-    "type": "string",
-    "description": "Seat/Zone Availability"
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "zone": {
+       "type": "string",
+       "description": "Seat zone / section"
+      },
+      "available": {
+       "type": "integer",
+       "description": "Seats available"
+      }
+     }
+    },
+    "description": "Seat/Zone Availability; empty for unseated products"
    },
    "salesPerHour": {
-    "type": "string",
-    "description": "Sales per Hour"
+    "type": "number",
+    "description": "Sales per Hour (tickets)"
    },
    "salesPerDay": {
-    "type": "string",
-    "description": "Sales per Day"
+    "type": "number",
+    "description": "Sales per Day (tickets)"
    },
    "bookingVelocity": {
-    "type": "string",
-    "description": "Booking Velocity"
+    "type": "number",
+    "description": "Booking Velocity against forecast (+31 = 31% above), percent"
    },
    "revenueVelocity": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue Velocity"
+    "description": "Revenue Velocity: revenue per hour over the last hour"
    },
    "accelerationDeceleration": {
-    "type": "string",
-    "description": "Acceleration/Deceleration"
-   },
-   "segment": {
-    "type": "string",
-    "description": "Segment"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "geography": {
-    "type": "string",
-    "description": "Geography"
+    "type": "number",
+    "description": "Acceleration/Deceleration: change in booking velocity against the previous window, percent"
    },
    "repeatPurchase": {
-    "type": "string",
-    "description": "Repeat Purchase"
+    "type": "number",
+    "description": "Repeat Purchase rate, percent"
    },
    "leadTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Lead Time"
+    "type": "number",
+    "description": "Lead Time: average days between purchase and visit"
    },
    "cancellation": {
-    "type": "string",
-    "description": "Cancellation"
+    "type": "integer",
+    "description": "Cancellations"
    },
    "noShow": {
-    "type": "string",
-    "description": "No-Show"
+    "type": "integer",
+    "description": "No-Shows"
    },
    "reschedule": {
-    "type": "string",
-    "description": "Reschedule"
+    "type": "integer",
+    "description": "Reschedules"
    },
-   "yesterday": {
+   "granularity": {
     "type": "string",
-    "description": "Yesterday"
+    "description": "Level of this row in the signal granularity hierarchy (pack p.97)",
+    "enum": [
+     "tenant",
+     "market",
+     "venue",
+     "event",
+     "performance",
+     "product",
+     "priceCategory",
+     "channel",
+     "timeslot"
+    ]
    },
-   "previousWeek": {
+   "venue": {
     "type": "string",
-    "description": "Previous Week"
+    "description": "Venue id"
    },
-   "sameDayLastYear": {
+   "event": {
     "type": "string",
-    "description": "Same Day Last Year"
+    "description": "Event id",
+    "nullable": true
    },
-   "previousEvent": {
+   "performance": {
     "type": "string",
-    "description": "Previous Event"
+    "description": "Performance id",
+    "nullable": true
    },
-   "similarEvent": {
+   "product": {
     "type": "string",
-    "description": "Similar Event"
+    "description": "Product id",
+    "nullable": true
    },
-   "forecastBaseline": {
+   "priceCategory": {
     "type": "string",
-    "description": "Forecast Baseline"
+    "description": "Price category",
+    "nullable": true
    },
-   "conversion": {
-    "type": "number",
-    "description": "Conversion (the pack shows +7.2%)"
+   "channel": {
+    "$ref": "#/components/schemas/Channel",
+    "description": "Channel"
    },
-   "channelTimeslot": {
+   "timeslot": {
     "type": "string",
-    "description": "Channel → Timeslot"
+    "description": "Timeslot",
+    "nullable": true
+   },
+   "date": {
+    "type": "string",
+    "description": "Business date",
+    "format": "date"
+   },
+   "refunds": {
+    "type": "integer",
+    "description": "Refunds"
+   },
+   "customerMix": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "dimension": {
+       "type": "string",
+       "enum": [
+        "segment",
+        "membership",
+        "geography"
+       ],
+       "description": "Customer dimension"
+      },
+      "value": {
+       "type": "string",
+       "description": "Segment / membership tier / geography"
+      },
+      "share": {
+       "type": "number",
+       "description": "Share of tickets sold, percent"
+      }
+     }
+    },
+    "description": "Customer signals: Segment, Membership, Geography mix"
+   },
+   "comparison": {
+    "type": "object",
+    "properties": {
+     "basis": {
+      "type": "string",
+      "enum": [
+       "yesterday",
+       "previousWeek",
+       "sameDayLastYear",
+       "previousEvent",
+       "similarEvent",
+       "forecastBaseline"
+      ],
+      "description": "Comparison basis (compareTo)"
+     },
+     "ticketsSoldChange": {
+      "type": "number",
+      "description": "Change in tickets sold, percent"
+     },
+     "revenueChange": {
+      "type": "number",
+      "description": "Change in revenue, percent"
+     },
+     "conversionChange": {
+      "type": "number",
+      "description": "Change in conversion, percentage points"
+     },
+     "bookingVelocityChange": {
+      "type": "number",
+      "description": "Change in booking velocity, percent"
+     }
+    },
+    "description": "Historical Comparison against the basis chosen in compareTo"
+   },
+   "anomalies": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Anomaly Detection, e.g. booking velocity increased 47% during the last 90 minutes. Advisory only: generated narrative never changes a price (decided 29 September, readiness close-out)"
+   },
+   "lastUpdated": {
+    "type": "string",
+    "description": "When the signal was last refreshed",
+    "format": "date-time"
    }
   }
  },
@@ -2684,121 +4005,111 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Market, Tourism, Holiday & Contextual Signal Hub displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "publicHolidays": {
-    "type": "string",
-    "description": "Public Holidays"
-   },
-   "schoolHolidays": {
-    "type": "string",
-    "description": "School Holidays"
-   },
-   "ramadan": {
-    "type": "string",
-    "description": "Ramadan"
-   },
-   "eid": {
-    "type": "string",
-    "description": "Eid"
-   },
-   "christmas": {
-    "type": "string",
-    "description": "Christmas"
-   },
-   "newYear": {
-    "type": "integer",
-    "description": "New Year"
-   },
-   "longWeekends": {
-    "type": "string",
-    "description": "Long Weekends"
-   },
-   "visitorArrivals": {
-    "type": "string",
-    "description": "Visitor Arrivals"
-   },
-   "tourismDemand": {
-    "type": "string",
-    "description": "Tourism Demand"
-   },
-   "hotelOccupancy": {
-    "type": "integer",
-    "description": "Hotel Occupancy"
-   },
-   "hotelRates": {
-    "type": "string",
-    "description": "Hotel Rates"
-   },
-   "destinationDemand": {
-    "type": "string",
-    "description": "Destination Demand"
-   },
-   "flightArrivals": {
-    "type": "string",
-    "description": "Flight Arrivals"
-   },
-   "airportPassengerVolume": {
-    "type": "integer",
-    "description": "Airport Passenger Volume"
-   },
-   "publicTransportDemand": {
-    "type": "string",
-    "description": "Public Transport Demand"
-   },
-   "trafficConditions": {
-    "type": "string",
-    "description": "Traffic Conditions"
-   },
-   "consumerDemandTrends": {
-    "type": "string",
-    "description": "Consumer Demand Trends"
-   },
-   "destinationPopularity": {
-    "type": "string",
-    "description": "Destination Popularity"
-   },
-   "marketActivity": {
-    "type": "string",
-    "description": "Market Activity"
-   },
    "source": {
     "type": "string",
-    "description": "Source"
+    "description": "Source name (vendor-neutral)"
    },
    "geography": {
     "type": "string",
-    "description": "Geography"
+    "description": "Geography the signal covers"
    },
    "refreshFrequency": {
     "type": "string",
-    "description": "Refresh Frequency"
+    "description": "Refresh Frequency",
+    "enum": [
+     "realTime",
+     "hourly",
+     "daily",
+     "weekly",
+     "manual"
+    ]
    },
    "weight": {
-    "type": "string",
-    "description": "Weight"
+    "type": "number",
+    "description": "Weight given to the signal in forecasting, 0-1; default 0.5 (decided 29 September, readiness close-out)"
    },
    "reliability": {
-    "type": "string",
-    "description": "Reliability"
+    "type": "number",
+    "description": "Reliability, percent"
    },
    "historicalCorrelation": {
-    "type": "string",
-    "description": "Historical Correlation"
-   },
-   "activeInactive": {
-    "type": "integer",
-    "description": "Active/Inactive"
-   },
-   "dubaiHotelOccupancy": {
-    "type": "integer",
-    "description": "Dubai Hotel Occupancy (the pack shows 92%)"
-   },
-   "venueDemand8": {
     "type": "number",
-    "description": "Venue demand +8%"
+    "description": "Historical correlation with venue demand, -1..1"
+   },
+   "active": {
+    "type": "boolean",
+    "description": "Active/Inactive; new external sources start inactive (decided 29 September, readiness close-out)"
    },
    "currentEstimatedImpact": {
+    "type": "number",
+    "description": "Current Estimated Impact on venue demand, percent"
+   },
+   "signalId": {
     "type": "string",
-    "description": "Current Estimated Impact (the pack shows +6%)"
+    "description": "Signal id"
+   },
+   "category": {
+    "type": "string",
+    "description": "Signal Category",
+    "enum": [
+     "calendar",
+     "tourism",
+     "transport",
+     "market"
+    ]
+   },
+   "signalType": {
+    "type": "string",
+    "description": "Signal",
+    "enum": [
+     "publicHoliday",
+     "schoolHoliday",
+     "ramadan",
+     "eid",
+     "christmas",
+     "newYear",
+     "longWeekend",
+     "visitorArrivals",
+     "tourismDemand",
+     "hotelOccupancy",
+     "hotelRates",
+     "destinationDemand",
+     "flightArrivals",
+     "airportPassengerVolume",
+     "publicTransportDemand",
+     "trafficConditions",
+     "consumerDemandTrends",
+     "searchTrends",
+     "destinationPopularity",
+     "marketActivity"
+    ]
+   },
+   "currentValue": {
+    "type": "number",
+    "description": "Current reading, e.g. hotel occupancy 92",
+    "nullable": true
+   },
+   "unit": {
+    "type": "string",
+    "description": "Unit of currentValue (percent, count, currency...)",
+    "nullable": true
+   },
+   "periodStart": {
+    "type": "string",
+    "description": "Calendar signals: first day",
+    "format": "date",
+    "nullable": true
+   },
+   "periodEnd": {
+    "type": "string",
+    "description": "Calendar signals: last day",
+    "format": "date",
+    "nullable": true
+   },
+   "lastUpdated": {
+    "type": "string",
+    "description": "Last refresh",
+    "format": "date-time"
    }
   }
  },
@@ -2808,75 +4119,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Nearby Event, Exhibition & Local Demand Intelligence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "exhibition": {
-    "type": "string",
-    "description": "Exhibition"
-   },
-   "conference": {
-    "type": "string",
-    "description": "Conference"
-   },
-   "concert": {
-    "type": "string",
-    "description": "Concert"
-   },
-   "sportsEvent": {
-    "type": "string",
-    "description": "Sports Event"
-   },
-   "festival": {
-    "type": "string",
-    "description": "Festival"
-   },
-   "tradeShow": {
-    "type": "string",
-    "description": "Trade Show"
-   },
-   "convention": {
-    "type": "string",
-    "description": "Convention"
-   },
-   "publicCelebration": {
-    "type": "string",
-    "description": "Public Celebration"
-   },
-   "majorAttractionEvent": {
-    "type": "string",
-    "description": "Major Attraction Event"
-   },
-   "schoolEvent": {
-    "type": "string",
-    "description": "School Event"
-   },
-   "customLocalEvent": {
-    "type": "string",
-    "description": "Custom Local Event"
-   },
    "eventName": {
     "type": "string",
     "description": "Event Name"
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "External venue hosting the event"
    },
    "location": {
     "type": "string",
-    "description": "Location"
+    "description": "Location (address or area)"
    },
-   "distanceFromTicvaiVenue": {
-    "type": "string",
-    "description": "Distance from TICVAI Venue"
-   },
-   "startEndDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Start/End Date"
-   },
-   "startEndTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Start/End Time"
+   "distanceKm": {
+    "type": "number",
+    "description": "Distance from the TICVAI venue, km"
    },
    "expectedAttendance": {
     "type": "integer",
@@ -2884,77 +4141,127 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "eventType": {
     "type": "string",
-    "description": "Event Type"
+    "description": "Event Type",
+    "enum": [
+     "exhibition",
+     "conference",
+     "concert",
+     "sportsEvent",
+     "festival",
+     "tradeShow",
+     "convention",
+     "publicCelebration",
+     "majorAttractionEvent",
+     "schoolEvent",
+     "customLocalEvent"
+    ]
    },
    "audienceType": {
     "type": "string",
-    "description": "Audience Type"
+    "description": "Audience Type (decided 29 September, readiness close-out)",
+    "enum": [
+     "family",
+     "business",
+     "youth",
+     "general",
+     "tourist",
+     "other"
+    ]
    },
    "source": {
     "type": "string",
-    "description": "Source"
+    "description": "Source: name of the event feed or 'manual' (vendor-neutral)"
    },
    "confidence": {
+    "type": "number",
+    "description": "Confidence that the event and its attendance are accurate, percent"
+   },
+   "externalEventId": {
     "type": "string",
-    "description": "Confidence"
+    "description": "External event id"
    },
-   "distance12Km": {
+   "ticvaiVenue": {
     "type": "string",
-    "description": "Distance: 1.2 km"
+    "description": "TICVAI venue whose monitoring radius the event falls in"
    },
-   "attendance60000": {
-    "type": "integer",
-    "description": "Attendance: 60,000"
+   "monitoringRadiusKm": {
+    "type": "number",
+    "description": "Geographic Radius configured for that venue: 1, 3, 5, 10 or custom km; default 5 (decided 29 September, readiness close-out)"
    },
-   "duration4Days": {
+   "startDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "Duration: 4 days"
+    "description": "Start date",
+    "format": "date"
    },
-   "predictedImpact": {
+   "endDate": {
     "type": "string",
-    "description": "Predicted Impact (the pack shows +14–21%)"
+    "description": "End date",
+    "format": "date"
    },
-   "beforeEvent": {
+   "startTime": {
     "type": "string",
-    "description": "Before Event"
+    "description": "Start time (HH:mm)",
+    "nullable": true
    },
-   "duringEvent": {
+   "endTime": {
     "type": "string",
-    "description": "During Event"
+    "description": "End time (HH:mm)",
+    "nullable": true
    },
-   "lunchPeriod": {
+   "historicalCorrelation": {
+    "type": "number",
+    "description": "Historical correlation: demand change seen at the venue for similar past events, percent"
+   },
+   "predictedImpactMin": {
+    "type": "number",
+    "description": "Predicted demand impact, low end, percent"
+   },
+   "predictedImpactMax": {
+    "type": "number",
+    "description": "Predicted demand impact, high end, percent"
+   },
+   "impactWindows": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "beforeEvent",
+      "duringEvent",
+      "lunchPeriod",
+      "afterEvent",
+      "evening",
+      "followingDay"
+     ]
+    },
+    "description": "Timing Intelligence: when the impact is expected"
+   },
+   "audienceMatch": {
     "type": "string",
-    "format": "date-time",
-    "description": "Lunch Period"
+    "description": "Audience Matching between the event and the TICVAI venue",
+    "enum": [
+     "low",
+     "medium",
+     "high"
+    ]
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
    },
-   "afterEvent": {
-    "type": "string",
-    "description": "After Event"
+   "nextCursor": {
+    "type": "string"
    },
-   "evening": {
-    "type": "string",
-    "description": "Evening"
-   },
-   "followingDay": {
-    "type": "string",
-    "description": "Following Day"
-   },
-   "ticvaiEvents": {
-    "type": "string",
-    "description": "TICVAI Events"
-   },
-   "demandForecast": {
-    "type": "string",
-    "description": "Demand Forecast"
-   },
-   "occupancy": {
-    "type": "integer",
-    "description": "Occupancy"
-   },
-   "currentPricing": {
-    "type": "string",
-    "description": "Current Pricing"
+   "hasMore": {
+    "type": "boolean"
    }
   }
  },
@@ -2966,48 +4273,268 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "price": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price"
+    "description": "Price tested on the curve"
    },
    "demand": {
-    "type": "string",
-    "description": "Demand"
+    "type": "integer",
+    "description": "Expected demand at this price"
    },
    "conversion": {
     "type": "number",
-    "description": "Conversion"
+    "description": "Expected conversion, percent"
    },
    "revenue": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue"
+    "description": "Expected revenue"
    },
    "margin": {
-    "type": "number",
-    "description": "Margin"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Expected margin"
    },
    "occupancy": {
-    "type": "integer",
-    "description": "Occupancy"
+    "type": "number",
+    "description": "Expected occupancy, percent"
    },
    "customerSegment": {
     "type": "string",
-    "description": "Customer Segment"
+    "description": "Customer segment (e.g. tourist, resident, family, VIP)",
+    "nullable": true
    },
    "channel": {
-    "type": "string",
+    "$ref": "#/components/schemas/Channel",
     "description": "Channel"
    },
    "time": {
     "type": "string",
-    "format": "date-time",
-    "description": "Time"
+    "description": "Time context of the curve: weekday/weekend, peak/off-peak or season label"
    },
    "product": {
     "type": "string",
-    "description": "Product"
+    "description": "Product id"
    },
-   "elasticityConfidenceLow": {
+   "venue": {
+    "type": "string",
+    "description": "Venue id"
+   },
+   "priceSensitivity": {
+    "type": "string",
+    "description": "Price sensitivity of the segment",
+    "enum": [
+     "low",
+     "medium",
+     "high"
+    ]
+   },
+   "elasticityCoefficient": {
     "type": "number",
-    "description": "Elasticity Confidence: Low"
+    "description": "Estimated price elasticity of demand (negative)",
+    "nullable": true
+   },
+   "elasticityConfidence": {
+    "type": "string",
+    "description": "Elasticity Confidence",
+    "enum": [
+     "low",
+     "medium",
+     "high"
+    ]
+   },
+   "inRecommendedRevenueZone": {
+    "type": "boolean",
+    "description": "Price lies inside the Recommended Revenue Zone"
+   },
+   "revenueZoneMin": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Optimal revenue range, low end"
+   },
+   "revenueZoneMax": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Optimal revenue range, high end"
+   }
+  }
+ },
+ "SignalRegistryEntry": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.signal_registry",
+  "description": "**The registry of AI signals and models, with their trust and quality** (29 September, data model DM3). ADM-106 and ADM-118. A signal or model not `approved` for a use in `aiUsePermissions` is not used for it.",
+  "required": [
+   "id",
+   "scopePath",
+   "registryKind",
+   "name",
+   "trustLevel"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `tenant` scope."
+   },
+   "registryKind": {
+    "type": "string",
+    "enum": [
+     "signal",
+     "model"
+    ]
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "category": {
+    "type": "string",
+    "enum": [
+     "internalSales",
+     "inventory",
+     "weather",
+     "nearbyEvents",
+     "competitor",
+     "tourism",
+     "calendar",
+     "transport",
+     "market",
+     "other",
+     null
+    ],
+    "nullable": true
+   },
+   "provider": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "source": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "internalExternal": {
+    "type": "string",
+    "enum": [
+     "internal",
+     "external",
+     null
+    ],
+    "nullable": true
+   },
+   "marketCode": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "refreshFrequency": {
+    "type": "string",
+    "enum": [
+     "realTime",
+     "minutes10",
+     "hourly",
+     "daily",
+     "weekly",
+     "manual",
+     null
+    ],
+    "nullable": true
+   },
+   "trustLevel": {
+    "type": "string",
+    "enum": [
+     "approved",
+     "experimental",
+     "advisoryOnly",
+     "blocked"
+    ],
+    "default": "experimental"
+   },
+   "aiUsePermissions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "forecasting",
+      "recommendations",
+      "simulation",
+      "automatedPricing"
+     ]
+    }
+   },
+   "fallbackPolicy": {
+    "type": "string",
+    "enum": [
+     "useHistoricalValue",
+     "ignore",
+     "substitute",
+     "reduceConfidence",
+     "stopAiRecommendation",
+     null
+    ],
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "version": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true,
+    "description": "Models."
+   },
+   "purpose": {
+    "type": "string",
+    "nullable": true
+   },
+   "deployedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "trainingWindow": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true
+   },
+   "validationResult": {
+    "type": "string",
+    "nullable": true
+   },
+   "lastUpdateAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "qualityCounts": {
+    "type": "object",
+    "additionalProperties": true,
+    "readOnly": true,
+    "description": "Signals: `{missingData, delayedData, outliers, invalidValues, unexpectedChanges, sourceFailure, duplicateData}`."
+   },
+   "performance": {
+    "type": "object",
+    "additionalProperties": true,
+    "readOnly": true,
+    "description": "Models: `{forecastAccuracy, bias, recommendationAccuracy, revenuePerformance, drift}` and the per-segment learning metrics."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -3018,101 +4545,218 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "description": "**What Weather Intelligence & Demand Impact Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "temperature": {
-    "type": "string",
-    "description": "Temperature"
+    "type": "number",
+    "description": "Temperature, degrees C"
    },
    "feelsLikeTemperature": {
-    "type": "string",
-    "description": "Feels-Like Temperature"
+    "type": "number",
+    "description": "Feels-Like Temperature, degrees C"
    },
    "rain": {
-    "type": "string",
-    "description": "Rain"
+    "type": "number",
+    "description": "Rain, mm in the last hour"
    },
    "rainProbability": {
-    "type": "string",
-    "description": "Rain Probability"
+    "type": "number",
+    "description": "Rain Probability, percent"
    },
    "humidity": {
-    "type": "string",
-    "description": "Humidity"
+    "type": "number",
+    "description": "Humidity, percent"
    },
    "wind": {
-    "type": "string",
-    "description": "Wind"
+    "type": "number",
+    "description": "Wind speed, km/h"
    },
    "visibility": {
-    "type": "string",
-    "description": "Visibility"
+    "type": "number",
+    "description": "Visibility, km"
    },
    "storm": {
-    "type": "string",
-    "description": "Storm"
+    "type": "boolean",
+    "description": "Storm warning in force"
    },
    "extremeHeat": {
-    "type": "string",
-    "description": "Extreme Heat"
-   },
-   "airQualityWhereAvailable": {
-    "type": "string",
-    "description": "Air Quality where available"
+    "type": "boolean",
+    "description": "Extreme Heat: temperature at or above the venue's configured heat threshold"
    },
    "currentConditions": {
     "type": "string",
-    "description": "Current Conditions"
+    "description": "Current Conditions summary as reported by the source"
    },
    "hourlyForecast": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "at": {
+       "type": "string",
+       "format": "date-time",
+       "description": "Hour"
+      },
+      "temperature": {
+       "type": "number",
+       "description": "Degrees C"
+      },
+      "rainProbability": {
+       "type": "number",
+       "description": "Percent"
+      },
+      "conditions": {
+       "type": "string",
+       "description": "Conditions"
+      }
+     }
+    },
     "description": "Hourly Forecast"
    },
    "dailyForecast": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "date": {
+       "type": "string",
+       "format": "date",
+       "description": "Day"
+      },
+      "minTemperature": {
+       "type": "number",
+       "description": "Degrees C"
+      },
+      "maxTemperature": {
+       "type": "number",
+       "description": "Degrees C"
+      },
+      "rainProbability": {
+       "type": "number",
+       "description": "Percent"
+      },
+      "conditions": {
+       "type": "string",
+       "description": "Conditions"
+      }
+     }
+    },
     "description": "Daily Forecast"
    },
-   "today": {
-    "type": "string",
-    "description": "Today"
-   },
-   "configurableFutureWindow": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Configurable Future Window"
-   },
-   "andWeatherSensitivity": {
-    "type": "string",
-    "description": "and weather sensitivity"
-   },
-   "extremeHeatNegative": {
-    "type": "string",
-    "description": "Extreme Heat → Negative"
-   },
-   "extremeHeatPotentialPositive": {
-    "type": "string",
-    "description": "Extreme Heat → Potential Positive"
-   },
-   "highTemperaturePositive": {
-    "type": "string",
-    "description": "High Temperature → Positive"
-   },
-   "heavyRainStrongNegative": {
-    "type": "string",
-    "description": "Heavy Rain → Strong Negative"
-   },
-   "demandImpact8": {
+   "weatherForecastConfidence": {
     "type": "number",
-    "description": "Demand Impact +8%"
+    "description": "Weather Forecast Confidence, percent"
    },
-   "demandImpact17": {
+   "estimatedDemandImpactMin": {
     "type": "number",
-    "description": "Demand Impact −17%"
+    "description": "Estimated Demand Impact, low end of the range, percent"
    },
-   "weatherForecastConfidence93": {
-    "type": "number",
-    "description": "Weather Forecast Confidence: 93%"
+   "venue": {
+    "type": "string",
+    "description": "TICVAI venue id"
    },
-   "estimatedDemandImpact812": {
+   "venueExposure": {
+    "type": "string",
+    "description": "Venue Sensitivity: Indoor / Outdoor / Mixed",
+    "enum": [
+     "indoor",
+     "outdoor",
+     "mixed"
+    ]
+   },
+   "weatherSensitivity": {
+    "type": "string",
+    "description": "Weather sensitivity of the venue; default medium (decided 29 September, readiness close-out)",
+    "enum": [
+     "low",
+     "medium",
+     "high"
+    ]
+   },
+   "airQualityIndex": {
+    "type": "integer",
+    "description": "Air quality index where available",
+    "nullable": true
+   },
+   "conditionImpacts": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "condition": {
+       "type": "string",
+       "enum": [
+        "temperature",
+        "feelsLikeTemperature",
+        "rain",
+        "rainProbability",
+        "humidity",
+        "wind",
+        "visibility",
+        "storm",
+        "extremeHeat",
+        "airQuality",
+        "heavyRain",
+        "highTemperature"
+       ],
+       "description": "Weather condition"
+      },
+      "threshold": {
+       "type": "number",
+       "nullable": true,
+       "description": "Threshold in the condition's unit, e.g. 42 (degrees C)"
+      },
+      "demandImpactPercent": {
+       "type": "number",
+       "description": "Modelled demand impact, e.g. +8 indoor / -17 outdoor"
+      }
+     }
+    },
+    "description": "Weather Impact Model: condition -> demand impact rules for this venue"
+   },
+   "estimatedDemandImpactMax": {
     "type": "number",
-    "description": "Estimated Demand Impact: +8–12%"
+    "description": "Estimated Demand Impact, high end of the range, percent"
+   },
+   "forecastHorizon": {
+    "type": "string",
+    "description": "Forecast Horizon",
+    "enum": [
+     "today",
+     "hours24",
+     "days3",
+     "days7",
+     "custom"
+    ]
+   },
+   "forecastWindowDays": {
+    "type": "integer",
+    "description": "Configurable future window in days when forecastHorizon is custom; max 14 (decided 29 September, readiness close-out)",
+    "nullable": true
+   },
+   "dataFailurePolicy": {
+    "type": "string",
+    "description": "What happens when weather data is unavailable; default reduceConfidence (decided 29 September, readiness close-out)",
+    "enum": [
+     "useLastValidSignal",
+     "useHistoricalBaseline",
+     "reduceConfidence",
+     "ignoreWeather",
+     "suspendWeatherDrivenRecommendation"
+    ]
+   },
+   "historicalInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Historical Learning, e.g. similar weather historically gave +11% indoor demand. Advisory only: generated narrative never changes a price (decided 29 September, readiness close-out)"
+   },
+   "weatherSource": {
+    "type": "string",
+    "description": "Name of the configured weather data source (vendor-neutral: the provider is data in the signal registry)"
+   },
+   "lastUpdated": {
+    "type": "string",
+    "description": "When the source last refreshed",
+    "format": "date-time"
    }
   }
  }

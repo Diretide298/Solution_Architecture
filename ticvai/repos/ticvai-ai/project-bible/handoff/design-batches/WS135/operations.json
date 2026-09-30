@@ -18,6 +18,25 @@
   "requestBody": "AdjustLoyaltyPointsRequest",
   "responds": "LoyaltyAdjustmentResult"
  },
+ "decideGuestIdentityVerification": {
+  "method": "POST",
+  "path": "/guest-identity-verifications/{verificationId}/decision",
+  "contract": "identity",
+  "summary": "Verify or refuse a guest's identity document",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "IdentityGuestVerification"
+ },
  "getConsentHistory": {
   "method": "GET",
   "path": "/guests/{subjectId}/consents/history",
@@ -214,6 +233,40 @@
   ],
   "requestBody": null,
   "responds": "Customer360ServiceProfileView"
+ },
+ "listGuestIdentityVerifications": {
+  "method": "GET",
+  "path": "/guest-identity-verifications",
+  "contract": "identity",
+  "summary": "Guest identity verifications, the review queue first",
+  "permission": "GUEST_VIEW_PII",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listSegments": {
   "method": "GET",

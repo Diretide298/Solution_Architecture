@@ -24,7 +24,7 @@ Offline is not a feature. It is a layer every write path passes through.
 | Concern | Rule |
 |---|---|
 | **Ordering** | Strictly sequential per device. A void arriving before the sale it voids is rejected and retried forever |
-| **Idempotency** | Client-generated ULID, sent as `Idempotency-Key`. Server deduplicates. Replay after a crash is a no-op |
+| **Idempotency** | Client-generated UUIDv7 (the id format the service mints, ADR-0056), sent as `Idempotency-Key`. Server deduplicates. Replay after a crash is a no-op |
 | **Timestamps** | Both `recorded_at` (device) and `synced_at` (server) retained. Reporting on the wrong one misstates revenue by trading day |
 | **Conflict policy** | Declared **per entity** at the call site. No global default |
 | **Capacity products** | Blocked offline. Client-enforced, server re-validated |
@@ -49,7 +49,7 @@ Offline is not a feature. It is a layer every write path passes through.
 | `Outbox` | Durable queue, per-device sequence, status, attempt counting, crash recovery |
 | `SyncOrchestrator` | Drain with backpressure, mode switching, failure classification, jittered backoff |
 | `sqlite` | Driver boundary — swappable in one place |
-| `ulid` | ID generation matching the backend's generator |
+| `id` | UUIDv7 generation (the `uuid` package's `v7`), the format the backend's `Id.New()` mints |
 
 ## Drain behaviour
 

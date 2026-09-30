@@ -1,4 +1,218 @@
 {
+ "Alert": {
+  "type": "object",
+  "x-ticvai-persistence": "reporting.alert",
+  "description": "A raised alert. **Acknowledged rather than dismissed** — CF-134 asked for it markable, and the difference is that an acknowledgement records who saw it.\n",
+  "required": [
+   "id",
+   "ruleId",
+   "raisedAt",
+   "severity",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "ruleId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "ruleName": {
+    "type": "string",
+    "description": "`AlertRule.name` as it stood when the alert was raised. **The line a person reads** — a list of rule ids is not an alert panel, and a screen should not need `listAlertRules` to label one.\n"
+   },
+   "metric": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricSource"
+     }
+    ],
+    "description": "The rule's metric, carried so the alert says what went out of range."
+   },
+   "raisedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "severity": {
+    "$ref": "#/components/schemas/AlertSeverity"
+   },
+   "status": {
+    "$ref": "#/components/schemas/AlertStatus"
+   },
+   "observedValue": {
+    "$ref": "#/components/schemas/MetricValue"
+   },
+   "threshold": {
+    "$ref": "#/components/schemas/MetricValue"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The workstation the reading was taken for, where the metric is measured per workstation (`salesByWorkstation`). Null otherwise. `listAlerts` filters on it."
+   },
+   "shiftId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The till shift (`orders.pos_shift`) the reading belongs to, where it was taken for a workstation with a shift open. Null otherwise. `listAlerts` filters on it."
+   },
+   "itemId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The inventory item the reading is about, where the metric is measured per item (`stockAgeing`, `stockTurnover`, `wastageRate`, `inventoryValuation`). Null otherwise. **What a replenishment screen prefills a requisition from.**\n"
+   },
+   "acknowledgedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "acknowledgedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "acknowledgementNote": {
+    "type": "string",
+    "maxLength": 300,
+    "nullable": true,
+    "description": "The `note` given to `acknowledgeAlert`. Kept, because an acknowledgement that says what is being done about it is the one escalation can skip."
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**Set when the metric returns to range, automatically.** An alert that only a person can close is an alert list that only grows.\n"
+   },
+   "escalatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Where `VenueSettings.alerting.escalateAfterMinutes` passed with no acknowledgement. **A critical alert nobody acknowledged is the case escalation exists for.**\n"
+   }
+  }
+ },
+ "AlertRule": {
+  "type": "object",
+  "x-ticvai-persistence": "reporting.alert_rule",
+  "description": "BL-152, CF-134. **Six contracts detect their own trouble and none told a person.**\nFive sections ask for this and it is the same gap as `MessageTrigger`, seen from the operational side — **that one tells a guest something happened; this one tells an operator something is wrong.**\n**A threshold that nobody is watching is a threshold nobody set.** 6.1.57 wants an exception when a KPI leaves range, and an exception that arrives in a nightly report is an exception nobody acted on.\n",
+  "required": [
+   "id",
+   "name",
+   "metric",
+   "comparator",
+   "threshold",
+   "severity",
+   "isActive",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "metric": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricSource"
+     }
+    ],
+    "description": "**From the closed set**, so a rule cannot watch something nothing produces — the same discipline `MetricSource` exists for.\n"
+   },
+   "comparator": {
+    "type": "string",
+    "enum": [
+     "above",
+     "below",
+     "outsideRange",
+     "changesBy",
+     "equals"
+    ]
+   },
+   "threshold": {
+    "$ref": "#/components/schemas/MetricValue"
+   },
+   "thresholdUpper": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricValue"
+     }
+    ],
+    "nullable": true,
+    "description": "**Required when `comparator` is `outsideRange`** (decided 28 September, audit R158): the range is `threshold` to `thresholdUpper`, and a rule missing either, or with the upper not above the lower, is refused by `setAlertRule` with 400. Ignored for every other comparator.\n"
+   },
+   "windowMinutes": {
+    "type": "integer",
+    "default": 15,
+    "description": "**The window is what stops an alert firing on noise.** A queue that spikes for ninety seconds is not a queue that needs a manager, and a rule with no window is a rule somebody mutes within a week.\n"
+   },
+   "severity": {
+    "$ref": "#/components/schemas/AlertSeverity"
+   },
+   "deliverTo": {
+    "type": "array",
+    "description": "CF-134. **The dashboard panel is the default and the only one that always applies.** Email or WhatsApp where the matrix names them — an operational alert arriving by email is an alert nobody sees in time.\n",
+    "items": {
+     "type": "string",
+     "enum": [
+      "dashboardPanel",
+      "email",
+      "whatsapp",
+      "sms",
+      "push"
+     ]
+    },
+    "x-ticvai-push-note": "**`push` added 29 September** (6.1.56, 18.1.5, build pass): delivered to every staff-app handset registered for a recipient (tenancy `RegisteredDevice`, kind `mobileHandset`, with a push token). It is how a daily revenue alert reaches a manager's phone, which a panel on a web dashboard does not.\n"
+   },
+   "recipientRoleIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "cooldownMinutes": {
+    "type": "integer",
+    "default": 30,
+    "description": "**How long before the same rule may fire again.** Without it, a metric hovering on a threshold produces forty alerts an hour and the panel becomes something people close.\n"
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**\n\n**Required, and it is the write target.** `setAlertRule` has no id in its path and a caller may hold several venues, so the rule names the venue it watches here — inside the caller's scope, or the write is refused."
+   }
+  }
+ },
+ "AlertSeverity": {
+  "type": "string",
+  "description": "How urgent an alert rule's breach is. Shared by `AlertRule`, `Alert` and the `listAlerts` filter.",
+  "enum": [
+   "info",
+   "warning",
+   "critical"
+  ]
+ },
+ "AlertStatus": {
+  "type": "string",
+  "description": "Where a raised alert is. Shared by `Alert` and the `listAlerts` filter.",
+  "enum": [
+   "raised",
+   "acknowledged",
+   "resolved",
+   "expired"
+  ]
+ },
  "AttendanceAmendment": {
   "type": "object",
   "x-ticvai-persistence": "workforce.attendance_amendment",
@@ -242,6 +456,80 @@
     "type": "integer"
    }
   }
+ },
+ "MetricSource": {
+  "type": "string",
+  "description": "**A named metric with a verified source.** BL-053, 75 requirement rows.\n`reporting` is a generic builder, and **a generic builder makes every reporting requirement look covered** — it will happily assemble a report over data nobody produces. That is the shape to watch across the whole walk, and this enum is the answer to it: each value below was checked against the schema before being named.\n| Metric | Source | |---|---| | `occupancy` | `catalogue.channel_capacity.sold` and `leased` against `capacity` | | `capacityUtilisation` | `catalogue.channel_capacity.remaining` over the same window | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order` | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation on the shift that took it | | `waitTime` | `queue.waiting_guest.estimated_call_at` against `called_at` | | `throughput` | `queue.waiting_guest` completions per hour | | `abandonmentRate` | Queue entries that left before being called |\n**`salesByInstructor` was deliberately absent from the first cut** because it needed the staff-assignment link CL-01 covers. It was added on 18 August once `resources.Resource` produced it — see `x-ticvai-extension-note` below. Naming a metric with no source is still the defect this enum exists to prevent.\n**Money-valued metrics are listed in `x-ticvai-money-valued`.** A reading or threshold on one of them is a `Money`, never a float (`MetricValue`).\n",
+  "enum": [
+   "occupancy",
+   "capacityUtilisation",
+   "admissionRate",
+   "noShowRate",
+   "conversion",
+   "salesByOperator",
+   "salesByWorkstation",
+   "waitTime",
+   "throughput",
+   "abandonmentRate",
+   "inventoryValuation",
+   "stockTurnover",
+   "stockAgeing",
+   "wastageRate",
+   "resaleVolume",
+   "resaleCommission",
+   "salesByInstructor",
+   "resourceUtilisation",
+   "allocationUtilisation",
+   "channelAllocationBurn",
+   "membershipChurn",
+   "membershipRenewalRate",
+   "supplierDeliveryPerformance",
+   "revenuePerEntitlement",
+   "revenuePerVisitor",
+   "assetDowntime",
+   "meanTimeToRepair",
+   "challengeCompletionRate",
+   "attributedRevenue",
+   "loyaltyActiveMembers",
+   "loyaltyTierDistribution",
+   "loyaltyPointsLiability",
+   "loyaltyBreakageRate",
+   "loyaltyMemberRetention",
+   "challengeParticipationRate",
+   "gamificationLoyaltyImpact",
+   "gamificationMembershipImpact",
+   "gamificationRetention",
+   "accreditationApplications",
+   "accreditationTimeToDecision",
+   "accreditationCredentialsIssued",
+   "accreditationActiveHolders",
+   "accreditationRenewalsDue",
+   "staffingShortfall"
+  ],
+  "x-ticvai-money-valued": [
+   "inventoryValuation",
+   "resaleCommission",
+   "revenuePerEntitlement",
+   "revenuePerVisitor",
+   "attributedRevenue",
+   "loyaltyPointsLiability"
+  ],
+  "x-ticvai-extended-29-september": "**Fourteen metrics added 29 September (build pass)**, each checked against the schema of the contract that produces it.\n\n| Metric | Source | Requirement | |---|---|---| | `loyaltyActiveMembers` | `marketing.loyalty_position` members with a `marketing.loyalty_points` movement in the period | 5.4.27 | | `loyaltyTierDistribution` | `marketing.loyalty_position.tier_id` against `marketing.programme_tier`, members per tier | 5.4.27 | | `loyaltyPointsLiability` | the balance of `ledger.journal_line` on each programme's `pointsLiabilityAccountId`, where points post on accrual and release on redemption or expiry | 5.4.27 | | `loyaltyBreakageRate` | `marketing.loyalty_points` expiry movements over points earned, in the period | 5.4.27 | | `loyaltyMemberRetention` | members with a movement in the previous period who also have one in this period | 5.4.27 | | `challengeParticipationRate` | distinct `marketing.challenge_progress.subject_id` over active loyalty members | 22.6.20 | | `gamificationLoyaltyImpact` | points earned per member, challenge participants against non-participants (`marketing.loyalty_points` split by `marketing.challenge_progress`) | 22.6.20 | | `gamificationMembershipImpact` | joins and renewals in `identity.customer_membership`, participants against non-participants | 22.6.20 | | `gamificationRetention` | return visits (`access.scan_event`, in-direction) of participants against non-participants | 22.6.20 | | `accreditationApplications` | `accreditation.application` by `status` | 12.1.50 | | `accreditationTimeToDecision` | `accreditation.application.decided_at` minus `submitted_at` | 12.1.50 | | `accreditationCredentialsIssued` | `accreditation.credential.issued_at` | 12.1.50 | | `accreditationActiveHolders` | `accreditation.holder` `active`, by `category_code` | 12.1.50 | | `accreditationRenewalsDue` | `accreditation.holder.valid_to` inside `accreditation.validity.renewal_window_days` | 12.1.50 |\n\n**`staffingShortfall` added the same evening (build pass, group G2; 8.2.49)**: the largest gap in the window between the staff rostered and the staff the forecast requires, per venue and position, from `workforce.forecast_requirement` (the handed-over AI staff requirement) against `workforce.rota_assignment` and `workforce.open_shift`, computed as `workforce.getStaffingCoverage` with `basis` `forecastRequirement`. An `AlertRule` on it with `comparator` `above` and `threshold` 0 is the staffing shortage alert; `windowMinutes` looks ahead rather than back for this metric (the rota for the coming window), and `cooldownMinutes` stops one short shift alerting every quarter hour.\n\n**Points issued, points redeemed, campaign performance and reward redemption were already served** by the `loyalty` and `campaigns` sources, and challenge completion and revenue attribution by `challengeCompletionRate` and `attributedRevenue`.\n",
+  "x-ticvai-money-valued-note": "**`salesByOperator`, `salesByWorkstation` and `resaleVolume` are not listed because the package does not say whether they count sales or sum their value.** Until that is decided, a rule on them carries a plain number.\n",
+  "x-ticvai-extended": "18 August 2026",
+  "x-ticvai-extension-note": "**Nineteen metrics added when their upstream models landed**, which is how BL-053 was always going to close — not by changing `reporting` but by building the things it wanted to report on.\n`inventoryValuation`, `stockTurnover`, `stockAgeing` and `wastageRate` came from `inventory.StockBatch`; `resaleVolume` and `resaleCommission` from `orders.ResaleListing`; **`salesByInstructor` from `resources.Resource`, which was the one metric this enum deliberately refused to name in the morning** because nothing produced it. `allocationUtilisation` from `PartnerUser` and `ChannelListing`, `membershipChurn` from `Journey`, `supplierDeliveryPerformance` from `ProductionRun`, `assetDowntime` and `meanTimeToRepair` from `WorkOrder.downtimeMinutes`, `challengeCompletionRate` from `ChallengeProgress`, `attributedRevenue` from `AttributionTouch`.\n**Each was checked against the schema before being named.** That rule has not changed — naming a metric with no source is the defect this enum exists to prevent.\n"
+ },
+ "MetricValue": {
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**A reading of a metric or KPI, or a threshold on one.** A `Money` where the metric is money-valued — `MetricSource` lists those in `x-ticvai-money-valued`, and a KPI is when its `unit` is `currency` — and a plain number otherwise. naming-and-style 5.1: money is never a float, at any layer.\nStored as `numeric(18,4)` either way: a money value stores its amount, and currency and scale resolve from the scope as they do for every `Money`.\n",
+  "oneOf": [
+   {
+    "type": "number"
+   },
+   {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  ]
  },
  "OpenShift": {
   "type": "object",
@@ -504,6 +792,35 @@
      "type": "string",
      "format": "uuid"
     }
+   },
+   "basisApplied": {
+    "type": "string",
+    "enum": [
+     "minimum",
+     "forecastRequirement"
+    ],
+    "description": "Which figure `required` is for this row. With `higherOfBoth`, the larger; with `forecastRequirement` and no handed-over requirement for the period, `minimum`."
+   },
+   "minimumRequired": {
+    "type": "integer",
+    "nullable": true,
+    "description": "The configured minimum for the position and window."
+   },
+   "forecastRequired": {
+    "type": "number",
+    "nullable": true,
+    "description": "The forecast staff requirement (p50) for the position and window, from `workforce.forecast_requirement`. Null where none was handed over."
+   },
+   "forecastRequiredP90": {
+    "type": "number",
+    "nullable": true,
+    "description": "The busy-case requirement, for planning to the busy case."
+   },
+   "forecastVersionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The AI forecast version the requirement is bound to (AIP-067), so a manager can open the forecast behind it."
    }
   }
  },

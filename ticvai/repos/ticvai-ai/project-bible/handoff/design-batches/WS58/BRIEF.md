@@ -1,6 +1,6 @@
 # WS58 — Sales Channel Management board 2
 
-**10 screens · 10 operations · 10 schemas · 1 permissions**
+**10 screens · 17 operations · 17 schemas · 4 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 1 permissions apply here:
-  `PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `AI_APPROVE, PRICE_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-268` | Channel Operations Command Center | commandCentre | 1 | 0 | — |
-| `ADM-269` | Channel Connection & Integration Manager | configEditor | 1 | 0 | — |
-| `ADM-270` | Product, Price & Availability Synchronization | listDetail | 1 | 0 | — |
-| `ADM-271` | Real-Time Channel Availability & Inventory Monitor | listDetail | 1 | 0 | — |
+| `ADM-268` | Channel Operations Command Center | commandCentre | 2 | 0 | — |
+| `ADM-269` | Channel Connection & Integration Manager | configEditor | 3 | 2 | — |
+| `ADM-270` | Product, Price & Availability Synchronization | listDetail | 2 | 1 | — |
+| `ADM-271` | Real-Time Channel Availability & Inventory Monitor | listDetail | 2 | 0 | — |
 | `ADM-272` | Channel Allocation & Rebalancing Operations | listDetail | 1 | 0 | — |
-| `ADM-273` | Channel Exceptions, Incidents & Recovery | configEditor | 1 | 0 | — |
+| `ADM-273` | Channel Exceptions, Incidents & Recovery | configEditor | 3 | 1 | — |
 | `ADM-274` | Channel Performance & Commercial Analytics | commandCentre | 1 | 0 | — |
 | `ADM-275` | Channel Audit, Logs & Transaction Traceability | listDetail | 1 | 0 | — |
 | `ADM-276` | Channel Governance, SLA & Partner Control | configEditor | 1 | 0 | — |
-| `ADM-277` | AI Channel Optimization & Intelligence Center | listDetail | 1 | 0 | — |
+| `ADM-277` | AI Channel Optimization & Intelligence Center | listDetail | 3 | 1 | — |
 
 ## Thin screens in this batch
 

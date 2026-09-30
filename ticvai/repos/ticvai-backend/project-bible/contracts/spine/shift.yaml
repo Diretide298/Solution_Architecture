@@ -509,7 +509,7 @@ paths:
         the box's lifts.
 
         **`recordedAt` is the device's time** (offline-and-sync: offline data keeps both
-        `recorded_at` and `synced_at`), and `id` is the client ULID that doubles as the
+        `recorded_at` and `synced_at`), and `id` is the client UUIDv7 that doubles as the
         idempotency key.
       tags: [shift]
       x-ticvai-permission: CASH_LIFT
@@ -528,8 +528,8 @@ paths:
               properties:
                 id:
                   type: string
-                  pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
-                  description: Client-generated ULID of the `CashMovement` this records.
+                  format: uuid
+                  description: Client-generated UUIDv7 of the `CashMovement` this records.
                 amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
                 witnessPrincipalId:
                   type: string
@@ -674,7 +674,7 @@ paths:
       - name: shiftId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     get:
       operationId: getShift
       x-ticvai-consumed-by:
@@ -710,7 +710,7 @@ paths:
       - name: shiftId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: approveShiftOpen
       x-ticvai-consumed-by:
@@ -763,7 +763,7 @@ paths:
       - name: shiftId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: reopenShift
       x-ticvai-consumed-by:
@@ -848,7 +848,7 @@ paths:
       - name: shiftId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: suspendShift
       x-ticvai-consumed-by:
@@ -908,7 +908,7 @@ paths:
       - name: shiftId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: resumeShift
       x-ticvai-consumed-by:
@@ -970,7 +970,7 @@ paths:
       - name: shiftId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: closeShift
       x-ticvai-consumed-by:
@@ -1051,7 +1051,7 @@ paths:
       - name: shiftId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: acceptShiftVariance
       x-ticvai-consumed-by:
@@ -1127,7 +1127,7 @@ paths:
       - name: shiftId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: approveShiftClose
       x-ticvai-audience: [staff]
@@ -1182,7 +1182,7 @@ paths:
       - name: shiftId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: recordNoSale
       x-ticvai-consumed-by:
@@ -1220,7 +1220,7 @@ paths:
               type: object
               required: [id, reason, recordedAt]
               properties:
-                id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                id: { type: string, format: uuid }
                 reason:
                   type: string
                   enum: [changeForGuest, correctFloat, retrieveDroppedCash, tillCheck, other]
@@ -1246,7 +1246,7 @@ paths:
       - name: shiftId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     get:
       operationId: listCashMovements
       x-ticvai-consumed-by:
@@ -1385,9 +1385,9 @@ components:
           description: Where it is being used now. **Changes during a shift; the box does not.**
         shiftId:
           type: string
-          pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+          format: uuid
           nullable: true
-          description: The shift trading from this box. A ULID, as `Shift.id` is.
+          description: The shift trading from this box. A UUIDv7, as `Shift.id` is.
         status: { $ref: '#/components/schemas/DepositBoxStatus' }
         openingFloat: { $ref: '../shared/common.yaml#/components/schemas/Money' }
         openingDenominations:
@@ -1595,8 +1595,8 @@ components:
         id: { type: string, format: uuid }
         shiftId:
           type: string
-          pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
-          description: A ULID, as `Shift.id` and `orders.pos_shift.id` are.
+          format: uuid
+          description: A UUIDv7, as `Shift.id` and `orders.pos_shift.id` are.
         depositBoxId: { type: string, format: uuid, nullable: true }
         countKind:
           type: string
@@ -1608,7 +1608,7 @@ components:
             operation that wrote the line.
         cashMovementId:
           type: string
-          pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+          format: uuid
           nullable: true
           description: >
             The movement this line counts, where `countKind` is `movement`. How
@@ -1736,8 +1736,8 @@ components:
       properties:
         id:
           type: string
-          pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
-          description: Client-generated ULID. Also the idempotency key.
+          format: uuid
+          description: Client-generated UUIDv7. Also the idempotency key.
         workstationId: { type: string, format: uuid }
         venueId: { type: string, format: uuid }
         scopePath: { type: string }
@@ -1893,8 +1893,8 @@ components:
       properties:
         id:
           type: string
-          pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
-          description: Client-generated ULID.
+          format: uuid
+          description: Client-generated UUIDv7.
         kind: { $ref: '#/components/schemas/CashMovementKind' }
         amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
         denominations:
@@ -1916,8 +1916,8 @@ components:
       x-ticvai-persistence: "orders.no_sale_event"
       required: [id, shiftId, reason, principalId, recordedAt]
       properties:
-        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
-        shiftId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        id: { type: string, format: uuid }
+        shiftId: { type: string, format: uuid }
         workstationId: { type: string, format: uuid }
         reason: { type: string }
         note: { type: string, nullable: true }
@@ -1938,7 +1938,7 @@ components:
           properties:
             shiftId:
               type: string
-              pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+              format: uuid
             depositBoxId:
               type: string
               format: uuid

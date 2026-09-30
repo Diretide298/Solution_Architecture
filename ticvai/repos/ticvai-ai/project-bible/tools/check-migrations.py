@@ -8,11 +8,11 @@ What this checks is the conventions a parser cannot know:
 
   * every table that carries scope_path OR venue_id has RLS, FORCE and a policy --
     longhand, or through platform.apply_scope_rls / apply_venue_rls
-  * every partitioned table has a default partition, with venue_id leading its key
+  * every partitioned table has a default partition, with its partition column in its key
   * every referenced schema exists by the time it is used
   * every foreign key points at a table some migration actually creates
   * money columns are numeric(18,4) and carry currency and scale
-  * ULID columns are char(26)
+  * every key named `id` or `*_id` is uuid (ADR-0056: one id type; new ids are UUIDv7)
   * no DROP or destructive ALTER outside a rollback block
 
 On a versioned `V*__*.sql` migration it additionally checks version registration and
@@ -125,6 +125,11 @@ ALTERED: set[str] = set()   # tables given a level-typed FK by a later ALTER TAB
 # `920-row-level-security.sql` protects it, so a per-file search finds neither half beside the
 # other. Collected across the whole series for the same reason foreign keys are.
 RLS_APPLIED: set[str] = set()
+# **Tables given a DEFAULT partition anywhere in the series** (ADR-0056, 30 September). The tables
+# declare `PARTITION BY RANGE` in `010-<schema>.sql` and their partitions are created in
+# `930-partitioning.sql`, so a per-file search finds neither half beside the other -- the same
+# reason RLS is collected across the series.
+DEFAULTS: set[str] = set()
 EXEMPT = {
     # Written inside the same transaction as the state change it records. A foreign key
     # failure here would roll back a sale for a bookkeeping reason, and the venue_id is
@@ -165,6 +170,8 @@ def collect_alters(files: list[Path]) -> None:
             RLS_APPLIED.add(m.group(1).replace('"', ""))
         for m in re.finditer(r"ALTER TABLE ([\w.]+) ENABLE ROW LEVEL SECURITY", text):
             RLS_APPLIED.add(m.group(1))
+        for m in re.finditer(r"PARTITION OF ([\w.\"]+) DEFAULT", text):
+            DEFAULTS.add(m.group(1).replace('"', ""))
 
 
 def check_file(path: Path, known_schemas: set[str]) -> set[str]:
@@ -255,10 +262,19 @@ def check_file(path: Path, known_schemas: set[str]) -> set[str]:
                            "and a composite FK to scope_node (id, level)")
 
         if is_partitioned:
-            if not re.search(rf"PARTITION OF {re.escape(table)} DEFAULT", code):
+            if (table.replace('"', "") not in DEFAULTS
+                    and not re.search(rf"PARTITION OF {re.escape(table)} DEFAULT", code)):
                 fail(name, f"{table} is partitioned but has no DEFAULT partition")
-            if "PRIMARY KEY (" in head and "venue_id" not in head.split("PRIMARY KEY (")[1].split(")")[0]:
-                fail(name, f"{table} partitions by venue_id but venue_id is not in the primary key")
+            # **The partition column, not venue_id** (ADR-0056 amends ADR-0044): release 1
+            # partitions by time. Postgres refuses a primary key without the partition column.
+            pm = re.search(r"PARTITION BY (?:RANGE|LIST|HASH) \((\w+)\)", head)
+            if pm and "PRIMARY KEY (" in head:
+                keycols = head.split("PRIMARY KEY (")[1].split(")")[0]
+                if pm.group(1) not in [k.strip() for k in keycols.split(",")]:
+                    fail(name, f"{table} partitions by {pm.group(1)} but it is not in the primary key")
+            elif pm:
+                fail(name, f"{table} is partitioned and has no table-level primary key naming "
+                           f"{pm.group(1)}")
 
         # money columns
         for col in re.findall(r"^\s+(\w*(?:amount|price|cost|total|balance)\w*)\s+([\w()., ]+)", head, re.M | re.I):
@@ -269,11 +285,18 @@ def check_file(path: Path, known_schemas: set[str]) -> set[str]:
             if "currency_code" not in head and "currency" not in head:
                 warn(name, f"{table} has money columns but no currency column")
 
-        # ULID keys
-        for col in re.findall(r"^\s+(id|\w+_id)\s+(char\(\d+\)|uuid|text)", head, re.M):
-            cname, ctype = col
-            if ctype.startswith("char(") and ctype != "char(26)":
-                fail(name, f"{table}.{cname} is {ctype} — ULIDs are char(26)")
+        # **One id type** (ADR-0056, accepted 30 September). This used to check that a ULID column
+        # was char(26); ULIDs are gone and every id is a uuid (UUIDv7 when new). A key named `id` or
+        # `*_id` of any other type is the mixed-type package the ADR ended -- the one where
+        # `platform.outbox.aggregate_id` could not hold an order id.
+        keyed = set(re.findall(r"^\s+(id|\w+_id)\s+[\w()]+ PRIMARY KEY", head, re.M))
+        tm = re.search(r"CONSTRAINT \w+ PRIMARY KEY \(([^)]*)\)", head)
+        if tm:
+            keyed |= {k.strip() for k in tm.group(1).split(",")
+                      if k.strip() == "id" or k.strip().endswith("_id")}
+        for cname, ctype in re.findall(r"^\s+(id|\w+_id)\s+([\w()]+)", head, re.M):
+            if cname in keyed and ctype != "uuid":
+                fail(name, f"{table}.{cname} is a key of type {ctype} -- every id is uuid (ADR-0056)")
 
     return known
 

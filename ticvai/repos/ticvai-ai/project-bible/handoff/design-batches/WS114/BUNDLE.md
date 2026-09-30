@@ -1,6 +1,6 @@
 # WS114 — ACCREDITATION board 7
 
-**10 screens · 7 operations · 8 schemas · 5 permissions**
+**10 screens · 12 operations · 15 schemas · 8 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `ACCREDITATION_CONFIGURE, ACCREDITATION_MANAGE, ACCREDITATION_VIEW, GUEST_MANAGE, MARKETING_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 8 permissions apply here:
+  `ACCREDITATION_CONFIGURE, ACCREDITATION_MANAGE, ACCREDITATION_VIEW, GUEST_MANAGE, MARKETING_SEND, MARKETING_VIEW, REPORT_EXPORT, REPORT_VIEW_VENUE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -68,7 +68,7 @@ convincingly. It is never a caption.
 | `BO-679` | Manual & Bulk Communication Center | listDetail | 1 | 0 | — |
 | `BO-680` | Accreditation Bulk Import | listDetail | 1 | 0 | — |
 | `BO-681` | Import Validation & Processing Monitor | listDetail | 1 | 0 | — |
-| `BO-682` | Accreditation Export & Data Extract Center | configEditor | 1 | 0 | — |
+| `BO-682` | Accreditation Export & Data Extract Center | configEditor | 6 | 0 | — |
 | `BO-683` | Delivery, Batch & Operational History | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
@@ -1296,6 +1296,41 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Export",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listAccreditationExports",
+    "contract": "accreditation",
+    "purpose": "Export history: requested by, date, filters, fields, records, status",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "exportAccreditationData",
+    "contract": "accreditation",
+    "purpose": "Request an export",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getAccreditationExport",
+    "contract": "accreditation",
+    "purpose": "Status and download link",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "runReport",
+    "contract": "reporting",
+    "purpose": "Report over the accreditation data sources",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "exportReportResult",
+    "contract": "reporting",
+    "purpose": "csv or xlsx extract",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1304,6 +1339,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS07 ACCREDITATION Board 7.dc.html#bo-682"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 61. 0 of 0 labels bound to a contract property; 7 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "executionId",
+     "from": "navigation"
+    },
+    {
+     "name": "exportId",
+     "from": "navigation"
+    },
+    {
+     "name": "reportId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1447,6 +1498,57 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+ "exportAccreditationData": {
+  "method": "POST",
+  "path": "/accreditation-exports",
+  "contract": "accreditation",
+  "summary": "Export holders, applications, credentials or access assignments",
+  "permission": "ACCREDITATION_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccreditationDataExport",
+  "responds": null
+ },
+ "exportReportResult": {
+  "method": "POST",
+  "path": "/report-executions/{executionId}/export",
+  "contract": "reporting",
+  "summary": "Export a completed result",
+  "permission": "REPORT_EXPORT",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getAccreditationExport": {
+  "method": "GET",
+  "path": "/accreditation-exports/{exportId}",
+  "contract": "accreditation",
+  "summary": "One export, and its download link once ready",
+  "permission": "ACCREDITATION_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AccreditationDataExport"
+ },
  "importAccreditationHolders": {
   "method": "POST",
   "path": "/accreditation-imports",
@@ -1454,7 +1556,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Load a roster supplied by an organisation",
   "permission": "ACCREDITATION_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1489,6 +1591,35 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "AccreditationAuditRecord"
+ },
+ "listAccreditationExports": {
+  "method": "GET",
+  "path": "/accreditation-exports",
+  "contract": "accreditation",
+  "summary": "Exports taken, by whom, of what",
+  "permission": "ACCREDITATION_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listAccreditationHolders": {
   "method": "GET",
@@ -1553,12 +1684,31 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
+ "runReport": {
+  "method": "POST",
+  "path": "/reports/{reportId}/run",
+  "contract": "reporting",
+  "summary": "Run a report",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RunReportRequest",
+  "responds": "ReportResult"
+ },
  "sendTransactionalMessage": {
   "method": "POST",
   "path": "/messages",
   "contract": "marketing-crm",
   "summary": "Send a transactional message",
-  "permission": null,
+  "permission": "MARKETING_SEND",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -1579,7 +1729,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Who is told what, and when",
   "permission": "ACCREDITATION_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1681,6 +1831,121 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "AccreditationDataExport": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.data_export",
+  "description": "12.1.55. **A spreadsheet of accredited people leaving the platform is an event someone should own.** Requested by `exportAccreditationData`, listed for BO-682, and fetched once `ready`.\n",
+  "required": [
+   "dataset",
+   "format"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "dataset": {
+    "type": "string",
+    "enum": [
+     "holders",
+     "applications",
+     "credentials",
+     "accessAssignments",
+     "documents"
+    ]
+   },
+   "format": {
+    "type": "string",
+    "enum": [
+     "csv",
+     "xlsx"
+    ]
+   },
+   "programmeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "statusFilter": {
+    "type": "string",
+    "nullable": true
+   },
+   "organisationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "categoryCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "validOn": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "Only accreditations valid on this date — the register for one performance"
+   },
+   "fields": {
+    "type": "array",
+    "description": "The columns wanted. Omitted means the dataset's standard set",
+    "items": {
+     "type": "string"
+    }
+   },
+   "includePersonalData": {
+    "type": "boolean",
+    "default": false,
+    "description": "Contact details, date of birth, nationality and document references. Requires REPORT_EXPORT_PII and a purpose; recorded in the accreditation audit trail"
+   },
+   "purpose": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "requestedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "recordCount": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true
+   },
+   "status": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "queued",
+     "running",
+     "ready",
+     "failed",
+     "expired"
+    ]
+   },
+   "downloadUrl": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Signed and expiring"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
  "AccreditationHolder": {
   "type": "object",
   "x-ticvai-persistence": "accreditation.holder",
@@ -1718,6 +1983,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "nationality": {
     "type": "string",
     "nullable": true
+   },
+   "email": {
+    "type": "string",
+    "format": "email",
+    "nullable": true,
+    "description": "12.1.16. The holder's own address — where a mobile credential and renewal notices go"
+   },
+   "phone": {
+    "type": "string",
+    "nullable": true,
+    "description": "12.1.16. E.164"
    },
    "identityDocumentVerified": {
     "type": "boolean",
@@ -1837,6 +2113,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
         "rejected",
         "credentialReady",
         "expiringSoon",
+        "renewalWindowOpen",
         "expired",
         "suspended",
         "revoked"
@@ -1876,6 +2153,29 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string"
    }
   }
+ },
+ "ExportFormat": {
+  "type": "string",
+  "enum": [
+   "csv",
+   "xlsx",
+   "pdf",
+   "json"
+  ]
+ },
+ "FieldType": {
+  "type": "string",
+  "enum": [
+   "string",
+   "integer",
+   "decimal",
+   "money",
+   "boolean",
+   "date",
+   "dateTime",
+   "uuid",
+   "enum"
+  ]
  },
  "LocalisedText": {
   "x-ticvai-persistence": "none — jsonb column",
@@ -2043,6 +2343,94 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
+ },
+ "MessageTemplate": {
+  "x-ticvai-persistence": "marketing.message_template",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "channel",
+   "bodies"
+  ],
+  "properties": {
+   "id": {
+    "readOnly": true,
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "subjects": {
+    "type": "object",
+    "description": "Per language. Email only.",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "bodies": {
+    "type": "object",
+    "description": "Per language, keyed by ISO 639-1 code.",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "mergeFields": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "missingLanguages": {
+    "type": "array",
+    "readOnly": true,
+    "description": "Enabled languages without a body. Flagged rather than silently falling back — a guest receiving English when they chose Arabic is a defect.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "providerTemplateId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Required for WhatsApp, where templates are pre-approved by the provider."
+   },
+   "brandId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The brand whose identity the template carries; null for the tenant default."
+   },
+   "ownership": {
+    "type": "string",
+    "enum": [
+     "platform",
+     "crm"
+    ],
+    "default": "crm",
+    "description": "`platform` = a transactional template owned by the communication service; `crm` = a marketing template owned by CRM (`listSystemTransactionalTemplate`). Content by language and version is in `MessageTemplateVersion`. (decided 29 September, data model for the agreed operations)"
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -2059,6 +2447,97 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "hasMore": {
     "type": "boolean"
+   }
+  }
+ },
+ "ReportResult": {
+  "x-ticvai-persistence": "none — result set, cached in object storage",
+  "type": "object",
+  "required": [
+   "executionId",
+   "columns",
+   "rows"
+  ],
+  "properties": {
+   "executionId": {
+    "type": "string"
+   },
+   "columns": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "key": {
+       "type": "string"
+      },
+      "label": {
+       "type": "string"
+      },
+      "type": {
+       "$ref": "#/components/schemas/FieldType"
+      }
+     }
+    }
+   },
+   "rows": {
+    "type": "array",
+    "description": "**Open on purpose; the shape is `columns`.** Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a `Money`, dates, date-times and uuids as strings. A report's columns are chosen at run time, so no fixed schema can name them.\n",
+    "items": {
+     "type": "object",
+     "additionalProperties": true
+    }
+   },
+   "totals": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Aggregated columns only, keyed and typed as a row is."
+   },
+   "rowCount": {
+    "type": "integer"
+   },
+   "nextCursor": {
+    "type": "string",
+    "nullable": true
+   },
+   "generatedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "dataAsOf": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it prevents an argument about a figure that moved.\n"
+   }
+  }
+ },
+ "RunReportRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "properties": {
+   "parameters": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "**Open on purpose; its shape is the report's.** Keyed by `ReportParameter.key` of the definition being run, each value of that parameter's `type`. An `isRequired` parameter with no value here and no `defaultValue` is the `400` `runReport` lists.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Narrows to one venue. Omitting it returns everything the caller's scope permits — it cannot be used to reach beyond that.\n"
+   },
+   "dateFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Defaults to today in the venue's time zone when not sent (decided 28 September, audit R158)."
+   },
+   "dateTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Defaults to today in the venue's time zone when not sent (audit R158)."
+   },
+   "forceAsync": {
+    "type": "boolean",
+    "default": false,
+    "description": "Queue regardless of size, for a result to be collected later."
    }
   }
  }

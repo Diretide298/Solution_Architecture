@@ -4,24 +4,125 @@
   "path": "/agent-workload-availability",
   "contract": "marketing-crm",
   "summary": "Agent Workload, Availability & Workforce Control",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "queueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "team",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "skill",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "language",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "AgentWorkloadAvailabilityWorkforceControlView"
+  "responds": "Page"
+ },
+ "listCaseCategories": {
+  "method": "GET",
+  "path": "/case-categories",
+  "contract": "marketing-crm",
+  "summary": "List case categories and subcategories",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "parentCategoryId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "topLevelOnly",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "isActive",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listContact": {
   "method": "GET",
   "path": "/contact",
   "contract": "marketing-crm",
   "summary": "Contact Center Operations Command Center",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "queueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "ContactCenterOperationsCommandCenterView"
  },
@@ -30,11 +131,27 @@
   "path": "/contact-automation",
   "contract": "marketing-crm",
   "summary": "AI Contact Center Intelligence & Automation Studio",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "horizonHours",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "AiContactCenterIntelligenceAutomationStudioView"
  },
@@ -43,11 +160,62 @@
   "path": "/customer-satisfaction-feedback",
   "contract": "marketing-crm",
   "summary": "Customer Satisfaction, Feedback & Voice of Customer",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "source",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "eventId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "agentPrincipalId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "sentiment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "CustomerSatisfactionFeedbackVoiceOfCustomerView"
  },
@@ -56,26 +224,108 @@
   "path": "/escalation-critical-case",
   "contract": "marketing-crm",
   "summary": "Escalation & Critical Case Monitor",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "escalationType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priority",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "eventId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "breachedOnly",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "EscalationCriticalCaseMonitorView"
+  "responds": "Page"
  },
  "listQualityAgentEvaluation": {
   "method": "GET",
   "path": "/quality-agent-evaluation",
   "contract": "marketing-crm",
   "summary": "Quality Management & Agent Evaluation",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "agentPrincipalId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "evaluatorPrincipalId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "sourceType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "criticalFailureOnly",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "QualityManagementAgentEvaluationView"
+  "responds": "Page"
  },
  "listQueues": {
   "method": "GET",
@@ -111,16 +361,91 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listServiceQueues": {
+  "method": "GET",
+  "path": "/service-queues",
+  "contract": "marketing-crm",
+  "summary": "List customer-service queues",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "isActive",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listServiceRootCause": {
   "method": "GET",
   "path": "/service-root-cause",
   "contract": "marketing-crm",
   "summary": "Service Analytics & Root-Cause Intelligence",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "eventId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "compare",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "compareId",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "ServiceAnalyticsRootCauseIntelligenceView"
  },
@@ -129,11 +454,57 @@
   "path": "/sla-policy-service",
   "contract": "marketing-crm",
   "summary": "SLA Policy & Service-Level Management",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "slaPolicyId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priority",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "queueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "SlaPolicyServiceLevelManagementView"
  },
@@ -141,13 +512,38 @@
   "method": "PUT",
   "path": "/intelligent-routing-skill",
   "contract": "marketing-crm",
-  "summary": "Intelligent Routing, Skills & Assignment Engine",
-  "permission": "MARKETING_MANAGE",
+  "summary": "Create or change a case routing rule",
+  "permission": "CASE_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "IntelligentRoutingSkillsAssignmentEngineInput",
   "responds": "IntelligentRoutingSkillsAssignmentEngineView"
+ },
+ "setServiceQueueDefinition": {
+  "method": "PUT",
+  "path": "/service-queues",
+  "contract": "marketing-crm",
+  "summary": "Create or change a customer-service queue",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ServiceQueue",
+  "responds": "ServiceQueue"
  }
 }

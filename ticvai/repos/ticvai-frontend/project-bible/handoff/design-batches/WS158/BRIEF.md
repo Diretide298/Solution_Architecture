@@ -1,6 +1,6 @@
 # WS158 — Resource Management Configuration board 4
 
-**10 screens · 13 operations · 11 schemas · 3 permissions**
+**10 screens · 15 operations · 17 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `ATTENDANCE_RECORD, WORKFORCE_MANAGE, WORKFORCE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `ATTENDANCE_RECORD, REPORT_MANAGE, REPORT_VIEW_VENUE, WORKFORCE_MANAGE, WORKFORCE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -63,7 +63,7 @@ convincingly. It is never a caption.
 | `BO-883` | Workforce Roster Command Center | listDetail | 2 | 0 | — |
 | `BO-884` | Attraction & Operational Staffing Roster | listDetail | 1 | 0 | — |
 | `BO-885` | Minimum Staffing & Coverage Rule Configuration | configEditor | 1 | 0 | — |
-| `BO-886` | Staffing Gap & Coverage Control Center | listDetail | 1 | 0 | — |
+| `BO-886` | Staffing Gap & Coverage Control Center | listDetail | 3 | 0 | — |
 | `BO-887` | Shift Marketplace & Workforce Requests | listDetail | 2 | 0 | — |
 | `BO-888` | Attendance & Live Workforce Command Center | listDetail | 1 | 0 | — |
 | `BO-889` | Staff Check-In, Check-Out & Attendance Exceptions | configEditor | 2 | 0 | — |

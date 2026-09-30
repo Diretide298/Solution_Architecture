@@ -238,7 +238,7 @@ The visit plan itself lives in `venue-map` (`venuemap.visit_plan`, `venuemap.vis
 
 ### 3.1 Data model
 
-All new tables are owned by the AI service. Scoped tables get `platform.apply_scope_rls`; child tables get `platform.apply_parent_rls`. **The five existing AI tables with no policy** (`chunk_ref`, `index_failure`, `knowledge_document`, `proposed_action`, `suggestion_outcome`) gain `scope_path` or a mandatory parent, closing an existing gap. **Platform rows** (the platform model catalogue, tool registry, platform prompts) are mastered in the control plane, which holds no personal data (ADR-0043), and replicated read-only into each tenant database by the release.
+All new tables are owned by the AI service. Scoped tables get `platform.apply_scope_rls`; child tables get `platform.apply_parent_rls`. **The four existing AI tables with no policy** (`index_failure`, `knowledge_document`, `proposed_action`, `suggestion_outcome`; a fifth, `chunk_ref`, was merged into `ai.chunk_embedding` on 30 September) gain `scope_path` or a mandatory parent, closing an existing gap. **Platform rows** (the platform model catalogue, tool registry, platform prompts) are mastered in the control plane, which holds no personal data (ADR-0043), and replicated read-only into each tenant database by the release.
 
 | Group | Table (tenant DB unless marked **log**) | RLS | Notes |
 |---|---|---|---|
@@ -727,6 +727,8 @@ Effort is in developer-weeks at the AI-assisted pace assumed in the six-month pl
 ---
 
 ## 8. Decisions taken on 29 September, and what remains
+
+> **30 September 2026:** ADR-0049 decided vectors go to Qdrant from day one, one collection per tenant with a collection-scoped token, reversing AI-D12's pgvector; the pgvector sections below are superseded on that point.
 
 Chinmay answered every question in this section on 29 September, following the readiness rule of the same day: the questions are ours to answer, and only make-or-break questions go to the client. None of these is make-or-break, so **nothing in this design now waits on the client.** Each answer and what it changed:
 

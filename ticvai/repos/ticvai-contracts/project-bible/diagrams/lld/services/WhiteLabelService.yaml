@@ -2,6 +2,7 @@ id: LLD-WhiteLabelService
 title: WhiteLabelService — 79 operations, 25 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
+deployable: operations
 index: diagrams/hld/02-services.yaml
 why: Branding, content, navigation and the tenant's own app configuration. Separate because **it is
   the only service a tenant edits directly and publishes from** — its deploy cadence follows tenant

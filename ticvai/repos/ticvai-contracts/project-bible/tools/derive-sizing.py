@@ -29,6 +29,11 @@ The autoscaler handles the rest, and it has all day to react.
 live`, warming happens before traffic arrives, and **the first seconds of a flash sale are the
 peak** — thirty thousand people do not arrive gradually.
 
+**Per deployable, since 30 September (ADR-0055).** The 17 services are modules deployed as five
+units, so the floor that matters is per deployable, not per module: each unit's floor is one replica
+per zone across two zones. `service-decomposition.json` says which unit each module ships in. The
+per-module figures stay, because a module's share of the load is still what drives its unit.
+
 Writes `handoff/sizing.json`.
 """
 from __future__ import annotations
@@ -63,6 +68,14 @@ RPS_PER_REPLICA = {
 # **One replica is a restart that is an outage.** The floor under normal operation, where the
 # autoscaler has all day to react to a busy afternoon.
 SURVIVABLE_FLOOR = 2
+
+# **Per deployable (ADR-0055): one replica per zone, two zones.** ADR-0061 is still a proposed draft;
+# it would raise `commerce` to 3 and split `ticvai-ai` into process groups (2 + 1 + 0), 12 in the small
+# cell. Until it is decided, every unit gets the survivable floor. `workers` serves no requests and
+# owns no module, so its load is queue depth and it sits at the floor here.
+ZONES = 2
+DEPLOYABLE_FLOOR = ZONES
+DEPLOYABLE_ORDER = ("commerce", "access", "operations", "ticvai-ai", "workers")
 
 # **Every service scales on its own utilisation, and the target is 60% rather than full.**
 #
@@ -173,6 +186,28 @@ def size(load_rps: float, mix: dict, floor_is_peak: bool) -> dict:
     return out
 
 
+def size_deployables(load_rps: float, mix: dict, deployable_of: dict) -> dict:
+    """The same arithmetic per unit of deployment. A unit's replicas carry all of its modules, so its
+    need is the sum of each module's load against that module's own per-replica figure."""
+    out = {}
+    for dep in DEPLOYABLE_ORDER:
+        members = sorted(s for s, d in deployable_of.items() if d == dep)
+        share = sum(mix.get(s, 0) for s in members)
+        load = sum(load_rps * mix.get(s, 0) / 100 / (RPS_PER_REPLICA.get(s, 400) * TARGET_UTILISATION)
+                   for s in members)
+        need = math.ceil(load) if load > 0 else 0
+        out[dep] = {
+            "modules": members,
+            "share": round(share, 1),
+            "rpsAtLoad": round(load_rps * share / 100, 1),
+            "impliedByLoad": need,
+            "floor": DEPLOYABLE_FLOOR,
+            "steadyState": max(DEPLOYABLE_FLOOR, need),
+            "drivenBy": "load" if need > DEPLOYABLE_FLOOR else "survivability floor",
+        }
+    return out
+
+
 def venue_load(tier: str) -> dict:
     """Requests per second a venue tier generates, mean and peak."""
     v = VENUES[tier]
@@ -195,6 +230,9 @@ def main() -> int:
     burst = json.loads((H / "burst-scope.json").read_text(encoding="utf-8"))
     burst_ops = {o["operationId"] for o in burst["operations"]}
 
+    dec = json.loads((H / "service-decomposition.json").read_text(encoding="utf-8"))
+    deployable_of = {n: v.get("deployable") for n, v in dec["services"].items() if v.get("deployable")}
+
     normal_mix = flow_mix(lin)
     sale_mix = {s["name"]: s["weightedShare"] for s in burst["services"] if s["deployed"]}
 
@@ -211,18 +249,31 @@ def main() -> int:
             "services": size(peak, normal_mix, floor_is_peak=False),
             "replicasAtFloor": sum(v["floor"] for v in size(peak, normal_mix, False).values()),
             "replicasAtPeak": sum(v["steadyState"] for v in size(peak, normal_mix, False).values()),
+            # **What is deployed (ADR-0055).** The two figures above are per module and are kept for
+            # the load each module brings; these are the replicas that actually run.
+            "deployables": size_deployables(peak, normal_mix, deployable_of),
+            "deployableReplicasAtFloor": sum(
+                v["floor"] for v in size_deployables(peak, normal_mix, deployable_of).values()),
+            "deployableReplicasAtPeak": sum(
+                v["steadyState"] for v in size_deployables(peak, normal_mix, deployable_of).values()),
             "note": ("**Floor is survivability, not peak.** The autoscaler has all day to react to "
-                     "a busy afternoon, so paying for the peak all night buys nothing."),
+                     "a busy afternoon, so paying for the peak all night buys nothing. **Per "
+                     "deployable** (ADR-0055) the floor is one replica per zone for each of the five "
+                     "units; ADR-0061, still a proposed draft, would set it at 12 in the small cell."),
         }
 
     out = {
         "generatedBy": "tools/derive-sizing.py",
         "algorithm": "replicas = max(floor, ceil(load_rps x share / rps_per_replica))",
+        # **The shares are read from the mixes, not typed** (SD-044): the typed note said Catalogue
+        # was 11% of normal traffic while the mix beside it said 24.0%.
         "note": (
             "**Two loads, two mixes, and they are not the same shape.** Under a sale Catalogue is "
-            "64% of the calls and F&B is absent; under normal operation Catalogue is 11%, F&B is "
-            "13%, and Order is the largest at 15% because a venue day is mostly transactions "
-            "rather than browsing.\n\n"
+            f"{sale_mix.get('CatalogueService', 0):.0f}% of the calls and F&B is "
+            f"{'absent' if not sale_mix.get('FnbService') else '%.0f%%' % sale_mix['FnbService']}; "
+            f"under normal operation Catalogue is {normal_mix.get('CatalogueService', 0):.1f}%, "
+            f"F&B {normal_mix.get('FnbService', 0):.1f}% and Order "
+            f"{normal_mix.get('OrderService', 0):.1f}%.\n\n"
             "**A shared cell sized from the burst mix would run eight Catalogue replicas and one "
             "F&B** — backwards for 363 days of the year."),
         "unmeasured": (

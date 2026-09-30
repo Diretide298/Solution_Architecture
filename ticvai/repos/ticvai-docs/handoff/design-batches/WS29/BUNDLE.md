@@ -1,6 +1,6 @@
 # WS29 — Membership   Annual Pass Management board 1
 
-**10 screens · 19 operations · 26 schemas · 6 permissions**
+**10 screens · 20 operations · 31 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -64,7 +64,7 @@ convincingly. It is never a caption.
 | `BO-285` | Membership Product & Tier Builder | configEditor | 2 | 0 | — |
 | `BO-286` | Membership Eligibility & Qualification Rule Builder | configEditor | 1 | 0 | — |
 | `BO-287` | Validity, Activation & Expiry Configuration | listDetail | 1 | 0 | — |
-| `BO-288` | Membership Entitlement & Admission Benefit Builder | configEditor | 4 | 0 | — |
+| `BO-288` | Membership Entitlement & Admission Benefit Builder | configEditor | 5 | 0 | — |
 | `BO-289` | Membership Usage, Visit & Consumption Rules | listDetail | 4 | 1 | — |
 | `BO-290` | Family, Household & Dependent Membership Configuration | configEditor | 1 | 0 | — |
 | `BO-291` | Membership Commercial, Pricing & Channel Association | configEditor | 5 | 1 | — |
@@ -1177,6 +1177,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "The membership plan templates whose benefits are set",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "createEntitlementTemplate",
+    "contract": "catalogue",
+    "purpose": "Set expiryNoticeDays on a pass template (pre-expiry notice)",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -2230,6 +2237,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "MembershipProductValidationApprovalPublicationVersioInput",
   "responds": "MembershipProductValidationApprovalPublicationVersioView"
  },
+ "createEntitlementTemplate": {
+  "method": "POST",
+  "path": "/entitlement-templates",
+  "contract": "catalogue",
+  "summary": "Create an entitlement template",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "EntitlementTemplate",
+  "responds": "EntitlementTemplate"
+ },
  "listEntitlementTemplates": {
   "method": "GET",
   "path": "/entitlement-templates",
@@ -2608,6 +2634,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -2660,6 +2691,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "CatalogueConfigStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "active",
+   "inactive",
+   "retired"
+  ],
+  "description": "**The status of a catalogue configuration record** (29 September, data model DM3): price lists, rates, fees and fee rules, tax profiles and rules, calculation and rounding profiles, package pricing and templates. `draft` is being prepared and is never used by a calculation; `active` is in use from its effective date; `inactive` is switched off and may be switched back; `retired` is kept for history only. A record already used by a live price becomes `active` through a published change request, not by an edit."
+ },
  "CatalogueMembershipBenefit": {
   "type": "object",
   "x-ticvai-persistence": "catalogue.membership_benefit",
@@ -3061,6 +3102,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true,
     "description": "Where `expiryAnchor` is `fixedDate`. Every pass expires the same day regardless of purchase."
    },
+   "expiryNoticeDays": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 180,
+    "nullable": true,
+    "description": "**How many days before `validTo` access raises `entitlement.expiringSoon`** for an entitlement of this template still `issued` or `partiallyConsumed` (29 September, build pass, group G2; 5.5.30). What a pre-expiry message or campaign is triggered by. Null, the default, means no notice: a day ticket needs none, an annual pass might want 30. An entitlement bought inside its own notice period raises nothing."
+   },
    "carriesStoredValue": {
     "type": "boolean",
     "default": false,
@@ -3127,12 +3175,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "properties": {
      "fromStationId": {
       "type": "string",
-      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "format": "uuid",
       "description": "A `transport.Station`."
      },
      "toStationId": {
       "type": "string",
-      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+      "format": "uuid"
      },
      "bothDirections": {
       "type": "boolean",
@@ -3144,7 +3192,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "description": "The routes it may be used on. Empty means any active route serving both stations.",
       "items": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+       "format": "uuid"
       }
      }
     }
@@ -3557,6 +3605,197 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "MembershipAnnualPassCommandCenterSummary": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Membership & Annual Pass Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
+  "properties": {
+   "activeMembershipProducts": {
+    "type": "integer",
+    "description": "Active Membership Products"
+   },
+   "annualPassProducts": {
+    "type": "integer",
+    "description": "Annual Pass Products"
+   },
+   "draftProducts": {
+    "type": "integer",
+    "description": "Draft Products"
+   },
+   "activeMembers": {
+    "type": "integer",
+    "description": "Active Members"
+   },
+   "familyMemberships": {
+    "type": "integer",
+    "description": "Family Memberships"
+   },
+   "membershipsExpiringSoon": {
+    "type": "integer",
+    "description": "Memberships Expiring Soon: active memberships whose expiry falls within the next 30 days (decided 29 September, readiness close-out)"
+   },
+   "renewalEnabledProducts": {
+    "type": "integer",
+    "description": "Renewal-Enabled Products"
+   },
+   "suspendedProducts": {
+    "type": "integer",
+    "description": "Suspended Products"
+   },
+   "productsWithConfigurationIssues": {
+    "type": "integer",
+    "description": "Products with Configuration Issues: products with at least one validationIssues entry"
+   },
+   "averageMembershipDuration": {
+    "type": "number",
+    "description": "Average Membership Duration, in days, across active members (decided 29 September, readiness close-out)"
+   }
+  }
+ },
+ "MembershipAnnualPassCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership & Annual Pass Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "productId": {
+    "type": "string",
+    "description": "Product ID"
+   },
+   "membershipName": {
+    "type": "string",
+    "description": "Membership Name"
+   },
+   "type": {
+    "type": "string",
+    "enum": [
+     "annualPass",
+     "seasonPass",
+     "monthlyMembership",
+     "fixedTermMembership",
+     "corporateMembership",
+     "familyMembership",
+     "individualMembership",
+     "studentMembership",
+     "vipMembership",
+     "customMembership"
+    ],
+    "description": "Type: the membership type (pack pp.4-5 Membership Types); customMembership for a venue-defined type"
+   },
+   "tier": {
+    "type": "string",
+    "description": "Tier name (Standard, Silver, Gold, Platinum, VIP or a custom tier the venue names)"
+   },
+   "venueAttraction": {
+    "type": "string",
+    "description": "Venue/Attraction the membership admits to"
+   },
+   "validityMethod": {
+    "type": "string",
+    "enum": [
+     "fixedCalendar",
+     "durationFromPurchase",
+     "durationFromActivation",
+     "seasonBased",
+     "customPeriod"
+    ],
+    "description": "Validity method (pack p.8 Validity Methods)"
+   },
+   "activationMethod": {
+    "type": "string",
+    "enum": [
+     "immediateOnPurchase",
+     "fixedStartDate",
+     "firstVisit",
+     "manualActivation",
+     "customerActivation",
+     "membershipCardCollection",
+     "identityVerification",
+     "configuredTrigger"
+    ],
+    "description": "Activation Method (pack pp.8-9)"
+   },
+   "renewalMode": {
+    "type": "string",
+    "enum": [
+     "manual",
+     "customerSelfService",
+     "agentAssisted",
+     "autoRenewal",
+     "invitationOnly",
+     "nonRenewable"
+    ],
+    "description": "Renewal: the product's primary renewal mode (pack p.15 Renewal Modes)"
+   },
+   "membershipStructure": {
+    "type": "string",
+    "enum": [
+     "individual",
+     "couple",
+     "family",
+     "household",
+     "parentChild",
+     "corporateGroup",
+     "custom"
+    ],
+    "description": "Family/Individual: the membership structure (pack p.12 Membership Structures)"
+   },
+   "currentMembers": {
+    "type": "integer",
+    "description": "Current Members"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From: the date the current version becomes sellable"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status of the membership product: draft, inReview, approved, scheduled, active, suspended, expired or retired (pack p.5 Statuses)"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "validationIssues": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "missingEntitlements",
+        "missingPricingAssociation",
+        "missingValidity",
+        "invalidEligibility",
+        "conflictingRules",
+        "missingRenewalPolicy"
+       ]
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    },
+    "description": "Configuration Health (pack p.5): the checks this product currently fails"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI Assistance: advisory observations only; never applied automatically (pack AI sections)"
+   }
+  }
+ },
  "MembershipCommercialConfigInput": {
   "type": "object",
   "x-ticvai-persistence": "none — request only; stored as the commercial columns of subscription.membership_product (MembershipProduct: basePricingProfile, taxProfile, feeProfile, upgradePricePolicy, promotionalPricingEligibility, paymentTerms, salesPeriod) (decided 29 September, writers pass; DM4)",
@@ -3618,6 +3857,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "capacityLimited"
     ],
     "description": "Sales Period (pack p.15); the window itself is the catalogue product's sales window"
+   },
+   "billingFrequency": {
+    "type": "string",
+    "enum": [
+     "upFront",
+     "monthly",
+     "quarterly",
+     "semiAnnual",
+     "annual",
+     "custom"
+    ],
+    "default": "upFront",
+    "description": "2.14.19 (29 September, build). **How often the member is charged, independent of the validity term**: an annual membership may be billed monthly or quarterly. `upFront` charges the whole term at sale. A recurring frequency needs `autoRenewPayment` or `installments` in `paymentTerms` and a card on file under a recurring mandate; each cycle is an instalment of the plan payments `createInstalmentPlan` schedules at sale, charged to the stored card on its due date."
+   },
+   "billingIntervalMonths": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 24,
+    "nullable": true,
+    "description": "For `custom`, every how many months. Null otherwise."
+   },
+   "billingAnchor": {
+    "type": "string",
+    "enum": [
+     "purchaseDate",
+     "calendarMonthStart"
+    ],
+    "default": "purchaseDate",
+    "description": "`purchaseDate` bills on the purchase day each cycle; `calendarMonthStart` on the 1st of the month, the first cycle prorated. A cycle longer than the term is refused (422)."
    }
   }
  },
@@ -3705,6 +3973,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "capacityLimited"
     ],
     "description": "Sales Period (pack p.15)"
+   },
+   "billingFrequency": {
+    "type": "string",
+    "enum": [
+     "upFront",
+     "monthly",
+     "quarterly",
+     "semiAnnual",
+     "annual",
+     "custom"
+    ],
+    "default": "upFront",
+    "description": "2.14.19 (29 September, build). **How often the member is charged, independent of the validity term**: an annual membership may be billed monthly or quarterly. `upFront` charges the whole term at sale. A recurring frequency needs `autoRenewPayment` or `installments` in `paymentTerms` and a card on file under a recurring mandate; each cycle is an instalment of the plan payments `createInstalmentPlan` schedules at sale, charged to the stored card on its due date."
+   },
+   "billingIntervalMonths": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 24,
+    "nullable": true,
+    "description": "For `custom`, every how many months. Null otherwise."
+   },
+   "billingAnchor": {
+    "type": "string",
+    "enum": [
+     "purchaseDate",
+     "calendarMonthStart"
+    ],
+    "default": "purchaseDate",
+    "description": "`purchaseDate` bills on the purchase day each cycle; `calendarMonthStart` on the 1st of the month, the first cycle prorated. A cycle longer than the term is refused (422)."
    },
    "salesWindowFrom": {
     "type": "string",
@@ -5009,6 +5306,191 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "PriceList": {
+  "x-ticvai-persistence": "catalogue.price_list",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "venueId",
+   "currency",
+   "currencyScale",
+   "channels"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overridable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire, removed from the table** — a client should not walk a hierarchy to read a figure, and the database should not hold nine million copies of AED. Four tables genuinely differ from their region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, `ledger.account`, `control.partner_agreement`.\n"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4,
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overridable below, so a row in a UAE region is AED and cannot be anything else — storing it per row is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a client reading a figure should not walk a hierarchy to know what it means, and the database should not hold nine million copies of AED. Four tables genuinely differ from their region and keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.account`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a workstation with its own currency is a misconfiguration.**\n"
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/Channel"
+    }
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "priority": {
+    "type": "integer",
+    "description": "Where lists overlap, higher priority wins."
+   },
+   "description": {
+    "type": "string",
+    "nullable": true,
+    "description": "Price list master fields (29 September, data model DM3), set with `setPriceListMaster` (ADM-058)."
+   },
+   "priceListType": {
+    "type": "string",
+    "enum": [
+     "standardRetail",
+     "venue",
+     "attraction",
+     "event",
+     "membership",
+     "group",
+     "corporate",
+     "b2b",
+     "reseller",
+     "ota",
+     "internal",
+     "specialMarket"
+    ],
+    "default": "standardRetail"
+   },
+   "status": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CatalogueConfigStatus"
+     }
+    ],
+    "default": "active"
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "tags": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "brand": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "businessUnit": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "countryCode": {
+    "type": "string",
+    "maxLength": 2,
+    "nullable": true,
+    "pattern": "^[A-Z]{2}$"
+   },
+   "marketCode": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "scopeLevel": {
+    "type": "string",
+    "enum": [
+     "global",
+     "country",
+     "market",
+     "brand",
+     "venue",
+     "event",
+     "businessUnit"
+    ],
+    "default": "venue"
+   },
+   "defaultPriceCategoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "roundingProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "priceResolutionPolicyId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "allowOverrides": {
+    "type": "boolean",
+    "default": false
+   },
+   "allowInheritance": {
+    "type": "boolean",
+    "default": true
+   },
+   "allowMultipleCurrencies": {
+    "type": "boolean",
+    "default": false
+   },
+   "allowProductSpecificRates": {
+    "type": "boolean",
+    "default": true
+   },
+   "clonedFromPriceListId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "currentVersion": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The active `catalogue.price_list_version`."
+   }
+  }
+ },
  "RenewalAutoRenewalMembershipContinuityConfigurationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -5264,6 +5746,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Cancellation/refund policy from the central policy management (MoM 25 Aug: refund and cancellation rules are managed centrally). Empty means no refund on cancellation unless the commercial team configures one; cancelling always stops the next auto-renew charge (decided 29 September, readiness close-out)",
     "nullable": true
+   }
+  }
+ },
+ "SetPriceRequest": {
+  "type": "object",
+  "required": [
+   "variantId",
+   "amount"
+  ],
+  "properties": {
+   "variantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxCodeId": {
+    "type": "string",
+    "format": "uuid"
    }
   }
  },

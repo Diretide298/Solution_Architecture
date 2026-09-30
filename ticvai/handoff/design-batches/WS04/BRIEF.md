@@ -1,6 +1,6 @@
 # WS04 — Access Control board 4
 
-**10 screens · 16 operations · 17 schemas · 2 permissions**
+**10 screens · 16 operations · 21 schemas · 2 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

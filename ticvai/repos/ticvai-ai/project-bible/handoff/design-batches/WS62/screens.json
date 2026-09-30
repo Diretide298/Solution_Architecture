@@ -39,10 +39,7 @@
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-278 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-279",
@@ -101,10 +98,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "An authorized administrator can understand the current state of the resale marketplace, identify listings requiring attention and navigate directly to the appropriate operational action.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each listing should show) — counts over a population, then the population",
   "purpose": "Provide administrators with a centralized operational view of the TICVAI resale marketplace.",
-  "purposeNote": "An authorized administrator can understand the current state of the resale marketplace, identify listings requiring attention and navigate directly to the appropriate operational action.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -134,6 +131,31 @@
        ],
        "notes": "The pack filters this screen by venue, event, product, seller, date, listing status and 4 more — which are present is a decision the pack already made.",
        "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 4 §Filter by"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The resale marketplace config",
+       "bindsTo": "ResaleMarketplaceConfig",
+       "columns": [
+        "ResaleMarketplaceConfig.id",
+        "ResaleMarketplaceConfig.marketplaceName",
+        "ResaleMarketplaceConfig.pricingMode",
+        "ResaleMarketplaceConfig.maximumDiscountPercent",
+        "ResaleMarketplaceConfig.sellerCanEditPrice",
+        "ResaleMarketplaceConfig.maximumPriceChanges",
+        "ResaleMarketplaceConfig.minimumMinutesBetweenPriceChanges",
+        "ResaleMarketplaceConfig.moderationMode",
+        "ResaleMarketplaceConfig.reviewTriggers",
+        "ResaleMarketplaceConfig.expiryRule",
+        "ResaleMarketplaceConfig.expiryOffset",
+        "ResaleMarketplaceConfig.withdrawalPolicy",
+        "ResaleMarketplaceConfig.maximumWithdrawals",
+        "ResaleMarketplaceConfig.cancellationFee",
+        "ResaleMarketplaceConfig.checkoutHoldMinutes",
+        "ResaleMarketplaceConfig.buyerIdentityVerificationRequired"
+       ],
+       "operation": "getResaleMarketplaceConfig",
+       "provenance": "contract orders.yaml GET /resale-marketplace-config"
       }
      ]
     },
@@ -292,12 +314,37 @@
     "contract": "orders",
     "purpose": "Resale Marketplace Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTicketResaleMarketplace",
+    "contract": "orders",
+    "purpose": "My Tickets & Resale Marketplace Entry",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listResalePolicyMarketplace",
+    "contract": "orders",
+    "purpose": "Resale Policy & Marketplace Settings",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOfficialResaleMarketplace",
+    "contract": "orders",
+    "purpose": "Official Resale Marketplace & Buyer Discovery",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getResaleMarketplaceConfig",
+    "contract": "orders",
+    "purpose": "How the venue's resale marketplace runs",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-278"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-278",
+   "workshopBoard": "wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-278"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 4. 30 of 38 labels bound to a contract property; 38 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -361,10 +408,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "for resale.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Administrators can define eligibility by; Configure) and no display directory — it is settings, not a population",
   "purpose": "Define whether a ticket is allowed to enter the resale marketplace. Not every TICVAI ticket should automatically be resellable.",
-  "purposeNote": "for resale.",
   "gaps": [
    {
     "operation": null,
@@ -475,16 +522,20 @@
     "operationId": "setResaleEligibilityRule",
     "contract": "orders",
     "purpose": "Resale Eligibility Rule Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setResaleEligibilityRule"
-    ]
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "setEligibilityRule",
+    "contract": "promotions",
+    "purpose": "Eligibility Rule Builder",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-279"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-279",
+   "workshopBoard": "wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-279"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 5. 0 of 0 labels bound to a contract property; 15 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -548,10 +599,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can establish different resale marketplace policies for different organizations, venues, events and products without software development.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Administrators can define; Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure the overall business policies governing a resale marketplace.",
-  "purposeNote": "Administrators can establish different resale marketplace policies for different organizations, venues, events and products without software development.",
   "layout": {
    "template": "form",
    "regions": [
@@ -673,6 +724,45 @@
        "kind": "selectField",
        "label": "Purchase limits",
        "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The resale marketplace config",
+       "bindsTo": "ResaleMarketplaceConfig",
+       "columns": [
+        "ResaleMarketplaceConfig.id",
+        "ResaleMarketplaceConfig.marketplaceName",
+        "ResaleMarketplaceConfig.pricingMode",
+        "ResaleMarketplaceConfig.maximumDiscountPercent",
+        "ResaleMarketplaceConfig.sellerCanEditPrice",
+        "ResaleMarketplaceConfig.maximumPriceChanges",
+        "ResaleMarketplaceConfig.minimumMinutesBetweenPriceChanges",
+        "ResaleMarketplaceConfig.moderationMode",
+        "ResaleMarketplaceConfig.reviewTriggers",
+        "ResaleMarketplaceConfig.expiryRule",
+        "ResaleMarketplaceConfig.expiryOffset",
+        "ResaleMarketplaceConfig.withdrawalPolicy",
+        "ResaleMarketplaceConfig.maximumWithdrawals",
+        "ResaleMarketplaceConfig.cancellationFee",
+        "ResaleMarketplaceConfig.checkoutHoldMinutes",
+        "ResaleMarketplaceConfig.buyerIdentityVerificationRequired"
+       ],
+       "operation": "getResaleMarketplaceConfig",
+       "provenance": "contract orders.yaml GET /resale-marketplace-config"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save resale marketplace config",
+       "operation": "setResaleMarketplaceConfig",
+       "permission": "PRODUCT_CONFIGURE",
+       "notes": "**The writer `orders.resale_marketplace_config` lacked** (DM5 open item: nine screens showed the row and none wrote it).",
+       "provenance": "contract orders.yaml PUT /resale-marketplace-config"
       }
      ]
     }
@@ -690,14 +780,68 @@
     "contract": "orders",
     "purpose": "Resale Policy & Marketplace Settings",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getResaleMarketplaceConfig",
+    "contract": "orders",
+    "purpose": "How the venue's resale marketplace runs",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setResaleMarketplaceConfig",
+    "contract": "orders",
+    "purpose": "Set how the venue's resale marketplace runs",
+    "trigger": "onAction",
+    "invalidates": [
+     "listResalePolicyMarketplace",
+     "getResaleMarketplaceConfig"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-280"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-280",
+   "workshopBoard": "wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-280"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 23 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetResaleMarketplaceConfig",
+    "component": "modal",
+    "trigger": "Save resale marketplace config",
+    "body": "**Collects what `setResaleMarketplaceConfig` sends before it is called.** Required: `id`, `marketplaceName`, `pricingMode`, `moderationMode`, `isActive`. Optional: `maximumDiscountPercent`, `sellerCanEditPrice`, `maximumPriceChanges`, `minimumMinutesBetweenPriceChanges`, `reviewTriggers`, `expiryRule`, `expiryOffset`, `withdrawalPolicy`, `maximumWithdrawals`, `cancellationFee`, `checkoutHoldMinutes`, `buyerIdentityVerificationRequired` and 16 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ResaleMarketplaceConfig",
+    "confirm": {
+     "label": "Save resale marketplace config",
+     "operation": "setResaleMarketplaceConfig"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "marketplaceName",
+      "pricingMode",
+      "moderationMode",
+      "isActive",
+      "maximumDiscountPercent",
+      "sellerCanEditPrice",
+      "maximumPriceChanges",
+      "minimumMinutesBetweenPriceChanges",
+      "reviewTriggers",
+      "expiryRule",
+      "expiryOffset",
+      "withdrawalPolicy",
+      "maximumWithdrawals",
+      "cancellationFee",
+      "checkoutHoldMinutes",
+      "buyerIdentityVerificationRequired",
+      "settlementTiming"
+     ]
+    },
+    "provenance": "contract orders.yaml PUT /resale-marketplace-config"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -759,10 +903,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "An eligible ticket holder can create a resale listing through a controlled workflow without allowing invalid, already-used or unauthorized tickets to enter the marketplace.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure whether seller may; Capture) and no display directory — it is settings, not a population",
   "purpose": "Define how eligible ticket holders create resale listings.",
-  "purposeNote": "An eligible ticket holder can create a resale listing through a controlled workflow without allowing invalid, already-used or unauthorized tickets to enter the marketplace.",
   "gaps": [
    {
     "operation": null,
@@ -893,16 +1037,14 @@
     "operationId": "createListingSeller",
     "contract": "orders",
     "purpose": "Listing Creation & Seller Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "createListingSeller"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-281"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-281",
+   "workshopBoard": "wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-281"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 19 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -966,10 +1108,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "No resale listing can be published at a price outside the applicable approved marketplace pricing policy.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Configured resale policy) and no display directory — it is settings, not a population",
   "purpose": "Control the permitted resale price while protecting the operator, seller and buyer.",
-  "purposeNote": "No resale listing can be published at a price outside the applicable approved marketplace pricing policy.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1061,6 +1203,45 @@
        "kind": "selectField",
        "label": "Maximum: AED 240",
        "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 10 §Configured resale policy"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The resale marketplace config",
+       "bindsTo": "ResaleMarketplaceConfig",
+       "columns": [
+        "ResaleMarketplaceConfig.id",
+        "ResaleMarketplaceConfig.marketplaceName",
+        "ResaleMarketplaceConfig.pricingMode",
+        "ResaleMarketplaceConfig.maximumDiscountPercent",
+        "ResaleMarketplaceConfig.sellerCanEditPrice",
+        "ResaleMarketplaceConfig.maximumPriceChanges",
+        "ResaleMarketplaceConfig.minimumMinutesBetweenPriceChanges",
+        "ResaleMarketplaceConfig.moderationMode",
+        "ResaleMarketplaceConfig.reviewTriggers",
+        "ResaleMarketplaceConfig.expiryRule",
+        "ResaleMarketplaceConfig.expiryOffset",
+        "ResaleMarketplaceConfig.withdrawalPolicy",
+        "ResaleMarketplaceConfig.maximumWithdrawals",
+        "ResaleMarketplaceConfig.cancellationFee",
+        "ResaleMarketplaceConfig.checkoutHoldMinutes",
+        "ResaleMarketplaceConfig.buyerIdentityVerificationRequired"
+       ],
+       "operation": "getResaleMarketplaceConfig",
+       "provenance": "contract orders.yaml GET /resale-marketplace-config"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save resale marketplace config",
+       "operation": "setResaleMarketplaceConfig",
+       "permission": "PRODUCT_CONFIGURE",
+       "notes": "**The writer `orders.resale_marketplace_config` lacked** (DM5 open item: nine screens showed the row and none wrote it).",
+       "provenance": "contract orders.yaml PUT /resale-marketplace-config"
       }
      ]
     }
@@ -1078,14 +1259,68 @@
     "contract": "orders",
     "purpose": "Resale Pricing & Price Guardrails",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getResaleMarketplaceConfig",
+    "contract": "orders",
+    "purpose": "How the venue's resale marketplace runs",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setResaleMarketplaceConfig",
+    "contract": "orders",
+    "purpose": "Set how the venue's resale marketplace runs",
+    "trigger": "onAction",
+    "invalidates": [
+     "listResalePricingPrice",
+     "getResaleMarketplaceConfig"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-282"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-282",
+   "workshopBoard": "wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-282"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 17 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetResaleMarketplaceConfig",
+    "component": "modal",
+    "trigger": "Save resale marketplace config",
+    "body": "**Collects what `setResaleMarketplaceConfig` sends before it is called.** Required: `id`, `marketplaceName`, `pricingMode`, `moderationMode`, `isActive`. Optional: `maximumDiscountPercent`, `sellerCanEditPrice`, `maximumPriceChanges`, `minimumMinutesBetweenPriceChanges`, `reviewTriggers`, `expiryRule`, `expiryOffset`, `withdrawalPolicy`, `maximumWithdrawals`, `cancellationFee`, `checkoutHoldMinutes`, `buyerIdentityVerificationRequired` and 16 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ResaleMarketplaceConfig",
+    "confirm": {
+     "label": "Save resale marketplace config",
+     "operation": "setResaleMarketplaceConfig"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "marketplaceName",
+      "pricingMode",
+      "moderationMode",
+      "isActive",
+      "maximumDiscountPercent",
+      "sellerCanEditPrice",
+      "maximumPriceChanges",
+      "minimumMinutesBetweenPriceChanges",
+      "reviewTriggers",
+      "expiryRule",
+      "expiryOffset",
+      "withdrawalPolicy",
+      "maximumWithdrawals",
+      "cancellationFee",
+      "checkoutHoldMinutes",
+      "buyerIdentityVerificationRequired",
+      "settlementTiming"
+     ]
+    },
+    "provenance": "contract orders.yaml PUT /resale-marketplace-config"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1147,14 +1382,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "estimated seller proceeds using configured rules.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Define by) and no display directory — it is settings, not a population",
   "purpose": "Configure the commercial model of the resale marketplace.",
-  "purposeNote": "estimated seller proceeds using configured rules.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Seller fee, Buyer fee, Percentage fee, Administrative fee, Venue fee, Tax on fee. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Seller fee, Buyer fee, Flat transaction fee, Percentage fee, Payment processing fee, Administrative fee, Venue fee, Tax on fee. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Ticket Resale Marketplace_Reference.pdf, page 12 §Support"
    }
   ],
@@ -1223,7 +1458,17 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Flat transaction fee",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 12 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Percentage fee",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 12 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Payment processing fee",
        "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 12 §Support"
       },
       {
@@ -1257,14 +1502,38 @@
     "contract": "orders",
     "purpose": "Resale Fees, Commission & Seller Proceeds",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listFeeSellerProceed",
+    "contract": "orders",
+    "purpose": "Fees, Seller Proceeds & Listing Confirmation",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getResaleFeePolicy",
+    "contract": "orders",
+    "purpose": "The resale fee and price-cap policy in force",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "setResaleFeePolicy",
+    "contract": "orders",
+    "purpose": "Save the resale fee and price-cap policy",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "getResaleFeePolicy"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-283"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-283",
+   "workshopBoard": "wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-283"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 12. 0 of 0 labels bound to a contract property; 14 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 12. 0 of 0 labels bound to a contract property; 16 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1326,10 +1595,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Listings requiring governance cannot become publicly available until the configured approval or risk-control conditions are satisfied.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Determine whether listings are published automatically or require operator review.",
-  "purposeNote": "Listings requiring governance cannot become publicly available until the configured approval or risk-control conditions are satisfied.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1415,10 +1684,7 @@
     "operationId": "approveListingModeration",
     "contract": "orders",
     "purpose": "Listing Approval & Moderation",
-    "trigger": "onAction",
-    "invalidates": [
-     "approveListingModeration"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1434,7 +1700,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-284"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-284",
+   "workshopBoard": "wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-284"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 13. 9 of 10 labels bound to a contract property; 16 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1498,10 +1765,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Marketplace availability accurately represents eligible resale inventory and prevents the same ticket from being sold or listed more than once.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Maintain an accurate, synchronized view of tickets currently available through resale.",
-  "purposeNote": "Marketplace availability accurately represents eligible resale inventory and prevents the same ticket from being sold or listed more than once.",
   "gaps": [
    {
     "operation": null,
@@ -1557,7 +1824,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-285"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-285",
+   "workshopBoard": "wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-285"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 0 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1621,10 +1889,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every resale listing follows a controlled and traceable lifecycle, with automatic removal when it is no longer commercially or operationally valid.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Configure whether the ticket) and no display directory — it is settings, not a population",
   "purpose": "Control the full lifecycle of a resale listing from creation until sale, withdrawal or expiry.",
-  "purposeNote": "Every resale listing follows a controlled and traceable lifecycle, with automatic removal when it is no longer commercially or operationally valid.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1693,7 +1961,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-286"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-286",
+   "workshopBoard": "wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-286"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 8 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1749,10 +2018,10 @@
    "notes": "**Reached from ADM-278, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Administrators receive explainable, actionable AI recommendations for marketplace configuration and performance without AI bypassing approved commercial, security or governance controls. Board 1 — Final Screen Register Screen Backend Screen Primary Responsibility 3.1.1 Resale Marketplace Command Center Marketplace oversight Screen Backend Screen Primary Responsibility 3.1.2 Resale Eligibility Rule Configuration Determine what can be resold 3.1.3 Resale Policy & Marketplace Settings Marketplace business policies 3.1.4 Listing Creation & Seller Configuration Seller/listing journey 3.1.5 Resale P",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configuration; AI Resale Configuration & Marketplace) and no display directory — it is settings, not a population",
   "purpose": "Provide TICVAI's AI intelligence layer for optimizing resale configuration while keeping commercial control with the operator. Board 2 manages what happens once a resale listing attracts a buyer and enters the transaction stage.",
-  "purposeNote": "Administrators receive explainable, actionable AI recommendations for marketplace configuration and performance without AI bypassing approved commercial, security or governance controls. Board 1 — Final Screen Register Screen Backend Screen Primary Responsibility 3.1.1 Resale Marketplace Command Center Marketplace oversight Screen Backend Screen Primary Responsibility 3.1.2 Resale Eligibility Rule Configuration Determine what can be resold 3.1.3 Resale Policy & Marketplace Settings Marketplace business policies 3.1.4 Listing Creation & Seller Configuration Seller/listing journey 3.1.5 Resale P",
   "layout": {
    "template": "form",
    "regions": [
@@ -1826,16 +2095,14 @@
     "operationId": "setResaleMarketplaceRecommendation",
     "contract": "orders",
     "purpose": "AI Resale Configuration & Marketplace Recommendations",
-    "trigger": "onAction",
-    "invalidates": [
-     "setResaleMarketplaceRecommendation"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-287"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-287",
+   "workshopBoard": "wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-287"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 18. 0 of 0 labels bound to a contract property; 8 of 74 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

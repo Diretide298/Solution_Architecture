@@ -1985,7 +1985,7 @@ paths:
         in: query
         schema:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
       - name: status
         in: query
         schema:
@@ -2056,7 +2056,7 @@ paths:
               properties:
                 orderId:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                 frequency:
                   type: string
                   enum:
@@ -2271,7 +2271,7 @@ components:
           - cancelled
         paymentId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         dunningCaseId:
           type: string
@@ -2298,7 +2298,7 @@ components:
           format: uuid
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         subjectId:
           type: string
           format: uuid

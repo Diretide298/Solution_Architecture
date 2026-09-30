@@ -13,6 +13,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -75,6 +80,25 @@
   "requestBody": null,
   "responds": "SeatMapTemplate"
  },
+ "decideProposedAction": {
+  "method": "POST",
+  "path": "/proposed-actions/{actionId}/decide",
+  "contract": "ai",
+  "summary": "Approve or reject a proposal",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProposedAction"
+ },
  "diffSeatMapVersions": {
   "method": "GET",
   "path": "/seat-maps/{seatMapId}/diff",
@@ -98,6 +122,19 @@
   ],
   "requestBody": null,
   "responds": "SeatMapDiff"
+ },
+ "getActionPlan": {
+  "method": "GET",
+  "path": "/action-plans/{planId}",
+  "contract": "ai",
+  "summary": "A plan with its steps",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiActionPlanDetail"
  },
  "getSeatMap": {
   "method": "GET",
@@ -190,6 +227,25 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "proposeSeatMapChanges": {
+  "method": "POST",
+  "path": "/ai/seat-maps/{seatMapId}/proposals",
+  "contract": "ai",
+  "summary": "Propose changes to an existing seat map, as a plan a person approves",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiSeatMapProposal"
  },
  "publishSeatMap": {
   "method": "POST",

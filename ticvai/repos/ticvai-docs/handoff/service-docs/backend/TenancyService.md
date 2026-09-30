@@ -92,7 +92,7 @@
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ApprovalMatrixMultiLevelApprovalConfigurationInput`
 
@@ -184,7 +184,7 @@
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `RolesAuthorityDelegationApprovalLimitsInput`
 
@@ -274,7 +274,7 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ApprovalDelegation`
 
@@ -349,7 +349,7 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | deviceId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `DeviceAssignment`
 
@@ -422,7 +422,7 @@ What requires approval, and who grants it
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ApprovalExternalProvider`
 
@@ -512,7 +512,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ApprovalMatrix`
 
@@ -621,7 +621,7 @@ Changing `currencyCode` or `currencyScale` after transactions exist is rejected.
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | regionId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `RegionSettings`
 
@@ -700,13 +700,13 @@ Draft is supported (11.1.51) for the case where a person raises it themselves an
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateApprovalRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes |  |
 | kind | ApprovalKind: enum (refund, priceOverride, discountOverride, complimentaryTicket, membershipCancellation, accessPermissionChange, configurationChange, aiRecommendation, …) | yes | 11.1.7 and 11.1.30–11.1.37. |
 | subjectContract | string | yes | Which contract owns the thing being approved. |
 | subjectType | string | yes |  |
@@ -825,8 +825,8 @@ A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.2
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| requestId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| requestId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -942,7 +942,7 @@ Read-only and deliberately cheap. It runs on the hot path — every refund, ever
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1030,7 +1030,7 @@ Where the position needs a till, the assignment names the workstation their shif
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `RotaAssignment`
 
@@ -1176,7 +1176,7 @@ Where the position needs a till, the assignment names the workstation their shif
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateScopeNodeRequest`
 
@@ -1283,7 +1283,7 @@ Deactivating a node causes every permission query at or beneath it to resolve to
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | orgUnitId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1520,7 +1520,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | venueId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `VenueSettings`
 
@@ -1750,7 +1750,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | workstationId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ConfigureWorkstationRequest`
 
@@ -1840,7 +1840,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `Outlet`
 
@@ -1910,7 +1910,7 @@ Tiles reference catalogue variants and are grouped into pages. A cashier finds a
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `SaleBoard`
 
@@ -2190,7 +2190,7 @@ Reports reachability and consumables — paper low, drawer open, reader offline.
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | deviceId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2229,7 +2229,7 @@ Reports reachability and consumables — paper low, drawer open, reader offline.
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | outletId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2296,7 +2296,7 @@ Changes reach terminals with the next catalogue bundle, not immediately — a bo
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | saleBoardId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `SaleBoard`
 
@@ -2511,12 +2511,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| event_id | text | yes | The envelope's event id, a ULID (system-design review SD-030, 29 September; applied 30 September). |
+| event_id | uuid | yes | The envelope's event id, which is this row's id (ADR-0058; UUIDv7, ADR-0056). |
 | event_name | text | yes | The name of an event in events/ (aggregate.pastTenseFact). |
 | event_version | integer | no | The event's version, carried in the envelope so a consumer on an older version can tell. |
 | tenant_id | uuid | yes | The tenant the change belongs to (envelope field, SD-030). |
 | aggregate_type | text | yes | The table the change happened in. |
-| aggregate_id | text | yes | Which row changed, as text (SD-012, SD-030): order ids are ULIDs and most other keys UUIDs, so the column holds either; it was format: uuid, which no order event could satisfy. |
+| aggregate_id | uuid | yes | Which row changed (ADR-0056: every id is a uuid, so every aggregate fits). |
 | payload | jsonb | yes | The event as it happened, not a reference to a row that may have moved on. |
 | scope_path | text | no | The partition key (ADR-0005). |
 | sequence | integer | yes | Monotonic per aggregate (SD-030: was *per scope*), allocated in the writing transaction. |

@@ -15581,7 +15581,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         metric:
           $ref: '#/components/schemas/UsageMetric'
         quantity:

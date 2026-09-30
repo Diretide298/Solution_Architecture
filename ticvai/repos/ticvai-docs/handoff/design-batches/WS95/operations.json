@@ -6,7 +6,7 @@
   "summary": "Price the damage, and say who approved it",
   "permission": "RENTAL_OPERATE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -72,7 +72,7 @@
   "summary": "Condition before or after, with evidence",
   "permission": "RENTAL_OPERATE",
   "offlineCapable": true,
-  "conflictPolicy": null,
+  "conflictPolicy": "append",
   "scopeLevel": "venue",
   "parameters": [
    {

@@ -1,6 +1,6 @@
 # P06-operations-01 — P06 · Operations (1 of 5)
 
-**10 screens · 52 operations · 48 schemas · 23 permissions**
+**10 screens · 57 operations · 62 schemas · 26 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -47,10 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 23 permissions apply here:
-  `ACCESS_OVERRIDE, ACCESS_VALIDATE, ANNOUNCEMENT_PUBLISH, CASH_LIFT, INCIDENT_MANAGE, INCIDENT_REPORT, INCIDENT_VIEW, MAINTENANCE_APPROVE, MAINTENANCE_EXECUTE, OVERSHORT_ACCEPT, REPORT_VIEW_VENUE, REPORT_VIEW_WORKSTATION`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 26 permissions apply here:
+  `ACCESS_OVERRIDE, ACCESS_VALIDATE, ANNOUNCEMENT_PUBLISH, CASH_LIFT, CASH_NO_SALE, INCIDENT_MANAGE, INCIDENT_REPORT, INCIDENT_VIEW, MAINTENANCE_APPROVE, MAINTENANCE_EXECUTE, OVERSHORT_ACCEPT, PROCUREMENT_REQUEST`…. A control nobody can use must say so,
   not sit enabled and fail.
-- **31 of these operations work offline**: acceptWorkOrder, acknowledgeAnnouncement, attachWorkOrderEvidence, closeShift, completeWorkOrder, createCashMovement, createWorkOrder, getCurrentSession
+- **28 of these operations work offline**: acceptWorkOrder, acknowledgeAnnouncement, attachWorkOrderEvidence, completeWorkOrder, createCashMovement, createWorkOrder, getCurrentSession, getCurrentShift
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
@@ -61,13 +61,13 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `EMP-001` | Sign in | listDetail | 5 | 0 | — |
-| `EMP-002` | Select venue & role | listDetail | 6 | 0 | — |
-| `EMP-003` | Home — on duty | approvalInbox | 17 | 2 | — |
-| `EMP-009` | End shift | approvalInbox | 13 | 2 | — |
-| `EMP-010` | Scan — ready | listDetail | 7 | 1 | — |
-| `EMP-004` | Task list | listDetail | 15 | 3 | — |
-| `EMP-005` | Task detail | listDetail | 15 | 3 | — |
-| `EMP-006` | Raise a task | listDetail | 16 | 3 | — |
-| `EMP-007` | Handover notes | listDetail | 4 | 0 | — |
+| `EMP-001` | Sign in | listDetail | 6 | 1 | — |
+| `EMP-002` | Select venue & role | listDetail | 5 | 1 | — |
+| `EMP-003` | Home — on duty | approvalInbox | 17 | 11 | — |
+| `EMP-009` | End shift | approvalInbox | 13 | 9 | — |
+| `EMP-010` | Scan — ready | listDetail | 8 | 4 | — |
+| `EMP-004` | Task list | listDetail | 15 | 11 | — |
+| `EMP-005` | Task detail | listDetail | 18 | 11 | — |
+| `EMP-006` | Raise a task | listDetail | 16 | 12 | — |
+| `EMP-007` | Handover notes | listDetail | 4 | 1 | — |
 | `EMP-008` | Shift summary | listDetail | 5 | 1 | — |

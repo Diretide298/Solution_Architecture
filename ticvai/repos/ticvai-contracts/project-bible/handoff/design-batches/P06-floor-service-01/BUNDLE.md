@@ -1,6 +1,6 @@
 # P06-floor-service-01 — P06 · Floor Service
 
-**10 screens · 31 operations · 26 schemas · 6 permissions**
+**10 screens · 38 operations · 43 schemas · 6 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -50,7 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 6 permissions apply here:
   `GUEST_MANAGE, GUEST_VIEW, ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW, PRODUCT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **19 of these operations work offline**: compItem, createFnbOrder, createPayment, fireCourse, getBill, getTableMap, holdCourse, joinRestaurantWaitlist
+- **22 of these operations work offline**: addGuestNote, compItem, createFnbOrder, createPayment, fireCourse, getBill, getTableMap, getTableVisit
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
@@ -62,14 +62,14 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `EMP-051` | Restaurant Service Command Center | listDetail | 3 | 0 | — |
-| `EMP-052` | Floor Plan & Table Map | statusTracker | 2 | 0 | — |
-| `EMP-053` | Table & Seating Configuration | configEditor | 1 | 0 | — |
+| `EMP-052` | Floor Plan & Table Map | statusTracker | 2 | 1 | — |
+| `EMP-053` | Table & Seating Configuration | configEditor | 4 | 0 | — |
 | `EMP-054` | Reservation Calendar & Timeline | listDetail | 1 | 0 | — |
-| `EMP-055` | Create / Edit Reservation | configEditor | 2 | 0 | — |
-| `EMP-056` | Walk-In & Waitlist Management | configEditor | 1 | 0 | — |
-| `EMP-057` | Guest Profile & Dining History | listDetail | 4 | 0 | — |
-| `EMP-058` | Live Table & Service Management | configEditor | 16 | 1 | — |
-| `EMP-059` | Table Order, Bill & Payment Management | statusTracker | 7 | 1 | — |
+| `EMP-055` | Create / Edit Reservation | configEditor | 2 | 1 | — |
+| `EMP-056` | Walk-In & Waitlist Management | configEditor | 2 | 1 | — |
+| `EMP-057` | Guest Profile & Dining History | listDetail | 5 | 2 | — |
+| `EMP-058` | Live Table & Service Management | configEditor | 17 | 14 | — |
+| `EMP-059` | Table Order, Bill & Payment Management | statusTracker | 8 | 7 | — |
 | `EMP-060` | Reservation & Table Performance | listDetail | 2 | 0 | — |
 
 ---
@@ -96,22 +96,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "entryFrom": [
     "EMP-003"
    ],
-   "exitTo": [
-    "EMP-003"
-   ],
    "inferred": false,
-   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
-   "transitions": [
-    {
-     "to": "EMP-003",
-     "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
-    }
-   ]
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product."
   },
   "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Named in the board contents and not written up in it.** **Drawn 31 August** — `FnB Board 4.dc.html` frame `fnb-4a`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Restaurant Service Command Center* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
   "density": "comfortable",
@@ -121,13 +107,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listTableReservations` reads the population and `getTableMap` reads one of them — list, select, act",
   "purpose": "Restaurant Service Command Center — from the client design board, 20 August.",
-  "gaps": [
-   {
-    "operation": "listFnbOrders",
-    "why": "**1 declared operation reach no component on this screen**: listFnbOrders. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -136,8 +115,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Outlet id",
+       "operation": "listTableReservations",
+       "notes": "Sends `?outletId=` to `listTableReservations`.",
+       "provenance": "contract fnb.yaml GET /table-reservations"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Date",
+       "operation": "listTableReservations",
+       "notes": "Sends `?date=` to `listTableReservations`.",
+       "provenance": "contract fnb.yaml GET /table-reservations"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every restaurant service",
+       "label": "Every table reservation",
        "bindsTo": "TableReservation",
        "columns": [
         "TableReservation.id",
@@ -148,38 +141,35 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "TableReservation.partySize",
         "TableReservation.startsAt",
         "TableReservation.durationMinutes",
-        "TableReservation.tableIds",
+        "TableReservation.tables[].tableId",
         "TableReservation.status",
         "TableReservation.groupId",
         "TableReservation.notes"
        ],
        "operation": "listTableReservations",
        "provenance": "contract fnb.yaml GET /table-reservations"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
+      },
       {
-       "kind": "detailPanel",
-       "label": "The selected restaurant service",
-       "bindsTo": "TableMap",
+       "kind": "dataTable",
+       "label": "Every F&B order",
+       "bindsTo": "FnbOrder",
        "columns": [
-        "TableMap.outletId",
-        "TableMap.zones",
-        "TableMap.tables"
+        "FnbOrder.id",
+        "FnbOrder.orderNumber",
+        "FnbOrder.outletId",
+        "FnbOrder.serviceMode",
+        "FnbOrder.tableVisitId",
+        "FnbOrder.status",
+        "FnbOrder.lines",
+        "FnbOrder.salesOrderId",
+        "FnbOrder.grossAmount",
+        "FnbOrder.taxAmount",
+        "FnbOrder.kitchenTicketId",
+        "FnbOrder.estimatedReadyAt"
        ],
-       "operation": "getTableMap",
-       "provenance": "contract fnb.yaml GET /outlets/{outletId}/tables"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+       "operation": "listFnbOrders",
+       "provenance": "contract fnb.yaml GET /fnb-orders"
+      },
       {
        "kind": "searchField",
        "label": "Search restaurant service command center",
@@ -196,15 +186,56 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "carried from the previous definition"
       }
      ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected table reservation",
+       "bindsTo": "TableReservation",
+       "columns": [
+        "TableReservation.id",
+        "TableReservation.outletId",
+        "TableReservation.subjectId",
+        "TableReservation.guestName",
+        "TableReservation.contactPoint",
+        "TableReservation.partySize",
+        "TableReservation.startsAt",
+        "TableReservation.durationMinutes",
+        "TableReservation.tables",
+        "TableReservation.status",
+        "TableReservation.groupId",
+        "TableReservation.notes",
+        "TableReservation.actualPartySize",
+        "TableReservation.tableVisitId"
+       ],
+       "operation": "listTableReservations",
+       "provenance": "contract fnb.yaml GET /table-reservations"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The table map",
+       "bindsTo": "TableMap",
+       "columns": [
+        "TableMap.outletId",
+        "TableMap.zones",
+        "TableMap.tables"
+       ],
+       "operation": "getTableMap",
+       "provenance": "contract fnb.yaml GET /outlets/{outletId}/tables"
+      }
+     ]
     }
    ]
   },
   "states": {
    "loading": "The restaurant service list.",
    "error": "Could not load. Names which read failed and leaves the restaurant service untouched.",
-   "emptyFirstRun": "No restaurant service yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the restaurant service are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No restaurant service yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on outletId, date and the restaurant service are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getTableMap` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -240,15 +271,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to.",
    "preloaded": [
-    "TableMap.outletId",
-    "TableMap.zones",
-    "TableMap.tables"
+    "TableReservation.id",
+    "TableReservation.outletId",
+    "TableReservation.subjectId",
+    "TableReservation.guestName",
+    "TableReservation.contactPoint"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-051",
+   "derivedFrom": "wireframes/reference/FnB Board 4.dc.html",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -289,22 +323,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "entryFrom": [
     "EMP-003"
    ],
-   "exitTo": [
-    "EMP-003"
-   ],
    "inferred": false,
-   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
-   "transitions": [
-    {
-     "to": "EMP-003",
-     "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
-    }
-   ]
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product."
   },
   "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Drawn 31 August** — `FnB Board 4.dc.html` frame `fnb-4b`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Floor Plan &amp; Table Map* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
   "density": "comfortable",
@@ -323,7 +343,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected floor plan table",
+       "label": "The table map",
        "bindsTo": "TableMap",
        "columns": [
         "TableMap.outletId",
@@ -332,25 +352,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getTableMap",
        "provenance": "contract fnb.yaml GET /outlets/{outletId}/tables"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save changes",
-       "operation": "setTableLayout",
-       "provenance": "contract fnb.yaml PUT /outlets/{outletId}/tables"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+      },
       {
        "kind": "searchField",
        "label": "Search floor plan",
@@ -367,15 +369,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "carried from the previous definition"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save table layout",
+       "operation": "setTableLayout",
+       "provenance": "contract fnb.yaml PUT /outlets/{outletId}/tables"
+      }
+     ]
     }
    ]
   },
   "states": {
-   "loading": "The floor plan table list.",
+   "loading": "The floor plan table, read by `getTableMap`.",
    "error": "Could not load. Names which read failed and leaves the floor plan table untouched.",
-   "emptyFirstRun": "No floor plan table yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the floor plan table are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No floor plan table yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getTableMap` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -409,9 +422,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-052",
+   "derivedFrom": "wireframes/reference/FnB Board 4.dc.html",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetTableLayout",
+    "component": "modal",
+    "trigger": "Save table layout",
+    "body": "**Collects what `setTableLayout` sends before it is called.** Required: `tables`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save table layout",
+     "operation": "setTableLayout"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "tables"
+     ]
+    },
+    "provenance": "contract fnb.yaml PUT /outlets/{outletId}/tables"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -449,22 +482,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "entryFrom": [
     "EMP-003"
    ],
-   "exitTo": [
-    "EMP-003"
-   ],
    "inferred": false,
-   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
-   "transitions": [
-    {
-     "to": "EMP-003",
-     "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
-    }
-   ]
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product."
   },
   "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Named in the board contents and not written up in it.** **Drawn 31 August** — `FnB Board 4.dc.html` frame `fnb-4c`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Table &amp; Seating Configuration* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
   "density": "comfortable",
@@ -516,25 +535,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "shape",
        "bindsTo": "TableDefinition.shape",
        "provenance": "contract fnb.yaml PUT /outlets/{outletId}/tables"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "publish",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Save changes",
-       "operation": "setTableLayout",
-       "provenance": "contract fnb.yaml PUT /outlets/{outletId}/tables"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+      },
       {
        "kind": "searchField",
        "label": "Search table",
@@ -551,14 +552,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "carried from the previous definition"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save table layout",
+       "operation": "setTableLayout",
+       "provenance": "contract fnb.yaml PUT /outlets/{outletId}/tables"
+      }
+     ]
     }
    ]
   },
   "states": {
    "loading": "The saved table seating.",
    "error": "Could not load. Names which read failed and leaves the table seating untouched.",
-   "emptyFirstRun": "No table seating configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No table seating configured. The form opens empty and `setTableLayout` saves the first one; it says what the platform does in the meantime.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_CONFIGURE`, which `setTableLayout` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -567,6 +580,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "fnb",
     "purpose": "Configure the table layout",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "createTable",
+    "contract": "fnb",
+    "purpose": "Add a table to the floor",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "updateTable",
+    "contract": "fnb",
+    "purpose": "Change a table's covers, shape or section",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "setSectionLayout",
+    "contract": "fnb",
+    "purpose": "Arrange the outlet's sections",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
    }
   ],
   "entryState": {
@@ -578,6 +612,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "outletId",
      "from": "EMP-003"
+    },
+    {
+     "name": "tableId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to."
@@ -586,6 +624,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-053",
+   "derivedFrom": "wireframes/reference/FnB Board 4.dc.html",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -626,22 +665,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "entryFrom": [
     "EMP-003"
    ],
-   "exitTo": [
-    "EMP-003"
-   ],
    "inferred": false,
-   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
-   "transitions": [
-    {
-     "to": "EMP-003",
-     "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
-    }
-   ]
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product."
   },
   "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Drawn 31 August** — `FnB Board 4.dc.html` frame `fnb-4d`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Reservation Calendar &amp; Timeline* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
   "density": "comfortable",
@@ -659,8 +684,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "calendarView",
+       "label": "Calendar",
+       "operation": "listTableReservations",
+       "notes": "Reservations by hour; agenda view on the handheld. Day, week, month and agenda views; the day starts at the venue's `calendarDayStartHour`. Filters the category on what it read.",
+       "provenance": "decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)"
+      },
+      {
+       "kind": "textField",
+       "label": "Outlet id",
+       "operation": "listTableReservations",
+       "notes": "Sends `?outletId=` to `listTableReservations`.",
+       "provenance": "contract fnb.yaml GET /table-reservations"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Date",
+       "operation": "listTableReservations",
+       "notes": "Sends `?date=` to `listTableReservations`.",
+       "provenance": "contract fnb.yaml GET /table-reservations"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every reservation calendar timeline",
+       "label": "Every table reservation",
        "bindsTo": "TableReservation",
        "columns": [
         "TableReservation.id",
@@ -671,49 +717,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "TableReservation.partySize",
         "TableReservation.startsAt",
         "TableReservation.durationMinutes",
-        "TableReservation.tableIds",
+        "TableReservation.tables[].tableId",
         "TableReservation.status",
         "TableReservation.groupId",
         "TableReservation.notes"
        ],
        "operation": "listTableReservations",
        "provenance": "contract fnb.yaml GET /table-reservations"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected reservation calendar timeline",
-       "bindsTo": "TableReservation",
-       "columns": [
-        "TableReservation.id",
-        "TableReservation.outletId",
-        "TableReservation.subjectId",
-        "TableReservation.guestName",
-        "TableReservation.contactPoint",
-        "TableReservation.partySize",
-        "TableReservation.startsAt",
-        "TableReservation.durationMinutes",
-        "TableReservation.tableIds",
-        "TableReservation.status",
-        "TableReservation.groupId",
-        "TableReservation.notes",
-        "TableReservation.actualPartySize",
-        "TableReservation.tableVisitId"
-       ],
-       "operation": "listTableReservations",
-       "provenance": "contract fnb.yaml GET /table-reservations"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+      },
       {
        "kind": "searchField",
        "label": "Search reservation calendar",
@@ -730,15 +741,44 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "carried from the previous definition"
       }
      ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected table reservation",
+       "bindsTo": "TableReservation",
+       "columns": [
+        "TableReservation.id",
+        "TableReservation.outletId",
+        "TableReservation.subjectId",
+        "TableReservation.guestName",
+        "TableReservation.contactPoint",
+        "TableReservation.partySize",
+        "TableReservation.startsAt",
+        "TableReservation.durationMinutes",
+        "TableReservation.tables[].tableId",
+        "TableReservation.status",
+        "TableReservation.groupId",
+        "TableReservation.notes",
+        "TableReservation.actualPartySize",
+        "TableReservation.tableVisitId"
+       ],
+       "operation": "listTableReservations",
+       "provenance": "contract fnb.yaml GET /table-reservations"
+      }
+     ]
     }
    ]
   },
   "states": {
    "loading": "The reservation calendar timeline list.",
    "error": "Could not load. Names which read failed and leaves the reservation calendar timeline untouched.",
-   "emptyFirstRun": "No reservation calendar timeline yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the reservation calendar timeline are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No reservation calendar timeline yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on outletId, date and the reservation calendar timeline are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_MODIFY`, which `listTableReservations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -769,6 +809,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-054",
+   "derivedFrom": "wireframes/reference/FnB Board 4.dc.html",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -809,22 +850,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "entryFrom": [
     "EMP-003"
    ],
-   "exitTo": [
-    "EMP-003"
-   ],
    "inferred": false,
-   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
-   "transitions": [
-    {
-     "to": "EMP-003",
-     "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
-    }
-   ]
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product."
   },
   "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Named in the board contents and not written up in it.** **Drawn 31 August** — `FnB Board 4.dc.html` frame `fnb-4e`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Create / Edit Reservation* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
   "density": "comfortable",
@@ -892,7 +919,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "textField",
        "label": "tableIds",
-       "bindsTo": "TableReservation.tableIds",
+       "bindsTo": "TableReservation.tables[].tableId",
        "provenance": "contract fnb.yaml POST /table-reservations"
       },
       {
@@ -929,30 +956,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "duplicateMatch",
        "label": "Possible existing guest",
        "notes": "**Runs while the booking is being typed, not after it is saved.** A duplicate created at the podium is one somebody has to find later. Proposes only — `matchGuest` never merges, and the reason each candidate matched is shown beside it.\n"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "publish",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createTableReservation",
-       "provenance": "contract fnb.yaml POST /table-reservations"
       },
-      {
-       "kind": "duplicateMatch",
-       "label": "Possible existing guest",
-       "notes": "**Runs while the booking is being typed, not after it is saved.** A duplicate created at the podium is one somebody has to find later. Proposes only — `matchGuest` never merges, and the reason each candidate matched is shown beside it.\n"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
       {
        "kind": "searchField",
        "label": "Search create / edit reservation",
@@ -974,14 +978,38 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "notes": "**Runs while the booking is being typed, not after it is saved.** A duplicate created at the podium is one somebody has to find later. Proposes only — `matchGuest` never merges, and the reason each candidate matched is shown beside it.\n"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create table reservation",
+       "operation": "createTableReservation",
+       "provenance": "contract fnb.yaml POST /table-reservations",
+       "notes": "**No deposit unless the venue switched the table deposit on** (decided 29 September, rev 3 REV3-8b, superseding audit R077 (a) \"no table deposit in the first release\"; the venue sets it on BO-327). With it off, or a party below its size, the booking is `booked`, takes no payment and the copy names no fee. Where it applies, `createTableReservation` returns `awaitingDeposit` with the deposit amount, basis and `holdExpiresAt`: the screen shows them, says the cover is held until then, and names the refund cut-off and the late-cancel and no-show terms from the policy. The deposit is paid through the cart (`addCartLine` with `tableReservationId`, then `checkoutCart`), at a till or by the guest; unpaid by `holdExpiresAt`, the booking is cancelled and the cover released."
+      },
+      {
+       "kind": "duplicateMatch",
+       "label": "Possible existing guest",
+       "notes": "**Runs while the booking is being typed, not after it is saved.** A duplicate created at the podium is one somebody has to find later. Proposes only — `matchGuest` never merges, and the reason each candidate matched is shown beside it.\n"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Find matches for guest",
+       "operation": "matchGuest",
+       "provenance": "contract marketing-crm.yaml POST /guests/match"
+      }
+     ]
     }
    ]
   },
   "states": {
    "loading": "The saved create edit reservation.",
    "error": "Could not load. Names which read failed and leaves the create edit reservation untouched.",
-   "emptyFirstRun": "No create edit reservation configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No create edit reservation configured. The form opens empty and `createTableReservation` saves the first one; it says what the platform does in the meantime.",
+   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `matchGuest` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -1011,9 +1039,31 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-055",
+   "derivedFrom": "wireframes/reference/FnB Board 4.dc.html",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formMatchGuest",
+    "component": "modal",
+    "trigger": "Find matches for guest",
+    "body": "**Collects what `matchGuest` sends before it is called.** Nothing in the body is required. Optional: `name`, `phone`, `email`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Find matches for guest",
+     "operation": "matchGuest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "phone",
+      "email"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /guests/match"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -1051,22 +1101,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "entryFrom": [
     "EMP-003"
    ],
-   "exitTo": [
-    "EMP-003"
-   ],
    "inferred": false,
-   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
-   "transitions": [
-    {
-     "to": "EMP-003",
-     "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
-    }
-   ]
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product."
   },
   "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Drawn 31 August** — `FnB Board 4.dc.html` frame `fnb-4f`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Walk-In &amp; Waitlist Management* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
   "density": "comfortable",
@@ -1136,25 +1172,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "holdExpiresAt",
        "bindsTo": "RestaurantWaitlist.holdExpiresAt",
        "provenance": "contract fnb.yaml POST /waitlist"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "publish",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Join",
-       "operation": "joinRestaurantWaitlist",
-       "provenance": "contract fnb.yaml POST /waitlist"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+      },
       {
        "kind": "searchField",
        "label": "Search walk-in",
@@ -1171,14 +1189,33 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "carried from the previous definition"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Join restaurant waitlist",
+       "operation": "joinRestaurantWaitlist",
+       "provenance": "contract fnb.yaml POST /waitlist"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Leave waitlist",
+       "operation": "leaveRestaurantWaitlist",
+       "provenance": "contract fnb.yaml POST /waitlist/{entryId}/leave",
+       "notes": "Takes the selected party off the list; the entry returns `cancelled`, and a party already called releases its held table at once. Not `walkedAway`, which records a party that left without saying so (decided 28 September, audit R073 (d))."
+      }
+     ]
     }
    ]
   },
   "states": {
    "loading": "The saved walk-in waitlist.",
    "error": "Could not load. Names which read failed and leaves the walk-in waitlist untouched.",
-   "emptyFirstRun": "No walk-in waitlist configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No walk-in waitlist configured. The form opens empty and `joinRestaurantWaitlist` saves the first one; it says what the platform does in the meantime.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_MODIFY`, which `joinRestaurantWaitlist` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -1187,6 +1224,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "fnb",
     "purpose": "Add a party to an outlet's waitlist",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "leaveRestaurantWaitlist",
+    "contract": "fnb",
+    "purpose": "Take a party off the waitlist; the entry ends cancelled (audit R073 (d))",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1194,6 +1237,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "entryId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to."
@@ -1202,9 +1249,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-056",
+   "derivedFrom": "wireframes/reference/FnB Board 4.dc.html",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "confirmLeaveRestaurantWaitlist",
+    "component": "confirmDialog",
+    "trigger": "Leave waitlist",
+    "body": "**Names the party and its place in the list.** `leaveRestaurantWaitlist` ends the entry `cancelled`; a party already called releases its held table at once. Optional: `note`, why the party left (audit R073 (d)).",
+    "confirm": {
+     "label": "Take them off the list",
+     "operation": "leaveRestaurantWaitlist",
+     "carries": [
+      "entryId"
+     ]
+    },
+    "dismiss": {
+     "label": "Keep them",
+     "discards": [
+      "note"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /waitlist/{entryId}/leave"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -1242,22 +1312,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "entryFrom": [
     "EMP-003"
    ],
-   "exitTo": [
-    "EMP-003"
-   ],
    "inferred": false,
-   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
-   "transitions": [
-    {
-     "to": "EMP-003",
-     "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
-    }
-   ]
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product."
   },
   "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Named in the board contents and not written up in it.** **Drawn 31 August** — `FnB Board 4.dc.html` frame `fnb-4g`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Guest Profile &amp; Dining History* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
   "density": "comfortable",
@@ -1275,8 +1331,50 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listOrders",
+       "notes": "Sends `?venueId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Principal id",
+       "operation": "listOrders",
+       "notes": "Sends `?principalId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Shift id",
+       "operation": "listOrders",
+       "notes": "Sends `?shiftId=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listOrders",
+       "notes": "Sends `?status=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Created from",
+       "operation": "listOrders",
+       "notes": "Sends `?createdFrom=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Created to",
+       "operation": "listOrders",
+       "notes": "Sends `?createdTo=` to `listOrders`.",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every guest profile dining",
+       "label": "Every order",
        "bindsTo": "OrderSummary",
        "columns": [
         "OrderSummary.id",
@@ -1301,56 +1399,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Merge these two records",
        "permission": "GUEST_MANAGE",
        "notes": "**The consequence, stated before the act.** The losing record is superseded rather than deleted so a year of orders and consents keeps resolving; the merge is reversible for thirty days; and **consent takes the narrower of the two positions**, which is the one thing about a merge that is a regulatory question rather than a data one.\n"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected guest profile dining",
-       "bindsTo": "GuestProfileDetail",
-       "columns": [
-        "GuestProfileDetail.id",
-        "GuestProfileDetail.subjectId",
-        "GuestProfileDetail.displayName",
-        "GuestProfileDetail.email",
-        "GuestProfileDetail.phone",
-        "GuestProfileDetail.preferredLanguage",
-        "GuestProfileDetail.preferredChannel",
-        "GuestProfileDetail.guestLinkId",
-        "GuestProfileDetail.tags",
-        "GuestProfileDetail.engagementScore",
-        "GuestProfileDetail.engagementTier",
-        "GuestProfileDetail.lifetimeValue",
-        "GuestProfileDetail.visitCount",
-        "GuestProfileDetail.lastVisitAt",
-        "GuestProfileDetail.isActive",
-        "GuestProfileDetail.consents"
-       ],
-       "operation": "getGuestProfile",
-       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
       },
-      {
-       "kind": "duplicateMatch",
-       "label": "Possible duplicates of this guest",
-       "permission": "GUEST_MANAGE",
-       "notes": "Candidates from `matchGuest`, each with the rule that matched it."
-      },
-      {
-       "kind": "confirmDialog",
-       "label": "Merge these two records",
-       "permission": "GUEST_MANAGE",
-       "notes": "**The consequence, stated before the act.** The losing record is superseded rather than deleted so a year of orders and consents keeps resolving; the merge is reversible for thirty days; and **consent takes the narrower of the two positions**, which is the one thing about a merge that is a regulatory question rather than a data one.\n"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
       {
        "kind": "searchField",
        "label": "Search guest profile",
@@ -1379,15 +1428,95 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "notes": "**The consequence, stated before the act.** The losing record is superseded rather than deleted so a year of orders and consents keeps resolving; the merge is reversible for thirty days; and **consent takes the narrower of the two positions**, which is the one thing about a merge that is a regulatory question rather than a data one.\n"
       }
      ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected order",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount",
+        "OrderSummary.principalId",
+        "OrderSummary.holdLabel",
+        "OrderSummary.heldUntil"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "duplicateMatch",
+       "label": "Possible duplicates of this guest",
+       "permission": "GUEST_MANAGE",
+       "notes": "Candidates from `matchGuest`, each with the rule that matched it."
+      },
+      {
+       "kind": "confirmDialog",
+       "label": "Merge these two records",
+       "permission": "GUEST_MANAGE",
+       "notes": "**The consequence, stated before the act.** The losing record is superseded rather than deleted so a year of orders and consents keeps resolving; the merge is reversible for thirty days; and **consent takes the narrower of the two positions**, which is the one thing about a merge that is a regulatory question rather than a data one.\n"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The guest profile",
+       "bindsTo": "GuestProfileDetail",
+       "columns": [
+        "GuestProfileDetail.id",
+        "GuestProfileDetail.subjectId",
+        "GuestProfileDetail.displayName",
+        "GuestProfileDetail.email",
+        "GuestProfileDetail.phone",
+        "GuestProfileDetail.preferredLanguage",
+        "GuestProfileDetail.preferredChannel",
+        "GuestProfileDetail.guestLinkId",
+        "GuestProfileDetail.tags",
+        "GuestProfileDetail.engagementScore",
+        "GuestProfileDetail.engagementTier",
+        "GuestProfileDetail.lifetimeValue",
+        "GuestProfileDetail.visitCount",
+        "GuestProfileDetail.lastVisitAt",
+        "GuestProfileDetail.isActive",
+        "GuestProfileDetail.mergedIntoSubjectId"
+       ],
+       "operation": "getGuestProfile",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Find matches for guest",
+       "operation": "matchGuest",
+       "provenance": "contract marketing-crm.yaml POST /guests/match"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Merge guests",
+       "operation": "mergeGuests",
+       "provenance": "contract marketing-crm.yaml POST /guests/merge"
+      }
+     ]
     }
    ]
   },
   "states": {
    "loading": "The guest profile dining list.",
    "error": "Could not load. Names which read failed and leaves the guest profile dining untouched.",
-   "emptyFirstRun": "No guest profile dining yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the guest profile dining are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No guest profile dining yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the guest profile dining are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `getGuestProfile` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -1414,6 +1543,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "marketing-crm",
     "purpose": "Merge a proposed duplicate into this profile, once a person has decided",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "addGuestNote",
+    "contract": "marketing-crm",
+    "purpose": "What the floor needs to know about this table",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
    }
   ],
   "entryState": {
@@ -1429,20 +1565,49 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to.",
    "preloaded": [
-    "GuestProfileDetail.id",
-    "GuestProfileDetail.subjectId",
-    "GuestProfileDetail.displayName",
-    "GuestProfileDetail.email",
-    "GuestProfileDetail.phone"
+    "OrderSummary.id",
+    "OrderSummary.orderNumber",
+    "OrderSummary.status",
+    "OrderSummary.grossAmount",
+    "OrderSummary.refundedAmount"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-057",
+   "derivedFrom": "wireframes/reference/FnB Board 4.dc.html",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formMatchGuest",
+    "component": "modal",
+    "trigger": "Find matches for guest",
+    "body": "**Collects what `matchGuest` sends before it is called.** Nothing in the body is required. Optional: `name`, `phone`, `email`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Find matches for guest",
+     "operation": "matchGuest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "phone",
+      "email"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /guests/match"
+   },
+   {
+    "id": "confirmMergeGuests",
+    "component": "confirmDialog",
+    "trigger": "Merge guests",
+    "body": "**Names what `mergeGuests` changes and what it leaves alone**, in the consequence rather than the verb. A guest profile dining this affects should be identified in the dialog, not just counted. **Collects what `mergeGuests` sends before it is called.** Required: `keepSubjectId`, `mergeSubjectIds`. Optional: `reason`.",
+    "provenance": "contract marketing-crm.yaml POST /guests/merge"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -1488,19 +1653,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "EMP-059",
      "trigger": "Food is ordered with courses",
-     "provenance": "flow F29 step 2→3"
+     "provenance": "flow F29 step 2→3",
+     "carries": [
+      "visitId"
+     ]
     },
     {
      "to": "EMP-060",
      "trigger": "Reservation & Table Performance",
-     "provenance": "flow F80 step 2→3, F94 step 1→2"
+     "provenance": "flow F80 step 2→3, F94 step 1→2",
+     "carries": [
+      "outletId"
+     ]
     },
     {
      "to": "KIT-002",
      "trigger": "One main comes back wrong",
      "provenance": "flow F29 step 5→6",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "ticketId",
+      "visitId"
+     ]
     }
    ]
   },
@@ -1556,115 +1731,31 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "recordedAt",
        "bindsTo": "OpenTableVisitRequest.recordedAt",
        "provenance": "contract fnb.yaml POST /table-visits"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "publish",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Open",
-       "operation": "openTableVisit",
-       "provenance": "contract fnb.yaml POST /table-visits"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "updateTableVisit",
-       "provenance": "contract fnb.yaml PATCH /table-visits/{visitId}"
+       "kind": "detailPanel",
+       "label": "The table visit",
+       "bindsTo": "TableVisit",
+       "columns": [
+        "TableVisit.id",
+        "TableVisit.tableId",
+        "TableVisit.tableLabel",
+        "TableVisit.outletId",
+        "TableVisit.covers",
+        "TableVisit.status",
+        "TableVisit.serverPrincipalId",
+        "TableVisit.subjectId",
+        "TableVisit.orders",
+        "TableVisit.mergedIntoVisitId",
+        "TableVisit.mergedFromVisitIds",
+        "TableVisit.runningTotal",
+        "TableVisit.gratuity",
+        "TableVisit.openedAt",
+        "TableVisit.closedAt"
+       ],
+       "operation": "getTableVisit",
+       "provenance": "contract fnb.yaml GET /table-visits/{visitId}"
       },
-      {
-       "kind": "destructiveButton",
-       "label": "Merge",
-       "operation": "mergeTableVisits",
-       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/merge"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Transfer",
-       "operation": "transferTableVisit",
-       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/transfer"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Seat",
-       "operation": "seatTableReservation",
-       "provenance": "contract fnb.yaml POST /table-reservations/{reservationId}/seat"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "setServiceStage",
-       "provenance": "contract fnb.yaml PUT /table-visits/{visitId}/stage"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Move",
-       "operation": "moveTableVisit",
-       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/move"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reassign",
-       "operation": "reassignServer",
-       "provenance": "contract fnb.yaml PUT /table-visits/{visitId}/server"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Notify",
-       "operation": "notifyServer",
-       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/notify-server"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create",
-       "operation": "createFnbOrder",
-       "provenance": "contract fnb.yaml POST /fnb-orders"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Fire",
-       "operation": "fireCourse",
-       "provenance": "contract fnb.yaml POST /kitchen-tickets/{ticketId}/fire"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Hold",
-       "operation": "holdCourse",
-       "provenance": "contract fnb.yaml POST /kitchen-tickets/{ticketId}/hold"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save changes",
-       "operation": "setTableCombinations",
-       "provenance": "contract fnb.yaml PUT /outlets/{outletId}/table-combinations"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Quote",
-       "operation": "quoteWaitTime",
-       "provenance": "contract fnb.yaml POST /waitlist/{entryId}/quote"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Join",
-       "operation": "joinRestaurantWaitlist",
-       "provenance": "contract fnb.yaml POST /waitlist"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Notify",
-       "operation": "notifyWaitlistParty",
-       "provenance": "contract fnb.yaml POST /waitlist/{entryId}/notify"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
       {
        "kind": "searchField",
        "label": "Search live table",
@@ -1681,6 +1772,108 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "carried from the previous definition"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Open table visit",
+       "operation": "openTableVisit",
+       "provenance": "contract fnb.yaml POST /table-visits"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save table visit",
+       "operation": "updateTableVisit",
+       "provenance": "contract fnb.yaml PATCH /table-visits/{visitId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Merge table visits",
+       "operation": "mergeTableVisits",
+       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/merge"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Transfer table visit",
+       "operation": "transferTableVisit",
+       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/transfer"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Seat table reservation",
+       "operation": "seatTableReservation",
+       "provenance": "contract fnb.yaml POST /table-reservations/{reservationId}/seat"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save service stage",
+       "operation": "setServiceStage",
+       "provenance": "contract fnb.yaml PUT /table-visits/{visitId}/stage"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Move table visit",
+       "operation": "moveTableVisit",
+       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/move"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reassign server",
+       "operation": "reassignServer",
+       "provenance": "contract fnb.yaml PUT /table-visits/{visitId}/server"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Notify server",
+       "operation": "notifyServer",
+       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/notify-server"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create F&B order",
+       "operation": "createFnbOrder",
+       "provenance": "contract fnb.yaml POST /fnb-orders"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Fire course",
+       "operation": "fireCourse",
+       "provenance": "contract fnb.yaml POST /kitchen-tickets/{ticketId}/fire"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Hold course",
+       "operation": "holdCourse",
+       "provenance": "contract fnb.yaml POST /kitchen-tickets/{ticketId}/hold"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save table combinations",
+       "operation": "setTableCombinations",
+       "provenance": "contract fnb.yaml PUT /outlets/{outletId}/table-combinations"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Quote wait time",
+       "operation": "quoteWaitTime",
+       "provenance": "contract fnb.yaml POST /waitlist/{entryId}/quote"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Join restaurant waitlist",
+       "operation": "joinRestaurantWaitlist",
+       "provenance": "contract fnb.yaml POST /waitlist"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Notify waitlist party",
+       "operation": "notifyWaitlistParty",
+       "provenance": "contract fnb.yaml POST /waitlist/{entryId}/notify"
+      }
+     ]
     }
    ]
   },
@@ -1688,16 +1881,275 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmMergeTableVisits",
     "component": "confirmDialog",
-    "trigger": "Merge",
-    "body": "**Names what `mergeTableVisits` changes and what it leaves alone**, in the consequence rather than the verb. A live table service this affects should be identified in the dialog, not just counted.",
+    "trigger": "Merge table visits",
+    "body": "**Names what `mergeTableVisits` changes and what it leaves alone**, in the consequence rather than the verb. A live table service this affects should be identified in the dialog, not just counted. **Collects what `mergeTableVisits` sends before it is called.** Required: `sourceVisitId`.",
     "provenance": "contract fnb.yaml POST /table-visits/{visitId}/merge"
+   },
+   {
+    "id": "formUpdateTableVisit",
+    "component": "modal",
+    "trigger": "Save table visit",
+    "body": "**Collects what `updateTableVisit` sends before it is called.** Required: `recordedAt`. Optional: `covers`, `tableId`, `serverPrincipalId`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save table visit",
+     "operation": "updateTableVisit"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "recordedAt",
+      "covers",
+      "tableId",
+      "serverPrincipalId",
+      "note"
+     ]
+    },
+    "provenance": "contract fnb.yaml PATCH /table-visits/{visitId}"
+   },
+   {
+    "id": "formTransferTableVisit",
+    "component": "modal",
+    "trigger": "Transfer table visit",
+    "body": "**Collects what `transferTableVisit` sends before it is called.** Required: `toPrincipalId`, `reason`, `recordedAt`. **`note` is collected too, and required when the reason is Other** — the operation refuses 400 without it (decided 28 September, audit R222). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Transfer table visit",
+     "operation": "transferTableVisit"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "toPrincipalId",
+      "reason",
+      "recordedAt",
+      "note"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /table-visits/{visitId}/transfer"
+   },
+   {
+    "id": "formSeatTableReservation",
+    "component": "modal",
+    "trigger": "Seat table reservation",
+    "body": "**Collects what `seatTableReservation` sends before it is called.** Required: `tableIds`, `recordedAt`. Optional: `actualPartySize`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Seat table reservation",
+     "operation": "seatTableReservation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "tableIds",
+      "recordedAt",
+      "actualPartySize"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /table-reservations/{reservationId}/seat"
+   },
+   {
+    "id": "formSetServiceStage",
+    "component": "modal",
+    "trigger": "Save service stage",
+    "body": "**Collects what `setServiceStage` sends before it is called.** Required: `recordedAt`, `stage`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save service stage",
+     "operation": "setServiceStage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "recordedAt",
+      "stage"
+     ]
+    },
+    "provenance": "contract fnb.yaml PUT /table-visits/{visitId}/stage"
+   },
+   {
+    "id": "formMoveTableVisit",
+    "component": "modal",
+    "trigger": "Move table visit",
+    "body": "**Collects what `moveTableVisit` sends before it is called.** Required: `toTableId`, `recordedAt`. Optional: `reason`. **`note` is collected too, and required when the reason is Other** — the operation refuses 400 without it (decided 28 September, audit R222). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Move table visit",
+     "operation": "moveTableVisit"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "toTableId",
+      "recordedAt",
+      "reason",
+      "note"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /table-visits/{visitId}/move"
+   },
+   {
+    "id": "formReassignServer",
+    "component": "modal",
+    "trigger": "Reassign server",
+    "body": "**Collects what `reassignServer` sends before it is called.** Required: `recordedAt`, `serverPrincipalId`. Optional: `splitGratuity`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reassign server",
+     "operation": "reassignServer"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "recordedAt",
+      "serverPrincipalId",
+      "splitGratuity"
+     ]
+    },
+    "provenance": "contract fnb.yaml PUT /table-visits/{visitId}/server"
+   },
+   {
+    "id": "formNotifyServer",
+    "component": "modal",
+    "trigger": "Notify server",
+    "body": "**Collects what `notifyServer` sends before it is called.** Nothing in the body is required. Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Notify server",
+     "operation": "notifyServer"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /table-visits/{visitId}/notify-server"
+   },
+   {
+    "id": "formCreateFnbOrder",
+    "component": "modal",
+    "trigger": "Create F&B order",
+    "body": "**Collects what `createFnbOrder` sends before it is called.** Required: `id`, `outletId`, `serviceMode`, `lines`, `recordedAt`. Optional: `tableVisitId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateFnbOrderRequest",
+    "confirm": {
+     "label": "Create F&B order",
+     "operation": "createFnbOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "outletId",
+      "serviceMode",
+      "lines",
+      "recordedAt",
+      "tableVisitId"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /fnb-orders"
+   },
+   {
+    "id": "formFireCourse",
+    "component": "modal",
+    "trigger": "Fire course",
+    "body": "**Collects what `fireCourse` sends before it is called.** Required: `recordedAt`, `course`. Optional: `fireAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Fire course",
+     "operation": "fireCourse"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "recordedAt",
+      "course",
+      "fireAt"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /kitchen-tickets/{ticketId}/fire"
+   },
+   {
+    "id": "formHoldCourse",
+    "component": "modal",
+    "trigger": "Hold course",
+    "body": "**Collects what `holdCourse` sends before it is called.** Required: `recordedAt`, `course`. Optional: `reason`. **`note` is collected too, and required when the reason is Other** — the operation refuses 400 without it (decided 28 September, audit R222). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Hold course",
+     "operation": "holdCourse"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "recordedAt",
+      "course",
+      "reason",
+      "note"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /kitchen-tickets/{ticketId}/hold"
+   },
+   {
+    "id": "formSetTableCombinations",
+    "component": "modal",
+    "trigger": "Save table combinations",
+    "body": "**Collects what `setTableCombinations` sends before it is called.** Required: `combinations`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save table combinations",
+     "operation": "setTableCombinations"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "combinations"
+     ]
+    },
+    "provenance": "contract fnb.yaml PUT /outlets/{outletId}/table-combinations"
+   },
+   {
+    "id": "formJoinRestaurantWaitlist",
+    "component": "modal",
+    "trigger": "Join restaurant waitlist",
+    "body": "**Collects what `joinRestaurantWaitlist` sends before it is called.** Required: `id`, `outletId`, `partySize`, `status`, `recordedAt`. Optional: `subjectId`, `quotedWaitMinutes`, `seatingPreference`, `notifiedAt`, `syncedAt`, `holdExpiresAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "RestaurantWaitlist",
+    "confirm": {
+     "label": "Join restaurant waitlist",
+     "operation": "joinRestaurantWaitlist"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "outletId",
+      "partySize",
+      "status",
+      "recordedAt",
+      "subjectId",
+      "quotedWaitMinutes",
+      "seatingPreference",
+      "notifiedAt",
+      "syncedAt",
+      "holdExpiresAt"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /waitlist"
+   },
+   {
+    "id": "formNotifyWaitlistParty",
+    "component": "modal",
+    "trigger": "Notify waitlist party",
+    "body": "**Collects what `notifyWaitlistParty` sends before it is called.** Nothing in the body is required. Optional: `channel`, `holdMinutes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Notify waitlist party",
+     "operation": "notifyWaitlistParty"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "channel",
+      "holdMinutes"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /waitlist/{entryId}/notify"
    }
   ],
   "states": {
    "loading": "The saved live table service.",
    "error": "Could not load. Names which read failed and leaves the live table service untouched.",
-   "emptyFirstRun": "No live table service configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No live table service configured. The form opens empty and `openTableVisit` saves the first one; it says what the platform does in the meantime.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getTableVisit` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -1796,6 +2248,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "fnb",
     "purpose": "Their table is ready",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getTableVisit",
+    "contract": "fnb",
+    "purpose": "Read a visit with all its orders",
+    "trigger": "onAction",
+    "provenance": "wiring gap, 19 September 2026 — the screen showed the noun and could not act on it"
    }
   ],
   "entryState": {
@@ -1834,6 +2293,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-058",
+   "derivedFrom": "wireframes/reference/FnB Board 4.dc.html",
    "source": "Claude Design F&B pack, 24 August",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
@@ -1883,7 +2343,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "EMP-058",
      "trigger": "Live Table & Service Management",
      "provenance": "flow F80 step 1→2",
-     "operation": "transferOrderItems"
+     "operation": "transferOrderItems",
+     "carries": [
+      "visitId"
+     ]
     },
     {
      "to": "KIT-002",
@@ -1891,7 +2354,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "provenance": "flow F29 step 3→4",
      "operation": "createFnbOrder",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "visitId"
+     ]
     }
    ]
   },
@@ -1912,7 +2378,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected table order bill",
+       "label": "The bill",
        "bindsTo": "Bill",
        "columns": [
         "Bill.visitId",
@@ -1926,55 +2392,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getBill",
        "provenance": "contract fnb.yaml GET /table-visits/{visitId}/bill"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "destructiveButton",
-       "label": "Close",
-       "operation": "closeTableVisit",
-       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/close"
       },
-      {
-       "kind": "secondaryButton",
-       "label": "Create",
-       "operation": "createPayment",
-       "provenance": "contract orders.yaml POST /payments"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create",
-       "operation": "createFnbOrder",
-       "provenance": "contract fnb.yaml POST /fnb-orders"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Split",
-       "operation": "splitBill",
-       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/bill/split"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Comp",
-       "operation": "compItem",
-       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/comp"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Transfer",
-       "operation": "transferOrderItems",
-       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/transfer-items"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
       {
        "kind": "searchField",
        "label": "Search table order, bill",
@@ -1991,6 +2409,54 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "carried from the previous definition"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "destructiveButton",
+       "label": "Close table visit",
+       "operation": "closeTableVisit",
+       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/close"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create payment",
+       "operation": "createPayment",
+       "provenance": "contract orders.yaml POST /payments"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create F&B order",
+       "operation": "createFnbOrder",
+       "provenance": "contract fnb.yaml POST /fnb-orders"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Split bill",
+       "operation": "splitBill",
+       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/bill/split"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Comp item",
+       "operation": "compItem",
+       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/comp"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Transfer order items",
+       "operation": "transferOrderItems",
+       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/transfer-items"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Request bill",
+       "operation": "requestBill",
+       "provenance": "contract fnb.yaml POST /table-visits/{visitId}/request-bill"
+      }
+     ]
     }
    ]
   },
@@ -1998,17 +2464,144 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmCloseTableVisit",
     "component": "confirmDialog",
-    "trigger": "Close",
-    "body": "**Names what `closeTableVisit` changes and what it leaves alone**, in the consequence rather than the verb. A table order bill this affects should be identified in the dialog, not just counted.",
+    "trigger": "Close table visit",
+    "body": "**Names what `closeTableVisit` changes and what it leaves alone**, in the consequence rather than the verb. A table order bill this affects should be identified in the dialog, not just counted. **Collects what `closeTableVisit` sends before it is called.** Required: `payments`. Optional: `gratuity`.",
     "provenance": "contract fnb.yaml POST /table-visits/{visitId}/close"
+   },
+   {
+    "id": "formRequestBill",
+    "component": "modal",
+    "trigger": "Request bill",
+    "body": "**Collects what `requestBill` sends before it is called.** Required: `recordedAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Request bill",
+     "operation": "requestBill"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "recordedAt"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /table-visits/{visitId}/request-bill"
+   },
+   {
+    "id": "formCreatePayment",
+    "component": "modal",
+    "trigger": "Create payment",
+    "body": "**Collects what `createPayment` sends before it is called.** Required: `id`, `orderId`, `tender`, `amount`, `recordedAt`. Optional: `tenderCurrency`, `tenderAmount`, `walletAuthorisationId`, `deviceId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreatePaymentRequest",
+    "confirm": {
+     "label": "Create payment",
+     "operation": "createPayment"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "orderId",
+      "tender",
+      "amount",
+      "recordedAt",
+      "tenderCurrency",
+      "tenderAmount",
+      "walletAuthorisationId",
+      "deviceId"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /payments"
+   },
+   {
+    "id": "formCreateFnbOrder",
+    "component": "modal",
+    "trigger": "Create F&B order",
+    "body": "**Collects what `createFnbOrder` sends before it is called.** Required: `id`, `outletId`, `serviceMode`, `lines`, `recordedAt`. Optional: `tableVisitId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateFnbOrderRequest",
+    "confirm": {
+     "label": "Create F&B order",
+     "operation": "createFnbOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "outletId",
+      "serviceMode",
+      "lines",
+      "recordedAt",
+      "tableVisitId"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /fnb-orders"
+   },
+   {
+    "id": "formSplitBill",
+    "component": "modal",
+    "trigger": "Split bill",
+    "body": "**Collects what `splitBill` sends before it is called.** Required: `recordedAt`, `method`. Optional: `parts`, `amounts`, `lineAssignments`, `categoryAssignments`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SplitBillRequest",
+    "confirm": {
+     "label": "Split bill",
+     "operation": "splitBill"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "recordedAt",
+      "method",
+      "parts",
+      "amounts",
+      "lineAssignments",
+      "categoryAssignments"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /table-visits/{visitId}/bill/split"
+   },
+   {
+    "id": "formCompItem",
+    "component": "modal",
+    "trigger": "Comp item",
+    "body": "**Collects what `compItem` sends before it is called.** Required: `orderLineId`, `recordedAt`, `reason`. Optional: `note`. **When the reason is Other, `note` is required** — the operation refuses 400 without it (decided 28 September, audit R222). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Comp item",
+     "operation": "compItem"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "orderLineId",
+      "recordedAt",
+      "reason",
+      "note"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /table-visits/{visitId}/comp"
+   },
+   {
+    "id": "formTransferOrderItems",
+    "component": "modal",
+    "trigger": "Transfer order items",
+    "body": "**Collects what `transferOrderItems` sends before it is called.** Required: `toVisitId`, `lineIds`, `recordedAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Transfer order items",
+     "operation": "transferOrderItems"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "toVisitId",
+      "lineIds",
+      "recordedAt"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /table-visits/{visitId}/transfer-items"
    }
   ],
   "states": {
-   "loading": "The table order bill list.",
+   "loading": "The table order bill, read by `getBill`.",
    "error": "Could not load. Names which read failed and leaves the table order bill untouched.",
-   "emptyFirstRun": "No table order bill yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the table order bill are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No table order bill yet. Offers Create payment (`createPayment`).",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getBill` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -2053,6 +2646,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "fnb",
     "purpose": "Move items to another table's bill",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "requestBill",
+    "contract": "fnb",
+    "purpose": "The party asked to pay",
+    "trigger": "onAction",
+    "provenance": "wiring gap, 19 September 2026 — the screen showed the noun and could not act on it",
+    "invalidates": [
+     "getTableVisit"
+    ]
    }
   ],
   "entryState": {
@@ -2072,6 +2675,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-059",
+   "derivedFrom": "wireframes/reference/FnB Board 4.dc.html",
    "source": "Claude Design F&B pack, 24 August",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
@@ -2115,7 +2719,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "EMP-058"
    ],
    "exitTo": [
-    "EMP-003",
     "EMP-061"
    ],
    "inferred": false,
@@ -2125,15 +2728,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "EMP-061",
      "trigger": "Retail Inventory Command Center",
      "provenance": "flow F80 step 3→4, F94 step 2→3"
-    },
-    {
-     "to": "EMP-003",
-     "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
     }
    ]
   },
@@ -2153,8 +2747,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Outlet id",
+       "operation": "listTableReservations",
+       "notes": "Sends `?outletId=` to `listTableReservations`.",
+       "provenance": "contract fnb.yaml GET /table-reservations"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Date",
+       "operation": "listTableReservations",
+       "notes": "Sends `?date=` to `listTableReservations`.",
+       "provenance": "contract fnb.yaml GET /table-reservations"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every reservation table performance",
+       "label": "Every table reservation",
        "bindsTo": "TableReservation",
        "columns": [
         "TableReservation.id",
@@ -2165,38 +2773,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "TableReservation.partySize",
         "TableReservation.startsAt",
         "TableReservation.durationMinutes",
-        "TableReservation.tableIds",
+        "TableReservation.tables[].tableId",
         "TableReservation.status",
         "TableReservation.groupId",
         "TableReservation.notes"
        ],
        "operation": "listTableReservations",
        "provenance": "contract fnb.yaml GET /table-reservations"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected reservation table performance",
-       "bindsTo": "TableMap",
-       "columns": [
-        "TableMap.outletId",
-        "TableMap.zones",
-        "TableMap.tables"
-       ],
-       "operation": "getTableMap",
-       "provenance": "contract fnb.yaml GET /outlets/{outletId}/tables"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+      },
       {
        "kind": "searchField",
        "label": "Search reservation",
@@ -2213,15 +2797,56 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "carried from the previous definition"
       }
      ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected table reservation",
+       "bindsTo": "TableReservation",
+       "columns": [
+        "TableReservation.id",
+        "TableReservation.outletId",
+        "TableReservation.subjectId",
+        "TableReservation.guestName",
+        "TableReservation.contactPoint",
+        "TableReservation.partySize",
+        "TableReservation.startsAt",
+        "TableReservation.durationMinutes",
+        "TableReservation.tables",
+        "TableReservation.status",
+        "TableReservation.groupId",
+        "TableReservation.notes",
+        "TableReservation.actualPartySize",
+        "TableReservation.tableVisitId"
+       ],
+       "operation": "listTableReservations",
+       "provenance": "contract fnb.yaml GET /table-reservations"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The table map",
+       "bindsTo": "TableMap",
+       "columns": [
+        "TableMap.outletId",
+        "TableMap.zones",
+        "TableMap.tables"
+       ],
+       "operation": "getTableMap",
+       "provenance": "contract fnb.yaml GET /outlets/{outletId}/tables"
+      }
+     ]
     }
    ]
   },
   "states": {
    "loading": "The reservation table performance list.",
    "error": "Could not load. Names which read failed and leaves the reservation table performance untouched.",
-   "emptyFirstRun": "No reservation table performance yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the reservation table performance are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No reservation table performance yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on outletId, date and the reservation table performance are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_MODIFY`, which `listTableReservations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -2251,15 +2876,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to.",
    "preloaded": [
-    "TableMap.outletId",
-    "TableMap.zones",
-    "TableMap.tables"
+    "TableReservation.id",
+    "TableReservation.outletId",
+    "TableReservation.subjectId",
+    "TableReservation.guestName",
+    "TableReservation.contactPoint"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-060",
+   "derivedFrom": "wireframes/reference/FnB Board 4.dc.html",
    "source": "Claude Design F&B pack, 24 August",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
@@ -2294,6 +2922,25 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+ "addGuestNote": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/notes",
+  "contract": "marketing-crm",
+  "summary": "What the floor needs to know about this table",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestNote"
+ },
  "closeTableVisit": {
   "method": "POST",
   "path": "/table-visits/{visitId}/close",
@@ -2369,6 +3016,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "CreatePaymentRequest",
   "responds": "Payment"
+ },
+ "createTable": {
+  "method": "POST",
+  "path": "/tables",
+  "contract": "fnb",
+  "summary": "A table as a thing, not an inference",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "TableDefinition",
+  "responds": "TableDefinition"
  },
  "createTableReservation": {
   "method": "POST",
@@ -2447,6 +3113,19 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "TableMap"
  },
+ "getTableVisit": {
+  "method": "GET",
+  "path": "/table-visits/{visitId}",
+  "contract": "fnb",
+  "summary": "Read a visit with all its orders",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TableVisit"
+ },
  "holdCourse": {
   "method": "POST",
   "path": "/kitchen-tickets/{ticketId}/hold",
@@ -2483,6 +3162,25 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": "RestaurantWaitlist",
+  "responds": "RestaurantWaitlist"
+ },
+ "leaveRestaurantWaitlist": {
+  "method": "POST",
+  "path": "/waitlist/{entryId}/leave",
+  "contract": "fnb",
+  "summary": "Take a party off an outlet's waitlist",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
   "responds": "RestaurantWaitlist"
  },
  "listFnbOrders": {
@@ -2610,7 +3308,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": "TableReservation"
+  "responds": "Page"
  },
  "matchGuest": {
   "method": "POST",
@@ -2648,7 +3346,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "MergeResult"
  },
  "mergeTableVisits": {
   "method": "POST",
@@ -2783,6 +3481,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "TableVisit"
  },
+ "requestBill": {
+  "method": "POST",
+  "path": "/table-visits/{visitId}/request-bill",
+  "contract": "fnb",
+  "summary": "The party asked to pay",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TableVisit"
+ },
  "seatTableReservation": {
   "method": "POST",
   "path": "/table-reservations/{reservationId}/seat",
@@ -2801,6 +3518,30 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "TableReservation"
+ },
+ "setSectionLayout": {
+  "method": "PUT",
+  "path": "/outlets/{outletId}/sections",
+  "contract": "fnb",
+  "summary": "Divide the floor into sections and give each a server",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SectionLayout",
+  "responds": "SectionLayout"
  },
  "setServiceStage": {
   "method": "PUT",
@@ -2835,6 +3576,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -2850,6 +3596,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -2885,7 +3636,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Move items to another table's bill",
   "permission": "ORDER_MODIFY",
   "offlineCapable": true,
-  "conflictPolicy": "lastWriterWins",
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -2914,7 +3665,31 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "TableVisit"
+ },
+ "updateTable": {
+  "method": "PUT",
+  "path": "/tables/{tableId}",
+  "contract": "fnb",
+  "summary": "Change what a table is",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "TableDefinition",
+  "responds": "TableDefinition"
  },
  "updateTableVisit": {
   "method": "PATCH",
@@ -2944,6 +3719,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AllergenCode": {
+  "type": "string",
+  "description": "**The fourteen declarable allergens, as one closed list.** Every allergen field in this contract uses it — the menu claim, the ticket line, a substitution's delta, a modifier option, the label on a bag — so a declared set and an actual set compare without anybody normalising case or synonyms. It was the `Allergen.contains` enum; the other fields were free text.\n",
+  "enum": [
+   "gluten",
+   "crustaceans",
+   "eggs",
+   "fish",
+   "peanuts",
+   "soybeans",
+   "milk",
+   "nuts",
+   "celery",
+   "mustard",
+   "sesame",
+   "sulphites",
+   "lupin",
+   "molluscs"
+  ]
+ },
  "Bill": {
   "x-ticvai-persistence": "none — computed from visit orders",
   "type": "object",
@@ -3059,12 +3854,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        }
       },
       "subtotal": {
+       "x-ticvai-column": "net_amount",
        "$ref": "../shared/common.yaml#/components/schemas/Money"
       },
       "taxAmount": {
        "$ref": "../shared/common.yaml#/components/schemas/Money"
       },
       "total": {
+       "x-ticvai-column": "gross_amount",
        "$ref": "../shared/common.yaml#/components/schemas/Money"
       },
       "status": {
@@ -3078,6 +3875,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     }
    }
   }
+ },
+ "ConsentDecision": {
+  "type": "string",
+  "enum": [
+   "granted",
+   "withdrawn",
+   "notAsked"
+  ]
+ },
+ "ConsentPurpose": {
+  "type": "string",
+  "enum": [
+   "marketing",
+   "personalisation",
+   "profiling",
+   "thirdPartySharing",
+   "aiProcessing",
+   "transactional"
+  ]
  },
  "ConsentState": {
   "x-ticvai-persistence": "none — projection over consent_record",
@@ -3131,6 +3947,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "CoursingPolicy": {
+  "type": "string",
+  "description": "How a ticket's courses are fired. `fireAndForget` sends every course at once, which is no coursing; `holdAndFire` waits for a server to call each course; `timed` fires on a clock; `phased` staggers by course. **One vocabulary for the ticket (`KitchenTicket.coursing`) and the outlet default (`CourseRules.defaultCoursing`)** — the default said `none` for `fireAndForget` and had no `delayed` until 26 September, so a default could not be copied onto the field it defaults.\n",
+  "enum": [
+   "fireAndForget",
+   "holdAndFire",
+   "phased",
+   "timed",
+   "delayed"
+  ]
+ },
  "CreateFnbOrderLine": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -3142,7 +3969,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "menuItemId": {
     "type": "string",
@@ -3173,6 +4000,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "nullable": true,
     "description": "Course grouping, so the kitchen fires in sequence."
+   },
+   "redeemEntitlementId": {
+    "type": "string",
+    "nullable": true,
+    "x-ticvai-references": "access.entitlement",
+    "description": "**A meal combo redeemed at the till or by a scan** (29 September, MOB-4; applied 30 September). The entitlement a bundle's `fnbMenuItem` component issued (promotions `BundleComponent.componentKind: fnbMenuItem`, `menuItemId`, `redeemAtOutletIds`). The line is priced at zero against it, `menuItemId` must be the component's menu item and the outlet one of `redeemAtOutletIds` (or any outlet with the item on a live menu when that list is empty), and the entitlement is marked used in the same step through access `validateAccess` at the outlet. An entitlement already used, for another item or outlet, or not yet valid is refused 409 `entitlementNotRedeemable`; a till that is offline queues the redemption like any sale and the replay is refused the same way if it was used meanwhile."
    }
   }
  },
@@ -3189,7 +4022,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "outletId": {
     "type": "string",
@@ -3200,6 +4033,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "tableVisitId": {
     "type": "string",
+    "format": "uuid",
     "nullable": true,
     "description": "Required for table service. Absent for quick service."
    },
@@ -3209,6 +4043,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "items": {
      "$ref": "#/components/schemas/CreateFnbOrderLine"
     }
+   },
+   "salesOrderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `orders.sales_order` this F&B order fulfils (SD-046, 29 September). A POS sale sends the order it took payment on; the commercial order is the sales order and this is its fulfilment."
    },
    "recordedAt": {
     "type": "string",
@@ -3228,10 +4068,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid",
+    "description": "Client-generated UUIDv7 of the payment, and its idempotency key — it must equal the `Idempotency-Key` header."
    },
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid"
    },
    "tender": {
     "$ref": "#/components/schemas/TenderKind"
@@ -3239,18 +4081,42 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
-   "tenderedAmount": {
+   "tenderCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "description": "The currency the guest handed over, where it is not the venue's — becomes `Payment.tenderCurrency`. Omit for a payment in the venue's own currency."
+   },
+   "tenderAmount": {
     "allOf": [
      {
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "Cash only. Change is the difference."
+    "description": "**What the guest handed over**, in `tenderCurrency` — becomes `Payment.tenderAmount`, one name for one concept (renamed from `tenderedAmount` on 26 September). For cash, change is the difference.\n"
    },
    "walletAuthorisationId": {
     "type": "string",
     "nullable": true,
     "description": "Cross-cell wallet hold, where the guest's home cell is elsewhere."
+   },
+   "walletHoldId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a `wallet` tender, the hold `wallet.holdWalletFunds` placed (SD-027). Capture debits it; the order service writes no wallet table."
+   },
+   "returnUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "description": "Where the provider returns the guest after a 3-D Secure challenge or hosted page (SD-034). Required for a card payment from the guest web or app."
+   },
+   "terminalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The card terminal to instruct, for a card payment at a till (ECR flow, SD-034)."
    },
    "deviceId": {
     "type": "string",
@@ -3263,8 +4129,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "ExchangeRateDecimal": {
+  "type": "string",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,6)",
+  "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n",
+  "pattern": "^\\d+(\\.\\d{1,6})?$"
+ },
  "FnbOrder": {
-  "x-ticvai-persistence": "fnb.fnb_order + fnb.fnb_order_line",
+  "x-ticvai-persistence": "fnb.service_order + fnb.service_order_line",
   "type": "object",
   "required": [
    "id",
@@ -3278,7 +4151,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid"
    },
    "orderNumber": {
     "type": "string"
@@ -3292,6 +4166,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "tableVisitId": {
     "type": "string",
+    "format": "uuid",
     "nullable": true
    },
    "status": {
@@ -3321,6 +4196,19 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      ]
     }
    },
+   "salesOrderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "orders.sales_order",
+    "description": "**Retyped 29 September (SD-046)**, and `format: uuid` since ADR-0056 (30 September): every id is a uuid, so this joins `orders.sales_order.id`. **Taken from their `fnb.order`, 20 September.** We carried outlet, table visit and kitchen ticket on an F&B order and nothing joining it to what was actually sold, so an F&B line could not be reconciled to the order that paid for it.\n"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Taken from their `fnb.order`. Ours had `recordedAt` and `syncedAt`, which are both offline-sync fields, and no plain updated timestamp.\n"
+   },
    "grossAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
@@ -3329,7 +4217,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "kitchenTicketId": {
     "type": "string",
+    "format": "uuid",
     "nullable": true
+   },
+   "kitchenTickets": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The kitchen tickets this order created, one per station (SD-046). Returned, not stored here; they are `fnb.kitchen_ticket` rows.",
+    "items": {
+     "$ref": "#/components/schemas/KitchenTicket"
+    }
    },
    "estimatedReadyAt": {
     "type": "string",
@@ -3365,6 +4263,89 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "cancelled",
    "refunded"
   ]
+ },
+ "FnbReservationTable": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.reservation_table",
+  "description": "**Taken from the backend workbook, 20 September.** Maps one or more dining tables assigned to a reservation.",
+  "required": [
+   "reservationId",
+   "tableId",
+   "createdAt"
+  ],
+  "properties": {
+   "reservationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "tableId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "GuestNote": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.guest_note",
+  "description": "A note on a guest, written by staff (`addGuestNote`). **Attributed and personal data**, and `isAllergy` keeps an allergy apart from every other kind so it surfaces on the order screen.\n",
+  "required": [
+   "id",
+   "subjectId",
+   "kind",
+   "text",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "allergy",
+     "dietary",
+     "seatingPreference",
+     "occasion",
+     "serviceRecovery",
+     "vip",
+     "general"
+    ]
+   },
+   "text": {
+    "type": "string"
+   },
+   "isAllergy": {
+    "type": "boolean",
+    "default": false
+   },
+   "visibleToServer": {
+    "type": "boolean",
+    "default": true
+   },
+   "authorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
  },
  "GuestProfile": {
   "x-ticvai-persistence": "marketing.guest_profile",
@@ -3448,6 +4429,19 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "isActive": {
     "type": "boolean"
+   },
+   "mergedIntoSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Set on the absorbed profile by `mergeGuestProfiles` and `mergeGuests`**, which retain it as a redirect rather than deleting it. A read that lands here follows it; a second merge of a profile that has one is refused as `alreadyMerged`.\n"
+   },
+   "mergedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    }
   }
  },
@@ -3509,10 +4503,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid"
    },
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid",
+    "description": "The F&B order the ticket was created from on acceptance (`FnbOrder.id`)."
    },
    "orderNumber": {
     "type": "string"
@@ -3529,15 +4526,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "$ref": "#/components/schemas/ServiceMode"
    },
    "coursing": {
-    "type": "string",
-    "nullable": true,
-    "enum": [
-     "fireAndForget",
-     "holdAndFire",
-     "phased",
-     "timed",
-     "delayed"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CoursingPolicy"
+     }
     ],
+    "nullable": true,
     "description": "BL-131. **Starters before mains is the entire job of a kitchen pass**, and the model fired everything at once.\n`holdAndFire` waits for a server to call it; `timed` fires on a clock; `phased` staggers by course. **Without this a table gets its dessert while eating its starter.**\n"
    },
    "buzzerCode": {
@@ -3573,7 +4567,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      ],
      "properties": {
       "lineId": {
-       "type": "string"
+       "type": "string",
+       "format": "uuid"
       },
       "name": {
        "type": "string"
@@ -3594,8 +4589,30 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "allergens": {
        "type": "array",
        "items": {
-        "type": "string"
+        "$ref": "#/components/schemas/AllergenCode"
        }
+      },
+      "refireOfLineId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true,
+       "readOnly": true,
+       "description": "**Set on a refire.** The line it remakes, which stays — food cost counts both, the bill counts one (`refireItem`)."
+      },
+      "refireReason": {
+       "allOf": [
+        {
+         "$ref": "#/components/schemas/RefireReason"
+        }
+       ],
+       "nullable": true,
+       "readOnly": true
+      },
+      "isChargeable": {
+       "type": "boolean",
+       "nullable": true,
+       "readOnly": true,
+       "description": "A refire's `chargeable` flag. Null on a line that is not a refire."
       },
       "course": {
        "type": "integer",
@@ -3647,6 +4664,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "tierCode"
   ],
   "properties": {
+   "leaderboardNickname": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 24,
+    "description": "BL-173. **The name shown on a leaderboard, chosen by the guest.** Offered whenever they reach the board and changeable afterwards; `setLeaderboardNickname` is the only thing that writes it.\n**Null means the guest has not chosen one yet, and the board shows a generated `Player-4821` in its place** — never `pii.subject.display_name`, which would disclose silently on the day a guest first placed and is the case this field exists to prevent.\n**The generated name is computed at read time and not stored here.** Writing it would make *\"has this guest chosen a name\"* unanswerable, and that flag is what the prompt-on-reaching-the-board depends on.\n"
+   },
    "subjectId": {
     "type": "string",
     "format": "uuid"
@@ -3660,6 +4683,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "lifetimePoints": {
     "type": "integer"
+   },
+   "tierId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The tier this row's `tierCode` and `tierName` are a copy of.** Added 20 September with `marketing.programme_tier`: the two strings were a cache of something that did not exist, and a cache with no source cannot be rebuilt or audited.\n"
    },
    "tierCode": {
     "type": "string"
@@ -3682,6 +4711,117 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "MergeResult": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "survivingSubjectId",
+   "absorbedSubjectId",
+   "transferred"
+  ],
+  "properties": {
+   "survivingSubjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "absorbedSubjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "transferred": {
+    "type": "object",
+    "properties": {
+     "orders": {
+      "type": "integer"
+     },
+     "cases": {
+      "type": "integer"
+     },
+     "loyaltyPoints": {
+      "type": "integer",
+      "description": "The total points moved across every programme. The per-programme outcome is `loyaltyProgrammes`."
+     }
+    }
+   },
+   "loyaltyProgrammes": {
+    "type": "array",
+    "description": "**One entry per loyalty programme either record belonged to (decided 28 September, audit R149).** Points are added and the higher tier is kept, per programme — a single points number cannot say which programme it belongs to.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "programmeId",
+      "pointsAdded",
+      "resultingPoints"
+     ],
+     "properties": {
+      "programmeId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "pointsAdded": {
+       "type": "integer",
+       "description": "The absorbed record's balance in this programme, added to the survivor's."
+      },
+      "resultingPoints": {
+       "type": "integer"
+      },
+      "tierKept": {
+       "type": "string",
+       "nullable": true,
+       "description": "The higher of the two records' tiers in this programme."
+      }
+     }
+    }
+   },
+   "consentOutcome": {
+    "type": "array",
+    "description": "Per purpose, the resulting position. Where the two profiles disagreed, the more restrictive position won.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "purpose": {
+       "$ref": "#/components/schemas/ConsentPurpose"
+      },
+      "result": {
+       "$ref": "#/components/schemas/ConsentDecision"
+      },
+      "wasRestricted": {
+       "type": "boolean"
+      }
+     }
+    }
+   }
+  }
+ },
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
+   }
+  }
+ },
  "OpenTableVisitRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -3694,7 +4834,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "tableId": {
     "type": "string",
@@ -3714,6 +4854,95 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid"
    },
    "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "OrderChannel": {
+  "type": "string",
+  "description": "Where the order originated. Added when guest self-ordering was contracted — an order a guest placed on their own phone is commercially and operationally different from one a cashier typed, and reporting that cannot separate them cannot answer whether self-ordering is working.\n",
+  "enum": [
+   "pos",
+   "kiosk",
+   "guestApp",
+   "guestWeb",
+   "callCentre",
+   "partner",
+   "api",
+   "backOffice"
+  ]
+ },
+ "OrderStatus": {
+  "type": "string",
+  "enum": [
+   "pending",
+   "held",
+   "paid",
+   "partiallyPaid",
+   "completed",
+   "voided",
+   "refunded",
+   "partiallyRefunded",
+   "failed"
+  ],
+  "description": "`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"
+ },
+ "OrderSummary": {
+  "x-ticvai-persistence": "none — projection",
+  "type": "object",
+  "required": [
+   "id",
+   "orderNumber",
+   "status",
+   "grossAmount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/OrderStatus"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "refundedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OrderChannel"
+     }
+    ],
+    "description": "The same vocabulary as `Order.channel`, which this projects."
+   },
+   "lineCount": {
+    "type": "integer"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The cashier who raised it — what the held-orders list shows."
+   },
+   "holdLabel": {
+    "type": "string",
+    "nullable": true,
+    "description": "As `Order.holdLabel`."
+   },
+   "heldUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "As `Order.heldUntil`, so a held-orders list can warn about the ones about to lapse."
+   },
+   "createdAt": {
     "type": "string",
     "format": "date-time"
    }
@@ -3751,10 +4980,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid"
    },
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid"
    },
    "tender": {
     "$ref": "#/components/schemas/TenderKind"
@@ -3773,7 +5004,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "The amount in `tenderCurrency`, at that currency's own scale."
    },
    "fxRate": {
-    "type": "number",
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
     "nullable": true,
     "description": "The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"
    },
@@ -3817,7 +5052,45 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "providerReference": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "The provider's own id for the charge (Stripe PaymentIntent, NI order reference). What `payments.receivePaymentProviderWebhook` matches an incoming event on (SD-034)."
+   },
+   "providerIdempotencyKey": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The idempotency key sent to the provider, which is this payment's `id` (SD-034, 29 September). A retried provider call cannot charge twice."
+   },
+   "terminalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The card terminal a till payment ran on (ECR flow, SD-034)."
+   },
+   "nextAction": {
+    "type": "object",
+    "nullable": true,
+    "x-ticvai-persisted": false,
+    "description": "**What the caller does while the payment is `pendingConfirmation`** (SD-034, 29 September). `redirect`: send the browser to `url` (3-D Secure challenge or hosted page); the provider returns the guest to `returnUrl` and the result arrives by webhook. `terminal`: the card terminal has been instructed; wait for its result. Null once the payment has an outcome.",
+    "properties": {
+     "kind": {
+      "type": "string",
+      "enum": [
+       "redirect",
+       "terminal"
+      ]
+     },
+     "url": {
+      "type": "string",
+      "format": "uri",
+      "nullable": true
+     },
+     "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
    },
    "lastInquiryAt": {
     "type": "string",
@@ -3835,6 +5108,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "RefireReason": {
+  "type": "string",
+  "description": "Why a line was made again (`refireItem`). The reasons are the data.",
+  "enum": [
+   "overcooked",
+   "undercooked",
+   "wrongItem",
+   "dropped",
+   "cold",
+   "allergyRisk",
+   "guestChangedMind",
+   "lateAdd"
+  ]
+ },
  "RestaurantWaitlist": {
   "type": "object",
   "x-ticvai-persistence": "fnb.waitlist_entry",
@@ -3843,7 +5130,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "id",
    "outletId",
    "partySize",
-   "status"
+   "status",
+   "recordedAt"
   ],
   "properties": {
    "id": {
@@ -3894,11 +5182,62 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "date-time",
     "nullable": true
    },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "**When the party joined, on the device.** The wait a party had is measured from here to `notifiedAt` or to seating, which is the report `walkedAway` exists for. Required on a join — the operation is offline-capable."
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
    "holdExpiresAt": {
     "type": "string",
     "format": "date-time",
     "nullable": true,
     "description": "**How long a table waits for somebody who was called.** Too short and a guest returning from the bathroom loses it; too long and the table sits empty at peak — which is why it is a setting rather than a constant.\n"
+   }
+  }
+ },
+ "SectionLayout": {
+  "type": "object",
+  "description": "An outlet's floor divided into sections, each with its server (`setSectionLayout`).",
+  "required": [
+   "sections"
+  ],
+  "properties": {
+   "sections": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "name",
+      "tableIds"
+     ],
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "tableIds": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "uuid"
+       }
+      },
+      "serverPrincipalId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "servicePeriod": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
    }
   }
  },
@@ -3916,9 +5255,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only",
   "type": "object",
   "required": [
-   "method"
+   "method",
+   "recordedAt"
   ],
   "properties": {
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Device time of the split (offline-capable)."
+   },
    "method": {
     "$ref": "#/components/schemas/SplitMethod"
    },
@@ -3986,6 +5331,105 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "bySeat"
   ]
  },
+ "TableCombination": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.table_combination",
+  "description": "**Tables that can be pushed together, and what they seat together.** Declared by a host rather than inferred from a floor plan — a pillar, a step or a service run stops two adjacent tables combining. `setTableCombinations` writes the outlet's set.\n",
+  "required": [
+   "tableIds",
+   "combinedCovers"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The outlet in the path."
+   },
+   "tableIds": {
+    "type": "array",
+    "minItems": 2,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "combinedCovers": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "setupMinutes": {
+    "type": "integer",
+    "default": 5
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `outlet` scope."
+   }
+  }
+ },
+ "TableDefinition": {
+  "x-ticvai-persistence": "fnb.dining_table",
+  "type": "object",
+  "description": "A restaurant (dining) table, reserved with `createTableReservation`. Not a map-bookable `resources` table, which is a non-dining spot sold like a cabana (decided 29 September, rev 3 GAP-C2).",
+  "required": [
+   "id",
+   "label",
+   "capacity"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "label": {
+    "type": "string",
+    "maxLength": 32,
+    "x-ticvai-unique": "venue",
+    "description": "**The table code, unique per venue** (decided 28 September, audit R108). Two tables in one venue never share a label, across all its outlets, so *T12* names one table wherever it is read. `createTable` and `updateTable` refuse a duplicate with `409` `duplicate-code`.\n"
+   },
+   "capacity": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "zone": {
+    "type": "string",
+    "nullable": true
+   },
+   "position": {
+    "type": "object",
+    "properties": {
+     "x": {
+      "type": "number"
+     },
+     "y": {
+      "type": "number"
+     }
+    }
+   },
+   "shape": {
+    "type": "string",
+    "enum": [
+     "round",
+     "square",
+     "rectangle",
+     "booth",
+     "bar"
+    ]
+   },
+   "isOutOfService": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Damaged, or its section closed.** `getTableMap` shows it as `outOfService` and a claim on it is refused with `tableOutOfService`."
+   }
+  }
+ },
  "TableMap": {
   "x-ticvai-persistence": "none — projection",
   "type": "object",
@@ -4015,6 +5459,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "TableReservation": {
   "type": "object",
   "x-ticvai-persistence": "fnb.table_reservation",
+  "x-ticvai-retired-columns": [
+   "table_ids"
+  ],
   "required": [
    "outletId",
    "startsAt",
@@ -4053,12 +5500,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "description": "**How long the cover is held.** An outlet turning tables twice an evening needs this to be real, or the second sitting cannot be booked.\n"
    },
-   "tableIds": {
+   "tables": {
     "type": "array",
-    "description": "Usually empty until seating. **Committing a specific table at booking time refuses later bookings against a constraint that did not need to exist.**\n",
+    "description": "The dining tables assigned to this reservation, one row each.\n**Usually empty until seating.** Committing a specific table at booking time refuses later bookings against a constraint that did not need to exist — that was true of the `tableIds` array this replaces and it is still true, because it is about *when* a table is assigned rather than how the assignment is stored.\n**Replaces `tableIds`, retired 20 September.** An array cannot carry per-row state, which is the same reason this merge took `entry_rule_point`, `menu_item_modifier`, `seat_block_item`, `plan_benefit`, `payment_method_config` and `tier_module` from the backend workbook. A party seated across three tables that releases one early has nowhere to say so in an array, and *\"which reservations are on table 7 tonight\"* is a GIN scan over every reservation instead of an index seek.\n",
     "items": {
-     "type": "string",
-     "format": "uuid"
+     "$ref": "#/components/schemas/FnbReservationTable"
     }
    },
    "status": {
@@ -4087,6 +5533,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true,
     "readOnly": true
    },
+   "deposit": {
+    "$ref": "#/components/schemas/TableReservationDeposit"
+   },
    "createdAt": {
     "type": "string",
     "format": "date-time",
@@ -4094,9 +5543,64 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "TableReservationDeposit": {
+  "type": "object",
+  "nullable": true,
+  "readOnly": true,
+  "x-ticvai-persistence": "fnb.table_reservation",
+  "description": "**The deposit this booking holds, snapshotted from `orders.DepositPolicy.dining` when it was made** (decided 29 September, rev 3 REV3-8b). Null where no deposit applied, which is every booking while the venue leaves `dining.enabled` false (the default). A later change to the policy does not re-price a booking already made.\n",
+  "required": [
+   "amount",
+   "basis"
+  ],
+  "properties": {
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "basis": {
+    "type": "string",
+    "enum": [
+     "fixedPerGuest",
+     "fixedPerTable",
+     "percentOfMinimumSpend"
+    ]
+   },
+   "holdExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "While `awaitingDeposit`, when the held cover is released if the deposit has not been authorised. The cart lease of the deposit line (15 minutes, audit R169)."
+   },
+   "refundableUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "`startsAt` less `dining.refundableUntilHours`. Cancelling before it releases the deposit in full."
+   },
+   "variantId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The venue's table-deposit variant, `DepositPolicy.dining.depositVariantId`, which the client sends to `addCartLine` with this booking's id."
+   },
+   "cartLineId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `orders.CartLine` carrying the deposit, once added."
+   },
+   "depositId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `orders.deposit` row, once the payment is authorised."
+   }
+  }
+ },
  "TableReservationStatus": {
   "type": "string",
+  "description": "`awaitingDeposit` only where the venue's dining deposit applies (decided 29 September, rev 3 REV3-8b); a booking with no deposit starts `booked`.",
   "enum": [
+   "awaitingDeposit",
    "booked",
    "confirmed",
    "seated",
@@ -4122,6 +5626,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "visitId": {
       "type": "string",
+      "format": "uuid",
       "nullable": true
      },
      "covers": {
@@ -4159,7 +5664,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid"
    },
    "tableId": {
     "type": "string",
@@ -4203,16 +5709,28 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "mergedIntoVisitId": {
     "type": "string",
+    "format": "uuid",
     "nullable": true
    },
    "mergedFromVisitIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "format": "uuid"
     }
    },
    "runningTotal": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "gratuity": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "The gratuity taken at `closeTableVisit`. **Not the service charge**, which is revenue (`FnbServiceChargePolicy`); this is the guest's tip, and `reassignServer` decides who shares it."
    },
    "openedAt": {
     "type": "string",
@@ -4227,6 +5745,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "TenderKind": {
   "type": "string",
+  "description": "`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n",
   "enum": [
    "cash",
    "card",

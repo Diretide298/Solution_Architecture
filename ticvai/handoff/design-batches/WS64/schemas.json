@@ -5,10 +5,6 @@
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Buyer Checkout, Inventory Hold & Secure Payment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "architecture": {
-    "type": "string",
-    "description": "architecture"
-   },
    "name": {
     "type": "string",
     "description": "Name"
@@ -28,6 +24,15 @@
    "requiredParticipantInformation": {
     "type": "string",
     "description": "Required participant information"
+   },
+   "holdExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "When the inventory hold ends"
+   },
+   "total": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Total payable"
    }
   }
  },
@@ -37,33 +42,29 @@
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Create Listing & Resale Price Selection displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "faceValueOnly": {
+   "pricingMode": {
     "type": "string",
-    "description": "Face Value Only"
+    "enum": [
+     "faceValueOnly",
+     "fixedPrice",
+     "sellerSelectedPrice",
+     "cappedPrice",
+     "operatorControlled",
+     "aiRecommendedPrice"
+    ],
+    "description": "How the seller prices the listing."
    },
-   "fixedPrice": {
+   "recommendedPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed Price"
+    "description": "Recommended price"
    },
-   "sellerSelectedPrice": {
+   "minimumPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Seller Selected Price"
+    "description": "Permitted minimum"
    },
-   "cappedPrice": {
+   "maximumPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Capped Price"
-   },
-   "operatorControlled": {
-    "type": "string",
-    "description": "Operator Controlled"
-   },
-   "aiRecommendedPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "AI Recommended Price"
-   },
-   "recommendedPriceAed215": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Recommended Price: AED 215"
+    "description": "Permitted maximum"
    }
   }
  },
@@ -73,26 +74,6 @@
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Fees, Seller Proceeds & Listing Confirmation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "yourSellingPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Your Selling Price (the pack shows AED 220.00)"
-   },
-   "aed2200": {
-    "type": "string",
-    "description": "− AED 22.00"
-   },
-   "aed000": {
-    "type": "string",
-    "description": "− AED 0.00"
-   },
-   "youWillReceiveAed19800": {
-    "type": "string",
-    "description": "You will receive AED 198.00"
-   },
-   "clearlyExplainApplicableSettlementRules": {
-    "type": "string",
-    "description": "Clearly explain applicable settlement rules"
-   },
    "marketplaceTerms": {
     "type": "integer",
     "description": "Marketplace Terms"
@@ -117,33 +98,21 @@
     "type": "string",
     "description": "Applicable privacy notice"
    },
-   "storeTheApplicableTermsVersionAcceptance": {
-    "type": "string",
-    "description": "Store the applicable terms/version acceptance"
-   },
-   "eventMuseumNight": {
-    "type": "string",
-    "description": "Event: Museum Night"
-   },
-   "seatA18": {
-    "type": "string",
-    "description": "Seat: A18"
-   },
-   "originalPriceAed200": {
+   "sellingPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Original Price: AED 200"
+    "description": "Selling price"
    },
-   "resalePriceAed220": {
+   "fee": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Resale Price: AED 220"
+    "description": "Fee"
    },
-   "feeAed22": {
+   "estimatedProceeds": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fee: AED 22"
+    "description": "Estimated seller proceeds"
    },
-   "estimatedProceedsAed198": {
+   "termsVersion": {
     "type": "string",
-    "description": "Estimated Proceeds: AED 198"
+    "description": "Terms version the seller accepts; stored with the acceptance"
    }
   }
  },
@@ -206,10 +175,6 @@
     "type": "string",
     "description": "Marketplace Status"
    },
-   "viewsWhereApplicable": {
-    "type": "string",
-    "description": "Views where applicable"
-   },
    "listingDate": {
     "type": "string",
     "format": "date-time",
@@ -224,30 +189,14 @@
     "type": "string",
     "description": "Settlement Status"
    },
-   "acceptAiPriceRecommendation": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Accept AI Price Recommendation"
-   },
-   "relist": {
-    "type": "string",
-    "description": "Relist"
-   },
-   "contactSupport": {
-    "type": "boolean",
-    "description": "Contact Support"
-   },
-   "sellingPriceAed220": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Selling Price: AED 220"
-   },
-   "estimatedProceedsAed198": {
-    "type": "string",
-    "description": "Estimated Proceeds: AED 198"
-   },
    "settlementScheduledAfterEvent": {
     "type": "string",
     "format": "date-time",
     "description": "Settlement: Scheduled after event"
+   },
+   "views": {
+    "type": "string",
+    "description": "Views where applicable"
    }
   }
  },
@@ -298,38 +247,6 @@
     "type": "string",
     "description": "Available Actions"
    },
-   "exchange": {
-    "type": "string",
-    "description": "Exchange"
-   },
-   "resellTicket": {
-    "type": "string",
-    "description": "Resell Ticket"
-   },
-   "requestRefund": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Request Refund"
-   },
-   "customerAccount": {
-    "type": "string",
-    "description": "Customer account"
-   },
-   "sso": {
-    "type": "string",
-    "description": "SSO"
-   },
-   "passwordlessLogin": {
-    "type": "string",
-    "description": "Passwordless login"
-   },
-   "otp": {
-    "type": "string",
-    "description": "OTP"
-   },
-   "appAuthentication": {
-    "type": "string",
-    "description": "App authentication"
-   },
    "clientLogo": {
     "type": "string",
     "description": "Client logo"
@@ -357,6 +274,17 @@
    "marketplaceName": {
     "type": "string",
     "description": "Marketplace name"
+   },
+   "authenticationMethod": {
+    "type": "string",
+    "enum": [
+     "customerAccount",
+     "sso",
+     "passwordlessLogin",
+     "otp",
+     "appAuthentication"
+    ],
+    "description": "How the guest signs in to the marketplace"
    }
   }
  },
@@ -366,14 +294,6 @@
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Official Resale Marketplace & Buyer Discovery displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "officialTicketsOfficialResale": {
-    "type": "string",
-    "description": "Official Tickets + Official Resale"
-   },
-   "asASeparateMarketplacePage": {
-    "type": "string",
-    "description": "as a separate marketplace page"
-   },
    "event": {
     "type": "string",
     "description": "Event"
@@ -411,18 +331,6 @@
     "type": "string",
     "description": "Accessibility"
    },
-   "resaleOnly": {
-    "type": "string",
-    "description": "Resale only"
-   },
-   "primaryOnly": {
-    "type": "string",
-    "description": "Primary only"
-   },
-   "andWhereAppropriate": {
-    "type": "string",
-    "description": "and, where appropriate"
-   },
    "name": {
     "type": "string",
     "description": "Name"
@@ -442,6 +350,15 @@
    "paymentInformation": {
     "type": "string",
     "description": "Payment information"
+   },
+   "inventoryFilter": {
+    "type": "string",
+    "enum": [
+     "officialTicketsOfficialResale",
+     "resaleOnly",
+     "primaryOnly"
+    ],
+    "description": "Which inventory the buyer sees."
    }
   }
  },
@@ -451,26 +368,6 @@
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Resale Confirmation, Ownership Transfer & Ticket Delivery displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "followedBy": {
-    "type": "string",
-    "description": "followed by"
-   },
-   "yourTicketIsReady": {
-    "type": "string",
-    "description": "Your Ticket Is Ready ✓"
-   },
-   "currentOwnerSellerA": {
-    "type": "string",
-    "description": "Current Owner: Seller A"
-   },
-   "previousOwnerSellerA": {
-    "type": "string",
-    "description": "Previous Owner: Seller A"
-   },
-   "currentOwnerBuyerB": {
-    "type": "string",
-    "description": "Current Owner: Buyer B"
-   },
    "dynamicQr": {
     "type": "string",
     "description": "Dynamic QR"
@@ -487,21 +384,29 @@
     "type": "string",
     "description": "Google Wallet"
    },
-   "rfidNfcAssignmentWhereApplicable": {
-    "type": "string",
-    "description": "RFID/NFC assignment where applicable"
-   },
    "otherSupportedCredentialMedia": {
     "type": "string",
     "description": "Other supported credential media"
    },
-   "yourTicketHasBeenSold": {
+   "rfidNfcAssignment": {
     "type": "string",
-    "description": "Your ticket has been sold"
+    "description": "RFID/NFC assignment where applicable"
    },
-   "settlementStatusPending": {
-    "type": "integer",
-    "description": "Settlement Status: Pending"
+   "ticketId": {
+    "type": "string",
+    "description": "Ticket ID, unchanged through the resale (MoM 1 Sep)"
+   },
+   "currentOwner": {
+    "type": "string",
+    "description": "Current owner"
+   },
+   "previousOwner": {
+    "type": "string",
+    "description": "Previous owner"
+   },
+   "settlementStatus": {
+    "type": "string",
+    "description": "Seller settlement status"
    }
   }
  },
@@ -560,10 +465,6 @@
     "type": "string",
     "description": "Fraud/security hold"
    },
-   "with": {
-    "type": "string",
-    "description": "with"
-   },
    "event": {
     "type": "string",
     "description": "Event"
@@ -594,41 +495,15 @@
     "type": "integer",
     "description": "Applicable marketplace conditions"
    },
-   "error5042": {
+   "sellingMode": {
     "type": "string",
-    "description": "Error 5042"
-   },
-   "a14": {
-    "type": "string",
-    "description": "A14 ☑"
-   },
-   "a15": {
-    "type": "string",
-    "description": "A15 ☑"
-   },
-   "a16": {
-    "type": "string",
-    "description": "A16 ☐"
-   },
-   "a17": {
-    "type": "string",
-    "description": "A17 ☐"
-   },
-   "sellIndividually": {
-    "type": "string",
-    "description": "Sell individually"
-   },
-   "sellSelectedTickets": {
-    "type": "string",
-    "description": "Sell selected tickets"
-   },
-   "sellTogetherOnly": {
-    "type": "string",
-    "description": "Sell together only"
-   },
-   "adjacentSeatGroup": {
-    "type": "string",
-    "description": "Adjacent-seat group"
+    "enum": [
+     "sellIndividually",
+     "sellSelectedTickets",
+     "sellTogetherOnly",
+     "adjacentSeatGroup"
+    ],
+    "description": "How the tickets may be sold."
    }
   }
  },
@@ -638,10 +513,6 @@
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "integrateWithTicvaiSeatMap": {
-    "type": "string",
-    "description": "Integrate with TICVAI Seat Map"
-   },
    "event": {
     "type": "string",
     "description": "Event"
@@ -690,25 +561,21 @@
     "type": "integer",
     "description": "Applicable restrictions"
    },
-   "originalFaceValueAed200": {
-    "type": "string",
-    "description": "Original Face Value: AED 200"
-   },
-   "officialResalePriceAed220": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Official Resale Price: AED 220"
-   },
-   "theCustomerCanChoose": {
-    "type": "string",
-    "description": "The customer can choose"
-   },
    "primaryInventoryResaleInventory": {
     "type": "string",
     "description": "Primary Inventory + Resale Inventory"
    },
-   "whileMaintainingTheirBackendDistinction": {
+   "originalFaceValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Original face value"
+   },
+   "listingSource": {
     "type": "string",
-    "description": "while maintaining their backend distinction"
+    "enum": [
+     "primary",
+     "resale"
+    ],
+    "description": "Primary or resale inventory, shown distinctly"
    }
   }
  },
@@ -762,55 +629,6 @@
     "type": "string",
     "description": "Mobile responsive behavior"
    },
-   "english": {
-    "type": "string",
-    "description": "English"
-   },
-   "arabicRtl": {
-    "type": "string",
-    "description": "Arabic RTL"
-   },
-   "additionalClientLanguages": {
-    "type": "string",
-    "description": "Additional client languages"
-   },
-   "secureSessions": {
-    "type": "string",
-    "description": "Secure sessions"
-   },
-   "authentication": {
-    "type": "string",
-    "description": "Authentication"
-   },
-   "authorization": {
-    "type": "string",
-    "description": "Authorization"
-   },
-   "rateLimiting": {
-    "type": "number",
-    "description": "Rate limiting"
-   },
-   "botProtectionWhereApplicable": {
-    "type": "string",
-    "description": "Bot protection where applicable"
-   },
-   "fraudIntegration": {
-    "type": "string",
-    "description": "Fraud integration"
-   },
-   "dataProtection": {
-    "type": "string",
-    "description": "Data protection"
-   },
-   "sessionExpiry": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Session expiry"
-   },
-   "auditLogging": {
-    "type": "string",
-    "description": "Audit logging"
-   },
    "marketplaceName": {
     "type": "string",
     "description": "Marketplace Name"
@@ -859,25 +677,28 @@
     "type": "string",
     "description": "Authentication method"
    },
-   "myTickets": {
+   "deploymentModel": {
     "type": "string",
-    "description": "My Tickets"
+    "enum": [
+     "embeddedWhiteLabel",
+     "ticvaiHostedWhiteLabel",
+     "headlessApi"
+    ],
+    "description": "Deployment model (MoM 1 Sep: own B2C site, TICVAI-hosted portal, API)"
    },
-   "sell": {
-    "type": "string",
-    "description": "Sell"
-   },
-   "buy": {
-    "type": "string",
-    "description": "Buy"
-   },
-   "myListings": {
-    "type": "string",
-    "description": "My Listings"
-   },
-   "transactions": {
-    "type": "string",
-    "description": "Transactions"
+   "navigation": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "myTickets",
+      "sell",
+      "buy",
+      "myListings",
+      "transactions"
+     ]
+    },
+    "description": "Marketplace navigation"
    }
   }
  }

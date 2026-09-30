@@ -1,6 +1,6 @@
 # WS35 — Pricing   Revenue Management board 2
 
-**10 screens · 10 operations · 10 schemas · 1 permissions**
+**10 screens · 11 operations · 14 schemas · 1 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 1 permissions apply here:
   `PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,7 +60,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-058` | Pricing Rule Command Center | commandCentre | 1 | 1 | — |
+| `ADM-058` | Pricing Rule Command Center | commandCentre | 3 | 0 | — |
 | `ADM-059` | Customer Segment & Profile Pricing Rules | configEditor | 1 | 0 | — |
 | `ADM-060` | Membership & Loyalty Pricing Rules | configEditor | 1 | 0 | — |
 | `ADM-061` | Residency, Nationality & Market Pricing Rules | configEditor | 1 | 0 | — |
@@ -70,7 +69,7 @@ convincingly. It is never a caption.
 | `ADM-064` | Quantity, Group & Volume Pricing Rules | listDetail | 1 | 0 | — |
 | `ADM-065` | Effective Date, Season & Day-Based Pricing Rules | configEditor | 1 | 0 | — |
 | `ADM-066` | Timeslot, Performance & Time-of-Day Pricing Rules | listDetail | 1 | 0 | — |
-| `ADM-067` | Pricing Rule Priority, Conflict Resolution & Testing | listDetail | 1 | 0 | — |
+| `ADM-067` | Pricing Rule Priority, Conflict Resolution & Testing | listDetail | 3 | 0 | — |
 
 ## Thin screens in this batch
 

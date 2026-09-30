@@ -263,7 +263,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getAiVenueSettings",
        "notes": "**What every AI answer stands on before the venue has history** (29 September, AI functions review). Collected at onboarding, here or by the configuration assistant in conversation.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     },
@@ -275,7 +275,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "primaryButton",
        "label": "Save venue AI profile",
        "operation": "setAiVenueSettings",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     }
@@ -308,7 +308,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "ai",
     "purpose": "The venue AI profile the baselines use",
     "trigger": "onLoad",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "operationId": "setAiVenueSettings",
@@ -318,7 +318,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "getAiVenueSettings"
     ],
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "wireframe": {
@@ -365,7 +365,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       "staffProductivity"
      ]
     },
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "_platform": {

@@ -1,6 +1,6 @@
 # WS68 — Unified BI Reporting and AI Analytics Platform board 3
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 10 operations · 18 schemas · 3 permissions**
 
 Platform P16 Venue Analytics · ships as **venue-management** ·
 staff audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `REPORT_MANAGE, REPORT_VIEW_TENANT, REPORT_VIEW_VENUE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ANL-031` | Report Catalogue & Library | listDetail | 0 | 0 | — |
-| `ANL-032` | Report Creation Wizard | configEditor | 0 | 0 | — |
-| `ANL-033` | Data Domain & Dataset Selector | listDetail | 0 | 0 | — |
-| `ANL-034` | Field & Column Selector | listDetail | 0 | 0 | — |
-| `ANL-035` | Filter & Parameter Builder | listDetail | 0 | 0 | — |
-| `ANL-036` | Grouping, Aggregation & Calculation Builder | listDetail | 0 | 0 | — |
-| `ANL-037` | Cross-Domain Report Composer | listDetail | 0 | 0 | — |
-| `ANL-038` | Report Layout & Formatting Designer | configEditor | 0 | 0 | — |
-| `ANL-039` | Report Preview, Test & Validation | listDetail | 0 | 0 | — |
-| `ANL-040` | Save, Run & Report Results Viewer | commandCentre | 0 | 0 | — |
+| `ANL-031` | Report Catalogue & Library | listDetail | 2 | 0 | — |
+| `ANL-032` | Report Creation Wizard | configEditor | 1 | 0 | — |
+| `ANL-033` | Data Domain & Dataset Selector | listDetail | 1 | 0 | — |
+| `ANL-034` | Field & Column Selector | listDetail | 1 | 0 | — |
+| `ANL-035` | Filter & Parameter Builder | listDetail | 1 | 0 | — |
+| `ANL-036` | Grouping, Aggregation & Calculation Builder | listDetail | 1 | 0 | — |
+| `ANL-037` | Cross-Domain Report Composer | listDetail | 2 | 0 | — |
+| `ANL-038` | Report Layout & Formatting Designer | configEditor | 1 | 0 | — |
+| `ANL-039` | Report Preview, Test & Validation | listDetail | 3 | 0 | — |
+| `ANL-040` | Save, Run & Report Results Viewer | commandCentre | 2 | 0 | — |
 
 ## Thin screens in this batch
 
-**ANL-031, ANL-033, ANL-034, ANL-035, ANL-036, ANL-037, ANL-039 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ANL-031, ANL-033, ANL-035, ANL-036, ANL-037, ANL-039 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

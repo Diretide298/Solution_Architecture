@@ -1,6 +1,6 @@
 # WS50 — Promotions   Bundles Management board 6
 
-**10 screens · 10 operations · 10 schemas · 1 permissions**
+**10 screens · 13 operations · 14 schemas · 3 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 1 permissions apply here:
-  `PRICE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `PRICE_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-188` | Dynamic Bundle Operations Command Center | commandCentre | 1 | 0 | — |
-| `ADM-189` | Component Inventory & Availability Matrix | listDetail | 1 | 0 | — |
+| `ADM-188` | Dynamic Bundle Operations Command Center | commandCentre | 3 | 0 | — |
+| `ADM-189` | Component Inventory & Availability Matrix | listDetail | 2 | 0 | — |
 | `ADM-190` | Bundle Sellability & Dependency Rule Engine | listDetail | 1 | 0 | — |
-| `ADM-191` | Capacity Pool & Reservation Manager | configEditor | 1 | 0 | — |
+| `ADM-191` | Capacity Pool & Reservation Manager | configEditor | 3 | 1 | — |
 | `ADM-192` | Dynamic Component Substitution Engine | configEditor | 1 | 0 | — |
 | `ADM-193` | Dynamic Bundle Rule & Composition Engine | listDetail | 1 | 0 | — |
 | `ADM-194` | Real-Time Availability & Checkout Validation | configEditor | 1 | 0 | — |
-| `ADM-195` | Bundle Availability by Channel, Venue & Partner | configEditor | 1 | 0 | — |
+| `ADM-195` | Bundle Availability by Channel, Venue & Partner | configEditor | 3 | 1 | — |
 | `ADM-196` | Bundle Availability Forecast, Alerts & Recovery | listDetail | 1 | 0 | — |
-| `ADM-197` | Dynamic Bundle Simulation & AI Optimization | listDetail | 1 | 0 | — |
+| `ADM-197` | Dynamic Bundle Simulation & AI Optimization | listDetail | 3 | 0 | — |
 
 ## Thin screens in this batch
 
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-188 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-189",
@@ -281,9 +277,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "apis": [
    {
+    "operationId": "listDynamicBundle2",
+    "contract": "promotions",
+    "purpose": "Dynamic Bundle Simulation & AI Optimization",
+    "trigger": "onLoad"
+   },
+   {
     "operationId": "listDynamicBundle",
     "contract": "promotions",
     "purpose": "Dynamic Bundle Operations Command Center",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listDynamicBundleRule",
+    "contract": "promotions",
+    "purpose": "Dynamic Bundle Rule & Composition Engine",
     "trigger": "onLoad"
    }
   ],
@@ -300,7 +308,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-188"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-188",
+   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-188"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 78. 12 of 12 labels bound to a contract property; 12 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -390,6 +399,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "derived": true,
        "impliedBy": "listComponentInventoryAvailability",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getInventoryKitDefinition",
+       "notes": "One record, read-only."
       }
      ]
     }
@@ -408,21 +423,31 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "promotions",
     "purpose": "Component Inventory & Availability Matrix",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getInventoryKitDefinition",
+    "contract": "inventory",
+    "purpose": "Show kit components",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
    "preloaded": [
-    "ComponentInventoryAvailabilityMatrixView.tRyTyLe",
-    "ComponentInventoryAvailabilityMatrixView.dE",
-    "ComponentInventoryAvailabilityMatrixView.souvenir0Open",
-    "ComponentInventoryAvailabilityMatrixView.ticketInventory",
-    "ComponentInventoryAvailabilityMatrixView.attractionCapacity"
+    "ComponentInventoryAvailabilityMatrixView.availabilitySource"
+   ],
+   "params": [
+    {
+     "name": "itemId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-189"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-189",
+   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-189"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 79. 0 of 0 labels bound to a contract property; 1 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -550,17 +575,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "BundleSellabilityDependencyRuleEngineView.allComponentsRequired",
-    "BundleSellabilityDependencyRuleEngineView.atLeastXOfY",
-    "BundleSellabilityDependencyRuleEngineView.atLeastOneFromCategory",
-    "BundleSellabilityDependencyRuleEngineView.optionalComponent",
-    "BundleSellabilityDependencyRuleEngineView.conditionalComponent"
+    "BundleSellabilityDependencyRuleEngineView.dependencyRule"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-190"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-190",
+   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-190"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 80. 0 of 0 labels bound to a contract property; 1 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -627,13 +649,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Manage how bundle sales consume capacity from underlying products. This is particularly important because a bundle must not create artificial inventory separate from the actual attraction/product capacity.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**Capacity Pool & Reservation Manager declares no operation that writes anything** — its only declared call is `listCapacityPoolReservation`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -675,6 +690,41 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "selectField",
        "label": "Waitlist behavior",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 81 §Configure"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every bundle capacity policy",
+       "bindsTo": "BundleCapacityPolicy",
+       "columns": [
+        "BundleCapacityPolicy.id",
+        "BundleCapacityPolicy.bundleId",
+        "BundleCapacityPolicy.channel",
+        "BundleCapacityPolicy.venueId",
+        "BundleCapacityPolicy.partnerId",
+        "BundleCapacityPolicy.capacitySource",
+        "BundleCapacityPolicy.allocationMode",
+        "BundleCapacityPolicy.capacityCeiling",
+        "BundleCapacityPolicy.holdDurationMinutes",
+        "BundleCapacityPolicy.bookingCutoffMinutes",
+        "BundleCapacityPolicy.allowOverbooking",
+        "BundleCapacityPolicy.allowWaitlist"
+       ],
+       "operation": "listBundleCapacityPolicies",
+       "provenance": "contract promotions.yaml GET /bundles/{bundleId}/capacity-policies"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save bundle capacity policy",
+       "operation": "setBundleCapacityPolicy",
+       "permission": "PRODUCT_CONFIGURE",
+       "notes": "Replaces the bundle's `promotions.bundle_capacity_policy` rows with the set sent: a row sent with an `id` is updated, one without is created, and a stored row not sent is removed.",
+       "provenance": "contract promotions.yaml PUT /bundles/{bundleId}/capacity-policies"
       }
      ]
     }
@@ -692,14 +742,58 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "promotions",
     "purpose": "Capacity Pool & Reservation Manager",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listBundleCapacityPolicies",
+    "contract": "promotions",
+    "purpose": "List a bundle's capacity policies",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setBundleCapacityPolicy",
+    "contract": "promotions",
+    "purpose": "Set a bundle's capacity policies",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCapacityPoolReservation",
+     "listBundleCapacityPolicies"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-191"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-191",
+   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-191"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 81. 0 of 0 labels bound to a contract property; 7 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "bundleId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "formSetBundleCapacityPolicy",
+    "component": "modal",
+    "trigger": "Save bundle capacity policy",
+    "body": "**Collects what `setBundleCapacityPolicy` sends before it is called.** Required: `policies`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save bundle capacity policy",
+     "operation": "setBundleCapacityPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "policies"
+     ]
+    },
+    "provenance": "contract promotions.yaml PUT /bundles/{bundleId}/capacity-policies"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -842,7 +936,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-192"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-192",
+   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-192"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 82. 0 of 0 labels bound to a contract property; 10 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -964,7 +1059,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-193"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-193",
+   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-193"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 83. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1070,7 +1166,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-194"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-194",
+   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-194"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 84. 0 of 0 labels bound to a contract property; 1 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1168,6 +1265,41 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "selectField",
        "label": "Sales location",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 85 §Configure"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every bundle capacity policy",
+       "bindsTo": "BundleCapacityPolicy",
+       "columns": [
+        "BundleCapacityPolicy.id",
+        "BundleCapacityPolicy.bundleId",
+        "BundleCapacityPolicy.channel",
+        "BundleCapacityPolicy.venueId",
+        "BundleCapacityPolicy.partnerId",
+        "BundleCapacityPolicy.capacitySource",
+        "BundleCapacityPolicy.allocationMode",
+        "BundleCapacityPolicy.capacityCeiling",
+        "BundleCapacityPolicy.holdDurationMinutes",
+        "BundleCapacityPolicy.bookingCutoffMinutes",
+        "BundleCapacityPolicy.allowOverbooking",
+        "BundleCapacityPolicy.allowWaitlist"
+       ],
+       "operation": "listBundleCapacityPolicies",
+       "provenance": "contract promotions.yaml GET /bundles/{bundleId}/capacity-policies"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save bundle capacity policy",
+       "operation": "setBundleCapacityPolicy",
+       "permission": "PRODUCT_CONFIGURE",
+       "notes": "Replaces the bundle's `promotions.bundle_capacity_policy` rows with the set sent: a row sent with an `id` is updated, one without is created, and a stored row not sent is removed.",
+       "provenance": "contract promotions.yaml PUT /bundles/{bundleId}/capacity-policies"
       }
      ]
     }
@@ -1185,14 +1317,58 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "promotions",
     "purpose": "Bundle Availability by Channel, Venue & Partner",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listBundleCapacityPolicies",
+    "contract": "promotions",
+    "purpose": "List a bundle's capacity policies",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setBundleCapacityPolicy",
+    "contract": "promotions",
+    "purpose": "Set a bundle's capacity policies",
+    "trigger": "onAction",
+    "invalidates": [
+     "listBundleAvailabilityChannel",
+     "listBundleCapacityPolicies"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-195"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-195",
+   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-195"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 85. 0 of 0 labels bound to a contract property; 5 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "bundleId",
+     "from": "navigation"
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "formSetBundleCapacityPolicy",
+    "component": "modal",
+    "trigger": "Save bundle capacity policy",
+    "body": "**Collects what `setBundleCapacityPolicy` sends before it is called.** Required: `policies`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save bundle capacity policy",
+     "operation": "setBundleCapacityPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "policies"
+     ]
+    },
+    "provenance": "contract promotions.yaml PUT /bundles/{bundleId}/capacity-policies"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1338,7 +1514,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-196"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-196",
+   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-196"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 86. 9 of 9 labels bound to a contract property; 9 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1461,6 +1638,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "promotions",
     "purpose": "Dynamic Bundle Simulation & AI Optimization",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listDynamicBundle",
+    "contract": "promotions",
+    "purpose": "Dynamic Bundle Operations Command Center",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listDynamicBundleRule",
+    "contract": "promotions",
+    "purpose": "Dynamic Bundle Rule & Composition Engine",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -1476,7 +1665,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-197"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-197",
+   "workshopBoard": "wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-197"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 87. 8 of 8 labels bound to a contract property; 9 of 87 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1512,6 +1702,19 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+ "getInventoryKitDefinition": {
+  "method": "GET",
+  "path": "/inventory-items/{itemId}/kit-definition",
+  "contract": "inventory",
+  "summary": "The components a kit item is made of",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "InventoryKitDefinition"
+ },
  "listBundleAvailabilityChannel": {
   "method": "GET",
   "path": "/bundle-availability-channel",
@@ -1534,9 +1737,39 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "BundleAvailabilityForecastAlertsRecoveryView"
+ },
+ "listBundleCapacityPolicies": {
+  "method": "GET",
+  "path": "/bundles/{bundleId}/capacity-policies",
+  "contract": "promotions",
+  "summary": "List a bundle's capacity policies",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listBundleSellabilityDependency": {
   "method": "GET",
@@ -1586,7 +1819,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "DynamicBundleOperationsCommandCenterView"
  },
@@ -1641,6 +1880,25 @@ Method, path, parameters, request and response for every operation these screens
   "parameters": [],
   "requestBody": null,
   "responds": "RealTimeAvailabilityCheckoutValidationView"
+ },
+ "setBundleCapacityPolicy": {
+  "method": "PUT",
+  "path": "/bundles/{bundleId}/capacity-policies",
+  "contract": "promotions",
+  "summary": "Set a bundle's capacity policies",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  }
 }
 ```
@@ -1673,10 +1931,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "partner"
     ],
     "description": "Vocabulary listed under Channels."
-   },
-   "eEE": {
-    "type": "string",
-    "description": "e e e"
    },
    "venueSpecificAvailability": {
     "type": "string",
@@ -1793,51 +2047,126 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "BundleCapacityPolicy": {
+  "x-ticvai-persistence": "promotions.bundle_capacity_policy",
+  "type": "object",
+  "description": "How a bundle draws on capacity, per channel where it differs: the capacity source, dedicated or shared and hard or soft allocation, the ceiling, how long a hold lasts, the booking cut-off, and whether overbooking or a waitlist is allowed (Capacity Pool & Reservation Manager; Bundle Availability by Channel, Venue & Partner). The capacity itself is the catalogue's (`catalogue.channel_capacity`, `catalogue.inventory_hold`). A row with no channel is the bundle's default. (DM5, 29 September: data model for the agreed operations)\n**Written by setBundleCapacityPolicy; read by listBundleCapacityPolicies, listCapacityPoolReservation and listBundleAvailabilityChannel** (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "bundleId",
+   "capacitySource"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "bundleId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+     }
+    ],
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where the policy differs by venue for a multi-venue bundle."
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "capacitySource": {
+    "type": "string",
+    "enum": [
+     "sharedPool",
+     "dedicatedBundleAllocation",
+     "channelAllocation",
+     "partnerAllocation",
+     "eventCapacity",
+     "timeslotCapacity",
+     "seatInventory",
+     "resourceCapacity"
+    ]
+   },
+   "allocationMode": {
+    "type": "string",
+    "enum": [
+     "hard",
+     "soft"
+    ],
+    "default": "hard",
+    "description": "Hard allocation is ring-fenced for the bundle; soft is released back when unsold."
+   },
+   "capacityCeiling": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
+   },
+   "holdDurationMinutes": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "How long a temporary reservation of the components lasts."
+   },
+   "bookingCutoffMinutes": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Minutes before the experience after which the bundle is no longer sold."
+   },
+   "allowOverbooking": {
+    "type": "boolean",
+    "default": false
+   },
+   "allowWaitlist": {
+    "type": "boolean",
+    "default": false
+   }
+  }
+ },
  "BundleSellabilityDependencyRuleEngineView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Bundle Sellability & Dependency Rule Engine displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "allComponentsRequired": {
-    "type": "boolean",
-    "description": "All components required"
-   },
-   "atLeastXOfY": {
+   "dependencyRule": {
     "type": "string",
-    "description": "At least X of Y"
+    "enum": [
+     "allComponentsRequired",
+     "atLeastXOfY",
+     "atLeastOneFromCategory",
+     "optionalComponent",
+     "conditionalComponent",
+     "substituteAllowed",
+     "partnerComponentRequired"
+    ],
+    "description": "The sellability rule."
    },
-   "atLeastOneFromCategory": {
+   "bundleId": {
     "type": "string",
-    "description": "At least one from category"
+    "description": "Bundle ID"
    },
-   "optionalComponent": {
-    "type": "string",
-    "description": "Optional component"
+   "componentIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Components the rule covers"
    },
-   "conditionalComponent": {
-    "type": "string",
-    "description": "Conditional component"
-   },
-   "substituteAllowed": {
-    "type": "boolean",
-    "description": "Substitute allowed"
-   },
-   "partnerComponentRequired": {
-    "type": "boolean",
-    "description": "Partner component required"
-   },
-   "waterParkMandatory": {
-    "type": "string",
-    "description": "Water Park — Mandatory"
-   },
-   "aquariumMandatory": {
-    "type": "string",
-    "description": "Aquarium — Mandatory"
-   },
-   "photoOptional": {
-    "type": "string",
-    "description": "Photo — Optional"
+   "minimumCount": {
+    "type": "integer",
+    "description": "For atLeastXOfY: X"
    }
   }
  },
@@ -1847,54 +2176,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Capacity Pool & Reservation Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "aquariumRemainingCapacity": {
-    "type": "integer",
-    "description": "Aquarium remaining capacity (the pack shows 100)"
-   },
-   "standaloneSales": {
-    "type": "integer",
-    "description": "Standalone sales (the pack shows 60)"
-   },
-   "held": {
-    "type": "string",
-    "description": "Held (the pack shows 5)"
-   },
-   "remainingSellable": {
-    "type": "string",
-    "description": "Remaining sellable (the pack shows 10)"
-   },
-   "sharedPool": {
-    "type": "string",
-    "description": "Shared pool"
-   },
-   "dedicatedBundleAllocation": {
-    "type": "string",
-    "description": "Dedicated bundle allocation"
-   },
-   "channelAllocation": {
-    "type": "string",
-    "description": "Channel allocation"
-   },
-   "partnerAllocation": {
-    "type": "string",
-    "description": "Partner allocation"
-   },
-   "eventCapacity": {
-    "type": "integer",
-    "description": "Event capacity"
-   },
-   "timeslotCapacity": {
-    "type": "integer",
-    "description": "Timeslot capacity"
-   },
-   "seatInventory": {
-    "type": "string",
-    "description": "Seat inventory"
-   },
-   "resourceCapacity": {
-    "type": "integer",
-    "description": "Resource capacity"
-   },
    "temporaryReservation": {
     "type": "string",
     "description": "Temporary reservation"
@@ -1920,9 +2201,19 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Waitlist behavior"
    },
-   "capacityAutomaticallyReleased": {
-    "type": "integer",
-    "description": "Capacity automatically released"
+   "capacitySource": {
+    "type": "string",
+    "enum": [
+     "sharedPool",
+     "dedicatedBundleAllocation",
+     "channelAllocation",
+     "partnerAllocation",
+     "eventCapacity",
+     "timeslotCapacity",
+     "seatInventory",
+     "resourceCapacity"
+    ],
+    "description": "Capacity source."
    }
   }
  },
@@ -1932,93 +2223,56 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Component Inventory & Availability Matrix displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "tRyTyLe": {
+   "availabilitySource": {
     "type": "string",
-    "description": "t ry ty le"
+    "enum": [
+     "ticketInventory",
+     "attractionCapacity",
+     "eventCapacity",
+     "seatInventory",
+     "timeslots",
+     "fBAvailability",
+     "retailStock",
+     "resourceAvailability",
+     "parking",
+     "rental",
+     "externalPartnerApi"
+    ],
+    "description": "Where the component's availability comes from."
    },
-   "dE": {
+   "componentStatus": {
     "type": "string",
-    "description": "d e"
+    "enum": [
+     "available",
+     "limited",
+     "low",
+     "soldOut",
+     "closed",
+     "suspended",
+     "unpublished",
+     "apiUnavailable"
+    ],
+    "description": "Component status."
    },
-   "souvenir0Open": {
+   "componentId": {
+    "type": "string",
+    "description": "Component ID"
+   },
+   "componentName": {
+    "type": "string",
+    "description": "Component"
+   },
+   "inventory": {
     "type": "integer",
-    "description": "Souvenir 0 — Open"
+    "description": "Inventory"
    },
-   "ticketInventory": {
-    "type": "string",
-    "description": "Ticket inventory"
-   },
-   "attractionCapacity": {
+   "capacity": {
     "type": "integer",
-    "description": "Attraction capacity"
+    "description": "Capacity"
    },
-   "eventCapacity": {
-    "type": "integer",
-    "description": "Event capacity"
-   },
-   "seatInventory": {
+   "schedule": {
     "type": "string",
-    "description": "Seat inventory"
-   },
-   "timeslots": {
-    "type": "string",
-    "description": "Timeslots"
-   },
-   "fBAvailability": {
-    "type": "string",
-    "description": "F&B availability"
-   },
-   "retailStock": {
-    "type": "string",
-    "description": "Retail stock"
-   },
-   "resourceAvailability": {
-    "type": "string",
-    "description": "Resource availability"
-   },
-   "parking": {
-    "type": "string",
-    "description": "Parking"
-   },
-   "rental": {
-    "type": "string",
-    "description": "Rental"
-   },
-   "externalPartnerApi": {
-    "type": "string",
-    "description": "External partner API"
-   },
-   "available": {
-    "type": "string",
-    "description": "Available"
-   },
-   "limited": {
-    "type": "string",
-    "description": "Limited"
-   },
-   "low": {
-    "type": "string",
-    "description": "Low"
-   },
-   "soldOut": {
-    "type": "string",
-    "description": "Sold Out"
-   },
-   "closed": {
-    "type": "integer",
-    "description": "Closed"
-   },
-   "suspended": {
-    "type": "string",
-    "description": "Suspended"
-   },
-   "unpublished": {
-    "type": "string",
-    "description": "Unpublished"
-   },
-   "apiUnavailable": {
-    "type": "string",
-    "description": "API Unavailable"
+    "description": "Schedule"
    }
   }
  },
@@ -2076,41 +2330,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Recovered Revenue"
    },
-   "healthy": {
-    "type": "string",
-    "description": "Healthy"
-   },
-   "warning": {
-    "type": "string",
-    "description": "Warning"
-   },
-   "critical": {
-    "type": "string",
-    "description": "Critical"
-   },
    "unavailable": {
     "type": "string",
     "description": "Unavailable"
    },
-   "waterParkAvailable": {
+   "health": {
     "type": "string",
-    "description": "Water Park — Available"
-   },
-   "aquariumAvailable": {
-    "type": "string",
-    "description": "Aquarium — Available"
-   },
-   "familyMealLowStock": {
-    "type": "string",
-    "description": "Family Meal — Low Stock"
-   },
-   "photoAvailable": {
-    "type": "string",
-    "description": "Photo — Available"
-   },
-   "bundleHealthWarning": {
-    "type": "string",
-    "description": "Bundle Health: WARNING"
+    "enum": [
+     "healthy",
+     "warning",
+     "critical"
+    ],
+    "description": "Bundle health."
    }
   }
  },
@@ -2189,30 +2420,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Dynamic Bundle Simulation & AI Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "aquariumUnavailable": {
-    "type": "string",
-    "description": "Aquarium unavailable"
-   },
-   "aquariumRequiredSubstituteAllowed": {
-    "type": "boolean",
-    "description": "Aquarium required → Substitute allowed"
-   },
-   "observationDeckAvailable": {
-    "type": "string",
-    "description": "Observation Deck available"
-   },
-   "aed20": {
-    "type": "string",
-    "description": "+AED 20"
-   },
-   "customerApprovalRequired": {
-    "type": "boolean",
-    "description": "Customer approval required"
-   },
-   "bundleRemainsSellable": {
-    "type": "string",
-    "description": "Bundle remains sellable"
-   },
    "bundleStatus": {
     "type": "integer",
     "description": "Bundle status"
@@ -2244,91 +2451,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "revenueImpact": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Revenue impact"
-   },
-   "beforeRecommendingSubstitutions": {
-    "type": "string",
-    "description": "before recommending substitutions"
-   },
-   "level1RecommendOnly": {
-    "type": "string",
-    "description": "Level 1 — Recommend Only"
-   },
-   "humanApproves": {
-    "type": "string",
-    "description": "Human approves"
-   },
-   "level2PreApprovedAutomation": {
-    "type": "string",
-    "description": "Level 2 — Pre-Approved Automation"
-   },
-   "productStatusAndInventory": {
-    "type": "string",
-    "description": "Product status and inventory"
-   },
-   "attractionEventCapacity": {
-    "type": "integer",
-    "description": "Attraction/event capacity"
-   },
-   "seatAvailabilityWhereIncluded": {
-    "type": "string",
-    "description": "Seat availability where included"
-   },
-   "resourceAvailability": {
-    "type": "string",
-    "description": "Resource availability"
-   },
-   "menuAvailability": {
-    "type": "string",
-    "description": "Menu availability"
-   },
-   "physicalInventory": {
-    "type": "string",
-    "description": "Physical inventory"
-   },
-   "membershipBasedComponents": {
-    "type": "string",
-    "description": "Membership-based components"
-   },
-   "entitlementRedemptionState": {
-    "type": "string",
-    "description": "Entitlement/redemption state"
-   },
-   "realTimePricing": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Real-time pricing"
-   },
-   "promotionQualification": {
-    "type": "string",
-    "description": "Promotion qualification"
-   },
-   "checkoutPaymentCoordination": {
-    "type": "string",
-    "description": "Checkout/payment coordination"
-   },
-   "partnerAllocation": {
-    "type": "string",
-    "description": "Partner allocation"
-   },
-   "externalAvailability": {
-    "type": "string",
-    "description": "External availability"
-   },
-   "commercialImpact": {
-    "type": "string",
-    "description": "Commercial impact"
-   },
-   "whatIsTheBundle": {
-    "type": "string",
-    "description": "WHAT IS THE BUNDLE?"
-   },
-   "change": {
-    "type": "string",
-    "description": "CHANGE?"
-   },
-   "matrixCoverageBoard6": {
-    "type": "string",
-    "description": "Matrix Coverage — Board 6"
    }
   }
  },
@@ -2358,30 +2480,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Fallback action"
    },
-   "soldOut": {
-    "type": "string",
-    "description": "Sold out"
-   },
-   "capacityExhausted": {
-    "type": "integer",
-    "description": "Capacity exhausted"
-   },
-   "productSuspended": {
-    "type": "string",
-    "description": "Product suspended"
-   },
-   "venueClosed": {
-    "type": "integer",
-    "description": "Venue closed"
-   },
-   "externalApiUnavailable": {
-    "type": "string",
-    "description": "External API unavailable"
-   },
-   "inventoryBelowThreshold": {
-    "type": "integer",
-    "description": "Inventory below threshold"
-   },
    "maintainsSameBundlePrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Maintains same bundle price"
@@ -2401,6 +2499,95 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "requiresOperatorApproval": {
     "type": "string",
     "description": "Requires operator approval"
+   },
+   "substitutionTriggers": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "soldOut",
+      "capacityExhausted",
+      "productSuspended",
+      "venueClosed",
+      "externalApiUnavailable",
+      "inventoryBelowThreshold"
+     ]
+    },
+    "description": "When substitution may occur."
+   }
+  }
+ },
+ "InventoryKitComponent": {
+  "x-ticvai-persistence": "inventory.kit_component",
+  "type": "object",
+  "description": "4.4.20. One component of a kit and the quantity one kit consumes.",
+  "required": [
+   "componentItemId",
+   "quantity"
+  ],
+  "properties": {
+   "kitItemId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "componentItemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "quantity": {
+    "type": "number",
+    "exclusiveMinimum": 0
+   },
+   "unit": {
+    "type": "string",
+    "nullable": true,
+    "description": "The component's base unit where omitted."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Written at the kit item's venue scope."
+   }
+  }
+ },
+ "InventoryKitDefinition": {
+  "x-ticvai-persistence": "none — composed of the item's inventory.kit_component rows",
+  "type": "object",
+  "description": "4.4.20. Also the `setInventoryKitDefinition` body.",
+  "required": [
+   "components"
+  ],
+  "properties": {
+   "kitItemId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "components": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/InventoryKitComponent"
+    }
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
    }
   }
  },
@@ -2410,41 +2597,31 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Real-Time Availability & Checkout Validation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "productActive": {
-    "type": "integer",
-    "description": "Product active"
+   "failedChecks": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "productInactive",
+      "inventoryUnavailable",
+      "capacityUnavailable",
+      "timeslotUnavailable",
+      "resourceUnavailable",
+      "priceInvalid",
+      "promotionInvalid",
+      "partnerComponentInvalid",
+      "componentMappingInvalid"
+     ]
+    },
+    "description": "Checkout validations that failed; empty means the bundle is sellable."
    },
-   "inventoryAvailable": {
+   "bundleId": {
     "type": "string",
-    "description": "Inventory available"
+    "description": "Bundle ID"
    },
-   "capacityAvailable": {
-    "type": "integer",
-    "description": "Capacity available"
-   },
-   "timeslotAvailable": {
-    "type": "string",
-    "description": "Timeslot available"
-   },
-   "resourceAvailable": {
-    "type": "string",
-    "description": "Resource available"
-   },
-   "priceValid": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price valid"
-   },
-   "promotionValid": {
-    "type": "string",
-    "description": "Promotion valid"
-   },
-   "partnerComponentValid": {
-    "type": "string",
-    "description": "Partner component valid"
-   },
-   "componentMappingValid": {
-    "type": "string",
-    "description": "Component mapping valid"
+   "sellable": {
+    "type": "boolean",
+    "description": "Whether the bundle can be sold now"
    }
   }
  }

@@ -1,6 +1,6 @@
 # WS115 — ACCREDITATION board 8
 
-**10 screens · 6 operations · 7 schemas · 3 permissions**
+**10 screens · 10 operations · 11 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `ACCREDITATION_VIEW, DEVELOPER_VIEW, REPORT_VIEW_VENUE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `ACCREDITATION_VIEW, DEVELOPER_MANAGE, DEVELOPER_VIEW, REPORT_VIEW_VENUE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -60,15 +60,15 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-684` | Accreditation Executive Dashboard | listDetail | 1 | 0 | — |
-| `BO-685` | Accreditation Status & Portfolio Reporting | listDetail | 1 | 0 | — |
+| `BO-684` | Accreditation Executive Dashboard | listDetail | 2 | 0 | — |
+| `BO-685` | Accreditation Status & Portfolio Reporting | listDetail | 2 | 0 | — |
 | `BO-686` | Accreditation Utilization Analytics | listDetail | 1 | 0 | — |
 | `BO-687` | Accreditation Access Activity Reporting | listDetail | 1 | 0 | — |
 | `BO-688` | Accreditation Trend & Comparative Analysis | listDetail | 1 | 0 | — |
 | `BO-689` | Accreditation Audit Reporting | listDetail | 1 | 0 | — |
 | `BO-690` | Immutable Accreditation Audit Log | configEditor | 1 | 0 | — |
 | `BO-691` | Accreditation API Management | listDetail | 1 | 0 | — |
-| `BO-692` | Accreditation Webhook Management | configEditor | 1 | 0 | — |
+| `BO-692` | Accreditation Webhook Management | configEditor | 5 | 0 | — |
 | `BO-693` | Integration & Data Exchange Monitor | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
@@ -245,6 +245,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "The executive view",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Accreditation KPIs (kpiCodes=accreditation*)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -366,6 +373,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Status and portfolio",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "Applications by status, active holders by category (groupBy)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1353,6 +1367,34 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Webhooks",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listWebhookEventTypes",
+    "contract": "public-api",
+    "purpose": "Accreditation events (publisher=accreditation)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "createWebhookSubscription",
+    "contract": "public-api",
+    "purpose": "Subscribe an endpoint to accreditation events",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "testWebhookSubscription",
+    "contract": "public-api",
+    "purpose": "Send a signed test event",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listWebhookDeliveries",
+    "contract": "public-api",
+    "purpose": "Delivery log",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1361,6 +1403,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS08 ACCREDITATION Board 8.dc.html#bo-692"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 71. 0 of 0 labels bound to a contract property; 8 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "subscriptionId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1504,6 +1554,25 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+ "createWebhookSubscription": {
+  "method": "POST",
+  "path": "/webhook-subscriptions",
+  "contract": "public-api",
+  "summary": "Subscribe to business events",
+  "permission": "DEVELOPER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WebhookSubscription",
+  "responds": "WebhookSubscription"
+ },
  "getKpiValues": {
   "method": "GET",
   "path": "/kpi-values",
@@ -1536,6 +1605,16 @@ Method, path, parameters, request and response for every operation these screens
    },
    {
     "name": "compareTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "interval",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
     "in": "query",
     "required": null
    }
@@ -1648,6 +1727,48 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "ApiClient"
  },
+ "listWebhookDeliveries": {
+  "method": "GET",
+  "path": "/webhook-subscriptions/{subscriptionId}/deliveries",
+  "contract": "public-api",
+  "summary": "What was sent, what failed, and why",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WebhookDelivery"
+ },
+ "listWebhookEventTypes": {
+  "method": "GET",
+  "path": "/webhook-event-types",
+  "contract": "public-api",
+  "summary": "The events a webhook may subscribe to",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "publisher",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listWebhookSubscriptions": {
   "method": "GET",
   "path": "/webhook-subscriptions",
@@ -1666,6 +1787,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "WebhookSubscription"
+ },
+ "testWebhookSubscription": {
+  "method": "POST",
+  "path": "/webhook-subscriptions/{subscriptionId}/test",
+  "contract": "public-api",
+  "summary": "Send a signed test event to the endpoint, now",
+  "permission": "DEVELOPER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WebhookDelivery"
  }
 }
 ```
@@ -1817,6 +1957,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "nullable": true
    },
+   "email": {
+    "type": "string",
+    "format": "email",
+    "nullable": true,
+    "description": "12.1.16. The holder's own address — where a mobile credential and renewal notices go"
+   },
+   "phone": {
+    "type": "string",
+    "nullable": true,
+    "description": "12.1.16. E.164"
+   },
    "identityDocumentVerified": {
     "type": "boolean",
     "default": false
@@ -1906,10 +2057,41 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "scopes": {
     "type": "array",
-    "description": "**Resolved against the tenant's licence at token issue** (13.3.24). A scope granted here and not licensed there produces no token — and the refusal is at issue rather than at call time, so an integrator finds out in testing.\n",
+    "description": "**Resolved against the tenant's licence at token issue** (13.3.24). A scope granted here and not licensed there produces no token — and the refusal is at issue rather than at call time, so an integrator finds out in testing. **Module scopes** (17 September minutes, M17-05): `{module}.read` or `{module}.write`, one of `listApiScopes`.\n",
     "items": {
-     "type": "string"
+     "type": "string",
+     "pattern": "^[a-zA-Z]+\\.(read|write)$"
     }
+   },
+   "issuedBy": {
+    "type": "string",
+    "enum": [
+     "partner",
+     "ticvai"
+    ],
+    "readOnly": true,
+    "description": "Who generated the key (M17-06): a developer for a sandbox key, TICVAI for a production key issued on an approved `requestProductionAccess`.\n"
+   },
+   "certificationListingId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "control.integration_listing",
+    "description": "For a production client, the certified integration it was issued against."
+   },
+   "credentialTtlDays": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 730,
+    "nullable": true,
+    "description": "Key lifetime. Default 365 for production, 90 for sandbox (M17-06, configurable expiry)."
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the key stops working unless rotated. No token is issued after it."
    },
    "allowedTenantIds": {
     "type": "array",
@@ -1921,7 +2103,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "ipAllowList": {
     "type": "array",
-    "description": "13.1.38. Optional, and the strongest control available where an integrator has fixed egress.",
+    "description": "13.1.38. **Required on a production client** (17 September minutes, M17-07: endpoints are protected by IP allow-listing, not left open to the internet); optional in the sandbox. CIDR ranges. Checked at token issue and on every call.\n",
     "items": {
      "type": "string"
     }
@@ -1954,6 +2136,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "code": {
     "type": "string"
+   },
+   "bucketStart": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise."
+   },
+   "groupKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked."
    },
    "name": {
     "type": "string"
@@ -2026,6 +2219,207 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   ]
  },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "WebhookDelivery": {
+  "type": "object",
+  "x-ticvai-persistence": "control.webhook_delivery",
+  "description": "13.1.30. **The log a developer needs most**, and without it every question becomes a support ticket.\n",
+  "required": [
+   "id",
+   "subscriptionId",
+   "eventType",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subscriptionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "eventType": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "delivered",
+     "failed",
+     "retrying",
+     "abandoned"
+    ]
+   },
+   "attemptCount": {
+    "type": "integer"
+   },
+   "responseCode": {
+    "type": "integer",
+    "nullable": true
+   },
+   "responseBodyExcerpt": {
+    "type": "string",
+    "nullable": true,
+    "description": "**Truncated, and it is what makes the log useful** — a 500 with the receiver's own error message in it answers the question without a conversation.\n"
+   },
+   "isReplay": {
+    "type": "boolean",
+    "default": false
+   },
+   "isTest": {
+    "type": "boolean",
+    "default": false,
+    "description": "Sent by `testWebhookSubscription` (VM close-out, 29 September). Marked in the payload so a receiver never books it, and never counted towards `consecutiveFailures`.\n"
+   },
+   "deliveredAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "WebhookEventCatalogueEntry": {
+  "type": "object",
+  "x-ticvai-persistence": "none — read from the event catalogue (events/*.yaml) shipped with the release",
+  "description": "One event a webhook may subscribe to, as the event catalogue declares it. What a receiver needs to write a handler: the name, the version in the payload, who publishes it, what it is about and when, and the payload fields.\n",
+  "required": [
+   "name",
+   "version",
+   "publisher"
+  ],
+  "properties": {
+   "name": {
+    "$ref": "#/components/schemas/WebhookEventType"
+   },
+   "version": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "publisher": {
+    "type": "string",
+    "description": "The one context that publishes it."
+   },
+   "aggregate": {
+    "type": "string",
+    "description": "What the event is about. Delivery is ordered within one instance of it."
+   },
+   "description": {
+    "type": "string"
+   },
+   "emittedWhen": {
+    "type": "string",
+    "nullable": true
+   },
+   "payload": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "field",
+      "type"
+     ],
+     "properties": {
+      "field": {
+       "type": "string"
+      },
+      "type": {
+       "type": "string"
+      },
+      "required": {
+       "type": "boolean",
+       "default": true
+      },
+      "notes": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "WebhookEventType": {
+  "type": "string",
+  "description": "**The webhook event catalogue: every event a subscription may name** (29 September, build pass). Each value is the `name` of an event in `events/` — `aggregate.pastTenseFact`, published through `platform.outbox` by exactly one context. A name is added here in the same change that adds its event file, and never before.\n**Added 29 September**, each closing a requirement that had the webhook mechanism and nothing to subscribe to:\n| Events | Publisher | Requirement | |---|---|---| | `device.statusChanged`, `device.tamperDetected`, `device.enrolmentChanged`, `device.firmwareReleased`, `device.firmwareRolloutCompleted` | tenancy | 16.9.56 | | `accreditation.applicationDecided`, `accreditation.holderStatusChanged`, `accreditation.credentialIssued`, `accreditation.renewalDue` | accreditation | 12.1.53 | | `approval.requested`, `approval.escalated`, `approval.stepCompleted`, `approval.expired` | approvals | 11.1.64, 11.1.66 | | `seat.held`, `seat.released`, `seat.blocked`, `seatMap.published` | seating | 21.13.4 | | `consent.deviceConsentRecorded`, `consent.deviceConsentClaimed` | marketing | 2.6.65 | | `order.chargebackRecorded` | orders | 8.3.11 to 8.3.15 (a tenant's own finance or fraud tooling) | | `entitlement.expiringSoon` | access | 5.5.30 (a tenant's own CRM) | | `apiClient.anomalyDetected` | public-api | 17 September minutes M17-07 (added 30 September with its event file) |\n**Published and deliberately not offered** (29 September, build pass, group G2): `identity.credentialResetRequested` and `identity.loginRecorded` are security signals, and a stream of them to an outside receiver is a map of which accounts are under attack; `storefront.sessionEvent` is high-volume fraud telemetry, not a business fact a receiver acts on.\n",
+  "enum": [
+   "access.validated",
+   "accreditation.applicationDecided",
+   "accreditation.credentialIssued",
+   "accreditation.holderStatusChanged",
+   "accreditation.renewalDue",
+   "ai.ceilingApproaching",
+   "apiClient.anomalyDetected",
+   "approval.escalated",
+   "approval.expired",
+   "approval.granted",
+   "approval.rejected",
+   "approval.requested",
+   "approval.stepCompleted",
+   "assets.documentIndexed",
+   "cart.abandoned",
+   "catalogue.productPublished",
+   "consent.deviceConsentClaimed",
+   "consent.deviceConsentRecorded",
+   "conversation.handedOver",
+   "device.enrolmentChanged",
+   "device.firmwareReleased",
+   "device.firmwareRolloutCompleted",
+   "device.statusChanged",
+   "device.tamperDetected",
+   "entitlement.expiringSoon",
+   "entitlement.issued",
+   "entitlement.statusChanged",
+   "fnb.menuPublished",
+   "fnb.orderReady",
+   "inventory.purchaseOrderReceived",
+   "ledger.journalPosted",
+   "ledger.periodClosed",
+   "maintenance.assetReturnedToService",
+   "maintenance.templatePublished",
+   "maintenance.workOrderCompleted",
+   "marketing.caseClosed",
+   "order.chargebackRecorded",
+   "order.completed",
+   "order.paid",
+   "order.refunded",
+   "performance.cancelled",
+   "reporting.definitionPublished",
+   "retail.merchandisePublished",
+   "seat.blocked",
+   "seat.held",
+   "seat.released",
+   "seat.sold",
+   "seatMap.published",
+   "shift.closed",
+   "stock.depleted",
+   "tenant.suspended",
+   "whitelabel.contentPublished"
+  ]
+ },
  "WebhookSubscription": {
   "type": "object",
   "x-ticvai-persistence": "control.webhook_subscription",
@@ -2052,9 +2446,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "eventTypes": {
     "type": "array",
-    "description": "**Filtered at subscription, not at delivery.** A subscriber taking every event and discarding 99% is a subscriber the platform pays to talk to.\n",
+    "description": "**Filtered at subscription, not at delivery.** A subscriber taking every event and discarding 99% is a subscriber the platform pays to talk to. Each entry is a name from the webhook event catalogue (`WebhookEventType`).\n",
     "items": {
-     "type": "string"
+     "$ref": "#/components/schemas/WebhookEventType"
     }
    },
    "filters": {

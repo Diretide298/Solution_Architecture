@@ -1,6 +1,8 @@
 # ticvai-backend
 
-.NET 8. One deployment serves one tenant in one jurisdiction.
+.NET 10 (LTS). A modular monolith: one solution, 17 modules, deployed as five units (`commerce`,
+`access`, `operations`, `ticvai-ai`, `workers`; ADR-0055). One deployment serves many tenants, each in
+its own database, routed per request by tenant id (ADR-0038).
 
 ## Read this first
 

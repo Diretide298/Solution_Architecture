@@ -242,7 +242,7 @@ screens:
         venue''s home call to action opens the route and schedule screen'
     - to: WEB-050
       trigger: Plan your visit (header)
-      provenance: decided 29 September 2026 (P29), MOB-6; web build Plan your visit
+      provenance: decided 29 September 2026, MOB-6; web build Plan your visit
     - to: WEB-004
       trigger: Opens a product and decides
       provenance: flow F01 step 1→2
@@ -674,19 +674,19 @@ screens:
         operation: getPublishedGuidedChoice
         notes: '**The answers filter the list** (W4): sent as `guidedAnswerIds` to `listProducts` (and
           `searchCatalogue`), so web, app and kiosk filter the same way on the server.'
-        provenance: decided 29 September 2026 (P29), W4
+        provenance: decided 29 September 2026, W4
       - kind: secondaryButton
         label: Show everything
         operation: listProducts
         notes: Clears the Help me choose filter (W4).
-        provenance: decided 29 September 2026 (P29), W4
+        provenance: decided 29 September 2026, W4
       - kind: cardList
         label: Contact sales
         bindsTo: Product.salesContact
         operation: listProducts
         notes: '**View-only products** (W3): Call sales / Email sales from `Product.salesContact` instead
           of Book.'
-        provenance: decided 29 September 2026 (P29), W3
+        provenance: decided 29 September 2026, W3
     - name: contextPanel
       slot: selection
       components:
@@ -770,7 +770,7 @@ screens:
     contract: white-label
     purpose: 'Help me choose: the questions whose answers filter this list (W4)'
     trigger: onLoad
-    provenance: decided 29 September 2026 (P29), W4
+    provenance: decided 29 September 2026, W4
   entryState:
     params:
     - name: eventId
@@ -1101,13 +1101,13 @@ screens:
         operation: getProduct
         notes: '**View-only product** (W3): no Book; the sales contact from `Product.salesContact` (phone,
           email, note; the venue contact when absent).'
-        provenance: decided 29 September 2026 (P29), W3
+        provenance: decided 29 September 2026, W3
       - kind: datePicker
         label: Next 7 days
         operation: listPerformances
         notes: '**Single-event page** (M18-13): banner or video hero, a brief description, and a date
           strip of the next `dateStripDays` days (default 7) with a calendar icon for later dates (M17-08).'
-        provenance: decided 29 September 2026 (P29), M18-13, M17-08
+        provenance: decided 29 September 2026, M18-13, M17-08
     - name: contextPanel
       slot: selection
       components:
@@ -1317,7 +1317,7 @@ screens:
       trigger: Workshop chosen, then date and time (product-first flow)
       carries:
       - productId
-      provenance: decided 29 September 2026 (P29), W8
+      provenance: decided 29 September 2026, W8
   density: compact
   pattern: listDetail
   patternReason: '`listProductVariants` reads a population and nothing reads one of them; the detail is
@@ -1403,12 +1403,12 @@ screens:
         operation: getPublishedBookingFlow
         notes: The steps of the published flow in their `sortOrder`, this one (tickets) highlighted. A
           step the flow has turned off is not shown and is skipped by Continue and Back.
-        provenance: decided 29 September 2026 (P29), W12; CMS-103 Booking Flows
+        provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
       - kind: secondaryButton
         label: Show everything
         operation: listProducts
         notes: Clears the Help me choose filter (W4).
-        provenance: decided 29 September 2026 (P29), W4
+        provenance: decided 29 September 2026, W4
     - name: contextPanel
       slot: selection
       components:
@@ -1476,7 +1476,7 @@ screens:
     contract: white-label
     purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
     trigger: onLoad
-    provenance: decided 29 September 2026 (P29), W12
+    provenance: decided 29 September 2026, W12
   entryState:
     params:
     - name: productId
@@ -1768,7 +1768,7 @@ screens:
         operation: getPublishedBookingFlow
         notes: The steps of the published flow in their `sortOrder`, this one (date and time) highlighted.
           A step the flow has turned off is not shown and is skipped by Continue and Back.
-        provenance: decided 29 September 2026 (P29), W12; CMS-103 Booking Flows
+        provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
   states:
     loading: The date session selection, read by `getPerformance`.
     error: Could not load. Names which read failed and leaves the date session selection untouched.
@@ -1820,7 +1820,7 @@ screens:
     contract: white-label
     purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
     trigger: onLoad
-    provenance: decided 29 September 2026 (P29), W12
+    provenance: decided 29 September 2026, W12
   wireframe:
     status: review
     provenance: client-verified
@@ -2053,7 +2053,7 @@ screens:
         operation: getPublishedBookingFlow
         notes: The steps of the published flow in their `sortOrder`, this one (seats) highlighted. A step
           the flow has turned off is not shown and is skipped by Continue and Back.
-        provenance: decided 29 September 2026 (P29), W12; CMS-103 Booking Flows
+        provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
     - name: actionBar
       slot: rowActions
       components:
@@ -2108,7 +2108,7 @@ screens:
     contract: white-label
     purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
     trigger: onLoad
-    provenance: decided 29 September 2026 (P29), W12
+    provenance: decided 29 September 2026, W12
   entryState:
     params:
     - name: performanceId
@@ -2338,7 +2338,7 @@ screens:
         operation: getPublishedBookingFlow
         notes: The steps of the published flow in their `sortOrder`, this one (extras) highlighted. A
           step the flow has turned off is not shown and is skipped by Continue and Back.
-        provenance: decided 29 September 2026 (P29), W12; CMS-103 Booking Flows
+        provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
     - name: actionBar
       slot: rowActions
       components:
@@ -2388,7 +2388,7 @@ screens:
     contract: white-label
     purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
     trigger: onLoad
-    provenance: decided 29 September 2026 (P29), W12
+    provenance: decided 29 September 2026, W12
   entryState:
     params:
     - name: cartId
@@ -2644,7 +2644,7 @@ screens:
         subjectId, so an edge into it carries them
     - to: WEB-012
       trigger: 'Guest code proved or signed in: straight to payment (details skipped)'
-      provenance: decided 29 September 2026 (P29), W1
+      provenance: decided 29 September 2026, W1
       carries:
       - orderId
       - paymentId
@@ -2746,7 +2746,7 @@ screens:
         operation: getPublishedBookingFlow
         notes: The steps of the published flow in their `sortOrder`, this one (cart) highlighted. A step
           the flow has turned off is not shown and is skipped by Continue and Back.
-        provenance: decided 29 September 2026 (P29), W12; CMS-103 Booking Flows
+        provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
     - name: actionBar
       slot: rowActions
       components:
@@ -2953,7 +2953,7 @@ screens:
     contract: white-label
     purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
     trigger: onLoad
-    provenance: decided 29 September 2026 (P29), W12
+    provenance: decided 29 September 2026, W12
   entryState:
     params:
     - name: cartId
@@ -3050,7 +3050,7 @@ screens:
       provenance: flow F01 step 6→7, F02 step 4→5
     - to: WEB-012
       trigger: 'Skipped: nothing to ask (guest code proved, or signed in, and no attendee forms)'
-      provenance: decided 29 September 2026 (P29), W1
+      provenance: decided 29 September 2026, W1
     - to: WEB-010
       trigger: They check out
       provenance: flow F55 step 2→3
@@ -3155,7 +3155,7 @@ screens:
         operation: getPublishedBookingFlow
         notes: The steps of the published flow in their `sortOrder`, this one (details) highlighted. A
           step the flow has turned off is not shown and is skipped by Continue and Back.
-        provenance: decided 29 September 2026 (P29), W12; CMS-103 Booking Flows
+        provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
     - name: contextPanel
       slot: selection
       components:
@@ -3440,7 +3440,7 @@ screens:
     contract: white-label
     purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
     trigger: onLoad
-    provenance: decided 29 September 2026 (P29), W12
+    provenance: decided 29 September 2026, W12
   entryState:
     params:
     - name: deviceId
@@ -3601,18 +3601,18 @@ screens:
         operation: getPublishedBookingFlow
         notes: The steps of the published flow in their `sortOrder`, this one (payment) highlighted. A
           step the flow has turned off is not shown and is skipped by Continue and Back.
-        provenance: decided 29 September 2026 (P29), W12; CMS-103 Booking Flows
+        provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
       - kind: consentBlock
         label: Terms and conditions
         operation: createOrder
         notes: After the code the guest goes straight to the T&Cs tick and completes (W1).
-        provenance: decided 29 September 2026 (P29), W1
+        provenance: decided 29 September 2026, W1
       - kind: toggle
         label: Send me offers and news
         operation: createOrder
         notes: 'Marketing opt-in beside the T&Cs, **never pre-ticked** (M18-15): `marketingConsents[]`
           on the order, bound to the verified contact.'
-        provenance: decided 29 September 2026 (P29), M18-15
+        provenance: decided 29 September 2026, M18-15
     - name: actionBar
       slot: rowActions
       components:
@@ -3672,7 +3672,7 @@ screens:
     contract: white-label
     purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
     trigger: onLoad
-    provenance: decided 29 September 2026 (P29), W12
+    provenance: decided 29 September 2026, W12
   entryState:
     params:
     - name: orderId
@@ -5655,7 +5655,7 @@ screens:
         operation: updateMyProfile
         notes: 'For a profile created by guest checkout (W1): asks for what the pop-up did not; never
           blocks.'
-        provenance: decided 29 September 2026 (P29), W1
+        provenance: decided 29 September 2026, W1
     - name: contextPanel
       slot: selection
       components:
@@ -12183,19 +12183,18 @@ screens:
       - when: an item sold out since the plan was made
         to: WEB-050
         note: Names it and offers a swap; the rest of the plan is kept.
-      provenance: 'decided 29 September 2026 (P29), MOB-6; web build: Book this plan goes straight into
-        booking'
+      provenance: 'decided 29 September 2026, MOB-6; web build: Book this plan goes straight into booking'
     - to: WEB-004
       trigger: Opens an item on the plan
       carries:
       - productId
-      provenance: decided 29 September 2026 (P29), MOB-6
+      provenance: decided 29 September 2026, MOB-6
     - to: WEB-001
       trigger: Back to tickets
-      provenance: decided 29 September 2026 (P29), MOB-6
-  notes: '**Added 29 September (P29)**: the 29 September web build has *Plan your visit* in the header,
-    opening the planner full screen, and *Book this plan* goes straight into booking. The web twin of
-    the Plan tab (GST-051 questions, GST-053 plan), binding the same planner operations (venue-map `generateVisitPlan`,
+      provenance: decided 29 September 2026, MOB-6
+  notes: '**Added 29 September**: the 29 September web build has *Plan your visit* in the header, opening
+    the planner full screen, and *Book this plan* goes straight into booking. The web twin of the Plan
+    tab (GST-051 questions, GST-053 plan), binding the same planner operations (venue-map `generateVisitPlan`,
     `getVisitPlan`, `updateVisitPlan`, `listVisitPlanAlternatives`, `bookVisitPlan`). Block A (29 September
     re-plan, superseding R187 and GAP-C3). Rules-based; the AI planner chat is app-only for now. Hidden
     when the venue turns module `visitPlanner` off.'
@@ -12213,41 +12212,41 @@ screens:
       - kind: progressIndicator
         label: Plan your visit · n of 6
         notes: Who, heights (skipped with no children), days (up to 3), pace, interests, lunch.
-        provenance: decided 29 September 2026 (P29), MOB-6; Visit Planner prototype
+        provenance: decided 29 September 2026, MOB-6; Visit Planner prototype
     - name: fields
       slot: fields
       components:
       - kind: numberField
         label: Adults and children
         notes: Adults 1-8 (12+), children 0-8 (3-11).
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: selectField
         label: How tall are the children?
         operation: listProducts
         notes: Per child; rides over the limit are left out (`ProductEligibilityRule`).
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: multiSelect
         label: Which days are you visiting?
         notes: Up to three.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: selectField
         label: How busy should each day be?
         notes: Packed, Balanced or Relaxed.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: multiSelect
         label: What are you most interested in?
         operation: listProducts
         notes: Interest tags of the venue.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: selectField
         label: What would you like for lunch?
         notes: Cuisines of the outlets.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: primaryButton
         label: Make my plan
         operation: generateVisitPlan
         notes: Runs the rules planner.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
     - name: review
       slot: review
       components:
@@ -12256,27 +12255,27 @@ screens:
         bindsTo: VisitPlanItem
         operation: getVisitPlan
         notes: Day tabs; arrival, timed items and lunch.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: secondaryButton
         label: Swap / + Add something
         operation: listVisitPlanAlternatives
         notes: Candidates that suit everyone in the group.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: secondaryButton
         label: Remove / Undo changes
         operation: updateVisitPlan
         notes: Each change is a new version.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: toggle
         label: Add Fast Track
         operation: updateVisitPlan
         notes: Per guest, with the queuing time saved.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: detailPanel
         label: Estimated total
         operation: getVisitPlan
         notes: Estimate for the group; confirmed in booking.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
     - name: submit
       slot: submit
       components:
@@ -12284,11 +12283,11 @@ screens:
         label: Book this plan
         operation: bookVisitPlan
         notes: Cart lines from the plan; opens the cart.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: secondaryButton
         label: Change answers
         notes: Back to the questions.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
   states:
     loading: The plan builds in place; the answers stay on screen.
     error: Could not build or load the plan. Names what failed; the answers are kept.
@@ -12305,32 +12304,32 @@ screens:
     contract: catalogue
     purpose: Interests and height limits of what the planner may include
     trigger: onLoad
-    provenance: decided 29 September 2026 (P29), MOB-6
+    provenance: decided 29 September 2026, MOB-6
   - operationId: generateVisitPlan
     contract: venue-map
     purpose: Build a rules plan from the inputs (party, heights, dates, pace, interests, cuisine)
     trigger: onAction
-    provenance: decided 29 September 2026 (P29), MOB-6
+    provenance: decided 29 September 2026, MOB-6
   - operationId: getVisitPlan
     contract: venue-map
     purpose: 'The plan: days, timed items and add-on suggestions, at its current version'
     trigger: onLoad
-    provenance: decided 29 September 2026 (P29), MOB-6
+    provenance: decided 29 September 2026, MOB-6
   - operationId: updateVisitPlan
     contract: venue-map
     purpose: 'Swap, remove, add or undo: each change is a new version, so undo goes back one'
     trigger: onAction
-    provenance: decided 29 September 2026 (P29), MOB-6
+    provenance: decided 29 September 2026, MOB-6
   - operationId: listVisitPlanAlternatives
     contract: venue-map
     purpose: Swap candidates for one item that suit everyone in the party
     trigger: onAction
-    provenance: decided 29 September 2026 (P29), MOB-6
+    provenance: decided 29 September 2026, MOB-6
   - operationId: bookVisitPlan
     contract: venue-map
     purpose: 'Book this plan: turns the plan (and chosen add-ons) into cart lines and returns the cart'
     trigger: onAction
-    provenance: decided 29 September 2026 (P29), MOB-6
+    provenance: decided 29 September 2026, MOB-6
   entryState:
     params:
     - name: venueId

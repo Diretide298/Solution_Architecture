@@ -2,6 +2,7 @@ id: LLD-IdentityService
 title: IdentityService — 89 operations, 38 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
+deployable: commerce
 index: diagrams/hld/02-services.yaml
 why: '**Twelve contracts read it and it reads almost nothing.** The one service nothing can be deployed
   without, and the only writer of `pii` — which is what makes a subject-access export and a deletion

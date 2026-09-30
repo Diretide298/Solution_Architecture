@@ -1,4 +1,220 @@
 {
+ "AiDemandForecastingBookingCurveStudioView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What AI Demand Forecasting & Booking Curve Studio displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "venue": {
+    "type": "string",
+    "description": "Venue id"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product id",
+    "nullable": true
+   },
+   "event": {
+    "type": "string",
+    "description": "Event id",
+    "nullable": true
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance id",
+    "nullable": true
+   },
+   "date": {
+    "type": "string",
+    "description": "Date",
+    "format": "date"
+   },
+   "timeslot": {
+    "type": "string",
+    "description": "Timeslot",
+    "nullable": true
+   },
+   "priceCategory": {
+    "type": "string",
+    "description": "Price category",
+    "nullable": true
+   },
+   "sectionCode": {
+    "type": "string",
+    "nullable": true,
+    "description": "Seat-map section (`seating.Section.code`) the row forecasts; null for a row at price-category or performance level (29 September, build pass, group G2; 21.11.4)"
+   },
+   "channel": {
+    "$ref": "#/components/schemas/Channel",
+    "description": "Channel"
+   },
+   "confidence": {
+    "type": "number",
+    "description": "Forecast Confidence, percent"
+   },
+   "forecastFinalOccupancy": {
+    "type": "number",
+    "description": "Forecast Final Occupancy, percent"
+   },
+   "demand": {
+    "type": "integer",
+    "description": "Forecast demand"
+   },
+   "attendance": {
+    "type": "integer",
+    "description": "Forecast attendance"
+   },
+   "occupancy": {
+    "type": "number",
+    "description": "Forecast occupancy, percent"
+   },
+   "sellThrough": {
+    "type": "number",
+    "description": "Forecast sell-through, percent"
+   },
+   "expectedSellOutTime": {
+    "type": "string",
+    "description": "Expected Sell-Out Time; empty if no sell-out forecast",
+    "format": "date-time",
+    "nullable": true
+   },
+   "revenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Forecast revenue"
+   },
+   "conversion": {
+    "type": "number",
+    "description": "Forecast conversion, percent"
+   },
+   "remainingInventory": {
+    "type": "integer",
+    "description": "Forecast remaining inventory at event"
+   },
+   "mape": {
+    "type": "number",
+    "description": "MAPE over closed forecasts at this level, percent"
+   },
+   "forecastBias": {
+    "type": "number",
+    "description": "Forecast Bias (positive = over-forecast), percent"
+   },
+   "overForecast": {
+    "type": "number",
+    "description": "Share of closed forecasts that over-forecast, percent"
+   },
+   "underForecast": {
+    "type": "number",
+    "description": "Share of closed forecasts that under-forecast, percent"
+   },
+   "forecastId": {
+    "type": "string",
+    "description": "Forecast id"
+   },
+   "horizon": {
+    "type": "string",
+    "description": "Forecast Horizon",
+    "enum": [
+     "intraday",
+     "tomorrow",
+     "days7",
+     "days30",
+     "eventHorizon",
+     "seasonalHorizon"
+    ]
+   },
+   "bookingCurve": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "daysBeforeEvent": {
+       "type": "integer",
+       "description": "T minus days"
+      },
+      "historicalExpectedPercentSold": {
+       "type": "number",
+       "description": "Historical expected curve, percent sold"
+      },
+      "actualPercentSold": {
+       "type": "number",
+       "nullable": true,
+       "description": "Current actual curve, percent sold (empty for future points)"
+      },
+      "forecastPercentSold": {
+       "type": "number",
+       "description": "AI forecast curve, percent sold"
+      }
+     }
+    },
+    "description": "Booking Curve"
+   },
+   "signalContributions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "signal": {
+       "type": "string",
+       "enum": [
+        "internalSales",
+        "bookingVelocity",
+        "occupancy",
+        "historicalEvents",
+        "nearbyEvent",
+        "weather",
+        "marketTourism",
+        "competitor",
+        "priceElasticity",
+        "other"
+       ],
+       "description": "Signal category"
+      },
+      "contributionPercent": {
+       "type": "number",
+       "description": "Explanatory share of the forecast"
+      }
+     }
+    },
+    "description": "Model Inputs: which signals contributed"
+   },
+   "confidenceReasons": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "strongHistoricalData",
+      "stableBookingPattern",
+      "reliableExternalSignals",
+      "limitedHistoricalData",
+      "volatileBookingPattern",
+      "degradedExternalSignals"
+     ]
+    },
+    "description": "Reasons behind the forecast confidence"
+   },
+   "modelVersion": {
+    "type": "string",
+    "description": "Model version that produced the forecast"
+   },
+   "generatedAt": {
+    "type": "string",
+    "description": "When the forecast was produced",
+    "format": "date-time"
+   }
+  }
+ },
+ "Channel": {
+  "type": "string",
+  "enum": [
+   "pos",
+   "kiosk",
+   "web",
+   "mobile",
+   "b2b",
+   "ota",
+   "callCentre"
+  ]
+ },
  "CreateReportRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -64,7 +280,7 @@
  },
  "DataSource": {
   "type": "string",
-  "description": "What a report may be built over. **A closed set, and that is the point** — a builder that accepts any table will happily produce a report over data nobody maintains.\n**Eight sources added 18 August** (BL-143), each because the matrix asks for a report the builder could not source. `stockCounts` and `waste`: 6.1.21 wants count variance and `stockMovements` records the movement rather than **the count that found the discrepancy**. `workstations`, `devices` and `principals`: 6.1.28 — **who did what at which till** is the question an auditor asks first and it had no source. `loyalty`: 6.1.37, points earned, burned and expiring. `reviews`: 6.1.46. `queueEntries`: **wait times are already measured and nothing could report on them.**\n**Adding a source is a decision, not an omission.** `principals`, `guests`, `loyalty` and `reviews` all name a person, and `REPORT_EXPORT_PII` gates them.\n",
+  "description": "What a report may be built over. **A closed set, and that is the point** — a builder that accepts any table will happily produce a report over data nobody maintains.\n**Eight sources added 18 August** (BL-143), each because the matrix asks for a report the builder could not source. `stockCounts` and `waste`: 6.1.21 wants count variance and `stockMovements` records the movement rather than **the count that found the discrepancy**. `workstations`, `devices` and `principals`: 6.1.28 — **who did what at which till** is the question an auditor asks first and it had no source. `loyalty`: 6.1.37, points earned, burned and expiring. `reviews`: 6.1.46. `queueEntries`: **wait times are already measured and nothing could report on them.**\n**Adding a source is a decision, not an omission.** `principals`, `guests`, `loyalty` and `reviews` all name a person, and `REPORT_EXPORT_PII` gates them.\n\n**`forecastPoints` added 29 September** (8.2.55, build pass, group G2): the points of published AI forecast versions; see `x-ticvai-forecast-points`.\n\n**Three accreditation sources added 29 September** (12.1.50, build pass): `accreditationApplications`, `accreditationHolders` and `accreditationCredentials`, over `accreditation.application`, `accreditation.holder` and `accreditation.credential`. They are what the accreditation KPIs and any accreditation report or export (`exportReportResult`, csv or xlsx) are built over. **All three name a person**, and `REPORT_EXPORT_PII` gates them as it gates `guests`.\n",
   "enum": [
    "orders",
    "orderLines",
@@ -99,7 +315,21 @@
    "forms",
    "challenges",
    "wallets",
-   "resaleListings"
+   "resaleListings",
+   "accreditationApplications",
+   "accreditationHolders",
+   "accreditationCredentials",
+   "forecastPoints"
+  ],
+  "x-ticvai-forecast-points": "**`forecastPoints` added 29 September (build pass, group G2; 8.2.55)**: one row per forecast point (`ai.forecast_point`) of a **published** forecast version (`ai.forecast_version` status `published`), with the definition it belongs to (`ai.forecast_definition`: subject, grain, unit), the period, the dimension key and the p10, p50 and p90 values. Draft, awaiting-approval and superseded versions are not reachable, and scenario points (`scenarioId` set) only with the scenario named as a filter: **a forecast leaves the platform as the one somebody published**. It is how a forecast is exported (`runReport` then `exportReportResult`, csv or xlsx), scheduled or put on a dashboard. Names no person, so `REPORT_EXPORT` is enough. Read from the reporting replica of the AI log database (design 2.4), never from the model service.\n"
+ },
+ "ExportFormat": {
+  "type": "string",
+  "enum": [
+   "csv",
+   "xlsx",
+   "pdf",
+   "json"
   ]
  },
  "FieldType": {
@@ -116,6 +346,114 @@
    "enum"
   ]
  },
+ "InventoryHold": {
+  "x-ticvai-persistence": "catalogue.inventory_hold",
+  "type": "object",
+  "required": [
+   "id",
+   "channelCapacityId",
+   "holderKind",
+   "grantedUnits",
+   "consumedUnits",
+   "status",
+   "acquiredAt",
+   "expiresAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "channelCapacityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "holderKind": {
+    "$ref": "#/components/schemas/InventoryHoldHolderKind"
+   },
+   "holderWorkstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The holding workstation when `holderKind` is `workstation`; null on a cart hold, because a browser has none (SD-023, 29 September)."
+   },
+   "holderCartId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The holding cart (`orders.cart`) when `holderKind` is `cart` (SD-023, 29 September)."
+   },
+   "convertedOrderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The paid order the hold was converted for, set by `convertInventoryHold`."
+   },
+   "convertedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "parentLeaseId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Present when sub-leased from a venue edge node."
+   },
+   "requestedUnits": {
+    "type": "integer"
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/Channel"
+     }
+    ],
+    "description": "Allocation this lease draws from."
+   },
+   "grantedUnits": {
+    "type": "integer",
+    "description": "May be less than requested — a partial grant is not an error. Constrained by the channel's remaining allocation plus the general pool, never by raw capacity.\n"
+   },
+   "consumedUnits": {
+    "type": "integer"
+   },
+   "status": {
+    "$ref": "#/components/schemas/LeaseStatus"
+   },
+   "acquiredAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "releasedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "forceReleasedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "forceReleaseReason": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "InventoryHoldHolderKind": {
+  "type": "string",
+  "enum": [
+   "workstation",
+   "cart"
+  ],
+  "default": "workstation",
+  "description": "**Who holds the units** (decided 29 September, SD-023). A till, kiosk or edge node holds as a `workstation`; a guest's web or app cart holds as a `cart`, acquired by the order service. A browser has no workstation, so a cart hold carries `cartId` and no `holderWorkstationId`.\n"
+ },
  "KpiValue": {
   "type": "object",
   "description": "BI board 10.3. **Value, target, variance, direction and freshness in one read.**",
@@ -126,6 +464,17 @@
    },
    "code": {
     "type": "string"
+   },
+   "bucketStart": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise."
+   },
+   "groupKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked."
    },
    "name": {
     "type": "string"
@@ -186,6 +535,17 @@
    }
   }
  },
+ "LeaseStatus": {
+  "type": "string",
+  "description": "`states/lease.yaml`. **`expired` is set by that model's timer transition when `expiresAt` passes without a renewal**, not by any operation in this contract. The job that runs the timer is the sweeper ADR-0037 deferred: it returns an expired hold's unconsumed units to `remaining` in the same guarded statement as a release (SD-023, 29 September), and **writes `inventoryHold.expired` to the outbox in the same transaction** (SD-023/SD-033, applied 30 September; `events/inventoryHold-expired.yaml`), so the cart that held the units hears of it before checkout. A `converted` hold is never swept.\n**`converted` is set by `convertInventoryHold`** when the order that holds the units is paid (decided 29 September, SD-023); its units are `sold` and the sweeper never touches it.\n",
+  "enum": [
+   "active",
+   "expired",
+   "released",
+   "forceReleased",
+   "converted"
+  ]
+ },
  "MetricValue": {
   "x-ticvai-persistence-column": "numeric(18,4)",
   "description": "**A reading of a metric or KPI, or a threshold on one.** A `Money` where the metric is money-valued — `MetricSource` lists those in `x-ticvai-money-valued`, and a KPI is when its `unit` is `currency` — and a plain number otherwise. naming-and-style 5.1: money is never a float, at any layer.\nStored as `numeric(18,4)` either way: a money value stores its amount, and currency and scale resolve from the scope as they do for every `Money`.\n",
@@ -214,6 +574,21 @@
    },
    "hasMore": {
     "type": "boolean"
+   }
+  }
+ },
+ "Point": {
+  "type": "object",
+  "required": [
+   "x",
+   "y"
+  ],
+  "properties": {
+   "x": {
+    "type": "number"
+   },
+   "y": {
+    "type": "number"
    }
   }
  },
@@ -501,6 +876,90 @@
     "description": "Queue regardless of size, for a result to be collected later."
    }
   }
+ },
+ "Seat": {
+  "x-ticvai-persistence": "seating.seat",
+  "type": "object",
+  "required": [
+   "id",
+   "sectionCode",
+   "rowLabel",
+   "seatNumber",
+   "attribute"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "**Stable for the life of the seat.** Section, row and number are display labels that change on a refit; this does not. A ticket sold today must still resolve after a renumbering.\n"
+   },
+   "sectionCode": {
+    "type": "string"
+   },
+   "rowLabel": {
+    "type": "string"
+   },
+   "seatNumber": {
+    "type": "string"
+   },
+   "displayLabel": {
+    "type": "string",
+    "description": "What the guest sees, e.g. `A2-7-11`."
+   },
+   "position": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/Point"
+     }
+    ],
+    "nullable": true
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "attribute": {
+    "$ref": "#/components/schemas/SeatAttribute"
+   },
+   "companionSeatIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Present on accessible seats. Sold together, released together."
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "SeatAttribute": {
+  "type": "string",
+  "description": "BL-168. **Extended from eight values on 18 August.** Amenity and view filters needed attributes the original set did not carry, and a guest filtering for *aisle seat with power* was filtering on something the model could not express.\n",
+  "enum": [
+   "standard",
+   "accessible",
+   "companion",
+   "obstructedView",
+   "restrictedLegroom",
+   "premium",
+   "houseSeat",
+   "buffer",
+   "aisle",
+   "endOfRow",
+   "extraLegroom",
+   "powerOutlet",
+   "tableService",
+   "shaded",
+   "covered",
+   "nearExit",
+   "nearAccessibleWc",
+   "wheelchairTransfer",
+   "limitedRecline",
+   "sofa",
+   "beanbag"
+  ]
  },
  "SeatCategory": {
   "x-ticvai-persistence": "seating.seat_category",

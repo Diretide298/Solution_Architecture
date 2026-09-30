@@ -1,6 +1,6 @@
 # WS80 — Game and Ride board 3
 
-**10 screens · 12 operations · 7 schemas · 5 permissions**
+**10 screens · 16 operations · 13 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -62,7 +62,7 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `BO-414` | Wallet & Credit Management Dashboard | commandCentre | 2 | 0 | — |
 | `BO-415` | Wallet & Credit Type Configuration | configEditor | 2 | 0 | — |
-| `BO-416` | Wallet Account & Balance View | listDetail | 4 | 0 | — |
+| `BO-416` | Wallet Account & Balance View | listDetail | 8 | 0 | — |
 | `BO-417` | Top-Up Configuration | listDetail | 1 | 0 | — |
 | `BO-418` | Top-Up Bonus Rule Configuration | listDetail | 1 | 0 | — |
 | `BO-419` | Bonus Usage Restrictions | listDetail | 1 | 0 | — |
@@ -650,6 +650,34 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "getWallet",
      "listCreditLots"
     ]
+   },
+   {
+    "operationId": "getWalletAutoReloadSetting",
+    "contract": "wallet",
+    "purpose": "Show auto top-up",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setWalletAutoReloadSetting",
+    "contract": "wallet",
+    "purpose": "Set auto top-up",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getWalletExitBalance",
+    "contract": "wallet",
+    "purpose": "Balance due / refundable at exit",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "settleWalletAtExit",
+    "contract": "wallet",
+    "purpose": "Settle the wallet at exit",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1626,7 +1654,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Define a kind of credit, without a release",
   "permission": "WALLET_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {
@@ -1666,9 +1694,41 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Wallet"
+ },
+ "getWalletAutoReloadSetting": {
+  "method": "GET",
+  "path": "/wallets/{walletId}/auto-reload",
+  "contract": "wallet",
+  "summary": "A wallet's own auto top-up, if the holder set one",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WalletAutoReloadSetting"
+ },
+ "getWalletExitBalance": {
+  "method": "GET",
+  "path": "/wallets/{walletId}/exit-balance",
+  "contract": "wallet",
+  "summary": "What the holder owes or is owed on leaving",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WalletExitBalance"
  },
  "listCreditLots": {
   "method": "GET",
@@ -1739,6 +1799,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -1751,9 +1816,14 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Where this credit may be spent, and on what",
   "permission": "WALLET_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -1763,6 +1833,30 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "CreditEligibility",
   "responds": "CreditEligibility"
  },
+ "setWalletAutoReloadSetting": {
+  "method": "PUT",
+  "path": "/wallets/{walletId}/auto-reload",
+  "contract": "wallet",
+  "summary": "Top the wallet up automatically from a stored card when it runs low",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WalletAutoReloadSetting",
+  "responds": "WalletAutoReloadSetting"
+ },
  "setWalletFundingRules": {
   "method": "PUT",
   "path": "/wallet-funding-rules",
@@ -1770,9 +1864,14 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Amounts, channels, bonuses, limits and velocity",
   "permission": "WALLET_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -1781,6 +1880,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "WalletFundingRules",
   "responds": "WalletFundingRules"
+ },
+ "settleWalletAtExit": {
+  "method": "POST",
+  "path": "/wallets/{walletId}/exit-settlement",
+  "contract": "wallet",
+  "summary": "Settle a short balance, or refund a credit, when the holder leaves",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletExitSettlement"
  },
  "suspendWallet": {
   "method": "POST",
@@ -1808,9 +1926,14 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Change a kind of credit",
   "permission": "WALLET_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -2144,6 +2267,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -2265,6 +2417,180 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "nullable": true
+   }
+  }
+ },
+ "WalletAutoReloadSetting": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.auto_reload_setting",
+  "description": "4.2.17, 4.3.28. Also the `setWalletAutoReloadSetting` body. One per wallet; the holder's own setting within the venue's `WalletFundingRules.autoReload`.",
+  "required": [
+   "enabled"
+  ],
+  "properties": {
+   "walletId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "enabled": {
+    "type": "boolean"
+   },
+   "thresholdAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "reloadAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "paymentTokenId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "maximumPerDay": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "active",
+     "suspendedAfterDecline",
+     "disabledByVenue"
+    ]
+   },
+   "lastReloadAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Written at the wallet's venue scope."
+   }
+  }
+ },
+ "WalletExitBalance": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed from wallet.wallet, wallet.credit_lot and held offline transactions",
+  "required": [
+   "walletId",
+   "balance",
+   "amountDue",
+   "refundable"
+  ],
+  "properties": {
+   "walletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "balance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "pendingOfflineAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "amountDue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "refundable": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "nonRefundableCredit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "waiveAllowedUpTo": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "asAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "WalletExitSettlement": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.exit_settlement",
+  "description": "4.3.4. One settlement of a wallet at exit.",
+  "required": [
+   "id",
+   "walletId",
+   "action",
+   "amount",
+   "settledAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "walletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "action": {
+    "type": "string",
+    "enum": [
+     "collect",
+     "refund",
+     "waive"
+    ]
+   },
+   "method": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "card",
+     "cash",
+     "storedCard",
+     "originalPayment"
+    ]
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "balanceBefore": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "paymentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "refundId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "walletTransactionId": {
+    "type": "string",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "settledByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "settledAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true
    }
   }
  },
@@ -2419,6 +2745,78 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string"
    }
   }
+ },
+ "WalletTransaction": {
+  "x-ticvai-persistence": "wallet.wallet_transaction",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "amount",
+   "balanceAfter",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "walletId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "wallet.wallet",
+    "description": "The wallet this movement is on (SD-027, 29 September). A shared wallet has many subjects, so the subject alone cannot say which balance moved."
+   },
+   "walletHoldId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "wallet.hold",
+    "description": "The hold a spend settled, where it came through `holdWalletFunds`."
+   },
+   "kind": {
+    "$ref": "#/components/schemas/WalletTransactionKind"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "balanceAfter": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "orderId": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "WalletTransactionKind": {
+  "type": "string",
+  "enum": [
+   "topUp",
+   "spend",
+   "refund",
+   "adjustment",
+   "bonus",
+   "expiry",
+   "transfer"
+  ]
  }
 }
 ```

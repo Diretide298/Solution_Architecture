@@ -721,11 +721,11 @@
   },
   "apis": [
    {
-    "operationId": "getRecommendations",
-    "contract": "promotions",
-    "purpose": "Seat upsell offers",
+    "operationId": "decideRecommendations",
+    "contract": "ai",
+    "purpose": "Fill a recommendation slot",
     "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {

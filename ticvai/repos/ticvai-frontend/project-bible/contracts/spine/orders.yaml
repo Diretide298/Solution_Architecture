@@ -60,10 +60,10 @@ info:
     \ matters more than the happy path. A terminal that charged a card and\n  never received a response\
     \ is the normal failure, not the exotic one.\n\n## Conventions this file keeps\n- **Ids.** An order,\
     \ its lines, a payment, a refund, a reservation, a ticket transfer, a sync rejection\n  and an entitlement\
-    \ are edge-created and are ULIDs (`^[0-9A-HJKMNP-TV-Z]{26}$`) everywhere\n  they appear: as the row's\
+    \ are edge-created and are UUIDv7s (`format: uuid`) everywhere\n  they appear: as the row's\
     \ own `id`, as a path parameter and as a reference from another\n  schema (naming-and-style §4). Server-created\
-    \ configuration (a cart, a payment link, a\n  template, a policy) is a uuid. A ticket is an entitlement:\
-    \ `ticketIds` are `Entitlement.id`\n  values.\n- **A client ULID in a body is the idempotency key.** Where\
+    \ configuration (a cart, a payment link, a\n  template, a policy) is a uuid too, minted by the service (ADR-0056). A ticket is an entitlement:\
+    \ `ticketIds` are `Entitlement.id`\n  values.\n- **A client UUIDv7 in a body is the idempotency key.** Where\
     \ a write body carries a\n  client-generated `id`, it must equal the `Idempotency-Key` header; the\
     \ replay and\n  mismatch rules are `IdempotencyKey` in `shared/common.yaml`.\n- **Server-owned fields\
     \ in a request body are ignored.** A property marked `readOnly` is\n  never taken from a request, even\
@@ -748,12 +748,12 @@ paths:
                 properties:
                   orderId:
                     type: string
-                    pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                    format: uuid
                   entitlementIds:
                     type: array
                     items:
                       type: string
-                      pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                      format: uuid
         '409':
           description: '**The hold went while they were paying** (`linesUnavailable`). Rare and real
             — a link near its expiry and a guest reading slowly. Nothing is charged. The response names
@@ -828,7 +828,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: convertToTermProduct
       security:
@@ -949,7 +949,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: splitOrder
       x-ticvai-consumed-by:
@@ -998,7 +998,7 @@ paths:
                         type: array
                         items:
                           type: string
-                          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                          format: uuid
                       subjectId:
                         type: string
                         format: uuid
@@ -1016,7 +1016,7 @@ paths:
                 type: array
                 items:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
         '409':
           description: 'The order is partly paid and the payment is not yet allocated to lines
             (`paymentNotAllocated`), which the description makes a precondition of splitting.
@@ -1033,7 +1033,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: reissueEntitlement
       x-ticvai-consumed-by:
@@ -1109,7 +1109,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: shareEntitlement
       x-ticvai-consumed-by:
@@ -1185,7 +1185,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     - name: shareId
       in: path
       required: true
@@ -1274,7 +1274,7 @@ paths:
               properties:
                 entitlementId:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                 platform:
                   type: string
                   enum:
@@ -1490,7 +1490,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: quoteUpgrade
       x-ticvai-consumed-by:
@@ -1535,7 +1535,7 @@ paths:
               properties:
                 entitlementId:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                 targetProductId:
                   type: string
                   format: uuid
@@ -2136,7 +2136,7 @@ paths:
               properties:
                 orderId:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                 expiresAt:
                   type: string
                   format: date-time
@@ -3367,7 +3367,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: voidPayment
       x-ticvai-consumed-by:
@@ -3624,7 +3624,7 @@ paths:
         description: Exact match on the shift the order was taken in.
         schema:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
       - name: status
         in: query
         schema:
@@ -3781,7 +3781,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: getOrder
       x-ticvai-consumed-by:
@@ -3841,7 +3841,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: getOrderCalendarEvent
       x-ticvai-consumed-by:
@@ -3893,7 +3893,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: getVisitReminder
       x-ticvai-consumed-by:
@@ -3978,7 +3978,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: holdOrder
       x-ticvai-consumed-by:
@@ -4077,7 +4077,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: resumeOrder
       x-ticvai-consumed-by:
@@ -4148,7 +4148,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: applyManualDiscount
       x-ticvai-consumed-by:
@@ -4222,7 +4222,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: voidOrder
       x-ticvai-consumed-by:
@@ -4282,8 +4282,8 @@ paths:
               properties:
                 id:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-                  description: Client-generated ULID of this void, and its idempotency key — it must
+                  format: uuid
+                  description: Client-generated UUIDv7 of this void, and its idempotency key — it must
                     equal the `Idempotency-Key` header.
                 reason:
                   $ref: '#/components/schemas/VoidReason'
@@ -4322,7 +4322,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: listOrderRefunds
       x-ticvai-consumed-by:
@@ -4461,7 +4461,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: approveRefund
       x-ticvai-consumed-by:
@@ -4646,12 +4646,12 @@ paths:
               properties:
                 orderId:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                 lineIds:
                   type: array
                   items:
                     type: string
-                    pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                    format: uuid
                 reason:
                   type: string
                   minLength: 3
@@ -4900,7 +4900,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: inquirePaymentStatus
       x-ticvai-consumed-by:
@@ -4967,7 +4967,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: addTip
       x-ticvai-consumed-by:
@@ -5051,7 +5051,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: capturePayment
       x-ticvai-consumed-by:
@@ -5156,7 +5156,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: convertReservation
       x-ticvai-audience:
@@ -5347,7 +5347,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: resolveSyncRejection
       x-ticvai-audience:
@@ -5403,7 +5403,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: modifyOrder
       x-ticvai-consumed-by:
@@ -5588,7 +5588,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: exchangeOrderLines
       x-ticvai-consumed-by:
@@ -5669,7 +5669,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: rescheduleOrder
       x-ticvai-consumed-by:
@@ -5734,7 +5734,7 @@ paths:
                   description: Omit to move the whole order.
                   items:
                     type: string
-                    pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                    format: uuid
                 waiveFee:
                   type: boolean
                   default: false
@@ -5771,7 +5771,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: reprintOrder
       x-ticvai-consumed-by:
@@ -5840,7 +5840,7 @@ paths:
                   description: Omit to reprint every line.
                   items:
                     type: string
-                    pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                    format: uuid
                 reason:
                   type: string
                   enum:
@@ -5878,7 +5878,7 @@ paths:
                       properties:
                         lineId:
                           type: string
-                          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                          format: uuid
                         reprintCount:
                           type: integer
                   reissuedTicketIds:
@@ -5887,7 +5887,7 @@ paths:
                       `Entitlement.id` values.
                     items:
                       type: string
-                      pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                      format: uuid
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
   /orders/{orderId}/transfer:
@@ -5897,7 +5897,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: transferOrderTickets
       x-ticvai-consumed-by:
@@ -5960,7 +5960,7 @@ paths:
                     '
                   items:
                     type: string
-                    pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                    format: uuid
                 recipient:
                   type: object
                   required:
@@ -6005,7 +6005,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: claimTicketTransfer
       x-ticvai-consumed-by:
@@ -6126,7 +6126,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: getOrderStatement
       x-ticvai-consumed-by:
@@ -6281,7 +6281,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: getReservation
       x-ticvai-consumed-by:
@@ -6359,7 +6359,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: extendReservation
       x-ticvai-audience:
@@ -6542,7 +6542,7 @@ paths:
               properties:
                 orderId:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                 amount:
                   $ref: ../shared/common.yaml#/components/schemas/Money
                 reason:
@@ -11798,7 +11798,7 @@ paths:
         required: true
         schema:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -12471,7 +12471,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: voidEntitlement
       x-ticvai-consumed-by:
@@ -12534,7 +12534,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: cleanupFailedPayment
       x-ticvai-consumed-by:
@@ -13010,7 +13010,7 @@ paths:
       description: The order the others are merged into; it survives.
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: mergeOrders
       x-ticvai-consumed-by:
@@ -13058,7 +13058,7 @@ paths:
                   description: The orders merged into this one. Must not include it.
                   items:
                     type: string
-                    pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                    format: uuid
                 reason:
                   type: string
                   maxLength: 500
@@ -13091,7 +13091,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: listExternalReferenceMappings
       x-ticvai-consumed-by:
@@ -13302,7 +13302,7 @@ paths:
                   description: Matched to the payment. Either this or `paymentId`.
                 paymentId:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                 amount:
                   $ref: ../shared/common.yaml#/components/schemas/Money
                 feeAmount:
@@ -15392,7 +15392,7 @@ components:
           description: With `proRata`, the difference charged (positive) or credited (negative).
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           readOnly: true
           description: The order the pro-rata difference went through.
@@ -15663,7 +15663,7 @@ components:
           readOnly: true
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         customerId:
           type: string
           format: uuid
@@ -15723,7 +15723,7 @@ components:
           readOnly: true
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         promotionId:
           type: string
           format: uuid
@@ -15771,7 +15771,7 @@ components:
           format: uuid
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           readOnly: true
           description: The order the renewal charged through. Set by the server.
@@ -15824,7 +15824,7 @@ components:
           format: uuid
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         ruleId:
           type: string
           format: uuid
@@ -15875,13 +15875,13 @@ components:
           maxLength: 50
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         originalOrderLineId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         newOrderLineId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         ruleId:
           x-ticvai-references: orders.upgrade_rule
@@ -16493,10 +16493,10 @@ components:
           readOnly: true
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         orderLineId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         reservationId:
           type: string
@@ -16653,7 +16653,7 @@ components:
           readOnly: true
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         reservationId:
           type: string
           format: uuid
@@ -16743,10 +16743,10 @@ components:
           readOnly: true
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         relatedOrderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         relationshipType:
           type: string
           enum:
@@ -17142,7 +17142,7 @@ components:
           readOnly: true
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         paymentId:
           type: string
           format: uuid
@@ -17252,8 +17252,8 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: 'Client-generated ULID **of this modification, not of the order** — the order is
+          format: uuid
+          description: 'Client-generated UUIDv7 **of this modification, not of the order** — the order is
             the path''s `orderId`. It is the modification''s idempotency key and must equal the
             `Idempotency-Key` header.
 
@@ -17266,7 +17266,7 @@ components:
           type: array
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         reason:
           type: string
           maxLength: 500
@@ -17301,10 +17301,10 @@ components:
           readOnly: true
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         reservationId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: 'Where the link was issued against a reservation rather than an order. **A reservation
             holds inventory and carries no money**, which is the whole reason a link is needed.
@@ -17473,7 +17473,7 @@ components:
           nullable: true
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         leaderSubjectId:
           type: string
           format: uuid
@@ -17580,7 +17580,7 @@ components:
           readOnly: true
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           readOnly: true
         subjectId:
           type: string
@@ -17895,7 +17895,7 @@ components:
             dateUnavailable` is checked against. Null for a group a member of staff built from an order.
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         leaderSubjectId:
           type: string
           format: uuid
@@ -17958,7 +17958,7 @@ components:
           format: uuid
         entitlementId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         platform:
           type: string
           enum:
@@ -18094,7 +18094,7 @@ components:
           readOnly: true
         entitlementId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         sellerSubjectId:
           type: string
           format: uuid
@@ -18719,7 +18719,7 @@ components:
       properties:
         entitlementId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         askPrice:
           $ref: ../shared/common.yaml#/components/schemas/Money
         sellerSubjectId:
@@ -18874,7 +18874,7 @@ components:
           format: uuid
         paymentId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         providerId:
           type: string
           format: uuid
@@ -18981,12 +18981,12 @@ components:
                 format: date-time
         debitJournalEntryId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: The `chargebackDebit` (and `chargebackFee`) entry posted at intake.
         outcomeJournalEntryId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: The `chargebackReversal` entry posted when the case is won, or the additional fee when lost.
     FraudRule:
@@ -19421,7 +19421,7 @@ components:
           type: array
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         issuedAt:
           type: string
           format: date-time
@@ -19509,18 +19509,18 @@ components:
           description: Positive means the guest pays; negative means a refund is due.
         refundId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         revokedEntitlementIds:
           type: array
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         issuedEntitlementIds:
           type: array
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
     ExchangeOrderRequest:
       type: object
       required:
@@ -19531,15 +19531,15 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: Client-generated ULID of this exchange, and its idempotency key — it must equal the
+          format: uuid
+          description: Client-generated UUIDv7 of this exchange, and its idempotency key — it must equal the
             `Idempotency-Key` header.
         outgoingLineIds:
           type: array
           minItems: 1
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         incomingLines:
           type: array
           minItems: 1
@@ -19565,7 +19565,7 @@ components:
       properties:
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         outgoingValue:
           $ref: ../shared/common.yaml#/components/schemas/Money
         incomingValue:
@@ -19583,17 +19583,17 @@ components:
           type: array
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         revokedEntitlementIds:
           type: array
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         issuedEntitlementIds:
           type: array
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
     TicketTransfer:
       x-ticvai-persistence: orders.ticket_transfer
       type: object
@@ -19607,17 +19607,17 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         ticketIds:
           type: array
           description: The entitlements offered — `Entitlement.id` values, since a ticket is an
             entitlement. Each points at `access.entitlement`.
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         fromSubjectId:
           type: string
           format: uuid
@@ -19673,7 +19673,7 @@ components:
       properties:
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         orderNumber:
           type: string
         currency:
@@ -19794,7 +19794,7 @@ components:
             properties:
               orderId:
                 type: string
-                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                format: uuid
               amount:
                 $ref: ../shared/common.yaml#/components/schemas/Money
               authorisedByPrincipalId:
@@ -19848,7 +19848,7 @@ components:
       properties:
         entitlementId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         productName:
           type: string
         status:
@@ -19916,7 +19916,7 @@ components:
             properties:
               entitlementId:
                 type: string
-                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                format: uuid
               name:
                 type: string
               kind:
@@ -19932,7 +19932,7 @@ components:
                 - membership
               orderId:
                 type: string
-                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                format: uuid
               addedAt:
                 type: string
                 format: date-time
@@ -19971,8 +19971,8 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: Client-generated ULID of the new order this creates, and its idempotency key — it
+          format: uuid
+          description: Client-generated UUIDv7 of the new order this creates, and its idempotency key — it
             must equal the `Idempotency-Key` header.
         lines:
           type: array
@@ -20029,7 +20029,7 @@ components:
           type: array
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
     AppendRefusedProblem:
       allOf:
       - $ref: ../shared/common.yaml#/components/schemas/Problem
@@ -20082,7 +20082,7 @@ components:
                 - productWithdrawn
               lineId:
                 type: string
-                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                format: uuid
               detail:
                 type: string
               wasAmount:
@@ -20099,12 +20099,12 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: Client-generated ULID of this discount, and its idempotency key — it must equal the
+          format: uuid
+          description: Client-generated UUIDv7 of this discount, and its idempotency key — it must equal the
             `Idempotency-Key` header.
         lineId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: Omit to discount the order rather than a line.
         amount:
@@ -20312,8 +20312,8 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: 'Client-generated ULID. Also the idempotency key: it must equal the
+          format: uuid
+          description: 'Client-generated UUIDv7. Also the idempotency key: it must equal the
             `Idempotency-Key` header, and a replay or a mismatch follows `IdempotencyKey` in
             `shared/common.yaml`. Offline replay through `syncOrders` carries no header, and this id
             alone deduplicates there.
@@ -20326,7 +20326,7 @@ components:
           $ref: '#/components/schemas/Channel'
         shiftId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         subjectId:
           type: string
           format: uuid
@@ -20361,8 +20361,8 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: Client-generated ULID of the line. `lineIds` everywhere in this contract are these.
+          format: uuid
+          description: Client-generated UUIDv7 of the line. `lineIds` everywhere in this contract are these.
         variantId:
           type: string
           format: uuid
@@ -20389,7 +20389,7 @@ components:
           maxItems: 50
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
           description: Seated products only, as `seating.Seat.id`. Not available offline. **At most
             `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel** (default
             10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); **at most 10 per sale on staff and
@@ -20397,7 +20397,7 @@ components:
             refuses more with 422 `seatLimitExceeded` (problem type `seat-limit-exceeded`).
         resourceHoldId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29
             September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant.
@@ -20501,7 +20501,7 @@ components:
               `transferOrderTickets.ticketIds` and `reprintOrder.reissuedTicketIds` take and return them.
             items:
               type: string
-              pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+              format: uuid
           crossRegionRightIds:
             type: array
             items:
@@ -20617,10 +20617,10 @@ components:
           maxItems: 50
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         resourceHoldId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: The `resources.ResourceHold` this line buys (decided 29 September, rev 3 REV3-15).
             While set, `leaseExpiresAt` is the hold's `expiresAt` and `inventoryHoldId` is null.
@@ -20916,10 +20916,10 @@ components:
             on staff and POS (audit R080 (c)). Over the limit is 422 `seatLimitExceeded`.
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         resourceHoldId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29
             September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant and
@@ -20964,15 +20964,15 @@ components:
       properties:
         routeId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: The `transport.TransportRoute`.
         fromStationId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: Boarding station, a stop of the route.
         toStationId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: Alighting station, a later stop of the route.
         passengerTypeCode:
           type: string
@@ -20981,12 +20981,12 @@ components:
           description: The fare table's passenger type (`adult`, `child`, ...). Required on a one-way trip.
         passTypeId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: Pass purchase only. The `transport.PassType` bought for this station pair.
         passEntitlementId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: A seat reserved with a pass already owned. The line is zero-priced and validated
             against the pass (stations covered, an entry left, within validity).
@@ -21086,8 +21086,8 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: The client ULID from `CreateOrderRequest.id`.
+          format: uuid
+          description: The client UUIDv7 from `CreateOrderRequest.id`.
         orderNumber:
           type: string
           readOnly: true
@@ -21187,7 +21187,7 @@ components:
           format: uuid
         shiftId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         subjectId:
           type: string
@@ -21229,7 +21229,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         orderNumber:
           type: string
         status:
@@ -21384,14 +21384,14 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: Client-generated ULID of the refund, and its idempotency key — it must equal the
+          format: uuid
+          description: Client-generated UUIDv7 of the refund, and its idempotency key — it must equal the
             `Idempotency-Key` header.
         lineIds:
           type: array
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
           description: Omit to refund the whole order.
         amount:
           $ref: ../shared/common.yaml#/components/schemas/Money
@@ -21437,10 +21437,10 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         batchId:
           type: string
           format: uuid
@@ -21530,6 +21530,7 @@ components:
           nullable: true
         ledgerEntryId:
           type: string
+          format: uuid
           nullable: true
           description: Written before the gateway is called.
         gatewayReference:
@@ -21553,12 +21554,12 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: Client-generated ULID of the payment, and its idempotency key — it must equal the
+          format: uuid
+          description: Client-generated UUIDv7 of the payment, and its idempotency key — it must equal the
             `Idempotency-Key` header.
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         tender:
           $ref: '#/components/schemas/TenderKind'
         amount:
@@ -21618,10 +21619,10 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         tender:
           $ref: '#/components/schemas/TenderKind'
         tenderCurrency:
@@ -21744,8 +21745,8 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: Client-generated ULID of the reservation, and its idempotency key — it must equal
+          format: uuid
+          description: Client-generated UUIDv7 of the reservation, and its idempotency key — it must equal
             the `Idempotency-Key` header.
         venueId:
           type: string
@@ -21781,7 +21782,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         venueId:
           type: string
           format: uuid
@@ -21810,7 +21811,7 @@ components:
           format: date-time
         convertedOrderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
     OfflineOrder:
       x-ticvai-persistence: none — client-side journal, not server storage
@@ -21857,7 +21858,7 @@ components:
             properties:
               id:
                 type: string
-                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                format: uuid
                 description: The `OfflineOrder.id` this result is about.
               sequence:
                 type: integer
@@ -21900,7 +21901,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         workstationId:
           type: string
           format: uuid
@@ -21950,7 +21951,7 @@ components:
           description: What `resolveSyncRejection` recorded. Null while the rejection waits.
         resolvedRecordId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           readOnly: true
           description: The order, void or refund the resolution produced — what stops the entry being
@@ -21974,7 +21975,7 @@ components:
             '
         resolvedRecordId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: The id of the order, void or refund that resolution produced.
         note:
           type: string
@@ -22073,7 +22074,7 @@ components:
               properties:
                 lineId:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                 productName:
                   type: string
     ConvertToTermResult:
@@ -22144,11 +22145,11 @@ components:
       properties:
         entitlementId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: The new entitlement.
         replacesEntitlementId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: The expired one, now voided. **The original is traceable** from the new one.
         reason:
           type: string
@@ -22185,7 +22186,7 @@ components:
           format: uuid
         entitlementId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         toSubjectId:
           type: string
           format: uuid
@@ -22230,7 +22231,7 @@ components:
             - entitlementSettled           # voidEntitlement: its order has a captured payment; refund instead
           entitlementId:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
     ResaleRefusedProblem:
       x-ticvai-persistence: none — error shape
       allOf:
@@ -22436,7 +22437,7 @@ components:
             description: The order lines the refusal is about, where it is about lines.
             items:
               type: string
-              pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+              format: uuid
     RefundBatch:
       type: object
       x-ticvai-persistence: orders.refund_batch
@@ -22542,7 +22543,7 @@ components:
             description: With a transfer refusal, the tickets refused — `Entitlement.id` values.
             items:
               type: string
-              pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+              format: uuid
     MembershipRenewalProblem:
       x-ticvai-persistence: none — error shape
       allOf:

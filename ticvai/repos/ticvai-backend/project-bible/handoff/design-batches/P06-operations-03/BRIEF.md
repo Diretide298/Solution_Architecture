@@ -1,6 +1,6 @@
 # P06-operations-03 — P06 · Operations (3 of 5)
 
-**10 screens · 53 operations · 58 schemas · 22 permissions**
+**10 screens · 55 operations · 79 schemas · 23 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 22 permissions apply here:
-  `ATTENDANCE_RECORD, CAPACITY_CONFIGURE, CASE_MANAGE, CASE_VIEW, INCIDENT_MANAGE, INCIDENT_REPORT, INCIDENT_VIEW, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY, ORDER_REFUND`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 23 permissions apply here:
+  `AI_USE, ATTENDANCE_RECORD, CAPACITY_CONFIGURE, CASE_MANAGE, CASE_VIEW, INCIDENT_MANAGE, INCIDENT_REPORT, INCIDENT_VIEW, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY`…. A control nobody can use must say so,
   not sit enabled and fail.
 - **21 of these operations work offline**: addCaseMessage, applyManualDiscount, createCase, createOrder, getOrder, getProduct, getQueue, getVenueMap
   — and the rest do not. A surface that looks the same online and off is lying.
@@ -61,13 +61,13 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `EMP-031` | Queue monitor | listDetail | 7 | 0 | — |
-| `EMP-032` | Manual wait entry | listDetail | 5 | 0 | — |
-| `EMP-033` | Capacity view | listDetail | 6 | 0 | — |
-| `EMP-034` | Walk-up sale | listDetail | 22 | 1 | — |
-| `EMP-025` | Break management | listDetail | 2 | 0 | — |
-| `EMP-026` | Incident report | listDetail | 5 | 0 | — |
-| `EMP-027` | Incident detail | listDetail | 3 | 0 | — |
-| `EMP-028` | Lost & found | listDetail | 7 | 0 | — |
-| `EMP-029` | Guest assistance | listDetail | 12 | 0 | — |
+| `EMP-031` | Queue monitor | listDetail | 8 | 3 | — |
+| `EMP-032` | Manual wait entry | listDetail | 5 | 1 | — |
+| `EMP-033` | Capacity view | listDetail | 6 | 4 | — |
+| `EMP-034` | Walk-up sale | listDetail | 23 | 13 | — |
+| `EMP-025` | Break management | listDetail | 2 | 1 | — |
+| `EMP-026` | Incident report | listDetail | 5 | 3 | — |
+| `EMP-027` | Incident detail | listDetail | 3 | 1 | — |
+| `EMP-028` | Lost & found | listDetail | 7 | 5 | — |
+| `EMP-029` | Guest assistance | listDetail | 12 | 8 | — |
 | `EMP-030` | Venue map | listDetail | 4 | 0 | — |

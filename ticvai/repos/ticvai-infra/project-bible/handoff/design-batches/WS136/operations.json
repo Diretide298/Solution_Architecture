@@ -81,6 +81,35 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listDataRetentionSettings": {
+  "method": "GET",
+  "path": "/data-retention-settings",
+  "contract": "tenancy",
+  "summary": "How long the tenant keeps each class of data",
+  "permission": "TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "dataClass",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listDataSubjectCustomer": {
   "method": "GET",
   "path": "/data-subject-customer",
@@ -561,6 +590,25 @@
   ],
   "requestBody": "DataRetentionPolicy",
   "responds": "DataRetentionPolicy"
+ },
+ "setDataRetentionSetting": {
+  "method": "PUT",
+  "path": "/data-retention-settings/{dataClass}",
+  "contract": "tenancy",
+  "summary": "Set how long the tenant keeps one class of data",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "TenantDataRetentionSetting",
+  "responds": "TenantDataRetentionSetting"
  },
  "setGuestMatchPolicy": {
   "method": "PUT",

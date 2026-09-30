@@ -11,7 +11,7 @@ emittedBy:
 - submitApprovalRequest
 payload:
 - field: requestId
-  type: string
+  type: uuid
 - field: kind
   type: string
 - field: subjectContract
@@ -19,7 +19,7 @@ payload:
 - field: subjectType
   type: string
 - field: subjectId
-  type: string
+  type: uuid
 - field: scopePath
   type: string
 - field: amount

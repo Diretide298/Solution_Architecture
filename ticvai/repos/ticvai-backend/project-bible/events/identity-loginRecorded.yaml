@@ -12,8 +12,8 @@ emittedWhen: Every call to login, guestPasswordLogin, verifyGuestOtp, guestSocia
   success or failure
 payload:
 - field: loginEventId
-  type: string
-  notes: ULID minted by the operation. The idempotency key for every consumer
+  type: uuid
+  notes: UUIDv7 minted by the operation. The idempotency key for every consumer
 - field: principalId
   type: uuid
   required: false

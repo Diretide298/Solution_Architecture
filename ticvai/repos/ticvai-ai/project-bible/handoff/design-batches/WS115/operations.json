@@ -1,4 +1,23 @@
 {
+ "createWebhookSubscription": {
+  "method": "POST",
+  "path": "/webhook-subscriptions",
+  "contract": "public-api",
+  "summary": "Subscribe to business events",
+  "permission": "DEVELOPER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WebhookSubscription",
+  "responds": "WebhookSubscription"
+ },
  "getKpiValues": {
   "method": "GET",
   "path": "/kpi-values",
@@ -31,6 +50,16 @@
    },
    {
     "name": "compareTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "interval",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
     "in": "query",
     "required": null
    }
@@ -143,6 +172,48 @@
   "requestBody": null,
   "responds": "ApiClient"
  },
+ "listWebhookDeliveries": {
+  "method": "GET",
+  "path": "/webhook-subscriptions/{subscriptionId}/deliveries",
+  "contract": "public-api",
+  "summary": "What was sent, what failed, and why",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WebhookDelivery"
+ },
+ "listWebhookEventTypes": {
+  "method": "GET",
+  "path": "/webhook-event-types",
+  "contract": "public-api",
+  "summary": "The events a webhook may subscribe to",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "publisher",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listWebhookSubscriptions": {
   "method": "GET",
   "path": "/webhook-subscriptions",
@@ -161,5 +232,24 @@
   ],
   "requestBody": null,
   "responds": "WebhookSubscription"
+ },
+ "testWebhookSubscription": {
+  "method": "POST",
+  "path": "/webhook-subscriptions/{subscriptionId}/test",
+  "contract": "public-api",
+  "summary": "Send a signed test event to the endpoint, now",
+  "permission": "DEVELOPER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WebhookDelivery"
  }
 }

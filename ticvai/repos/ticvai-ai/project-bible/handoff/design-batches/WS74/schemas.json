@@ -726,6 +726,62 @@
    }
   }
  },
+ "SearchResult": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed",
+  "properties": {
+   "kind": {
+    "type": "string"
+   },
+   "id": {
+    "type": "string"
+   },
+   "title": {
+    "type": "string"
+   },
+   "excerpt": {
+    "type": "string"
+   },
+   "relevance": {
+    "type": "number"
+   },
+   "collectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For kind `media`, the asset (29 September, build; 23.1.6)."
+   },
+   "mediaType": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "image",
+     "video",
+     "audio",
+     "document"
+    ]
+   },
+   "matchedOn": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "title",
+     "description",
+     "tags",
+     "aiDescription"
+    ],
+    "description": "Which text the match came from, so a wrong hit can be traced to a wrong tag."
+   }
+  }
+ },
  "UploadTicket": {
   "x-ticvai-persistence": "assets.media_upload",
   "type": "object",

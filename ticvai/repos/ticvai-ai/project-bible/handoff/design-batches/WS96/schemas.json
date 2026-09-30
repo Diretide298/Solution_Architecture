@@ -128,6 +128,47 @@
    "low"
   ]
  },
+ "AssetHistoryEntry": {
+  "x-ticvai-persistence": "none — union view over work orders, inspections, incidents and asset status changes",
+  "type": "object",
+  "description": "**Every kind has a source.** `workOrder` is a work-order row, `inspection` an inspection, `incident` an incident, `statusChange` a `maintenance.asset_status_change` row. `partReplaced` is a completed work order whose `resolutionCode` is `partReplaced`, and `planCompleted` a completed work order with a `sourcePlanId` — both read from `maintenance.work_order`, not stored twice.\n",
+  "required": [
+   "kind",
+   "occurredAt",
+   "summary"
+  ],
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "workOrder",
+     "inspection",
+     "incident",
+     "statusChange",
+     "partReplaced",
+     "planCompleted"
+    ]
+   },
+   "referenceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The source row's id: a work order, inspection or incident, or an `asset_status_change` id. A uuid, as every id is (ADR-0056).\n"
+   },
+   "summary": {
+    "type": "string"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "AssetStatus": {
   "type": "string",
   "enum": [
@@ -169,7 +210,7 @@
      },
      "workOrderId": {
       "type": "string",
-      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "format": "uuid",
       "nullable": true
      }
     }
@@ -183,13 +224,12 @@
    "id",
    "title",
    "venueId",
-   "priority",
    "recordedAt"
   ],
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "title": {
     "type": "string",
@@ -220,7 +260,23 @@
     "default": "corrective"
    },
    "priority": {
-    "$ref": "#/components/schemas/WorkOrderPriority"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/WorkOrderPriority"
+     }
+    ],
+    "description": "**Optional since 29 September** (M17-01). Sent, it is `manual` and wins. Absent, the asset's `priorityOverride` applies, and failing that the venue's `WorkOrderPriorityPolicy` scores the fault.\n"
+   },
+   "faultAssessment": {
+    "$ref": "#/components/schemas/WorkOrderFaultAssessment"
+   },
+   "requiredQualificationCodes": {
+    "type": "array",
+    "maxItems": 10,
+    "items": {
+     "type": "string"
+    },
+    "description": "Skills the job needs, as qualification codes; `suggestWorkOrderAssignee` ranks by them (M17-13)."
    },
    "categoryId": {
     "type": "string",
@@ -300,7 +356,7 @@
    },
    "workOrderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    }
   }
@@ -319,7 +375,7 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "templateId": {
     "type": "string",
@@ -387,7 +443,7 @@
    },
    "inspectionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "templateItemId": {
     "type": "string",
@@ -467,7 +523,7 @@
       "type": "array",
       "items": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+       "format": "uuid"
       }
      },
      "productsSuspended": {
@@ -483,6 +539,71 @@
       "nullable": true
      }
     }
+   }
+  }
+ },
+ "InventoryStockReservation": {
+  "type": "object",
+  "x-ticvai-persistence": "inventory.stock_reservation",
+  "description": "**Taken from the backend workbook, 20 September.** Temporarily reserves stock for an order or operational requirement so it cannot be allocated elsewhere.",
+  "required": [
+   "itemId",
+   "locationId",
+   "quantity",
+   "sourceType",
+   "sourceId",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "itemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "quantity": {
+    "type": "number",
+    "exclusiveMinimum": 0
+   },
+   "sourceType": {
+    "$ref": "#/components/schemas/StockReservationSourceType"
+   },
+   "sourceId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The id of what the stock is reserved for: a work order, a rental agreement or an order. A uuid, as every id is (ADR-0056); it was text from 29 September to 30 September because a work order id was then 26-character text (M17-02)."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "consumed",
+     "released",
+     "expired"
+    ],
+    "readOnly": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "releasedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
    }
   }
  },
@@ -576,6 +697,35 @@
    }
   }
  },
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -627,7 +777,7 @@
    },
    "inspectionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "Required for return to service where the asset demands it."
    },
@@ -640,6 +790,17 @@
     "format": "date-time"
    }
   }
+ },
+ "StockReservationSourceType": {
+  "type": "string",
+  "enum": [
+   "workOrder",
+   "rentalAgreement",
+   "order",
+   "transfer",
+   "other"
+  ],
+  "description": "What a stock reservation is for (decided 17 September, M17-02; `rentalAgreement` is the existing use from `rental.agreement_item`)."
  },
  "SubmitInspectionRequest": {
   "x-ticvai-persistence": "maintenance.inspection + maintenance.inspection_item",
@@ -654,7 +815,7 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "templateId": {
     "type": "string",
@@ -708,6 +869,97 @@
     "format": "date-time"
    }
   }
+ },
+ "VendorServiceRequest": {
+  "x-ticvai-persistence": "maintenance.vendor_service_request",
+  "type": "object",
+  "description": "**An outside vendor engaged on a work order** (decided 17 September, M17-13). The supplier is an `inventory.supplier`.\n",
+  "required": [
+   "workOrderId",
+   "supplierId",
+   "scope"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "workOrderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "supplierId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scope": {
+    "type": "string",
+    "maxLength": 2000,
+    "description": "What the vendor is asked to do."
+   },
+   "status": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/VendorServiceRequestStatus"
+     }
+    ],
+    "default": "draft"
+   },
+   "vendorReference": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "quotedCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "finalCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "scheduledVisitAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "raisedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   }
+  }
+ },
+ "VendorServiceRequestStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "sent",
+   "accepted",
+   "scheduled",
+   "completed",
+   "cancelled"
+  ]
  },
  "WorkOrder": {
   "x-ticvai-persistence": "maintenance.work_order",
@@ -765,7 +1017,7 @@
    },
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "workOrderNumber": {
     "type": "string",
@@ -796,6 +1048,34 @@
    },
    "priority": {
     "$ref": "#/components/schemas/WorkOrderPriority"
+   },
+   "priorityScore": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The score the venue's policy gave the fault when raised; null when a person or the asset set the priority (M17-01)."
+   },
+   "prioritySource": {
+    "type": "string",
+    "enum": [
+     "scored",
+     "assetOverride",
+     "manual"
+    ],
+    "readOnly": true,
+    "description": "Where `priority` came from (M17-01). A change through `updateWorkOrder` makes it `manual`."
+   },
+   "faultAssessment": {
+    "$ref": "#/components/schemas/WorkOrderFaultAssessment"
+   },
+   "requiredQualificationCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Skills the job needs (M17-13)."
    },
    "kind": {
     "$ref": "#/components/schemas/WorkOrderKind"
@@ -855,12 +1135,12 @@
    },
    "sourceInspectionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "sourceIncidentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "createdAt": {
@@ -883,6 +1163,43 @@
    }
   }
  },
+ "WorkOrderAssigneeSuggestion": {
+  "x-ticvai-persistence": "none — computed on read",
+  "type": "object",
+  "required": [
+   "principalId",
+   "rank"
+  ],
+  "properties": {
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "rank": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "hasAllQualifications": {
+    "type": "boolean"
+   },
+   "missingQualificationCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "onShift": {
+    "type": "boolean",
+    "description": "On shift now or before the work order is due."
+   },
+   "openWorkOrderCount": {
+    "type": "integer"
+   }
+  }
+ },
  "WorkOrderAttachment": {
   "type": "object",
   "x-ticvai-persistence": "maintenance.work_order_attachment",
@@ -899,7 +1216,7 @@
    },
    "workOrderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "kind": {
     "type": "string",
@@ -1010,6 +1327,10 @@
         "quantity": {
          "type": "number"
         },
+        "reservedQuantity": {
+         "type": "number",
+         "description": "Still reserved for this work order and not yet issued (M17-02)."
+        },
         "cost": {
          "$ref": "../shared/common.yaml#/components/schemas/Money"
         }
@@ -1082,7 +1403,7 @@
      },
      "supersededByWorkOrderId": {
       "type": "string",
-      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "format": "uuid",
       "nullable": true,
       "description": "Set by `cancelWorkOrder` where the reason is `superseded`."
      },
@@ -1109,7 +1430,7 @@
      },
      "duplicateOfWorkOrderId": {
       "type": "string",
-      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "format": "uuid",
       "nullable": true,
       "description": "Set by `closeWorkOrder` where the outcome is `duplicate`."
      },
@@ -1126,6 +1447,26 @@
     }
    }
   ]
+ },
+ "WorkOrderFaultAssessment": {
+  "x-ticvai-persistence": "none — columns on maintenance.work_order",
+  "type": "object",
+  "description": "What the person raising a fault says about it, which the priority score reads (M17-01).",
+  "properties": {
+   "safetyRisk": {
+    "type": "boolean",
+    "default": false
+   },
+   "guestImpact": {
+    "type": "string",
+    "enum": [
+     "none",
+     "degraded",
+     "closed"
+    ],
+    "default": "none"
+   }
+  }
  },
  "WorkOrderKind": {
   "type": "string",
@@ -1146,6 +1487,92 @@
    "urgent",
    "emergency"
   ]
+ },
+ "WorkOrderPriorityPolicy": {
+  "x-ticvai-persistence": "maintenance.priority_scoring_model",
+  "type": "object",
+  "description": "**How a corrective fault's priority is scored** (decided 17 September, M17-01). One per venue. The score is 0 to 100: each weight times its factor, where safety is the fault's `faultAssessment.safetyRisk`, guest operations is `faultAssessment.guestImpact` (and whether the asset has a linked access point), revenue is whether the asset has linked products, and criticality is the asset's `criticality`. The band the score falls in is the priority. **An asset's `priorityOverride` wins over the score**, and a priority a person sets wins over both.\n",
+  "required": [
+   "weights",
+   "bands"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "weights": {
+    "type": "object",
+    "required": [
+     "safety",
+     "guestOperations",
+     "revenue",
+     "criticality"
+    ],
+    "properties": {
+     "safety": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "guestOperations": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "revenue": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "criticality": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     }
+    }
+   },
+   "bands": {
+    "type": "array",
+    "minItems": 1,
+    "maxItems": 5,
+    "description": "Highest first. A score at or above `minScore` takes `priority`.",
+    "items": {
+     "type": "object",
+     "required": [
+      "minScore",
+      "priority"
+     ],
+     "properties": {
+      "minScore": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 100
+      },
+      "priority": {
+       "$ref": "#/components/schemas/WorkOrderPriority"
+      }
+     }
+    }
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "nullable": true
+   }
+  }
  },
  "WorkOrderStatus": {
   "type": "string",

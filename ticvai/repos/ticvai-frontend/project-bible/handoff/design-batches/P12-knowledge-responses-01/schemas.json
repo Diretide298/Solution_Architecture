@@ -1,4 +1,91 @@
 {
+ "AiKnowledgeGap": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.knowledge_gap",
+  "description": "**A question the assistant could not answer**, grouped so the content owner gets a task, not a log (AIC-061, AIC-062). Also written for an analytics question outside the semantic model (design 5.7).",
+  "required": [
+   "question",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "question": {
+    "type": "string",
+    "description": "The normalised question."
+   },
+   "examples": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Up to ten phrasings as asked, with personal data masked."
+   },
+   "occurrences": {
+    "type": "integer",
+    "minimum": 1,
+    "readOnly": true
+   },
+   "audience": {
+    "type": "string",
+    "enum": [
+     "staff",
+     "guest"
+    ]
+   },
+   "locale": {
+    "type": "string",
+    "nullable": true
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "knowledge",
+     "analytics"
+    ]
+   },
+   "suggestedCollectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.knowledge_collection"
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "assigned",
+     "answered",
+     "dismissed"
+    ]
+   },
+   "resolvedDocumentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.knowledge_document"
+   },
+   "lastAskedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
  "FaqCategory": {
   "x-ticvai-persistence": "whitelabel.faq_category + whitelabel.faq_entry",
   "type": "object",
@@ -48,6 +135,7 @@
    },
    "scopePath": {
     "type": "string",
+    "readOnly": true,
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
    }
   }
@@ -164,6 +252,7 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -210,6 +299,21 @@
     "type": "string",
     "nullable": true,
     "description": "Required for WhatsApp, where templates are pre-approved by the provider."
+   },
+   "brandId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The brand whose identity the template carries; null for the tenant default."
+   },
+   "ownership": {
+    "type": "string",
+    "enum": [
+     "platform",
+     "crm"
+    ],
+    "default": "crm",
+    "description": "`platform` = a transactional template owned by the communication service; `crm` = a marketing template owned by CRM (`listSystemTransactionalTemplate`). Content by language and version is in `MessageTemplateVersion`. (decided 29 September, data model for the agreed operations)"
    }
   }
  },

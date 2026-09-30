@@ -1,6 +1,6 @@
 # WS15 — Approval Workflows and Governance board 3
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 5 operations · 8 schemas · 2 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 2 permissions apply here:
+  `APPROVAL_CONFIGURE, APPROVAL_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-329` | Approval Matrix Command Center | commandCentre | 0 | 0 | — |
-| `ADM-330` | Approval Authority Matrix | configEditor | 0 | 0 | — |
-| `ADM-331` | Organizational Hierarchy Routing | listDetail | 0 | 0 | — |
-| `ADM-332` | Department-Based Approval Matrix | configEditor | 0 | 0 | — |
-| `ADM-333` | Venue & Tenant Approval Matrix | listDetail | 0 | 0 | — |
-| `ADM-334` | Value & Threshold Routing | listDetail | 0 | 0 | — |
-| `ADM-335` | Risk-Based & Conditional Routing | listDetail | 0 | 0 | — |
-| `ADM-336` | Approver Group & Decision Policy | listDetail | 0 | 0 | — |
-| `ADM-337` | Routing Simulator & Conflict Detection | listDetail | 0 | 0 | — |
-| `ADM-338` | AI Routing Advisor & Matrix Optimization | listDetail | 0 | 0 | — |
+| `ADM-329` | Approval Matrix Command Center | commandCentre | 1 | 0 | — |
+| `ADM-330` | Approval Authority Matrix | configEditor | 1 | 0 | — |
+| `ADM-331` | Organizational Hierarchy Routing | listDetail | 1 | 0 | — |
+| `ADM-332` | Department-Based Approval Matrix | configEditor | 1 | 0 | — |
+| `ADM-333` | Venue & Tenant Approval Matrix | listDetail | 1 | 0 | — |
+| `ADM-334` | Value & Threshold Routing | listDetail | 1 | 0 | — |
+| `ADM-335` | Risk-Based & Conditional Routing | listDetail | 1 | 0 | — |
+| `ADM-336` | Approver Group & Decision Policy | listDetail | 1 | 0 | — |
+| `ADM-337` | Routing Simulator & Conflict Detection | listDetail | 2 | 0 | — |
+| `ADM-338` | AI Routing Advisor & Matrix Optimization | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 

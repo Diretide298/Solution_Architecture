@@ -160,7 +160,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: getStockTransfer
       x-ticvai-consumed-by:
@@ -206,7 +206,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     put:
       operationId: updateRequisitionLines
       x-ticvai-consumed-by:
@@ -1213,7 +1213,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: submitCountLines
       x-ticvai-consumed-by:
@@ -1296,7 +1296,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: getCountVariance
       x-ticvai-consumed-by:
@@ -1350,7 +1350,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: cancelStockCount
       x-ticvai-consumed-by:
@@ -1405,7 +1405,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: recountStockCount
       x-ticvai-consumed-by:
@@ -1479,7 +1479,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: postStockCount
       x-ticvai-consumed-by:
@@ -1627,7 +1627,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: closeTransferShort
       x-ticvai-consumed-by:
@@ -1704,7 +1704,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: receiveStockTransfer
       x-ticvai-consumed-by:
@@ -1903,7 +1903,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: rejectRequisition
       x-ticvai-consumed-by:
@@ -1958,7 +1958,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: returnRequisition
       x-ticvai-consumed-by:
@@ -2013,7 +2013,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: cancelRequisition
       x-ticvai-consumed-by:
@@ -2067,7 +2067,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: approveRequisition
       x-ticvai-consumed-by:
@@ -2274,7 +2274,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: compareQuotations
       x-ticvai-consumed-by:
@@ -2410,7 +2410,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: getPurchaseOrder
       x-ticvai-consumed-by:
@@ -2442,7 +2442,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: sendPurchaseOrder
       x-ticvai-consumed-by:
@@ -2486,7 +2486,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: acknowledgePurchaseOrder
       x-ticvai-consumed-by:
@@ -2542,7 +2542,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: closePurchaseOrderShort
       x-ticvai-consumed-by:
@@ -2616,7 +2616,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: cancelPurchaseOrder
       x-ticvai-consumed-by:
@@ -2705,7 +2705,7 @@ paths:
         in: query
         schema:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -2779,7 +2779,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: rejectReceivedGoods
       x-ticvai-consumed-by:
@@ -2827,7 +2827,7 @@ paths:
                     properties:
                       lineId:
                         type: string
-                        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                        format: uuid
                         description: '`GoodsReceipt.lines[].lineId`, the batch or expiry line rejected
                           (audit R171).
 
@@ -3417,9 +3417,10 @@ components:
           $ref: '#/components/schemas/StockReservationSourceType'
         sourceId:
           type: string
-          maxLength: 64
-          description: 'The id of what the stock is reserved for: a work order id (a ULID), a rental agreement
-            or an order (a uuid). Text since 29 September because a work order id is not a uuid (M17-02).'
+          format: uuid
+          description: 'The id of what the stock is reserved for: a work order, a rental agreement or
+            an order. A uuid, as every id is (ADR-0056); it was text from 29 September to 30 September
+            because a work order id was then 26-character text (M17-02).'
         status:
           type: string
           enum:
@@ -3548,7 +3549,7 @@ components:
           format: uuid
         countId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         itemId:
           type: string
           format: uuid
@@ -3975,7 +3976,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         itemId:
           type: string
           format: uuid
@@ -4058,7 +4059,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         locationId:
           type: string
           format: uuid
@@ -4098,7 +4099,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         locationId:
           type: string
           format: uuid
@@ -4163,7 +4164,7 @@ components:
       properties:
         countId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         totalVarianceValue:
           $ref: ../shared/common.yaml#/components/schemas/Money
         exceptionCount:
@@ -4226,7 +4227,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         fromLocationId:
           type: string
           format: uuid
@@ -4269,7 +4270,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         transferNumber:
           type: string
         fromLocationId:
@@ -4374,7 +4375,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         venueId:
           type: string
           format: uuid
@@ -4424,7 +4425,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         requisitionNumber:
           type: string
         venueId:
@@ -4648,7 +4649,7 @@ components:
       properties:
         requisitionId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         reference:
           type: string
           maxLength: 128
@@ -4721,7 +4722,7 @@ components:
       properties:
         requisitionId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         quotations:
           type: array
           items:
@@ -4780,10 +4781,10 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         requisitionId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         supplierId:
           type: string
           format: uuid
@@ -4842,7 +4843,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         purchaseOrderNumber:
           type: string
           readOnly: true
@@ -4853,7 +4854,7 @@ components:
             '
         requisitionId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: Null on a blanket order or an RFQ award, which are raised without one.
         quotationId:
@@ -4882,7 +4883,7 @@ components:
             '
         blanketParentId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: The blanket order this release draws against — another purchase order, so
             the same id type.
@@ -5038,10 +5039,10 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         purchaseOrderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         locationId:
           type: string
           format: uuid
@@ -5092,7 +5093,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         receiptNumber:
           type: string
           readOnly: true
@@ -5104,7 +5105,7 @@ components:
             '
         purchaseOrderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         locationId:
           type: string
           format: uuid
@@ -5118,7 +5119,7 @@ components:
             properties:
               lineId:
                 type: string
-                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                format: uuid
                 readOnly: true
                 description: 'One batch or expiry line of the receipt. What `rejectReceivedGoods` addresses
                   (decided 28 September, audit R171).

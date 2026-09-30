@@ -15,7 +15,7 @@ emittedBy:
 - payments.receivePaymentProviderWebhook
 payload:
 - field: orderId
-  type: string
+  type: uuid
 - field: venueId
   type: uuid
 - field: subjectId

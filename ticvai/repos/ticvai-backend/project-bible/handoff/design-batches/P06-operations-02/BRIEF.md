@@ -1,6 +1,6 @@
 # P06-operations-02 — P06 · Operations (2 of 5)
 
-**10 screens · 36 operations · 42 schemas · 19 permissions**
+**10 screens · 37 operations · 55 schemas · 19 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -61,13 +61,13 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `EMP-014` | Ticket lookup | listDetail | 14 | 1 | — |
-| `EMP-015` | Group scan | listDetail | 7 | 1 | — |
-| `EMP-017` | Sync & reconciliation | listDetail | 9 | 1 | — |
-| `EMP-018` | Offline package | listDetail | 3 | 0 | — |
-| `EMP-019` | AI assistant — home | listDetail | 3 | 0 | — |
-| `EMP-020` | AI assistant — answer | listDetail | 3 | 0 | — |
-| `EMP-021` | Roster | listDetail | 2 | 0 | — |
-| `EMP-022` | My rota | listDetail | 3 | 0 | — |
-| `EMP-023` | Swap request | listDetail | 3 | 0 | — |
-| `EMP-024` | Clock in / out | listDetail | 3 | 0 | — |
+| `EMP-014` | Ticket lookup | listDetail | 14 | 9 | — |
+| `EMP-015` | Group scan | listDetail | 7 | 4 | — |
+| `EMP-017` | Sync & reconciliation | listDetail | 9 | 5 | — |
+| `EMP-018` | Offline package | listDetail | 3 | 1 | — |
+| `EMP-019` | AI assistant — home | listDetail | 3 | 2 | — |
+| `EMP-020` | AI assistant — answer | listDetail | 4 | 2 | — |
+| `EMP-021` | Roster | listDetail | 2 | 1 | — |
+| `EMP-022` | My rota | listDetail | 3 | 1 | — |
+| `EMP-023` | Swap request | listDetail | 3 | 1 | — |
+| `EMP-024` | Clock in / out | listDetail | 3 | 2 | — |

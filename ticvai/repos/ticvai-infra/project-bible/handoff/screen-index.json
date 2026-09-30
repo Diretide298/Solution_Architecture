@@ -307,7 +307,7 @@
    {
     "to": "WEB-050",
     "trigger": "Plan your visit (header)",
-    "provenance": "decided 29 September 2026 (P29), MOB-6; web build Plan your visit"
+    "provenance": "decided 29 September 2026, MOB-6; web build Plan your visit"
    },
    {
     "to": "WEB-004",
@@ -706,7 +706,7 @@
     "carries": [
      "productId"
     ],
-    "provenance": "decided 29 September 2026 (P29), W8"
+    "provenance": "decided 29 September 2026, W8"
    }
   ],
   "machine": null,
@@ -1491,7 +1491,7 @@
    {
     "to": "WEB-012",
     "trigger": "Guest code proved or signed in: straight to payment (details skipped)",
-    "provenance": "decided 29 September 2026 (P29), W1",
+    "provenance": "decided 29 September 2026, W1",
     "carries": [
      "orderId",
      "paymentId"
@@ -1749,7 +1749,7 @@
    {
     "to": "WEB-012",
     "trigger": "Skipped: nothing to ask (guest code proved, or signed in, and no attendee forms)",
-    "provenance": "decided 29 September 2026 (P29), W1"
+    "provenance": "decided 29 September 2026, W1"
    },
    {
     "to": "WEB-010",
@@ -5929,7 +5929,6 @@
    "ai.capability",
    "ai.capability_maturity",
    "ai.chunk_embedding",
-   "ai.chunk_ref",
    "ai.conversation",
    "ai.forecast_point",
    "ai.forecast_version",
@@ -6629,7 +6628,7 @@
       "note": "Names it and offers a swap; the rest of the plan is kept."
      }
     ],
-    "provenance": "decided 29 September 2026 (P29), MOB-6; web build: Book this plan goes straight into booking"
+    "provenance": "decided 29 September 2026, MOB-6; web build: Book this plan goes straight into booking"
    },
    {
     "to": "WEB-004",
@@ -6637,12 +6636,12 @@
     "carries": [
      "productId"
     ],
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "to": "WEB-001",
     "trigger": "Back to tickets",
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    }
   ],
   "machine": null,
@@ -7223,12 +7222,12 @@
     "carries": [
      "productId"
     ],
-    "provenance": "decided 29 September 2026 (P29), MOB-3, MOB-4"
+    "provenance": "decided 29 September 2026, MOB-3, MOB-4"
    },
    {
     "to": "GST-051",
     "trigger": "Plan tab",
-    "provenance": "decided 29 September 2026 (P29), MOB-1, MOB-6"
+    "provenance": "decided 29 September 2026, MOB-1, MOB-6"
    }
   ],
   "machine": null,
@@ -7256,7 +7255,7 @@
       "the rest of the video"
      ]
     },
-    "provenance": "decided 29 September 2026 (P29), MOB-5; mobile v4 prototype, launch screen"
+    "provenance": "decided 29 September 2026, MOB-5; mobile v4 prototype, launch screen"
    }
   ]
  },
@@ -7324,7 +7323,7 @@
    {
     "to": "GST-063",
     "trigger": "Searches (results in place)",
-    "provenance": "decided 29 September 2026 (P29), MOB-1"
+    "provenance": "decided 29 September 2026, MOB-1"
    }
   ],
   "machine": null,
@@ -7416,7 +7415,7 @@
     "carries": [
      "productId"
     ],
-    "provenance": "decided 29 September 2026 (P29), MOB-2"
+    "provenance": "decided 29 September 2026, MOB-2"
    },
    {
     "to": "GST-008",
@@ -7424,7 +7423,7 @@
     "carries": [
      "productId"
     ],
-    "provenance": "decided 29 September 2026 (P29), MOB-2, W8"
+    "provenance": "decided 29 September 2026, MOB-2, W8"
    },
    {
     "to": "GST-074",
@@ -7432,7 +7431,7 @@
     "carries": [
      "productId"
     ],
-    "provenance": "decided 29 September 2026 (P29), MOB-2, W6"
+    "provenance": "decided 29 September 2026, MOB-2, W6"
    },
    {
     "to": "GST-075",
@@ -7440,12 +7439,12 @@
     "carries": [
      "productId"
     ],
-    "provenance": "decided 29 September 2026 (P29), MOB-2, W9"
+    "provenance": "decided 29 September 2026, MOB-2, W9"
    },
    {
     "to": "GST-056",
     "trigger": "Book a bundle (e.g. meal combo with admission)",
-    "provenance": "decided 29 September 2026 (P29), MOB-2, MOB-4"
+    "provenance": "decided 29 September 2026, MOB-2, MOB-4"
    },
    {
     "to": "BO-005",
@@ -7598,12 +7597,12 @@
     "carries": [
      "bundleId"
     ],
-    "provenance": "decided 29 September 2026 (P29), MOB-4"
+    "provenance": "decided 29 September 2026, MOB-4"
    },
    {
     "to": "GST-038",
     "trigger": "Show on the map (At the Venue, Map view)",
-    "provenance": "decided 29 September 2026 (P29), MOB-4"
+    "provenance": "decided 29 September 2026, MOB-4"
    }
   ],
   "machine": null,
@@ -7739,7 +7738,7 @@
     "carries": [
      "productId"
     ],
-    "provenance": "decided 29 September 2026 (P29), MOB-4, W12"
+    "provenance": "decided 29 September 2026, MOB-4, W12"
    }
   ],
   "machine": null,
@@ -7857,7 +7856,7 @@
     "carries": [
      "performanceId"
     ],
-    "provenance": "decided 29 September 2026 (P29), W8"
+    "provenance": "decided 29 September 2026, W8"
    }
   ],
   "machine": null,
@@ -8034,7 +8033,7 @@
     "carries": [
      "productId"
     ],
-    "provenance": "decided 29 September 2026 (P29), W8"
+    "provenance": "decided 29 September 2026, W8"
    }
   ],
   "machine": null,
@@ -10475,7 +10474,6 @@
    "ai.capability",
    "ai.capability_maturity",
    "ai.chunk_embedding",
-   "ai.chunk_ref",
    "ai.conversation",
    "ai.forecast_point",
    "ai.forecast_version",
@@ -10676,7 +10674,6 @@
    "ai.assistant_profile",
    "ai.capability",
    "ai.chunk_embedding",
-   "ai.chunk_ref",
    "ai.conversation",
    "ai.knowledge_document",
    "ai.message",
@@ -10923,7 +10920,6 @@
    "ai.assistant_profile",
    "ai.capability",
    "ai.chunk_embedding",
-   "ai.chunk_ref",
    "ai.conversation",
    "ai.knowledge_document",
    "ai.message",
@@ -11354,32 +11350,32 @@
    {
     "to": "GST-021",
     "trigger": "Map view",
-    "provenance": "decided 29 September 2026 (P29), MOB-1"
+    "provenance": "decided 29 September 2026, MOB-1"
    },
    {
     "to": "GST-022",
     "trigger": "Waits view",
-    "provenance": "decided 29 September 2026 (P29), MOB-1"
+    "provenance": "decided 29 September 2026, MOB-1"
    },
    {
     "to": "GST-024",
     "trigger": "Food",
-    "provenance": "decided 29 September 2026 (P29), MOB-1"
+    "provenance": "decided 29 September 2026, MOB-1"
    },
    {
     "to": "GST-026",
     "trigger": "Shop",
-    "provenance": "decided 29 September 2026 (P29), MOB-1"
+    "provenance": "decided 29 September 2026, MOB-1"
    },
    {
     "to": "GST-029",
     "trigger": "Services",
-    "provenance": "decided 29 September 2026 (P29), MOB-1"
+    "provenance": "decided 29 September 2026, MOB-1"
    },
    {
     "to": "GST-023",
     "trigger": "Join a virtual queue",
-    "provenance": "decided 29 September 2026 (P29), MOB-1"
+    "provenance": "decided 29 September 2026, MOB-1"
    }
   ],
   "machine": null,
@@ -12766,17 +12762,17 @@
       "note": "Says which answer ruled everything out."
      }
     ],
-    "provenance": "decided 29 September 2026 (P29), MOB-6; v4 prototype plan \u2192 planResult"
+    "provenance": "decided 29 September 2026, MOB-6; v4 prototype plan \u2192 planResult"
    },
    {
     "to": "GST-052",
     "trigger": "Take a ready-made plan",
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "to": "GST-001",
     "trigger": "Home tab",
-    "provenance": "decided 29 September 2026 (P29), MOB-1"
+    "provenance": "decided 29 September 2026, MOB-1"
    }
   ],
   "machine": null,
@@ -12854,17 +12850,17 @@
     "carries": [
      "planId"
     ],
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "to": "GST-051",
     "trigger": "Make my own",
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "to": "GST-001",
     "trigger": "Home tab",
-    "provenance": "decided 29 September 2026 (P29), MOB-1"
+    "provenance": "decided 29 September 2026, MOB-1"
    }
   ],
   "machine": null,
@@ -12970,7 +12966,7 @@
       "note": "Names it and offers a swap; the rest of the plan is kept."
      }
     ],
-    "provenance": "decided 29 September 2026 (P29), MOB-6; v4 prototype Book this plan"
+    "provenance": "decided 29 September 2026, MOB-6; v4 prototype Book this plan"
    },
    {
     "to": "GST-054",
@@ -12978,12 +12974,12 @@
     "carries": [
      "planId"
     ],
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "to": "GST-051",
     "trigger": "Change answers",
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "to": "GST-048",
@@ -12991,7 +12987,7 @@
     "carries": [
      "cartId"
     ],
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "to": "GST-059",
@@ -12999,12 +12995,12 @@
     "carries": [
      "planId"
     ],
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "to": "GST-001",
     "trigger": "Home tab",
-    "provenance": "decided 29 September 2026 (P29), MOB-1"
+    "provenance": "decided 29 September 2026, MOB-1"
    }
   ],
   "machine": null,
@@ -13048,7 +13044,6 @@
    "ai.capability",
    "ai.capability_maturity",
    "ai.chunk_embedding",
-   "ai.chunk_ref",
    "ai.conversation",
    "ai.forecast_point",
    "ai.forecast_version",
@@ -13117,7 +13112,7 @@
     "carries": [
      "planId"
     ],
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "to": "GST-059",
@@ -13125,18 +13120,18 @@
     "carries": [
      "planId"
     ],
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "to": "GST-001",
     "trigger": "Home tab",
-    "provenance": "decided 29 September 2026 (P29), MOB-1"
+    "provenance": "decided 29 September 2026, MOB-1"
    }
   ],
   "machine": {
    "key": "plannerMode",
    "initial": "rulesPlan",
-   "provenance": "decided 29 September 2026 (P29), MOB-6; BRIEF decision 1: the rules planner with the AI planner agent on top",
+   "provenance": "decided 29 September 2026, MOB-6; BRIEF decision 1: the rules planner with the AI planner agent on top",
    "states": {
     "rulesPlan": {
      "operation": "getVisitPlan",
@@ -13359,7 +13354,7 @@
     "carries": [
      "cartId"
     ],
-    "provenance": "decided 29 September 2026 (P29), MOB-4"
+    "provenance": "decided 29 September 2026, MOB-4"
    }
   ],
   "machine": null,
@@ -13587,17 +13582,17 @@
     "carries": [
      "planId"
     ],
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "to": "GST-038",
     "trigger": "Directions (At the Venue, Map)",
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "to": "GST-001",
     "trigger": "Home tab",
-    "provenance": "decided 29 September 2026 (P29), MOB-1"
+    "provenance": "decided 29 September 2026, MOB-1"
    }
   ],
   "machine": null,
@@ -13795,7 +13790,7 @@
    {
     "to": "GST-002",
     "trigger": "Clears the search",
-    "provenance": "decided 29 September 2026 (P29), MOB-1"
+    "provenance": "decided 29 September 2026, MOB-1"
    },
    {
     "to": "GST-004",
@@ -13803,7 +13798,7 @@
     "carries": [
      "productId"
     ],
-    "provenance": "decided 29 September 2026 (P29), MOB-1, MOB-4"
+    "provenance": "decided 29 September 2026, MOB-1, MOB-4"
    }
   ],
   "machine": null,
@@ -22922,7 +22917,6 @@
    "ai.assistant_profile",
    "ai.capability",
    "ai.chunk_embedding",
-   "ai.chunk_ref",
    "ai.conversation",
    "ai.knowledge_document",
    "ai.message",
@@ -26398,7 +26392,6 @@
    "ai.assistant_profile",
    "ai.capability",
    "ai.chunk_embedding",
-   "ai.chunk_ref",
    "ai.conversation",
    "ai.knowledge_document",
    "ai.message",
@@ -26534,7 +26527,6 @@
    "ai.assistant_profile",
    "ai.capability",
    "ai.chunk_embedding",
-   "ai.chunk_ref",
    "ai.conversation",
    "ai.knowledge_document",
    "ai.message",
@@ -29636,7 +29628,6 @@
   ],
   "reads": [
    "ai.chunk_embedding",
-   "ai.chunk_ref",
    "ai.knowledge_collection",
    "ai.knowledge_document",
    "assets.media_asset",
@@ -29716,7 +29707,6 @@
   ],
   "reads": [
    "ai.chunk_embedding",
-   "ai.chunk_ref",
    "ai.knowledge_collection",
    "ai.knowledge_document",
    "assets.media_asset",
@@ -55157,7 +55147,6 @@
   "reads": [
    "ai.capability_maturity",
    "ai.chunk_embedding",
-   "ai.chunk_ref",
    "ai.forecast_point",
    "ai.forecast_version",
    "ai.history_observation",
@@ -87662,7 +87651,6 @@
    "ai.action_plan",
    "ai.action_step",
    "ai.chunk_embedding",
-   "ai.chunk_ref",
    "ai.knowledge_document",
    "ai.policy",
    "ai.provider",
@@ -87749,7 +87737,6 @@
    "ai.action_plan",
    "ai.action_step",
    "ai.chunk_embedding",
-   "ai.chunk_ref",
    "ai.knowledge_document",
    "ai.policy",
    "ai.provider",
@@ -108511,7 +108498,6 @@
    "ai.assistant_profile",
    "ai.capability",
    "ai.chunk_embedding",
-   "ai.chunk_ref",
    "ai.conversation",
    "ai.knowledge_document",
    "ai.message",
@@ -108589,7 +108575,6 @@
    "ai.assistant_profile",
    "ai.capability",
    "ai.chunk_embedding",
-   "ai.chunk_ref",
    "ai.conversation",
    "ai.knowledge_document",
    "ai.message",
@@ -108775,7 +108760,6 @@
    "ai.assistant_profile",
    "ai.capability",
    "ai.chunk_embedding",
-   "ai.chunk_ref",
    "ai.conversation",
    "ai.knowledge_document",
    "ai.message",
@@ -126501,7 +126485,7 @@
     "id": "formOpenPlatformStaffGrant",
     "component": "modal",
     "trigger": "Open access grant",
-    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only \u2014 the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client UUIDv7), `permissions` (tenant permissions only \u2014 the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Open access grant",
      "operation": "openPlatformStaffGrant"
@@ -128160,7 +128144,7 @@
       "credentialTtlDays"
      ]
     },
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "id": "formSetApiAnomalyRule",
@@ -128185,7 +128169,7 @@
       "isActive"
      ]
     },
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ]
  },
@@ -128286,7 +128270,7 @@
     "id": "formOpenPlatformStaffGrant",
     "component": "modal",
     "trigger": "Open access grant",
-    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only \u2014 the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client UUIDv7), `permissions` (tenant permissions only \u2014 the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Open access grant",
      "operation": "openPlatformStaffGrant"
@@ -128492,7 +128476,7 @@
     "id": "formOpenPlatformStaffGrant",
     "component": "modal",
     "trigger": "Open access grant",
-    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only \u2014 the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client UUIDv7), `permissions` (tenant permissions only \u2014 the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Open access grant",
      "operation": "openPlatformStaffGrant"
@@ -128608,7 +128592,7 @@
     "id": "formOpenPlatformStaffGrant",
     "component": "modal",
     "trigger": "Open access grant",
-    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only \u2014 the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client UUIDv7), `permissions` (tenant permissions only \u2014 the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Open access grant",
      "operation": "openPlatformStaffGrant"
@@ -128759,7 +128743,7 @@
     "id": "formOpenPlatformStaffGrant",
     "component": "modal",
     "trigger": "Open access grant",
-    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only \u2014 the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client UUIDv7), `permissions` (tenant permissions only \u2014 the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Open access grant",
      "operation": "openPlatformStaffGrant"
@@ -130240,7 +130224,7 @@
     "id": "formOpenPlatformStaffGrant",
     "component": "modal",
     "trigger": "Open access grant",
-    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only \u2014 the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client UUIDv7), `permissions` (tenant permissions only \u2014 the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Open access grant",
      "operation": "openPlatformStaffGrant"
@@ -131003,7 +130987,7 @@
     "id": "formOpenPlatformStaffGrant",
     "component": "modal",
     "trigger": "Open access grant",
-    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only; `AI_CONFIGURE` and `SCOPE_VIEW` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client UUIDv7), `permissions` (tenant permissions only; `AI_CONFIGURE` and `SCOPE_VIEW` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Open access grant",
      "operation": "openPlatformStaffGrant"
@@ -155593,7 +155577,7 @@
     "id": "formOpenPlatformStaffGrant",
     "component": "modal",
     "trigger": "Open access grant",
-    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only \u2014 the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client UUIDv7), `permissions` (tenant permissions only \u2014 the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Open access grant",
      "operation": "openPlatformStaffGrant"
@@ -156169,7 +156153,7 @@
     "id": "formOpenPlatformStaffGrant",
     "component": "modal",
     "trigger": "Open access grant",
-    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only \u2014 the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client UUIDv7), `permissions` (tenant permissions only \u2014 the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Open access grant",
      "operation": "openPlatformStaffGrant"
@@ -159391,7 +159375,7 @@
       "staffProductivity"
      ]
     },
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ]
  },
@@ -161941,7 +161925,7 @@
     "component": "confirmDialog",
     "trigger": "Revoke AI policy exception",
     "body": "**Names the exception and what the capability falls back to** once it is revoked: the stricter policy applies at once to every scope the exception covered.",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ]
  },
@@ -162290,7 +162274,7 @@
       "thresholds"
      ]
     },
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ]
  },
@@ -162463,7 +162447,6 @@
    "ai.assistant_profile",
    "ai.capability",
    "ai.chunk_embedding",
-   "ai.chunk_ref",
    "ai.conversation",
    "ai.decision_record",
    "ai.intervention",
@@ -162670,14 +162653,14 @@
     "component": "confirmDialog",
     "trigger": "Cancel plan",
     "body": "**Names the plan, the steps already executed and what stays applied**: cancelling stops the remaining steps; it does not undo the executed ones (that is Roll back).",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "id": "confirmRollbackActionPlan",
     "component": "confirmDialog",
     "trigger": "Roll back",
     "body": "**Names each executed step and its compensation**, and that the rollback plan goes for approval before it runs.",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ]
  },
@@ -179940,7 +179923,7 @@
    "redis"
   ],
   "reads": [
-   "ai.chunk_ref",
+   "ai.chunk_embedding",
    "ai.knowledge_collection",
    "ai.knowledge_gap",
    "qdrant:knowledge",
@@ -183015,7 +182998,6 @@
    "access.entitlement",
    "access.scan_event",
    "ai.chunk_embedding",
-   "ai.chunk_ref",
    "ai.knowledge_collection",
    "ai.knowledge_document",
    "assets.media_asset",
@@ -186760,7 +186742,6 @@
   ],
   "reads": [
    "ai.chunk_embedding",
-   "ai.chunk_ref",
    "ai.knowledge_collection",
    "ai.knowledge_document",
    "assets.media_asset",
@@ -189647,7 +189628,6 @@
    "ai.assistant_profile",
    "ai.capability",
    "ai.chunk_embedding",
-   "ai.chunk_ref",
    "ai.conversation",
    "ai.knowledge_document",
    "ai.message",
@@ -190041,7 +190021,7 @@
       "note"
      ]
     },
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ]
  },
@@ -190159,7 +190139,7 @@
       "note"
      ]
     },
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ]
  },
@@ -190566,7 +190546,7 @@
       "credentialTtlDays"
      ]
     },
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "id": "formSetApiAnomalyRule",
@@ -190591,7 +190571,7 @@
       "isActive"
      ]
     },
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ]
  },
@@ -193101,7 +193081,7 @@
    {
     "to": "ANL-071",
     "trigger": "AI maturity",
-    "provenance": "29 September pass (P29 group A) \u2014 the stage badge links to the maturity page"
+    "provenance": "29 September pass (group A) \u2014 the stage badge links to the maturity page"
    }
   ],
   "machine": null,
@@ -197047,7 +197027,7 @@
     "to": "ANL-010",
     "trigger": "Suggestions & Advice",
     "back": true,
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "machine": null,
@@ -197084,7 +197064,7 @@
       "staffProductivity"
      ]
     },
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "id": "formImportVenueHistory",
@@ -197105,7 +197085,7 @@
       "dryRun"
      ]
     },
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ]
  },

@@ -1,0 +1,1145 @@
+{
+ "date": "30 September 2026",
+ "linkTypes": {
+  "api": {
+   "label": "Real-time API call (HTTPS)",
+   "color": "#F2A900",
+   "dash": null
+  },
+  "direct": {
+   "label": "Real-time direct call (database, cache)",
+   "color": "#D62828",
+   "dash": null
+  },
+  "event": {
+   "label": "Event through the broker",
+   "color": "#7B2CBF",
+   "dash": null
+  },
+  "batch": {
+   "label": "Batch process",
+   "color": "#111111",
+   "dash": "8,5"
+  },
+  "sync": {
+   "label": "Near-real-time sync (offline-first)",
+   "color": "#F2A900",
+   "dash": "8,5"
+  },
+  "internet": {
+   "label": "Internet (TLS) / VPN",
+   "color": "#2F80ED",
+   "dash": null
+  },
+  "wireless": {
+   "label": "4G / Wi-Fi",
+   "color": "#2E9E44",
+   "dash": null
+  },
+  "lan": {
+   "label": "Venue local network",
+   "color": "#2E9E44",
+   "dash": "3,4"
+  },
+  "repl": {
+   "label": "Replication",
+   "color": "#D62828",
+   "dash": "8,5"
+  }
+ },
+ "hld": {
+  "zones": [
+   {
+    "label": "TICVAI AZURE CLOUD - UAE North (one cell per region)",
+    "x": 40,
+    "y": 20,
+    "w": 1160,
+    "h": 680,
+    "fill": "#FFF3CC",
+    "stroke": "#333333"
+   },
+   {
+    "label": "VENUE SITE (each venue)",
+    "x": 40,
+    "y": 730,
+    "w": 1160,
+    "h": 250,
+    "fill": "#DCE6F5",
+    "stroke": "#333333"
+   },
+   {
+    "label": "ONSITE SALES",
+    "x": 70,
+    "y": 780,
+    "w": 440,
+    "h": 180,
+    "fill": "#F7CFB5",
+    "stroke": "#333333"
+   },
+   {
+    "label": "ACCESS CONTROL",
+    "x": 780,
+    "y": 780,
+    "w": 300,
+    "h": 180,
+    "fill": "#F7CFB5",
+    "stroke": "#333333"
+   }
+  ],
+  "nodes": [
+   {
+    "id": "replica",
+    "label": "Read replicas",
+    "sub": "x2, zone-redundant",
+    "x": 70,
+    "y": 110,
+    "w": 150,
+    "h": 70
+   },
+   {
+    "id": "blob",
+    "label": "Blob storage",
+    "sub": "media, exports, backups",
+    "x": 70,
+    "y": 510,
+    "w": 150,
+    "h": 70
+   },
+   {
+    "id": "pg",
+    "label": "PostgreSQL 16",
+    "sub": "control DB + one DB per tenant",
+    "x": 270,
+    "y": 110,
+    "w": 180,
+    "h": 70
+   },
+   {
+    "id": "rpt",
+    "label": "Reporting replica",
+    "sub": "lag-tolerant, no writes",
+    "x": 270,
+    "y": 210,
+    "w": 180,
+    "h": 70
+   },
+   {
+    "id": "redis",
+    "label": "Redis",
+    "sub": "sessions, idempotency, cache",
+    "x": 270,
+    "y": 310,
+    "w": 180,
+    "h": 70
+   },
+   {
+    "id": "broker",
+    "label": "Event broker",
+    "sub": "RabbitMQ or Kafka (client)",
+    "x": 270,
+    "y": 410,
+    "w": 180,
+    "h": 70
+   },
+   {
+    "id": "workers",
+    "label": "workers",
+    "sub": "outbox relay, consumers, jobs",
+    "x": 270,
+    "y": 510,
+    "w": 180,
+    "h": 70
+   },
+   {
+    "id": "commerce",
+    "label": "commerce",
+    "sub": "sale path",
+    "x": 540,
+    "y": 110,
+    "w": 160,
+    "h": 70
+   },
+   {
+    "id": "operations",
+    "label": "operations",
+    "sub": "back office, engagement",
+    "x": 540,
+    "y": 210,
+    "w": 160,
+    "h": 70
+   },
+   {
+    "id": "ai",
+    "label": "ticvai-ai",
+    "sub": "AI engine (Python)",
+    "x": 540,
+    "y": 330,
+    "w": 160,
+    "h": 70
+   },
+   {
+    "id": "access",
+    "label": "access",
+    "sub": "gate hot path",
+    "x": 540,
+    "y": 510,
+    "w": 160,
+    "h": 70
+   },
+   {
+    "id": "waf",
+    "label": "Front Door + WAF",
+    "sub": "one entry, origin in UAE",
+    "x": 780,
+    "y": 60,
+    "w": 170,
+    "h": 60
+   },
+   {
+    "id": "qdrant",
+    "label": "Qdrant",
+    "sub": "one collection per tenant",
+    "x": 780,
+    "y": 300,
+    "w": 150,
+    "h": 70
+   },
+   {
+    "id": "llm",
+    "label": "Azure OpenAI",
+    "sub": "LLM, UAE region",
+    "x": 780,
+    "y": 410,
+    "w": 150,
+    "h": 60
+   },
+   {
+    "id": "posapi",
+    "label": "Device API",
+    "sub": "POS, kiosk, KDS",
+    "x": 780,
+    "y": 600,
+    "w": 160,
+    "h": 70
+   },
+   {
+    "id": "fe_b2c",
+    "label": "Guest web",
+    "sub": "B2C front end",
+    "x": 1000,
+    "y": 110,
+    "w": 160,
+    "h": 60
+   },
+   {
+    "id": "fe_b2b",
+    "label": "Partner Portal",
+    "sub": "B2B front end",
+    "x": 1000,
+    "y": 210,
+    "w": 160,
+    "h": 60
+   },
+   {
+    "id": "fe_bo",
+    "label": "Back office",
+    "sub": "Venue Mgmt, CMS, Console",
+    "x": 1000,
+    "y": 310,
+    "w": 160,
+    "h": 60
+   },
+   {
+    "id": "pubapi",
+    "label": "Public API",
+    "sub": "partners' systems, OTAs",
+    "x": 1000,
+    "y": 410,
+    "w": 160,
+    "h": 60
+   },
+   {
+    "id": "u_b2c",
+    "label": "B2C guest",
+    "sub": "web and mobile app",
+    "x": 1300,
+    "y": 110,
+    "w": 150,
+    "h": 60
+   },
+   {
+    "id": "u_b2b",
+    "label": "B2B partner",
+    "sub": "hotels, agents",
+    "x": 1300,
+    "y": 210,
+    "w": 150,
+    "h": 60
+   },
+   {
+    "id": "u_ops",
+    "label": "Venue operators",
+    "sub": "and TICVAI staff",
+    "x": 1300,
+    "y": 310,
+    "w": 150,
+    "h": 60
+   },
+   {
+    "id": "ext3p",
+    "label": "3rd parties",
+    "sub": "OTAs, ERP, developers",
+    "x": 1300,
+    "y": 410,
+    "w": 150,
+    "h": 60
+   },
+   {
+    "id": "pay",
+    "label": "Payments",
+    "sub": "Stripe, Network Intl.",
+    "x": 1300,
+    "y": 540,
+    "w": 150,
+    "h": 60
+   },
+   {
+    "id": "einv",
+    "label": "E-invoicing",
+    "sub": "accredited provider",
+    "x": 1300,
+    "y": 630,
+    "w": 150,
+    "h": 60
+   },
+   {
+    "id": "msg",
+    "label": "Messaging",
+    "sub": "email, SMS, WhatsApp, push",
+    "x": 1300,
+    "y": 720,
+    "w": 150,
+    "h": 60
+   },
+   {
+    "id": "pos",
+    "label": "POS",
+    "sub": "terminal, tablet",
+    "x": 90,
+    "y": 850,
+    "w": 120,
+    "h": 60
+   },
+   {
+    "id": "kds",
+    "label": "Kitchen display",
+    "sub": "stations",
+    "x": 230,
+    "y": 850,
+    "w": 120,
+    "h": 60
+   },
+   {
+    "id": "kiosk",
+    "label": "Kiosks",
+    "sub": "self-service",
+    "x": 370,
+    "y": 850,
+    "w": 120,
+    "h": 60
+   },
+   {
+    "id": "edge",
+    "label": "Venue edge node",
+    "sub": "access + local DB, offline",
+    "x": 560,
+    "y": 800,
+    "w": 170,
+    "h": 70
+   },
+   {
+    "id": "turn",
+    "label": "Turnstiles",
+    "sub": "gates, readers",
+    "x": 800,
+    "y": 850,
+    "w": 120,
+    "h": 60
+   },
+   {
+    "id": "hand",
+    "label": "Handhelds",
+    "sub": "scanners, staff app",
+    "x": 940,
+    "y": 850,
+    "w": 120,
+    "h": 60
+   }
+  ],
+  "links": [
+   {
+    "source": "u_b2c",
+    "target": "fe_b2c",
+    "type": "internet",
+    "via": null
+   },
+   {
+    "source": "u_b2b",
+    "target": "fe_b2b",
+    "type": "internet",
+    "via": null
+   },
+   {
+    "source": "u_ops",
+    "target": "fe_bo",
+    "type": "internet",
+    "via": null
+   },
+   {
+    "source": "ext3p",
+    "target": "pubapi",
+    "type": "internet",
+    "via": null
+   },
+   {
+    "source": "fe_b2c",
+    "target": "waf",
+    "type": "api",
+    "via": null
+   },
+   {
+    "source": "fe_b2b",
+    "target": "waf",
+    "type": "api",
+    "via": null
+   },
+   {
+    "source": "fe_bo",
+    "target": "waf",
+    "type": "api",
+    "via": null
+   },
+   {
+    "source": "pubapi",
+    "target": "waf",
+    "type": "api",
+    "via": null
+   },
+   {
+    "source": "waf",
+    "target": "commerce",
+    "type": "api",
+    "via": null
+   },
+   {
+    "source": "waf",
+    "target": "operations",
+    "type": "api",
+    "via": null
+   },
+   {
+    "source": "commerce",
+    "target": "pg",
+    "type": "direct",
+    "via": null
+   },
+   {
+    "source": "commerce",
+    "target": "redis",
+    "type": "direct",
+    "via": null
+   },
+   {
+    "source": "operations",
+    "target": "pg",
+    "type": "direct",
+    "via": null
+   },
+   {
+    "source": "operations",
+    "target": "rpt",
+    "type": "direct",
+    "via": null
+   },
+   {
+    "source": "access",
+    "target": "pg",
+    "type": "direct",
+    "via": null
+   },
+   {
+    "source": "pg",
+    "target": "replica",
+    "type": "repl",
+    "via": null
+   },
+   {
+    "source": "pg",
+    "target": "rpt",
+    "type": "repl",
+    "via": null
+   },
+   {
+    "source": "commerce",
+    "target": "broker",
+    "type": "event",
+    "via": null
+   },
+   {
+    "source": "operations",
+    "target": "broker",
+    "type": "event",
+    "via": null
+   },
+   {
+    "source": "ai",
+    "target": "broker",
+    "type": "event",
+    "via": null
+   },
+   {
+    "source": "workers",
+    "target": "broker",
+    "type": "event",
+    "via": null
+   },
+   {
+    "source": "workers",
+    "target": "pg",
+    "type": "direct",
+    "via": [
+     [
+      252,
+      530
+     ],
+     [
+      252,
+      160
+     ]
+    ]
+   },
+   {
+    "source": "workers",
+    "target": "blob",
+    "type": "batch",
+    "via": null
+   },
+   {
+    "source": "ai",
+    "target": "qdrant",
+    "type": "direct",
+    "via": null
+   },
+   {
+    "source": "ai",
+    "target": "llm",
+    "type": "api",
+    "via": null
+   },
+   {
+    "source": "commerce",
+    "target": "pay",
+    "type": "api",
+    "via": [
+     [
+      745,
+      170
+     ],
+     [
+      745,
+      562
+     ]
+    ]
+   },
+   {
+    "source": "workers",
+    "target": "einv",
+    "type": "sync",
+    "via": [
+     [
+      350,
+      686
+     ],
+     [
+      1250,
+      686
+     ]
+    ]
+   },
+   {
+    "source": "workers",
+    "target": "msg",
+    "type": "sync",
+    "via": [
+     [
+      372,
+      693
+     ],
+     [
+      1240,
+      693
+     ]
+    ]
+   },
+   {
+    "source": "pos",
+    "target": "posapi",
+    "type": "internet+sync",
+    "via": [
+     [
+      150,
+      790
+     ]
+    ]
+   },
+   {
+    "source": "kiosk",
+    "target": "posapi",
+    "type": "internet+api",
+    "via": [
+     [
+      430,
+      790
+     ]
+    ]
+   },
+   {
+    "source": "posapi",
+    "target": "commerce",
+    "type": "api",
+    "via": [
+     [
+      760,
+      600
+     ],
+     [
+      760,
+      185
+     ],
+     [
+      700,
+      170
+     ]
+    ]
+   },
+   {
+    "source": "pos",
+    "target": "kds",
+    "type": "lan",
+    "via": null
+   },
+   {
+    "source": "edge",
+    "target": "access",
+    "type": "internet+sync",
+    "via": null
+   },
+   {
+    "source": "turn",
+    "target": "edge",
+    "type": "lan",
+    "via": null
+   },
+   {
+    "source": "hand",
+    "target": "edge",
+    "type": "wireless",
+    "via": [
+     [
+      1000,
+      815
+     ]
+    ]
+   }
+  ]
+ },
+ "lld": {
+  "region": "UAE North, zones 1-3, VNet 10.20.0.0/16",
+  "nodes": [
+   {
+    "id": "users",
+    "label": "Users",
+    "lines": [
+     "B2C guests",
+     "B2B partners",
+     "Venue operators"
+    ],
+    "x": 30,
+    "y": 330,
+    "w": 150,
+    "h": 110
+   },
+   {
+    "id": "fd",
+    "label": "Azure Front Door Premium",
+    "lines": [
+     "WAF: OWASP + bot rules",
+     "TLS 1.2+, custom domains",
+     "Private Link to origin"
+    ],
+    "x": 220,
+    "y": 320,
+    "w": 190,
+    "h": 130
+   },
+   {
+    "id": "ilb",
+    "label": "Ingress (internal LB)",
+    "lines": [
+     "NGINX ingress on AKS",
+     "Private Link service"
+    ],
+    "x": 470,
+    "y": 330,
+    "w": 170,
+    "h": 110
+   },
+   {
+    "id": "sys",
+    "label": "AKS system pool",
+    "lines": [
+     "D4s v5, 2-4 nodes",
+     "zones 1-3"
+    ],
+    "x": 690,
+    "y": 150,
+    "w": 190,
+    "h": 80
+   },
+   {
+    "id": "wl",
+    "label": "AKS workload pool",
+    "lines": [
+     "D8s v5, 3-20 nodes",
+     "commerce, access,",
+     "operations, workers"
+    ],
+    "x": 690,
+    "y": 250,
+    "w": 190,
+    "h": 110
+   },
+   {
+    "id": "aip",
+    "label": "AKS AI pool",
+    "lines": [
+     "D8s v5, 2-4 nodes",
+     "ticvai-ai, embeddings,",
+     "reranker (CPU)"
+    ],
+    "x": 690,
+    "y": 380,
+    "w": 190,
+    "h": 110
+   },
+   {
+    "id": "data",
+    "label": "AKS data pool",
+    "lines": [
+     "E4s v5 x3, zones 1-3",
+     "Qdrant 3-node cluster",
+     "broker 3-node cluster"
+    ],
+    "x": 690,
+    "y": 510,
+    "w": 190,
+    "h": 110
+   },
+   {
+    "id": "pg",
+    "label": "PostgreSQL Flexible Server 16",
+    "lines": [
+     "GP D4ds v5, zone-redundant HA",
+     "control DB + DB per tenant",
+     "PITR 35 days, UAE only"
+    ],
+    "x": 950,
+    "y": 150,
+    "w": 220,
+    "h": 110
+   },
+   {
+    "id": "ro",
+    "label": "Read replicas x2",
+    "lines": [
+     "GP D4ds v5",
+     "gate checks never read here"
+    ],
+    "x": 950,
+    "y": 280,
+    "w": 220,
+    "h": 70
+   },
+   {
+    "id": "rpt",
+    "label": "Reporting + AI log DB",
+    "lines": [
+     "reporting replica (D2ds v5)",
+     "AI log DB (D4ds v5, 1 TB)"
+    ],
+    "x": 950,
+    "y": 370,
+    "w": 220,
+    "h": 80
+   },
+   {
+    "id": "pe",
+    "label": "Private endpoints",
+    "lines": [
+     "Redis Premium (13 GB)",
+     "Key Vault (HSM keys)",
+     "Blob storage (ZRS)",
+     "Container Registry"
+    ],
+    "x": 950,
+    "y": 470,
+    "w": 220,
+    "h": 120
+   },
+   {
+    "id": "bastion",
+    "label": "Azure Bastion",
+    "lines": [
+     "admin access only",
+     "no public SSH / RDP"
+    ],
+    "x": 470,
+    "y": 560,
+    "w": 170,
+    "h": 80
+   },
+   {
+    "id": "nat",
+    "label": "NAT Gateway",
+    "lines": [
+     "one static egress IP",
+     "for provider allow-lists"
+    ],
+    "x": 470,
+    "y": 700,
+    "w": 170,
+    "h": 80
+   },
+   {
+    "id": "extp",
+    "label": "External providers",
+    "lines": [
+     "Payments, e-invoicing",
+     "messaging, Azure OpenAI"
+    ],
+    "x": 220,
+    "y": 700,
+    "w": 190,
+    "h": 80
+   },
+   {
+    "id": "ops",
+    "label": "Operations",
+    "lines": [
+     "Azure Monitor + Log Analytics",
+     "Azure Backup, Defender",
+     "Entra ID, subscription"
+    ],
+    "x": 30,
+    "y": 560,
+    "w": 180,
+    "h": 100
+   },
+   {
+    "id": "venue",
+    "label": "Venue site",
+    "lines": [
+     "POS, kiosks, KDS",
+     "venue edge node (offline)",
+     "turnstiles, handhelds on LAN"
+    ],
+    "x": 1250,
+    "y": 300,
+    "w": 190,
+    "h": 110
+   },
+   {
+    "id": "vpn",
+    "label": "Site-to-site VPN",
+    "lines": [
+     "dedicated tier only;",
+     "others: Internet + mTLS"
+    ],
+    "x": 1250,
+    "y": 450,
+    "w": 190,
+    "h": 80
+   }
+  ],
+  "frames": {
+   "aks": {
+    "label": "AKS cluster",
+    "x": 670,
+    "y": 130,
+    "w": 230,
+    "h": 510
+   }
+  },
+  "links": [
+   {
+    "source": "users",
+    "target": "fd",
+    "type": "internet",
+    "via": null
+   },
+   {
+    "source": "fd",
+    "target": "ilb",
+    "type": "api",
+    "via": null
+   },
+   {
+    "source": "ilb",
+    "target": "wl",
+    "type": "api",
+    "via": null
+   },
+   {
+    "source": "ilb",
+    "target": "aip",
+    "type": "api",
+    "via": null
+   },
+   {
+    "source": "wl",
+    "target": "pg",
+    "type": "direct",
+    "via": null
+   },
+   {
+    "source": "wl",
+    "target": "ro",
+    "type": "direct",
+    "via": null
+   },
+   {
+    "source": "wl",
+    "target": "pe",
+    "type": "direct",
+    "via": null
+   },
+   {
+    "source": "aip",
+    "target": "rpt",
+    "type": "direct",
+    "via": null
+   },
+   {
+    "source": "aip",
+    "target": "data",
+    "type": "direct",
+    "via": null
+   },
+   {
+    "source": "wl",
+    "target": "data",
+    "type": "event",
+    "via": [
+     [
+      912,
+      345
+     ],
+     [
+      912,
+      580
+     ]
+    ]
+   },
+   {
+    "source": "pg",
+    "target": "ro",
+    "type": "repl",
+    "via": null
+   },
+   {
+    "source": "pg",
+    "target": "rpt",
+    "type": "repl",
+    "via": [
+     [
+      1180,
+      215
+     ],
+     [
+      1180,
+      405
+     ]
+    ]
+   },
+   {
+    "source": "aks",
+    "target": "nat",
+    "type": "api",
+    "via": [
+     [
+      785,
+      740
+     ]
+    ]
+   },
+   {
+    "source": "nat",
+    "target": "extp",
+    "type": "api",
+    "via": null
+   },
+   {
+    "source": "bastion",
+    "target": "sys",
+    "type": "internet",
+    "via": [
+     [
+      660,
+      600
+     ],
+     [
+      660,
+      190
+     ]
+    ]
+   },
+   {
+    "source": "venue",
+    "target": "fd",
+    "type": "internet",
+    "via": [
+     [
+      1345,
+      85
+     ],
+     [
+      315,
+      85
+     ]
+    ]
+   },
+   {
+    "source": "venue",
+    "target": "vpn",
+    "type": "internet",
+    "via": null
+   },
+   {
+    "source": "vpn",
+    "target": "ilb",
+    "type": "sync",
+    "via": [
+     [
+      1225,
+      490
+     ],
+     [
+      1225,
+      676
+     ],
+     [
+      650,
+      676
+     ],
+     [
+      650,
+      420
+     ]
+    ]
+   }
+  ],
+  "subnets": [
+   {
+    "name": "snet-ingress",
+    "cidr": "10.20.0.0/24",
+    "holds": "Internal load balancer and Private Link service for Front Door",
+    "rule": "Inbound only from Front Door's Private Link; no public IP"
+   },
+   {
+    "name": "snet-aks-system",
+    "cidr": "10.20.4.0/22",
+    "holds": "AKS system node pool",
+    "rule": "No inbound from outside the VNet"
+   },
+   {
+    "name": "snet-aks-workload",
+    "cidr": "10.20.8.0/21",
+    "holds": "Workload pool: commerce, access, operations, workers",
+    "rule": "Inbound from snet-ingress only; outbound through the NAT Gateway"
+   },
+   {
+    "name": "snet-aks-ai",
+    "cidr": "10.20.16.0/22",
+    "holds": "AI pool: ticvai-ai, embeddings, reranker",
+    "rule": "Inbound from snet-ingress and snet-aks-workload; read-only role on transactional schemas (ADR-0020)"
+   },
+   {
+    "name": "snet-aks-data",
+    "cidr": "10.20.20.0/23",
+    "holds": "Data pool: Qdrant cluster, broker cluster",
+    "rule": "Inbound from the workload and AI pools only; Qdrant needs each tenant's collection-scoped JWT"
+   },
+   {
+    "name": "snet-postgres",
+    "cidr": "10.20.24.0/24",
+    "holds": "PostgreSQL Flexible Server (delegated subnet), replicas, AI log DB",
+    "rule": "Inbound 5432 from the AKS subnets only (through pgbouncer); public access disabled"
+   },
+   {
+    "name": "snet-private-endpoints",
+    "cidr": "10.20.25.0/24",
+    "holds": "Redis, Key Vault, Blob storage, Container Registry",
+    "rule": "Private endpoints with private DNS zones; public access disabled on every resource"
+   },
+   {
+    "name": "AzureBastionSubnet",
+    "cidr": "10.20.26.0/26",
+    "holds": "Azure Bastion",
+    "rule": "The only administrative path in"
+   }
+  ]
+ },
+ "deployables": {
+  "commerce": {
+   "what": "The sale path: order, payment and ledger commit in one transaction. Autoscales on requests per second.",
+   "modules": [
+    "Catalogue",
+    "Identity",
+    "Ledger",
+    "Order",
+    "Tenancy",
+    "Wallet"
+   ]
+  },
+  "access": {
+   "what": "The gate hot path, flat high rate, offline package. The same module code builds the venue edge node.",
+   "modules": [
+    "Access"
+   ]
+  },
+  "operations": {
+   "what": "Back office and engagement. Nothing that takes money waits on it.",
+   "modules": [
+    "CrossRegion",
+    "Fnb",
+    "Inventory",
+    "Marketing",
+    "Platform",
+    "Reporting",
+    "Retail",
+    "VenueOps",
+    "WhiteLabel"
+   ]
+  },
+  "ticvai-ai": {
+   "what": "AI, in Python, isolated (ADR-0020): three process groups, read-only on the transactional schemas.",
+   "modules": [
+    "Ai"
+   ]
+  },
+  "workers": {
+   "what": "No module of its own: the outbox relay (one per region, ADR-0058), every module's event consumers and scheduled jobs. Scales on queue depth.",
+   "modules": []
+  }
+ }
+}

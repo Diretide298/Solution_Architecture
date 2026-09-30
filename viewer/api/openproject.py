@@ -46,6 +46,7 @@ from __future__ import annotations
 
 import base64
 import json
+import re
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -225,6 +226,21 @@ def _id_from_href(href: Optional[str]) -> Optional[int]:
     return int(tail) if tail.isdigit() else None
 
 
+# "Build order #123" is the line the delivery plan writes at the top of every task's description
+# (ticvai/tools/push-openproject.py). It is the order the work is meant to be finished in, and the only order
+# a board can be sorted by that does not change when somebody comments on a ticket.
+BUILD_ORDER = re.compile(r"Build order:?\s*#(\d+)")  # "Build order: #12" (push) and "Build order #12" (rewrites)
+
+
+def build_order(work_package: dict) -> Optional[int]:
+    """The ticket's place in the build order, read from its description; None when it has none."""
+    text = work_package.get("description")
+    if isinstance(text, dict):
+        text = text.get("raw")
+    found = BUILD_ORDER.search(text or "")
+    return int(found.group(1)) if found else None
+
+
 def summarise(work_package: dict, endpoint: str) -> dict:
     """
     A work package, flattened to the fields a board or a tool actually shows.
@@ -255,6 +271,9 @@ def summarise(work_package: dict, endpoint: str) -> dict:
         "parentSubject": _titled(links.get("parent")),
         "startDate": work_package.get("startDate"),
         "dueDate": work_package.get("dueDate"),
+        # Where this ticket sits in the order the work is finished in. Read here, where the description
+        # is at hand, so the description itself need not be carried on every list row.
+        "buildOrder": build_order(work_package),
         # Whether this ticket's dates are its own. OpenProject schedules a
         # parent automatically by default: its dates are derived from its
         # children and a PATCH that sets them is refused with a 422. The plan
@@ -525,7 +544,36 @@ def mine_finished(endpoint: str, token: str, project_id: Optional[int] = None,
             for wp in page.get("_embedded", {}).get("elements", [])]
 
 
-def mine(endpoint: str, token: str, limit: int = 100,
+# The custom field that holds the build order as a number ("Priority_No." on the TICVAI project), found by name
+# in the project's work package schema, once per project. The delivery plan renumbers it on every ticket when the
+# plan changes; a started ticket's description is kept, so its "Build order #n" line can be stale while the field
+# is not. None when the project has no such field, and the description is read instead.
+BUILD_ORDER_FIELD_NAMES = {"priority_no.", "priority_no", "priority no", "build order"}
+_order_field: dict = {}
+
+
+def build_order_field(endpoint: str, token: str, sample: dict) -> Optional[str]:
+    links = sample.get("_links", {})
+    project = _id_from_href((links.get("project") or {}).get("href"))
+    kind = _id_from_href((links.get("type") or {}).get("href"))
+    if project is None or kind is None:
+        return None
+    if (endpoint, project) not in _order_field:
+        found = None
+        try:
+            schema = call(endpoint, token, f"work_packages/schemas/{project}-{kind}")
+            for field, spec in schema.items():
+                if (field.startswith("customField") and isinstance(spec, dict)
+                        and str(spec.get("name", "")).strip().lower() in BUILD_ORDER_FIELD_NAMES):
+                    found = field
+                    break
+        except Exception:  # noqa: BLE001 -- no schema, no field: the description is the fallback
+            found = None
+        _order_field[(endpoint, project)] = found
+    return _order_field[(endpoint, project)]
+
+
+def mine(endpoint: str, token: str, limit: int = 2000,
          project_id: Optional[int] = None) -> list:
     """
     What is assigned to the owner of this token and still open.
@@ -545,10 +593,29 @@ def mine(endpoint: str, token: str, limit: int = 100,
     if project_id is not None:
         wanted.append({"project": {"operator": "=", "values": [str(project_id)]}})
     filters = json.dumps(wanted)
-    page = call(endpoint, token, "work_packages", {
-        "filters": filters,
-        "pageSize": max(1, min(limit, 200)),
-        "sortBy": json.dumps([["updatedAt", "desc"]]),
-    })
-    elements = page.get("_embedded", {}).get("elements", [])
-    return [summarise(wp, endpoint) for wp in elements]
+    # **Every page, in id order.** This used to be one page of 100 sorted newest-updated first, so
+    # anybody holding more than 100 tickets saw a different 100 each time a comment or a push touched
+    # one, and the board changed between two asks with nothing done. Id order keeps the pages stable
+    # while they are walked; the order a person reads is set by the caller (main.my_board).
+    found, offset, size = {}, 1, 200
+    for _ in range(50):
+        page = call(endpoint, token, "work_packages", {
+            "filters": filters,
+            "pageSize": size,
+            "offset": offset,
+            "sortBy": json.dumps([["id", "asc"]]),
+        })
+        elements = page.get("_embedded", {}).get("elements", [])
+        before = len(found)
+        field = build_order_field(endpoint, token, elements[0]) if elements else None
+        for raw in elements:
+            summary = summarise(raw, endpoint)
+            if field and isinstance(raw.get(field), (int, float)):
+                summary["buildOrder"] = int(raw[field])
+            found[summary["key"]] = summary
+        total = page.get("total")
+        if (len(elements) < size or len(found) == before or len(found) >= limit
+                or (isinstance(total, int) and len(found) >= total)):
+            break
+        offset += 1
+    return list(found.values())[:limit]

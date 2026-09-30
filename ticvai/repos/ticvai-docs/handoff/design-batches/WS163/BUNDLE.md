@@ -1,6 +1,6 @@
 # WS163 — Resource Management Configuration board 9
 
-**10 screens · 16 operations · 31 schemas · 8 permissions**
+**10 screens · 16 operations · 34 schemas · 8 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -73,7 +73,7 @@ convincingly. It is never a caption.
 
 ## Thin screens in this batch
 
-**BO-933, BO-934, BO-936, BO-939, BO-940, BO-942 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-933, BO-936, BO-939, BO-940, BO-942 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -357,6 +357,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "name": "contentBody",
      "slot": "collection",
      "components": [
+      {
+       "kind": "calendarView",
+       "label": "Calendar",
+       "operation": "getResourceCalendar",
+       "notes": "The signed-in person's schedule and assignments. Day, week, month and agenda views; the day starts at the venue's `calendarDayStartHour`. Filters the category on what it read.",
+       "provenance": "decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)"
+      },
       {
        "kind": "dataTable",
        "label": "Every schedule calendar",
@@ -1901,6 +1908,11 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    },
    {
+    "name": "sort",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -2133,6 +2145,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "requiresAcknowledgement": {
     "type": "boolean"
+   },
+   "deliveryChannels": {
+    "type": "array",
+    "description": "How it reaches people (29 September, build, 18.1.5). `inApp` always; `push` to the targeted people's registered staff phones (tenancy `RegisteredDevice`, kind `mobileHandset`). `emergency` is sent by both whatever is set here.\n",
+    "items": {
+     "type": "string",
+     "enum": [
+      "inApp",
+      "push"
+     ]
+    },
+    "default": [
+     "inApp",
+     "push"
+    ]
    },
    "expiresAt": {
     "type": "string",
@@ -2420,6 +2447,84 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "aiAssessment": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.",
+    "properties": {
+     "riskScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "riskBand": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high",
+       "critical"
+      ]
+     },
+     "priorityScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "escalationSuggestion": {
+      "type": "object",
+      "description": "A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.",
+      "properties": {
+       "action": {
+        "type": "string",
+        "enum": [
+         "escalate",
+         "addBackupApprover",
+         "none"
+        ]
+       },
+       "reason": {
+        "type": "string",
+        "nullable": true
+       }
+      }
+     },
+     "signals": {
+      "type": "array",
+      "maxItems": 10,
+      "description": "The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.",
+      "items": {
+       "type": "object",
+       "properties": {
+        "code": {
+         "type": "string"
+        },
+        "contribution": {
+         "type": "number"
+        },
+        "detail": {
+         "type": "string",
+         "nullable": true
+        }
+       }
+      }
+     },
+     "scoreId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."
+     },
+     "decisionRecordId": {
+      "type": "string",
+      "description": "The ai decision record, for the audit of what the AI said and why."
+     },
+     "assessedAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
    }
   }
  },
@@ -2608,8 +2713,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a ULID."
+    "format": "uuid",
+    "description": "Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7."
    },
    "caseNumber": {
     "type": "string",
@@ -2775,7 +2880,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "incidentNumber": {
     "type": "string",
@@ -2832,7 +2937,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "correctiveWorkOrderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "occurredAt": {
@@ -2899,6 +3004,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "inApp",
    "post"
   ]
+ },
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
+   }
+  }
  },
  "Page": {
   "type": "object",
@@ -2979,7 +3113,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "kind": {
     "$ref": "#/components/schemas/IncidentKind"
@@ -3102,7 +3236,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "teardownMinutes": {
     "type": "integer",
-    "default": 0
+    "default": 0,
+    "description": "After the booking. **Kept as it is** (decided 29 September, W10): with a `cleaningPolicy` of `afterEveryBooking` the cleaning buffer is added after the teardown, so a room with no teardown and a 15-minute clean is free 15 minutes after each booking ends.\n"
+   },
+   "cleaningPolicy": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ResourceCleaningPolicy"
+     }
+    ],
+    "nullable": true,
+    "description": "How the resource is cleaned between uses (decided 29 September, W10). Null means no cleaning is scheduled beyond `teardownMinutes`."
    },
    "requiresQualification": {
     "type": "array",
@@ -3172,7 +3316,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "holdId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The `ResourceHold` this booking was converted from, where a guest picked the resource on a venue map (rev 3 REV3-15). Null for a staff booking or an allocation.\n"
    },
@@ -3325,6 +3469,49 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "ResourceCleaningPolicy": {
+  "x-ticvai-persistence": "none — columns on resources.resource",
+  "type": "object",
+  "description": "**When the resource is cleaned, and what that takes out of availability** (decided 29 September, W10; the meeting-room case from the 29 September website review).\n- `afterEveryBooking` (option A): `bufferMinutes` blocked after every booking, after its teardown. - `timesPerDay` (option B): `cleaningsPerDay` cleanings of `bufferMinutes` each, between `windowStart` and `windowEnd`, **placed by the system**. The targets are spread evenly across the window; each is put in the free gap nearest its target that is long enough, and never on a booking, a hold or a block. **A confirmed booking is never moved for a cleaning.** Placement is computed on read from the day's bookings, so it moves when bookings change, and a start time is offered only if every cleaning of that day can still be placed after it is booked.\n`createResource` and `updateResource` refuse a policy with `timesPerDay` and no `cleaningsPerDay`, or a window that ends before it starts, with `422`.\n",
+  "required": [
+   "mode",
+   "bufferMinutes"
+  ],
+  "properties": {
+   "mode": {
+    "type": "string",
+    "enum": [
+     "afterEveryBooking",
+     "timesPerDay"
+    ]
+   },
+   "bufferMinutes": {
+    "type": "integer",
+    "minimum": 5,
+    "maximum": 240,
+    "description": "Minutes one cleaning takes. The prototype uses 15 (proposed default, client to correct)."
+   },
+   "cleaningsPerDay": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 24,
+    "nullable": true,
+    "description": "Required for `timesPerDay`; ignored for `afterEveryBooking`."
+   },
+   "windowStart": {
+    "type": "string",
+    "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+    "nullable": true,
+    "description": "Venue-local time the cleaning window opens. Null means the resource's opening time."
+   },
+   "windowEnd": {
+    "type": "string",
+    "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+    "nullable": true,
+    "description": "Venue-local time the cleaning window closes. Null means the resource's closing time."
+   }
+  }
+ },
  "ResourceKind": {
   "type": "string",
   "description": "BL-135. **`locker` was an entitlement kind in `orders` and nothing issued, assigned or released one.** A locker is a specific object checked out to a named guest and returned — which is this context exactly, and modelling it as an entitlement would have needed a second check-out mechanism.\nA seed for `ResourceType` rather than the law (board 1.02): a customer adding a class does it with `createResourceType`, not by waiting for this list to grow.\n**`table` is a non-dining spot** (decided 29 September, rev 3 GAP-C2, confirmed by Chinmay): a beach or event table placed on a venue map, picked and sold like a cabana (`createResourceHold`, then the order). **A dining table is not this**: restaurant tables stay `fnb` tables, booked with `fnb.createTableReservation` and the waitlist (audit R073 (d)).\n",
@@ -3364,7 +3551,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "kind": {
     "$ref": "#/components/schemas/ResourceRequestKind"
@@ -3431,8 +3618,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID, so a request raised offline is not duplicated on sync."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7, so a request raised offline is not duplicated on sync."
    },
    "kind": {
     "$ref": "#/components/schemas/ResourceRequestKind"
@@ -3524,6 +3711,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "date-time"
    }
   }
+ },
+ "StoredValueKind": {
+  "type": "string",
+  "description": "**Six things in this package hold a balance and behave the same way** — a wallet, a gift card, a game card, a voucher, a loyalty position and a prepaid entitlement. They were built separately across three sessions and each grew its own balance, bonus balance, status, blocked reason and expiry (CF-126).\n**The concern is not tidiness. Only one of the six could hold an authorisation.** `authoriseWalletSpend` / `captureWalletAuthorisation` / `relinquishWalletAuthorisation` gave two-phase spend to the retail wallet alone, so **a guest with 200 game credits starting a play the machine then failed had no held balance** — the credits were either taken or not, with no third state.\nThe entities stay distinct because their lifecycles genuinely differ — a gift card activates at a till, a loyalty position never expires the same way. **What is shared is the spend mechanism**, and this enum is what lets it be shared.\n",
+  "enum": [
+   "wallet",
+   "giftCard",
+   "gameCard",
+   "voucher",
+   "loyalty",
+   "prepaidEntitlement"
+  ]
  }
 }
 ```

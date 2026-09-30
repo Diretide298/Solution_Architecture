@@ -1478,6 +1478,72 @@ paths:
                 $ref: '#/components/schemas/ScalingPolicy'
 components:
   schemas:
+    OutboxRelay:
+      type: object
+      x-ticvai-persistence: control.outbox_relay
+      x-ticvai-primary-key:
+      - cellTenantId
+      description: '**Which worker replica relays which tenant database''s outbox** (ADR-0058). One row per tenant
+        database in the region, in the regional control database. A replica holds a lease by renewing it every
+        few seconds; when it dies the lease expires and another replica takes it, so exactly one publisher per
+        tenant database keeps per-tenant order. pgbouncer runs in transaction mode, so this is a row and not a
+        session advisory lock.'
+      required:
+      - cellTenantId
+      - holder
+      - leaseExpiresAt
+      properties:
+        cellTenantId:
+          type: string
+          format: uuid
+          x-ticvai-references: control.cell_tenant
+          description: The tenant database this lease covers (`control.cell_tenant`).
+        holder:
+          type: string
+          maxLength: 200
+          description: The worker replica holding the lease (pod name plus a start nonce).
+        leaseExpiresAt:
+          type: string
+          format: date-time
+          description: Another replica may take the lease after this instant.
+        acquiredAt:
+          type: string
+          format: date-time
+        renewedAt:
+          type: string
+          format: date-time
+        lastPolledAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: The end of the last poll, for the relay-lag dashboard.
+    InboxEntry:
+      type: object
+      x-ticvai-persistence: kernel.inbox
+      x-ticvai-primary-key:
+      - consumer
+      - eventId
+      x-ticvai-append-only: eventId
+      description: '**The consumer''s record of every event it has processed** (ADR-0058). Inserted in the same
+        transaction as the effect, with `ON CONFLICT DO NOTHING`; no row inserted means already processed, so skip
+        and acknowledge. One per tenant database, written by every consumer through the kernel''s inbox wrapper. Kept 30 days, longer than any redelivery window, and dropped a month at a
+        time: partitioned by month on `eventId`, which is a UUIDv7 and so sorts by time (ADR-0056).'
+      required:
+      - consumer
+      - eventId
+      - processedAt
+      properties:
+        consumer:
+          type: string
+          maxLength: 200
+          description: The consumer's stable name (`<service>.<handler>`); one event is processed once per consumer.
+        eventId:
+          type: string
+          format: uuid
+          description: The envelope's `eventId`, which is the producing outbox row's id (UUIDv7).
+        processedAt:
+          type: string
+          format: date-time
     ScalingPolicy:
       type: object
       x-ticvai-persistence: control.scaling_policy
@@ -2413,6 +2479,7 @@ components:
 
             **Operations write it at `tenant` scope.**'
     DeadLetter:
+      x-ticvai-append-only: createdAt
       type: object
       x-ticvai-persistence: platform.dead_letter
       description: 'ADR-0033. **An outbox row whose delivery failed after its retry budget.**
@@ -2462,6 +2529,7 @@ components:
           type: string
           format: date-time
     OutboxEntry:
+      x-ticvai-append-only: createdAt
       type: object
       x-ticvai-persistence: platform.outbox
       description: '**Written in the same transaction as the state change** (ADR-0033). That is what makes
@@ -2491,10 +2559,10 @@ components:
           format: uuid
         eventId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: '**The envelope''s event id, a ULID** (system-design review SD-030, 29 September; applied
-            30 September). Allocated in the writing transaction; the consumer inbox key, so a redelivery is
-            recognised as the same event. `events/_schema.yaml` defines the envelope.'
+          format: uuid
+          description: '**The envelope''s event id, which is this row''s `id`** (ADR-0058; UUIDv7, ADR-0056). The
+            consumer inbox key, so a redelivery is recognised as the same event. `events/_schema.yaml` defines
+            the envelope.'
         eventName:
           type: string
           description: The `name` of an event in `events/` (`aggregate.pastTenseFact`).
@@ -2511,9 +2579,10 @@ components:
           description: The table the change happened in.
         aggregateId:
           type: string
-          maxLength: 64
-          description: '**Which row changed, as text** (SD-012, SD-030): order ids are ULIDs and most other keys
-            UUIDs, so the column holds either; it was `format: uuid`, which no order event could satisfy.'
+          format: uuid
+          description: '**Which row changed** (ADR-0056: every id is a uuid, so every aggregate fits). Also the
+            broker ordering key (ADR-0058): a partition key in Kafka, a consistent-hash or single-active-consumer key
+            in RabbitMQ, so one aggregate''s events arrive in `sequence` order.'
         payload:
           type: object
           description: '**The event as it happened, not a reference to a row that may have moved on.**

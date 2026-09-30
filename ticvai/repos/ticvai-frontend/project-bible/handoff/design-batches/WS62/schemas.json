@@ -2,17 +2,9 @@
  "AiResaleConfigurationMarketplaceRecommendationsInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; lands in `orders.resale_recommendation` (DM5, 29 September)",
   "description": "**What AI Resale Configuration & Marketplace Recommendations submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "highDemand": {
-    "type": "string",
-    "description": "high demand"
-   },
-   "category": {
-    "type": "string",
-    "description": "category"
-   },
    "pricingRecommendations": {
     "type": "string",
     "description": "Pricing recommendations"
@@ -42,29 +34,14 @@
     "type": "string",
     "description": "Anomaly detection"
    },
-   "accept": {
+   "decision": {
     "type": "string",
-    "description": "Accept"
-   },
-   "modify": {
-    "type": "string",
-    "description": "Modify"
-   },
-   "ignore": {
-    "type": "string",
-    "description": "Ignore"
-   },
-   "model": {
-    "type": "string",
-    "description": "model"
-   },
-   "synchronization": {
-    "type": "string",
-    "description": "synchronization"
-   },
-   "financialTransaction": {
-    "type": "string",
-    "description": "financial transaction"
+    "enum": [
+     "accept",
+     "modify",
+     "ignore"
+    ],
+    "description": "What the administrator does with the recommendation"
    }
   }
  },
@@ -74,14 +51,6 @@
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What AI Resale Configuration & Marketplace Recommendations displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "highDemand": {
-    "type": "string",
-    "description": "high demand"
-   },
-   "category": {
-    "type": "string",
-    "description": "category"
-   },
    "pricingRecommendations": {
     "type": "string",
     "description": "Pricing recommendations"
@@ -111,85 +80,289 @@
     "type": "string",
     "description": "Anomaly detection"
    },
-   "accept": {
+   "decision": {
     "type": "string",
-    "description": "Accept"
+    "enum": [
+     "accept",
+     "modify",
+     "ignore"
+    ],
+    "description": "What the administrator does with the recommendation"
+   }
+  }
+ },
+ "EligibilityRuleBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; saved as a `promotions.promotion_rule` row (PromotionRule, ruleType eligibility, its criteria as the condition group and ruleEffect as effect) (DM5, 29 September: data model for the agreed operations)",
+  "description": "**What Eligibility Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "guestType": {
+    "type": "string",
+    "description": "Guest type"
    },
-   "modify": {
+   "customerSegment": {
     "type": "string",
-    "description": "Modify"
+    "description": "Customer segment"
    },
-   "ignore": {
+   "ageCategory": {
     "type": "string",
-    "description": "Ignore"
+    "description": "Age/category"
    },
-   "model": {
+   "membership": {
     "type": "string",
-    "description": "model"
+    "description": "Membership"
    },
-   "synchronization": {
+   "loyaltyTier": {
     "type": "string",
-    "description": "synchronization"
+    "description": "Loyalty tier"
    },
-   "financialTransaction": {
+   "purchaseHistory": {
     "type": "string",
-    "description": "financial transaction"
+    "description": "Purchase history"
+   },
+   "visitHistory": {
+    "type": "string",
+    "description": "Visit history"
+   },
+   "transactionValue": {
+    "type": "string",
+    "description": "Transaction value"
+   },
+   "productPurchased": {
+    "type": "string",
+    "description": "Product purchased"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "location": {
+    "type": "string",
+    "description": "Location"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "dateTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date/time"
+   },
+   "paymentMethod": {
+    "type": "string",
+    "description": "Payment method"
+   },
+   "campaign": {
+    "type": "string",
+    "description": "Campaign"
+   },
+   "customerAccountAttributes": {
+    "type": "string",
+    "description": "Customer/account attributes"
+   },
+   "nestedGroups": {
+    "type": "string",
+    "description": "Nested groups"
+   },
+   "multipleConditionSets": {
+    "type": "string",
+    "description": "Multiple condition sets"
+   },
+   "ruleEffect": {
+    "type": "string",
+    "enum": [
+     "include",
+     "exclude"
+    ],
+    "description": "Whether matching guests are included or excluded."
+   }
+  }
+ },
+ "EligibilityRuleBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Eligibility Rule Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "guestType": {
+    "type": "string",
+    "description": "Guest type"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer segment"
+   },
+   "ageCategory": {
+    "type": "string",
+    "description": "Age/category"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "loyaltyTier": {
+    "type": "string",
+    "description": "Loyalty tier"
+   },
+   "purchaseHistory": {
+    "type": "string",
+    "description": "Purchase history"
+   },
+   "visitHistory": {
+    "type": "string",
+    "description": "Visit history"
+   },
+   "transactionValue": {
+    "type": "string",
+    "description": "Transaction value"
+   },
+   "productPurchased": {
+    "type": "string",
+    "description": "Product purchased"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "location": {
+    "type": "string",
+    "description": "Location"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "dateTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date/time"
+   },
+   "paymentMethod": {
+    "type": "string",
+    "description": "Payment method"
+   },
+   "campaign": {
+    "type": "string",
+    "description": "Campaign"
+   },
+   "customerAccountAttributes": {
+    "type": "string",
+    "description": "Customer/account attributes"
+   },
+   "nestedGroups": {
+    "type": "string",
+    "description": "Nested groups"
+   },
+   "multipleConditionSets": {
+    "type": "string",
+    "description": "Multiple condition sets"
+   },
+   "ruleEffect": {
+    "type": "string",
+    "enum": [
+     "include",
+     "exclude"
+    ],
+    "description": "Whether matching guests are included or excluded."
+   }
+  }
+ },
+ "FeesSellerProceedsListingConfirmationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Fees, Seller Proceeds & Listing Confirmation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "marketplaceTerms": {
+    "type": "integer",
+    "description": "Marketplace Terms"
+   },
+   "sellerTerms": {
+    "type": "integer",
+    "description": "Seller Terms"
+   },
+   "cancellationPolicy": {
+    "type": "string",
+    "description": "Cancellation Policy"
+   },
+   "settlementConditions": {
+    "type": "integer",
+    "description": "Settlement Conditions"
+   },
+   "eventCancellationTreatment": {
+    "type": "string",
+    "description": "Event Cancellation Treatment"
+   },
+   "applicablePrivacyNotice": {
+    "type": "string",
+    "description": "Applicable privacy notice"
+   },
+   "sellingPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Selling price"
+   },
+   "fee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fee"
+   },
+   "estimatedProceeds": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Estimated seller proceeds"
+   },
+   "termsVersion": {
+    "type": "string",
+    "description": "Terms version the seller accepts; stored with the acceptance"
    }
   }
  },
  "ListingApprovalModerationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; lands in the moderation columns of `orders.resale_listing` (DM5, 29 September)",
   "description": "**What Listing Approval & Moderation submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "highResalePrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "High resale price"
+   "reviewReasons": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "highResalePrice",
+      "unusualDiscount",
+      "highValueTicket",
+      "vipTicket",
+      "sellerRisk",
+      "newSeller",
+      "multipleListings",
+      "identityIssue",
+      "paymentIssue",
+      "ticketOwnershipConcern",
+      "fraudIndicator"
+     ]
+    },
+    "description": "Why the listing is under review."
    },
-   "unusualDiscount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Unusual discount"
-   },
-   "highValueTicket": {
+   "decision": {
     "type": "string",
-    "description": "High-value ticket"
+    "enum": [
+     "approve",
+     "reject",
+     "requestInformation"
+    ],
+    "description": "Moderation decision"
    },
-   "vipTicket": {
+   "reason": {
     "type": "string",
-    "description": "VIP ticket"
-   },
-   "sellerRisk": {
-    "type": "string",
-    "description": "Seller risk"
-   },
-   "newSeller": {
-    "type": "integer",
-    "description": "New seller"
-   },
-   "multipleListings": {
-    "type": "string",
-    "description": "Multiple listings"
-   },
-   "identityIssue": {
-    "type": "string",
-    "description": "Identity issue"
-   },
-   "paymentIssue": {
-    "type": "string",
-    "description": "Payment issue"
-   },
-   "ticketOwnershipConcern": {
-    "type": "string",
-    "description": "Ticket ownership concern"
-   },
-   "fraudIndicator": {
-    "type": "string",
-    "description": "Fraud indicator"
-   },
-   "requestInformation": {
-    "type": "string",
-    "description": "Request Information"
+    "description": "Reason"
    }
   }
  },
@@ -199,50 +372,6 @@
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Listing Approval & Moderation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "highResalePrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "High resale price"
-   },
-   "unusualDiscount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Unusual discount"
-   },
-   "highValueTicket": {
-    "type": "string",
-    "description": "High-value ticket"
-   },
-   "vipTicket": {
-    "type": "string",
-    "description": "VIP ticket"
-   },
-   "sellerRisk": {
-    "type": "string",
-    "description": "Seller risk"
-   },
-   "newSeller": {
-    "type": "integer",
-    "description": "New seller"
-   },
-   "multipleListings": {
-    "type": "string",
-    "description": "Multiple listings"
-   },
-   "identityIssue": {
-    "type": "string",
-    "description": "Identity issue"
-   },
-   "paymentIssue": {
-    "type": "string",
-    "description": "Payment issue"
-   },
-   "ticketOwnershipConcern": {
-    "type": "string",
-    "description": "Ticket ownership concern"
-   },
-   "fraudIndicator": {
-    "type": "string",
-    "description": "Fraud indicator"
-   },
    "listing": {
     "type": "string",
     "description": "Listing"
@@ -280,9 +409,34 @@
     "format": "date-time",
     "description": "Submitted date"
    },
-   "requestInformation": {
+   "reviewReasons": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "highResalePrice",
+      "unusualDiscount",
+      "highValueTicket",
+      "vipTicket",
+      "sellerRisk",
+      "newSeller",
+      "multipleListings",
+      "identityIssue",
+      "paymentIssue",
+      "ticketOwnershipConcern",
+      "fraudIndicator"
+     ]
+    },
+    "description": "Why the listing is under review."
+   },
+   "decision": {
     "type": "string",
-    "description": "Request Information"
+    "enum": [
+     "approve",
+     "reject",
+     "requestInformation"
+    ],
+    "description": "Moderation decision"
    }
   }
  },
@@ -292,10 +446,6 @@
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Listing Creation & Seller Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "acceptTermsSubmitListing": {
-    "type": "string",
-    "description": "Accept Terms → Submit Listing"
-   },
    "event": {
     "type": "string",
     "description": "Event"
@@ -332,26 +482,6 @@
    "ticketStatus": {
     "type": "string",
     "description": "Ticket status"
-   },
-   "resaleEligibility": {
-    "type": "string",
-    "description": "Resale eligibility"
-   },
-   "chooseSellingPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Choose selling price"
-   },
-   "acceptRecommendedPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Accept recommended price"
-   },
-   "relistExpiredListing": {
-    "type": "string",
-    "description": "Relist expired listing"
-   },
-   "changePrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Change price"
    },
    "listingId": {
     "type": "string",
@@ -390,37 +520,14 @@
     "type": "string",
     "description": "Seller terms acceptance"
    },
-   "singleTicketListing": {
+   "listingType": {
     "type": "string",
-    "description": "Single ticket listing"
-   },
-   "multipleTicketListing": {
-    "type": "string",
-    "description": "Multiple ticket listing"
-   },
-   "adjacentSeatGroup": {
-    "type": "string",
-    "description": "Adjacent-seat group"
-   },
-   "ticketOwnership": {
-    "type": "string",
-    "description": "Ticket ownership"
-   },
-   "ticketValidity": {
-    "type": "string",
-    "description": "Ticket validity"
-   },
-   "paymentStatus": {
-    "type": "string",
-    "description": "Payment status"
-   },
-   "existingListing": {
-    "type": "string",
-    "description": "Existing listing"
-   },
-   "ticketScanStatus": {
-    "type": "string",
-    "description": "Ticket scan status"
+    "enum": [
+     "singleTicketListing",
+     "multipleTicketListing",
+     "adjacentSeatGroup"
+    ],
+    "description": "What is listed."
    }
   }
  },
@@ -430,10 +537,6 @@
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Listing Creation & Seller Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "acceptTermsSubmitListing": {
-    "type": "string",
-    "description": "Accept Terms → Submit Listing"
-   },
    "event": {
     "type": "string",
     "description": "Event"
@@ -470,26 +573,6 @@
    "ticketStatus": {
     "type": "string",
     "description": "Ticket status"
-   },
-   "resaleEligibility": {
-    "type": "string",
-    "description": "Resale eligibility"
-   },
-   "chooseSellingPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Choose selling price"
-   },
-   "acceptRecommendedPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Accept recommended price"
-   },
-   "relistExpiredListing": {
-    "type": "string",
-    "description": "Relist expired listing"
-   },
-   "changePrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Change price"
    },
    "listingId": {
     "type": "string",
@@ -528,37 +611,14 @@
     "type": "string",
     "description": "Seller terms acceptance"
    },
-   "singleTicketListing": {
+   "listingType": {
     "type": "string",
-    "description": "Single ticket listing"
-   },
-   "multipleTicketListing": {
-    "type": "string",
-    "description": "Multiple ticket listing"
-   },
-   "adjacentSeatGroup": {
-    "type": "string",
-    "description": "Adjacent-seat group"
-   },
-   "ticketOwnership": {
-    "type": "string",
-    "description": "Ticket ownership"
-   },
-   "ticketValidity": {
-    "type": "string",
-    "description": "Ticket validity"
-   },
-   "paymentStatus": {
-    "type": "string",
-    "description": "Payment status"
-   },
-   "existingListing": {
-    "type": "string",
-    "description": "Existing listing"
-   },
-   "ticketScanStatus": {
-    "type": "string",
-    "description": "Ticket scan status"
+    "enum": [
+     "singleTicketListing",
+     "multipleTicketListing",
+     "adjacentSeatGroup"
+    ],
+    "description": "What is listed."
    }
   }
  },
@@ -568,56 +628,6 @@
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Listing Lifecycle, Expiry & Cancellation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "rejected": {
-    "type": "integer",
-    "description": "Rejected"
-   },
-   "suspended": {
-    "type": "string",
-    "description": "Suspended"
-   },
-   "withdrawn": {
-    "type": "string",
-    "description": "Withdrawn"
-   },
-   "cancelled": {
-    "type": "integer",
-    "description": "Cancelled"
-   },
-   "expired": {
-    "type": "integer",
-    "description": "Expired"
-   },
-   "xMinutesBeforeEvent": {
-    "type": "string",
-    "description": "X minutes before event"
-   },
-   "xHoursBeforeEvent": {
-    "type": "string",
-    "description": "X hours before event"
-   },
-   "atEventStart": {
-    "type": "string",
-    "description": "At event start"
-   },
-   "atConfiguredDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "At configured date"
-   },
-   "atConfiguredTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "At configured time"
-   },
-   "sellerCanWithdrawAnytime": {
-    "type": "string",
-    "description": "Seller can withdraw anytime"
-   },
-   "sellerCannotWithdrawWhileReserved": {
-    "type": "string",
-    "description": "Seller cannot withdraw while reserved"
-   },
    "cancellationCutoff": {
     "type": "string",
     "description": "Cancellation cutoff"
@@ -630,80 +640,225 @@
     "type": "string",
     "description": "Maximum withdrawals"
    },
-   "ticketBecomesInvalid": {
+   "closure": {
     "type": "string",
-    "description": "Ticket becomes invalid"
+    "enum": [
+     "rejected",
+     "suspended",
+     "withdrawn",
+     "cancelled",
+     "expired"
+    ],
+    "description": "How the listing left the market: moderation outcome, or the resale-listing state it ended in (states/resale-listing.yaml)."
    },
-   "eventIsCancelled": {
+   "expiryRule": {
     "type": "string",
-    "description": "Event is cancelled"
+    "enum": [
+     "xMinutesBeforeEvent",
+     "xHoursBeforeEvent",
+     "atEventStart",
+     "atConfiguredDate"
+    ],
+    "description": "When the listing expires."
    },
-   "eventChangesMaterially": {
+   "withdrawalPolicy": {
     "type": "string",
-    "description": "Event changes materially"
+    "enum": [
+     "sellerCanWithdrawAnytime",
+     "sellerCannotWithdrawWhileReserved"
+    ],
+    "description": "When the seller may withdraw."
    },
-   "ticketIsRefunded": {
+   "autoCancellationReason": {
     "type": "string",
-    "description": "Ticket is refunded"
+    "enum": [
+     "ticketBecomesInvalid",
+     "eventIsCancelled",
+     "eventChangesMaterially",
+     "ticketIsRefunded",
+     "ticketIsTransferred",
+     "paymentIsReversed",
+     "eligibilityChanges",
+     "fraudIsDetected"
+    ],
+    "description": "Why the listing was cancelled automatically."
    },
-   "ticketIsTransferred": {
+   "expiryOffset": {
+    "type": "integer",
+    "description": "Minutes or hours for the xMinutes/xHours rules"
+   },
+   "listingId": {
     "type": "string",
-    "description": "Ticket is transferred"
-   },
-   "paymentIsReversed": {
+    "description": "Listing ID"
+   }
+  }
+ },
+ "MyTicketsResaleMarketplaceEntryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What My Tickets & Resale Marketplace Entry displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "eventProduct": {
     "type": "string",
-    "description": "Payment is reversed"
+    "description": "Event/Product"
    },
-   "eligibilityChanges": {
+   "venue": {
     "type": "string",
-    "description": "Eligibility changes"
+    "description": "Venue"
    },
-   "fraudIsDetected": {
+   "dateTime": {
     "type": "string",
-    "description": "Fraud is detected"
+    "format": "date-time",
+    "description": "Date/Time"
    },
-   "requiresOperatorAction": {
+   "ticketType": {
     "type": "string",
-    "description": "Requires operator action"
+    "description": "Ticket Type"
    },
-   "listingApproved": {
+   "sectionRowSeat": {
     "type": "string",
-    "description": "Listing approved"
+    "description": "Section/Row/Seat"
    },
-   "listingRejected": {
+   "ticketHolder": {
     "type": "string",
-    "description": "Listing rejected"
+    "description": "Ticket Holder"
    },
-   "priceChanged": {
+   "virtualTicketIdReference": {
+    "type": "string",
+    "description": "Virtual Ticket ID reference"
+   },
+   "ticketStatus": {
+    "type": "string",
+    "description": "Ticket Status"
+   },
+   "resaleStatus": {
+    "type": "string",
+    "description": "Resale Status"
+   },
+   "availableActions": {
+    "type": "string",
+    "description": "Available Actions"
+   },
+   "clientLogo": {
+    "type": "string",
+    "description": "Client logo"
+   },
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "colors": {
+    "type": "string",
+    "description": "Colors"
+   },
+   "typography": {
+    "type": "string",
+    "description": "Typography"
+   },
+   "language": {
+    "type": "string",
+    "description": "Language"
+   },
+   "supportDetails": {
+    "type": "string",
+    "description": "Support details"
+   },
+   "marketplaceName": {
+    "type": "string",
+    "description": "Marketplace name"
+   },
+   "authenticationMethod": {
+    "type": "string",
+    "enum": [
+     "customerAccount",
+     "sso",
+     "passwordlessLogin",
+     "otp",
+     "appAuthentication"
+    ],
+    "description": "How the guest signs in to the marketplace"
+   }
+  }
+ },
+ "OfficialResaleMarketplaceBuyerDiscoveryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Official Resale Marketplace & Buyer Discovery displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "Ticket Type"
+   },
+   "section": {
+    "type": "string",
+    "description": "Section"
+   },
+   "price": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price changed"
+    "description": "Price"
    },
-   "listingExpiring": {
-    "type": "string",
-    "description": "Listing expiring"
+   "quantity": {
+    "type": "integer",
+    "description": "Quantity"
    },
-   "listingExpired": {
+   "accessibility": {
     "type": "string",
-    "description": "Listing expired"
+    "description": "Accessibility"
    },
-   "listingSuspended": {
+   "name": {
     "type": "string",
-    "description": "Listing suspended"
+    "description": "Name"
    },
-   "listingWithdrawn": {
+   "email": {
     "type": "string",
-    "description": "Listing withdrawn"
+    "description": "Email"
    },
-   "listingSold": {
+   "mobile": {
     "type": "string",
-    "description": "Listing sold"
+    "description": "Mobile"
+   },
+   "address": {
+    "type": "string",
+    "description": "Address"
+   },
+   "paymentInformation": {
+    "type": "string",
+    "description": "Payment information"
+   },
+   "inventoryFilter": {
+    "type": "string",
+    "enum": [
+     "officialTicketsOfficialResale",
+     "resaleOnly",
+     "primaryOnly"
+    ],
+    "description": "Which inventory the buyer sees."
    }
   }
  },
  "ResaleEligibilityRuleConfigurationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; lands in `orders.resale_eligibility_rule` (DM5, 29 September)",
   "description": "**What Resale Eligibility Rule Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "product": {
@@ -758,54 +913,10 @@
     "type": "string",
     "description": "Ticket ownership status"
    },
-   "ticketIsFullyPaid": {
-    "type": "string",
-    "description": "Ticket is fully paid"
-   },
-   "ticketHasNotBeenScanned": {
-    "type": "string",
-    "description": "Ticket has not been scanned"
-   },
-   "ticketHasNotExpired": {
-    "type": "string",
-    "description": "Ticket has not expired"
-   },
-   "eventHasNotStarted": {
-    "type": "string",
-    "description": "Event has not started"
-   },
-   "ticketIsNotRefunded": {
-    "type": "string",
-    "description": "Ticket is not refunded"
-   },
-   "ticketIsNotComplimentary": {
-    "type": "string",
-    "description": "Ticket is not complimentary"
-   },
-   "ticketIsNotStaff": {
-    "type": "string",
-    "description": "Ticket is not staff"
-   },
-   "ticketIsNotInternal": {
-    "type": "string",
-    "description": "Ticket is not internal"
-   },
-   "ticketIsNotBlocked": {
-    "type": "string",
-    "description": "Ticket is not blocked"
-   },
-   "ticketIsNotUnderDispute": {
-    "type": "string",
-    "description": "Ticket is not under dispute"
-   },
    "specificResaleStartEndDate": {
     "type": "string",
     "format": "date-time",
     "description": "Specific resale start/end date"
-   },
-   "allowResaleImmediatelyAfterPurchase": {
-    "type": "boolean",
-    "description": "Allow resale immediately after purchase"
    },
    "blackoutPeriod": {
     "type": "string",
@@ -836,6 +947,29 @@
    "membershipRestriction": {
     "type": "string",
     "description": "Membership restriction"
+   },
+   "resaleImmediatelyAfterPurchase": {
+    "type": "boolean",
+    "description": "Allow resale immediately after purchase"
+   },
+   "requiredConditions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "fullyPaid",
+      "notScanned",
+      "notExpired",
+      "eventNotStarted",
+      "notRefunded",
+      "notComplimentary",
+      "notStaff",
+      "notInternal",
+      "notBlocked",
+      "notUnderDispute"
+     ]
+    },
+    "description": "Conditions a ticket must meet to be listed."
    }
   }
  },
@@ -897,54 +1031,10 @@
     "type": "string",
     "description": "Ticket ownership status"
    },
-   "ticketIsFullyPaid": {
-    "type": "string",
-    "description": "Ticket is fully paid"
-   },
-   "ticketHasNotBeenScanned": {
-    "type": "string",
-    "description": "Ticket has not been scanned"
-   },
-   "ticketHasNotExpired": {
-    "type": "string",
-    "description": "Ticket has not expired"
-   },
-   "eventHasNotStarted": {
-    "type": "string",
-    "description": "Event has not started"
-   },
-   "ticketIsNotRefunded": {
-    "type": "string",
-    "description": "Ticket is not refunded"
-   },
-   "ticketIsNotComplimentary": {
-    "type": "string",
-    "description": "Ticket is not complimentary"
-   },
-   "ticketIsNotStaff": {
-    "type": "string",
-    "description": "Ticket is not staff"
-   },
-   "ticketIsNotInternal": {
-    "type": "string",
-    "description": "Ticket is not internal"
-   },
-   "ticketIsNotBlocked": {
-    "type": "string",
-    "description": "Ticket is not blocked"
-   },
-   "ticketIsNotUnderDispute": {
-    "type": "string",
-    "description": "Ticket is not under dispute"
-   },
    "specificResaleStartEndDate": {
     "type": "string",
     "format": "date-time",
     "description": "Specific resale start/end date"
-   },
-   "allowResaleImmediatelyAfterPurchase": {
-    "type": "boolean",
-    "description": "Allow resale immediately after purchase"
    },
    "blackoutPeriod": {
     "type": "string",
@@ -975,6 +1065,95 @@
    "membershipRestriction": {
     "type": "string",
     "description": "Membership restriction"
+   },
+   "resaleImmediatelyAfterPurchase": {
+    "type": "boolean",
+    "description": "Allow resale immediately after purchase"
+   },
+   "requiredConditions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "fullyPaid",
+      "notScanned",
+      "notExpired",
+      "eventNotStarted",
+      "notRefunded",
+      "notComplimentary",
+      "notStaff",
+      "notInternal",
+      "notBlocked",
+      "notUnderDispute"
+     ]
+    },
+    "description": "Conditions a ticket must meet to be listed."
+   }
+  }
+ },
+ "ResaleFeePolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.resale_fee_policy",
+  "description": "**What a resale costs and how high it may be priced.** The listing snapshots these onto itself at creation; this is where they come from.\n**A rule and its snapshot are two rows on purpose.** `payments.fee_rule` and `orders.order_fee` already work this way — changing a commission must not restate what somebody already sold at.",
+  "required": [
+   "sellerFeePercent",
+   "buyerFeePercent",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The narrowest match wins.** Null is the venue default; a policy naming an event overrides it for that event, because a final and a Tuesday fixture do not resell on the same terms."
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "sellerFeePercent": {
+    "type": "number",
+    "description": "Deducted from the seller's proceeds."
+   },
+   "buyerFeePercent": {
+    "type": "number",
+    "description": "Added to what the buyer pays."
+   },
+   "priceCapPercent": {
+    "type": "number",
+    "nullable": true,
+    "description": "**A ceiling as a percentage of face value.** Null means uncapped, which stays a venue decision rather than a default — the wording `ResaleListing.priceCapPercent` already uses, kept identical so the snapshot and its source cannot drift apart in meaning.\n**Anti-scalping limits are regulated in several jurisdictions**; whether they bind in the UAE and Oman is recorded as a research item on the resale backlog entry and is not settled here."
+   },
+   "minimumAskPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "feesShownToSeller": {
+    "type": "boolean",
+    "description": "**Whether the seller sees the deduction before listing.** A seller who learns the commission at payout is a complaint, and `ListingCreationSellerConfiguration` already draws an `estimatedProceeds` that needs this to be true to mean anything."
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
    }
   }
  },
@@ -984,42 +1163,6 @@
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Resale Fees, Commission & Seller Proceeds displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "sellerFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Seller fee"
-   },
-   "buyerFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Buyer fee"
-   },
-   "marketplaceCommission": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Marketplace commission"
-   },
-   "flatTransactionFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Flat transaction fee"
-   },
-   "percentageFee": {
-    "type": "number",
-    "description": "Percentage fee"
-   },
-   "paymentProcessingFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Payment processing fee"
-   },
-   "administrativeFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Administrative fee"
-   },
-   "venueFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Venue fee"
-   },
-   "taxOnFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Tax on fee"
-   },
    "tenant": {
     "type": "string",
     "description": "Tenant"
@@ -1052,25 +1195,36 @@
     "type": "string",
     "description": "Currency"
    },
-   "listingPriceAed250": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Listing Price: AED 250"
-   },
-   "sellerProceedsAed225": {
+   "feeType": {
     "type": "string",
-    "description": "Seller Proceeds: AED 225"
+    "enum": [
+     "sellerFee",
+     "buyerFee",
+     "marketplaceCommission",
+     "flatTransactionFee",
+     "percentageFee",
+     "paymentProcessingFee",
+     "administrativeFee",
+     "venueFee",
+     "taxOnFee"
+    ],
+    "description": "Fee type."
    },
-   "ticketAed250": {
-    "type": "string",
-    "description": "Ticket: AED 250"
+   "rate": {
+    "type": "number",
+    "description": "Percentage rate, where the fee is a percentage"
    },
-   "buyerServiceFeeAed12": {
+   "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Buyer Service Fee: AED 12"
+    "description": "Fixed amount, where the fee is flat"
    },
-   "totalAed262": {
-    "type": "integer",
-    "description": "Total: AED 262"
+   "payer": {
+    "type": "string",
+    "enum": [
+     "seller",
+     "buyer"
+    ],
+    "description": "Who pays the fee"
    }
   }
  },
@@ -1111,10 +1265,6 @@
    "listingStatus": {
     "type": "integer",
     "description": "Listing status"
-   },
-   "unsoldOriginalTicketInventory": {
-    "type": "string",
-    "description": "Unsold original ticket inventory"
    }
   }
  },
@@ -1234,10 +1384,264 @@
    "riskIndicator": {
     "type": "string",
     "description": "Risk Indicator"
-   },
-   "andExceptionStates": {
+   }
+  }
+ },
+ "ResaleMarketplaceConfig": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.resale_marketplace_config",
+  "description": "**How a venue's resale marketplace runs: terms, pricing mode and guardrails, moderation, listing lifecycle, buyer checkout hold, seller settlement timing, and the white-label deployment** (DM5, 29 September: data model for the agreed operations; MoM 1 Sep 4.14: admin-configured resale price range; own B2C site, hosted white-label portal, or API).\n**One row per venue.** The resale model is four tables and they do not overlap: what a resale costs is `orders.resale_fee_policy` (narrowable by event and product), which tickets may be resold is `orders.resale_eligibility_rule` (narrowable the same way), how the marketplace behaves is this row, and what each seller is owed is `orders.resale_settlement`. The listing snapshots what it needs at creation.\n**Written by `setResaleMarketplaceConfig` and read by `getResaleMarketplaceConfig`** (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "marketplaceName",
+   "pricingMode",
+   "moderationMode",
+   "isActive",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "and exception states"
+    "format": "uuid",
+    "readOnly": true
+   },
+   "marketplaceName": {
+    "type": "string",
+    "maxLength": 150
+   },
+   "pricingMode": {
+    "type": "string",
+    "enum": [
+     "faceValueOnly",
+     "fixedPrice",
+     "sellerSelectedPrice",
+     "cappedPrice",
+     "operatorControlled",
+     "aiRecommendedPrice"
+    ]
+   },
+   "maximumDiscountPercent": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 100,
+    "description": "The floor below face value, beside `ResaleFeePolicy.priceCapPercent` above it."
+   },
+   "sellerCanEditPrice": {
+    "type": "boolean",
+    "default": true
+   },
+   "maximumPriceChanges": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "minimumMinutesBetweenPriceChanges": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "moderationMode": {
+    "type": "string",
+    "default": "automatic",
+    "description": "`reviewTriggers` sends a listing to `pendingReview` when `moderationMode` is `riskBased`; `manual` reviews every listing.",
+    "enum": [
+     "automatic",
+     "riskBased",
+     "manual"
+    ]
+   },
+   "reviewTriggers": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "highResalePrice",
+      "unusualDiscount",
+      "highValueTicket",
+      "vipTicket",
+      "sellerRisk",
+      "newSeller",
+      "multipleListings",
+      "identityIssue",
+      "paymentIssue",
+      "ticketOwnershipConcern",
+      "fraudIndicator"
+     ]
+    }
+   },
+   "expiryRule": {
+    "type": "string",
+    "default": "atEventStart",
+    "enum": [
+     "xMinutesBeforeEvent",
+     "xHoursBeforeEvent",
+     "atEventStart",
+     "atConfiguredDate"
+    ]
+   },
+   "expiryOffset": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "description": "Minutes or hours, per `expiryRule`."
+   },
+   "withdrawalPolicy": {
+    "type": "string",
+    "default": "sellerCannotWithdrawWhileReserved",
+    "enum": [
+     "sellerCanWithdrawAnytime",
+     "sellerCannotWithdrawWhileReserved"
+    ]
+   },
+   "maximumWithdrawals": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "cancellationFee": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "checkoutHoldMinutes": {
+    "type": "integer",
+    "minimum": 1,
+    "default": 10,
+    "description": "How long a listing stays `reserved` for one buyer in checkout."
+   },
+   "buyerIdentityVerificationRequired": {
+    "type": "boolean",
+    "default": false
+   },
+   "settlementTiming": {
+    "type": "string",
+    "default": "afterAccessValidation",
+    "description": "**Default `afterAccessValidation`**: the seller is paid after the buyer is admitted, not after they pay (`ResaleListing.payoutStatus`).",
+    "enum": [
+     "immediatelyAfterResale",
+     "xDaysAfterResale",
+     "afterEventCompletion",
+     "xDaysAfterEvent",
+     "afterAccessValidation",
+     "operatorDefinedSettlementCycle"
+    ]
+   },
+   "settlementDelayDays": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0
+   },
+   "minimumPayoutThreshold": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "customerTerms": {
+    "type": "string",
+    "maxLength": 20000,
+    "nullable": true
+   },
+   "sellerTerms": {
+    "type": "string",
+    "maxLength": 20000,
+    "nullable": true
+   },
+   "buyerTerms": {
+    "type": "string",
+    "maxLength": 20000,
+    "nullable": true
+   },
+   "termsVersion": {
+    "type": "string",
+    "maxLength": 20,
+    "nullable": true,
+    "description": "The version a seller accepts at listing."
+   },
+   "disclosures": {
+    "type": "string",
+    "maxLength": 4000,
+    "nullable": true
+   },
+   "resaleTicketLabel": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true
+   },
+   "deploymentModel": {
+    "type": "string",
+    "default": "ticvaiHostedWhiteLabel",
+    "enum": [
+     "embeddedWhiteLabel",
+     "ticvaiHostedWhiteLabel",
+     "headlessApi"
+    ]
+   },
+   "navigation": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "myTickets",
+      "sell",
+      "buy",
+      "myListings",
+      "transactions"
+     ]
+    }
+   },
+   "authenticationMethod": {
+    "type": "string",
+    "default": "customerAccount",
+    "enum": [
+     "customerAccount",
+     "sso",
+     "passwordlessLogin",
+     "otp",
+     "appAuthentication"
+    ]
+   },
+   "branding": {
+    "type": "object",
+    "nullable": true,
+    "description": "Logo, colours, typography, support contact and legal links for the marketplace pages. **A hosted white-label marketplace takes the venue's white-label theme when this is null**, so a venue sets it only to differ."
+   },
+   "domain": {
+    "type": "string",
+    "maxLength": 253,
+    "nullable": true
+   },
+   "languages": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "maxLength": 10
+    }
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    }
   }
  },
@@ -1292,14 +1696,6 @@
     "type": "string",
     "description": "Seller terms"
    },
-   "sellerSelectsAPermittedPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Seller selects a permitted price"
-   },
-   "operatorDeterminesResalePrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Operator determines resale price"
-   },
    "sellerVerification": {
     "type": "string",
     "description": "Seller verification"
@@ -1343,6 +1739,14 @@
    "purchaseLimits": {
     "type": "string",
     "description": "Purchase limits"
+   },
+   "pricingMode": {
+    "type": "string",
+    "enum": [
+     "sellerSelectsPermittedPrice",
+     "operatorDeterminesPrice"
+    ],
+    "description": "Seller picks within the configured range (MoM 1 Sep: e.g. 10-20% below original) or the operator sets the price"
    }
   }
  },
@@ -1363,10 +1767,6 @@
    "maximumResalePrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Maximum resale price"
-   },
-   "maximumMarkup": {
-    "type": "number",
-    "description": "Maximum markup %"
    },
    "maximumDiscount": {
     "type": "number",
@@ -1408,14 +1808,6 @@
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Price adjustment cutoff"
    },
-   "minimumAed160": {
-    "type": "string",
-    "description": "Minimum: AED 160"
-   },
-   "maximumAed240": {
-    "type": "string",
-    "description": "Maximum: AED 240"
-   },
    "originalFaceValue": {
     "type": "string",
     "description": "Original face value"
@@ -1439,6 +1831,10 @@
    "priceCategory": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Price category"
+   },
+   "maximumMarkupPercent": {
+    "type": "number",
+    "description": "Maximum markup, percent"
    }
   }
  }

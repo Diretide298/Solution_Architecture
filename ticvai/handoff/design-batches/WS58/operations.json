@@ -1,4 +1,23 @@
 {
+ "decideCatalogueAiFinding": {
+  "method": "POST",
+  "path": "/ai-findings/{findingId}/decision",
+  "contract": "catalogue",
+  "summary": "Acknowledge, accept, dismiss or resolve an AI finding",
+  "permission": "AI_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CatalogueAiFinding"
+ },
  "listChannel": {
   "method": "GET",
   "path": "/channel",
@@ -8,9 +27,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "type",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "healthStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ChannelOperationsCommandCenterView"
+  "responds": "Page"
  },
  "listChannel2": {
   "method": "GET",
@@ -21,9 +66,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "category",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "AiChannelOptimizationIntelligenceCenterView"
+  "responds": "Page"
  },
  "listChannelAllocationRebalancing": {
   "method": "GET",
@@ -34,9 +105,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ChannelAllocationRebalancingOperationsView"
+  "responds": "Page"
  },
  "listChannelConnectionIntegration": {
   "method": "GET",
@@ -47,9 +144,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "connectionType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "environment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ChannelConnectionIntegrationManagerView"
+  "responds": "Page"
  },
  "listChannelExceptionIncident": {
   "method": "GET",
@@ -60,9 +188,45 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "severity",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "errorType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "currentStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ChannelExceptionsIncidentsRecoveryView"
+  "responds": "Page"
  },
  "listChannelGovernanceSla": {
   "method": "GET",
@@ -73,9 +237,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "complianceFlag",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "governanceStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ChannelGovernanceSlaPartnerControlView"
+  "responds": "Page"
  },
  "listChannelLogTransaction": {
   "method": "GET",
@@ -126,10 +321,45 @@
     "name": "correlationId",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "apiRequest",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "user",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "category",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "ChannelAuditLogsTransactionTraceabilityView"
+  "responds": "Page"
  },
  "listChannelPerformanceCommercial": {
   "method": "GET",
@@ -177,13 +407,43 @@
     "required": false
    },
    {
-    "name": "date",
+    "name": "dateFrom",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "dateTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "timeFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "timeTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "currency",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "ChannelPerformanceCommercialAnalyticsView"
+  "responds": "Page"
  },
  "listProductPriceAvailability": {
   "method": "GET",
@@ -194,9 +454,53 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "domain",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "frequency",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "hasFailures",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listRealTimeAvailability": {
+  "method": "GET",
+  "path": "/real-time-availability",
+  "contract": "promotions",
+  "summary": "Real-Time Availability & Checkout Validation",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": "ProductPriceAvailabilitySynchronizationView"
+  "responds": "RealTimeAvailabilityCheckoutValidationView"
  },
  "listRealTimeChannel": {
   "method": "GET",
@@ -207,8 +511,134 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "availabilityStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "RealTimeChannelAvailabilityInventoryMonitorView"
+  "responds": "Page"
+ },
+ "retryChannelIncident": {
+  "method": "POST",
+  "path": "/channel-incidents/{incidentId}/retry",
+  "contract": "catalogue",
+  "summary": "Retry the failed channel call behind an incident",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setChannelConnectionConfiguration": {
+  "method": "PUT",
+  "path": "/channel-connections",
+  "contract": "catalogue",
+  "summary": "Create or update a channel connection",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ChannelConnection",
+  "responds": "ChannelConnection"
+ },
+ "setChannelSyncSetting": {
+  "method": "PUT",
+  "path": "/channel-syncs",
+  "contract": "catalogue",
+  "summary": "Set how one kind of data synchronises with a channel",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ChannelSync",
+  "responds": "ChannelSync"
+ },
+ "testChannelConnection": {
+  "method": "POST",
+  "path": "/channel-connections/{connectionId}/test",
+  "contract": "catalogue",
+  "summary": "Test a channel connection now",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ChannelConnection"
+ },
+ "updateChannelIncident": {
+  "method": "PATCH",
+  "path": "/channel-incidents/{incidentId}",
+  "contract": "catalogue",
+  "summary": "Own, investigate, resolve or close a channel incident",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ChannelIncident"
  }
 }

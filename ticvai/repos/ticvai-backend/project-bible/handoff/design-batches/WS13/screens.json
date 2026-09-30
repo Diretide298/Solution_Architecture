@@ -58,7 +58,10 @@
     {
      "to": "BO-367",
      "trigger": "Approval Request Detail",
-     "provenance": "structural — pack board 1 wiring, 9 September 2026"
+     "provenance": "structural — pack board 1 wiring, 9 September 2026",
+     "carries": [
+      "approvalRequestId"
+     ]
     },
     {
      "to": "BO-368",
@@ -68,7 +71,10 @@
     {
      "to": "BO-369",
      "trigger": "High Priority & Risk Queue",
-     "provenance": "structural — pack board 1 wiring, 9 September 2026"
+     "provenance": "structural — pack board 1 wiring, 9 September 2026",
+     "carries": [
+      "approvalRequestId"
+     ]
     },
     {
      "to": "BO-370",
@@ -608,6 +614,13 @@
      "getApprovalRecord",
      "getApprovalAnalytics"
     ]
+   },
+   {
+    "operationId": "getApprovalRequestScore",
+    "contract": "ai",
+    "purpose": "Risk band, priority and suggested escalation for the request, as context only (no approve/reject suggestion)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -620,6 +633,10 @@
    "params": [
     {
      "name": "requestId",
+     "from": "navigation"
+    },
+    {
+     "name": "approvalRequestId",
      "from": "navigation"
     }
    ]
@@ -734,6 +751,13 @@
     "purpose": "What the rules say",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listApprovalRequests",
+    "contract": "approvals",
+    "purpose": "Requests with their AI context (aiAssessment: risk, priority, escalation suggestion) for the reviewer; context only",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -826,6 +850,12 @@
        "derived": true,
        "impliedBy": "listApprovalRequests",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getApprovalRequestScore",
+       "notes": "One record, read-only."
       }
      ]
     }
@@ -845,6 +875,13 @@
     "purpose": "High priority and risk",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getApprovalRequestScore",
+    "contract": "ai",
+    "purpose": "Risk band, priority and suggested escalation for the request, as context only (no approve/reject suggestion)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -853,6 +890,14 @@
    "workshopBoard": "wireframes/WS30 Approval Workflows and Governance Board 1.dc.html#bo-369"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 0 of 5 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "approvalRequestId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

@@ -16,7 +16,8 @@
    "exitTo": [
     "KSK-002",
     "KSK-003",
-    "KSK-004"
+    "KSK-004",
+    "KSK-014"
    ],
    "inferred": true,
    "isEntryPoint": true,
@@ -34,6 +35,11 @@
     {
      "to": "KSK-004",
      "trigger": "Choose tickets",
+     "provenance": "structural — KSK-001 is P05's home screen and its exits are its launcher"
+    },
+    {
+     "to": "KSK-014",
+     "trigger": "Out of service",
      "provenance": "structural — KSK-001 is P05's home screen and its exits are its launcher"
     }
    ]
@@ -58,14 +64,7 @@
    "regions": [
     {
      "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
+     "components": []
     }
    ]
   },
@@ -73,8 +72,6 @@
    "loading": "Not applicable — the attract loop is the idle state",
    "error": "Falls through to KSK-014 if the kiosk cannot reach the server",
    "emptyFirstRun": "Not applicable",
-   "emptyNoResults": "The filter narrowed it and the attract loop are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available.** An unattended terminal selling from a stale catalogue oversells with nobody watching"
   },
   "apis": [],
@@ -82,6 +79,7 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-001",
+   "derivedFrom": "wireframes/reference/Kiosk Board 1.dc.html",
    "note": "**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -137,10 +135,7 @@
     {
      "to": "KSK-004",
      "trigger": "Choose tickets",
-     "carries": [
-      "productId"
-     ],
-     "provenance": "derived — KSK-004 declares entryState.params productId, so an edge into it must carry them"
+     "provenance": "derived — KSK-004 declares entryState.params productId and KSK-002 holds none of them, so the edge carries nothing and KSK-004 opens cold"
     }
    ]
   },
@@ -152,13 +147,6 @@
   "pattern": "statusTracker",
   "patternReason": "`getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing",
   "purpose": "Ask the only question that changes everything else.",
-  "gaps": [
-   {
-    "operation": "getTenantConfig",
-    "why": "**1 declared operation reach no component on this screen**: getTenantConfig. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "detail",
    "regions": [
@@ -168,7 +156,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected language select",
+       "label": "The tenant app status",
        "bindsTo": "TenantAppStatus",
        "columns": [
         "TenantAppStatus.isPublished",
@@ -186,28 +174,41 @@
        ],
        "operation": "getTenantAppStatus",
        "provenance": "contract white-label.yaml GET /tenant-config/status"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+      },
       {
        "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
+       "label": "The tenant config",
+       "bindsTo": "TenantConfig",
+       "columns": [
+        "TenantConfig.isDraft",
+        "TenantConfig.brand",
+        "TenantConfig.appIcons",
+        "TenantConfig.bookingFlow",
+        "TenantConfig.theme",
+        "TenantConfig.fonts",
+        "TenantConfig.footer",
+        "TenantConfig.notificationBranding",
+        "TenantConfig.enabledPaymentMethods",
+        "TenantConfig.accessibility",
+        "TenantConfig.header",
+        "TenantConfig.navigation",
+        "TenantConfig.homepage",
+        "TenantConfig.modules",
+        "TenantConfig.features",
+        "TenantConfig.languages"
+       ],
+       "operation": "getTenantConfig",
+       "provenance": "contract white-label.yaml GET /tenant-config"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The language select list.",
+   "loading": "The language select, read by `getTenantAppStatus`.",
    "error": "Could not load. Names which read failed and leaves the language select untouched.",
-   "emptyFirstRun": "No language select yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the language select are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No language select yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `getTenantConfig` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Not available"
   },
   "apis": [
@@ -228,6 +229,7 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-002",
+   "derivedFrom": "wireframes/reference/Kiosk Board 1.dc.html",
    "note": "**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -271,21 +273,36 @@
     "KSK-001",
     "KSK-002",
     "KSK-004",
-    "KSK-006"
+    "KSK-006",
+    "KSK-011",
+    "KSK-016"
    ],
    "inferred": true,
    "transitions": [
-    {
-     "to": "KSK-004",
-     "trigger": "Chooses tickets and quantities",
-     "provenance": "flow F07 step 3→4",
-     "operation": "listProducts"
-    },
     {
      "to": "KSK-006",
      "trigger": "They review the basket",
      "provenance": "flow F75 step 3→4",
      "operation": "listProducts"
+    },
+    {
+     "to": "KSK-011",
+     "trigger": "Collect a booking",
+     "provenance": "derived — KSK-011 declares entryState.params orderId and KSK-003 holds none of them, so the edge carries nothing and KSK-011 opens cold"
+    },
+    {
+     "to": "KSK-016",
+     "trigger": "Order Food",
+     "provenance": "derived — KSK-016 declares entryState.params outletId and KSK-003 holds none of them, so the edge carries nothing and KSK-016 opens cold"
+    },
+    {
+     "to": "KSK-004",
+     "trigger": "Chooses tickets and quantities",
+     "provenance": "flow F07 step 3→4",
+     "operation": "listProducts",
+     "carries": [
+      "productId"
+     ]
     }
    ]
   },
@@ -305,8 +322,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listProducts",
+       "notes": "Sends `?venueId=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listProducts",
+       "notes": "Sends `?kind=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is sellable",
+       "operation": "listProducts",
+       "notes": "Sends `?isSellable=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every what are you",
+       "label": "Every product",
        "bindsTo": "Product",
        "columns": [
         "Product.id",
@@ -333,7 +371,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected what are you",
+       "label": "The selected product",
        "bindsTo": "Product",
        "columns": [
         "Product.id",
@@ -357,33 +395,15 @@
        "provenance": "contract catalogue.yaml GET /products"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "cardList",
-       "derived": true,
-       "impliedBy": "listProducts",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The what are you list.",
    "error": "Could not load. Names which read failed and leaves the what are you untouched.",
-   "emptyFirstRun": "No what are you yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the what are you are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No what are you yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the what are you are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Not available"
   },
   "apis": [
@@ -407,6 +427,7 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-003",
+   "derivedFrom": "wireframes/reference/Kiosk Board 1.dc.html",
    "note": "**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -450,7 +471,8 @@
     "KSK-001",
     "KSK-002",
     "KSK-003",
-    "KSK-005"
+    "KSK-005",
+    "KSK-015"
    ],
    "inferred": true,
    "fromFlows": true,
@@ -459,6 +481,11 @@
      "to": "KSK-005",
      "trigger": "Chooses a session",
      "provenance": "flow F07 step 4→5"
+    },
+    {
+     "to": "KSK-015",
+     "trigger": "Assistant",
+     "provenance": "derived — KSK-015 declares entryState.params conversationId, messageId and KSK-004 holds none of them, so the edge carries nothing and KSK-015 opens cold"
     }
    ]
   },
@@ -473,8 +500,8 @@
   "gaps": [
    {
     "operation": "getAvailability",
-    "why": "**1 declared operation reach no component on this screen**: getAvailability. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
+    "why": "**`getAvailability` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
+    "source": "contract catalogue.yaml GET /availability"
    }
   ],
   "layout": {
@@ -486,7 +513,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every choose tickets",
+       "label": "Every product variant",
        "bindsTo": "ProductVariant",
        "columns": [
         "ProductVariant.id",
@@ -497,24 +524,13 @@
        ],
        "operation": "listProductVariants",
        "provenance": "contract catalogue.yaml GET /products/{productId}/variants"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
       },
       {
-       "kind": "cardList",
-       "derived": true,
-       "impliedBy": "listProductVariants",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
+       "kind": "dataTable",
+       "label": "Availability",
+       "operation": "getAvailability",
+       "notes": "Shows `channelCapacityId`, `performanceId`, `capacity`, `sold`, `leased`, `remaining`, `byChannel` from `getAvailability`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.",
+       "provenance": "contract catalogue.yaml GET /availability"
       }
      ]
     }
@@ -523,9 +539,9 @@
   "states": {
    "loading": "The choose tickets list.",
    "error": "Could not load. Names which read failed and leaves the choose tickets untouched.",
-   "emptyFirstRun": "No choose tickets yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the choose tickets are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No choose tickets yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listProductVariants` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getAvailability` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Not available"
   },
   "apis": [
@@ -556,6 +572,7 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-004",
+   "derivedFrom": "wireframes/reference/Kiosk Board 1.dc.html",
    "note": "**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -583,7 +600,7 @@
  },
  {
   "id": "KSK-005",
-  "name": "Choose a session",
+  "name": "Choose a performance",
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 2,
@@ -622,8 +639,8 @@
   "gaps": [
    {
     "operation": "getAvailability",
-    "why": "**1 declared operation reach no component on this screen**: getAvailability. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
+    "why": "**`getAvailability` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
+    "source": "contract catalogue.yaml GET /availability"
    }
   ],
   "layout": {
@@ -635,8 +652,8 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Acquire",
-       "operation": "acquireInventoryHold",
+       "label": "Acquire inventory hold",
+       "operation": "addCartLine",
        "provenance": "contract catalogue.yaml POST /inventory-holds"
       }
      ]
@@ -646,17 +663,11 @@
      "slot": "carried",
      "components": [
       {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "acquireInventoryHold",
-       "provenance": "carried from the previous definition"
+       "kind": "dataTable",
+       "label": "Availability",
+       "operation": "getAvailability",
+       "notes": "Shows `channelCapacityId`, `performanceId`, `capacity`, `sold`, `leased`, `remaining`, `byChannel` from `getAvailability`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.",
+       "provenance": "contract catalogue.yaml GET /availability"
       }
      ]
     }
@@ -665,15 +676,14 @@
   "states": {
    "loading": "The choose session list.",
    "error": "Could not load. Names which read failed and leaves the choose session untouched.",
-   "emptyFirstRun": "No choose session yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the choose session are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No choose session yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getAvailability` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Not available"
   },
   "apis": [
    {
-    "operationId": "acquireInventoryHold",
-    "contract": "catalogue",
+    "operationId": "addCartLine",
+    "contract": "orders",
     "purpose": "Acquire an inventory lease",
     "trigger": "onAction"
    },
@@ -688,9 +698,42 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-005",
+   "derivedFrom": "wireframes/reference/Kiosk Board 1.dc.html",
    "note": "**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAcquireInventoryHold",
+    "component": "modal",
+    "trigger": "Add to cart",
+    "body": "**Collects what `addCartLine` sends before it is called; the cart takes the hold server-side.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AddCartLineRequest",
+    "confirm": {
+     "label": "Add to cart",
+     "operation": "addCartLine"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "channelCapacityId",
+      "requestedUnits",
+      "ttlSeconds",
+      "channel"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /inventory-holds"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "cartId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P05",
    "audience": "guest",
@@ -745,7 +788,10 @@
     {
      "to": "KSK-008",
      "trigger": "The payment does not resolve",
-     "provenance": "flow F57 step 1→2"
+     "provenance": "flow F57 step 1→2",
+     "carries": [
+      "paymentId"
+     ]
     }
    ],
    "entryFrom": [
@@ -769,7 +815,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected review",
+       "label": "The cart",
        "bindsTo": "Cart",
        "columns": [
         "Cart.id",
@@ -800,58 +846,31 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Add",
+       "label": "Add cart line",
        "operation": "addCartLine",
        "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
       },
       {
        "kind": "secondaryButton",
-       "label": "Checkout",
+       "label": "Checkout cart",
        "operation": "checkoutCart",
        "provenance": "contract orders.yaml POST /carts/{cartId}/checkout"
       },
       {
        "kind": "secondaryButton",
-       "label": "Evaluate",
+       "label": "Evaluate promotions",
        "operation": "evaluatePromotions",
        "provenance": "contract promotions.yaml POST /promotions/evaluate"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "addCartLine",
-       "label": "Add cart line",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "addCartLine",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The review list.",
+   "loading": "The review, read by `getCart`.",
    "error": "Could not load. Names which read failed and leaves the review untouched.",
-   "emptyFirstRun": "No review yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the review are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No review yet. Offers Add cart line (`addCartLine`).",
+   "emptyNoAccess": "Shown when the caller lacks `PRICE_VIEW`, which `evaluatePromotions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Not available"
   },
   "apis": [
@@ -893,9 +912,77 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-006",
+   "derivedFrom": "wireframes/reference/Kiosk Board 1.dc.html",
    "note": "**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAddCartLine",
+    "component": "modal",
+    "trigger": "Add cart line",
+    "body": "**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AddCartLineRequest",
+    "confirm": {
+     "label": "Add cart line",
+     "operation": "addCartLine"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "variantId",
+      "quantity",
+      "performanceId",
+      "seatIds",
+      "parentLineId",
+      "attributes"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
+   },
+   {
+    "id": "formCheckoutCart",
+    "component": "modal",
+    "trigger": "Checkout cart",
+    "body": "**Collects what `checkoutCart` sends before it is called.** Nothing in the body is required. Optional: `subjectId`, `attendees`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Checkout cart",
+     "operation": "checkoutCart"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "subjectId",
+      "attendees"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /carts/{cartId}/checkout"
+   },
+   {
+    "id": "formEvaluatePromotions",
+    "component": "modal",
+    "trigger": "Evaluate promotions",
+    "body": "**Collects what `evaluatePromotions` sends before it is called.** Required: `venueId`, `channel`, `lines`. Optional: `subjectId`, `membershipTierId`, `couponCodes`, `evaluateAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "EvaluatePromotionsRequest",
+    "confirm": {
+     "label": "Evaluate promotions",
+     "operation": "evaluatePromotions"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "venueId",
+      "channel",
+      "lines",
+      "subjectId",
+      "membershipTierId",
+      "couponCodes",
+      "evaluateAt"
+     ]
+    },
+    "provenance": "contract promotions.yaml POST /promotions/evaluate"
+   }
+  ],
   "_platform": {
    "code": "P05",
    "audience": "guest",
@@ -936,16 +1023,28 @@
     "KSK-001",
     "KSK-002",
     "KSK-003",
+    "KSK-008",
     "KSK-009"
    ],
    "inferred": true,
    "fromFlows": true,
    "transitions": [
     {
+     "to": "KSK-008",
+     "trigger": "Payment unresolved",
+     "carries": [
+      "paymentId"
+     ],
+     "provenance": "derived — KSK-008 declares entryState.params paymentId and KSK-007 holds paymentId, so an edge into it carries them"
+    },
+    {
      "to": "KSK-009",
      "trigger": "Takes the printed ticket",
      "provenance": "flow F07 step 7→8, F75 step 5→6",
-     "operation": "createPayment"
+     "operation": "createPayment",
+     "carries": [
+      "orderId"
+     ]
     }
    ]
   },
@@ -991,7 +1090,7 @@
       {
        "kind": "textField",
        "label": "tenderedAmount",
-       "bindsTo": "CreatePaymentRequest.tenderedAmount",
+       "bindsTo": "CreatePaymentRequest.tenderAmount",
        "provenance": "contract orders.yaml POST /payments"
       },
       {
@@ -1020,35 +1119,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create payment",
        "operation": "createPayment",
        "provenance": "contract orders.yaml POST /payments"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createPayment",
-       "label": "Create payment",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createPayment",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1057,8 +1130,8 @@
   "states": {
    "loading": "The saved payment.",
    "error": "Could not load. Names which read failed and leaves the payment untouched.",
-   "emptyFirstRun": "No payment configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No payment configured. The form opens empty and `createPayment` saves the first one; it says what the platform does in the meantime.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_CREATE`, which `createPayment` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Not available. **Card only, and card needs the acquirer**"
   },
   "apis": [
@@ -1073,6 +1146,7 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-007",
+   "derivedFrom": "wireframes/reference/Kiosk Board 1.dc.html",
    "note": "**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -1129,7 +1203,10 @@
      "to": "KSK-010",
      "trigger": "Or it resolves and the printer fails",
      "provenance": "flow F57 step 2→3",
-     "operation": "inquirePaymentStatus"
+     "operation": "inquirePaymentStatus",
+     "carries": [
+      "orderId"
+     ]
     }
    ]
   },
@@ -1157,7 +1234,7 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Inquire",
+       "label": "Inquire payment status",
        "operation": "inquirePaymentStatus",
        "provenance": "contract orders.yaml POST /payments/{paymentId}/inquiry"
       }
@@ -1165,20 +1242,13 @@
     },
     {
      "name": "contentBody",
-     "slot": "carried",
      "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
       {
        "kind": "secondaryButton",
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
-       "impliedBy": "inquirePaymentStatus",
-       "provenance": "carried from the previous definition"
+       "impliedBy": "inquirePaymentStatus"
       }
      ]
     }
@@ -1187,8 +1257,8 @@
   "states": {
    "loading": "The saved payment unresolved.",
    "error": "Could not load. Names which read failed and leaves the payment unresolved untouched.",
-   "emptyFirstRun": "No payment unresolved configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No payment unresolved configured. The form opens empty and `inquirePaymentStatus` saves the first one; it says what the platform does in the meantime.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_CREATE`, which `inquirePaymentStatus` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Not applicable"
   },
   "apis": [
@@ -1212,6 +1282,7 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-008",
+   "derivedFrom": "wireframes/reference/Kiosk Board 1.dc.html",
    "note": "**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -1255,6 +1326,7 @@
     "KSK-001",
     "KSK-002",
     "KSK-003",
+    "KSK-010",
     "KSK-013"
    ],
    "inferred": true,
@@ -1263,6 +1335,14 @@
      "to": "KSK-013",
      "trigger": "Something goes wrong and they call staff",
      "provenance": "flow F75 step 6→7"
+    },
+    {
+     "to": "KSK-010",
+     "trigger": "Print failure",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — KSK-010 declares entryState.params orderId and KSK-009 holds orderId, so an edge into it carries them"
     }
    ]
   },
@@ -1283,7 +1363,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected ticket issued",
+       "label": "The order",
        "bindsTo": "Order",
        "columns": [
         "Order.id",
@@ -1314,39 +1394,19 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Transfer",
+       "label": "Transfer order tickets",
        "operation": "transferOrderTickets",
        "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "transferOrderTickets",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
    ]
   },
   "states": {
-   "loading": "The ticket issued list.",
+   "loading": "The ticket issued, read by `getOrder`.",
    "error": "Could not load. Names which read failed and leaves the ticket issued untouched.",
-   "emptyFirstRun": "No ticket issued yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the ticket issued are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No ticket issued yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Not applicable"
   },
   "apis": [
@@ -1376,9 +1436,31 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-009",
+   "derivedFrom": "wireframes/reference/Kiosk Board 1.dc.html",
    "note": "**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formTransferOrderTickets",
+    "component": "modal",
+    "trigger": "Transfer order tickets",
+    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Transfer order tickets",
+     "operation": "transferOrderTickets"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "ticketIds",
+      "recipient",
+      "message"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+   }
+  ],
   "_platform": {
    "code": "P05",
    "audience": "guest",
@@ -1444,13 +1526,6 @@
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`transferOrderTickets`) and no read of a population — it is settings, not a list",
   "purpose": "Recover when the paper runs out mid-sale.",
-  "gaps": [
-   {
-    "operation": "transferOrderTickets",
-    "why": "**`transferOrderTickets` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
-    "source": "contract orders.yaml POST /orders/{orderId}/transfer"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1460,7 +1535,7 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Transfer",
+       "label": "Transfer order tickets",
        "operation": "transferOrderTickets",
        "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       }
@@ -1471,17 +1546,24 @@
      "slot": "carried",
      "components": [
       {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
+       "kind": "multiSelect",
+       "label": "Ticket ids",
+       "operation": "transferOrderTickets",
+       "notes": "Required.",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "transferOrderTickets",
-       "provenance": "carried from the previous definition"
+       "kind": "textField",
+       "label": "Recipient",
+       "operation": "transferOrderTickets",
+       "notes": "Required.",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      },
+      {
+       "kind": "textField",
+       "label": "Message",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       }
      ]
     }
@@ -1491,7 +1573,6 @@
    "loading": "Sending by email and rendering the QR",
    "error": "**The order is paid and the ticket exists.** Email and on-screen QR, and the kiosk marks itself degraded rather than dead",
    "emptyFirstRun": "Not applicable",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Not applicable"
   },
   "apis": [
@@ -1515,6 +1596,7 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-010",
+   "derivedFrom": "wireframes/reference/Kiosk Board 2.dc.html",
    "note": "**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",

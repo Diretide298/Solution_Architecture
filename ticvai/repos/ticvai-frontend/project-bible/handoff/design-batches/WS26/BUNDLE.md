@@ -1,6 +1,6 @@
 # WS26 — Customer Service board 2
 
-**10 screens · 10 operations · 11 schemas · 3 permissions**
+**10 screens · 13 operations · 22 schemas · 3 permissions**
 
 Platform P12 Venue Support · ships as **venue-management** ·
 staff audience · web ·
@@ -48,10 +48,9 @@ convincingly. It is never a caption.
 ## Rules that are not style preferences
 
 - **Every control that can be refused must be gated.** 3 permissions apply here:
-  `MARKETING_MANAGE, MARKETING_VIEW, QUEUE_VIEW`. A control nobody can use must say so,
+  `CASE_MANAGE, CASE_VIEW, QUEUE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **1 of these operations work offline**: listQueues
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -62,8 +61,8 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `SUP-019` | Contact Center Operations Command Center | commandCentre | 1 | 0 | — |
-| `SUP-020` | Queue Configuration & Management | configEditor | 1 | 0 | — |
-| `SUP-021` | Intelligent Routing, Skills & Assignment Engine | listDetail | 1 | 0 | — |
+| `SUP-020` | Queue Configuration & Management | configEditor | 3 | 1 | — |
+| `SUP-021` | Intelligent Routing, Skills & Assignment Engine | listDetail | 3 | 0 | — |
 | `SUP-022` | SLA Policy & Service-Level Management | configEditor | 1 | 0 | — |
 | `SUP-023` | Agent Workload, Availability & Workforce Control | listDetail | 1 | 0 | — |
 | `SUP-024` | Escalation & Critical Case Monitor | listDetail | 1 | 0 | — |
@@ -74,7 +73,7 @@ convincingly. It is never a caption.
 
 ## Thin screens in this batch
 
-**SUP-021, SUP-023, SUP-024, SUP-025, SUP-028 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**SUP-023, SUP-024, SUP-025, SUP-028 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "SUP-001",
      "trigger": "Agent Login",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-019 holds none of them, so the edge carries nothing and SUP-001 opens cold"
     },
     {
      "to": "SUP-020",
@@ -186,10 +182,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Supervisors can understand the real-time operational state of Customer Service and identify the queues, channels and issues requiring immediate intervention.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Display) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Provide supervisors and management with a real-time view of customer-service operations across",
-  "purposeNote": "Supervisors can understand the real-time operational state of Customer Service and identify the queues, channels and issues requiring immediate intervention.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -268,19 +264,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "metricTile",
        "label": "First Response Time",
        "provenance": "pack Customer Service_Reference.pdf, page 24 §Display",
-       "bindsTo": "ContactCenterOperationsCommandCenterView.firstResponseTime"
+       "bindsTo": "ContactCenterOperationsCommandCenterView.averageFirstResponseSeconds"
       },
       {
        "kind": "metricTile",
        "label": "Average Resolution Time",
        "provenance": "pack Customer Service_Reference.pdf, page 24 §Display",
-       "bindsTo": "ContactCenterOperationsCommandCenterView.averageResolutionTime"
+       "bindsTo": "ContactCenterOperationsCommandCenterView.averageResolutionSeconds"
       },
       {
        "kind": "metricTile",
        "label": "First Contact Resolution",
        "provenance": "pack Customer Service_Reference.pdf, page 24 §Display",
-       "bindsTo": "ContactCenterOperationsCommandCenterView.firstContactResolution"
+       "bindsTo": "ContactCenterOperationsCommandCenterView.firstContactResolutionRate"
       },
       {
        "kind": "metricTile",
@@ -332,7 +328,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-019"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-019",
+   "workshopBoard": "wireframes/WS43 Customer Service Board 2.dc.html#sup-019"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 24. 13 of 14 labels bound to a contract property; 15 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -395,14 +392,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can configure specialized service queues and supervisors can operationally adjust them without changing application code.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure and operate the queues through which customer-service cases are organized.",
-  "purposeNote": "Administrators can configure specialized service queues and supervisors can operationally adjust them without changing application code.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Membership, Group Sales Support. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Payments, Membership, Wallet, Group Sales Support, Access Control. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Customer Service_Reference.pdf, page 25 §Support configurable queues such as"
    }
   ],
@@ -512,6 +509,28 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "selectField",
        "label": "Emergency handling",
        "provenance": "pack Customer Service_Reference.pdf, page 25 §Configure"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is active",
+       "operation": "listServiceQueues",
+       "notes": "Sends `?isActive=` to `listServiceQueues`.",
+       "provenance": "contract marketing-crm.yaml GET /service-queues"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every service queue",
+       "bindsTo": "ServiceQueue",
+       "columns": [
+        "ServiceQueue.id",
+        "ServiceQueue.code",
+        "ServiceQueue.name",
+        "ServiceQueue.overflowWaitSeconds",
+        "ServiceQueue.isActive",
+        "ServiceQueue.scopePath"
+       ],
+       "operation": "listServiceQueues",
+       "provenance": "contract marketing-crm.yaml GET /service-queues"
       }
      ]
     },
@@ -521,13 +540,36 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Payments",
+       "provenance": "pack Customer Service_Reference.pdf, page 25 §Support configurable queues such as"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Membership",
+       "provenance": "pack Customer Service_Reference.pdf, page 25 §Support configurable queues such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Wallet",
        "provenance": "pack Customer Service_Reference.pdf, page 25 §Support configurable queues such as"
       },
       {
        "kind": "secondaryButton",
        "label": "Group Sales Support",
        "provenance": "pack Customer Service_Reference.pdf, page 25 §Support configurable queues such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Access Control",
+       "provenance": "pack Customer Service_Reference.pdf, page 25 §Support configurable queues such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save service queue definition",
+       "operation": "setServiceQueueDefinition",
+       "permission": "CASE_MANAGE",
+       "notes": "**An upsert keyed on `code`**, which is unique in the venue and never changes once created.",
+       "provenance": "contract marketing-crm.yaml PUT /service-queues"
       }
      ]
     }
@@ -545,14 +587,56 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "queue",
     "purpose": "List queues",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listServiceQueues",
+    "contract": "marketing-crm",
+    "purpose": "List customer-service queues",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setServiceQueueDefinition",
+    "contract": "marketing-crm",
+    "purpose": "Create or change a customer-service queue",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueues",
+     "listServiceQueues"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-020"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-020",
+   "workshopBoard": "wireframes/WS43 Customer Service Board 2.dc.html#sup-020"
   },
-  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 25. 0 of 0 labels bound to a contract property; 22 of 52 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 25. 0 of 0 labels bound to a contract property; 25 of 52 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetServiceQueueDefinition",
+    "component": "modal",
+    "trigger": "Save service queue definition",
+    "body": "**Collects what `setServiceQueueDefinition` sends before it is called.** Required: `id`, `code`, `name`, `isActive`. Optional: `overflowWaitSeconds`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ServiceQueue",
+    "confirm": {
+     "label": "Save service queue definition",
+     "operation": "setServiceQueueDefinition"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "code",
+      "name",
+      "isActive",
+      "overflowWaitSeconds",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml PUT /service-queues"
+   }
+  ],
   "_platform": {
    "code": "P12",
    "audience": "staff",
@@ -613,10 +697,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Customer cases are routed to appropriately skilled and available agents using governed routing rules with transparent assignment logic.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Determine the best agent or team to handle each customer request.",
-  "purposeNote": "Customer cases are routed to appropriately skilled and available agents using governed routing rules with transparent assignment logic.",
   "gaps": [
    {
     "operation": null,
@@ -652,6 +736,65 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setIntelligentRoutingSkill"
+      },
+      {
+       "kind": "textField",
+       "label": "Parent category id",
+       "operation": "listCaseCategories",
+       "notes": "Sends `?parentCategoryId=` to `listCaseCategories`.",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      },
+      {
+       "kind": "toggle",
+       "label": "Top level only",
+       "operation": "listCaseCategories",
+       "notes": "Sends `?topLevelOnly=` to `listCaseCategories`.",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is active",
+       "operation": "listCaseCategories",
+       "notes": "Sends `?isActive=` to `listCaseCategories`.",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every case category",
+       "bindsTo": "CaseCategory",
+       "columns": [
+        "CaseCategory.id",
+        "CaseCategory.code",
+        "CaseCategory.name",
+        "CaseCategory.parentCategoryId",
+        "CaseCategory.defaultPriority",
+        "CaseCategory.isActive",
+        "CaseCategory.scopePath"
+       ],
+       "operation": "listCaseCategories",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is active",
+       "operation": "listServiceQueues",
+       "notes": "Sends `?isActive=` to `listServiceQueues`.",
+       "provenance": "contract marketing-crm.yaml GET /service-queues"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every service queue",
+       "bindsTo": "ServiceQueue",
+       "columns": [
+        "ServiceQueue.id",
+        "ServiceQueue.code",
+        "ServiceQueue.name",
+        "ServiceQueue.overflowWaitSeconds",
+        "ServiceQueue.isActive",
+        "ServiceQueue.scopePath"
+       ],
+       "operation": "listServiceQueues",
+       "provenance": "contract marketing-crm.yaml GET /service-queues"
       }
      ]
     }
@@ -669,16 +812,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setIntelligentRoutingSkill",
     "contract": "marketing-crm",
     "purpose": "Intelligent Routing, Skills & Assignment Engine",
-    "trigger": "onAction",
-    "invalidates": [
-     "setIntelligentRoutingSkill"
-    ]
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listCaseCategories",
+    "contract": "marketing-crm",
+    "purpose": "List case categories and subcategories",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listServiceQueues",
+    "contract": "marketing-crm",
+    "purpose": "List customer-service queues",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-021"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-021",
+   "workshopBoard": "wireframes/WS43 Customer Service Board 2.dc.html#sup-021"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 27. 0 of 0 labels bound to a contract property; 0 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -741,10 +894,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "cases likely to breach.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Define and monitor service-level commitments for different customer-service scenarios.",
-  "purposeNote": "cases likely to breach.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Venue operating hours. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Customer Service_Reference.pdf, page 29 §Support"
+   }
+  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -783,6 +943,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Customer Service_Reference.pdf, page 29 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Venue operating hours",
+       "provenance": "pack Customer Service_Reference.pdf, page 29 §Support"
+      }
+     ]
     }
    ]
   },
@@ -804,18 +975,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "preloaded": [
     "SlaPolicyServiceLevelManagementView.withinSla",
     "SlaPolicyServiceLevelManagementView.atRisk",
-    "SlaPolicyServiceLevelManagementView.breached",
-    "SlaPolicyServiceLevelManagementView.averageResponse",
-    "SlaPolicyServiceLevelManagementView.averageResolution",
-    "SlaPolicyServiceLevelManagementView.slaCompliance"
+    "SlaPolicyServiceLevelManagementView.breached"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-022"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-022",
+   "workshopBoard": "wireframes/WS43 Customer Service Board 2.dc.html#sup-022"
   },
-  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 29. 0 of 0 labels bound to a contract property; 12 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 29. 0 of 0 labels bound to a contract property; 13 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P12",
    "audience": "staff",
@@ -876,10 +1045,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Supervisors can understand workload distribution and rebalance service resources before queue or SLA performance deteriorates.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Give supervisors visibility and control over active customer-service resources.",
-  "purposeNote": "Supervisors can understand workload distribution and rebalance service resources before queue or SLA performance deteriorates.",
   "layout": {
    "template": "split",
    "regions": [
@@ -891,7 +1060,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every agent workload availability",
        "columns": [
-        "AgentWorkloadAvailabilityWorkforceControlView.agent",
+        "AgentWorkloadAvailabilityWorkforceControlView.agentName",
         "AgentWorkloadAvailabilityWorkforceControlView.team",
         "AgentWorkloadAvailabilityWorkforceControlView.skills",
         "AgentWorkloadAvailabilityWorkforceControlView.languages",
@@ -899,9 +1068,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "AgentWorkloadAvailabilityWorkforceControlView.activeCases",
         "AgentWorkloadAvailabilityWorkforceControlView.chats",
         "AgentWorkloadAvailabilityWorkforceControlView.calls",
-        "AgentWorkloadAvailabilityWorkforceControlView.queue",
+        "AgentWorkloadAvailabilityWorkforceControlView.queues[].queueName",
         "AgentWorkloadAvailabilityWorkforceControlView.slaRiskCases",
-        "AgentWorkloadAvailabilityWorkforceControlView.averageHandleTime",
+        "AgentWorkloadAvailabilityWorkforceControlView.averageHandleSeconds",
         "AgentWorkloadAvailabilityWorkforceControlView.resolutionRate",
         "AgentWorkloadAvailabilityWorkforceControlView.utilization"
        ],
@@ -920,7 +1089,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected agent workload availability",
        "bindsTo": "AgentWorkloadAvailabilityWorkforceControlView",
        "columns": [
-        "AgentWorkloadAvailabilityWorkforceControlView.agent",
+        "AgentWorkloadAvailabilityWorkforceControlView.agentName",
         "AgentWorkloadAvailabilityWorkforceControlView.team",
         "AgentWorkloadAvailabilityWorkforceControlView.skills",
         "AgentWorkloadAvailabilityWorkforceControlView.languages",
@@ -928,9 +1097,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "AgentWorkloadAvailabilityWorkforceControlView.activeCases",
         "AgentWorkloadAvailabilityWorkforceControlView.chats",
         "AgentWorkloadAvailabilityWorkforceControlView.calls",
-        "AgentWorkloadAvailabilityWorkforceControlView.queue",
+        "AgentWorkloadAvailabilityWorkforceControlView.queues[].queueName",
         "AgentWorkloadAvailabilityWorkforceControlView.slaRiskCases",
-        "AgentWorkloadAvailabilityWorkforceControlView.averageHandleTime",
+        "AgentWorkloadAvailabilityWorkforceControlView.averageHandleSeconds",
         "AgentWorkloadAvailabilityWorkforceControlView.resolutionRate",
         "AgentWorkloadAvailabilityWorkforceControlView.utilization"
        ],
@@ -958,7 +1127,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "AgentWorkloadAvailabilityWorkforceControlView.agent",
+    "AgentWorkloadAvailabilityWorkforceControlView.agentName",
     "AgentWorkloadAvailabilityWorkforceControlView.team",
     "AgentWorkloadAvailabilityWorkforceControlView.skills",
     "AgentWorkloadAvailabilityWorkforceControlView.languages",
@@ -969,7 +1138,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-023"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-023",
+   "workshopBoard": "wireframes/WS43 Customer Service Board 2.dc.html#sup-023"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 31. 13 of 13 labels bound to a contract property; 13 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1032,10 +1202,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Supervisors can identify, coordinate and resolve critical escalations and systemic service incidents from one central workspace.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide supervisors with one workspace for cases requiring elevated attention.",
-  "purposeNote": "Supervisors can identify, coordinate and resolve critical escalations and systemic service incidents from one central workspace.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1047,25 +1217,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every escalation critical case",
        "columns": [
-        "EscalationCriticalCaseMonitorView.escalatedCases",
-        "EscalationCriticalCaseMonitorView.criticalCases",
-        "EscalationCriticalCaseMonitorView.slaBreaches",
-        "EscalationCriticalCaseMonitorView.vipEscalations",
-        "EscalationCriticalCaseMonitorView.financialEscalations",
-        "EscalationCriticalCaseMonitorView.eventDayEscalations",
-        "EscalationCriticalCaseMonitorView.managementEscalations",
-        "EscalationCriticalCaseMonitorView.technicalEscalations",
-        "EscalationCriticalCaseMonitorView.case",
-        "EscalationCriticalCaseMonitorView.customer",
+        "EscalationCriticalCaseMonitorView.caseNumber",
+        "EscalationCriticalCaseMonitorView.customerName",
         "EscalationCriticalCaseMonitorView.reason",
         "EscalationCriticalCaseMonitorView.priority",
         "EscalationCriticalCaseMonitorView.transactionValue",
-        "EscalationCriticalCaseMonitorView.event",
-        "EscalationCriticalCaseMonitorView.assignedAgent",
-        "EscalationCriticalCaseMonitorView.escalatedTo",
-        "EscalationCriticalCaseMonitorView.escalationTime",
-        "EscalationCriticalCaseMonitorView.sla",
-        "EscalationCriticalCaseMonitorView.currentStatus"
+        "EscalationCriticalCaseMonitorView.eventName",
+        "EscalationCriticalCaseMonitorView.assignedToPrincipalId",
+        "EscalationCriticalCaseMonitorView.escalatedToPrincipalId",
+        "EscalationCriticalCaseMonitorView.escalatedAt",
+        "EscalationCriticalCaseMonitorView.slaDueAt",
+        "EscalationCriticalCaseMonitorView.isSlaBreached",
+        "EscalationCriticalCaseMonitorView.status"
        ],
        "bindsTo": "EscalationCriticalCaseMonitorView",
        "operation": "listEscalationCriticalCase",
@@ -1082,25 +1245,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected escalation critical case",
        "bindsTo": "EscalationCriticalCaseMonitorView",
        "columns": [
-        "EscalationCriticalCaseMonitorView.escalatedCases",
-        "EscalationCriticalCaseMonitorView.criticalCases",
-        "EscalationCriticalCaseMonitorView.slaBreaches",
-        "EscalationCriticalCaseMonitorView.vipEscalations",
-        "EscalationCriticalCaseMonitorView.financialEscalations",
-        "EscalationCriticalCaseMonitorView.eventDayEscalations",
-        "EscalationCriticalCaseMonitorView.managementEscalations",
-        "EscalationCriticalCaseMonitorView.technicalEscalations",
-        "EscalationCriticalCaseMonitorView.case",
-        "EscalationCriticalCaseMonitorView.customer",
+        "EscalationCriticalCaseMonitorView.caseNumber",
+        "EscalationCriticalCaseMonitorView.customerName",
         "EscalationCriticalCaseMonitorView.reason",
         "EscalationCriticalCaseMonitorView.priority",
         "EscalationCriticalCaseMonitorView.transactionValue",
-        "EscalationCriticalCaseMonitorView.event",
-        "EscalationCriticalCaseMonitorView.assignedAgent",
-        "EscalationCriticalCaseMonitorView.escalatedTo",
-        "EscalationCriticalCaseMonitorView.escalationTime",
-        "EscalationCriticalCaseMonitorView.sla",
-        "EscalationCriticalCaseMonitorView.currentStatus"
+        "EscalationCriticalCaseMonitorView.eventName",
+        "EscalationCriticalCaseMonitorView.assignedToPrincipalId",
+        "EscalationCriticalCaseMonitorView.escalatedToPrincipalId",
+        "EscalationCriticalCaseMonitorView.escalatedAt",
+        "EscalationCriticalCaseMonitorView.slaDueAt",
+        "EscalationCriticalCaseMonitorView.isSlaBreached",
+        "EscalationCriticalCaseMonitorView.status"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Major Issue Detection”, “Potential Major Incident”.",
        "provenance": "pack Customer Service_Reference.pdf, page 32 §Display"
@@ -1125,19 +1281,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    }
   ],
   "entryState": {
-   "preloaded": [
-    "EscalationCriticalCaseMonitorView.escalatedCases",
-    "EscalationCriticalCaseMonitorView.criticalCases",
-    "EscalationCriticalCaseMonitorView.slaBreaches",
-    "EscalationCriticalCaseMonitorView.vipEscalations",
-    "EscalationCriticalCaseMonitorView.financialEscalations",
-    "EscalationCriticalCaseMonitorView.eventDayEscalations"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-024"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-024",
+   "workshopBoard": "wireframes/WS43 Customer Service Board 2.dc.html#sup-024"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 32. 19 of 19 labels bound to a contract property; 19 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1200,10 +1350,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "findings into measurable coaching actions.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Measure whether customer-service interactions meet TICVAI's defined service-quality standards.",
-  "purposeNote": "findings into measurable coaching actions.",
   "gaps": [
    {
     "operation": null,
@@ -1264,18 +1414,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    }
   ],
   "entryState": {
-   "preloaded": [
-    "QualityManagementAgentEvaluationView.greeting",
-    "QualityManagementAgentEvaluationView.customerVerification",
-    "QualityManagementAgentEvaluationView.understanding",
-    "QualityManagementAgentEvaluationView.accuracy",
-    "QualityManagementAgentEvaluationView.policyCompliance"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-025"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-025",
+   "workshopBoard": "wireframes/WS43 Customer Service Board 2.dc.html#sup-025"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 34. 0 of 0 labels bound to a contract property; 1 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1338,14 +1483,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Management can understand what customers think about the service experience and trace negative trends back to their underlying operational causes.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Display) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Measure customer perception of TICVAI's support experience and identify recurring service problems.",
-  "purposeNote": "Management can understand what customers think about the service experience and trace negative trends back to their underlying operational causes.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Direct Customer Comment. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Service Rating, NPS where used, Direct Customer Comment. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Customer Service_Reference.pdf, page 35 §Support"
    }
   ],
@@ -1372,19 +1517,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "metricTile",
        "label": "Positive %",
        "provenance": "pack Customer Service_Reference.pdf, page 35 §Display",
-       "bindsTo": "CustomerSatisfactionFeedbackVoiceOfCustomerView.positive"
+       "bindsTo": "CustomerSatisfactionFeedbackVoiceOfCustomerView.positiveRate"
       },
       {
        "kind": "metricTile",
        "label": "Neutral %",
        "provenance": "pack Customer Service_Reference.pdf, page 35 §Display",
-       "bindsTo": "CustomerSatisfactionFeedbackVoiceOfCustomerView.neutral"
+       "bindsTo": "CustomerSatisfactionFeedbackVoiceOfCustomerView.neutralRate"
       },
       {
        "kind": "metricTile",
        "label": "Negative %",
        "provenance": "pack Customer Service_Reference.pdf, page 35 §Display",
-       "bindsTo": "CustomerSatisfactionFeedbackVoiceOfCustomerView.negative"
+       "bindsTo": "CustomerSatisfactionFeedbackVoiceOfCustomerView.negativeRate"
       },
       {
        "kind": "metricTile",
@@ -1402,7 +1547,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "metricTile",
        "label": "Customer Effort where measured",
        "provenance": "pack Customer Service_Reference.pdf, page 35 §Display",
-       "bindsTo": "CustomerSatisfactionFeedbackVoiceOfCustomerView.customerEffortWhereMeasured"
+       "bindsTo": "CustomerSatisfactionFeedbackVoiceOfCustomerView.customerEffortScore"
       }
      ]
     },
@@ -1412,6 +1557,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Service Rating",
+       "provenance": "pack Customer Service_Reference.pdf, page 35 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "NPS where used",
+       "provenance": "pack Customer Service_Reference.pdf, page 35 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Direct Customer Comment",
        "provenance": "pack Customer Service_Reference.pdf, page 35 §Support"
       }
@@ -1438,18 +1593,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "preloaded": [
     "CustomerSatisfactionFeedbackVoiceOfCustomerView.csat",
     "CustomerSatisfactionFeedbackVoiceOfCustomerView.surveyResponseRate",
-    "CustomerSatisfactionFeedbackVoiceOfCustomerView.positive",
-    "CustomerSatisfactionFeedbackVoiceOfCustomerView.neutral",
-    "CustomerSatisfactionFeedbackVoiceOfCustomerView.negative",
+    "CustomerSatisfactionFeedbackVoiceOfCustomerView.positiveRate",
+    "CustomerSatisfactionFeedbackVoiceOfCustomerView.neutralRate",
+    "CustomerSatisfactionFeedbackVoiceOfCustomerView.negativeRate",
     "CustomerSatisfactionFeedbackVoiceOfCustomerView.complaints"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-026"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-026",
+   "workshopBoard": "wireframes/WS43 Customer Service Board 2.dc.html#sup-026"
   },
-  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 35. 8 of 8 labels bound to a contract property; 9 of 46 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 35. 8 of 8 labels bound to a contract property; 11 of 46 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P12",
    "audience": "staff",
@@ -1510,10 +1666,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Management can move beyond reporting case volumes and identify the actual product, process and technology issues generating customer demand.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Analyze; Compare) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Provide comprehensive analytics explaining why customers contact TICVAI and what is driving service demand.",
-  "purposeNote": "Management can move beyond reporting case volumes and identify the actual product, process and technology issues generating customer demand.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -1537,19 +1693,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "metricTile",
        "label": "First Response Time",
        "provenance": "pack Customer Service_Reference.pdf, page 37 §Analyze",
-       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.firstResponseTime"
+       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.averageFirstResponseSeconds"
       },
       {
        "kind": "metricTile",
        "label": "Resolution Time",
        "provenance": "pack Customer Service_Reference.pdf, page 37 §Analyze",
-       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.resolutionTime"
+       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.averageResolutionSeconds"
       },
       {
        "kind": "metricTile",
        "label": "First Contact Resolution",
        "provenance": "pack Customer Service_Reference.pdf, page 37 §Analyze",
-       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.firstContactResolution"
+       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.firstContactResolutionRate"
       },
       {
        "kind": "metricTile",
@@ -1567,13 +1723,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "metricTile",
        "label": "SLA Compliance",
        "provenance": "pack Customer Service_Reference.pdf, page 37 §Analyze",
-       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.slaCompliance"
+       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.slaComplianceRate"
       },
       {
        "kind": "metricTile",
        "label": "Cost per Case where available",
        "provenance": "pack Customer Service_Reference.pdf, page 37 §Analyze",
-       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.costPerCaseWhereAvailable"
+       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.costPerCase"
       },
       {
        "kind": "metricTile",
@@ -1584,7 +1740,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "metricTile",
        "label": "Refund Requests",
-       "provenance": "pack Customer Service_Reference.pdf, page 37 §Analyze"
+       "provenance": "pack Customer Service_Reference.pdf, page 37 §Analyze",
+       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.refundRequests"
       },
       {
        "kind": "metricTile",
@@ -1593,40 +1750,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.complaintRate"
       },
       {
-       "kind": "metricTile",
-       "label": "Today vs Yesterday",
-       "provenance": "pack Customer Service_Reference.pdf, page 37 §Compare",
-       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.todayVsYesterday"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Week vs Week",
-       "provenance": "pack Customer Service_Reference.pdf, page 37 §Compare",
-       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.weekVsWeek"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Month vs Month",
-       "provenance": "pack Customer Service_Reference.pdf, page 37 §Compare",
-       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.monthVsMonth"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Event vs Event",
-       "provenance": "pack Customer Service_Reference.pdf, page 37 §Compare",
-       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.eventVsEvent"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Venue vs Venue",
-       "provenance": "pack Customer Service_Reference.pdf, page 37 §Compare",
-       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.venueVsVenue"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Product vs Product",
-       "provenance": "pack Customer Service_Reference.pdf, page 37 §Compare",
-       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.productVsProduct"
+       "kind": "dataTable",
+       "label": "Comparison",
+       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.comparison.kpis[]",
+       "columns": [
+        "ServiceAnalyticsRootCauseIntelligenceView.comparison.kpis[].kpi",
+        "ServiceAnalyticsRootCauseIntelligenceView.comparison.kpis[].current",
+        "ServiceAnalyticsRootCauseIntelligenceView.comparison.kpis[].previous",
+        "ServiceAnalyticsRootCauseIntelligenceView.comparison.kpis[].changeRate"
+       ],
+       "operation": "listServiceRootCause",
+       "notes": "One comparison panel in place of the pack's six tiles (Today vs Yesterday, Week vs Week, Month vs Month, Event vs Event, Venue vs Venue, Product vs Product). The compare selector sends `?compare=` (previousDay, previousWeek, previousMonth, event, venue, product) and `?compareId=` to `listServiceRootCause`; the basis shown is `comparison.basis`.",
+       "provenance": "pack Customer Service_Reference.pdf, page 37 §Compare"
       }
      ]
     }
@@ -1651,15 +1786,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "preloaded": [
     "ServiceAnalyticsRootCauseIntelligenceView.contactVolume",
     "ServiceAnalyticsRootCauseIntelligenceView.cases",
-    "ServiceAnalyticsRootCauseIntelligenceView.firstResponseTime",
-    "ServiceAnalyticsRootCauseIntelligenceView.resolutionTime",
-    "ServiceAnalyticsRootCauseIntelligenceView.firstContactResolution"
+    "ServiceAnalyticsRootCauseIntelligenceView.averageFirstResponseSeconds",
+    "ServiceAnalyticsRootCauseIntelligenceView.averageResolutionSeconds",
+    "ServiceAnalyticsRootCauseIntelligenceView.firstContactResolutionRate"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-027"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-027",
+   "workshopBoard": "wireframes/WS43 Customer Service Board 2.dc.html#sup-027"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 37. 17 of 17 labels bound to a contract property; 18 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1714,10 +1850,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "approved low-risk workflows without removing governance over customer-impacting decisions. Board 2 — Final Screen Register",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Forecast) and no metric row",
   "purpose": "Create the management-level AI intelligence layer for Customer Service. This is different from 10.1.10 AI Customer Service Copilot. Board 1 Copilot = helps one agent resolve one case. Board 2 AI Intelligence = improves the entire service operation.",
-  "purposeNote": "approved low-risk workflows without removing governance over customer-impacting decisions. Board 2 — Final Screen Register",
   "gaps": [
    {
     "operation": null,
@@ -1736,12 +1872,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every contact intelligence automation",
        "columns": [
-        "AiContactCenterIntelligenceAutomationStudioView.contactVolume",
-        "AiContactCenterIntelligenceAutomationStudioView.queueDemand",
-        "AiContactCenterIntelligenceAutomationStudioView.requiredAgents",
-        "AiContactCenterIntelligenceAutomationStudioView.slaRisk",
-        "AiContactCenterIntelligenceAutomationStudioView.expectedComplaints",
-        "AiContactCenterIntelligenceAutomationStudioView.eventDaySupportDemand"
+        "AiContactCenterIntelligenceAutomationStudioView.forecast.contactVolume",
+        "AiContactCenterIntelligenceAutomationStudioView.forecast.queueDemand[]",
+        "AiContactCenterIntelligenceAutomationStudioView.forecast.requiredAgents",
+        "AiContactCenterIntelligenceAutomationStudioView.forecast.slaRiskCases",
+        "AiContactCenterIntelligenceAutomationStudioView.forecast.expectedComplaints",
+        "AiContactCenterIntelligenceAutomationStudioView.forecast.eventDaySupportDemand"
        ],
        "bindsTo": "AiContactCenterIntelligenceAutomationStudioView",
        "operation": "listContactAutomation",
@@ -1758,12 +1894,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected contact intelligence automation",
        "bindsTo": "AiContactCenterIntelligenceAutomationStudioView",
        "columns": [
-        "AiContactCenterIntelligenceAutomationStudioView.contactVolume",
-        "AiContactCenterIntelligenceAutomationStudioView.queueDemand",
-        "AiContactCenterIntelligenceAutomationStudioView.requiredAgents",
-        "AiContactCenterIntelligenceAutomationStudioView.slaRisk",
-        "AiContactCenterIntelligenceAutomationStudioView.expectedComplaints",
-        "AiContactCenterIntelligenceAutomationStudioView.eventDaySupportDemand"
+        "AiContactCenterIntelligenceAutomationStudioView.forecast.contactVolume",
+        "AiContactCenterIntelligenceAutomationStudioView.forecast.queueDemand[]",
+        "AiContactCenterIntelligenceAutomationStudioView.forecast.requiredAgents",
+        "AiContactCenterIntelligenceAutomationStudioView.forecast.slaRiskCases",
+        "AiContactCenterIntelligenceAutomationStudioView.forecast.expectedComplaints",
+        "AiContactCenterIntelligenceAutomationStudioView.forecast.eventDaySupportDemand"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Analyze governed information from”, “Workforce”, “Self-Service”, “Product Improvement”, “Operational Improvement”, “Incident Detection”.",
        "provenance": "pack Customer Service_Reference.pdf, page 39 §Forecast"
@@ -1789,18 +1925,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "AiContactCenterIntelligenceAutomationStudioView.contactVolume",
-    "AiContactCenterIntelligenceAutomationStudioView.queueDemand",
-    "AiContactCenterIntelligenceAutomationStudioView.requiredAgents",
-    "AiContactCenterIntelligenceAutomationStudioView.slaRisk",
-    "AiContactCenterIntelligenceAutomationStudioView.expectedComplaints",
-    "AiContactCenterIntelligenceAutomationStudioView.eventDaySupportDemand"
+    "AiContactCenterIntelligenceAutomationStudioView.forecast.contactVolume",
+    "AiContactCenterIntelligenceAutomationStudioView.forecast.queueDemand[]",
+    "AiContactCenterIntelligenceAutomationStudioView.forecast.requiredAgents",
+    "AiContactCenterIntelligenceAutomationStudioView.forecast.slaRiskCases",
+    "AiContactCenterIntelligenceAutomationStudioView.forecast.expectedComplaints",
+    "AiContactCenterIntelligenceAutomationStudioView.forecast.eventDaySupportDemand"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-028"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-028",
+   "workshopBoard": "wireframes/WS43 Customer Service Board 2.dc.html#sup-028"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 39. 6 of 6 labels bound to a contract property; 6 of 95 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1840,24 +1977,125 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/agent-workload-availability",
   "contract": "marketing-crm",
   "summary": "Agent Workload, Availability & Workforce Control",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "queueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "team",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "skill",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "language",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "AgentWorkloadAvailabilityWorkforceControlView"
+  "responds": "Page"
+ },
+ "listCaseCategories": {
+  "method": "GET",
+  "path": "/case-categories",
+  "contract": "marketing-crm",
+  "summary": "List case categories and subcategories",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "parentCategoryId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "topLevelOnly",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "isActive",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listContact": {
   "method": "GET",
   "path": "/contact",
   "contract": "marketing-crm",
   "summary": "Contact Center Operations Command Center",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "queueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "ContactCenterOperationsCommandCenterView"
  },
@@ -1866,11 +2104,27 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/contact-automation",
   "contract": "marketing-crm",
   "summary": "AI Contact Center Intelligence & Automation Studio",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "horizonHours",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "AiContactCenterIntelligenceAutomationStudioView"
  },
@@ -1879,11 +2133,62 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/customer-satisfaction-feedback",
   "contract": "marketing-crm",
   "summary": "Customer Satisfaction, Feedback & Voice of Customer",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "source",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "eventId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "agentPrincipalId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "sentiment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "CustomerSatisfactionFeedbackVoiceOfCustomerView"
  },
@@ -1892,26 +2197,108 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/escalation-critical-case",
   "contract": "marketing-crm",
   "summary": "Escalation & Critical Case Monitor",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "escalationType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priority",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "eventId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "breachedOnly",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "EscalationCriticalCaseMonitorView"
+  "responds": "Page"
  },
  "listQualityAgentEvaluation": {
   "method": "GET",
   "path": "/quality-agent-evaluation",
   "contract": "marketing-crm",
   "summary": "Quality Management & Agent Evaluation",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "agentPrincipalId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "evaluatorPrincipalId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "sourceType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "criticalFailureOnly",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "QualityManagementAgentEvaluationView"
+  "responds": "Page"
  },
  "listQueues": {
   "method": "GET",
@@ -1947,16 +2334,91 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
+ "listServiceQueues": {
+  "method": "GET",
+  "path": "/service-queues",
+  "contract": "marketing-crm",
+  "summary": "List customer-service queues",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "isActive",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listServiceRootCause": {
   "method": "GET",
   "path": "/service-root-cause",
   "contract": "marketing-crm",
   "summary": "Service Analytics & Root-Cause Intelligence",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "eventId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "compare",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "compareId",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "ServiceAnalyticsRootCauseIntelligenceView"
  },
@@ -1965,11 +2427,57 @@ Method, path, parameters, request and response for every operation these screens
   "path": "/sla-policy-service",
   "contract": "marketing-crm",
   "summary": "SLA Policy & Service-Level Management",
-  "permission": "MARKETING_VIEW",
+  "permission": "CASE_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "slaPolicyId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priority",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "queueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "SlaPolicyServiceLevelManagementView"
  },
@@ -1977,14 +2485,39 @@ Method, path, parameters, request and response for every operation these screens
   "method": "PUT",
   "path": "/intelligent-routing-skill",
   "contract": "marketing-crm",
-  "summary": "Intelligent Routing, Skills & Assignment Engine",
-  "permission": "MARKETING_MANAGE",
+  "summary": "Create or change a case routing rule",
+  "permission": "CASE_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "IntelligentRoutingSkillsAssignmentEngineInput",
   "responds": "IntelligentRoutingSkillsAssignmentEngineView"
+ },
+ "setServiceQueueDefinition": {
+  "method": "PUT",
+  "path": "/service-queues",
+  "contract": "marketing-crm",
+  "summary": "Create or change a customer-service queue",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ServiceQueue",
+  "responds": "ServiceQueue"
  }
 }
 ```
@@ -1997,783 +2530,1630 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
  "AgentWorkloadAvailabilityWorkforceControlView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Agent Workload, Availability & Workforce Control displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.agent_service_profile (new), marketing.agent_availability, marketing.case, marketing.conversation, marketing.service_queue (new) and workforce.shift",
+  "description": "One agent's live status and workload. Rates are over the period since the agent's current shift started, or the venue's current day when no shift is rostered.",
+  "required": [
+   "principalId",
+   "agentName",
+   "status",
+   "activeCases"
+  ],
   "properties": {
-   "available": {
+   "principalId": {
     "type": "string",
-    "description": "Available"
+    "format": "uuid"
    },
-   "busy": {
+   "agentName": {
     "type": "string",
-    "description": "Busy"
-   },
-   "onCall": {
-    "type": "string",
-    "description": "On Call"
-   },
-   "chatting": {
-    "type": "string",
-    "description": "Chatting"
-   },
-   "afterCallWork": {
-    "type": "string",
-    "description": "After Call Work"
-   },
-   "break": {
-    "type": "string",
-    "description": "Break"
-   },
-   "training": {
-    "type": "string",
-    "description": "Training"
-   },
-   "offline": {
-    "type": "integer",
-    "description": "Offline"
-   },
-   "agent": {
-    "type": "string",
-    "description": "Agent"
+    "description": "The agent's display name."
    },
    "team": {
     "type": "string",
-    "description": "Team"
+    "nullable": true
    },
    "skills": {
-    "type": "integer",
-    "description": "Skills"
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
    },
    "languages": {
-    "type": "integer",
-    "description": "Languages"
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
    },
    "status": {
-    "type": "integer",
-    "description": "Status"
+    "type": "string",
+    "enum": [
+     "available",
+     "busy",
+     "onCall",
+     "chatting",
+     "afterCallWork",
+     "break",
+     "training",
+     "offline"
+    ]
    },
    "activeCases": {
     "type": "integer",
-    "description": "Active Cases"
+    "minimum": 0
    },
    "chats": {
     "type": "integer",
-    "description": "Chats"
+    "minimum": 0,
+    "description": "Conversations the agent holds now."
    },
    "calls": {
     "type": "integer",
-    "description": "Calls"
+    "minimum": 0,
+    "description": "Voice conversations in progress (0 or 1)."
    },
-   "queue": {
-    "type": "string",
-    "description": "Queue"
+   "queues": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "queueId",
+      "queueName"
+     ],
+     "properties": {
+      "queueId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "queueName": {
+       "type": "string"
+      }
+     }
+    }
    },
    "slaRiskCases": {
     "type": "integer",
-    "description": "SLA Risk Cases"
+    "minimum": 0,
+    "description": "The agent's open cases at risk or breached."
    },
-   "averageHandleTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Average Handle Time"
+   "averageHandleSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
    },
    "resolutionRate": {
     "type": "number",
-    "description": "Resolution Rate"
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true,
+    "description": "Cases resolved over cases handled."
    },
    "utilization": {
     "type": "number",
-    "description": "Utilization"
+    "minimum": 0,
+    "description": "Active cases and conversations over `maxConcurrentCases`; above 1 means overloaded."
    },
-   "reassignCases": {
+   "workloadBand": {
     "type": "string",
-    "description": "Reassign Cases"
+    "enum": [
+     "available",
+     "normal",
+     "overloaded"
+    ],
+    "description": "`overloaded` at utilization 0.9 or above, `available` below 0.5."
    },
-   "changeAvailability": {
+   "availabilityExpiresAt": {
     "type": "string",
-    "description": "Change Availability"
-   },
-   "requestAssistance": {
-    "type": "string",
-    "description": "Request Assistance"
-   },
-   "managementWhereApplicable": {
-    "type": "string",
-    "description": "Management where applicable"
+    "format": "date-time",
+    "nullable": true
    }
   }
  },
  "AiContactCenterIntelligenceAutomationStudioView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What AI Contact Center Intelligence & Automation Studio displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.contact_automation (new), with the forecast and recommendations computed over marketing.case, marketing.conversation and marketing.agent_availability",
+  "description": "The studio's forecast, recommendations and automations for the filters given.",
+  "required": [
+   "forecast",
+   "recommendations",
+   "automations"
+  ],
   "properties": {
-   "cases": {
+   "forecast": {
+    "type": "object",
+    "nullable": true,
+    "description": "Expected over the next `horizonHours`.",
+    "properties": {
+     "contactVolume": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "queueDemand": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "required": [
+        "queueId",
+        "expectedCases"
+       ],
+       "properties": {
+        "queueId": {
+         "type": "string",
+         "format": "uuid"
+        },
+        "queueName": {
+         "type": "string"
+        },
+        "expectedCases": {
+         "type": "integer",
+         "minimum": 0
+        },
+        "requiredAgents": {
+         "type": "integer",
+         "minimum": 0
+        }
+       }
+      }
+     },
+     "requiredAgents": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "slaRiskCases": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Cases expected to breach."
+     },
+     "expectedComplaints": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "eventDaySupportDemand": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Expected cases tied to events on the day."
+     },
+     "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   },
+   "recommendations": {
+    "type": "array",
+    "maxItems": 20,
+    "items": {
+     "type": "object",
+     "required": [
+      "category",
+      "text"
+     ],
+     "properties": {
+      "category": {
+       "type": "string",
+       "enum": [
+        "workforce",
+        "selfService",
+        "productImprovement",
+        "operationalImprovement",
+        "incidentDetection"
+       ]
+      },
+      "text": {
+       "type": "string",
+       "maxLength": 500
+      },
+      "evidence": {
+       "type": "string",
+       "maxLength": 500,
+       "nullable": true
+      },
+      "confidence": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      }
+     }
+    }
+   },
+   "automations": {
+    "type": "array",
+    "maxItems": 200,
+    "items": {
+     "$ref": "#/components/schemas/ContactAutomation"
+    }
+   }
+  }
+ },
+ "CaseCategory": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.case_category",
+  "description": "**The venue's case taxonomy**: categories and, under them, subcategories (`parentCategoryId`). `Case.categoryId` and the routing rules' `match.categoryIds` point here; `createCaseClassificationIntelligent` recommends one. Maintained by `setCaseCategoryDefinition`, read by `listCaseCategories` (decided 29 September, writers pass). (decided 29 September, data model for the agreed operations)\n",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "Cases"
+    "format": "uuid",
+    "readOnly": true
    },
-   "interactions": {
+   "code": {
     "type": "string",
-    "description": "Interactions"
+    "maxLength": 60
    },
-   "queues": {
+   "name": {
     "type": "string",
-    "description": "Queues"
+    "maxLength": 150
    },
-   "sla": {
+   "parentCategoryId": {
     "type": "string",
-    "description": "SLA"
+    "format": "uuid",
+    "nullable": true,
+    "description": "Set on a subcategory; null on a top-level category."
    },
-   "agentPerformance": {
+   "defaultPriority": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CasePriority"
+     }
+    ],
+    "nullable": true,
+    "description": "The priority a case in this category starts at before routing factors apply."
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   },
+   "scopePath": {
     "type": "string",
-    "description": "Agent Performance"
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
    },
-   "qa": {
+   "createdAt": {
     "type": "string",
-    "description": "QA"
+    "format": "date-time",
+    "readOnly": true
    },
-   "customerFeedback": {
+   "updatedAt": {
     "type": "string",
-    "description": "Customer Feedback"
-   },
-   "orders": {
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "CaseKind": {
+  "type": "string",
+  "description": "**What the guest says the case is about**, in their words rather than the venue's taxonomy — `raiseMyCase` asks for it and `categoryId` is what staff file it under. Stored on the case, because a lost-property report that forgets it was one cannot be routed to the lost and found desk.\n**`other` only with a note (decided 28 September, audit R222).** A case raised as `other` must carry a non-empty `detail` (`raiseMyCase`), or it is refused with 400; the notes are reviewed quarterly to add the real kinds they reveal.\n",
+  "enum": [
+   "lostProperty",
+   "complaint",
+   "question",
+   "accessibility",
+   "refundRequest",
+   "other"
+  ]
+ },
+ "CasePriority": {
+  "type": "string",
+  "enum": [
+   "low",
+   "normal",
+   "high",
+   "urgent"
+  ]
+ },
+ "CaseStatus": {
+  "type": "string",
+  "enum": [
+   "open",
+   "inProgress",
+   "awaitingGuest",
+   "escalated",
+   "resolved",
+   "closed"
+  ]
+ },
+ "ContactAutomation": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.contact_automation",
+  "description": "One governed contact-centre automation (pack 10.2.10 AI Governance).",
+  "required": [
+   "code",
+   "name",
+   "level",
+   "trigger",
+   "allowedActions",
+   "confidenceThreshold",
+   "onException",
+   "status"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "Orders"
+    "format": "uuid",
+    "readOnly": true
    },
-   "tickets": {
+   "code": {
     "type": "string",
-    "description": "Tickets"
+    "maxLength": 60,
+    "description": "The natural key, e.g. `autoResendValidTicket`."
    },
-   "payments": {
+   "name": {
     "type": "string",
-    "description": "Payments"
+    "maxLength": 150
    },
-   "products": {
+   "ownerPrincipalId": {
     "type": "string",
-    "description": "Products"
+    "format": "uuid",
+    "nullable": true
    },
-   "events": {
+   "level": {
     "type": "string",
-    "description": "Events"
+    "enum": [
+     "recommendOnly",
+     "agentConfirmation",
+     "supervisorGoverned",
+     "fullyAutomated"
+    ]
    },
-   "systemIncidents": {
-    "type": "string",
-    "description": "System Incidents"
-   },
-   "contactVolume": {
-    "type": "integer",
-    "description": "Contact Volume"
-   },
-   "queueDemand": {
-    "type": "string",
-    "description": "Queue Demand"
-   },
-   "requiredAgents": {
-    "type": "string",
-    "description": "Required Agents"
-   },
-   "slaRisk": {
-    "type": "string",
-    "description": "SLA Risk"
-   },
-   "expectedComplaints": {
-    "type": "string",
-    "description": "Expected Complaints"
-   },
-   "eventDaySupportDemand": {
-    "type": "string",
-    "description": "Event-Day Support Demand"
-   },
-   "level1RecommendOnly": {
-    "type": "string",
-    "description": "Level 1 — Recommend Only"
-   },
-   "aiSuggestsAction": {
-    "type": "string",
-    "description": "AI suggests action"
-   },
-   "level2AgentConfirmation": {
-    "type": "string",
-    "description": "Level 2 — Agent Confirmation"
-   },
-   "aiPreparesActionAgentApproves": {
-    "type": "string",
-    "description": "AI prepares action; agent approves"
-   },
-   "level3SupervisorGovernedAutomation": {
-    "type": "string",
-    "description": "Level 3 — Supervisor-Governed Automation"
-   },
-   "approvedLowRiskWorkflowsExecuteAutomatically": {
-    "type": "integer",
-    "description": "Approved low-risk workflows execute automatically"
-   },
-   "onlySpecificallyApprovedScenarios": {
-    "type": "string",
-    "description": "Only specifically approved scenarios"
-   },
-   "estimatedAutomationConfidence964": {
-    "type": "number",
-    "description": "Estimated automation confidence: 96.4%"
-   },
-   "owner": {
-    "type": "string",
-    "description": "Owner"
-   },
-   "version": {
-    "type": "string",
-    "description": "Version"
+   "trigger": {
+    "type": "object",
+    "required": [
+     "event"
+    ],
+    "properties": {
+     "event": {
+      "type": "string",
+      "enum": [
+       "caseCreated",
+       "caseUpdated",
+       "conversationMessageReceived",
+       "caseClusterDetected"
+      ]
+     },
+     "conditions": {
+      "type": "array",
+      "maxItems": 20,
+      "description": "All must hold.",
+      "items": {
+       "type": "object",
+       "required": [
+        "field",
+        "operator"
+       ],
+       "properties": {
+        "field": {
+         "type": "string",
+         "maxLength": 100,
+         "description": "e.g. `case.kind`, `ticket.isValid`, `guest.identityVerified`, `cluster.caseCount`."
+        },
+        "operator": {
+         "type": "string",
+         "enum": [
+          "eq",
+          "neq",
+          "in",
+          "gt",
+          "gte",
+          "lt",
+          "lte",
+          "exists"
+         ]
+        },
+        "value": {
+         "description": "Any JSON value; omitted for `exists`."
+        }
+       }
+      }
+     },
+     "windowMinutes": {
+      "type": "integer",
+      "minimum": 1,
+      "nullable": true,
+      "description": "For cluster triggers, e.g. 5 cases in 10 minutes."
+     }
+    }
    },
    "scope": {
-    "type": "string",
-    "description": "Scope"
+    "type": "object",
+    "description": "Where it applies; empty lists mean everywhere in the scope path.",
+    "properties": {
+     "venueIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "queueIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "channels": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/MessageChannel"
+      }
+     }
+    }
    },
    "allowedActions": {
-    "type": "string",
-    "description": "Allowed Actions"
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "string",
+     "enum": [
+      "resendTicket",
+      "resolveCase",
+      "createCase",
+      "assignQueue",
+      "setPriority",
+      "sendMessage",
+      "notifySupervisor",
+      "flagPotentialIncident"
+     ]
+    }
    },
    "confidenceThreshold": {
-    "type": "integer",
-    "description": "Confidence Threshold"
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1
    },
-   "exceptionHandling": {
+   "onException": {
     "type": "string",
-    "description": "Exception Handling"
+    "enum": [
+     "leaveForAgent",
+     "routeToQueue",
+     "notifySupervisor"
+    ]
    },
-   "approval": {
+   "exceptionQueueId": {
     "type": "string",
-    "description": "Approval"
+    "format": "uuid",
+    "nullable": true
    },
-   "auditTrail": {
+   "effectiveFrom": {
     "type": "string",
-    "description": "Audit Trail"
+    "format": "date-time",
+    "nullable": true
    },
-   "effectiveDates": {
+   "effectiveTo": {
     "type": "string",
-    "description": "Effective Dates"
+    "format": "date-time",
+    "nullable": true
    },
    "killSwitch": {
-    "type": "string",
-    "description": "Kill Switch"
+    "type": "boolean",
+    "default": false
    },
-   "management": {
+   "status": {
     "type": "string",
-    "description": "management"
+    "enum": [
+     "draft",
+     "approved",
+     "active",
+     "paused",
+     "retired"
+    ]
+   },
+   "version": {
+    "type": "integer",
+    "minimum": 1,
+    "readOnly": true
+   },
+   "approvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "approvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "lastSimulation": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "properties": {
+     "simulatedVersion": {
+      "type": "integer",
+      "minimum": 1
+     },
+     "periodStart": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "periodEnd": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "casesMatched": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "casesResolvable": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "agentHoursSaved": {
+      "type": "number",
+      "minimum": 0
+     },
+     "estimatedConfidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+     }
+    }
+   },
+   "executionsLast30Days": {
+    "type": "integer",
+    "minimum": 0,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
  "ContactCenterOperationsCommandCenterView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Contact Center Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.case, marketing.conversation, marketing.agent_availability, marketing.sla_policy, marketing.form_submission (post-case CSAT surveys) and marketing.service_queue (new)",
+  "description": "The contact centre's live figures for the filters given. Counts are of cases unless the name says otherwise; durations are averages over cases first responded to or resolved today.",
+  "required": [
+   "casesToday",
+   "openCases",
+   "unassignedCases",
+   "customersWaiting",
+   "criticalCases",
+   "slaAtRisk",
+   "slaBreached",
+   "channels",
+   "queues"
+  ],
   "properties": {
    "casesToday": {
-    "type": "string",
-    "description": "Cases Today"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Cases created today."
+   },
+   "openCases": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Cases not `resolved` or `closed`."
    },
    "unassignedCases": {
     "type": "integer",
-    "description": "Unassigned Cases"
+    "minimum": 0
    },
    "customersWaiting": {
-    "type": "string",
-    "description": "Customers Waiting"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Unclaimed conversations waiting in a queue now."
    },
    "criticalCases": {
     "type": "integer",
-    "description": "Critical Cases"
+    "minimum": 0,
+    "description": "Open cases at priority `urgent`."
    },
    "slaAtRisk": {
-    "type": "string",
-    "description": "SLA At Risk"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Open cases that have used 75% or more of their SLA and have not breached."
    },
    "slaBreached": {
-    "type": "string",
-    "description": "SLA Breached"
+    "type": "integer",
+    "minimum": 0,
+    "description": "Open cases past their SLA (`Case.isSlaBreached`)."
    },
    "casesResolvedToday": {
-    "type": "string",
-    "description": "Cases Resolved Today"
+    "type": "integer",
+    "minimum": 0
    },
-   "firstResponseTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "First Response Time"
+   "averageFirstResponseSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
    },
-   "averageResolutionTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Average Resolution Time"
+   "averageResolutionSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
    },
-   "firstContactResolution": {
-    "type": "string",
-    "description": "First Contact Resolution"
+   "firstContactResolutionRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true,
+    "description": "Share of cases resolved today with no reopen and no transfer."
    },
    "csat": {
-    "type": "string",
-    "description": "CSAT"
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true,
+    "description": "Share of today's post-case CSAT responses that are satisfied (top two points of the scale). Null when there are none."
    },
    "activeAgents": {
     "type": "integer",
-    "description": "Active Agents"
+    "minimum": 0,
+    "description": "Agents whose availability is not `offline`."
    },
    "agentUtilization": {
     "type": "number",
-    "description": "Agent Utilization"
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true,
+    "description": "Active cases and conversations held, over the active agents' combined capacity."
    },
-   "email": {
+   "channels": {
+    "type": "array",
+    "description": "Workload per contact channel, from `Case.channel` and `Conversation.channel`.",
+    "items": {
+     "type": "object",
+     "required": [
+      "channel",
+      "openCases",
+      "waiting"
+     ],
+     "properties": {
+      "channel": {
+       "type": "string",
+       "enum": [
+        "email",
+        "phone",
+        "liveChat",
+        "whatsapp",
+        "webForm",
+        "mobileApp",
+        "b2cPortal",
+        "social",
+        "frontDesk"
+       ]
+      },
+      "openCases": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "waiting": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "slaAtRisk": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "averageFirstResponseSeconds": {
+       "type": "integer",
+       "minimum": 0,
+       "nullable": true
+      }
+     }
+    }
+   },
+   "queues": {
+    "type": "array",
+    "description": "Queue health, worst first.",
+    "items": {
+     "type": "object",
+     "required": [
+      "queueId",
+      "queueName",
+      "openCases",
+      "waiting",
+      "health"
+     ],
+     "properties": {
+      "queueId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "queueName": {
+       "type": "string"
+      },
+      "openCases": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "waiting": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "slaAtRisk": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "agentsOnline": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "health": {
+       "type": "string",
+       "enum": [
+        "healthy",
+        "warning",
+        "critical"
+       ],
+       "description": "`critical` when any case in the queue has breached or waiting exceeds the queue's overflow threshold; `warning` when any is at risk."
+      }
+     }
+    }
+   },
+   "operationalFeed": {
+    "type": "array",
+    "maxItems": 50,
+    "description": "Notable changes in the last hour, newest first (queue surges, cases nearing breach, a channel over its response target).",
+    "items": {
+     "type": "object",
+     "required": [
+      "occurredAt",
+      "severity",
+      "message"
+     ],
+     "properties": {
+      "occurredAt": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "info",
+        "warning",
+        "critical"
+       ]
+      },
+      "message": {
+       "type": "string",
+       "maxLength": 300
+      },
+      "queueId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "channel": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "serviceRiskSummary": {
+    "type": "object",
+    "nullable": true,
+    "description": "The AI operational summary; null when AI is disabled for the tenant. Advisory only, it changes nothing.",
+    "required": [
+     "riskLevel",
+     "summary",
+     "generatedAt"
+    ],
+    "properties": {
+     "riskLevel": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high",
+       "critical"
+      ]
+     },
+     "summary": {
+      "type": "string",
+      "maxLength": 1000
+     },
+     "recommendations": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+       "type": "string",
+       "maxLength": 300
+      }
+     },
+     "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  }
+ },
+ "CreateQueueRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "code",
+   "name",
+   "venueId",
+   "capacityPerCycle",
+   "cycleMinutes"
+  ],
+  "properties": {
+   "code": {
     "type": "string",
-    "description": "Email"
+    "maxLength": 64
    },
-   "phone": {
+   "name": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "venueId": {
     "type": "string",
-    "description": "Phone"
+    "format": "uuid"
    },
-   "liveChat": {
+   "attractionProductId": {
     "type": "string",
-    "description": "Live Chat"
+    "format": "uuid"
    },
-   "whatsapp": {
+   "assetId": {
     "type": "string",
-    "description": "WhatsApp"
+    "format": "uuid",
+    "nullable": true,
+    "description": "The ride. Taking it out of service closes this queue rather than leaving guests holding positions for something that is not running.\n"
    },
-   "webForm": {
+   "accessPointId": {
     "type": "string",
-    "description": "Web Form"
+    "format": "uuid",
+    "nullable": true
    },
-   "mobileApp": {
+   "kind": {
     "type": "string",
-    "description": "Mobile App"
+    "enum": [
+     "standby",
+     "singleRider",
+     "fastPass",
+     "virtual",
+     "accessible",
+     "groupOnly",
+     "staffOnly"
+    ],
+    "default": "standby",
+    "description": "5.6.x. **A ride has several queues and the model had one.** A single-rider line and a standby line at the same attraction draw from one capacity and fill at different rates, and modelling them as one queue makes both wait estimates wrong.\n**`accessible` is not a courtesy lane.** It has its own capacity because a guest who cannot stand in a switchback needs a place to wait, not priority.\n"
    },
-   "b2cPortal": {
+   "operatingWindows": {
+    "type": "array",
+    "description": "**When the queue runs, which is not when the venue is open.** A ride closing an hour early for maintenance leaves a queue accepting guests for a cycle that will not happen.\nStored one row per window in `queue.queue_operating_window` (see `Queue`), not as a column on the queue.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "day",
+      "from",
+      "to"
+     ],
+     "properties": {
+      "day": {
+       "type": "string",
+       "enum": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+       ]
+      },
+      "from": {
+       "type": "string",
+       "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+       "description": "Venue local time, 24-hour `HH:MM`, when the queue starts running."
+      },
+      "to": {
+       "type": "string",
+       "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+       "description": "Venue local time, 24-hour `HH:MM`, when the queue stops running."
+      },
+      "lastEntryMinutesBefore": {
+       "type": "integer",
+       "default": 0,
+       "description": "**When the queue stops accepting, which is before it stops running.** A guest joining two minutes before close waits twenty and is turned away at the front.\n"
+      }
+     }
+    }
+   },
+   "parentQueueId": {
     "type": "string",
-    "description": "B2C Portal"
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where several queues share one capacity. **The standby and single-rider lines at one ride draw from the same cycles**, and a parent is how that is expressed without either queue owning the other.\n"
    },
-   "socialChannelsWhereIntegrated": {
-    "type": "string",
-    "description": "Social channels where integrated"
+   "loadBalanceWithQueueIds": {
+    "type": "array",
+    "description": "BL-137. **Two rides with the same theme and different waits**, and nothing directed a guest to the shorter one. Load balancing is an offer, not an assignment — **a guest sent to a ride they did not choose is a guest who feels managed.**\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
    },
-   "frontDesk": {
-    "type": "string",
-    "description": "Front Desk"
+   "inQueueOfferEnabled": {
+    "type": "boolean",
+    "default": false,
+    "description": "**A guest with twenty minutes to wait is a guest with twenty minutes to buy something.** Offers surface in the wait screen and are the only reason a virtual queue earns its infrastructure.\n"
    },
-   "frontPos": {
+   "notifyBeforeCallMinutes": {
     "type": "integer",
-    "description": "Front POS"
+    "default": 5,
+    "description": "BL-017, 19.2.61. **A guest was not told their turn was approaching**, which makes a virtual queue worse than a physical one — at least a line is visible.\n"
    },
-   "nNgRiskTs": {
-    "type": "string",
-    "description": "n ng Risk ts"
+   "capacityPerCycle": {
+    "type": "integer",
+    "minimum": 1
    },
-   "ng": {
+   "cycleMinutes": {
+    "type": "number",
+    "minimum": 0
+   },
+   "maxPartySize": {
+    "type": "integer",
+    "default": 6
+   },
+   "returnWindowMinutes": {
+    "type": "integer",
+    "default": 15,
+    "description": "How long a called party has to arrive before the entry expires."
+   },
+   "heightRequirementCm": {
+    "type": "integer",
+    "nullable": true
+   },
+   "fastPassAllocationPercent": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100,
+    "default": 0,
+    "description": "Share of each cycle reserved for Fast Pass holders."
+   },
+   "zone": {
     "type": "string",
-    "description": "ng"
+    "nullable": true
+   },
+   "fastPass": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/QueueFastPass"
+     }
+    ],
+    "nullable": true,
+    "description": "The lane's Fast Pass block (decided 29 September, VM close-out). Null on a queue that takes no Fast Pass.\n"
    }
   }
  },
  "CustomerSatisfactionFeedbackVoiceOfCustomerView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Customer Satisfaction, Feedback & Voice of Customer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.form_submission and marketing.form_definition (survey forms), marketing.review, marketing.case and marketing.feedback_classification (new, the AI sentiment and topic per feedback item)",
+  "description": "Voice-of-customer figures for the filters given. Rates are shares of feedback items in the period.",
+  "required": [
+   "responses",
+   "breakdown",
+   "comments"
+  ],
   "properties": {
+   "responses": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Feedback items in the period."
+   },
    "csat": {
-    "type": "string",
-    "description": "CSAT"
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true,
+    "description": "Share of CSAT answers in the top two points of the scale."
    },
-   "serviceRating": {
-    "type": "string",
-    "description": "Service Rating"
-   },
-   "npsWhereUsed": {
-    "type": "string",
-    "description": "NPS where used"
-   },
-   "postCaseSurvey": {
-    "type": "string",
-    "description": "Post-Case Survey"
-   },
-   "complaint": {
-    "type": "string",
-    "description": "Complaint"
-   },
-   "appFeedback": {
-    "type": "string",
-    "description": "App Feedback"
-   },
-   "webFeedback": {
-    "type": "string",
-    "description": "Web Feedback"
-   },
-   "directCustomerComment": {
-    "type": "string",
-    "description": "Direct Customer Comment"
+   "nps": {
+    "type": "integer",
+    "minimum": -100,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Null where the tenant runs no NPS survey."
    },
    "surveyResponseRate": {
     "type": "number",
-    "description": "Survey Response Rate"
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true,
+    "description": "Surveys answered over surveys sent."
    },
-   "positive": {
+   "positiveRate": {
     "type": "number",
-    "description": "Positive %"
+    "minimum": 0,
+    "maximum": 1
    },
-   "neutral": {
+   "neutralRate": {
     "type": "number",
-    "description": "Neutral %"
+    "minimum": 0,
+    "maximum": 1
    },
-   "negative": {
+   "negativeRate": {
     "type": "number",
-    "description": "Negative %"
+    "minimum": 0,
+    "maximum": 1
    },
    "complaints": {
     "type": "integer",
-    "description": "Complaints"
+    "minimum": 0
    },
    "repeatContactRate": {
     "type": "number",
-    "description": "Repeat Contact Rate"
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true,
+    "description": "Customers with a second case within 7 days of the first, over customers with a case."
    },
-   "customerEffortWhereMeasured": {
-    "type": "string",
-    "description": "Customer Effort where measured"
+   "customerEffortScore": {
+    "type": "number",
+    "minimum": 1,
+    "maximum": 7,
+    "nullable": true,
+    "description": "Mean CES answer; null where effort is not measured."
    },
-   "agent": {
-    "type": "string",
-    "description": "Agent"
+   "csatChangeRate": {
+    "type": "number",
+    "nullable": true,
+    "description": "Relative change in `csat` against the previous period of equal length."
    },
-   "team": {
-    "type": "string",
-    "description": "Team"
+   "aiSummary": {
+    "type": "object",
+    "nullable": true,
+    "description": "AI-derived narrative of the feedback matching the filters (22.5.12; 29 September, build pass, group G2), labelled as AI on screen. Null when AI is off or fewer than 5 items match.",
+    "required": [
+     "text",
+     "basedOnCount",
+     "modelVersion"
+    ],
+    "properties": {
+     "text": {
+      "type": "string",
+      "maxLength": 2000
+     },
+     "basedOnCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The feedback items the summary was written from."
+     },
+     "modelVersion": {
+      "type": "string",
+      "maxLength": 60
+     },
+     "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
    },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
+   "breakdown": {
+    "type": "array",
+    "description": "One row per value of the `groupBy` dimension, most responses first.",
+    "items": {
+     "type": "object",
+     "required": [
+      "key",
+      "label",
+      "responses"
+     ],
+     "properties": {
+      "key": {
+       "type": "string",
+       "description": "The id or enum value of the group."
+      },
+      "label": {
+       "type": "string"
+      },
+      "responses": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "csat": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1,
+       "nullable": true
+      },
+      "negativeRate": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      }
+     }
+    }
    },
-   "product": {
-    "type": "string",
-    "description": "Product"
+   "themes": {
+    "type": "array",
+    "maxItems": 20,
+    "description": "AI topic themes, largest share first. Empty when AI is disabled for the tenant.",
+    "items": {
+     "type": "object",
+     "required": [
+      "topic",
+      "shareRate"
+     ],
+     "properties": {
+      "topic": {
+       "type": "string",
+       "maxLength": 100
+      },
+      "shareRate": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      },
+      "negativeRate": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      },
+      "changeRate": {
+       "type": "number",
+       "nullable": true,
+       "description": "Relative change in the theme's volume against the previous period."
+      }
+     }
+    }
    },
-   "event": {
-    "type": "string",
-    "description": "Event"
+   "trendAlerts": {
+    "type": "array",
+    "maxItems": 10,
+    "items": {
+     "type": "string",
+     "maxLength": 300
+    },
+    "description": "AI-detected shifts, e.g. negative feedback on ticket delivery rising after a release."
    },
-   "caseType": {
-    "type": "string",
-    "description": "Case Type"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "customerType": {
-    "type": "string",
-    "description": "Customer Type"
-   },
-   "language": {
-    "type": "string",
-    "description": "Language"
-   },
-   "sentiment": {
-    "type": "string",
-    "description": "Sentiment"
-   },
-   "topic": {
-    "type": "string",
-    "description": "Topic"
-   },
-   "case": {
-    "type": "string",
-    "description": "Case"
-   },
-   "productEvent": {
-    "type": "string",
-    "description": "Product/Event"
-   },
-   "rating": {
-    "type": "string",
-    "description": "Rating"
-   },
-   "followUpCase": {
-    "type": "string",
-    "description": "Follow-up Case"
-   },
-   "supervisorTask": {
-    "type": "string",
-    "description": "Supervisor Task"
-   },
-   "complaintReview": {
-    "type": "string",
-    "description": "Complaint Review"
+   "comments": {
+    "type": "array",
+    "maxItems": 50,
+    "description": "The 50 latest comments with text, newest first.",
+    "items": {
+     "type": "object",
+     "required": [
+      "feedbackId",
+      "source",
+      "receivedAt"
+     ],
+     "properties": {
+      "feedbackId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "source": {
+       "type": "string",
+       "enum": [
+        "csatSurvey",
+        "serviceRating",
+        "nps",
+        "postCaseSurvey",
+        "complaint",
+        "appFeedback",
+        "webFeedback",
+        "directComment"
+       ]
+      },
+      "receivedAt": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "comment": {
+       "type": "string",
+       "maxLength": 4000,
+       "nullable": true
+      },
+      "rating": {
+       "type": "number",
+       "nullable": true,
+       "description": "The answer on its survey's own scale."
+      },
+      "ratingScale": {
+       "type": "string",
+       "nullable": true,
+       "enum": [
+        "nps",
+        "csat",
+        "ces",
+        "likert5",
+        "likert7",
+        "stars"
+       ]
+      },
+      "sentiment": {
+       "type": "string",
+       "nullable": true,
+       "enum": [
+        "positive",
+        "neutral",
+        "negative"
+       ]
+      },
+      "topic": {
+       "type": "string",
+       "nullable": true
+      },
+      "caseId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "agentPrincipalId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "productId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "eventId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "followUpCaseId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      }
+     }
+    }
    }
   }
  },
  "EscalationCriticalCaseMonitorView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Escalation & Critical Case Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.case, marketing.case_escalation (new, one row per escalateCase call) and the related order in orders",
+  "description": "One open escalated case, as of its latest escalation.",
+  "required": [
+   "caseId",
+   "caseNumber",
+   "reason",
+   "escalationType",
+   "priority",
+   "escalatedAt",
+   "status"
+  ],
   "properties": {
-   "escalatedCases": {
-    "type": "integer",
-    "description": "Escalated Cases"
-   },
-   "criticalCases": {
-    "type": "integer",
-    "description": "Critical Cases"
-   },
-   "slaBreaches": {
-    "type": "integer",
-    "description": "SLA Breaches"
-   },
-   "vipEscalations": {
-    "type": "integer",
-    "description": "VIP Escalations"
-   },
-   "financialEscalations": {
-    "type": "integer",
-    "description": "Financial Escalations"
-   },
-   "eventDayEscalations": {
-    "type": "integer",
-    "description": "Event-Day Escalations"
-   },
-   "managementEscalations": {
-    "type": "integer",
-    "description": "Management Escalations"
-   },
-   "technicalEscalations": {
-    "type": "integer",
-    "description": "Technical Escalations"
-   },
-   "case": {
+   "caseId": {
     "type": "string",
-    "description": "Case"
+    "format": "uuid"
    },
-   "customer": {
+   "caseNumber": {
+    "type": "string"
+   },
+   "subjectId": {
     "type": "string",
-    "description": "Customer"
+    "format": "uuid",
+    "nullable": true
+   },
+   "customerName": {
+    "type": "string",
+    "nullable": true,
+    "description": "Resolved from `pii.subject`; null unless the caller holds `GUEST_VIEW_PII`."
    },
    "reason": {
     "type": "string",
-    "description": "Reason"
+    "description": "The reason given to `escalateCase`, or `SLA breached` for an automatic escalation."
+   },
+   "reasonCategory": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "slaRisk",
+     "customerComplaint",
+     "repeatedContact",
+     "highValue",
+     "refundException",
+     "operationalFailure",
+     "systemFailure",
+     "legalCompliance",
+     "vipCustomer",
+     "supervisorRequested",
+     "other"
+    ]
+   },
+   "escalationType": {
+    "type": "string",
+    "enum": [
+     "vip",
+     "financial",
+     "eventDay",
+     "management",
+     "technical",
+     "other"
+    ],
+    "description": "`vip` for a VIP-tier customer, `financial` for a refund or high-value order, `eventDay` when the case's event is today, `management` when escalated to a manager, `technical` for a technical category; the first that applies, in that order."
    },
    "priority": {
-    "type": "string",
-    "description": "Priority"
+    "$ref": "#/components/schemas/CasePriority"
    },
    "transactionValue": {
-    "type": "string",
-    "description": "Transaction Value"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "The related order's total, when the case has one."
    },
-   "event": {
+   "eventId": {
     "type": "string",
-    "description": "Event"
+    "format": "uuid",
+    "nullable": true
    },
-   "assignedAgent": {
+   "eventName": {
     "type": "string",
-    "description": "Assigned Agent"
+    "nullable": true
    },
-   "escalatedTo": {
+   "assignedToPrincipalId": {
     "type": "string",
-    "description": "Escalated To"
+    "format": "uuid",
+    "nullable": true
    },
-   "escalationTime": {
+   "escalatedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "escalatedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "escalationCount": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "slaDueAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Escalation Time"
+    "nullable": true
    },
-   "sla": {
-    "type": "string",
-    "description": "SLA"
+   "isSlaBreached": {
+    "type": "boolean"
    },
-   "currentStatus": {
-    "type": "integer",
-    "description": "Current Status"
+   "status": {
+    "$ref": "#/components/schemas/CaseStatus"
    }
   }
  },
  "IntelligentRoutingSkillsAssignmentEngineInput": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is marketing.message_trigger at 11%, so this is not an update to anything the package stores today and no new table has been decided",
-  "description": "**What Intelligent Routing, Skills & Assignment Engine submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "x-ticvai-persistence": "marketing.case_routing_rule",
+  "description": "One case routing rule (pack 10.2.3). Empty match lists match everything; all non-empty lists must match.",
+  "required": [
+   "code",
+   "name",
+   "strategy",
+   "rank",
+   "isActive"
+  ],
   "properties": {
-   "caseCategory": {
+   "id": {
     "type": "string",
-    "description": "Case Category"
+    "format": "uuid",
+    "readOnly": true
    },
-   "subcategory": {
+   "code": {
     "type": "string",
-    "description": "Subcategory"
+    "maxLength": 60,
+    "description": "The natural key, e.g. `eventDayArabic`."
    },
-   "channel": {
+   "name": {
     "type": "string",
-    "description": "Channel"
+    "maxLength": 150
    },
-   "customerLanguage": {
+   "rank": {
+    "type": "integer",
+    "minimum": 1,
+    "description": "Lower is tried first."
+   },
+   "queueId": {
     "type": "string",
-    "description": "Customer Language"
+    "format": "uuid",
+    "nullable": true,
+    "description": "The queue this rule routes into; null routes straight to an agent."
    },
-   "customerType": {
-    "type": "string",
-    "description": "Customer Type"
+   "match": {
+    "type": "object",
+    "properties": {
+     "categoryIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "description": "Case categories and subcategories (`Case.categoryId`)."
+     },
+     "kinds": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/CaseKind"
+      }
+     },
+     "channels": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/MessageChannel"
+      }
+     },
+     "customerLanguages": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "maxLength": 10
+      },
+      "description": "BCP-47 tags, e.g. `ar`, `en`."
+     },
+     "customerTypes": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "enum": [
+        "individual",
+        "member",
+        "vip",
+        "corporate",
+        "group",
+        "partner"
+       ]
+      }
+     },
+     "membershipTierIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "venueIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "eventIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "productIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "priorities": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/CasePriority"
+      }
+     },
+     "eventWithinHours": {
+      "type": "integer",
+      "minimum": 0,
+      "nullable": true,
+      "description": "Event proximity - matches only when the case's event starts within this many hours."
+     }
+    }
    },
-   "membershipTier": {
-    "type": "string",
-    "description": "Membership Tier"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "priority": {
-    "type": "string",
-    "description": "Priority"
-   },
-   "sla": {
-    "type": "string",
-    "description": "SLA"
-   },
-   "agentSkill": {
-    "type": "string",
-    "description": "Agent Skill"
-   },
-   "agentAvailability": {
-    "type": "string",
-    "description": "Agent Availability"
-   },
-   "currentWorkload": {
-    "type": "string",
-    "description": "Current Workload"
-   },
-   "eventProximity": {
-    "type": "string",
-    "description": "Event Proximity"
-   },
-   "caseTicketReschedule": {
-    "type": "string",
-    "description": "Case: Ticket reschedule"
-   },
-   "languageArabic": {
-    "type": "string",
-    "description": "Language: Arabic"
-   },
-   "priorityHigh": {
-    "type": "string",
-    "description": "Priority: High"
-   },
-   "type": {
+   "strategy": {
     "type": "string",
     "enum": [
-     "arabicSkill",
-     "ticketingSkill",
-     "currentWorkload62",
-     "slaCapability"
-    ],
-    "description": "Vocabulary listed under Reason."
+     "roundRobin",
+     "leastBusy",
+     "skillBased",
+     "priorityBased",
+     "languageBased",
+     "customerTierBased",
+     "aiRecommended"
+    ]
+   },
+   "requiredSkills": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "maxLength": 60
+    },
+    "description": "Skills an agent must hold (`AgentServiceProfile.skills`), e.g. `ticketing`, `refunds`."
+   },
+   "requireLanguageMatch": {
+    "type": "boolean",
+    "default": true,
+    "description": "Only agents who speak the customer's language are candidates."
+   },
+   "maxUtilizationRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true,
+    "description": "Agents above this workload are skipped."
+   },
+   "respectSlaCapability": {
+    "type": "boolean",
+    "default": true,
+    "description": "Skip agents whose current queue would push the case past its SLA."
+   },
+   "stickyOwnership": {
+    "type": "boolean",
+    "default": false,
+    "description": "Prefer the agent who last handled the customer or the reopened case, if available."
+   },
+   "stickyWindowHours": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true
+   },
+   "fallbackQueueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where the case goes when no candidate agent is available."
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
  "IntelligentRoutingSkillsAssignmentEngineView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Intelligent Routing, Skills & Assignment Engine displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "caseCategory": {
-    "type": "string",
-    "description": "Case Category"
+  "description": "A routing rule as stored, with how often it has matched.",
+  "x-ticvai-persistence": "none — the marketing.case_routing_rule (new) row plus a count over marketing.case",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/IntelligentRoutingSkillsAssignmentEngineInput"
    },
-   "subcategory": {
-    "type": "string",
-    "description": "Subcategory"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "customerLanguage": {
-    "type": "string",
-    "description": "Customer Language"
-   },
-   "customerType": {
-    "type": "string",
-    "description": "Customer Type"
-   },
-   "membershipTier": {
-    "type": "string",
-    "description": "Membership Tier"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "priority": {
-    "type": "string",
-    "description": "Priority"
-   },
-   "sla": {
-    "type": "string",
-    "description": "SLA"
-   },
-   "agentSkill": {
-    "type": "string",
-    "description": "Agent Skill"
-   },
-   "agentAvailability": {
-    "type": "string",
-    "description": "Agent Availability"
-   },
-   "currentWorkload": {
-    "type": "string",
-    "description": "Current Workload"
-   },
-   "eventProximity": {
-    "type": "string",
-    "description": "Event Proximity"
-   },
-   "caseTicketReschedule": {
-    "type": "string",
-    "description": "Case: Ticket reschedule"
-   },
-   "languageArabic": {
-    "type": "string",
-    "description": "Language: Arabic"
-   },
-   "priorityHigh": {
-    "type": "string",
-    "description": "Priority: High"
-   },
-   "type": {
-    "type": "string",
-    "enum": [
-     "arabicSkill",
-     "ticketingSkill",
-     "currentWorkload62",
-     "slaCapability"
-    ],
-    "description": "Vocabulary listed under Reason."
+   {
+    "type": "object",
+    "properties": {
+     "matchedLast7Days": {
+      "type": "integer",
+      "minimum": 0,
+      "readOnly": true
+     },
+     "lastMatchedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true
+     }
+    }
    }
-  }
+  ]
+ },
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
  },
  "Page": {
   "type": "object",
@@ -2796,343 +4176,768 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "QualityManagementAgentEvaluationView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Quality Management & Agent Evaluation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "marketing.quality_evaluation",
+  "description": "One quality evaluation of one interaction (pack 10.2.7). Resolution time and SLA outcome are read from the case, not entered.",
+  "required": [
+   "id",
+   "agentPrincipalId",
+   "sourceType",
+   "evaluatedBy",
+   "status",
+   "criteria"
+  ],
   "properties": {
-   "greeting": {
+   "id": {
     "type": "string",
-    "description": "Greeting"
+    "format": "uuid"
    },
-   "customerVerification": {
+   "agentPrincipalId": {
     "type": "string",
-    "description": "Customer Verification"
+    "format": "uuid"
    },
-   "understanding": {
+   "evaluatorPrincipalId": {
     "type": "string",
-    "description": "Understanding"
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The caller who scored it; null while only the AI has."
    },
-   "accuracy": {
+   "sourceType": {
     "type": "string",
-    "description": "Accuracy"
+    "enum": [
+     "call",
+     "chat",
+     "email",
+     "whatsapp",
+     "case",
+     "complaint"
+    ]
    },
-   "policyCompliance": {
+   "caseId": {
     "type": "string",
-    "description": "Policy Compliance"
+    "format": "uuid",
+    "nullable": true
    },
-   "communicationQuality": {
+   "conversationId": {
     "type": "string",
-    "description": "Communication Quality"
+    "format": "uuid",
+    "nullable": true
    },
-   "empathy": {
+   "evaluatedBy": {
     "type": "string",
-    "description": "Empathy"
+    "enum": [
+     "human",
+     "ai"
+    ]
    },
-   "resolution": {
+   "status": {
     "type": "string",
-    "description": "Resolution"
+    "enum": [
+     "draft",
+     "scored",
+     "acknowledged"
+    ]
    },
-   "documentation": {
-    "type": "string",
-    "description": "Documentation"
+   "criteria": {
+    "type": "array",
+    "maxItems": 30,
+    "items": {
+     "type": "object",
+     "required": [
+      "criterion",
+      "score",
+      "maxScore"
+     ],
+     "properties": {
+      "criterion": {
+       "type": "string",
+       "maxLength": 60,
+       "description": "The tenant's criterion code; the pack's defaults are `greeting`, `customerVerification`, `understanding`, `accuracy`, `policyCompliance`, `communicationQuality`, `empathy`, `resolution`, `documentation`, `closing`."
+      },
+      "score": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "maxScore": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "comment": {
+       "type": "string",
+       "maxLength": 1000,
+       "nullable": true
+      }
+     }
+    }
    },
-   "closing": {
-    "type": "string",
-    "description": "Closing"
+   "criticalFailures": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "incorrectRefund",
+      "privacyViolation",
+      "unauthorisedCompensation",
+      "incorrectTicketInformation",
+      "securityVerificationFailure",
+      "other"
+     ]
+    }
    },
-   "call": {
-    "type": "string",
-    "description": "Call"
+   "overallScore": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Criteria score as a percentage; 0 when any critical failure is recorded."
    },
-   "chat": {
-    "type": "string",
-    "description": "Chat"
+   "aiFindings": {
+    "type": "array",
+    "readOnly": true,
+    "items": {
+     "type": "object",
+     "required": [
+      "area",
+      "finding"
+     ],
+     "properties": {
+      "area": {
+       "type": "string",
+       "enum": [
+        "policyAdherence",
+        "requiredStatements",
+        "tone",
+        "accuracy",
+        "resolutionQuality",
+        "missingCaseDocumentation"
+       ]
+      },
+      "finding": {
+       "type": "string",
+       "maxLength": 500
+      },
+      "confidence": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      }
+     }
+    }
    },
-   "email": {
+   "feedback": {
     "type": "string",
-    "description": "Email"
+    "maxLength": 2000,
+    "nullable": true
    },
-   "whatsapp": {
-    "type": "string",
-    "description": "WhatsApp"
+   "coachingActions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "type"
+     ],
+     "properties": {
+      "type": {
+       "type": "string",
+       "enum": [
+        "productTraining",
+        "policyTraining",
+        "communicationCoaching",
+        "systemTraining"
+       ]
+      },
+      "note": {
+       "type": "string",
+       "maxLength": 500,
+       "nullable": true
+      },
+      "dueAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "completedAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      }
+     }
+    }
    },
-   "case": {
-    "type": "string",
-    "description": "Case"
+   "resolutionSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "readOnly": true
    },
-   "complaint": {
-    "type": "string",
-    "description": "Complaint"
+   "slaMet": {
+    "type": "boolean",
+    "nullable": true,
+    "readOnly": true
    },
-   "policyAdherence": {
+   "agentComment": {
     "type": "string",
-    "description": "Policy adherence"
+    "maxLength": 1000,
+    "nullable": true
    },
-   "requiredStatements": {
+   "acknowledgedAt": {
     "type": "string",
-    "description": "Required statements"
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    },
-   "tone": {
+   "evaluatedAt": {
     "type": "string",
-    "description": "Tone"
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    },
-   "resolutionQuality": {
+   "scopePath": {
     "type": "string",
-    "description": "Resolution quality"
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
    },
-   "missingCaseDocumentation": {
+   "updatedAt": {
     "type": "string",
-    "description": "Missing case documentation"
-   },
-   "productTraining": {
-    "type": "string",
-    "description": "Product Training"
-   },
-   "policyTraining": {
-    "type": "string",
-    "description": "Policy Training"
-   },
-   "communicationCoaching": {
-    "type": "string",
-    "description": "Communication Coaching"
-   },
-   "systemTraining": {
-    "type": "string",
-    "description": "System Training"
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
+ "Queue": {
+  "x-ticvai-persistence": "queue.queue + queue.queue_operating_window",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateQueueRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "status",
+     "waitingPartyCount"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "status": {
+      "$ref": "#/components/schemas/QueueStatus"
+     },
+     "statusReason": {
+      "type": "string",
+      "nullable": true
+     },
+     "waitingPartyCount": {
+      "type": "integer"
+     },
+     "waitingGuestCount": {
+      "type": "integer"
+     },
+     "currentWaitMinutes": {
+      "type": "integer",
+      "nullable": true
+     },
+     "waitTimeSource": {
+      "$ref": "#/components/schemas/WaitTimeSource"
+     },
+     "waitTimeAsOf": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "description": "When `currentWaitMinutes` was last set, by whichever source set it. `WaitTime.asOf` reads this.\n"
+     },
+     "manualWaitExpiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "description": "Set by `setWaitTime` as now plus `expiresInMinutes`. Past it, the manual figure is dropped and the queue reverts to its sensor or throughput estimate. Null when the current figure is not manual.\n"
+     },
+     "manualWaitNote": {
+      "type": "string",
+      "maxLength": 200,
+      "nullable": true,
+      "readOnly": true,
+      "description": "The `note` given with the current manual figure. Cleared when it expires."
+     },
+     "expectedReopenAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
+   }
+  ]
+ },
+ "QueueStatus": {
+  "type": "string",
+  "enum": [
+   "open",
+   "paused",
+   "closed",
+   "atCapacity"
+  ]
+ },
  "ServiceAnalyticsRootCauseIntelligenceView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What Service Analytics & Root-Cause Intelligence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.case, marketing.conversation, marketing.form_submission (CSAT) and the related orders and payments",
+  "description": "Service analytics for the filters given, with the comparison asked for.",
+  "required": [
+   "contactVolume",
+   "cases",
+   "drivers",
+   "comparison"
+  ],
   "properties": {
    "contactVolume": {
     "type": "integer",
-    "description": "Contact Volume"
+    "minimum": 0,
+    "description": "Conversations and cases opened, a conversation that became a case counted once."
    },
    "cases": {
-    "type": "string",
-    "description": "Cases"
+    "type": "integer",
+    "minimum": 0
    },
-   "firstResponseTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "First Response Time"
+   "averageFirstResponseSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
    },
-   "resolutionTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Resolution Time"
+   "averageResolutionSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
    },
-   "firstContactResolution": {
-    "type": "string",
-    "description": "First Contact Resolution"
+   "firstContactResolutionRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true
    },
    "reopenRate": {
     "type": "number",
-    "description": "Reopen Rate"
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true
    },
    "escalationRate": {
     "type": "number",
-    "description": "Escalation Rate"
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true
    },
-   "slaCompliance": {
-    "type": "string",
-    "description": "SLA Compliance"
+   "slaComplianceRate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true
    },
-   "costPerCaseWhereAvailable": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Cost per Case where available"
+   "costPerCase": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
    },
    "csat": {
-    "type": "string",
-    "description": "CSAT"
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true
+   },
+   "refundRequests": {
+    "type": "integer",
+    "minimum": 0
    },
    "complaintRate": {
     "type": "number",
-    "description": "Complaint Rate"
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true
    },
-   "todayVsYesterday": {
-    "type": "string",
-    "description": "Today vs Yesterday"
+   "comparison": {
+    "type": "object",
+    "required": [
+     "basis",
+     "kpis"
+    ],
+    "properties": {
+     "basis": {
+      "type": "string",
+      "enum": [
+       "previousDay",
+       "previousWeek",
+       "previousMonth",
+       "event",
+       "venue",
+       "product"
+      ]
+     },
+     "compareId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     },
+     "kpis": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "required": [
+        "kpi"
+       ],
+       "properties": {
+        "kpi": {
+         "type": "string",
+         "description": "The KPI's property name above, e.g. `contactVolume`."
+        },
+        "current": {
+         "type": "number",
+         "nullable": true
+        },
+        "previous": {
+         "type": "number",
+         "nullable": true
+        },
+        "changeRate": {
+         "type": "number",
+         "nullable": true
+        }
+       }
+      }
+     }
+    }
    },
-   "weekVsWeek": {
-    "type": "string",
-    "description": "Week vs Week"
+   "drivers": {
+    "type": "array",
+    "description": "Contact drivers, most cases first.",
+    "items": {
+     "type": "object",
+     "required": [
+      "driver",
+      "cases",
+      "shareRate"
+     ],
+     "properties": {
+      "driver": {
+       "type": "string",
+       "enum": [
+        "ticketDelivery",
+        "refund",
+        "reschedule",
+        "paymentFailure",
+        "membership",
+        "accessIssue",
+        "groupBooking",
+        "generalInformation",
+        "other"
+       ]
+      },
+      "cases": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "shareRate": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      },
+      "changeRate": {
+       "type": "number",
+       "nullable": true
+      }
+     }
+    }
    },
-   "monthVsMonth": {
-    "type": "string",
-    "description": "Month vs Month"
+   "rootCauses": {
+    "type": "array",
+    "maxItems": 20,
+    "description": "Case surges traced to one cause, largest first. Empty when AI is disabled for the tenant.",
+    "items": {
+     "type": "object",
+     "required": [
+      "summary",
+      "cases"
+     ],
+     "properties": {
+      "summary": {
+       "type": "string",
+       "maxLength": 500
+      },
+      "driver": {
+       "type": "string",
+       "nullable": true
+      },
+      "cases": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "causeType": {
+       "type": "string",
+       "enum": [
+        "paymentProvider",
+        "event",
+        "product",
+        "release",
+        "incident",
+        "venueArea",
+        "other"
+       ]
+      },
+      "causeRef": {
+       "type": "string",
+       "nullable": true,
+       "description": "The id of the provider, event, product or incident, where there is one."
+      },
+      "windowStart": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "windowEnd": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      }
+     }
+    }
    },
-   "eventVsEvent": {
+   "avoidableContacts": {
+    "type": "array",
+    "description": "AI estimate of cases that could have been prevented, by remedy.",
+    "items": {
+     "type": "object",
+     "required": [
+      "preventableBy",
+      "cases"
+     ],
+     "properties": {
+      "preventableBy": {
+       "type": "string",
+       "enum": [
+        "betterB2cInformation",
+        "selfService",
+        "productConfiguration",
+        "improvedNotifications",
+        "technicalFixes",
+        "betterTicketDelivery"
+       ]
+      },
+      "cases": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "recommendation": {
+       "type": "string",
+       "maxLength": 500,
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "ServiceQueue": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.service_queue",
+  "description": "**A customer-service queue** (e.g. `eventDaySupport`). Cases (`Case.queueId`), routing rules (`queueId`, `fallbackQueueId`) and agents (`AgentAvailability.queueIds`) name it; `listContact` and `listAgentWorkloadAvailability` report per queue. Maintained by `setServiceQueueDefinition`, read by `listServiceQueues` (decided 29 September, writers pass). (decided 29 September, data model for the agreed operations)\n",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "Event vs Event"
+    "format": "uuid",
+    "readOnly": true
    },
-   "venueVsVenue": {
+   "code": {
     "type": "string",
-    "description": "Venue vs Venue"
+    "maxLength": 60
    },
-   "productVsProduct": {
+   "name": {
     "type": "string",
-    "description": "Product vs Product"
+    "maxLength": 150
    },
-   "betterB2cInformation": {
-    "type": "string",
-    "description": "Better B2C information"
+   "overflowWaitSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "The queue's overflow threshold; a case waiting longer marks the queue `critical`."
    },
-   "selfService": {
-    "type": "string",
-    "description": "Self-service"
+   "isActive": {
+    "type": "boolean",
+    "default": true
    },
-   "productConfiguration": {
+   "scopePath": {
     "type": "string",
-    "description": "Product configuration"
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
    },
-   "improvedNotifications": {
+   "createdAt": {
     "type": "string",
-    "description": "Improved notifications"
+    "format": "date-time",
+    "readOnly": true
    },
-   "technicalFixes": {
+   "updatedAt": {
     "type": "string",
-    "description": "Technical fixes"
-   },
-   "betterTicketDelivery": {
-    "type": "string",
-    "description": "Better ticket delivery"
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
  "SlaPolicyServiceLevelManagementView": {
   "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
-  "description": "**What SLA Policy & Service-Level Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection over marketing.case and marketing.sla_policy",
+  "description": "SLA performance for the filters given. Counts are of open cases for the state counts and of cases in the period for the averages and the compliance rate.",
+  "required": [
+   "withinSla",
+   "atRisk",
+   "breached",
+   "byPolicy"
+  ],
   "properties": {
-   "firstResponseSla": {
-    "type": "string",
-    "description": "First Response SLA"
-   },
-   "nextResponseSla": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Next Response SLA"
-   },
-   "resolutionSla": {
-    "type": "string",
-    "description": "Resolution SLA"
-   },
-   "internalEscalationSla": {
-    "type": "string",
-    "description": "Internal Escalation SLA"
-   },
-   "complaintResolutionSla": {
-    "type": "string",
-    "description": "Complaint Resolution SLA"
-   },
-   "caseType": {
-    "type": "string",
-    "description": "Case Type"
-   },
-   "priority": {
-    "type": "string",
-    "description": "Priority"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "customerTier": {
-    "type": "string",
-    "description": "Customer Tier"
-   },
-   "brand": {
-    "type": "string",
-    "description": "Brand"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
-   "market": {
-    "type": "string",
-    "description": "Market"
-   },
-   "partner": {
-    "type": "string",
-    "description": "Partner"
-   },
-   "groupCustomer": {
-    "type": "string",
-    "description": "Group Customer"
-   },
-   "firstResponse5Minutes": {
-    "type": "string",
-    "description": "First Response: 5 minutes"
-   },
-   "resolutionTarget30Minutes": {
-    "type": "string",
-    "description": "Resolution Target: 30 minutes"
-   },
-   "firstResponse4Hours": {
-    "type": "string",
-    "description": "First Response: 4 hours"
-   },
-   "resolutionTarget24Hours": {
-    "type": "string",
-    "description": "Resolution Target: 24 hours"
-   },
-   "calendarTime": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Calendar time"
-   },
-   "businessHours": {
-    "type": "string",
-    "description": "Business hours"
-   },
-   "venueOperatingHours": {
-    "type": "string",
-    "description": "Venue operating hours"
-   },
-   "pausedStates": {
-    "type": "string",
-    "description": "Paused states"
-   },
-   "holidayCalendars": {
-    "type": "string",
-    "description": "Holiday calendars"
-   },
    "withinSla": {
-    "type": "string",
-    "description": "Within SLA"
+    "type": "integer",
+    "minimum": 0
    },
    "atRisk": {
-    "type": "string",
-    "description": "At Risk"
+    "type": "integer",
+    "minimum": 0
    },
    "breached": {
-    "type": "string",
-    "description": "Breached"
+    "type": "integer",
+    "minimum": 0
    },
-   "averageResponse": {
-    "type": "number",
-    "description": "Average Response"
+   "averageResponseSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Mean time to first response, less paused time."
    },
-   "averageResolution": {
-    "type": "number",
-    "description": "Average Resolution"
+   "averageResolutionSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true
    },
-   "slaCompliance": {
+   "slaComplianceRate": {
     "type": "number",
-    "description": "SLA Compliance %"
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true,
+    "description": "Cases resolved in the period within target, over cases resolved in the period."
+   },
+   "byPolicy": {
+    "type": "array",
+    "description": "One row per SLA policy that timed a case in the period, worst compliance first.",
+    "items": {
+     "type": "object",
+     "required": [
+      "slaPolicyId",
+      "code",
+      "name",
+      "withinSla",
+      "atRisk",
+      "breached"
+     ],
+     "properties": {
+      "slaPolicyId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "code": {
+       "type": "string"
+      },
+      "name": {
+       "type": "string"
+      },
+      "firstResponseMinutes": {
+       "type": "integer",
+       "nullable": true
+      },
+      "resolutionMinutes": {
+       "type": "integer",
+       "nullable": true
+      },
+      "withinSla": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "atRisk": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "breached": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "slaComplianceRate": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1,
+       "nullable": true
+      }
+     }
+    }
+   },
+   "forecastBreaches": {
+    "type": "array",
+    "maxItems": 50,
+    "description": "AI forecast of open cases likely to breach before the static thresholds fire, soonest first. Advisory; empty when AI is disabled for the tenant.",
+    "items": {
+     "type": "object",
+     "required": [
+      "caseCount",
+      "horizonMinutes"
+     ],
+     "properties": {
+      "queueId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "queueName": {
+       "type": "string",
+       "nullable": true
+      },
+      "slaPolicyId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "caseCount": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "horizonMinutes": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "confidence": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1
+      }
+     }
+    }
    }
   }
+ },
+ "WaitTimeSource": {
+  "type": "string",
+  "description": "Where the estimate came from. Surfaced so an operator knows whether a figure is measured or guessed.\n",
+  "enum": [
+   "sensor",
+   "throughput",
+   "manual",
+   "unavailable"
+  ]
  }
 }
 ```

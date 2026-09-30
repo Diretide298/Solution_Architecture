@@ -12,7 +12,7 @@ emittedBy:
 - relinquishSeatHold
 payload:
 - field: seatId
-  type: string
+  type: uuid
 - field: performanceId
   type: uuid
 - field: venueId

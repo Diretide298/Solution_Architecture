@@ -1,6 +1,6 @@
 # P08-stock-supply-02 — P08 · Stock & Supply (2 of 2)
 
-**6 screens · 18 operations · 19 schemas · 7 permissions**
+**6 screens · 19 operations · 28 schemas · 8 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 7 permissions apply here:
-  `ORDER_MODIFY, PROCUREMENT_REQUEST, PROCUREMENT_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE, TENANT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 8 permissions apply here:
+  `AI_USE, ORDER_MODIFY, PROCUREMENT_REQUEST, PROCUREMENT_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE, TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -62,8 +62,8 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `BO-105` | Stock & Supply | listDetail | 5 | 1 | — |
 | `BO-137` | Recipe Consumption & Theoretical Inventory | listDetail | 4 | 0 | — |
-| `BO-138` | Production Execution & Batch Management | listDetail | 3 | 2 | — |
-| `BO-139` | Wastage, Spoilage, Returns & Write-Off | configEditor | 1 | 0 | — |
+| `BO-138` | Production Execution & Batch Management | listDetail | 4 | 2 | — |
+| `BO-139` | Wastage, Spoilage, Returns & Write-Off | configEditor | 2 | 0 | — |
 | `BO-140` | Product Availability, 86 & Operational Food Safety | listDetail | 3 | 1 | — |
 | `BO-141` | Operational Alerts, AI Replenishment & Action Center | listDetail | 3 | 2 | — |
 
@@ -157,7 +157,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "supplierId"
      ],
-     "provenance": "derived — BO-083 declares entryState.params supplierId and BO-105 holds supplierId, so an edge into it carries them"
+     "provenance": "derived — BO-083 declares entryState.params contractId, supplierId and BO-105 holds supplierId, so an edge into it carries them"
     },
     {
      "to": "BO-137",
@@ -893,6 +893,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "inventory",
     "purpose": "What is about to go out of date",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "requestSuggestion",
+    "contract": "ai",
+    "purpose": "Waste-risk suggestion (kind wasteRisk): items at risk with a recommended action",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1104,6 +1111,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "fnb",
     "purpose": "Record waste",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "requestSuggestion",
+    "contract": "ai",
+    "purpose": "Waste-risk suggestion (kind wasteRisk): items at risk with a recommended action",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1785,6 +1799,16 @@ Method, path, parameters, request and response for every operation these screens
     "name": "compareTo",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "interval",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -2073,6 +2097,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": null
  },
+ "requestSuggestion": {
+  "method": "POST",
+  "path": "/ai/suggestions",
+  "contract": "ai",
+  "summary": "Ask for an answer, however it is currently produced",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Suggestion"
+ },
  "setItemAvailability": {
   "method": "PUT",
   "path": "/menu-items/{itemId}/availability",
@@ -2083,6 +2126,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -2106,6 +2154,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "TemperatureCheckpoint",
@@ -2120,6 +2173,97 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AiMaturity": {
+  "type": "object",
+  "x-ticvai-persistence": "none — embedded as jsonb on ai.suggestion and ai.forecast_version",
+  "description": "**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn). The customer sees a stage badge and a \"Based on\" chip, never a bare percentage (design 5.6), and \"Limited historical data\" while the starting pattern carries more than half the weight.",
+  "required": [
+   "stage",
+   "basedOn"
+  ],
+  "properties": {
+   "stage": {
+    "type": "string",
+    "enum": [
+     "starting",
+     "learning",
+     "established",
+     "learned"
+    ],
+    "description": "`starting`: the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, weather). `learning`: own data carries short-range patterns (about 4 weeks). `established`: own level and trend lead, the baseline fills gaps such as a holiday not yet seen (about 3 months, or at once with 12+ months imported). `learned`: a model trained on this tenant's data, promoted by an admin (AI-D16)."
+   },
+   "basedOn": {
+    "type": "string",
+    "description": "The \"Based on\" line, in words, e.g. *Based on: your venue profile, UAE calendar, weather, 23 days of your sales*. Always present."
+   },
+   "sources": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "source"
+     ],
+     "properties": {
+      "source": {
+       "type": "string",
+       "enum": [
+        "venueSettings",
+        "startingPattern",
+        "calendar",
+        "weather",
+        "bookingsOnHand",
+        "ownHistory",
+        "importedHistory",
+        "configuration",
+        "trainedModel"
+       ]
+      },
+      "detail": {
+       "type": "string",
+       "nullable": true,
+       "description": "e.g. *23 days*, *water park pattern v3*, *Eid al-Adha 2027*."
+      },
+      "observations": {
+       "type": "integer",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "ownDataShare": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "description": "The weight own data carries, `n / (k + n)`. Below 0.5 the answer is marked \"Limited historical data\"."
+   },
+   "limitedHistory": {
+    "type": "boolean"
+   },
+   "nextStage": {
+    "type": "object",
+    "nullable": true,
+    "description": "What the next stage needs, e.g. *8 more Saturdays of sales*, or *an admin promotion*.",
+    "properties": {
+     "stage": {
+      "type": "string",
+      "enum": [
+       "learning",
+       "established",
+       "learned"
+      ]
+     },
+     "needs": {
+      "type": "string"
+     },
+     "expectedBy": {
+      "type": "string",
+      "format": "date",
+      "nullable": true
+     }
+    }
+   }
+  }
+ },
  "Alert": {
   "type": "object",
   "x-ticvai-persistence": "reporting.alert",
@@ -2279,7 +2423,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "countId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "totalVarianceValue": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -2431,7 +2575,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "venueId": {
     "type": "string",
@@ -2545,6 +2689,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "code": {
     "type": "string"
+   },
+   "bucketStart": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise."
+   },
+   "groupKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked."
    },
    "name": {
     "type": "string"
@@ -2719,15 +2874,32 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "assetDowntime",
    "meanTimeToRepair",
    "challengeCompletionRate",
-   "attributedRevenue"
+   "attributedRevenue",
+   "loyaltyActiveMembers",
+   "loyaltyTierDistribution",
+   "loyaltyPointsLiability",
+   "loyaltyBreakageRate",
+   "loyaltyMemberRetention",
+   "challengeParticipationRate",
+   "gamificationLoyaltyImpact",
+   "gamificationMembershipImpact",
+   "gamificationRetention",
+   "accreditationApplications",
+   "accreditationTimeToDecision",
+   "accreditationCredentialsIssued",
+   "accreditationActiveHolders",
+   "accreditationRenewalsDue",
+   "staffingShortfall"
   ],
   "x-ticvai-money-valued": [
    "inventoryValuation",
    "resaleCommission",
    "revenuePerEntitlement",
    "revenuePerVisitor",
-   "attributedRevenue"
+   "attributedRevenue",
+   "loyaltyPointsLiability"
   ],
+  "x-ticvai-extended-29-september": "**Fourteen metrics added 29 September (build pass)**, each checked against the schema of the contract that produces it.\n\n| Metric | Source | Requirement | |---|---|---| | `loyaltyActiveMembers` | `marketing.loyalty_position` members with a `marketing.loyalty_points` movement in the period | 5.4.27 | | `loyaltyTierDistribution` | `marketing.loyalty_position.tier_id` against `marketing.programme_tier`, members per tier | 5.4.27 | | `loyaltyPointsLiability` | the balance of `ledger.journal_line` on each programme's `pointsLiabilityAccountId`, where points post on accrual and release on redemption or expiry | 5.4.27 | | `loyaltyBreakageRate` | `marketing.loyalty_points` expiry movements over points earned, in the period | 5.4.27 | | `loyaltyMemberRetention` | members with a movement in the previous period who also have one in this period | 5.4.27 | | `challengeParticipationRate` | distinct `marketing.challenge_progress.subject_id` over active loyalty members | 22.6.20 | | `gamificationLoyaltyImpact` | points earned per member, challenge participants against non-participants (`marketing.loyalty_points` split by `marketing.challenge_progress`) | 22.6.20 | | `gamificationMembershipImpact` | joins and renewals in `identity.customer_membership`, participants against non-participants | 22.6.20 | | `gamificationRetention` | return visits (`access.scan_event`, in-direction) of participants against non-participants | 22.6.20 | | `accreditationApplications` | `accreditation.application` by `status` | 12.1.50 | | `accreditationTimeToDecision` | `accreditation.application.decided_at` minus `submitted_at` | 12.1.50 | | `accreditationCredentialsIssued` | `accreditation.credential.issued_at` | 12.1.50 | | `accreditationActiveHolders` | `accreditation.holder` `active`, by `category_code` | 12.1.50 | | `accreditationRenewalsDue` | `accreditation.holder.valid_to` inside `accreditation.validity.renewal_window_days` | 12.1.50 |\n\n**`staffingShortfall` added the same evening (build pass, group G2; 8.2.49)**: the largest gap in the window between the staff rostered and the staff the forecast requires, per venue and position, from `workforce.forecast_requirement` (the handed-over AI staff requirement) against `workforce.rota_assignment` and `workforce.open_shift`, computed as `workforce.getStaffingCoverage` with `basis` `forecastRequirement`. An `AlertRule` on it with `comparator` `above` and `threshold` 0 is the staffing shortage alert; `windowMinutes` looks ahead rather than back for this metric (the rota for the coming window), and `cooldownMinutes` stops one short shift alerting every quarter hour.\n\n**Points issued, points redeemed, campaign performance and reward redemption were already served** by the `loyalty` and `campaigns` sources, and challenge completion and revenue attribution by `challengeCompletionRate` and `attributedRevenue`.\n",
   "x-ticvai-money-valued-note": "**`salesByOperator`, `salesByWorkstation` and `resaleVolume` are not listed because the package does not say whether they count sales or sum their value.** Until that is decided, a rule on them carries a plain number.\n",
   "x-ticvai-extended": "18 August 2026",
   "x-ticvai-extension-note": "**Nineteen metrics added when their upstream models landed**, which is how BL-053 was always going to close — not by changing `reporting` but by building the things it wanted to report on.\n`inventoryValuation`, `stockTurnover`, `stockAgeing` and `wastageRate` came from `inventory.StockBatch`; `resaleVolume` and `resaleCommission` from `orders.ResaleListing`; **`salesByInstructor` from `resources.Resource`, which was the one metric this enum deliberately refused to name in the morning** because nothing produced it. `allocationUtilisation` from `PartnerUser` and `ChannelListing`, `membershipChurn` from `Journey`, `supplierDeliveryPerformance` from `ProductionRun`, `assetDowntime` and `meanTimeToRepair` from `WorkOrder.downtimeMinutes`, `challengeCompletionRate` from `ChallengeProgress`, `attributedRevenue` from `AttributionTouch`.\n**Each was checked against the schema before being named.** That rule has not changed — naming a metric with no source is the defect this enum exists to prevent.\n"
@@ -2743,6 +2915,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    }
   ]
+ },
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
+   }
+  }
  },
  "Page": {
   "type": "object",
@@ -2834,6 +3035,290 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "PurchaseOrder": {
+  "x-ticvai-persistence": "inventory.purchase_order + inventory.purchase_order_line",
+  "type": "object",
+  "required": [
+   "id",
+   "purchaseOrderNumber",
+   "supplierId",
+   "status",
+   "lines",
+   "total",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "purchaseOrderNumber": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Per venue, in sequence** (decided 28 September, audit R171). Assigned by the server from the venue's gap-free sequence, or the tenant's for an order with no venue. Proposed format `PO-<venue code>-<sequence, six digits>`, client to correct.\n"
+   },
+   "requisitionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null on a blanket order or an RFQ award, which are raised without one."
+   },
+   "quotationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The quotation selected when the order was raised (`createPurchaseOrder` requires it). **The link that shows the comparison was made**, which `rfqId` alone does not."
+   },
+   "supplierId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "supplierName": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "standard",
+     "blanket",
+     "release",
+     "rfqAward"
+    ],
+    "default": "standard",
+    "description": "BL-159. **A blanket order is a price and a commitment, not a delivery.** Releases draw against it, and modelling each release as its own purchase order loses the contract that makes the price valid.\n"
+   },
+   "blanketParentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The blanket order this release draws against — another purchase order, so the same id type."
+   },
+   "contractPriceValidUntil": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "rfqId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where this order came from a quotation round. **Keeping the link is what lets a venue show it took the best of three**, which is usually the procurement rule rather than a preference.\n"
+   },
+   "supplierInvoiceRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "BL-123. **Purchase orders and goods receipts both existed — the third leg did not.** A three-way match with two legs is a two-way match, and it is the supplier invoice that carries the price nobody has checked yet.\n"
+   },
+   "matchStatus": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "unmatched",
+     "matched",
+     "priceVariance",
+     "quantityVariance",
+     "bothVariance"
+    ],
+    "description": "**The variance kinds are separated because they have different owners** — a price variance is a buyer's problem and a quantity variance is a receiving one.\n"
+   },
+   "status": {
+    "$ref": "#/components/schemas/PurchaseOrderStatus"
+   },
+   "deliverToLocationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Scoped 31 August.** A purchase order is raised by somebody, for somewhere, and carried neither. `requisitionId` reaches a venue through a join, but **a purchase order raised without a requisition — a blanket order, an RFQ award — had no scope at all**, so nothing could answer *whose budget is this* without guessing.\n\n**`deliverToLocationId` is separate from `venueId` on purpose.** A tenant buying centrally and delivering to three venues is one order and three destinations; collapsing them would force one order per venue and lose the volume the tenant negotiated for."
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "lineId": {
+       "type": "string"
+      },
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "itemName": {
+       "type": "string"
+      },
+      "orderedQuantity": {
+       "type": "number"
+      },
+      "receivedQuantity": {
+       "type": "number"
+      },
+      "outstandingQuantity": {
+       "type": "number"
+      },
+      "unitPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "quotedUnitPrice": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "nullable": true,
+       "description": "The selected quotation line's price, kept beside `unitPrice` (audit R171)."
+      },
+      "priceOverrideReason": {
+       "type": "string",
+       "nullable": true,
+       "description": "Why `unitPrice` differs from `quotedUnitPrice` (audit R171)."
+      },
+      "lineTotal": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "subtotal": {
+    "x-ticvai-column": "net_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "total": {
+    "x-ticvai-column": "gross_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "expectedDelivery": {
+    "type": "string",
+    "format": "date"
+   },
+   "raisedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "closedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "supplierReference": {
+    "type": "string",
+    "nullable": true,
+    "description": "The supplier's own order reference, from `acknowledgePurchaseOrder`."
+   },
+   "acknowledgedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**Null is the supplier performance figure** — goods arriving against an order never acknowledged."
+   },
+   "closeShortReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Why the balance was written off, from `closePurchaseOrderShort`."
+   },
+   "cancelReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "From `cancelPurchaseOrder`."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The pending approval request raised by `cancelPurchaseOrder` or `closePurchaseOrderShort` (kinds `purchaseOrderCancel`, `purchaseOrderShortClose`; audit R144). Null when none is open."
+   },
+   "cancelledAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Which venue is buying. **Null on a tenant-level order** — see `deliverToLocationId`."
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Present on every order regardless of whether a venue is named, because a tenant-level order still belongs to a tenant."
+   }
+  }
+ },
+ "PurchaseOrderStatus": {
+  "type": "string",
+  "enum": [
+   "raised",
+   "sent",
+   "acknowledged",
+   "partiallyReceived",
+   "received",
+   "closedShort",
+   "cancelled"
+  ]
+ },
+ "Recipe": {
+  "x-ticvai-persistence": "fnb.recipe + fnb.recipe_ingredient",
+  "type": "object",
+  "required": [
+   "menuItemId",
+   "ingredients"
+  ],
+  "properties": {
+   "menuItemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "yield": {
+    "type": "number",
+    "minimum": 0,
+    "description": "Portions produced by one execution."
+   },
+   "ingredients": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "inventoryItemId",
+      "quantity",
+      "unit"
+     ],
+     "properties": {
+      "inventoryItemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "quantity": {
+       "type": "number",
+       "minimum": 0
+      },
+      "unit": {
+       "type": "string"
+      },
+      "isOptional": {
+       "type": "boolean",
+       "default": false
+      }
+     }
+    }
+   },
+   "costPerPortion": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "description": "**Computed, never entered** (decided 28 September, audit R125 (9)): the sum of each ingredient quantity at its current inventory cost, divided by `yield`. Recomputed when the recipe or an ingredient cost changes.\n"
+   }
+  }
+ },
  "Requisition": {
   "x-ticvai-persistence": "inventory.requisition + inventory.requisition_line",
   "type": "object",
@@ -2849,7 +3334,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "requisitionNumber": {
     "type": "string"
@@ -2998,6 +3483,173 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "cancelled"
   ]
  },
+ "StockBatch": {
+  "type": "object",
+  "x-ticvai-persistence": "inventory.stock_batch",
+  "description": "BL-122. **`isPerishable` and `shelfLifeDays` are on the item, so a shelf life is declared and never instantiated.** Two deliveries of the same milk arriving a week apart are one stock level with one implied expiry, and the older one is invisible.\n**A batch is the instance that actually expires.** Without it, first-expiry-first-out is not computable and a venue discovers the problem by smell.\n",
+  "required": [
+   "id",
+   "itemId",
+   "locationId",
+   "quantity",
+   "receivedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "itemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "batchCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "lotNumber": {
+    "type": "string",
+    "nullable": true,
+    "description": "The supplier's own reference. **A recall names a lot number**, and an inventory that cannot resolve one has to discard everything.\n"
+   },
+   "quantity": {
+    "type": "number"
+   },
+   "receivedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "supplierId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "available",
+     "quarantined",
+     "expired",
+     "recalled",
+     "consumed",
+     "written-off"
+    ]
+   }
+  }
+ },
+ "Suggestion": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.suggestion",
+  "description": "One answer to one question, with its reasoning and its confidence. **Built 24 August so that machine learning can be swapped in without touching a screen.**\n**A suggestion is never an action.** It proposes; `ProposedAction` and its approval path decide. A model that can order stock is a model that will order stock wrongly at three in the morning.\n**`inputs` is recorded, not just referenced.** A suggestion that cannot be reproduced cannot be defended to a finance controller asking why the system said to order four hundred.\n",
+  "required": [
+   "id",
+   "kind",
+   "basis",
+   "maturity",
+   "producedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/SuggestionKind"
+   },
+   "basis": {
+    "$ref": "#/components/schemas/SuggestionBasis"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "subjectRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "What it is about — a product, an outlet, an item, a party."
+   },
+   "value": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "The suggestion itself. Shape depends on `kind`."
+   },
+   "confidence": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 1,
+    "description": "**Null for a heuristic and that is honest.** A rule has no confidence — dressing one up with 0.85 is the fastest way to make a manager trust a number that means nothing.\n"
+   },
+   "explanation": {
+    "type": "string",
+    "description": "**Plain words, always present, whatever the basis.** *Because covers are up 12% on this day last year* — a suggestion a manager cannot explain to their own boss is a suggestion they will not action.\n"
+   },
+   "inputs": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "What went in. **Recorded so the answer can be reproduced** — and so that when a model replaces the rule, the two can be run against the same inputs and compared.\n"
+   },
+   "producerRef": {
+    "type": "string",
+    "description": "The rule name or the model id and version. **A model version is part of the record**: *the model said so* is not an answer to *which model, when*.\n"
+   },
+   "maturity": {
+    "$ref": "#/components/schemas/AiMaturity"
+   },
+   "producedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**A demand forecast for Saturday is worthless on Sunday.** An expired suggestion is hidden rather than shown stale.\n"
+   }
+  }
+ },
+ "SuggestionBasis": {
+  "type": "string",
+  "description": "**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n",
+  "enum": [
+   "heuristic",
+   "statistical",
+   "model",
+   "hybrid",
+   "manual"
+  ]
+ },
+ "SuggestionKind": {
+  "type": "string",
+  "description": "What is being suggested. **A closed set, and the reason it is closed is the swap.** Every entry here is a question a venue asks that a model could answer better than a rule — and each one starts as a heuristic and becomes a model when there is data.\n**Six of these were drawn as their own endpoints on the client F&B boards** — `suggestPrice`, `simulateScenario`, `simulateSlaPolicy`, `suggestRequisition`, `suggestReplenishment`, `publishDemandPlan`. **Building six endpoints means six places to change when a model changes**, and the model will change more often than the venue's question does.\n**What each kind is based on, and when the venue's own data takes over. Proposed, client to correct (decided 28 September, audit R213; re-read 29 September, AI functions review).** The figure after each rule is **the point where own data takes over from the baseline, not a refusal**: below it the kind answers from the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, the weather) with `maturity.stage` `starting`, and between it and about three months it blends the two (`learning`). The day-one baseline per kind: `replenishment`, `requisition`, `prepPlan`, `staffing`, `demandForecast` and `scenario` from the baseline forecast (typical attendance from the venue AI settings x the venue-type month curve x the calendar x weather, bookings on hand as a floor); `menuEngineering` ranked by margin with popularity marked learning; `slaTarget` a standard default; `waitTime` people ahead / configured capacity; `upsell` the relationship map and business priority; `segmentation` known guest attributes; `anomaly` the venue's configured thresholds and actual against the forecast's low end; `sendTime` the channel's typical hour; `wasteRisk` shelf life and par against the forecast; `queueBalancing` configured capacity per queue. Only a missing setting refuses (422 `AiMissingSettingProblem`).\n- `price`: unit cost plus the category's target margin, held inside the price band. Minimum: a current cost, no history.\n- `replenishment`: par level minus on-hand plus expected use over the supplier lead time. Minimum: 14 days of stock movements.\n- `requisition`: the next service's prep-plan ingredient needs minus kitchen stock. Minimum: 14 days of sales.\n- `demandForecast`: the average of the same weekday over the last 8 weeks, adjusted by admissions already booked. Minimum: 8 weeks of sales.\n- `prepPlan`: forecast covers for the service times each item's share of the last 4 same weekdays. Minimum: 4 weeks of sales.\n- `menuEngineering`: each item placed by popularity against margin, over 90 days. Minimum: 90 days of sales.\n- `staffing`: forecast demand divided by the role's standard covers per staff hour. Minimum: 8 weeks of sales (the forecast it rests on).\n- `slaTarget`: the 80th percentile of actual times over the last 30 days. Minimum: 30 days of timed events.\n- `waitTime`: people ahead divided by the throughput of the last 30 minutes. Minimum: 30 minutes of throughput today.\n- `upsell`: the item most often bought with the basket's items over 90 days. Minimum: 90 days of orders.\n- `segmentation`: recency, frequency and spend scores over 12 months. Minimum: 90 days of orders.\n- `anomaly`: a value outside three standard deviations of the same weekday over 8 weeks. Minimum: 8 weeks of the measure.\n- `scenario`: the demand forecast re-run with the stated changes. Minimum: as `demandForecast`.\n- `sendTime` (added 29 September): per recipient, the hour inside `context.sendWindow` in which they have most often opened or clicked over the last 90 days (marketing-crm attribution touches), and where `context.channel` is `best`, the consented channel with the highest engagement. A recipient with fewer than three touches gets their segment's modal hour, and one with none the window's start. Asked with `subjectRef` a segment id or `context.subjectIds` (at most 10,000). `value` is `{recommendations: [{subjectId, sendAt, channel, basisTouches}]}`. Minimum: 90 days of message touches at the scope.\n- `wasteRisk` (added 29 September): per item at an outlet or store location, planned production and stock on hand minus forecast demand over the item's shelf life, plus batches expiring inside the horizon (`inventory.listExpiringBatches`). `value` is `{items: [{itemRef, quantityAtRisk, valueAtCost, expiresAt, recommendedAction (reducePrep, promote, transfer, useInRecipe), transferTo}]}`. Minimum: 14 days of recorded waste and of sales.\n- `queueBalancing` (added 29 September): per queue or attraction at `subjectRef` (a venue) over `horizon`, the forecast wait (the `queue` forecast definition) against throughput capacity, a recommended virtual-queue return-slot allocation by queue type, and guest redirection from over-used to under-used attractions. `value` is `{queues: [{queueId, forecastWaitMinutes, capacityPerHour, returnSlotsPerInterval, redirectTo}]}`. Minimum: 14 days of queue readings.\n- `itinerary` (added 29 September, MOB-6, guest-allowed): refines a `venue-map` visit plan the guest owns. `subjectRef` is the plan id; `value` is `{planId, baseVersion, changes, rationale}`, applied with `updateVisitPlan` as the guest. Minimum: none; the rules plan is the baseline.\n",
+  "enum": [
+   "price",
+   "replenishment",
+   "requisition",
+   "demandForecast",
+   "prepPlan",
+   "menuEngineering",
+   "staffing",
+   "slaTarget",
+   "waitTime",
+   "upsell",
+   "segmentation",
+   "anomaly",
+   "scenario",
+   "sendTime",
+   "wasteRisk",
+   "queueBalancing",
+   "itinerary"
+  ]
+ },
  "TemperatureCheckpoint": {
   "type": "object",
   "x-ticvai-persistence": "fnb.temperature_checkpoint",
@@ -3077,6 +3729,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid",
     "readOnly": true,
     "description": "From the path of `setVenueSettings`."
+   },
+   "calendarDayStartHour": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 23,
+    "nullable": true,
+    "default": 6,
+    "description": "**Where the venue's calendar day starts** (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (`calendarView` in `screens/_components.yaml`), so a venue open 06:00 to 02:00 sees its night on the day it belongs to. Display only: it moves no booking, slot or business date. Null inherits the tenant default (proposed 6, client to correct).\n"
    },
    "currencyCode": {
     "type": "string",

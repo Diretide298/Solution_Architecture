@@ -1,1 +1,639 @@
-{}
+{
+ "askReportingQuestion": {
+  "method": "POST",
+  "path": "/reports/ask",
+  "contract": "reporting",
+  "summary": "Natural-language reporting query",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "NaturalLanguageAnswer"
+ },
+ "configureAiCapability": {
+  "method": "PUT",
+  "path": "/governance/capabilities/{capabilityKey}",
+  "contract": "ai",
+  "summary": "Register a capability, or change its owner, risk class or autonomy",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AiCapabilityRegistration",
+  "responds": "AiCapabilityRegistration"
+ },
+ "configureAnomalyDetector": {
+  "method": "PUT",
+  "path": "/anomaly-detectors/{detectorKey}",
+  "contract": "ai",
+  "summary": "Set up anomaly detection on a KPI",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AiAnomalyDetector",
+  "responds": "AiAnomalyDetector"
+ },
+ "createDashboard": {
+  "method": "POST",
+  "path": "/dashboards",
+  "contract": "reporting",
+  "summary": "Create a dashboard",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateDashboardRequest",
+  "responds": "Dashboard"
+ },
+ "createForecastScenario": {
+  "method": "POST",
+  "path": "/forecast-scenarios",
+  "contract": "ai",
+  "summary": "Run a what-if",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AiForecastScenario",
+  "responds": null
+ },
+ "createReport": {
+  "method": "POST",
+  "path": "/reports",
+  "contract": "reporting",
+  "summary": "Create a custom report definition",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateReportRequest",
+  "responds": "ReportDefinition"
+ },
+ "decideAiInsight": {
+  "method": "POST",
+  "path": "/insights/{insightId}/decide",
+  "contract": "ai",
+  "summary": "Review, accept, reject or mark an insight actioned",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiInsight"
+ },
+ "explainMetricChange": {
+  "method": "POST",
+  "path": "/insights/explain-metric-change",
+  "contract": "ai",
+  "summary": "Why did this metric change",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiMetricChangeExplanation"
+ },
+ "exportForecastVersion": {
+  "method": "POST",
+  "path": "/forecast-versions/{versionId}/exports",
+  "contract": "ai",
+  "summary": "Export a forecast version as a file",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getEffectiveAiPolicy": {
+  "method": "GET",
+  "path": "/governance/effective-policy",
+  "contract": "ai",
+  "summary": "The policy in force for a capability at a scope",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "capabilityKey",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "environment",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiEffectivePolicy"
+ },
+ "getForecast": {
+  "method": "GET",
+  "path": "/forecasts",
+  "contract": "ai",
+  "summary": "Forecast values",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "definitionKey",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "versionId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "dimensionKey",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scenarioId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "getKpiValues": {
+  "method": "GET",
+  "path": "/kpi-values",
+  "contract": "reporting",
+  "summary": "Current values, against target, with movement",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kpiIds",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kpiCodes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "compareTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "interval",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KpiValue"
+ },
+ "listAiCapabilities": {
+  "method": "GET",
+  "path": "/governance/capabilities",
+  "contract": "ai",
+  "summary": "The capability registry",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "family",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "riskClass",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAiEvaluations": {
+  "method": "GET",
+  "path": "/evaluations",
+  "contract": "ai",
+  "summary": "Evaluation runs",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "releaseId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "capabilityKey",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAiInsights": {
+  "method": "GET",
+  "path": "/insights",
+  "contract": "ai",
+  "summary": "Insights and anomalies",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "priority",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAiModels": {
+  "method": "GET",
+  "path": "/models",
+  "contract": "ai",
+  "summary": "The model catalogue",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "layer",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "producerType",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAnalyticsAnomalies": {
+  "method": "GET",
+  "path": "/analytics-anomalies",
+  "contract": "reporting",
+  "summary": "Numbers that moved more than they should have",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "severity",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AnalyticsAnomaly"
+ },
+ "listAnomalyDetectors": {
+  "method": "GET",
+  "path": "/anomaly-detectors",
+  "contract": "ai",
+  "summary": "Anomaly detectors",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "metricKey",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listForecastDefinitions": {
+  "method": "GET",
+  "path": "/forecast-definitions",
+  "contract": "ai",
+  "summary": "What is forecast",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "subject",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPromptTemplates": {
+  "method": "GET",
+  "path": "/prompt-templates",
+  "contract": "ai",
+  "summary": "The prompt registry",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "task",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "layer",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "publishPromptTemplate": {
+  "method": "POST",
+  "path": "/prompt-templates/{templateKey}/versions",
+  "contract": "ai",
+  "summary": "Publish a prompt template version",
+  "permission": "AI_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiPromptTemplate"
+ },
+ "runAiEvaluation": {
+  "method": "POST",
+  "path": "/evaluations",
+  "contract": "ai",
+  "summary": "Evaluate a candidate",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "saveNaturalLanguageQuery": {
+  "method": "POST",
+  "path": "/reports/ask/{conversationId}/save",
+  "contract": "reporting",
+  "summary": "Save a natural-language answer as a report definition",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ReportDefinition"
+ }
+}

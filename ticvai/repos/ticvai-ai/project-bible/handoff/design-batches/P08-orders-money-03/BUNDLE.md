@@ -3665,7 +3665,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "fiscalPeriodId": {
     "type": "string",
@@ -4120,7 +4120,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "entryNumber": {
     "type": "string",
@@ -4173,12 +4173,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "reversalOfEntryId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "reversedByEntryId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "reversalReason": {
@@ -4213,6 +4213,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   }
  },
  "JournalLine": {
+  "x-ticvai-append-only": "postedAt",
   "type": "object",
   "required": [
    "accountId",
@@ -4243,6 +4244,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "description": {
     "type": "string",
     "maxLength": 500
+   },
+   "postedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "**Copied from the journal entry when it posts** (ADR-0056), so the line table can be partitioned by month on its own column. Never differs from its entry's."
    }
   }
  },
@@ -4379,7 +4386,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderNumber": {
     "type": "string"
@@ -4553,11 +4560,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderLineId": {
     "type": "string"
@@ -4608,7 +4615,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "journalEntryId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "occurredAt": {
@@ -4693,7 +4700,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "array",
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     }
    }
   }

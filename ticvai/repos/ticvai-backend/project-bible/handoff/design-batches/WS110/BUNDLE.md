@@ -1,6 +1,6 @@
 # WS110 — ACCREDITATION board 3
 
-**9 screens · 8 operations · 16 schemas · 6 permissions**
+**9 screens · 12 operations · 18 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 6 permissions apply here:
-  `ACCREDITATION_APPROVE, ACCREDITATION_VIEW, APPROVAL_CONFIGURE, APPROVAL_REQUEST, PRICE_CONFIGURE, PRODUCT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 7 permissions apply here:
+  `ACCREDITATION_APPLY, ACCREDITATION_APPROVE, ACCREDITATION_VIEW, APPROVAL_CONFIGURE, APPROVAL_REQUEST, PRICE_CONFIGURE, PRODUCT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,11 +61,11 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `BO-635` | Accreditation Review Queue | listDetail | 1 | 0 | — |
-| `BO-636` | Application Review Workspace | listDetail | 2 | 0 | — |
+| `BO-636` | Application Review Workspace | listDetail | 4 | 0 | — |
 | `BO-637` | Approval Workflow Builder | listDetail | 1 | 0 | — |
 | `BO-638` | Approval Rules & Conditions | listDetail | 1 | 0 | — |
 | `BO-639` | Reviewer Assignment & Delegation | listDetail | 1 | 0 | — |
-| `BO-640` | Rejection & Resubmission Management | listDetail | 1 | 0 | — |
+| `BO-640` | Rejection & Resubmission Management | listDetail | 4 | 0 | — |
 | `BO-641` | Escalation & Exception Management | listDetail | 1 | 0 | — |
 | `BO-642` | Approval Decision History | listDetail | 1 | 0 | — |
 | `BO-643` | Approval Policy Validation & Publication | listDetail | 1 | 0 | — |
@@ -433,6 +433,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "The application",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "The application being decided",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAccreditationDocuments",
+    "contract": "accreditation",
+    "purpose": "The application's documents",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -924,6 +938,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "listAccreditationApplications",
      "listAccreditationHolders"
     ]
+   },
+   {
+    "operationId": "getAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "The rejected or returned application",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "resubmitAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "Resubmit on the applicant's behalf",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "updateAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "Amend an application returned for information",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1372,7 +1407,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Approve, reject, return for more, or escalate",
   "permission": "ACCREDITATION_APPROVE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1402,6 +1437,19 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "ApprovalRequest"
+ },
+ "getAccreditationApplication": {
+  "method": "GET",
+  "path": "/accreditation-applications/{applicationId}",
+  "contract": "accreditation",
+  "summary": "One application, with where each requirement stands",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AccreditationApplication"
  },
  "listAccreditationApplications": {
   "method": "GET",
@@ -1456,6 +1504,74 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "AccreditationAuditRecord"
  },
+ "listAccreditationDocuments": {
+  "method": "GET",
+  "path": "/accreditation-documents",
+  "contract": "accreditation",
+  "summary": "Documents supplied, by holder, application, requirement or state",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "applicationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "holderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "requirementCode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "expiringWithinDays",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "resubmitAccreditationApplication": {
+  "method": "POST",
+  "path": "/accreditation-applications/{applicationId}/resubmit",
+  "contract": "accreditation",
+  "summary": "Send an application back after a return for information or a rejection",
+  "permission": "ACCREDITATION_APPLY",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationApplication"
+ },
  "setApprovalMatrix": {
   "method": "PUT",
   "path": "/approval-matrices",
@@ -1493,6 +1609,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "VisualWorkflowDesignerInput",
   "responds": "VisualWorkflowDesignerView"
+ },
+ "updateAccreditationApplication": {
+  "method": "PUT",
+  "path": "/accreditation-applications/{applicationId}",
+  "contract": "accreditation",
+  "summary": "Save a draft, or amend an application returned for information",
+  "permission": "ACCREDITATION_APPLY",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccreditationApplication",
+  "responds": "AccreditationApplication"
  }
 }
 ```
@@ -1581,6 +1716,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "nullable": true
    },
+   "missingRequirements": {
+    "type": "array",
+    "readOnly": true,
+    "description": "The requirement codes a reviewer returned the application for, or rejected it over — what the applicant must change before resubmitting",
+    "items": {
+     "type": "string"
+    }
+   },
+   "decisionDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a decision is due — the approvals request's SLA. **A date, not a queue position**"
+   },
    "approvalRequestId": {
     "type": "string",
     "format": "uuid",
@@ -1590,6 +1740,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "renewsHolderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "12.1.37. Set by `renewAccreditation`; approval extends this holder rather than creating one"
+   },
+   "resubmissionOfApplicationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "12.1.33. The rejected application this one resubmits, so the rejection stays in the record"
+   },
+   "resubmissionNote": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true,
+    "readOnly": true,
+    "description": "What the applicant changed, from `resubmitAccreditationApplication`"
    },
    "submittedAt": {
     "type": "string",
@@ -1662,6 +1833,74 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "broken",
      "unverifiable"
     ]
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "AccreditationDocument": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.document",
+  "description": "Board 2.5. **Submitted against a named requirement, not into a folder.**",
+  "required": [
+   "requirementCode",
+   "assetId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "applicationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "requirementCode": {
+    "type": "string"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "submittedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "submitted",
+     "verified",
+     "rejected",
+     "expired"
+    ]
+   },
+   "verifiedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "verifiedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "rejectionReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "**An insurance certificate valid until March accredits somebody until March**, whatever the programme says.\n"
    },
    "scopePath": {
     "type": "string"
@@ -2071,6 +2310,84 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "aiAssessment": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.",
+    "properties": {
+     "riskScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "riskBand": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high",
+       "critical"
+      ]
+     },
+     "priorityScore": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+     },
+     "escalationSuggestion": {
+      "type": "object",
+      "description": "A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.",
+      "properties": {
+       "action": {
+        "type": "string",
+        "enum": [
+         "escalate",
+         "addBackupApprover",
+         "none"
+        ]
+       },
+       "reason": {
+        "type": "string",
+        "nullable": true
+       }
+      }
+     },
+     "signals": {
+      "type": "array",
+      "maxItems": 10,
+      "description": "The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.",
+      "items": {
+       "type": "object",
+       "properties": {
+        "code": {
+         "type": "string"
+        },
+        "contribution": {
+         "type": "number"
+        },
+        "detail": {
+         "type": "string",
+         "nullable": true
+        }
+       }
+      }
+     },
+     "scoreId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."
+     },
+     "decisionRecordId": {
+      "type": "string",
+      "description": "The ai decision record, for the audit of what the AI said and why."
+     },
+     "assessedAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
    }
   }
  },
@@ -2102,7 +2419,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "riskScoreAbove": {
     "type": "number",
     "nullable": true,
-    "description": "11.1.12. **Nothing supplies this yet** — risk scoring is parked with the model-dependent AI. The field exists so adding the engine later is configuration rather than a schema change.\n"
+    "description": "11.1.12. **Not matched against the AI risk score** (29 September, build pass, group G2). The AI assessment on a request (`ApprovalRequest.aiAssessment`, from `ai.scoreApprovalRequest`) is context for the reviewer only (MoM 8 September: AI never influences approve or reject), and routing a request to more approvers because of it would be influence. A rule with this set matches only a `riskScore` the requesting contract passes in `attributes` from its own deterministic rules (a payment's rule score, for example). Using the AI score here needs the client to say so.\n"
    },
    "condition": {
     "type": "string",
@@ -2165,6 +2482,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "nullable": true,
     "description": "11.1.53. An unanswered request eventually stops waiting."
+   },
+   "externalProviderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "11.1.65 (29 September). **This level is decided in an external workflow system** (`ApprovalExternalProvider`) rather than by a person in TICVAI. `approverRoleIds` stay required: they are who decides if the provider does not answer in time and its `onTimeout` is `fallBackToRoles`.\n"
    }
   }
  },
@@ -2423,6 +2746,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Workflow id",
     "format": "uuid"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
    }
   }
  },

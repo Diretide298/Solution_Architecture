@@ -1,6 +1,6 @@
 # WS193 — Wallet Configuration Backend Structure v1.0 board 8
 
-**10 screens · 11 operations · 8 schemas · 4 permissions**
+**10 screens · 16 operations · 15 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `AUDIT_VIEW, WALLET_CONFIGURE, WALLET_OPERATE, WALLET_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `AUDIT_VIEW, RISK_INVESTIGATE, RISK_REVIEW, WALLET_CONFIGURE, WALLET_OPERATE, WALLET_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -67,7 +67,7 @@ convincingly. It is never a caption.
 | `BO-1157` | Device, Credential & Account Security | listDetail | 2 | 0 | — |
 | `BO-1158` | AI Fraud & Anomaly Detection Studio | listDetail | 1 | 0 | — |
 | `BO-1159` | Automated Security Action Orchestration | configEditor | 2 | 0 | — |
-| `BO-1160` | Fraud Alert & Investigation Case Management | listDetail | 1 | 0 | — |
+| `BO-1160` | Fraud Alert & Investigation Case Management | listDetail | 6 | 0 | — |
 | `BO-1161` | Security Rules Testing, Simulation & AI Sandbox | listDetail | 1 | 0 | — |
 | `BO-1162` | Security Governance, Audit & Rule Publication | listDetail | 6 | 1 | — |
 
@@ -1533,6 +1533,41 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Fraud cases",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listRiskAlerts",
+    "contract": "ai",
+    "purpose": "Risk alerts",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "decideRiskAlert",
+    "contract": "ai",
+    "purpose": "Dismiss, monitor, mark false positive, or escalate",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "createRiskCase",
+    "contract": "ai",
+    "purpose": "Open an investigation",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getRiskCase",
+    "contract": "ai",
+    "purpose": "A case with its evidence and actions",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "closeRiskCase",
+    "contract": "ai",
+    "purpose": "Close a case with an outcome",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1543,6 +1578,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "Transaction",
     "Amount",
     "Risk score"
+   ],
+   "params": [
+    {
+     "name": "alertId",
+     "from": "navigation"
+    },
+    {
+     "name": "caseId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
@@ -1996,6 +2041,63 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+ "closeRiskCase": {
+  "method": "POST",
+  "path": "/risk/cases/{caseId}/close",
+  "contract": "ai",
+  "summary": "Close a case with an outcome",
+  "permission": "RISK_INVESTIGATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiRiskCase"
+ },
+ "createRiskCase": {
+  "method": "POST",
+  "path": "/risk/cases",
+  "contract": "ai",
+  "summary": "Open an investigation",
+  "permission": "RISK_INVESTIGATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiRiskCase"
+ },
+ "decideRiskAlert": {
+  "method": "POST",
+  "path": "/risk/alerts/{alertId}/decide",
+  "contract": "ai",
+  "summary": "Dismiss, monitor, mark false positive, or escalate",
+  "permission": "RISK_REVIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiRiskAlert"
+ },
  "diffWalletConfigurationVersion": {
   "method": "GET",
   "path": "/wallet-configuration/versions/{version}/diff",
@@ -2015,6 +2117,19 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "WalletConfigurationDiff"
  },
+ "getRiskCase": {
+  "method": "GET",
+  "path": "/risk/cases/{caseId}",
+  "contract": "ai",
+  "summary": "A case with its evidence and actions",
+  "permission": "RISK_INVESTIGATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiRiskCaseDetail"
+ },
  "linkWalletCredential": {
   "method": "POST",
   "path": "/wallet-credentials",
@@ -2022,7 +2137,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Bind a wristband, card or device to a wallet",
   "permission": "WALLET_OPERATE",
   "offlineCapable": true,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -2098,6 +2213,50 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
+ "listRiskAlerts": {
+  "method": "GET",
+  "path": "/risk/alerts",
+  "contract": "ai",
+  "summary": "Risk alerts",
+  "permission": "RISK_REVIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "band",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "entityType",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listWalletConfigurationVersions": {
   "method": "GET",
   "path": "/wallet-configuration/versions",
@@ -2148,7 +2307,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Validate and publish the wallet configuration as a version",
   "permission": "WALLET_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {
@@ -2186,7 +2345,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Block, freeze or restrict a wallet",
   "permission": "WALLET_OPERATE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -2224,9 +2383,14 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Velocity, behaviour and what happens when a rule trips",
   "permission": "WALLET_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -2243,7 +2407,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Which credit this purchase would actually use",
   "permission": "WALLET_VIEW",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -2264,6 +2428,492 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AiRiskAlert": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.risk_alert",
+  "description": "**A risk alert** (AIP-109): raised by scoring or re-scoring. **Alert, case and confirmed fraud are kept distinct** (AIP-163): an alert is a signal to look, not a finding.",
+  "required": [
+   "kind",
+   "entityType",
+   "entityRef",
+   "band",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "transaction",
+     "velocity",
+     "entity",
+     "network",
+     "staffLeakage",
+     "scanAbuse",
+     "accountTakeover",
+     "chargeback"
+    ]
+   },
+   "entityType": {
+    "type": "string",
+    "enum": [
+     "customer",
+     "account",
+     "device",
+     "paymentToken",
+     "credential",
+     "cluster",
+     "staff",
+     "wallet",
+     "ipAddress"
+    ]
+   },
+   "entityRef": {
+    "type": "string"
+   },
+   "score": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100
+   },
+   "band": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
+    "description": "Design 5.6: a risk score and band, never a probability."
+   },
+   "reasonCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "correlationKey": {
+    "type": "string",
+    "nullable": true
+   },
+   "assessmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "monitoring",
+     "dismissed",
+     "falsePositive",
+     "escalated"
+    ],
+    "readOnly": true
+   },
+   "caseId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "ai.risk_case"
+   },
+   "raisedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "decisionNote": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiRiskCase": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.risk_case",
+  "description": "**An investigation** (AIP-150..160). Its evidence and actions are `ai.case_evidence` and `ai.case_action`. The summary is written by a model from structured evidence only (AIP-153); the outcome is a person's.",
+  "required": [
+   "reference",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "reference": {
+    "type": "string",
+    "readOnly": true
+   },
+   "title": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "investigating",
+     "pendingAction",
+     "closed"
+    ],
+    "readOnly": true
+   },
+   "priority": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
+   },
+   "entities": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "entityType": {
+       "type": "string",
+       "enum": [
+        "customer",
+        "account",
+        "device",
+        "paymentToken",
+        "credential",
+        "cluster",
+        "staff"
+       ]
+      },
+      "entityRef": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "alertIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "assigneePrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "summary": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "confirmedFraud",
+     "notFraud",
+     "inconclusive"
+    ],
+    "nullable": true,
+    "readOnly": true
+   },
+   "closureNote": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "openedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "openedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "closedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "closedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiRiskCaseAction": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.case_action",
+  "description": "**A restrictive action proposed from a case** (AIP-136). It goes to the owning module through the action pipeline, never straight from review; at the first-release ceiling (L1 advisory, design 3.8) it is a recommendation the owning module's operator applies. **Scoped through its case.**",
+  "required": [
+   "caseId",
+   "action",
+   "targetContract"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "caseId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "ai.risk_case"
+   },
+   "action": {
+    "type": "string",
+    "enum": [
+     "blockPaymentToken",
+     "suspendAccount",
+     "restrictWallet",
+     "revokeEntitlement",
+     "flagCustomer",
+     "requireStepUp",
+     "holdRefunds",
+     "lockIdentity"
+    ]
+   },
+   "targetContract": {
+    "type": "string"
+   },
+   "targetOperation": {
+    "type": "string"
+   },
+   "targetRef": {
+    "type": "string"
+   },
+   "rationale": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "recommended",
+     "planned",
+     "awaitingApproval",
+     "applied",
+     "rejected",
+     "failed"
+    ],
+    "readOnly": true
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "ai.action_plan"
+   },
+   "proposedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "proposedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "AiRiskCaseDetail": {
+  "type": "object",
+  "x-ticvai-persistence": "none — ai.risk_case with its evidence, actions and alerts",
+  "description": "A case with everything attached to it.",
+  "required": [
+   "case"
+  ],
+  "properties": {
+   "case": {
+    "$ref": "#/components/schemas/AiRiskCase"
+   },
+   "evidence": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiRiskCaseEvidence"
+    }
+   },
+   "actions": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiRiskCaseAction"
+    }
+   },
+   "alerts": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiRiskAlert"
+    }
+   }
+  }
+ },
+ "AiRiskCaseEvidence": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.case_evidence",
+  "description": "**Case evidence** (AIP-155): `jsonb` plus an immutable Blob copy. **Scoped through its case** (`platform.apply_parent_rls`). Never edited; a correction is new evidence.",
+  "required": [
+   "caseId",
+   "kind",
+   "label"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "caseId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "ai.risk_case"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "assessment",
+     "alert",
+     "transaction",
+     "networkSnapshot",
+     "note",
+     "document"
+    ]
+   },
+   "ref": {
+    "type": "string",
+    "nullable": true
+   },
+   "content": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true
+   },
+   "blobRef": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The immutable (WORM) copy."
+   },
+   "label": {
+    "type": "string",
+    "enum": [
+     "source",
+     "derived",
+     "modelInferred"
+    ]
+   },
+   "contentHash": {
+    "type": "string",
+    "readOnly": true
+   },
+   "addedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "addedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "AuditRecord": {
+  "x-ticvai-append-only": "occurredAt",
+  "type": "object",
+  "x-ticvai-persistence": "platform.audit_record",
+  "description": "26 September, pull audit R198. **One row of the platform audit trail, as `listAuditRecords` returns it.** It was a free-form object, so nothing said what an audit row carries. These are the fields the operation already filters on — who, where, on which workstation, what action, on what, and when — and nothing more. Written by the operations that audit themselves; never edited and never deleted.\n",
+  "required": [
+   "id",
+   "action",
+   "occurredAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Who acted."
+   },
+   "orgUnitId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The scope node the action happened in."
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The workstation it was done from, where there was one."
+   },
+   "action": {
+    "type": "string",
+    "description": "What was done, as the writing operation names it."
+   },
+   "subjectRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "**The thing acted on** — a profile, a shift, an order. The same value the `subjectRef` filter matches.\n"
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "When. The list is ordered by this, most recent first."
+   },
+   "platformStaffGrantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Set when a TICVAI platform operator acted, naming the grant they acted under** (`identity.openPlatformStaffGrant`; decided 28 September, audit R098). Null for the tenant's own staff. Every platform action in a tenant carries one, so the tenant can see all of them.\n"
+   }
+  }
+ },
  "CreditAllocation": {
   "type": "object",
   "description": "Board 3.10. **Which lots this purchase would draw on**, in order.",
@@ -2328,6 +2978,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       }
      }
     }
+   }
+  }
+ },
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
    }
   }
  },
@@ -2705,8 +3384,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
         "deviceChange",
         "dormantThenLarge",
         "repeatedFailure",
-        "refundPattern"
-       ]
+        "refundPattern",
+        "accountSharing",
+        "duplicateTransaction",
+        "aiRiskScore"
+       ],
+       "description": "4.3.32 (29 September, build pass). **`accountSharing`**: one wallet or credential used from more devices or places at once than one person can be (`threshold` concurrent devices within `windowMinutes`). **`duplicateTransaction`**: the same amount at the same acceptance point within `windowMinutes` (`threshold` repeats). **`aiRiskScore`**: the score the `ai` risk engine returns for the wallet operation (`scoreTransactionRisk`, rules first and statistical baselines as history builds, ai-system-design 3.10); `threshold` is the score at or above which the rule acts. The wallet keeps its own rules and actions; the AI finding and its case are the `ai` contract's (`listRiskAlerts`)."
       },
       "threshold": {
        "type": "number"

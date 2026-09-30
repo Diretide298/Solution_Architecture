@@ -110,7 +110,7 @@ BL-071, 2.6.34. **`setLanguages` already measures the gap** — `translationGaps
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -162,7 +162,7 @@ Proposes and stops. `venue-map.acceptVenueLabelProposals` is the human half.
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | mapId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Responses**
 
@@ -203,7 +203,7 @@ Proposes and stops. `venue-map.acceptVenueLabelProposals` is the human half.
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -277,7 +277,7 @@ Rotation is the same operation. The previous key is revoked at the vault after a
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | providerId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -353,7 +353,7 @@ Rotation is the same operation. The previous key is revoked at the vault after a
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -411,7 +411,7 @@ Scoped to a module and a role, because the same question means different things 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -504,7 +504,7 @@ Every response carries a trace id, the model and provider that produced it, toke
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | append |
-| Reads | `ai.assistant_profile`, `ai.capability`, `ai.chunk_embedding`, `ai.chunk_ref`, `ai.conversation`, `ai.knowledge_document`, `ai.message`, `ai.policy`, `ai.proposed_action`, `ai.provider`, `cache:answer`, `cache:idempotency`, `qdrant:knowledge` |
+| Reads | `ai.assistant_profile`, `ai.capability`, `ai.chunk_embedding`, `ai.conversation`, `ai.knowledge_document`, `ai.message`, `ai.policy`, `ai.proposed_action`, `ai.provider`, `cache:answer`, `cache:idempotency`, `qdrant:knowledge` |
 | Writes | `ai.activity`, `ai.decision_record`, `ai.knowledge_gap`, `ai.message`, `ai.proposed_action`, `cache:answer`, `cache:idempotency`, `qdrant:knowledge` |
 | Called by | ADM-533, BO-928, BO-929, BO-932, CMS-104, EMP-019, EMP-020, GST-031, GST-032, GST-033, GST-054, KSK-015, WEB-044 |
 
@@ -513,7 +513,7 @@ Every response carries a trace id, the model and provider that produced it, toke
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | conversationId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -684,7 +684,7 @@ Providers, models and policy
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | tenantId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `AiByokEnablement`
 
@@ -751,7 +751,7 @@ Masking is the part to get right. `maskedFields` names what is redacted before a
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `AiPolicy`
 
@@ -882,7 +882,7 @@ Credentials are a key-vault reference, never the key.
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `AiProvider`
 
@@ -1044,7 +1044,7 @@ The configuration assistant and Help me choose suggestions (design C7)
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | venueId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1114,7 +1114,7 @@ Forecasting and operational requirements (design C8)
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `AiForecastScenario`
 
@@ -1180,7 +1180,7 @@ Forecasting and operational requirements (design C8)
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | requirementId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1361,7 +1361,7 @@ The job's status, rows read, loaded and rejected, and each finding (a bad date, 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | venueId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1496,7 +1496,7 @@ Imports of the venue's own history, newest first, with the months each covered a
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | versionId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1569,7 +1569,7 @@ Outside the nightly run (design 2.2 C): snapshot, produce, reconcile, score. Ret
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | definitionKey | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Response**: `AiForecastVersion`
 
@@ -1637,7 +1637,7 @@ Outside the nightly run (design 2.2 C): snapshot, produce, reconcile, score. Ret
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | venueId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `AiVenueSettings`
 
@@ -1731,7 +1731,7 @@ Draft a configuration a person then reviews
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1806,7 +1806,7 @@ Logging, approval, explainability and cost
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | capabilityKey | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `AiCapabilityRegistration`
 
@@ -1893,7 +1893,7 @@ Logging, approval, explainability and cost
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1978,7 +1978,7 @@ Logging, approval, explainability and cost
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `AiPolicyException`
 
@@ -2051,7 +2051,7 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | actionId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2114,7 +2114,7 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2237,7 +2237,7 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | versionId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Response**: `AiGovernancePolicyVersion`
 
@@ -2300,7 +2300,7 @@ Resuming needs more authority than pausing (`AI_APPROVE`): stopping is always sa
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | capabilityKey | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2366,7 +2366,7 @@ Resuming needs more authority than pausing (`AI_APPROVE`): stopping is always sa
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | versionId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2426,7 +2426,7 @@ Moves an insight along new → reviewed → accepted/rejected → actioned (AIP-
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | insightId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2500,7 +2500,7 @@ Moves an insight along new → reviewed → accepted/rejected → actioned (AIP-
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2573,7 +2573,7 @@ Knowledge gaps, answer feedback and assistant profiles (design C4, C5)
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | profileKey | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `AiAssistantProfile`
 
@@ -2645,7 +2645,7 @@ One label per message per person (AIC-062): helpful or not, and why. Guests can 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | messageId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2707,7 +2707,7 @@ Model catalogue, prompt registry, evaluation and release (design C1, C13)
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | releaseId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2771,7 +2771,7 @@ Model catalogue, prompt registry, evaluation and release (design C1, C13)
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | templateKey | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2831,7 +2831,7 @@ Model catalogue, prompt registry, evaluation and release (design C1, C13)
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | releaseId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2891,7 +2891,7 @@ Offline golden set, backtest or shadow comparison of a candidate against its bas
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2951,7 +2951,7 @@ Offline golden set, backtest or shadow comparison of a candidate against its bas
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | modelId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `AiModel`
 
@@ -3064,7 +3064,7 @@ Records containment and performs it: pause a capability, roll back a release, re
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | incidentId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -3139,7 +3139,7 @@ The recommendation and upsell engine (design C11)
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -3208,7 +3208,7 @@ Impressions, clicks, add-to-cart, dismissals and explicit declines, batched. A `
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -3247,7 +3247,7 @@ Approved enterprise knowledge sources (8.4.38) — operating procedures, policie
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
-| Reads | `ai.chunk_ref`, `ai.knowledge_collection`, `cache:idempotency`, `qdrant:knowledge` |
+| Reads | `ai.chunk_embedding`, `ai.knowledge_collection`, `cache:idempotency`, `qdrant:knowledge` |
 | Writes | `ai.knowledge_collection`, `cache:idempotency`, `qdrant:knowledge` |
 | Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
 
@@ -3255,7 +3255,7 @@ Approved enterprise knowledge sources (8.4.38) — operating procedures, policie
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `KnowledgeCollection`
 
@@ -3316,7 +3316,7 @@ Sending both, or naming a document in another collection or in a state the trans
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `ai.chunk_ref`, `ai.knowledge_collection`, `ai.knowledge_document`, `cache:embedding`, `cache:idempotency`, `qdrant:knowledge` |
+| Reads | `ai.chunk_embedding`, `ai.knowledge_collection`, `ai.knowledge_document`, `cache:embedding`, `cache:idempotency`, `qdrant:knowledge` |
 | Writes | `ai.chunk_embedding`, `ai.knowledge_document`, `cache:embedding`, `cache:idempotency`, `qdrant:knowledge` |
 | Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
 | State model | AI knowledge document ([states/ai-knowledge-document.yaml](../../../states/ai-knowledge-document.yaml)): moves `indexed` -> `processing`, `indexed` -> `superseded`, `failed` -> `processing` |
@@ -3326,7 +3326,7 @@ Sending both, or naming a document in another collection or in a state the trans
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | collectionId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `KnowledgeDocument`
 
@@ -3393,7 +3393,7 @@ Needed for three reasons and worth naming them: the embedding model changed, the
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | sourceId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -3446,7 +3446,7 @@ Results are scoped to the principal, and each carries the collection it came fro
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `ai.chunk_embedding`, `ai.chunk_ref`, `ai.knowledge_collection`, `ai.knowledge_document`, `assets.media_asset`, `cache:answer`, `cache:idempotency`, `catalogue.product`, `qdrant:knowledge` |
+| Reads | `ai.chunk_embedding`, `ai.knowledge_collection`, `ai.knowledge_document`, `assets.media_asset`, `cache:answer`, `cache:idempotency`, `catalogue.product`, `qdrant:knowledge` |
 | Writes | `ai.activity`, `cache:answer`, `cache:idempotency`, `qdrant:knowledge` |
 | Called by | CMS-010, CMS-062, EMP-040, EMP-041 |
 
@@ -3454,7 +3454,7 @@ Results are scoped to the principal, and each carries the collection it came fro
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -3495,7 +3495,7 @@ Names the table, the fields that carry retrievable text, the collection it lands
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `IndexSource`
 
@@ -3712,21 +3712,15 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | no |  |
 | document_id | uuid | yes |  |
 | chunk_index | integer | yes |  |
-| parent_chunk_id | uuid | no | The parent section, where the source uses parentChild chunking. |
+| parent_chunk_id | uuid | no | The parent section's own row, where the source uses parentChild chunking. |
 | content | text | no | The chunk text. |
-| embedding_model | text | yes |  |
-| dense | text | no | Dense vector, halfvec(1024) in the DDL. |
-| sparse | jsonb | no | Learned sparse weights, sparsevec in the DDL. |
+| embedding_model | text | yes | The model that produced the point; a model change re-embeds into a new collection. |
+| collection_alias | text | yes | The Qdrant collection alias the point is in: tenant_<tenantId> for the current model. |
+| point_id | uuid | yes | The Qdrant point id. |
 | token_count | integer | no |  |
-| content_hash | text | no |  |
+| content_hash | text | no | Hash of content; a chunk whose hash is unchanged is not re-embedded. |
+| indexed_at | timestamptz | no | When the point was last written to Qdrant; null until it has been. |
 | created_at | timestamptz | no |  |
-
-### `ai.chunk_ref`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| id | uuid | yes | Synthesised key. |
-| document_id | uuid | yes | Points at ai.knowledge_document. |
 
 ### `ai.conversation`
 

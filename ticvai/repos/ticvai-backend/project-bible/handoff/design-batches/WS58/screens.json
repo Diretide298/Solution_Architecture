@@ -39,10 +39,7 @@
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-268 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-269",
@@ -101,10 +98,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Operations teams can determine the health, commercial activity and current issues of every active sales channel from one central workspace.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each channel should display) — counts over a population, then the population",
   "purpose": "Provide a real-time operational view of all active TICVAI sales channels.",
-  "purposeNote": "Operations teams can determine the health, commercial activity and current issues of every active sales channel from one central workspace.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -116,67 +113,67 @@
        "kind": "metricTile",
        "label": "Active Channels",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 20 §Display",
-       "bindsTo": "ChannelOperationsCommandCenterView.activeChannels"
+       "bindsTo": "ChannelOperationsCommandCenterSummary.activeChannels"
       },
       {
        "kind": "metricTile",
        "label": "Connected Channels",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 20 §Display",
-       "bindsTo": "ChannelOperationsCommandCenterView.connectedChannels"
+       "bindsTo": "ChannelOperationsCommandCenterSummary.connectedChannels"
       },
       {
        "kind": "metricTile",
        "label": "Degraded Channels",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 20 §Display",
-       "bindsTo": "ChannelOperationsCommandCenterView.degradedChannels"
+       "bindsTo": "ChannelOperationsCommandCenterSummary.degradedChannels"
       },
       {
        "kind": "metricTile",
        "label": "Offline Channels",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 20 §Display",
-       "bindsTo": "ChannelOperationsCommandCenterView.offlineChannels"
+       "bindsTo": "ChannelOperationsCommandCenterSummary.offlineChannels"
       },
       {
        "kind": "metricTile",
        "label": "Transactions Today",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 20 §Display",
-       "bindsTo": "ChannelOperationsCommandCenterView.transactionsToday"
+       "bindsTo": "ChannelOperationsCommandCenterSummary.transactionsToday"
       },
       {
        "kind": "metricTile",
        "label": "Gross Sales",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 20 §Display",
-       "bindsTo": "ChannelOperationsCommandCenterView.grossSales"
+       "bindsTo": "ChannelOperationsCommandCenterSummary.grossSales"
       },
       {
        "kind": "metricTile",
        "label": "Products Available",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 20 §Display",
-       "bindsTo": "ChannelOperationsCommandCenterView.productsAvailable"
+       "bindsTo": "ChannelOperationsCommandCenterSummary.productsAvailable"
       },
       {
        "kind": "metricTile",
        "label": "Synchronization Errors",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 20 §Display",
-       "bindsTo": "ChannelOperationsCommandCenterView.synchronizationErrors"
+       "bindsTo": "ChannelOperationsCommandCenterSummary.synchronizationErrors"
       },
       {
        "kind": "metricTile",
        "label": "Capacity Alerts",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 20 §Display",
-       "bindsTo": "ChannelOperationsCommandCenterView.capacityAlerts"
+       "bindsTo": "ChannelOperationsCommandCenterSummary.capacityAlerts"
       },
       {
        "kind": "metricTile",
        "label": "Pricing Errors",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 20 §Display",
-       "bindsTo": "ChannelOperationsCommandCenterView.pricingErrors"
+       "bindsTo": "ChannelOperationsCommandCenterSummary.pricingErrors"
       },
       {
        "kind": "metricTile",
        "label": "Failed Transactions",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 20 §Display",
-       "bindsTo": "ChannelOperationsCommandCenterView.failedTransactions"
+       "bindsTo": "ChannelOperationsCommandCenterSummary.failedTransactions"
       },
       {
        "kind": "metricTile",
@@ -262,6 +259,12 @@
   },
   "apis": [
    {
+    "operationId": "listChannel2",
+    "contract": "catalogue",
+    "purpose": "AI Channel Optimization & Intelligence Center",
+    "trigger": "onLoad"
+   },
+   {
     "operationId": "listChannel",
     "contract": "catalogue",
     "purpose": "Channel Operations Command Center",
@@ -271,7 +274,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-268"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-268",
+   "workshopBoard": "wireframes/WS139 Sales Channel Management Board 2.dc.html#adm-268"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 20. 23 of 23 labels bound to a contract property; 32 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -335,22 +339,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized technical administrators can establish, test and monitor channel connections without modifying core TICVAI application code for supported connector types.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure/reference) and no display directory — it is settings, not a population",
   "purpose": "Configure and manage the technical connection between TICVAI and external or internal sales channels.",
-  "purposeNote": "Authorized technical administrators can establish, test and monitor channel connections without modifying core TICVAI application code for supported connector types.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Webhook, Partner API. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack Sales_Channel_Management_Reference.pdf, page 22 §Support"
-   },
-   {
-    "operation": null,
-    "why": "**Channel Connection & Integration Manager declares no operation that writes anything** — its only declared call is `listChannelConnectionIntegration`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
-    "source": "contract — the screen's declared operations"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -436,13 +428,49 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "TICVAI Native",
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 22 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "REST API",
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 22 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Webhook",
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 22 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reseller API",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 22 §Support"
       },
       {
        "kind": "secondaryButton",
        "label": "Partner API",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 22 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "File/SFTP where required",
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 22 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save channel connection configuration",
+       "operation": "setChannelConnectionConfiguration",
+       "permission": "PRODUCT_CONFIGURE",
+       "notes": "**How TICVAI reaches one channel, per environment** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /channel-connections"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Test channel connection",
+       "operation": "testChannelConnection",
+       "permission": "PRODUCT_CONFIGURE",
+       "notes": "**Runs the connection tests and records the result** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml POST /channel-connections/{connectionId}/test"
       }
      ]
     }
@@ -460,14 +488,95 @@
     "contract": "catalogue",
     "purpose": "Channel Connection & Integration Manager",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setChannelConnectionConfiguration",
+    "contract": "catalogue",
+    "purpose": "Create or update a channel connection",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelConnectionIntegration"
+    ]
+   },
+   {
+    "operationId": "testChannelConnection",
+    "contract": "catalogue",
+    "purpose": "Test a channel connection now",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelConnectionIntegration"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-269"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-269",
+   "workshopBoard": "wireframes/WS139 Sales Channel Management Board 2.dc.html#adm-269"
   },
-  "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 22. 0 of 0 labels bound to a contract property; 16 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 22. 0 of 0 labels bound to a contract property; 20 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetChannelConnectionConfiguration",
+    "component": "modal",
+    "trigger": "Save channel connection configuration",
+    "body": "**Collects what `setChannelConnectionConfiguration` sends before it is called.** Required: `id`, `scopePath`, `salesChannelId`, `connectorName`, `environment`, `connectionType`. Optional: `partner`, `direction`, `endpoint`, `apiVersion`, `authenticationType`, `credentialsReference`, `certificateReference`, `certificateExpiresAt`, `timeoutMs`, `rateLimitPerMinute`, `ipRestrictions`, `retryPolicy` and 3 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ChannelConnection",
+    "confirm": {
+     "label": "Save channel connection configuration",
+     "operation": "setChannelConnectionConfiguration"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "salesChannelId",
+      "connectorName",
+      "environment",
+      "connectionType",
+      "partner",
+      "direction",
+      "endpoint",
+      "apiVersion",
+      "authenticationType",
+      "credentialsReference",
+      "certificateReference",
+      "certificateExpiresAt",
+      "timeoutMs",
+      "rateLimitPerMinute",
+      "ipRestrictions",
+      "retryPolicy"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /channel-connections"
+   },
+   {
+    "id": "formTestChannelConnection",
+    "component": "modal",
+    "trigger": "Test channel connection",
+    "body": "**Collects what `testChannelConnection` sends before it is called.** Nothing in the body is required. Optional: `tests`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Test channel connection",
+     "operation": "testChannelConnection"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "tests"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /channel-connections/{connectionId}/test"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "connectionId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -529,14 +638,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "supported sales channels while clearly identifying failed or inconsistent records.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Control how TICVAI distributes commercial information to connected channels and receives supported updates.",
-  "purposeNote": "supported sales channels while clearly identifying failed or inconsistent records.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Channel → TICVAI, Sync Now, Retry Failed, Compare, Reprocess, Pause Sync, Resume, Export Error. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 8 actions on this screen; 1 are served since the writers pass (29 September): Channel → TICVAI by `setChannelSyncSetting`.** Still unserved: Sync Now, Retry Failed, Compare, Reprocess, Pause Sync, Resume, Export Error. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Sales_Channel_Management_Reference.pdf, page 23 §Support as appropriate"
    }
   ],
@@ -632,6 +741,14 @@
        "kind": "secondaryButton",
        "label": "Export Error",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 23 §Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save channel sync setting",
+       "operation": "setChannelSyncSetting",
+       "permission": "PRODUCT_CONFIGURE",
+       "notes": "**The person's half of `catalogue.channel_sync`** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /channel-syncs"
       }
      ]
     }
@@ -650,6 +767,15 @@
     "contract": "catalogue",
     "purpose": "Product, Price & Availability Synchronization",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setChannelSyncSetting",
+    "contract": "catalogue",
+    "purpose": "Set how one kind of data synchronises with a channel",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProductPriceAvailability"
+    ]
    }
   ],
   "entryState": {
@@ -665,9 +791,46 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-270"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-270",
+   "workshopBoard": "wireframes/WS139 Sales Channel Management Board 2.dc.html#adm-270"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 23. 8 of 8 labels bound to a contract property; 21 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetChannelSyncSetting",
+    "component": "modal",
+    "trigger": "Save channel sync setting",
+    "body": "**Collects what `setChannelSyncSetting` sends before it is called.** Required: `id`, `scopePath`, `salesChannelId`, `domain`. Optional: `channelConnectionId`, `direction`, `frequency`, `isPaused`, `lastSuccessfulSyncAt`, `nextSyncAt`, `recordsProcessed`, `successful`, `failed`, `pending`, `warnings`, `durationMs` and 1 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ChannelSync",
+    "confirm": {
+     "label": "Save channel sync setting",
+     "operation": "setChannelSyncSetting"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "salesChannelId",
+      "domain",
+      "channelConnectionId",
+      "direction",
+      "frequency",
+      "isPaused",
+      "lastSuccessfulSyncAt",
+      "nextSyncAt",
+      "recordsProcessed",
+      "successful",
+      "failed",
+      "pending",
+      "warnings",
+      "durationMs",
+      "mismatchCount"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /channel-syncs"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -729,10 +892,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Operations can understand current sellable availability across all channels without checking each channel independently.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide operations with a live view of what each channel can currently sell.",
-  "purposeNote": "Operations can understand current sellable availability across all channels without checking each channel independently.",
   "layout": {
    "template": "split",
    "regions": [
@@ -795,6 +958,12 @@
     "contract": "catalogue",
     "purpose": "Real-Time Channel Availability & Inventory Monitor",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listRealTimeAvailability",
+    "contract": "promotions",
+    "purpose": "Real-Time Availability & Checkout Validation",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -810,7 +979,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-271"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-271",
+   "workshopBoard": "wireframes/WS139 Sales Channel Management Board 2.dc.html#adm-271"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 25. 7 of 7 labels bound to a contract property; 7 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -874,10 +1044,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can dynamically rebalance unsold channel capacity without affecting confirmed orders or exceeding underlying capacity.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Allow authorized users to operationally adjust inventory allocations as demand changes. Board 1 defines the allocation rules. Board 2 manages those allocations during live operations.",
-  "purposeNote": "Authorized users can dynamically rebalance unsold channel capacity without affecting confirmed orders or exceeding underlying capacity.",
   "layout": {
    "template": "split",
    "regions": [
@@ -971,7 +1141,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-272"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-272",
+   "workshopBoard": "wireframes/WS139 Sales Channel Management Board 2.dc.html#adm-272"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 26. 9 of 9 labels bound to a contract property; 16 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1035,14 +1206,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Channel incidents can be identified, assigned, investigated and recovered from a central operational workflow with complete traceability.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
   "purpose": "Provide one operational workspace for resolving channel problems.",
-  "purposeNote": "Channel incidents can be identified, assigned, investigated and recovered from a central operational workflow with complete traceability.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Connection Failure, Product Sync Failure, Pricing Mismatch, Order Failure, Payment Error, Duplicate Transaction, Partner Error. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Connection Failure, Product Sync Failure, Pricing Mismatch, Inventory Mismatch, Order Failure, Payment Error, Duplicate Transaction, Partner Error. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Sales_Channel_Management_Reference.pdf, page 27 §Support"
    }
   ],
@@ -1136,6 +1307,11 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Inventory Mismatch",
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 27 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Order Failure",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 27 §Support"
       },
@@ -1153,6 +1329,22 @@
        "kind": "secondaryButton",
        "label": "Partner Error",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 27 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save channel incident",
+       "operation": "updateChannelIncident",
+       "permission": "PRODUCT_CONFIGURE",
+       "notes": "**The person's moves on a channel incident** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PATCH /channel-incidents/{incidentId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Retry channel incident",
+       "operation": "retryChannelIncident",
+       "permission": "PRODUCT_CONFIGURE",
+       "notes": "**Retry, as a call** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml POST /channel-incidents/{incidentId}/retry"
       }
      ]
     }
@@ -1170,14 +1362,64 @@
     "contract": "catalogue",
     "purpose": "Channel Exceptions, Incidents & Recovery",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateChannelIncident",
+    "contract": "catalogue",
+    "purpose": "Own, investigate, resolve or close a channel incident",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelExceptionIncident"
+    ]
+   },
+   {
+    "operationId": "retryChannelIncident",
+    "contract": "catalogue",
+    "purpose": "Retry the failed channel call behind an incident",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelExceptionIncident"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-273"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-273",
+   "workshopBoard": "wireframes/WS139 Sales Channel Management Board 2.dc.html#adm-273"
   },
-  "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 27. 0 of 0 labels bound to a contract property; 19 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 27. 0 of 0 labels bound to a contract property; 20 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formUpdateChannelIncident",
+    "component": "modal",
+    "trigger": "Save channel incident",
+    "body": "**Collects what `updateChannelIncident` sends before it is called.** Nothing in the body is required. Optional: `status`, `ownerPrincipalId`, `slaDueAt`, `resolutionNote`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save channel incident",
+     "operation": "updateChannelIncident"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "ownerPrincipalId",
+      "slaDueAt",
+      "resolutionNote"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PATCH /channel-incidents/{incidentId}"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "incidentId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1239,10 +1481,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Management can objectively compare channel contribution and commercial efficiency using consistent TICVAI metrics.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Measure) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Compare the commercial effectiveness of TICVAI sales channels.",
-  "purposeNote": "Management can objectively compare channel contribution and commercial efficiency using consistent TICVAI metrics.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -1354,7 +1596,7 @@
        "kind": "metricTile",
        "label": "Cost of Sale where available",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 29 §Measure",
-       "bindsTo": "ChannelPerformanceCommercialAnalyticsView.costOfSaleWhereAvailable"
+       "bindsTo": "ChannelPerformanceCommercialAnalyticsView.costOfSale"
       }
      ]
     }
@@ -1378,7 +1620,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-274"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-274",
+   "workshopBoard": "wireframes/WS139 Sales Channel Management Board 2.dc.html#adm-274"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 29. 12 of 22 labels bound to a contract property; 23 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1442,10 +1685,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Any channel transaction or operational change can be reconstructed from initiation through final result.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Track) and no metric row",
   "purpose": "Provide complete traceability across channel configuration, synchronization and transactions.",
-  "purposeNote": "Any channel transaction or operational change can be reconstructed from initiation through final result.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1486,17 +1729,8 @@
        "kind": "dataTable",
        "label": "Every channel audit logs",
        "columns": [
-        "ChannelAuditLogsTransactionTraceabilityView.configurationChange",
-        "ChannelAuditLogsTransactionTraceabilityView.activation",
-        "ChannelAuditLogsTransactionTraceabilityView.suspension",
-        "ChannelAuditLogsTransactionTraceabilityView.allocationChange",
-        "ChannelAuditLogsTransactionTraceabilityView.priceAssignment",
-        "Sync",
-        "ChannelAuditLogsTransactionTraceabilityView.order",
-        "ChannelAuditLogsTransactionTraceabilityView.cancellation",
-        "ChannelAuditLogsTransactionTraceabilityView.error",
-        "ChannelAuditLogsTransactionTraceabilityView.manualIntervention",
-        "ChannelAuditLogsTransactionTraceabilityView.integrationChange"
+        "ChannelAuditLogsTransactionTraceabilityView.category",
+        "Sync"
        ],
        "bindsTo": "ChannelAuditLogsTransactionTraceabilityView",
        "operation": "listChannelLogTransaction",
@@ -1513,17 +1747,8 @@
        "label": "The selected channel audit logs",
        "bindsTo": "ChannelAuditLogsTransactionTraceabilityView",
        "columns": [
-        "ChannelAuditLogsTransactionTraceabilityView.configurationChange",
-        "ChannelAuditLogsTransactionTraceabilityView.activation",
-        "ChannelAuditLogsTransactionTraceabilityView.suspension",
-        "ChannelAuditLogsTransactionTraceabilityView.allocationChange",
-        "ChannelAuditLogsTransactionTraceabilityView.priceAssignment",
-        "Sync",
-        "ChannelAuditLogsTransactionTraceabilityView.order",
-        "ChannelAuditLogsTransactionTraceabilityView.cancellation",
-        "ChannelAuditLogsTransactionTraceabilityView.error",
-        "ChannelAuditLogsTransactionTraceabilityView.manualIntervention",
-        "ChannelAuditLogsTransactionTraceabilityView.integrationChange"
+        "ChannelAuditLogsTransactionTraceabilityView.category",
+        "Sync"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Transaction Trace”, “Partner Request”, “Export”.",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 30 §Track"
@@ -1549,18 +1774,15 @@
   ],
   "entryState": {
    "preloaded": [
-    "ChannelAuditLogsTransactionTraceabilityView.configurationChange",
-    "ChannelAuditLogsTransactionTraceabilityView.activation",
-    "ChannelAuditLogsTransactionTraceabilityView.suspension",
-    "ChannelAuditLogsTransactionTraceabilityView.allocationChange",
-    "ChannelAuditLogsTransactionTraceabilityView.priceAssignment",
+    "ChannelAuditLogsTransactionTraceabilityView.category",
     "Sync"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-275"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-275",
+   "workshopBoard": "wireframes/WS139 Sales Channel Management Board 2.dc.html#adm-275"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 30. 10 of 21 labels bound to a contract property; 30 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1624,10 +1846,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "governance obligations and can control channels that fall outside approved conditions.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure/monitor) and no display directory — it is settings, not a population",
   "purpose": "Govern live channels and ensure that internal/external channels operate within approved commercial and service conditions.",
-  "purposeNote": "governance obligations and can control channels that fall outside approved conditions.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1711,7 +1933,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-276"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-276",
+   "workshopBoard": "wireframes/WS139 Sales Channel Management Board 2.dc.html#adm-276"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 32. 0 of 0 labels bound to a contract property; 17 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1767,10 +1990,10 @@
    "notes": "**Reached from ADM-268, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "administrators optimize revenue, capacity and channel performance while respecting commercial and governance controls. Board 2 — Final Screen Register",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Analyze; Monitor) and no metric row",
   "purpose": "Create the AI intelligence layer that looks across all sales channels together rather than optimizing each channel in isolation.",
-  "purposeNote": "administrators optimize revenue, capacity and channel performance while respecting commercial and governance controls. Board 2 — Final Screen Register",
   "gaps": [
    {
     "operation": null,
@@ -1789,20 +2012,7 @@
        "kind": "dataTable",
        "label": "Every channel optimization intelligence",
        "columns": [
-        "AiChannelOptimizationIntelligenceCenterView.salesVelocity",
-        "AiChannelOptimizationIntelligenceCenterView.conversion",
-        "AiChannelOptimizationIntelligenceCenterView.capacity",
-        "AiChannelOptimizationIntelligenceCenterView.allocation",
-        "AiChannelOptimizationIntelligenceCenterView.revenue",
-        "AiChannelOptimizationIntelligenceCenterView.netRevenue",
-        "AiChannelOptimizationIntelligenceCenterView.pricing",
-        "AiChannelOptimizationIntelligenceCenterView.channelFees",
-        "AiChannelOptimizationIntelligenceCenterView.commission",
-        "AiChannelOptimizationIntelligenceCenterView.customerDemand",
-        "AiChannelOptimizationIntelligenceCenterView.timeToEvent",
-        "AiChannelOptimizationIntelligenceCenterView.historicalPerformance",
-        "AiChannelOptimizationIntelligenceCenterView.failures",
-        "AiChannelOptimizationIntelligenceCenterView.availability",
+        "AiChannelOptimizationIntelligenceCenterView.signals",
         "Channel Allocation & Rebalancing Operational capacity",
         "4.2.5"
        ],
@@ -1821,20 +2031,7 @@
        "label": "The selected channel optimization intelligence",
        "bindsTo": "AiChannelOptimizationIntelligenceCenterView",
        "columns": [
-        "AiChannelOptimizationIntelligenceCenterView.salesVelocity",
-        "AiChannelOptimizationIntelligenceCenterView.conversion",
-        "AiChannelOptimizationIntelligenceCenterView.capacity",
-        "AiChannelOptimizationIntelligenceCenterView.allocation",
-        "AiChannelOptimizationIntelligenceCenterView.revenue",
-        "AiChannelOptimizationIntelligenceCenterView.netRevenue",
-        "AiChannelOptimizationIntelligenceCenterView.pricing",
-        "AiChannelOptimizationIntelligenceCenterView.channelFees",
-        "AiChannelOptimizationIntelligenceCenterView.commission",
-        "AiChannelOptimizationIntelligenceCenterView.customerDemand",
-        "AiChannelOptimizationIntelligenceCenterView.timeToEvent",
-        "AiChannelOptimizationIntelligenceCenterView.historicalPerformance",
-        "AiChannelOptimizationIntelligenceCenterView.failures",
-        "AiChannelOptimizationIntelligenceCenterView.availability",
+        "AiChannelOptimizationIntelligenceCenterView.signals",
         "Channel Allocation & Rebalancing Operational capacity",
         "4.2.5"
        ],
@@ -1861,6 +2058,14 @@
        "kind": "secondaryButton",
        "label": "Risk",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 33 §Allow management to ask"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Decide catalogue AI finding",
+       "operation": "decideCatalogueAiFinding",
+       "permission": "AI_APPROVE",
+       "notes": "**The human control on a governance risk or a channel recommendation** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml POST /ai-findings/{findingId}/decision"
       }
      ]
     }
@@ -1879,24 +2084,65 @@
     "contract": "catalogue",
     "purpose": "AI Channel Optimization & Intelligence Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listChannel",
+    "contract": "catalogue",
+    "purpose": "Channel Operations Command Center",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "decideCatalogueAiFinding",
+    "contract": "catalogue",
+    "purpose": "Acknowledge, accept, dismiss or resolve an AI finding",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannel2",
+     "listChannel"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "AiChannelOptimizationIntelligenceCenterView.salesVelocity",
-    "AiChannelOptimizationIntelligenceCenterView.conversion",
-    "AiChannelOptimizationIntelligenceCenterView.capacity",
-    "AiChannelOptimizationIntelligenceCenterView.allocation",
-    "AiChannelOptimizationIntelligenceCenterView.revenue",
-    "AiChannelOptimizationIntelligenceCenterView.netRevenue"
+    "AiChannelOptimizationIntelligenceCenterView.signals"
+   ],
+   "params": [
+    {
+     "name": "findingId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-277"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-277",
+   "workshopBoard": "wireframes/WS139 Sales Channel Management Board 2.dc.html#adm-277"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 33. 14 of 16 labels bound to a contract property; 19 of 70 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formDecideCatalogueAiFinding",
+    "component": "modal",
+    "trigger": "Decide catalogue AI finding",
+    "body": "**Collects what `decideCatalogueAiFinding` sends before it is called.** Required: `decision`. Optional: `comment`, `ownerPrincipalId`, `dueDate`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Decide catalogue AI finding",
+     "operation": "decideCatalogueAiFinding"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "decision",
+      "comment",
+      "ownerPrincipalId",
+      "dueDate"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /ai-findings/{findingId}/decision"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

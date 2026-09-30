@@ -1,4 +1,23 @@
 {
+ "addGuestNote": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/notes",
+  "contract": "marketing-crm",
+  "summary": "What the floor needs to know about this table",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestNote"
+ },
  "closeTableVisit": {
   "method": "POST",
   "path": "/table-visits/{visitId}/close",
@@ -74,6 +93,25 @@
   ],
   "requestBody": "CreatePaymentRequest",
   "responds": "Payment"
+ },
+ "createTable": {
+  "method": "POST",
+  "path": "/tables",
+  "contract": "fnb",
+  "summary": "A table as a thing, not an inference",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "TableDefinition",
+  "responds": "TableDefinition"
  },
  "createTableReservation": {
   "method": "POST",
@@ -152,6 +190,19 @@
   "requestBody": null,
   "responds": "TableMap"
  },
+ "getTableVisit": {
+  "method": "GET",
+  "path": "/table-visits/{visitId}",
+  "contract": "fnb",
+  "summary": "Read a visit with all its orders",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TableVisit"
+ },
  "holdCourse": {
   "method": "POST",
   "path": "/kitchen-tickets/{ticketId}/hold",
@@ -188,6 +239,25 @@
    }
   ],
   "requestBody": "RestaurantWaitlist",
+  "responds": "RestaurantWaitlist"
+ },
+ "leaveRestaurantWaitlist": {
+  "method": "POST",
+  "path": "/waitlist/{entryId}/leave",
+  "contract": "fnb",
+  "summary": "Take a party off an outlet's waitlist",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
   "responds": "RestaurantWaitlist"
  },
  "listFnbOrders": {
@@ -315,7 +385,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "TableReservation"
+  "responds": "Page"
  },
  "matchGuest": {
   "method": "POST",
@@ -353,7 +423,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "MergeResult"
  },
  "mergeTableVisits": {
   "method": "POST",
@@ -488,6 +558,25 @@
   "requestBody": null,
   "responds": "TableVisit"
  },
+ "requestBill": {
+  "method": "POST",
+  "path": "/table-visits/{visitId}/request-bill",
+  "contract": "fnb",
+  "summary": "The party asked to pay",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TableVisit"
+ },
  "seatTableReservation": {
   "method": "POST",
   "path": "/table-reservations/{reservationId}/seat",
@@ -506,6 +595,30 @@
   ],
   "requestBody": null,
   "responds": "TableReservation"
+ },
+ "setSectionLayout": {
+  "method": "PUT",
+  "path": "/outlets/{outletId}/sections",
+  "contract": "fnb",
+  "summary": "Divide the floor into sections and give each a server",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SectionLayout",
+  "responds": "SectionLayout"
  },
  "setServiceStage": {
   "method": "PUT",
@@ -540,6 +653,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -555,6 +673,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -590,7 +713,7 @@
   "summary": "Move items to another table's bill",
   "permission": "ORDER_MODIFY",
   "offlineCapable": true,
-  "conflictPolicy": "lastWriterWins",
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -619,7 +742,31 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "TableVisit"
+ },
+ "updateTable": {
+  "method": "PUT",
+  "path": "/tables/{tableId}",
+  "contract": "fnb",
+  "summary": "Change what a table is",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "TableDefinition",
+  "responds": "TableDefinition"
  },
  "updateTableVisit": {
   "method": "PATCH",

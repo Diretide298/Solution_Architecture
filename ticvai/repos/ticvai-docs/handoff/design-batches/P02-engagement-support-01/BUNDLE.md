@@ -421,15 +421,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "client-verified",
+   "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-031",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
-    "match": "exact",
-    "view": "Account → All screens → Wave 2 → AI concierge – home"
-   }
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "rev": "Mobile App v4, 29 September 2026",
+    "match": "none",
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-031.html, and #GST-031 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → AI concierge – home (exact)."
+   },
+   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
@@ -765,15 +766,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "client-verified",
+   "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-032",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
-    "match": "exact",
-    "view": "Account → All screens → Wave 2 → AI concierge – chat"
-   }
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "rev": "Mobile App v4, 29 September 2026",
+    "match": "none",
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-032.html, and #GST-032 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → AI concierge – chat (exact)."
+   },
+   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
@@ -1578,17 +1580,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "note": "Says which answer ruled everything out."
       }
      ],
-     "provenance": "decided 29 September 2026 (P29), MOB-6; v4 prototype plan → planResult"
+     "provenance": "decided 29 September 2026, MOB-6; v4 prototype plan → planResult"
     },
     {
      "to": "GST-052",
      "trigger": "Take a ready-made plan",
-     "provenance": "decided 29 September 2026 (P29), MOB-6"
+     "provenance": "decided 29 September 2026, MOB-6"
     },
     {
      "to": "GST-001",
      "trigger": "Home tab",
-     "provenance": "decided 29 September 2026 (P29), MOB-1"
+     "provenance": "decided 29 September 2026, MOB-1"
     }
    ]
   },
@@ -1608,7 +1610,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "progressIndicator",
        "label": "Plan your visit · n of 6",
        "notes": "Six questions; Heights is skipped when no children are coming.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       }
      ]
     },
@@ -1620,45 +1622,45 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "numberField",
        "label": "Adults",
        "notes": "Age 12 and over, at least 1, at most 8.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "numberField",
        "label": "Children",
        "notes": "Age 3 to 11, 0-8.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "selectField",
        "label": "How tall are the children?",
        "operation": "listProducts",
        "notes": "Per child: under 1.0 m, 1.0-1.2 m, 1.2-1.4 m, 1.4 m and over (or an age where the venue sets age rules). Rides over a child's limit are left out, from `ProductEligibilityRule`.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "multiSelect",
        "label": "Which days are you visiting?",
        "notes": "Up to three days; each day gets its own park at a multi-park venue.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "selectField",
        "label": "How busy should each day be?",
        "notes": "Packed, Balanced or Relaxed.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "multiSelect",
        "label": "What are you most interested in?",
        "operation": "listProducts",
        "notes": "Interest tags from the venue's points (`VenuePoint.interestTags`): thrill rides, family rides, shows, water, shopping.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "selectField",
        "label": "What would you like for lunch?",
        "notes": "Cuisines from the outlets (`VenuePoint.cuisineTags`); lunch is planned at a restaurant that serves it.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       }
      ]
     },
@@ -1671,13 +1673,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Make my plan",
        "operation": "generateVisitPlan",
        "notes": "Calls `generateVisitPlan`: the rules planner, no AI. Opens Your Plan (GST-053).",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "secondaryButton",
        "label": "Take a ready-made plan",
        "notes": "Opens Suggested Itineraries (GST-052).",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       }
      ]
     }
@@ -1709,7 +1711,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "venue-map",
     "purpose": "Build a rules plan from the inputs (party, heights, dates, pace, interests, cuisine)",
     "trigger": "onAction",
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    }
   ],
   "entryState": {
@@ -1728,9 +1730,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "prototype": {
     "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-29",
+    "verified": "2026-09-30",
     "match": "exact",
-    "view": "Plan tab (Plan your visit · 1 of 6 … 6 of 6)"
+    "view": "Plan tab (Plan your visit · 1 of 6)"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -1797,17 +1799,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "planId"
      ],
-     "provenance": "decided 29 September 2026 (P29), MOB-6"
+     "provenance": "decided 29 September 2026, MOB-6"
     },
     {
      "to": "GST-051",
      "trigger": "Make my own",
-     "provenance": "decided 29 September 2026 (P29), MOB-6"
+     "provenance": "decided 29 September 2026, MOB-6"
     },
     {
      "to": "GST-001",
      "trigger": "Home tab",
-     "provenance": "decided 29 September 2026 (P29), MOB-1"
+     "provenance": "decided 29 September 2026, MOB-1"
     }
    ]
   },
@@ -1828,7 +1830,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Ready-made plans",
        "operation": "listProducts",
        "notes": "The venue's preset plans (e.g. *Thrill day*, *Family day*, *Relaxed day*), each a set of planner inputs; **Use this plan** runs `generateVisitPlan` with those inputs and the guest's party size and date. Rules-built, not AI: seeded, not learned, on day one.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "dataTable",
@@ -1848,7 +1850,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Use this plan",
        "operation": "generateVisitPlan",
        "notes": "Opens Your Plan (GST-053).",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       }
      ]
     }
@@ -1880,7 +1882,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "venue-map",
     "purpose": "Build a rules plan from the inputs (party, heights, dates, pace, interests, cuisine)",
     "trigger": "onAction",
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    }
   ],
   "entryState": {
@@ -1894,16 +1896,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "client-verified",
+   "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-052",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
-    "match": "exact",
-    "view": "Account → All screens → Wave 3 → Suggested itineraries",
-    "differences": "Mobile v4 draws no ready-made plans list: its Plan tab goes straight to the questions. Built from this definition in the v4 style."
-   }
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "rev": "Mobile App v4, 29 September 2026",
+    "match": "none",
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-052.html, and #GST-052 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 3 → Suggested itineraries (exact). What v2 did differently: Mobile v4 draws no ready-made plans list: its Plan tab goes straight to the questions. Built from this definition in the v4 style."
+   },
+   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -1981,7 +1983,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "note": "Names it and offers a swap; the rest of the plan is kept."
       }
      ],
-     "provenance": "decided 29 September 2026 (P29), MOB-6; v4 prototype Book this plan"
+     "provenance": "decided 29 September 2026, MOB-6; v4 prototype Book this plan"
     },
     {
      "to": "GST-054",
@@ -1989,12 +1991,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "planId"
      ],
-     "provenance": "decided 29 September 2026 (P29), MOB-6"
+     "provenance": "decided 29 September 2026, MOB-6"
     },
     {
      "to": "GST-051",
      "trigger": "Change answers",
-     "provenance": "decided 29 September 2026 (P29), MOB-6"
+     "provenance": "decided 29 September 2026, MOB-6"
     },
     {
      "to": "GST-048",
@@ -2002,7 +2004,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "cartId"
      ],
-     "provenance": "decided 29 September 2026 (P29), MOB-6"
+     "provenance": "decided 29 September 2026, MOB-6"
     },
     {
      "to": "GST-059",
@@ -2010,12 +2012,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "planId"
      ],
-     "provenance": "decided 29 September 2026 (P29), MOB-6"
+     "provenance": "decided 29 September 2026, MOB-6"
     },
     {
      "to": "GST-001",
      "trigger": "Home tab",
-     "provenance": "decided 29 September 2026 (P29), MOB-1"
+     "provenance": "decided 29 September 2026, MOB-1"
     }
    ]
   },
@@ -2037,7 +2039,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "VisitPlan",
        "operation": "getVisitPlan",
        "notes": "Day 1 · Fri 2 Oct · Summit Peaks … one tab per chosen day.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "timeline",
@@ -2045,42 +2047,42 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "VisitPlanItem",
        "operation": "getVisitPlan",
        "notes": "Arrive, then each timed item (ride, show, lunch at a restaurant serving the chosen cuisine) with its place and zone; Fast Track marked on the rides it covers.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "secondaryButton",
        "label": "Swap",
        "operation": "listVisitPlanAlternatives",
        "notes": "Opens the swap sheet of candidates that suit everyone (`listVisitPlanAlternatives`); choosing one saves a new version.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "destructiveButton",
        "label": "Remove",
        "operation": "updateVisitPlan",
        "notes": "Removes the item (not arrival or lunch); a new version, so Undo brings it back.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "secondaryButton",
        "label": "+ Add something",
        "operation": "listVisitPlanAlternatives",
        "notes": "The same sheet, adding to the day.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "secondaryButton",
        "label": "Undo changes",
        "operation": "updateVisitPlan",
        "notes": "Returns the day to the previous version of the plan.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "banner",
        "label": "Left out for your group",
        "operation": "getVisitPlan",
        "notes": "Items left out because of a child's height, with the limit (e.g. *Freefall Tower (needs 1.40 m)*).",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       }
      ]
     },
@@ -2093,14 +2095,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Add Fast Track",
        "operation": "updateVisitPlan",
        "notes": "An add-on from the plan's `addOnSuggestions` (the product GST-048 sells), priced per guest, with the queuing time it saves.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "detailPanel",
        "label": "Estimated total",
        "operation": "getVisitPlan",
        "notes": "Estimated price for the group and days; the guest confirms dates and tickets in the basket.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "detailPanel",
@@ -2120,19 +2122,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Book this plan",
        "operation": "bookVisitPlan",
        "notes": "`bookVisitPlan` turns the plan and add-ons into cart lines and returns the cart; lands on the basket (GST-041).",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "secondaryButton",
        "label": "Refine with the AI planner",
        "notes": "Opens GST-054 when the venue has AI on.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "secondaryButton",
        "label": "Change answers",
        "notes": "Back to the questions (GST-051).",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       }
      ]
     }
@@ -2170,28 +2172,28 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "venue-map",
     "purpose": "The plan: days, timed items and add-on suggestions, at its current version",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "operationId": "updateVisitPlan",
     "contract": "venue-map",
     "purpose": "Swap, remove, add or undo: each change is a new version, so undo goes back one",
     "trigger": "onAction",
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "operationId": "listVisitPlanAlternatives",
     "contract": "venue-map",
     "purpose": "Swap candidates for one item that suit everyone in the party",
     "trigger": "onAction",
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "operationId": "bookVisitPlan",
     "contract": "venue-map",
     "purpose": "Book this plan: turns the plan (and chosen add-ons) into cart lines and returns the cart",
     "trigger": "onAction",
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    }
   ],
   "entryState": {
@@ -2224,9 +2226,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "prototype": {
     "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-29",
+    "verified": "2026-09-30",
     "match": "exact",
-    "view": "Plan tab → answer the six questions → Make my plan (Your plan)"
+    "view": "Plan tab → the six questions → Make my plan (Your plan)"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -2291,7 +2293,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "planId"
      ],
-     "provenance": "decided 29 September 2026 (P29), MOB-6"
+     "provenance": "decided 29 September 2026, MOB-6"
     },
     {
      "to": "GST-059",
@@ -2299,12 +2301,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "planId"
      ],
-     "provenance": "decided 29 September 2026 (P29), MOB-6"
+     "provenance": "decided 29 September 2026, MOB-6"
     },
     {
      "to": "GST-001",
      "trigger": "Home tab",
-     "provenance": "decided 29 September 2026 (P29), MOB-1"
+     "provenance": "decided 29 September 2026, MOB-1"
     }
    ]
   },
@@ -2326,14 +2328,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "VisitPlanItem",
        "operation": "getVisitPlan",
        "notes": "The current plan version, updated as the agent changes it.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "assistantPanel",
        "label": "Ask the planner",
        "operation": "sendAiMessage",
        "notes": "e.g. *More shows, fewer coasters on day 2*. The agent calls `requestSuggestion` kind `itinerary` and applies the result with `updateVisitPlan`; Undo on GST-053 reverts it.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       }
      ]
     },
@@ -2346,7 +2348,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Planner unavailable",
        "operation": "getVisitPlan",
        "notes": "**The rules plan never fails over to an error**: with AI off, not licensed or failing, the guest keeps the rules plan and the Plan tab works in full. Shown when AI is off for the venue, the tenant has no AI licence, or the call fails or times out.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "detailPanel",
@@ -2366,13 +2368,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Apply this change",
        "operation": "updateVisitPlan",
        "notes": "Saves the agent's proposal as a new plan version.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "secondaryButton",
        "label": "Back to your plan",
        "notes": "GST-053.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       }
      ]
     }
@@ -2408,28 +2410,28 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "venue-map",
     "purpose": "The plan: days, timed items and add-on suggestions, at its current version",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "operationId": "updateVisitPlan",
     "contract": "venue-map",
     "purpose": "Swap, remove, add or undo: each change is a new version, so undo goes back one",
     "trigger": "onAction",
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "operationId": "createAiConversation",
     "contract": "ai",
     "purpose": "Open the planner conversation for this plan",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "operationId": "requestSuggestion",
     "contract": "ai",
     "purpose": "A suggestion of kind `itinerary` (guest-allowed since 29 September): the planner agent's proposal for the plan, applied through `updateVisitPlan`",
     "trigger": "onAction",
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    }
   ],
   "entryState": {
@@ -2457,9 +2459,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "prototype": {
     "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-29",
+    "verified": "2026-09-30",
     "match": "partial",
-    "view": "Plan tab → Your plan; Chat with the assistant (Assistant screen)",
+    "view": "Ask Sahli (the assistant chat; v4 has no plan-specific chat)",
     "differences": "v4 draws the rules plan and a general assistant chat; it has no plan-specific chat. Built from this definition."
    }
   },
@@ -2467,7 +2469,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "machine": {
    "key": "plannerMode",
    "initial": "rulesPlan",
-   "provenance": "decided 29 September 2026 (P29), MOB-6; BRIEF decision 1: the rules planner with the AI planner agent on top",
+   "provenance": "decided 29 September 2026, MOB-6; BRIEF decision 1: the rules planner with the AI planner agent on top",
    "states": {
     "rulesPlan": {
      "operation": "getVisitPlan",
@@ -3251,12 +3253,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); at most 10 per sale on staff and POS (audit R080 (c)). Over the limit is 422 `seatLimitExceeded`.",
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     }
    },
    "resourceHoldId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant and `quantity` is 1. The hold is the line's capacity; no inventory lease is taken."
    },
@@ -3899,12 +3901,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "maxItems": 50,
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     }
    },
    "resourceHoldId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The `resources.ResourceHold` this line buys (decided 29 September, rev 3 REV3-15). While set, `leaseExpiresAt` is the hold's `expiresAt` and `inventoryHoldId` is null."
    },
@@ -3999,8 +4001,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a ULID."
+    "format": "uuid",
+    "description": "Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7."
    },
    "caseNumber": {
     "type": "string",
@@ -4605,7 +4607,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "menuItemId": {
     "type": "string",
@@ -4641,11 +4643,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "locationSessionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "From `claimLocationSession`. Where the order is going. Required for delivery to a table, seat, cabana or named location. Absent for collection, where the outlet is named instead.\n"
    },
@@ -4962,7 +4964,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "readOnly": true,
     "x-ticvai-column": "service_order_id",
     "description": "The guest order this fulfils (`FnbOrder.id`). Set by the server from the order it arrives with."
@@ -5173,7 +5175,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "locationId": {
     "type": "string",
@@ -5193,7 +5195,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "visitId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The table visit this session orders onto, where the location is a table. Absent for a cabana or a seat, which have no visit concept — the order stands alone.\n"
    },
@@ -5339,8 +5341,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "The client ULID from `CreateOrderRequest.id`."
+    "format": "uuid",
+    "description": "The client UUIDv7 from `CreateOrderRequest.id`."
    },
    "orderNumber": {
     "type": "string",
@@ -5447,7 +5449,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "shiftId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "subjectId": {
@@ -5548,7 +5550,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "description": "The entitlements this line issued. **These are the ticket ids** — `transferOrderTickets.ticketIds` and `reprintOrder.reissuedTicketIds` take and return them.",
       "items": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+       "format": "uuid"
       }
      },
      "crossRegionRightIds": {
@@ -5643,11 +5645,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "tender": {
     "$ref": "#/components/schemas/TenderKind"
@@ -6336,7 +6338,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "subjectId": {
     "type": "string",

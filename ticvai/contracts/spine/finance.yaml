@@ -136,7 +136,7 @@ paths:
                   description: The `order.paid` event id, for the consumer's inbox record.
                 orderId:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
       responses:
         '200':
           headers:
@@ -317,7 +317,7 @@ paths:
                   nullable: true
                 orderId:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                   nullable: true
                 bookingId:
                   type: string
@@ -1642,7 +1642,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: getJournalEntry
       x-ticvai-consumed-by:
@@ -1673,7 +1673,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: approveJournalEntry
       x-ticvai-consumed-by:
@@ -1746,7 +1746,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: rejectJournal
       x-ticvai-consumed-by:
@@ -1808,7 +1808,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: reverseJournalEntry
       x-ticvai-consumed-by:
@@ -2046,7 +2046,7 @@ paths:
         in: query
         schema:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
       - name: from
         in: query
         schema:
@@ -2375,7 +2375,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: reviewPriceVariance
       x-ticvai-consumed-by:
@@ -2720,7 +2720,7 @@ paths:
                   $ref: '#/components/schemas/SettlementResolution'
                 matchedPaymentId:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                 note:
                   type: string
                   minLength: 3
@@ -3514,7 +3514,7 @@ paths:
         description: Invoices covering this order, including a consolidated invoice that names it.
         schema:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
       - name: legalEntityId
         in: query
         schema:
@@ -3809,7 +3809,7 @@ paths:
         in: query
         schema:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
       - name: legalEntityId
         in: query
         schema:
@@ -4398,7 +4398,7 @@ components:
             be paid, of one buyer, one legal entity and one currency.
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         recipient:
           $ref: '#/components/schemas/FinTaxInvoiceRecipient'
         languages:
@@ -4463,9 +4463,10 @@ components:
           minimum: 1
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         orderLineId:
           type: string
+          format: uuid
           nullable: true
         description:
           type: string
@@ -4542,7 +4543,7 @@ components:
           type: array
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         supplierName:
           type: string
         supplierAddress:
@@ -4667,11 +4668,11 @@ components:
           - other
         refundId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         cancelledOrderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         lines:
           type: array
@@ -4768,11 +4769,11 @@ components:
           - other
         refundId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         cancelledOrderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         legalEntityId:
           type: string
@@ -5254,7 +5255,7 @@ components:
           nullable: true
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         bookingId:
           type: string
@@ -6057,7 +6058,7 @@ components:
           type: array
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
     JournalStatus:
       type: string
       enum:
@@ -6080,6 +6081,7 @@ components:
       - writeOff   # posted by recordWriteOff
       - chargeback # posted by orders recordChargeback and recordChargebackOutcome (29 September)
     JournalLine:
+      x-ticvai-append-only: postedAt
       type: object
       required:
       - accountId
@@ -6104,6 +6106,12 @@ components:
         description:
           type: string
           maxLength: 500
+        postedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: '**Copied from the journal entry when it posts** (ADR-0056), so the line table can be
+            partitioned by month on its own column. Never differs from its entry''s.'
     CreateJournalEntryRequest:
       type: object
       required:
@@ -6114,7 +6122,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         fiscalPeriodId:
           type: string
           format: uuid
@@ -6151,7 +6159,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         entryNumber:
           type: string
           readOnly: true
@@ -6194,11 +6202,11 @@ components:
           nullable: true
         reversalOfEntryId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         reversedByEntryId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         reversalReason:
           type: string
@@ -6241,7 +6249,7 @@ components:
           type: string
         journalEntryId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         accountId:
           type: string
           format: uuid
@@ -6341,10 +6349,10 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         orderLineId:
           type: string
         venueId:
@@ -6385,7 +6393,7 @@ components:
           nullable: true
         journalEntryId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         occurredAt:
           type: string
@@ -6502,7 +6510,7 @@ components:
             properties:
               shiftId:
                 type: string
-                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                format: uuid
               principalId:
                 type: string
                 format: uuid
@@ -6551,10 +6559,10 @@ components:
           description: The consuming entity, which provided the service at redemption.
         entitlementId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         arisingAmount:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
@@ -6610,7 +6618,7 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
         journalEntryId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         accountsRevalued:
           type: integer
@@ -6807,7 +6815,7 @@ components:
           nullable: true
         paymentId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         amount:
           $ref: ../shared/common.yaml#/components/schemas/Money

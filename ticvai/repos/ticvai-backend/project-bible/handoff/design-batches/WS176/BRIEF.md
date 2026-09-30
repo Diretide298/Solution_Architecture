@@ -1,6 +1,6 @@
 # WS176 — Seat Management Venue Mapping Reference v1.0 board 12
 
-**10 screens · 23 operations · 23 schemas · 12 permissions**
+**10 screens · 31 operations · 30 schemas · 13 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 12 permissions apply here:
-  `APPROVAL_CONFIGURE, CAPACITY_CONFIGURE, DEVICE_VIEW, PERMISSION_MANAGE, PERMISSION_VIEW, PRODUCT_VIEW, REGION_CONFIGURE, SCOPE_VIEW, SHIFT_OPEN, TENANT_CONFIGURE, TENANT_VIEW, VENUE_MAP_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 13 permissions apply here:
+  `APPROVAL_CONFIGURE, CAPACITY_CONFIGURE, DEVICE_VIEW, PERMISSION_GRANT, PERMISSION_MANAGE, PERMISSION_VIEW, PRODUCT_VIEW, REGION_CONFIGURE, SCOPE_VIEW, SHIFT_OPEN, TENANT_CONFIGURE, TENANT_VIEW`…. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -65,7 +65,7 @@ convincingly. It is never a caption.
 | `BO-1063` | Venue-Specific Configuration | listDetail | 2 | 0 | — |
 | `BO-1064` | Naming, Numbering & Localization | listDetail | 2 | 0 | — |
 | `BO-1065` | Currency, Timezone & Channels | listDetail | 3 | 0 | — |
-| `BO-1066` | Roles, Permissions & Masking | listDetail | 6 | 0 | — |
+| `BO-1066` | Roles, Permissions & Masking | listDetail | 14 | 0 | — |
 | `BO-1067` | Seat Approval Workflows | listDetail | 1 | 0 | — |
 | `BO-1068` | Lifecycle & Environment Promotion | listDetail | 1 | 0 | — |
 | `BO-1069` | Platform Health & Observability | listDetail | 1 | 0 | — |

@@ -32,6 +32,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "CreateSeatMapRequest",
@@ -179,6 +184,25 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "proposeSeatMapChanges": {
+  "method": "POST",
+  "path": "/ai/seat-maps/{seatMapId}/proposals",
+  "contract": "ai",
+  "summary": "Propose changes to an existing seat map, as a plan a person approves",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiSeatMapProposal"
+ },
  "publishSeatMap": {
   "method": "POST",
   "path": "/seat-maps/{seatMapId}/publish",
@@ -212,6 +236,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -231,6 +260,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -246,6 +280,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,

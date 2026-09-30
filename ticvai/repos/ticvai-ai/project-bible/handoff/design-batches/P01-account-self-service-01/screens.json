@@ -1789,7 +1789,7 @@
        "label": "Complete your details",
        "operation": "updateMyProfile",
        "notes": "For a profile created by guest checkout (W1): asks for what the pop-up did not; never blocks.",
-       "provenance": "decided 29 September 2026 (P29), W1"
+       "provenance": "decided 29 September 2026, W1"
       }
      ]
     },

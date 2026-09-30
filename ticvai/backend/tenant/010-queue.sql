@@ -4,7 +4,7 @@
 -- A person in a virtual queue, with their position and their window. Renamed from entry: it is
 -- somebody waiting, not a row in a log
 CREATE TABLE IF NOT EXISTS queue.entry (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     queue_id                          uuid NOT NULL,
     queue_name                        jsonb,
     subject_id                        uuid,
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS queue.entry (
     priority_tier_id                  uuid,
     priority_promotion_id             uuid,
     is_accessibility_need_declared    boolean DEFAULT false,
-    entitlement_id                    text,
+    entitlement_id                    uuid,
     called_at                         timestamptz,
     return_window_ends_at             timestamptz,
     redeemed_at                       timestamptz,
@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS queue.queue_operating_window (
 
 -- What a queue system reported at a moment. The platform stores readings, not estimates
 CREATE TABLE IF NOT EXISTS queue.reading (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     feed_id                           uuid,
     disposition                       text CONSTRAINT reading_disposition_chk CHECK (disposition IN ('applied', 'discardedOutOfOrder')),
     kind                              text NOT NULL CONSTRAINT reading_kind_chk CHECK (kind IN ('peopleCount', 'dwellSeconds', 'throughputPerHour', 'queueLengthMetres')),

@@ -1,6 +1,6 @@
 # ADR-0020 — Where AI runs, and what it is isolated from
 
-**Status:** Proposed · 17 August 2026
+**Status:** Accepted · 30 September 2026 · Chinmay Parab — amended by [ADR-0049](0049-vectors-live-in-qdrant-one-collection-per-tenant.md): Qdrant per tenant on every tier (a collection and a scoped token per tenant); the analytical store is the AI log database. Proposed 17 August 2026
 **Relates to:** ADR-0001 (cells — **superseded in part by ADR-0014**), ADR-0009 (residency),
 ADR-0016 (read routing), CF-64 (retention)
 
@@ -40,6 +40,23 @@ considered.
 **Prompt content is personal data in the transactional store.** A guest's question contains
 whatever they typed. Putting it beside `pii.subject` is defensible; putting it there
 *accidentally*, with no retention and no erasure path, is not.
+
+---
+
+## Amended 30 September 2026
+
+**Accepted with two corrections from ADR-0049** (and the AI system design, section 8):
+
+1. **Retrieval runs on Qdrant per tenant, on every tier.** Section 1's "Qdrant runs per cell" stands as
+   the cluster, but inside it each tenant has its own collection (per embedding model, behind the alias
+   `tenant_<tenantId>`) and its own JWT scoped to that collection. The tenant boundary is enforced by
+   Qdrant, not by a filter; venue scope inside a tenant is a payload filter the retrieval client always
+   adds. Self-hosted in Azure UAE North, 3-node HA; a single node in the venue-local profile (ADR-0046).
+2. **"The analytical store" in section 3 is the AI log database**, not a general analytical replica.
+
+Sections 2 and 3's boundaries (the prompt is the only thing that leaves; AI's logs move off the
+transactional primary) stand. The AI deployable's Postgres role stays read-only on the transactional
+schemas (ADR-0055).
 
 ---
 

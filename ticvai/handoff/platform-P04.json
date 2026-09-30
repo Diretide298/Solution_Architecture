@@ -71,11 +71,11 @@
    "operations": 13
   },
   {
-   "contract": "tenancy",
+   "contract": "retail",
    "operations": 10
   },
   {
-   "contract": "retail",
+   "contract": "tenancy",
    "operations": 10
   },
   {
@@ -91,11 +91,11 @@
    "operations": 6
   },
   {
-   "contract": "finance",
+   "contract": "promotions",
    "operations": 5
   },
   {
-   "contract": "promotions",
+   "contract": "finance",
    "operations": 5
   },
   {
@@ -107,19 +107,19 @@
    "operations": 3
   },
   {
-   "contract": "queue",
-   "operations": 3
-  },
-  {
    "contract": "access",
    "operations": 3
   },
   {
-   "contract": "workforce",
-   "operations": 2
+   "contract": "queue",
+   "operations": 3
   },
   {
    "contract": "games",
+   "operations": 2
+  },
+  {
+   "contract": "workforce",
    "operations": 2
   },
   {
@@ -127,11 +127,11 @@
    "operations": 1
   },
   {
-   "contract": "inventory",
+   "contract": "wallet",
    "operations": 1
   },
   {
-   "contract": "wallet",
+   "contract": "inventory",
    "operations": 1
   }
  ],

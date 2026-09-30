@@ -1,6 +1,6 @@
 # WS114 — ACCREDITATION board 7
 
-**10 screens · 7 operations · 8 schemas · 5 permissions**
+**10 screens · 12 operations · 15 schemas · 8 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `ACCREDITATION_CONFIGURE, ACCREDITATION_MANAGE, ACCREDITATION_VIEW, GUEST_MANAGE, MARKETING_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 8 permissions apply here:
+  `ACCREDITATION_CONFIGURE, ACCREDITATION_MANAGE, ACCREDITATION_VIEW, GUEST_MANAGE, MARKETING_SEND, MARKETING_VIEW, REPORT_EXPORT, REPORT_VIEW_VENUE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -68,7 +68,7 @@ convincingly. It is never a caption.
 | `BO-679` | Manual & Bulk Communication Center | listDetail | 1 | 0 | — |
 | `BO-680` | Accreditation Bulk Import | listDetail | 1 | 0 | — |
 | `BO-681` | Import Validation & Processing Monitor | listDetail | 1 | 0 | — |
-| `BO-682` | Accreditation Export & Data Extract Center | configEditor | 1 | 0 | — |
+| `BO-682` | Accreditation Export & Data Extract Center | configEditor | 6 | 0 | — |
 | `BO-683` | Delivery, Batch & Operational History | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch

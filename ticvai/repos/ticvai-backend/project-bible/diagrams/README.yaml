@@ -24,7 +24,7 @@ hld:
   title: TICVAI scope hierarchy — eight levels
 - file: diagrams/hld/02-services.yaml
   id: HLD
-  title: TICVAI — seventeen services in five tiers
+  title: TICVAI — seventeen modules in five tiers, five deployables
 - file: diagrams/hld/03-contracts.yaml
   id: HLD-CONTRACTS
   title: 35 contracts — the join between every other layer

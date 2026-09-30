@@ -1,6 +1,6 @@
 # WS165 — Seat Management Venue Mapping Reference v1.0 board 1
 
-**10 screens · 13 operations · 18 schemas · 3 permissions**
+**10 screens · 14 operations · 22 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -66,7 +66,7 @@ convincingly. It is never a caption.
 | `BO-956` | Rows & Seats | listDetail | 2 | 0 | — |
 | `BO-957` | Standing Zones | listDetail | 1 | 0 | — |
 | `BO-958` | Suites & Boxes | listDetail | 1 | 0 | — |
-| `BO-959` | Stage & Focal Point | listDetail | 1 | 0 | — |
+| `BO-959` | Stage & Focal Point | listDetail | 2 | 0 | — |
 | `BO-960` | Entrances, Exits & Aisles | listDetail | 1 | 0 | — |
 | `BO-961` | Amenities & Obstructions | listDetail | 1 | 0 | — |
 | `BO-962` | Templates, Validation & Publish | listDetail | 4 | 0 | — |
@@ -1072,6 +1072,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "getSeatMap"
     ]
+   },
+   {
+    "operationId": "proposeSeatMapChanges",
+    "contract": "ai",
+    "purpose": "Propose categories, numbering, a stage variant or consistency findings for this map",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1574,6 +1581,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "CreateSeatMapRequest",
@@ -1721,6 +1733,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
+ "proposeSeatMapChanges": {
+  "method": "POST",
+  "path": "/ai/seat-maps/{seatMapId}/proposals",
+  "contract": "ai",
+  "summary": "Propose changes to an existing seat map, as a plan a person approves",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiSeatMapProposal"
+ },
  "publishSeatMap": {
   "method": "POST",
   "path": "/seat-maps/{seatMapId}/publish",
@@ -1754,6 +1785,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -1773,6 +1809,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -1788,6 +1829,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -1825,6 +1871,102 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AiSeatMapProposal": {
+  "type": "object",
+  "x-ticvai-persistence": "none — the plan is ai.action_plan and ai.action_step, presented as one ai.proposed_action; the findings are the evidence of its decision record",
+  "description": "What `proposeSeatMapChanges` proposed: findings with the seats they concern, and except for `consistency` the plan a person approves (1.4.23, 1.4.25, 1.4.26, 1.4.29).",
+  "required": [
+   "kind",
+   "findings"
+  ],
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "categories",
+     "numbering",
+     "stageVariant",
+     "consistency"
+    ]
+   },
+   "seatMapId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `ai.action_plan`, readable with `getActionPlan`. Null for `consistency`."
+   },
+   "proposedActionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `ai.proposed_action` a person decides. Null for `consistency`."
+   },
+   "summary": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Counts: seats re-categorised or relabelled, seats blocked, capacity by category before and after."
+   },
+   "findings": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "code",
+      "severity"
+     ],
+     "properties": {
+      "code": {
+       "type": "string",
+       "description": "e.g. `accessibleSeatWithoutAccessiblePrice`, `restrictedViewInPremium`, `companionWithoutWheelchairSpace`, `sightLineLost`, `behindStage`, `numberingGap`, `duplicateLabel`, `categoryChange`, `labelChange`."
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "blocking",
+        "warning",
+        "info"
+       ]
+      },
+      "seatIds": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "uuid"
+       }
+      },
+      "sectionId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "current": {
+       "type": "string",
+       "nullable": true
+      },
+      "proposed": {
+       "type": "string",
+       "nullable": true
+      },
+      "reason": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "basis": {
+    "$ref": "#/components/schemas/SuggestionBasis"
+   },
+   "decisionRecordId": {
+    "type": "string",
+    "format": "uuid"
+   }
+  }
+ },
  "BulkUpdateSeatsRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -2236,6 +2378,63 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "Seat": {
+  "x-ticvai-persistence": "seating.seat",
+  "type": "object",
+  "required": [
+   "id",
+   "sectionCode",
+   "rowLabel",
+   "seatNumber",
+   "attribute"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "**Stable for the life of the seat.** Section, row and number are display labels that change on a refit; this does not. A ticket sold today must still resolve after a renumbering.\n"
+   },
+   "sectionCode": {
+    "type": "string"
+   },
+   "rowLabel": {
+    "type": "string"
+   },
+   "seatNumber": {
+    "type": "string"
+   },
+   "displayLabel": {
+    "type": "string",
+    "description": "What the guest sees, e.g. `A2-7-11`."
+   },
+   "position": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/Point"
+     }
+    ],
+    "nullable": true
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "attribute": {
+    "$ref": "#/components/schemas/SeatAttribute"
+   },
+   "companionSeatIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Present on accessible seats. Sold together, released together."
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
  "SeatAttribute": {
   "type": "string",
   "description": "BL-168. **Extended from eight values on 18 August.** Amenity and view filters needed attributes the original set did not carry, and a guest filtering for *aisle seat with power* was filtering on something the model could not express.\n",
@@ -2306,6 +2505,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      }
     }
    }
+  ]
+ },
+ "SeatMapStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "validated",
+   "published",
+   "archived"
   ]
  },
  "SeatMapSummary": {
@@ -2453,6 +2661,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
    }
   }
+ },
+ "SuggestionBasis": {
+  "type": "string",
+  "description": "**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n",
+  "enum": [
+   "heuristic",
+   "statistical",
+   "model",
+   "hybrid",
+   "manual"
+  ]
  },
  "UploadTicket": {
   "x-ticvai-persistence": "assets.media_upload",

@@ -39,10 +39,7 @@
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-258 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-259",
@@ -69,24 +66,6 @@
      "operation": "listSaleChannel"
     },
     {
-     "to": "ADM-263",
-     "trigger": "Works in Channel Sales Schedule & Availability Windows",
-     "provenance": "flow F166 step 9→10",
-     "operation": "listSaleChannel"
-    },
-    {
-     "to": "ADM-264",
-     "trigger": "Works in Customer & Eligibility Rules by Channel",
-     "provenance": "flow F166 step 11→12",
-     "operation": "listSaleChannel"
-    },
-    {
-     "to": "ADM-265",
-     "trigger": "Works in Channel Sales Rules, Limits & Restrictions",
-     "provenance": "flow F166 step 13→14",
-     "operation": "listSaleChannel"
-    },
-    {
      "to": "ADM-266",
      "trigger": "Works in Channel Fees, Payment & Fulfillment Configuration",
      "provenance": "flow F166 step 15→16",
@@ -97,18 +76,45 @@
      "trigger": "Works in Channel Publication, Readiness & AI Validation",
      "provenance": "flow F166 step 17→18",
      "operation": "listSaleChannel"
+    },
+    {
+     "to": "ADM-263",
+     "trigger": "Works in Channel Sales Schedule & Availability Windows",
+     "provenance": "flow F166 step 9→10",
+     "operation": "listSaleChannel",
+     "carries": [
+      "ruleId"
+     ]
+    },
+    {
+     "to": "ADM-264",
+     "trigger": "Works in Customer & Eligibility Rules by Channel",
+     "provenance": "flow F166 step 11→12",
+     "operation": "listSaleChannel",
+     "carries": [
+      "ruleId"
+     ]
+    },
+    {
+     "to": "ADM-265",
+     "trigger": "Works in Channel Sales Rules, Limits & Restrictions",
+     "provenance": "flow F166 step 13→14",
+     "operation": "listSaleChannel",
+     "carries": [
+      "ruleId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "An administrator can see every configured sales channel, its status, scope, product coverage and configuration issues from one central workspace.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each record should display) — counts over a population, then the population",
   "purpose": "Provide administrators with one centralized view of every TICVAI sales channel and its current operational/configuration status.",
-  "purposeNote": "An administrator can see every configured sales channel, its status, scope, product coverage and configuration issues from one central workspace.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Partner Portal, Third-Party Channel, Custom Channel. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: POS, Mobile POS, Flying POS, Call Center, API, Partner Portal, Third-Party Channel, Custom Channel. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Sales_Channel_Management_Reference.pdf, page 3 §Support channels such as"
    }
   ],
@@ -123,61 +129,61 @@
        "kind": "metricTile",
        "label": "Total Channels",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 3 §Display",
-       "bindsTo": "SalesChannelCommandCenterView.totalChannels"
+       "bindsTo": "SalesChannelCommandCenterSummary.totalChannels"
       },
       {
        "kind": "metricTile",
        "label": "Active Channels",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 3 §Display",
-       "bindsTo": "SalesChannelCommandCenterView.activeChannels"
+       "bindsTo": "SalesChannelCommandCenterSummary.activeChannels"
       },
       {
        "kind": "metricTile",
        "label": "Inactive Channels",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 3 §Display",
-       "bindsTo": "SalesChannelCommandCenterView.inactiveChannels"
+       "bindsTo": "SalesChannelCommandCenterSummary.inactiveChannels"
       },
       {
        "kind": "metricTile",
        "label": "Channels in Draft",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 3 §Display",
-       "bindsTo": "SalesChannelCommandCenterView.channelsInDraft"
+       "bindsTo": "SalesChannelCommandCenterSummary.channelsInDraft"
       },
       {
        "kind": "metricTile",
        "label": "Channels With Errors",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 3 §Display",
-       "bindsTo": "SalesChannelCommandCenterView.channelsWithErrors"
+       "bindsTo": "SalesChannelCommandCenterSummary.channelsWithErrors"
       },
       {
        "kind": "metricTile",
        "label": "Products Distributed",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 3 §Display",
-       "bindsTo": "SalesChannelCommandCenterView.productsDistributed"
+       "bindsTo": "SalesChannelCommandCenterSummary.productsDistributed"
       },
       {
        "kind": "metricTile",
        "label": "Channels With Capacity Alerts",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 3 §Display",
-       "bindsTo": "SalesChannelCommandCenterView.channelsWithCapacityAlerts"
+       "bindsTo": "SalesChannelCommandCenterSummary.channelsWithCapacityAlerts"
       },
       {
        "kind": "metricTile",
        "label": "Channels With Pricing Issues",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 3 §Display",
-       "bindsTo": "SalesChannelCommandCenterView.channelsWithPricingIssues"
+       "bindsTo": "SalesChannelCommandCenterSummary.channelsWithPricingIssues"
       },
       {
        "kind": "metricTile",
        "label": "Scheduled Activations",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 3 §Display",
-       "bindsTo": "SalesChannelCommandCenterView.scheduledActivations"
+       "bindsTo": "SalesChannelCommandCenterSummary.scheduledActivations"
       },
       {
        "kind": "metricTile",
        "label": "Scheduled Deactivations",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 3 §Display",
-       "bindsTo": "SalesChannelCommandCenterView.scheduledDeactivations"
+       "bindsTo": "SalesChannelCommandCenterSummary.scheduledDeactivations"
       }
      ]
     },
@@ -241,6 +247,31 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "POS",
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 3 §Support channels such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Mobile POS",
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 3 §Support channels such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Flying POS",
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 3 §Support channels such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Call Center",
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 3 §Support channels such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "API",
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 3 §Support channels such as"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Partner Portal",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 3 §Support channels such as"
       },
@@ -277,14 +308,27 @@
     "contract": "catalogue",
     "purpose": "Sales Channel Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listChannelSaleSchedule",
+    "contract": "catalogue",
+    "purpose": "Channel Sales Schedule & Availability Windows",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listChannelSaleRule",
+    "contract": "catalogue",
+    "purpose": "Channel Sales Rules, Limits & Restrictions",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-258"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-258",
+   "workshopBoard": "wireframes/WS138 Sales Channel Management Board 1.dc.html#adm-258"
   },
-  "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 3. 22 of 22 labels bound to a contract property; 37 of 57 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 3. 22 of 22 labels bound to a contract property; 42 of 57 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -346,10 +390,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "An authorized administrator can create a new channel with a unique identity, operational scope and ownership without technical development.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Create and define a sales channel before products and commercial rules are assigned.",
-  "purposeNote": "An authorized administrator can create a new channel with a unique identity, operational scope and ownership without technical development.",
   "layout": {
    "template": "form",
    "regions": [
@@ -453,16 +497,14 @@
     "operationId": "createChannelProfile",
     "contract": "catalogue",
     "purpose": "Channel Creation & Profile Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "createChannelProfile"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-259"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-259",
+   "workshopBoard": "wireframes/WS138 Sales Channel Management Board 1.dc.html#adm-259"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 5. 0 of 0 labels bound to a contract property; 14 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -526,14 +568,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can determine precisely which approved products each channel is authorized to distribute without duplicating the product configuration itself.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Control exactly which products are available through each sales channel.",
-  "purposeNote": "Administrators can determine precisely which approved products each channel is authorized to distribute without duplicating the product configuration itself.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Assign Products, Remove Products, Disable, Import Assignment. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Assign Products, Remove Products, Disable, Copy Assignment, Import Assignment. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Sales_Channel_Management_Reference.pdf, page 7 §Support"
    }
   ],
@@ -611,6 +653,16 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Set Effective Dates",
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 7 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Copy Assignment",
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 7 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Import Assignment",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 7 §Support"
       }
@@ -646,10 +698,7 @@
     "operationId": "setProductCatalogue",
     "contract": "catalogue",
     "purpose": "Product & Catalogue Assignment",
-    "trigger": "onAction",
-    "invalidates": [
-     "setProductCatalogue"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -665,9 +714,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-260"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-260",
+   "workshopBoard": "wireframes/WS138 Sales Channel Management Board 1.dc.html#adm-260"
   },
-  "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 7. 10 of 10 labels bound to a contract property; 14 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 7. 10 of 10 labels bound to a contract property; 16 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -784,16 +834,14 @@
     "operationId": "setChannelPricingCommercial",
     "contract": "catalogue",
     "purpose": "Channel Pricing & Commercial Profile Assignment",
-    "trigger": "onAction",
-    "invalidates": [
-     "setChannelPricingCommercial"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-261"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-261",
+   "workshopBoard": "wireframes/WS138 Sales Channel Management Board 1.dc.html#adm-261"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -857,10 +905,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "exceed the underlying approved inventory/capacity.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Control how much product inventory or event capacity is available to each sales channel.",
-  "purposeNote": "exceed the underlying approved inventory/capacity.",
   "layout": {
    "template": "split",
    "regions": [
@@ -938,7 +986,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-262"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-262",
+   "workshopBoard": "wireframes/WS138 Sales Channel Management Board 1.dc.html#adm-262"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 10. 7 of 7 labels bound to a contract property; 18 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1002,13 +1051,61 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every channel can have independently governed selling windows without modifying the underlying product validity.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Control when each channel is permitted to sell.",
-  "purposeNote": "Every channel can have independently governed selling windows without modifying the underlying product validity.",
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Active selling periods",
+       "bindsTo": "ChannelSalesScheduleAvailabilityWindowsSummary.activeSellingPeriods",
+       "operation": "listChannelSaleSchedule",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Scheduled openings",
+       "bindsTo": "ChannelSalesScheduleAvailabilityWindowsSummary.scheduledOpenings",
+       "operation": "listChannelSaleSchedule",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Scheduled closures",
+       "bindsTo": "ChannelSalesScheduleAvailabilityWindowsSummary.scheduledClosures",
+       "operation": "listChannelSaleSchedule",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Blackouts",
+       "bindsTo": "ChannelSalesScheduleAvailabilityWindowsSummary.blackouts",
+       "operation": "listChannelSaleSchedule",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Conflicts",
+       "bindsTo": "ChannelSalesScheduleAvailabilityWindowsSummary.conflicts",
+       "operation": "listChannelSaleSchedule",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Event dates",
+       "bindsTo": "ChannelSalesScheduleAvailabilityWindowsSummary.eventDates",
+       "operation": "listChannelSaleSchedule",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -1016,14 +1113,6 @@
       {
        "kind": "dataTable",
        "label": "Every channel sales schedule",
-       "columns": [
-        "ChannelSalesScheduleAvailabilityWindowsView.activeSellingPeriods",
-        "ChannelSalesScheduleAvailabilityWindowsView.scheduledOpenings",
-        "ChannelSalesScheduleAvailabilityWindowsView.scheduledClosures",
-        "ChannelSalesScheduleAvailabilityWindowsView.blackouts",
-        "ChannelSalesScheduleAvailabilityWindowsView.conflicts",
-        "ChannelSalesScheduleAvailabilityWindowsView.eventDates"
-       ],
        "bindsTo": "ChannelSalesScheduleAvailabilityWindowsView",
        "operation": "listChannelSaleSchedule",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 11 §Display"
@@ -1038,16 +1127,22 @@
        "kind": "detailPanel",
        "label": "The selected channel sales schedule",
        "bindsTo": "ChannelSalesScheduleAvailabilityWindowsView",
-       "columns": [
-        "ChannelSalesScheduleAvailabilityWindowsView.activeSellingPeriods",
-        "ChannelSalesScheduleAvailabilityWindowsView.scheduledOpenings",
-        "ChannelSalesScheduleAvailabilityWindowsView.scheduledClosures",
-        "ChannelSalesScheduleAvailabilityWindowsView.blackouts",
-        "ChannelSalesScheduleAvailabilityWindowsView.conflicts",
-        "ChannelSalesScheduleAvailabilityWindowsView.eventDates"
-       ],
        "notes": "The pack groups this record's detail under its own headings: “Channel-Specific Scheduling”, “Automated Actions”.",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 11 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save channel sales rule",
+       "operation": "setChannelSalesRule",
+       "permission": "PRODUCT_CONFIGURE",
+       "notes": "**One rule on a channel** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /channel-sales-rules/{ruleId}"
       }
      ]
     }
@@ -1066,24 +1161,78 @@
     "contract": "catalogue",
     "purpose": "Channel Sales Schedule & Availability Windows",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setChannelSalesRule",
+    "contract": "catalogue",
+    "purpose": "Create or replace a channel sales window, limit or eligibility rule",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelSaleSchedule"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "ChannelSalesScheduleAvailabilityWindowsView.activeSellingPeriods",
-    "ChannelSalesScheduleAvailabilityWindowsView.scheduledOpenings",
-    "ChannelSalesScheduleAvailabilityWindowsView.scheduledClosures",
-    "ChannelSalesScheduleAvailabilityWindowsView.blackouts",
-    "ChannelSalesScheduleAvailabilityWindowsView.conflicts",
-    "ChannelSalesScheduleAvailabilityWindowsView.eventDates"
+    "ChannelSalesScheduleAvailabilityWindowsSummary.activeSellingPeriods",
+    "ChannelSalesScheduleAvailabilityWindowsSummary.scheduledOpenings",
+    "ChannelSalesScheduleAvailabilityWindowsSummary.scheduledClosures",
+    "ChannelSalesScheduleAvailabilityWindowsSummary.blackouts",
+    "ChannelSalesScheduleAvailabilityWindowsSummary.conflicts",
+    "ChannelSalesScheduleAvailabilityWindowsSummary.eventDates"
+   ],
+   "params": [
+    {
+     "name": "ruleId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-263"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-263",
+   "workshopBoard": "wireframes/WS138 Sales Channel Management Board 1.dc.html#adm-263"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 11. 6 of 6 labels bound to a contract property; 15 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetChannelSalesRule",
+    "component": "modal",
+    "trigger": "Save channel sales rule",
+    "body": "**Collects what `setChannelSalesRule` sends before it is called.** Required: `id`, `scopePath`, `salesChannelId`, `ruleKind`, `isActive`. Optional: `productId`, `name`, `ruleLevel`, `overridesProductRule`, `effectiveFrom`, `effectiveTo`, `salesStartDate`, `salesStartTime`, `salesEndDate`, `salesEndTime`, `timeZone`, `daysOfWeek` and 31 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ChannelSalesRule",
+    "confirm": {
+     "label": "Save channel sales rule",
+     "operation": "setChannelSalesRule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "salesChannelId",
+      "ruleKind",
+      "isActive",
+      "productId",
+      "name",
+      "ruleLevel",
+      "overridesProductRule",
+      "effectiveFrom",
+      "effectiveTo",
+      "salesStartDate",
+      "salesStartTime",
+      "salesEndDate",
+      "salesEndTime",
+      "timeZone",
+      "daysOfWeek",
+      "hoursOfOperation"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /channel-sales-rules/{ruleId}"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1145,10 +1294,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "purchased.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Determine who is allowed to purchase through a particular channel.",
-  "purposeNote": "purchased.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1182,6 +1331,20 @@
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 12 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save channel sales rule",
+       "operation": "setChannelSalesRule",
+       "permission": "PRODUCT_CONFIGURE",
+       "notes": "**One rule on a channel** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /channel-sales-rules/{ruleId}"
+      }
+     ]
     }
    ]
   },
@@ -1197,14 +1360,70 @@
     "contract": "catalogue",
     "purpose": "Customer & Eligibility Rules by Channel",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setChannelSalesRule",
+    "contract": "catalogue",
+    "purpose": "Create or replace a channel sales window, limit or eligibility rule",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCustomerEligibilityRule"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-264"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-264",
+   "workshopBoard": "wireframes/WS138 Sales Channel Management Board 1.dc.html#adm-264"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 12. 0 of 0 labels bound to a contract property; 5 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetChannelSalesRule",
+    "component": "modal",
+    "trigger": "Save channel sales rule",
+    "body": "**Collects what `setChannelSalesRule` sends before it is called.** Required: `id`, `scopePath`, `salesChannelId`, `ruleKind`, `isActive`. Optional: `productId`, `name`, `ruleLevel`, `overridesProductRule`, `effectiveFrom`, `effectiveTo`, `salesStartDate`, `salesStartTime`, `salesEndDate`, `salesEndTime`, `timeZone`, `daysOfWeek` and 31 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ChannelSalesRule",
+    "confirm": {
+     "label": "Save channel sales rule",
+     "operation": "setChannelSalesRule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "salesChannelId",
+      "ruleKind",
+      "isActive",
+      "productId",
+      "name",
+      "ruleLevel",
+      "overridesProductRule",
+      "effectiveFrom",
+      "effectiveTo",
+      "salesStartDate",
+      "salesStartTime",
+      "salesEndDate",
+      "salesEndTime",
+      "timeZone",
+      "daysOfWeek",
+      "hoursOfOperation"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /channel-sales-rules/{ruleId}"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "ruleId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1266,10 +1485,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can enforce channel-specific operational and transaction restrictions without changing the master product definition.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure operational restrictions that apply specifically to a sales channel.",
-  "purposeNote": "Administrators can enforce channel-specific operational and transaction restrictions without changing the master product definition.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1363,6 +1582,20 @@
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 13 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save channel sales rule",
+       "operation": "setChannelSalesRule",
+       "permission": "PRODUCT_CONFIGURE",
+       "notes": "**One rule on a channel** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /channel-sales-rules/{ruleId}"
+      }
+     ]
     }
    ]
   },
@@ -1378,14 +1611,70 @@
     "contract": "catalogue",
     "purpose": "Channel Sales Rules, Limits & Restrictions",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setChannelSalesRule",
+    "contract": "catalogue",
+    "purpose": "Create or replace a channel sales window, limit or eligibility rule",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelSaleRule"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-265"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-265",
+   "workshopBoard": "wireframes/WS138 Sales Channel Management Board 1.dc.html#adm-265"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 13. 0 of 0 labels bound to a contract property; 17 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetChannelSalesRule",
+    "component": "modal",
+    "trigger": "Save channel sales rule",
+    "body": "**Collects what `setChannelSalesRule` sends before it is called.** Required: `id`, `scopePath`, `salesChannelId`, `ruleKind`, `isActive`. Optional: `productId`, `name`, `ruleLevel`, `overridesProductRule`, `effectiveFrom`, `effectiveTo`, `salesStartDate`, `salesStartTime`, `salesEndDate`, `salesEndTime`, `timeZone`, `daysOfWeek` and 31 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ChannelSalesRule",
+    "confirm": {
+     "label": "Save channel sales rule",
+     "operation": "setChannelSalesRule"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "salesChannelId",
+      "ruleKind",
+      "isActive",
+      "productId",
+      "name",
+      "ruleLevel",
+      "overridesProductRule",
+      "effectiveFrom",
+      "effectiveTo",
+      "salesStartDate",
+      "salesStartTime",
+      "salesEndDate",
+      "salesEndTime",
+      "timeZone",
+      "daysOfWeek",
+      "hoursOfOperation"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /channel-sales-rules/{ruleId}"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "ruleId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1447,10 +1736,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Each channel exposes only approved payment, fee and fulfillment methods supported by its operational configuration.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Define the commercial and fulfillment behavior associated with each channel.",
-  "purposeNote": "Each channel exposes only approved payment, fee and fulfillment methods supported by its operational configuration.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1539,16 +1828,14 @@
     "operationId": "setChannelFeePayment",
     "contract": "catalogue",
     "purpose": "Channel Fees, Payment & Fulfillment Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setChannelFeePayment"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-266"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-266",
+   "workshopBoard": "wireframes/WS138 Sales Channel Management Board 1.dc.html#adm-266"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 11 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1604,10 +1891,10 @@
    "notes": "**Reached from ADM-258, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "No sales channel becomes operational until its required product, pricing, capacity, schedule, payment, fulfillment and governance dependencies have passed configured readiness validation. Board 1 — Final Screen Register",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configuration works) and no display directory — it is settings, not a population",
   "purpose": "Perform final validation before a sales channel or channel/product configuration becomes commercially active. Board 2 manages the live operational layer of TICVAI's sales-channel ecosystem after channels have been configured and activated in Board 1.",
-  "purposeNote": "No sales channel becomes operational until its required product, pricing, capacity, schedule, payment, fulfillment and governance dependencies have passed configured readiness validation. Board 1 — Final Screen Register",
   "layout": {
    "template": "form",
    "regions": [
@@ -1658,16 +1945,14 @@
     "operationId": "publishChannelReadinessValidation",
     "contract": "catalogue",
     "purpose": "Channel Publication, Readiness & AI Validation",
-    "trigger": "onAction",
-    "invalidates": [
-     "publishChannelReadinessValidation"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-267"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-267",
+   "workshopBoard": "wireframes/WS138 Sales Channel Management Board 1.dc.html#adm-267"
   },
   "apisNote": "Regenerated 9 September 2026 from Sales_Channel_Management_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 8 of 88 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

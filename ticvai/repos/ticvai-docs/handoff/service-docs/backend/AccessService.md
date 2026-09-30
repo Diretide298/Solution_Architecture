@@ -100,7 +100,7 @@
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ManualOverrideSupervisorApprovalInput`
 
@@ -160,8 +160,8 @@ The venue's device binding policy (`setDeviceBindingPolicy`) decides the rest: p
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| credentialId | path | yes | string | The Virtual Ticket (access.entitlement.id); decided 29 September, writers pass |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| credentialId | path | yes | string (uuid) | The Virtual Ticket (access.entitlement.id); decided 29 September, writers pass |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CredentialDeviceBindingInput`
 
@@ -179,8 +179,8 @@ The venue's device binding policy (`setDeviceBindingPolicy`) decides the rest: p
 |---|---|---|---|
 | id | string (uuid) | yes |  |
 | subjectId | string (uuid) |  | The guest (pii.subject) (nullable) |
-| entitlementId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| credentialBindingId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| entitlementId | string (uuid) | yes |  |
+| credentialBindingId | string (uuid) |  | (nullable) |
 | deviceId | string | yes | (max length 200) |
 | deviceReference | string |  | (max length 200; nullable) |
 | appInstallationId | string |  | (max length 200; nullable) |
@@ -227,7 +227,7 @@ Deletes a group. **Refused `409 group-in-use`** while another group is nested un
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | groupId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Responses**
 
@@ -269,14 +269,14 @@ No image is stored — a template is. **The template cannot reconstruct the face
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | subjectId | string (uuid) | yes |  |
-| entitlementId | string | yes | An Entitlement.id, which is a ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| entitlementId | string (uuid) | yes | An Entitlement.id, which is a UUIDv7. |
 | template | string (password) | yes | Write-only, never returned. |
 | capturedAt | string (date-time) | yes |  |
 | source | enum (guestApp, ticketCounter, annualPassCounter) | yes | The three surfaces 3.2.43 allows. |
@@ -293,7 +293,7 @@ No image is stored — a template is. **The template cannot reconstruct the face
 |---|---|---|---|
 | id | string (uuid) | yes | (read-only) |
 | subjectId | string (uuid) | yes |  |
-| entitlementId | string | yes | The Entitlement.id, a ULID (pii.subject_biometric.entitlement_id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| entitlementId | string (uuid) | yes | The Entitlement.id, a UUIDv7 (pii.subject_biometric.entitlement_id). |
 | kind | BiometricKind: enum (facePass, faceTag) | yes | BL-106, CF-35. |
 | retentionAnchor | object |  | BL-106. |
 | source | enum (guestApp, ticketCounter, annualPassCounter, entryGate) | yes | entryGate is valid for faceTag only, and 3.2.43's omission of it from Face Pass is deliberate: an enduring enrolment is a considered act with consent attached, not something done in a queue. |
@@ -339,14 +339,14 @@ No image is stored — a template is. **The template cannot reconstruct the face
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | subjectId | string (uuid) | yes |  |
-| entitlementId | string | yes | An Entitlement.id, which is a ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| entitlementId | string (uuid) | yes | An Entitlement.id, which is a UUIDv7. |
 | template | string (password) | yes | Write-only, never returned. |
 | capturedAt | string (date-time) | yes |  |
 | source | enum (ticketCounter, entryGate) | yes | The two surfaces 3.2.44 allows, and a gate is present here exactly where it is absent from Face Pass: this one does not outlive the visit. |
@@ -363,7 +363,7 @@ No image is stored — a template is. **The template cannot reconstruct the face
 |---|---|---|---|
 | id | string (uuid) | yes | (read-only) |
 | subjectId | string (uuid) | yes |  |
-| entitlementId | string | yes | The Entitlement.id, a ULID (pii.subject_biometric.entitlement_id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| entitlementId | string (uuid) | yes | The Entitlement.id, a UUIDv7 (pii.subject_biometric.entitlement_id). |
 | kind | BiometricKind: enum (facePass, faceTag) | yes | BL-106, CF-35. |
 | retentionAnchor | object |  | BL-106. |
 | source | enum (guestApp, ticketCounter, annualPassCounter, entryGate) | yes | entryGate is valid for faceTag only, and 3.2.43's omission of it from Face Pass is deliberate: an enduring enrolment is a considered act with consent attached, not something done in a queue. |
@@ -407,16 +407,16 @@ No image is stored — a template is. **The template cannot reconstruct the face
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| entitlementId | path | yes | string |  |
+| entitlementId | path | yes | string (uuid) |  |
 
 **Response**: `Entitlement`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | A ULID, matching TicketStatus.ticketId — stable for the life of the ticket and independent of the media carrying it. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | A UUIDv7, matching TicketStatus.ticketId — stable for the life of the ticket and independent of the media carrying it. |
 | templateId | string (uuid) | yes | The definition it was issued against. |
 | productId | string (uuid) | yes |  |
-| orderId | string | yes | The order's id, a ULID as in /orders/{orderId} (orders.sales_order.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orderId | string (uuid) | yes | The order's id, a UUIDv7 as in /orders/{orderId} (orders.sales_order.id). |
 | orderLineId | string (uuid) |  |  |
 | subjectId | string (uuid) | yes | Who holds it. (nullable) |
 | venueId | string (uuid) |  |  |
@@ -437,7 +437,7 @@ No image is stored — a template is. **The template cannot reconstruct the face
 | holderName | string |  | (nullable) |
 | sharedWithSubjectIds | array of string (uuid) |  | shareEntitlement. |
 | issuedVia | enum (sale, invitation, reissue, transfer, resale, membership, groupBooking) |  | How it came to exist, and it matters to finance. |
-| supersedesEntitlementId | string |  | For a reissue or a resale. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| supersedesEntitlementId | string (uuid) |  | For a reissue or a resale. (nullable) |
 | walletValueId | string (uuid) |  | Where the template carries stored value. (nullable) |
 | facePassEnrolmentId | string (uuid) |  | The active facePass enrolment on this entitlement (FacePassEnrolment.id), or null when none is. (read-only; nullable) |
 
@@ -473,7 +473,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| entitlementId | path | yes | string |  |
+| entitlementId | path | yes | string (uuid) |  |
 | rotate | query |  | boolean |  |
 
 **Response**: `object`
@@ -522,7 +522,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| entitlementId | path | yes | string |  |
+| entitlementId | path | yes | string (uuid) |  |
 
 **Responses**
 
@@ -563,7 +563,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 |---|---|---|---|
 | id | string (uuid) | yes | (read-only) |
 | subjectId | string (uuid) | yes |  |
-| entitlementId | string | yes | The Entitlement.id, a ULID (pii.subject_biometric.entitlement_id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| entitlementId | string (uuid) | yes | The Entitlement.id, a UUIDv7 (pii.subject_biometric.entitlement_id). |
 | kind | BiometricKind: enum (facePass, faceTag) | yes | BL-106, CF-35. |
 | retentionAnchor | object |  | BL-106. |
 | source | enum (guestApp, ticketCounter, annualPassCounter, entryGate) | yes | entryGate is valid for faceTag only, and 3.2.43's omission of it from Face Pass is deliberate: an enduring enrolment is a considered act with consent attached, not something done in a queue. |
@@ -616,10 +616,10 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of Entitlement | yes |  |
-| items[].id | string | yes | A ULID, matching TicketStatus.ticketId — stable for the life of the ticket and independent of the media carrying it. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].id | string (uuid) | yes | A UUIDv7, matching TicketStatus.ticketId — stable for the life of the ticket and independent of the media carrying it. |
 | items[].templateId | string (uuid) | yes | The definition it was issued against. |
 | items[].productId | string (uuid) | yes |  |
-| items[].orderId | string | yes | The order's id, a ULID as in /orders/{orderId} (orders.sales_order.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].orderId | string (uuid) | yes | The order's id, a UUIDv7 as in /orders/{orderId} (orders.sales_order.id). |
 | items[].orderLineId | string (uuid) |  |  |
 | items[].subjectId | string (uuid) | yes | Who holds it. (nullable) |
 | items[].venueId | string (uuid) |  |  |
@@ -640,7 +640,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | items[].holderName | string |  | (nullable) |
 | items[].sharedWithSubjectIds | array of string (uuid) |  | shareEntitlement. |
 | items[].issuedVia | enum (sale, invitation, reissue, transfer, resale, membership, groupBooking) |  | How it came to exist, and it matters to finance. |
-| items[].supersedesEntitlementId | string |  | For a reissue or a resale. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| items[].supersedesEntitlementId | string (uuid) |  | For a reissue or a resale. (nullable) |
 | items[].walletValueId | string (uuid) |  | Where the template carries stored value. (nullable) |
 | items[].facePassEnrolmentId | string (uuid) |  | The active facePass enrolment on this entitlement (FacePassEnrolment.id), or null when none is. (read-only; nullable) |
 | nextCursor | string |  |  |
@@ -689,10 +689,10 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of Entitlement | yes |  |
-| items[].id | string | yes | A ULID, matching TicketStatus.ticketId — stable for the life of the ticket and independent of the media carrying it. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].id | string (uuid) | yes | A UUIDv7, matching TicketStatus.ticketId — stable for the life of the ticket and independent of the media carrying it. |
 | items[].templateId | string (uuid) | yes | The definition it was issued against. |
 | items[].productId | string (uuid) | yes |  |
-| items[].orderId | string | yes | The order's id, a ULID as in /orders/{orderId} (orders.sales_order.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].orderId | string (uuid) | yes | The order's id, a UUIDv7 as in /orders/{orderId} (orders.sales_order.id). |
 | items[].orderLineId | string (uuid) |  |  |
 | items[].subjectId | string (uuid) | yes | Who holds it. (nullable) |
 | items[].venueId | string (uuid) |  |  |
@@ -713,7 +713,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | items[].holderName | string |  | (nullable) |
 | items[].sharedWithSubjectIds | array of string (uuid) |  | shareEntitlement. |
 | items[].issuedVia | enum (sale, invitation, reissue, transfer, resale, membership, groupBooking) |  | How it came to exist, and it matters to finance. |
-| items[].supersedesEntitlementId | string |  | For a reissue or a resale. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| items[].supersedesEntitlementId | string (uuid) |  | For a reissue or a resale. (nullable) |
 | items[].walletValueId | string (uuid) |  | Where the template carries stored value. (nullable) |
 | items[].facePassEnrolmentId | string (uuid) |  | The active facePass enrolment on this entitlement (FacePassEnrolment.id), or null when none is. (read-only; nullable) |
 | nextCursor | string |  |  |
@@ -808,7 +808,7 @@ Withdrawn by the guest, ended with the pass, or erased under a DSAR.
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | enrolmentId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Responses**
 
@@ -842,7 +842,7 @@ The restored version takes the same approval route as any policy change (`evalua
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | policyId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -896,7 +896,7 @@ The restored version takes the same approval route as any policy change (`evalua
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `AccessAttributeCatalogInput`
 
@@ -955,7 +955,7 @@ A group may not be its own ancestor (`409 group-cycle`), and every member access
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `AccessAccessPointGroup`
 
@@ -1023,7 +1023,7 @@ A group may not be its own ancestor (`409 group-cycle`), and every member access
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `BiometricVerificationProfileBuilderInput`
 
@@ -1031,7 +1031,7 @@ A group may not be its own ancestor (`409 group-cycle`), and every member access
 |---|---|---|---|
 | faceRequirement | enum (notUsed, optional, required) | yes | Whether face verification is not used, allowed, or required at this location (e.g. |
 | biometricType | enum (facePass, faceTag, otherProvider) | yes | Biometric model this profile uses |
-| profileId | string | yes | The profile row's key (access.biometric_profile.id, a ULID); absent creates one (decided 29 September, writers pass) (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| profileId | string (uuid) | yes | The profile row's key (access.biometric_profile.id, a UUIDv7); absent creates one (decided 29 September, writers pass) |
 | selectType | enum (ticketProduct, ticketType, membership, annualPass, multiDayTicket, multiAttractionTicket, vipCredential, accreditation, …) | yes | Vocabulary listed under Select. |
 | venueId | string | yes | Venue |
 | parkId | string |  | Park |
@@ -1091,7 +1091,7 @@ A group may not be its own ancestor (`409 group-cycle`), and every member access
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `BleBeaconGeofenceConfigurationInput`
 
@@ -1163,7 +1163,7 @@ A group may not be its own ancestor (`409 group-cycle`), and every member access
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ContextTimeEventCapacityPolicyBuilderInput`
 
@@ -1225,13 +1225,13 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CredentialActivationDisplayRulesInput`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| ruleId | string |  | Absent creates a rule (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| ruleId | string (uuid) |  | Absent creates a rule |
 | venueId | string | yes | Venue the rule applies to |
 | name | string | yes | (max length 200) |
 | beforeActivationDisplay | array of enum (hideQr, blurQr, showCountdown, showAvailableAtVenue, showVenueDirections) | yes | What the guest sees before the credential activates |
@@ -1282,7 +1282,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `DeviceBindingPolicyInput`
 
@@ -1297,7 +1297,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | The ruleId (display rule) or policyId (transfer policy) of the operations (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | The ruleId (display rule) or policyId (transfer policy) of the operations |
 | kind | enum (activationDisplay, transfer, virtualTicketIdentity, deviceBinding) | yes | Which policy this row is; the columns of the other kinds stay null |
 | name | string |  | (max length 200; nullable) |
 | venueId | string (uuid) |  | Required for activationDisplay and virtualTicketIdentity (one virtualTicketIdentity row per venue) (nullable) |
@@ -1366,13 +1366,13 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `FaceMatchingVerificationThresholdsInput`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| profileId | string |  | Absent creates a threshold profile (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| profileId | string (uuid) |  | Absent creates a threshold profile |
 | venueId | string | yes |  |
 | accessContext | string | yes | Where the thresholds apply, e.g. (max length 100) |
 | highConfidenceMin | number | yes | Score at or above which the match is high confidence (allow if every other rule passes) (min 0; max 1) |
@@ -1439,7 +1439,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `FacePassEnrollmentConfigurationInput`
 
@@ -1506,13 +1506,13 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `FaceTagTemporaryEnrollmentInput`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| profileId | string |  | Absent creates a Face Tag profile (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| profileId | string (uuid) |  | Absent creates a Face Tag profile |
 | venueId | string | yes |  |
 | name | string | yes | (max length 200) |
 | enrollmentChannels | array of enum (ticketCounter, entryGate) | yes | Where a Face Tag may be captured (min items 1) |
@@ -1569,7 +1569,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `AccessGateModePolicy`
 
@@ -1643,7 +1643,7 @@ A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs o
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ParkingFacility`
 
@@ -1717,7 +1717,7 @@ A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs o
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `VirtualTicketIdentityMasterRecordConfigurationInput`
 
@@ -1787,7 +1787,7 @@ A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs o
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `VisualAccessRuleBuilderInput`
 
@@ -1852,7 +1852,7 @@ A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs o
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `VisualDynamicPolicyBuilderInput`
 
@@ -1908,8 +1908,8 @@ Revocation removes the plate from the whitelist. A refunded parking entitlement 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| entitlementId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| entitlementId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `UpdateParkingEntitlementRequest`
 
@@ -1925,7 +1925,7 @@ Revocation removes the plate from the whitelist. A refunded parking entitlement 
 |---|---|---|---|
 | id | string (uuid) |  | (read-only) |
 | facilityId | string (uuid) | yes |  |
-| orderId | string | yes | The order's id, a ULID as in /orders/{orderId} (orders.sales_order.id). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orderId | string (uuid) | yes | The order's id, a UUIDv7 as in /orders/{orderId} (orders.sales_order.id). |
 | subjectId | string (uuid) |  | (nullable) |
 | plateNumber | string |  | Required in plateWhitelist mode, meaningless in the others. (nullable) |
 | plateCountry | string |  | (nullable) |
@@ -1969,7 +1969,7 @@ Denies outright regardless of entitlement state. Included in the offline package
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2020,7 +2020,7 @@ Denies outright regardless of entitlement state. Included in the offline package
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateAccessPointRequest`
 
@@ -2089,7 +2089,7 @@ Denies outright regardless of entitlement state. Included in the offline package
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `AdmissionRules`
 
@@ -2216,7 +2216,7 @@ Enforcement is configurable — `off`, `warn` or `deny` — because GPS accuracy
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | accessPointId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `AccessPointGeofence`
 
@@ -2291,7 +2291,7 @@ Podium operation. Changes what the gate does, not who may pass it.
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | accessPointId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2360,7 +2360,7 @@ Podium operation. Changes what the gate does, not who may pass it.
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | accessPointId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2433,7 +2433,7 @@ Changes take effect at terminals after the next offline package refresh, not imm
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | profileId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `AdmissionRules`
 
@@ -2604,7 +2604,7 @@ Pulled by scanners and venue edge nodes so validation continues through a WAN ou
 | dynamicPolicies[].createdAt | string (date-time) |  | (read-only) |
 | dynamicPolicies[].updatedAt | string (date-time) |  | (read-only) |
 | entitlements | array of object | yes | Read from access.entitlement (SD-052). |
-| entitlements[].ticketId | string | yes | The Entitlement.id. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| entitlements[].ticketId | string (uuid) | yes | The Entitlement.id. |
 | entitlements[].mediaCodes | array of string | yes | A ticket may carry several media over its life. |
 | entitlements[].validFrom | string (date-time) | yes |  |
 | entitlements[].validTo | string (date-time) | yes |  |
@@ -2615,7 +2615,7 @@ Pulled by scanners and venue edge nodes so validation continues through a WAN ou
 | entitlements[].admissionRulesId | string (uuid) |  |  |
 | delegatedRights | array of object |  | Redemption rights issued by other cells and valid at this access point. |
 | delegatedRights[].rightId | string | yes |  |
-| delegatedRights[].ticketId | string | yes | The Entitlement.id in the issuing cell. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| delegatedRights[].ticketId | string (uuid) | yes | The Entitlement.id in the issuing cell. |
 | delegatedRights[].issuingCellId | string | yes |  |
 | delegatedRights[].guestLinkId | string |  | (nullable) |
 | delegatedRights[].mediaCodes | array of string |  |  |
@@ -2812,9 +2812,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | occurred_at | timestamptz | yes |  |
 | is_simulation | boolean | yes |  |
 | scenario | text | no | Simulation rows only |
-| biometric_profile_id | text | no | The biometric profile applied or tested |
+| biometric_profile_id | uuid | no | The biometric profile applied or tested |
 | subject_id | uuid | no | The guest (the list's guestId) |
-| entitlement_id | text | no | The credential (the list's credentialId) |
+| entitlement_id | uuid | no | The credential (the list's credentialId) |
 | credential_type | text | no | Credential type simulated, when no credential is named |
 | face_profile_reference | text | no | Opaque face profile reference; never a template |
 | access_point_id | uuid | no | The gate (the list's gateId) |
@@ -2829,7 +2829,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes | The profileId the biometric writes are keyed by (a ULID, as their inputs declare) |
+| id | uuid | yes | The profileId the biometric writes are keyed by (a UUIDv7, as their inputs declare) |
 | profile_kind | text | yes | verification is written by setBiometricVerificationProfile, facePassEnrolment by setFacePassEnrollment (one per venue), faceTagEnrolment by setFaceTagTemporaryEnrollment, faceMatch by setFaceMatching… |
 | venue_id | uuid | yes |  |
 | scope_path | text | yes | ltree of the owning scope node |
@@ -2902,7 +2902,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes | The ruleId (display rule) or policyId (transfer policy) of the operations |
+| id | uuid | yes | The ruleId (display rule) or policyId (transfer policy) of the operations |
 | kind | text | yes | Which policy this row is; the columns of the other kinds stay null |
 | name | text | no |  |
 | venue_id | uuid | no | Required for activationDisplay and virtualTicketIdentity (one virtualTicketIdentity row per venue) |
@@ -2941,8 +2941,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | yes |  |
 | subject_id | uuid | no | The guest (pii.subject) |
-| entitlement_id | text | yes |  |
-| credential_binding_id | text | no |  |
+| entitlement_id | uuid | yes |  |
+| credential_binding_id | uuid | no |  |
 | device_id | text | yes |  |
 | device_reference | text | no |  |
 | app_installation_id | text | no |  |
@@ -2999,10 +2999,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes | A ULID, matching TicketStatus.ticketId — stable for the life of the ticket and independent of the media carrying it. |
+| id | uuid | yes | A UUIDv7, matching TicketStatus.ticketId — stable for the life of the ticket and independent of the media carrying it. |
 | template_id | uuid | yes | The definition it was issued against. |
 | product_id | uuid | yes |  |
-| order_id | text | yes | The order's id, a ULID as in /orders/{orderId} (orders.sales_order.id). |
+| order_id | uuid | yes | The order's id, a UUIDv7 as in /orders/{orderId} (orders.sales_order.id). |
 | order_line_id | uuid | no |  |
 | subject_id | uuid | no | Who holds it. |
 | venue_id | uuid | no |  |
@@ -3023,7 +3023,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | holder_name | text | no |  |
 | shared_with_subject_ids | text[] | no | shareEntitlement. |
 | issued_via | text | no | How it came to exist, and it matters to finance. |
-| supersedes_entitlement_id | text | no | For a reissue or a resale. |
+| supersedes_entitlement_id | uuid | no | For a reissue or a resale. |
 | wallet_value_id | uuid | no | Where the template carries stored value. |
 
 ### `access.entry_rule_point`
@@ -3044,7 +3044,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | venue_id | uuid | yes |  |
 | scope_path | text | yes | ltree of the owning scope node |
 | subject_id | uuid | yes | The guest (pii.subject) |
-| entitlement_id | text | no | The credential the Face Pass belongs to |
+| entitlement_id | uuid | no | The credential the Face Pass belongs to |
 | existing_profile_reference | text | yes | Opaque reference to the prior enrolment (pii.subject_biometric) |
 | new_capture_reference | text | yes | Opaque reference to the new capture |
 | match_result | text | yes |  |
@@ -3095,7 +3095,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | no |  |
 | facility_id | uuid | yes |  |
-| order_id | text | yes | The order's id, a ULID as in /orders/{orderId} (orders.sales_order.id). |
+| order_id | uuid | yes | The order's id, a UUIDv7 as in /orders/{orderId} (orders.sales_order.id). |
 | subject_id | uuid | no |  |
 | plate_number | text | no | Required in plateWhitelist mode, meaningless in the others. |
 | plate_country | text | no |  |
@@ -3128,18 +3128,18 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes | The scan's client-generated ULID, the key offline replay deduplicates on. |
+| id | uuid | yes | The scan's client-generated UUIDv7, the key offline replay deduplicates on. |
 | access_point_id | uuid | yes |  |
 | venue_id | uuid | yes |  |
 | scope_path | text | no |  |
-| ticket_id | text | no | The Entitlement.id scanned; null where the media resolved to nothing. |
+| ticket_id | uuid | no | The Entitlement.id scanned; null where the media resolved to nothing. |
 | media_code | text | no |  |
 | outcome | text | yes |  |
 | deny_reason | text | no |  |
 | direction | text | yes |  |
 | operator_principal_id | uuid | no |  |
 | device_id | uuid | no |  |
-| overrides_scan_id | text | no | Set only on an override row, naming the denied scan it admits against (decided 28 September, audit R228). |
+| overrides_scan_id | uuid | no | Set only on an override row, naming the denied scan it admits against (decided 28 September, audit R228). |
 | override_reason | text | no | The supervisor's justification, on the override row only. |
 | dynamic_policy_id | uuid | no | The dynamic access policy (access.dynamic_policy) whose result decided this scan; null when no dynamic policy matched and the entitlement alone decided (added 29 September, build pass, 3.3.48). |
 | dynamic_policy_version | integer | no | The version of that policy in force at the scan, so a report spanning a change counts each version apart. |

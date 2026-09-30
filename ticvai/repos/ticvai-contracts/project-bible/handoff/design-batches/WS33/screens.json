@@ -253,6 +253,20 @@
     "contract": "orders",
     "purpose": "Payment & Order Financial Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listInstalmentPlans",
+    "contract": "payments",
+    "purpose": "Instalment plans and schedule",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "createInstalmentPlan",
+    "contract": "payments",
+    "purpose": "Pay in instalments",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {

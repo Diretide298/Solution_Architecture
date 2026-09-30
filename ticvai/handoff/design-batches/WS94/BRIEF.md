@@ -1,6 +1,6 @@
 # WS94 — Rental Management board 7
 
-**10 screens · 9 operations · 6 schemas · 2 permissions**
+**10 screens · 9 operations · 7 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `RENTAL_OPERATE, RENTAL_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `MARKETING_SEND, RENTAL_OPERATE, RENTAL_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that

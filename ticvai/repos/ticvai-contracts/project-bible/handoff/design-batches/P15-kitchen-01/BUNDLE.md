@@ -3600,7 +3600,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "menuItemId": {
     "type": "string",
@@ -3798,7 +3798,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderNumber": {
     "type": "string"
@@ -3812,7 +3812,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "tableVisitId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "status": {
@@ -3844,10 +3844,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "salesOrderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "x-ticvai-references": "orders.sales_order",
-    "description": "**Retyped 29 September (SD-046)**: `orders.sales_order.id` is a ULID, so a uuid here could never join. **Taken from their `fnb.order`, 20 September.** We carried outlet, table visit and kitchen ticket on an F&B order and nothing joining it to what was actually sold, so an F&B line could not be reconciled to the order that paid for it.\n"
+    "description": "**Retyped 29 September (SD-046)**, and `format: uuid` since ADR-0056 (30 September): every id is a uuid, so this joins `orders.sales_order.id`. **Taken from their `fnb.order`, 20 September.** We carried outlet, table visit and kitchen ticket on an F&B order and nothing joining it to what was actually sold, so an F&B line could not be reconciled to the order that paid for it.\n"
    },
    "updatedAt": {
     "type": "string",
@@ -3863,7 +3863,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "kitchenTicketId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "kitchenTickets": {
@@ -4014,7 +4014,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "ticketId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "kind": {
@@ -4164,11 +4164,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "The F&B order the ticket was created from on acceptance (`FnbOrder.id`)."
    },
    "orderNumber": {
@@ -4228,7 +4228,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "properties": {
       "lineId": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+       "format": "uuid"
       },
       "name": {
        "type": "string"
@@ -4254,7 +4254,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       },
       "refireOfLineId": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "format": "uuid",
        "nullable": true,
        "readOnly": true,
        "description": "**Set on a refire.** The line it remakes, which stays — food cost counts both, the bill counts one (`refireItem`)."
@@ -4496,7 +4496,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "ticketId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderNumber": {
     "type": "string"

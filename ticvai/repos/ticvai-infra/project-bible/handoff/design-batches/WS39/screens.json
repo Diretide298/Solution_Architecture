@@ -39,10 +39,7 @@
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-098 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-099",
@@ -101,10 +98,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Revenue teams can understand all significant AI pricing opportunities, risks, forecasts and external demand drivers from one centralized intelligence workspace.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each opportunity displays) — counts over a population, then the population",
   "purpose": "Provide Revenue Managers with a single operational view of all AI signals, forecasts, opportunities and risks influencing pricing.",
-  "purposeNote": "Revenue teams can understand all significant AI pricing opportunities, risks, forecasts and external demand drivers from one centralized intelligence workspace.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -116,73 +113,73 @@
        "kind": "metricTile",
        "label": "Active AI Recommendations",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 94 §Display",
-       "bindsTo": "AiPricingIntelligenceCommandCenterView.activeAiRecommendations"
+       "bindsTo": "AiPricingIntelligenceCommandCenterSummary.activeAiRecommendations"
       },
       {
        "kind": "metricTile",
        "label": "High-Priority Opportunities",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 94 §Display",
-       "bindsTo": "AiPricingIntelligenceCommandCenterView.highPriorityOpportunities"
+       "bindsTo": "AiPricingIntelligenceCommandCenterSummary.highPriorityOpportunities"
       },
       {
        "kind": "metricTile",
        "label": "Estimated Revenue Opportunity",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 94 §Display",
-       "bindsTo": "AiPricingIntelligenceCommandCenterView.estimatedRevenueOpportunity"
+       "bindsTo": "AiPricingIntelligenceCommandCenterSummary.estimatedRevenueOpportunity"
       },
       {
        "kind": "metricTile",
        "label": "Demand Surges Detected",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 94 §Display",
-       "bindsTo": "AiPricingIntelligenceCommandCenterView.demandSurgesDetected"
+       "bindsTo": "AiPricingIntelligenceCommandCenterSummary.demandSurgesDetected"
       },
       {
        "kind": "metricTile",
        "label": "Demand Risks Detected",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 94 §Display",
-       "bindsTo": "AiPricingIntelligenceCommandCenterView.demandRisksDetected"
+       "bindsTo": "AiPricingIntelligenceCommandCenterSummary.demandRisksDetected"
       },
       {
        "kind": "metricTile",
        "label": "External Signals Active",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 94 §Display",
-       "bindsTo": "AiPricingIntelligenceCommandCenterView.externalSignalsActive"
+       "bindsTo": "AiPricingIntelligenceCommandCenterSummary.externalSignalsActive"
       },
       {
        "kind": "metricTile",
        "label": "Nearby Events Detected",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 94 §Display",
-       "bindsTo": "AiPricingIntelligenceCommandCenterView.nearbyEventsDetected"
+       "bindsTo": "AiPricingIntelligenceCommandCenterSummary.nearbyEventsDetected"
       },
       {
        "kind": "metricTile",
        "label": "Weather Impacts",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 94 §Display",
-       "bindsTo": "AiPricingIntelligenceCommandCenterView.weatherImpacts"
+       "bindsTo": "AiPricingIntelligenceCommandCenterSummary.weatherImpacts"
       },
       {
        "kind": "metricTile",
        "label": "Competitor Movements",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 94 §Display",
-       "bindsTo": "AiPricingIntelligenceCommandCenterView.competitorMovements"
+       "bindsTo": "AiPricingIntelligenceCommandCenterSummary.competitorMovements"
       },
       {
        "kind": "metricTile",
        "label": "Forecast Accuracy",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 94 §Display",
-       "bindsTo": "AiPricingIntelligenceCommandCenterView.forecastAccuracy"
+       "bindsTo": "AiPricingIntelligenceCommandCenterSummary.forecastAccuracy"
       },
       {
        "kind": "metricTile",
        "label": "Average AI Confidence",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 94 §Display",
-       "bindsTo": "AiPricingIntelligenceCommandCenterView.averageAiConfidence"
+       "bindsTo": "AiPricingIntelligenceCommandCenterSummary.averageAiConfidence"
       },
       {
        "kind": "metricTile",
        "label": "Data Quality Issues",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 94 §Display",
-       "bindsTo": "AiPricingIntelligenceCommandCenterView.dataQualityIssues"
+       "bindsTo": "AiPricingIntelligenceCommandCenterSummary.dataQualityIssues"
       }
      ]
     },
@@ -201,7 +198,6 @@
         "AiPricingIntelligenceCommandCenterView.adjustment",
         "AiPricingIntelligenceCommandCenterView.demandForecast",
         "AiPricingIntelligenceCommandCenterView.revenueOpportunity",
-        "AiPricingIntelligenceCommandCenterView.primaryDrivers",
         "AiPricingIntelligenceCommandCenterView.confidence",
         "AiPricingIntelligenceCommandCenterView.risk",
         "AiPricingIntelligenceCommandCenterView.urgency"
@@ -228,7 +224,6 @@
         "AiPricingIntelligenceCommandCenterView.adjustment",
         "AiPricingIntelligenceCommandCenterView.demandForecast",
         "AiPricingIntelligenceCommandCenterView.revenueOpportunity",
-        "AiPricingIntelligenceCommandCenterView.primaryDrivers",
         "AiPricingIntelligenceCommandCenterView.confidence",
         "AiPricingIntelligenceCommandCenterView.risk",
         "AiPricingIntelligenceCommandCenterView.urgency"
@@ -258,7 +253,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-098"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-098",
+   "workshopBoard": "wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-098"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 94. 23 of 23 labels bound to a contract property; 23 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -322,10 +318,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "pricing intelligence.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Centralize the internal TICVAI signals used by forecasting and AI pricing models. These are generally the highest-confidence signals because they come directly from TICVAI transactions.",
-  "purposeNote": "pricing intelligence.",
   "gaps": [
    {
     "operation": null,
@@ -381,7 +377,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-099"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-099",
+   "workshopBoard": "wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-099"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 95. 0 of 0 labels bound to a contract property; 0 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -445,10 +442,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Weather conditions are converted into venue-specific, explainable demand signals rather than directly changing prices.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Show) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Allow TICVAI to understand how weather conditions affect demand for different venues and experiences. This should be much more sophisticated than simply connecting a weather API.",
-  "purposeNote": "Weather conditions are converted into venue-specific, explainable demand signals rather than directly changing prices.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -460,13 +457,37 @@
        "kind": "metricTile",
        "label": "Weather Forecast Confidence: 93%",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 97 §Show",
-       "bindsTo": "WeatherIntelligenceDemandImpactConfigurationView.weatherForecastConfidence93"
+       "bindsTo": "WeatherIntelligenceDemandImpactConfigurationView.weatherForecastConfidence"
       },
       {
        "kind": "metricTile",
        "label": "Estimated Demand Impact: +8–12%",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 97 §Show",
-       "bindsTo": "WeatherIntelligenceDemandImpactConfigurationView.estimatedDemandImpact812"
+       "bindsTo": "WeatherIntelligenceDemandImpactConfigurationView.estimatedDemandImpactMin"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Hourly Forecast",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 97 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Daily Forecast",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 97 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save demand signal configuration",
+       "operation": "setDemandSignalConfiguration",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**The person's half of `catalogue.demand_signal`** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /demand-signals/{signalId}"
       }
      ]
     }
@@ -485,20 +506,74 @@
     "contract": "catalogue",
     "purpose": "Weather Intelligence & Demand Impact Configuration",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setDemandSignalConfiguration",
+    "contract": "catalogue",
+    "purpose": "Enter a calendar signal or configure how a demand signal is used",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWeatherDemandImpact"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "WeatherIntelligenceDemandImpactConfigurationView.weatherForecastConfidence93",
-    "WeatherIntelligenceDemandImpactConfigurationView.estimatedDemandImpact812"
+    "WeatherIntelligenceDemandImpactConfigurationView.weatherForecastConfidence",
+    "WeatherIntelligenceDemandImpactConfigurationView.estimatedDemandImpactMin"
+   ],
+   "params": [
+    {
+     "name": "signalId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-100"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-100",
+   "workshopBoard": "wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-100"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 97. 2 of 2 labels bound to a contract property; 2 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 97. 2 of 2 labels bound to a contract property; 4 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetDemandSignalConfiguration",
+    "component": "modal",
+    "trigger": "Save demand signal configuration",
+    "body": "**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `id`, `scopePath`, `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "DemandSignal",
+    "confirm": {
+     "label": "Save demand signal configuration",
+     "operation": "setDemandSignalConfiguration"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "signalKind",
+      "source",
+      "signalType",
+      "name",
+      "venueId",
+      "productId",
+      "geography",
+      "marketCode",
+      "periodStart",
+      "periodEnd",
+      "currentValue",
+      "unit",
+      "reading",
+      "configuration",
+      "weight",
+      "reliability"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /demand-signals/{signalId}"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -560,10 +635,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "impact signals for AI pricing decisions.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Detect/configure; Capture; Configure per TICVAI venue) and no display directory — it is settings, not a population",
   "purpose": "Detect external events around TICVAI venues that could materially affect visitor demand. This directly addresses the exhibition-near-the-venue scenario.",
-  "purposeNote": "impact signals for AI pricing decisions.",
   "layout": {
    "template": "form",
    "regions": [
@@ -682,6 +757,20 @@
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 99 §Capture"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save demand signal configuration",
+       "operation": "setDemandSignalConfiguration",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**The person's half of `catalogue.demand_signal`** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /demand-signals/{signalId}"
+      }
+     ]
     }
    ]
   },
@@ -697,14 +786,70 @@
     "contract": "catalogue",
     "purpose": "Nearby Event, Exhibition & Local Demand Intelligence",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setDemandSignalConfiguration",
+    "contract": "catalogue",
+    "purpose": "Enter a calendar signal or configure how a demand signal is used",
+    "trigger": "onAction",
+    "invalidates": [
+     "listNearbyEventExhibition"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-101"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-101",
+   "workshopBoard": "wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-101"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 99. 0 of 0 labels bound to a contract property; 22 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetDemandSignalConfiguration",
+    "component": "modal",
+    "trigger": "Save demand signal configuration",
+    "body": "**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `id`, `scopePath`, `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "DemandSignal",
+    "confirm": {
+     "label": "Save demand signal configuration",
+     "operation": "setDemandSignalConfiguration"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "signalKind",
+      "source",
+      "signalType",
+      "name",
+      "venueId",
+      "productId",
+      "geography",
+      "marketCode",
+      "periodStart",
+      "periodEnd",
+      "currentValue",
+      "unit",
+      "reading",
+      "configuration",
+      "weight",
+      "reliability"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /demand-signals/{signalId}"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "signalId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -766,10 +911,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "competitor data alone to determine the selling price.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Track) and no metric row",
   "purpose": "Allow TICVAI to understand its commercial position relative to relevant competitors.",
-  "purposeNote": "competitor data alone to determine the selling price.",
   "layout": {
    "template": "split",
    "regions": [
@@ -820,6 +965,20 @@
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 100 §Track"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save demand signal configuration",
+       "operation": "setDemandSignalConfiguration",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**The person's half of `catalogue.demand_signal`** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /demand-signals/{signalId}"
+      }
+     ]
     }
    ]
   },
@@ -836,6 +995,15 @@
     "contract": "catalogue",
     "purpose": "Competitor Pricing & Market Position Intelligence",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setDemandSignalConfiguration",
+    "contract": "catalogue",
+    "purpose": "Enter a calendar signal or configure how a demand signal is used",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCompetitorPricingMarket"
+    ]
    }
   ],
   "entryState": {
@@ -846,14 +1014,59 @@
     "CompetitorPricingMarketPositionIntelligenceView.peakPrice",
     "CompetitorPricingMarketPositionIntelligenceView.residentPrice",
     "CompetitorPricingMarketPositionIntelligenceView.memberPriceWherePubliclyAvailable"
+   ],
+   "params": [
+    {
+     "name": "signalId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-102"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-102",
+   "workshopBoard": "wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-102"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 100. 9 of 9 labels bound to a contract property; 18 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetDemandSignalConfiguration",
+    "component": "modal",
+    "trigger": "Save demand signal configuration",
+    "body": "**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `id`, `scopePath`, `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "DemandSignal",
+    "confirm": {
+     "label": "Save demand signal configuration",
+     "operation": "setDemandSignalConfiguration"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "signalKind",
+      "source",
+      "signalType",
+      "name",
+      "venueId",
+      "productId",
+      "geography",
+      "marketCode",
+      "periodStart",
+      "periodEnd",
+      "currentValue",
+      "unit",
+      "reading",
+      "configuration",
+      "weight",
+      "reliability"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /demand-signals/{signalId}"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -915,10 +1128,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "demand-intelligence layer.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Capture broader external factors that may affect visitor demand beyond weather and nearby events.",
-  "purposeNote": "demand-intelligence layer.",
   "gaps": [
    {
     "operation": null,
@@ -944,6 +1157,20 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save demand signal configuration",
+       "operation": "setDemandSignalConfiguration",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**The person's half of `catalogue.demand_signal`** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /demand-signals/{signalId}"
+      }
+     ]
     }
    ]
   },
@@ -960,23 +1187,73 @@
     "contract": "catalogue",
     "purpose": "Market, Tourism, Holiday & Contextual Signal Hub",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setDemandSignalConfiguration",
+    "contract": "catalogue",
+    "purpose": "Enter a calendar signal or configure how a demand signal is used",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMarketTourismHoliday"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "MarketTourismHolidayContextualSignalHubView.publicHolidays",
-    "MarketTourismHolidayContextualSignalHubView.schoolHolidays",
-    "MarketTourismHolidayContextualSignalHubView.ramadan",
-    "MarketTourismHolidayContextualSignalHubView.eid",
-    "MarketTourismHolidayContextualSignalHubView.christmas"
+    "MarketTourismHolidayContextualSignalHubView.signalType"
+   ],
+   "params": [
+    {
+     "name": "signalId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-103"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-103",
+   "workshopBoard": "wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-103"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 102. 0 of 0 labels bound to a contract property; 0 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetDemandSignalConfiguration",
+    "component": "modal",
+    "trigger": "Save demand signal configuration",
+    "body": "**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `id`, `scopePath`, `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "DemandSignal",
+    "confirm": {
+     "label": "Save demand signal configuration",
+     "operation": "setDemandSignalConfiguration"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "signalKind",
+      "source",
+      "signalType",
+      "name",
+      "venueId",
+      "productId",
+      "geography",
+      "marketCode",
+      "periodStart",
+      "periodEnd",
+      "currentValue",
+      "unit",
+      "reading",
+      "configuration",
+      "weight",
+      "reliability"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /demand-signals/{signalId}"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1038,11 +1315,16 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "approved external signals.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Track) and no metric row",
   "purpose": "Predict future demand at a granular commercial level. This is the core predictive engine behind intelligent dynamic pricing.",
-  "purposeNote": "approved external signals.",
   "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Event Horizon. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 103 §Support"
+   },
    {
     "operation": null,
     "why": "**AI Demand Forecasting & Booking Curve Studio declares no operation that writes anything** — its only declared call is `listDemandBookingCurve`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
@@ -1060,10 +1342,8 @@
        "kind": "dataTable",
        "label": "Every demand forecasting booking",
        "columns": [
-        "AiDemandForecastingBookingCurveStudioView.confidence91",
-        "AiDemandForecastingBookingCurveStudioView.strongHistoricalData",
-        "AiDemandForecastingBookingCurveStudioView.stableBookingPattern",
-        "AiDemandForecastingBookingCurveStudioView.reliableExternalSignals",
+        "AiDemandForecastingBookingCurveStudioView.confidence",
+        "AiDemandForecastingBookingCurveStudioView.confidenceReasons",
         "AiDemandForecastingBookingCurveStudioView.mape",
         "AiDemandForecastingBookingCurveStudioView.forecastBias",
         "AiDemandForecastingBookingCurveStudioView.overForecast",
@@ -1084,10 +1364,8 @@
        "label": "The selected demand forecasting booking",
        "bindsTo": "AiDemandForecastingBookingCurveStudioView",
        "columns": [
-        "AiDemandForecastingBookingCurveStudioView.confidence91",
-        "AiDemandForecastingBookingCurveStudioView.strongHistoricalData",
-        "AiDemandForecastingBookingCurveStudioView.stableBookingPattern",
-        "AiDemandForecastingBookingCurveStudioView.reliableExternalSignals",
+        "AiDemandForecastingBookingCurveStudioView.confidence",
+        "AiDemandForecastingBookingCurveStudioView.confidenceReasons",
         "AiDemandForecastingBookingCurveStudioView.mape",
         "AiDemandForecastingBookingCurveStudioView.forecastBias",
         "AiDemandForecastingBookingCurveStudioView.overForecast",
@@ -1095,6 +1373,17 @@
        ],
        "notes": "The pack groups this record's detail under its own headings: “Historical Expected Curve”, “Current Actual Curve”, “Saturday Performance”, “Actual”, “Provide”, “Clearly show which signals contributed”.",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 103 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Event Horizon",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 103 §Support"
       }
      ]
     }
@@ -1117,10 +1406,8 @@
   ],
   "entryState": {
    "preloaded": [
-    "AiDemandForecastingBookingCurveStudioView.confidence91",
-    "AiDemandForecastingBookingCurveStudioView.strongHistoricalData",
-    "AiDemandForecastingBookingCurveStudioView.stableBookingPattern",
-    "AiDemandForecastingBookingCurveStudioView.reliableExternalSignals",
+    "AiDemandForecastingBookingCurveStudioView.confidence",
+    "AiDemandForecastingBookingCurveStudioView.confidenceReasons",
     "AiDemandForecastingBookingCurveStudioView.mape",
     "AiDemandForecastingBookingCurveStudioView.forecastBias"
    ]
@@ -1128,9 +1415,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-104"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-104",
+   "workshopBoard": "wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-104"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 103. 8 of 8 labels bound to a contract property; 8 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 103. 8 of 8 labels bound to a contract property; 9 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1192,10 +1480,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "visible confidence and supporting evidence.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Analyze) and no metric row",
   "purpose": "Estimate how customers are likely to respond to different prices.",
-  "purposeNote": "visible confidence and supporting evidence.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1279,7 +1567,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-105"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-105",
+   "workshopBoard": "wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-105"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 105. 10 of 10 labels bound to a contract property; 10 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1343,10 +1632,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every AI pricing recommendation is accompanied by understandable evidence, expected commercial impact, confidence and human-governance actions.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Convert all intelligence generated by Board 6 into actionable pricing recommendations. This is the central AI recommendation screen.",
-  "purposeNote": "Every AI pricing recommendation is accompanied by understandable evidence, expected commercial impact, confidence and human-governance actions.",
   "gaps": [
    {
     "operation": null,
@@ -1407,14 +1696,14 @@
     "AiPricingRecommendationExplainabilityCenterView.expectedRevenueImpact",
     "AiPricingRecommendationExplainabilityCenterView.expectedOccupancy",
     "AiPricingRecommendationExplainabilityCenterView.confidence",
-    "AiPricingRecommendationExplainabilityCenterView.bookingVelocity",
-    "AiPricingRecommendationExplainabilityCenterView.nearbyExhibition"
+    "AiPricingRecommendationExplainabilityCenterView.drivers"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-106"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-106",
+   "workshopBoard": "wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-106"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 107. 0 of 0 labels bound to a contract property; 7 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1470,10 +1759,10 @@
    "notes": "**Reached from ADM-098, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "signals and predictive models used by AI pricing. Board 6 — Final Screen Register # Backend Screen Core Responsibility 10.6. AI Pricing Intelligence Command Center AI opportunity overview 1 10.6. TICVAI transactional Internal Demand & Booking Signal Hub 2 intelligence 10.6. Weather Intelligence & Demand Impact",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Monitor; Track) and no metric row",
   "purpose": "Govern the complete data and intelligence ecosystem behind AI pricing. This is critical. Without this screen, Development team could connect many external sources without giving TICVAI proper control over them.",
-  "purposeNote": "signals and predictive models used by AI pricing. Board 6 — Final Screen Register # Backend Screen Core Responsibility 10.6. AI Pricing Intelligence Command Center AI opportunity overview 1 10.6. TICVAI transactional Internal Demand & Booking Signal Hub 2 intelligence 10.6. Weather Intelligence & Demand Impact",
   "layout": {
    "template": "split",
    "regions": [
@@ -1564,6 +1853,14 @@
        "label": "Permissions this screen separates",
        "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Forecasting, Recommendations, Simulation, Automated Pricing. Each needs attaching to the control it gates, or the screen needs the control.",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 108 §AI Use Permission"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save signal registry policy",
+       "operation": "setSignalRegistryPolicy",
+       "permission": "AI_CONFIGURE",
+       "notes": "**AI governance of signals and models** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /signal-registry"
       }
      ]
     }
@@ -1582,6 +1879,15 @@
     "contract": "catalogue",
     "purpose": "AI Signal Registry, Data Quality & Model Governance",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setSignalRegistryPolicy",
+    "contract": "catalogue",
+    "purpose": "Register a signal or model and set how far AI may trust it",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSignalDataQuality"
+    ]
    }
   ],
   "entryState": {
@@ -1597,9 +1903,47 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-107"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-107",
+   "workshopBoard": "wireframes/WS100 Pricing   Revenue Management Board 6.dc.html#adm-107"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 108. 23 of 24 labels bound to a contract property; 32 of 121 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetSignalRegistryPolicy",
+    "component": "modal",
+    "trigger": "Save signal registry policy",
+    "body": "**Collects what `setSignalRegistryPolicy` sends before it is called.** Required: `id`, `scopePath`, `registryKind`, `name`, `trustLevel`. Optional: `category`, `provider`, `source`, `internalExternal`, `marketCode`, `refreshFrequency`, `aiUsePermissions`, `fallbackPolicy`, `status`, `ownerPrincipalId`, `purpose`, `deployedAt` and 5 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SignalRegistryEntry",
+    "confirm": {
+     "label": "Save signal registry policy",
+     "operation": "setSignalRegistryPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "registryKind",
+      "name",
+      "trustLevel",
+      "category",
+      "provider",
+      "source",
+      "internalExternal",
+      "marketCode",
+      "refreshFrequency",
+      "aiUsePermissions",
+      "fallbackPolicy",
+      "status",
+      "ownerPrincipalId",
+      "purpose",
+      "deployedAt",
+      "trainingWindow"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /signal-registry"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

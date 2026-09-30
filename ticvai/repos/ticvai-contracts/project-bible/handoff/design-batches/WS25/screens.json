@@ -39,10 +39,7 @@
     {
      "to": "SUP-001",
      "trigger": "Agent Login",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-009 holds none of them, so the edge carries nothing and SUP-001 opens cold"
     },
     {
      "to": "SUP-010",
@@ -101,10 +98,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "An agent can immediately understand their workload, priorities, SLA exposure and required actions without navigating multiple TICVAI modules.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Show) and no metric row",
   "purpose": "Provide every customer-service agent with a personalized operational workspace showing customers, cases, tasks, SLAs, alerts and workload.",
-  "purposeNote": "An agent can immediately understand their workload, priorities, SLA exposure and required actions without navigating multiple TICVAI modules.",
   "gaps": [
    {
     "operation": null,
@@ -132,26 +129,21 @@
         "CustomerServiceCommandCenterView.awaitingInternalTeam",
         "CustomerServiceCommandCenterView.escalatedCases",
         "CustomerServiceCommandCenterView.resolvedToday",
-        "CustomerServiceCommandCenterView.averageResolutionTime",
-        "CustomerServiceCommandCenterView.caseId",
-        "CustomerServiceCommandCenterView.customer",
-        "CustomerServiceCommandCenterView.subject",
-        "CustomerServiceCommandCenterView.category",
-        "CustomerServiceCommandCenterView.channel",
-        "CustomerServiceCommandCenterView.priority",
-        "CustomerServiceCommandCenterView.status",
-        "CustomerServiceCommandCenterView.assignedAgent",
-        "CustomerServiceCommandCenterView.slaRemaining",
-        "CustomerServiceCommandCenterView.lastInteraction",
-        "CustomerServiceCommandCenterView.nextAction",
-        "CustomerServiceCommandCenterView.callCustomer",
-        "Review refund request",
-        "CustomerServiceCommandCenterView.followUpFinance",
-        "Reissue ticket",
-        "CustomerServiceCommandCenterView.respondToComplaint",
-        "CustomerServiceCommandCenterView.requestSupervisorApproval"
+        "CustomerServiceCommandCenterView.averageResolutionSeconds",
+        "CustomerServiceCommandCenterView.workQueue[].caseId",
+        "CustomerServiceCommandCenterView.workQueue[].customer",
+        "CustomerServiceCommandCenterView.workQueue[].subject",
+        "CustomerServiceCommandCenterView.workQueue[].category",
+        "CustomerServiceCommandCenterView.workQueue[].channel",
+        "CustomerServiceCommandCenterView.workQueue[].priority",
+        "CustomerServiceCommandCenterView.workQueue[].status",
+        "CustomerServiceCommandCenterView.workQueue[].assignedAgentPrincipalId",
+        "CustomerServiceCommandCenterView.workQueue[].slaRemainingSeconds",
+        "CustomerServiceCommandCenterView.workQueue[].lastInteractionAt",
+        "CustomerServiceCommandCenterView.workQueue[].nextAction",
+        "CustomerServiceCommandCenterView.todaysTasks[].kind"
        ],
-       "bindsTo": "CustomerServiceCommandCenterView",
+       "bindsTo": "CustomerServiceCommandCenterView.workQueue[]",
        "operation": "listCustomerService",
        "provenance": "pack Customer Service_Reference.pdf, page 3 §Display"
       }
@@ -175,24 +167,19 @@
         "CustomerServiceCommandCenterView.awaitingInternalTeam",
         "CustomerServiceCommandCenterView.escalatedCases",
         "CustomerServiceCommandCenterView.resolvedToday",
-        "CustomerServiceCommandCenterView.averageResolutionTime",
-        "CustomerServiceCommandCenterView.caseId",
-        "CustomerServiceCommandCenterView.customer",
-        "CustomerServiceCommandCenterView.subject",
-        "CustomerServiceCommandCenterView.category",
-        "CustomerServiceCommandCenterView.channel",
-        "CustomerServiceCommandCenterView.priority",
-        "CustomerServiceCommandCenterView.status",
-        "CustomerServiceCommandCenterView.assignedAgent",
-        "CustomerServiceCommandCenterView.slaRemaining",
-        "CustomerServiceCommandCenterView.lastInteraction",
-        "CustomerServiceCommandCenterView.nextAction",
-        "CustomerServiceCommandCenterView.callCustomer",
-        "Review refund request",
-        "CustomerServiceCommandCenterView.followUpFinance",
-        "Reissue ticket",
-        "CustomerServiceCommandCenterView.respondToComplaint",
-        "CustomerServiceCommandCenterView.requestSupervisorApproval"
+        "CustomerServiceCommandCenterView.averageResolutionSeconds",
+        "CustomerServiceCommandCenterView.workQueue[].caseId",
+        "CustomerServiceCommandCenterView.workQueue[].customer",
+        "CustomerServiceCommandCenterView.workQueue[].subject",
+        "CustomerServiceCommandCenterView.workQueue[].category",
+        "CustomerServiceCommandCenterView.workQueue[].channel",
+        "CustomerServiceCommandCenterView.workQueue[].priority",
+        "CustomerServiceCommandCenterView.workQueue[].status",
+        "CustomerServiceCommandCenterView.workQueue[].assignedAgentPrincipalId",
+        "CustomerServiceCommandCenterView.workQueue[].slaRemainingSeconds",
+        "CustomerServiceCommandCenterView.workQueue[].lastInteractionAt",
+        "CustomerServiceCommandCenterView.workQueue[].nextAction",
+        "CustomerServiceCommandCenterView.todaysTasks[].kind"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Use”, “Customer Waiting”.",
        "provenance": "pack Customer Service_Reference.pdf, page 3 §Display"
@@ -260,6 +247,12 @@
     "contract": "marketing-crm",
     "purpose": "Customer Service Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCustomerServiceProfile",
+    "contract": "marketing-crm",
+    "purpose": "Customer 360° Service Profile",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -275,7 +268,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-009"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-009",
+   "workshopBoard": "wireframes/WS42 Customer Service Board 1.dc.html#sup-009"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 3. 25 of 27 labels bound to a contract property; 35 of 53 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -338,10 +332,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Agents can understand the customer's complete TICVAI relationship and relevant service context from one screen.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Show) and no metric row",
   "purpose": "Provide the agent with a complete customer-service view of the customer. This should be one of the most important screens in the entire Customer Service module.",
-  "purposeNote": "Agents can understand the customer's complete TICVAI relationship and relevant service context from one screen.",
   "layout": {
    "template": "split",
    "regions": [
@@ -370,7 +364,7 @@
         "Customer360ServiceProfileView.activeMembership",
         "Customer360ServiceProfileView.walletBalance",
         "Customer360ServiceProfileView.activeReservations",
-        "Customer360ServiceProfileView.futureGroupBookingWhereApplicable",
+        "Customer360ServiceProfileView.futureGroupBookings",
         "Open Orders"
        ],
        "bindsTo": "Customer360ServiceProfileView",
@@ -405,7 +399,7 @@
         "Customer360ServiceProfileView.activeMembership",
         "Customer360ServiceProfileView.walletBalance",
         "Customer360ServiceProfileView.activeReservations",
-        "Customer360ServiceProfileView.futureGroupBookingWhereApplicable",
+        "Customer360ServiceProfileView.futureGroupBookings",
         "Open Orders"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Today”, “Yesterday”, “Last Month”, “Display permitted information such as”, “Sensitive information should be”, “Customer Summary”.",
@@ -428,6 +422,12 @@
     "contract": "marketing-crm",
     "purpose": "Customer 360° Service Profile",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCustomerService",
+    "contract": "marketing-crm",
+    "purpose": "Customer Service Command Center",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -443,7 +443,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-010"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-010",
+   "workshopBoard": "wireframes/WS42 Customer Service Board 1.dc.html#sup-010"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 5. 16 of 19 labels bound to a contract property; 19 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -506,10 +507,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Agents can see the complete relevant conversation history without searching separate communication systems.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
   "purpose": "Provide one chronological timeline of customer interactions across supported service channels.",
-  "purposeNote": "Agents can see the complete relevant conversation history without searching separate communication systems.",
   "layout": {
    "template": "form",
    "regions": [
@@ -593,7 +594,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-011"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-011",
+   "workshopBoard": "wireframes/WS42 Customer Service Board 1.dc.html#sup-011"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 11 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -656,10 +658,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every service request becomes a properly categorized, prioritized and routed case with the appropriate business context attached.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
   "purpose": "Create structured customer-service cases and ensure they reach the correct team.",
-  "purposeNote": "Every service request becomes a properly categorized, prioritized and routed case with the appropriate business context attached.",
   "layout": {
    "template": "form",
    "regions": [
@@ -736,6 +738,43 @@
        "kind": "selectField",
        "label": "Attachments",
        "provenance": "pack Customer Service_Reference.pdf, page 9 §Capture"
+      },
+      {
+       "kind": "textField",
+       "label": "Parent category id",
+       "operation": "listCaseCategories",
+       "notes": "Sends `?parentCategoryId=` to `listCaseCategories`.",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      },
+      {
+       "kind": "toggle",
+       "label": "Top level only",
+       "operation": "listCaseCategories",
+       "notes": "Sends `?topLevelOnly=` to `listCaseCategories`.",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is active",
+       "operation": "listCaseCategories",
+       "notes": "Sends `?isActive=` to `listCaseCategories`.",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every case category",
+       "bindsTo": "CaseCategory",
+       "columns": [
+        "CaseCategory.id",
+        "CaseCategory.code",
+        "CaseCategory.name",
+        "CaseCategory.parentCategoryId",
+        "CaseCategory.defaultPriority",
+        "CaseCategory.isActive",
+        "CaseCategory.scopePath"
+       ],
+       "operation": "listCaseCategories",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
       }
      ]
     },
@@ -763,16 +802,20 @@
     "operationId": "createCaseClassificationIntelligent",
     "contract": "marketing-crm",
     "purpose": "Case Creation, Classification & Intelligent Routing",
-    "trigger": "onAction",
-    "invalidates": [
-     "createCaseClassificationIntelligent"
-    ]
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listCaseCategories",
+    "contract": "marketing-crm",
+    "purpose": "List case categories and subcategories",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-012"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-012",
+   "workshopBoard": "wireframes/WS42 Customer Service Board 1.dc.html#sup-012"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 14 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -835,10 +878,17 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "An agent can investigate and progress a customer case from one workspace with all required customer, transaction, policy and communication context visible.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide the primary workspace in which an agent investigates and resolves a case.",
-  "purposeNote": "An agent can investigate and progress a customer case from one workspace with all required customer, transaction, policy and communication context visible.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Action history. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Customer Service_Reference.pdf, page 11 §Support"
+   }
+  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -900,8 +950,8 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
-       "provenance": "contract operation setCaseInvestigationResolution"
+       "label": "Action history",
+       "provenance": "pack Customer Service_Reference.pdf, page 11 §Support"
       }
      ]
     }
@@ -919,10 +969,7 @@
     "operationId": "setCaseInvestigationResolution",
     "contract": "marketing-crm",
     "purpose": "Case Investigation & Resolution Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setCaseInvestigationResolution"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -938,9 +985,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-013"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-013",
+   "workshopBoard": "wireframes/WS42 Customer Service Board 1.dc.html#sup-013"
   },
-  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 11. 11 of 11 labels bound to a contract property; 11 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 11. 11 of 11 labels bound to a contract property; 12 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P12",
    "audience": "staff",
@@ -1001,10 +1049,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Agents can perform authorized ticket and booking service actions through one customer-service interface while underlying TICVAI services remain authoritative.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Allow customer-service agents to perform permitted ticket/order servicing without entering the underlying technical modules.",
-  "purposeNote": "Agents can perform authorized ticket and booking service actions through one customer-service interface while underlying TICVAI services remain authoritative.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1115,10 +1163,7 @@
     "operationId": "setOrderBookingTicket",
     "contract": "marketing-crm",
     "purpose": "Order, Booking & Ticket Service Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setOrderBookingTicket"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1134,7 +1179,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-014"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-014",
+   "workshopBoard": "wireframes/WS42 Customer Service Board 1.dc.html#sup-014"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 13. 10 of 21 labels bound to a contract property; 21 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1197,14 +1243,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Refunds, compensation and service exceptions are governed by applicable policies, financial limits and approval authorities.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Manage cases requiring money, compensation, goodwill or policy exceptions.",
-  "purposeNote": "Refunds, compensation and service exceptions are governed by applicable policies, financial limits and approval authorities.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Complimentary Ticket, Fee Waiver, Policy Exception. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Full Refund, Partial Refund, Wallet Credit, Voucher, Complimentary Ticket, Fee Waiver, Policy Exception. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Customer Service_Reference.pdf, page 15 §Support"
    }
   ],
@@ -1263,6 +1309,31 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Full Refund",
+       "provenance": "pack Customer Service_Reference.pdf, page 15 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Partial Refund",
+       "provenance": "pack Customer Service_Reference.pdf, page 15 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Service Credit",
+       "provenance": "pack Customer Service_Reference.pdf, page 15 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Wallet Credit",
+       "provenance": "pack Customer Service_Reference.pdf, page 15 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Voucher",
+       "provenance": "pack Customer Service_Reference.pdf, page 15 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Complimentary Ticket",
        "provenance": "pack Customer Service_Reference.pdf, page 15 §Support"
       },
@@ -1292,10 +1363,7 @@
     "operationId": "setRefundCompensationService",
     "contract": "marketing-crm",
     "purpose": "Refund, Compensation & Service Exception Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "setRefundCompensationService"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1311,9 +1379,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-015"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-015",
+   "workshopBoard": "wireframes/WS42 Customer Service Board 1.dc.html#sup-015"
   },
-  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 15. 8 of 8 labels bound to a contract property; 11 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 15. 8 of 8 labels bound to a contract property; 16 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P12",
    "audience": "staff",
@@ -1374,10 +1443,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Agents can obtain assistance from internal departments while retaining one customer-facing case, owner and audit trail.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
   "purpose": "Allow Customer Service to collaborate with other TICVAI departments without losing ownership of the customer case.",
-  "purposeNote": "Agents can obtain assistance from internal departments while retaining one customer-facing case, owner and audit trail.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1446,7 +1515,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-016"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-016",
+   "workshopBoard": "wireframes/WS42 Customer Service Board 1.dc.html#sup-016"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 8 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1509,10 +1579,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every closed case has a clear resolution, root cause, customer communication and auditable outcome.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture; Where configured, send) and no display directory — it is settings, not a population",
   "purpose": "Govern how cases are resolved and formally closed.",
-  "purposeNote": "Every closed case has a clear resolution, root cause, customer communication and auditable outcome.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1651,7 +1721,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-017"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-017",
+   "workshopBoard": "wireframes/WS42 Customer Service Board 1.dc.html#sup-017"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 17. 0 of 0 labels bound to a contract property; 22 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1706,10 +1777,10 @@
    "notes": "**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Agents receive explainable, context-aware AI assistance that reduces handling time and improves consistency without bypassing TICVAI's policies, permissions or transactional systems. Board 1 — Final Screen Register",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Create the AI intelligence layer assisting agents throughout the service journey. This should not be a simple chatbot added to the side of the screen. It should understand the customer + transaction + policy + case context. Board 1 focused on the individual customer-service agent and individual customer case. Board 2 moves one level higher and provides the supervisor, contact-center manager, operations manager and service leadership layer.",
-  "purposeNote": "Agents receive explainable, context-aware AI assistance that reduces handling time and improves consistency without bypassing TICVAI's policies, permissions or transactional systems. Board 1 — Final Screen Register",
   "gaps": [
    {
     "operation": null,
@@ -1767,18 +1838,38 @@
     "operationId": "setCustomerServiceCopilot",
     "contract": "marketing-crm",
     "purpose": "AI Customer Service Copilot & Knowledge Workspace",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "configureAssistantProfile",
+    "contract": "ai",
+    "purpose": "Define an assistant profile",
     "trigger": "onAction",
-    "invalidates": [
-     "setCustomerServiceCopilot"
-    ]
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAssistantProfiles",
+    "contract": "ai",
+    "purpose": "Assistant profiles",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-018"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-018",
+   "workshopBoard": "wireframes/WS42 Customer Service Board 1.dc.html#sup-018"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 19. 0 of 0 labels bound to a contract property; 1 of 96 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "profileKey",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P12",
    "audience": "staff",

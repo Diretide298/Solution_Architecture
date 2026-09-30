@@ -1116,6 +1116,20 @@
      "listDataRetentionExpiry",
      "searchGuests"
     ]
+   },
+   {
+    "operationId": "listDataRetentionSettings",
+    "contract": "tenancy",
+    "purpose": "Retention period per data class",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setDataRetentionSetting",
+    "contract": "tenancy",
+    "purpose": "Set a class's period",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1124,6 +1138,14 @@
    "workshopBoard": "wireframes/WS71 Marketing CRM Configuration Reference v1.0 Board 2.dc.html#bo-751"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 13. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "dataClass",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

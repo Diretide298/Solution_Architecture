@@ -69,7 +69,7 @@ Accounts may be created natively or mapped to a chart maintained externally in t
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateAccountRequest`
 
@@ -143,7 +143,7 @@ The code is immutable once entries exist; until then it can be corrected here. R
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | accountId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -220,7 +220,7 @@ The code is immutable once entries exist; until then it can be corrected here. R
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -287,7 +287,7 @@ The code is immutable once entries exist; until then it can be corrected here. R
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -329,7 +329,7 @@ The code is immutable once entries exist; until then it can be corrected here. R
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `LegalEntity`
 
@@ -458,7 +458,7 @@ The server sets `source` to `manual` and `setByPrincipalId` to the caller; `fetc
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `FxRate`
 
@@ -589,7 +589,7 @@ Supports compound tax — a code may apply on top of another code's result rathe
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateTaxCodeRequest`
 
@@ -709,7 +709,7 @@ Supports compound tax — a code may apply on top of another code's result rathe
 | legalEntityId | string (uuid) | yes |  |
 | templateId | string (uuid) |  | (nullable) |
 | venueId | string (uuid) |  | (nullable) |
-| orderIds | array of string |  |  |
+| orderIds | array of string (uuid) |  |  |
 | supplierName | string |  |  |
 | supplierAddress | string |  | (nullable) |
 | supplierTaxRegistrationNumber | string |  | (nullable) |
@@ -753,8 +753,8 @@ Supports compound tax — a code may apply on top of another code's result rathe
 | issuedByPrincipalId | string (uuid) |  | Null where the platform issued it. (read-only; nullable) |
 | lines | array of FinTaxInvoiceLine | yes |  |
 | lines[].lineNumber | integer | yes | (min 1) |
-| lines[].orderId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| lines[].orderLineId | string |  | (nullable) |
+| lines[].orderId | string (uuid) |  |  |
+| lines[].orderLineId | string (uuid) |  | (nullable) |
 | lines[].description | string | yes | (max length 500) |
 | lines[].quantity | number | yes |  |
 | lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
@@ -828,7 +828,7 @@ A credit memo has its **own series** per legal entity (`setTaxInvoiceTemplate`, 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | invoiceId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `FinIssueCreditMemoRequest`
 
@@ -836,8 +836,8 @@ A credit memo has its **own series** per legal entity (`setTaxInvoiceTemplate`, 
 |---|---|---|---|
 | kind | enum (full, partial) | yes |  |
 | reason | enum (refund, cancellation, priceAdjustment, returnOfGoods, billingError, other) | yes |  |
-| refundId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
-| cancelledOrderId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| refundId | string (uuid) |  | (nullable) |
+| cancelledOrderId | string (uuid) |  | (nullable) |
 | lines | array of object |  | Required for partial. |
 | lines[].lineNumber | integer | yes | (min 1) |
 | lines[].quantity | number |  | (nullable) |
@@ -857,8 +857,8 @@ A credit memo has its **own series** per legal entity (`setTaxInvoiceTemplate`, 
 | taxInvoiceNumber | string |  | (read-only) |
 | kind | enum (full, partial) | yes |  |
 | reason | enum (refund, cancellation, priceAdjustment, returnOfGoods, billingError, other) | yes |  |
-| refundId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
-| cancelledOrderId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| refundId | string (uuid) |  | (nullable) |
+| cancelledOrderId | string (uuid) |  | (nullable) |
 | legalEntityId | string (uuid) | yes |  |
 | buyerSubjectId | string (uuid) |  | (nullable) |
 | issuedAt | string (date-time) | yes |  |
@@ -944,14 +944,14 @@ An invoice is never edited or deleted: a correction is a credit memo (`issueCred
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `FinIssueTaxInvoiceRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | invoiceType | FinTaxInvoiceType: enum (simplified, full, consolidated) | yes | 5.7.93. |
-| orderIds | array of string | yes | One order for simplified and full; one or more for consolidated. (min items 1) |
+| orderIds | array of string (uuid) | yes | One order for simplified and full; one or more for consolidated. (min items 1) |
 | recipient | FinTaxInvoiceRecipient |  | Who the invoice is addressed to. |
 | recipient.name | string | yes | (max length 300) |
 | recipient.address | string |  | (max length 1000; nullable) |
@@ -973,7 +973,7 @@ An invoice is never edited or deleted: a correction is a credit memo (`issueCred
 | legalEntityId | string (uuid) | yes |  |
 | templateId | string (uuid) |  | (nullable) |
 | venueId | string (uuid) |  | (nullable) |
-| orderIds | array of string |  |  |
+| orderIds | array of string (uuid) |  |  |
 | supplierName | string |  |  |
 | supplierAddress | string |  | (nullable) |
 | supplierTaxRegistrationNumber | string |  | (nullable) |
@@ -1017,8 +1017,8 @@ An invoice is never edited or deleted: a correction is a credit memo (`issueCred
 | issuedByPrincipalId | string (uuid) |  | Null where the platform issued it. (read-only; nullable) |
 | lines | array of FinTaxInvoiceLine | yes |  |
 | lines[].lineNumber | integer | yes | (min 1) |
-| lines[].orderId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| lines[].orderLineId | string |  | (nullable) |
+| lines[].orderId | string (uuid) |  |  |
+| lines[].orderLineId | string (uuid) |  | (nullable) |
 | lines[].description | string | yes | (max length 500) |
 | lines[].quantity | number | yes |  |
 | lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
@@ -1094,7 +1094,7 @@ An invoice is never edited or deleted: a correction is a credit memo (`issueCred
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | taxInvoiceId | query |  | string (uuid) |  |
-| refundId | query |  | string |  |
+| refundId | query |  | string (uuid) |  |
 | legalEntityId | query |  | string (uuid) |  |
 | issuedFrom | query |  | string (date) |  |
 | issuedTo | query |  | string (date) |  |
@@ -1112,8 +1112,8 @@ An invoice is never edited or deleted: a correction is a credit memo (`issueCred
 | items[].taxInvoiceNumber | string |  | (read-only) |
 | items[].kind | enum (full, partial) | yes |  |
 | items[].reason | enum (refund, cancellation, priceAdjustment, returnOfGoods, billingError, other) | yes |  |
-| items[].refundId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
-| items[].cancelledOrderId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| items[].refundId | string (uuid) |  | (nullable) |
+| items[].cancelledOrderId | string (uuid) |  | (nullable) |
 | items[].legalEntityId | string (uuid) | yes |  |
 | items[].buyerSubjectId | string (uuid) |  | (nullable) |
 | items[].issuedAt | string (date-time) | yes |  |
@@ -1181,7 +1181,7 @@ Ordered by `issuedAt` descending, `id` as the tiebreak.
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| orderId | query |  | string | Invoices covering this order, including a consolidated invoice that names it. |
+| orderId | query |  | string (uuid) | Invoices covering this order, including a consolidated invoice that names it. |
 | legalEntityId | query |  | string (uuid) |  |
 | invoiceType | query |  | FinTaxInvoiceType: enum (simplified, full, consolidated) |  |
 | status | query |  | FinTaxInvoiceStatus: enum (issued, partiallyCredited, fullyCredited, superseded) |  |
@@ -1202,7 +1202,7 @@ Ordered by `issuedAt` descending, `id` as the tiebreak.
 | items[].legalEntityId | string (uuid) | yes |  |
 | items[].templateId | string (uuid) |  | (nullable) |
 | items[].venueId | string (uuid) |  | (nullable) |
-| items[].orderIds | array of string |  |  |
+| items[].orderIds | array of string (uuid) |  |  |
 | items[].supplierName | string |  |  |
 | items[].supplierAddress | string |  | (nullable) |
 | items[].supplierTaxRegistrationNumber | string |  | (nullable) |
@@ -1246,8 +1246,8 @@ Ordered by `issuedAt` descending, `id` as the tiebreak.
 | items[].issuedByPrincipalId | string (uuid) |  | Null where the platform issued it. (read-only; nullable) |
 | items[].lines | array of FinTaxInvoiceLine | yes |  |
 | items[].lines[].lineNumber | integer | yes | (min 1) |
-| items[].lines[].orderId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| items[].lines[].orderLineId | string |  | (nullable) |
+| items[].lines[].orderId | string (uuid) |  |  |
+| items[].lines[].orderLineId | string (uuid) |  | (nullable) |
 | items[].lines[].description | string | yes | (max length 500) |
 | items[].lines[].quantity | number | yes |  |
 | items[].lines[].unitPrice | Money |  | On the wire this is three fields; in the database it is one column. |
@@ -1297,7 +1297,7 @@ Ordered by `issuedAt` descending, `id` as the tiebreak.
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `FinEInvoicingProvider`
 
@@ -1363,7 +1363,7 @@ A document already `accepted` is never sent again. Nothing is sent for a legal e
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1431,7 +1431,7 @@ Rate changes are versioned with an effective date, never applied retrospectively
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | taxCodeId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1502,8 +1502,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | tax_invoice_number | text | no |  |
 | kind | text | yes |  |
 | reason | text | yes |  |
-| refund_id | text | no |  |
-| cancelled_order_id | text | no |  |
+| refund_id | uuid | no |  |
+| cancelled_order_id | uuid | no |  |
 | legal_entity_id | uuid | yes |  |
 | buyer_subject_id | uuid | no |  |
 | issued_at | timestamptz | yes |  |
@@ -1649,7 +1649,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | text | yes |  |
-| journal_entry_id | text | yes |  |
+| journal_entry_id | uuid | yes |  |
 | account_id | uuid | yes |  |
 | account_code | text | no |  |
 | debit | numeric(18,4) | yes |  |
@@ -1721,8 +1721,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | tax_invoice_id | uuid | yes | The parent row. |
 | line_number | integer | yes |  |
-| order_id | text | no |  |
-| order_line_id | text | no |  |
+| order_id | uuid | no |  |
+| order_line_id | uuid | no |  |
 | description | text | yes |  |
 | quantity | numeric | yes |  |
 | unit_price | numeric(18,4) | no |  |

@@ -4,7 +4,7 @@ A multi-tenant platform for ticketing, access control, point of sale and venue o
 **This package is the design of it** — the contracts, the data model, the screens, the
 journeys through them, and the reasoning behind every decision that was not obvious.
 
-**2660 operations · 33 contracts · 1091 tables · 2445 screens · 206 state models · 97 flows · 48 ADRs**
+**2660 operations · 33 contracts · 1093 tables · 2445 screens · 206 state models · 97 flows · 56 ADRs**
 
 **Design 96% · Build 33%.**
 
@@ -38,7 +38,7 @@ package has been bitten by that three times.
 | Screens drawn on a board | 2445 of 2445 | 100% |
 | Screens in a journey | 2123 of 2445 | 87% |
 | Conflicts | 157 closed | 9 open, none blocking |
-| **Tables written** | **0** of 1091 | **build has not started** |
+| **Tables written** | **0** of 1093 | **build has not started** |
 
 ---
 
@@ -105,7 +105,7 @@ cd viewer && npm start        →  http://localhost:4173
 
 **Put last on purpose.** A landing page that only lists what exists is a landing page that misleads.
 
-**Build is 0%.** 1091 tables are designed and none is written. No migration has run, no service is scaffolded, and nothing has executed. **The design is 100% of in-scope requirements and the gap to build is the entire remaining risk.**
+**Build is 0%.** 1093 tables are designed and none is written. No migration has run, no service is scaffolded, and nothing has executed. **The design is 100% of in-scope requirements and the gap to build is the entire remaining risk.**
 
 **97 journeys of a target 60.** Seventeen contracts have exactly one — `subscription` has one over 2660 operations. **Every journey written so far has found a defect**, which is the argument for writing more.
 

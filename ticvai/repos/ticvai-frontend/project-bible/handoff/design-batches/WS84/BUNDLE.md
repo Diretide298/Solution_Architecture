@@ -1673,7 +1673,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Bind a wristband, card or device to a wallet",
   "permission": "WALLET_OPERATE",
   "offlineCapable": true,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {

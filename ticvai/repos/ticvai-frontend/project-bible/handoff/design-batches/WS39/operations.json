@@ -8,9 +8,45 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "competitor",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "market",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "comparableTicvaiProduct",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CompetitorPricingMarketPositionIntelligenceView"
+  "responds": "Page"
  },
  "listDemandBookingCurve": {
   "method": "GET",
@@ -21,9 +57,70 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "performance",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "horizon",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priceCategory",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "sectionCode",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "AiDemandForecastingBookingCurveStudioView"
+  "responds": "Page"
  },
  "listInternalDemandBooking": {
   "method": "GET",
@@ -34,9 +131,65 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "granularity",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "performance",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "compareTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "InternalDemandBookingSignalHubView"
+  "responds": "Page"
  },
  "listMarketTourismHoliday": {
   "method": "GET",
@@ -47,9 +200,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "category",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "signalType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "geography",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "active",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "MarketTourismHolidayContextualSignalHubView"
+  "responds": "Page"
  },
  "listNearbyEventExhibition": {
   "method": "GET",
@@ -60,9 +244,45 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "ticvaiVenue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "eventType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "radiusKm",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dateTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "NearbyEventExhibitionLocalDemandIntelligenceView"
+  "responds": "Page"
  },
  "listPriceElasticityRevenue": {
   "method": "GET",
@@ -98,10 +318,35 @@
     "name": "venue",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerSegment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "PriceElasticityRevenueResponseIntelligenceView"
+  "responds": "Page"
  },
  "listPricing": {
   "method": "GET",
@@ -112,9 +357,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "urgency",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "risk",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "minConfidence",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "AiPricingIntelligenceCommandCenterView"
+  "responds": "Page"
  },
  "listPricingRecommendationExplainability": {
   "method": "GET",
@@ -125,9 +401,55 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "reviewOutcome",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "minConfidence",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "recommendationType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "objective",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priceCategory",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "AiPricingRecommendationExplainabilityCenterView"
+  "responds": "Page"
  },
  "listSignalDataQuality": {
   "method": "GET",
@@ -138,9 +460,40 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "registryKind",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "internalExternal",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "trustLevel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "AiSignalRegistryDataQualityModelGovernanceView"
+  "responds": "Page"
  },
  "listWeatherDemandImpact": {
   "method": "GET",
@@ -151,8 +504,72 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueExposure",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "forecastHorizon",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "WeatherIntelligenceDemandImpactConfigurationView"
+  "responds": "Page"
+ },
+ "setDemandSignalConfiguration": {
+  "method": "PUT",
+  "path": "/demand-signals/{signalId}",
+  "contract": "catalogue",
+  "summary": "Enter a calendar signal or configure how a demand signal is used",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DemandSignal",
+  "responds": "DemandSignal"
+ },
+ "setSignalRegistryPolicy": {
+  "method": "PUT",
+  "path": "/signal-registry",
+  "contract": "catalogue",
+  "summary": "Register a signal or model and set how far AI may trust it",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SignalRegistryEntry",
+  "responds": "SignalRegistryEntry"
  }
 }

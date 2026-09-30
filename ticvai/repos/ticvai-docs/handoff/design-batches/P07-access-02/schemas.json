@@ -1,4 +1,79 @@
 {
+ "AccessGateModeChange": {
+  "type": "object",
+  "x-ticvai-persistence": "access.gate_mode_change",
+  "description": "One gate mode change on an access point, pending or applied: from and target mode, operator, reason and effective time. Append-only history (declared 29 September, data-model close-out DM1) Written by setTurnstileMode (applied at once, or pending until a future effectiveAt) and cancelGateModeChange; a timer applies a pending change at its effective time (decided 29 September, writers pass).",
+  "required": [
+   "id",
+   "venueId",
+   "accessPointId",
+   "targetMode",
+   "status",
+   "changedByPrincipalId",
+   "changedAt",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "fromMode": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AccessPointOperatingMode"
+     }
+    ],
+    "nullable": true
+   },
+   "targetMode": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AccessPointOperatingMode"
+     }
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "applied",
+     "cancelled"
+    ]
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "effectiveAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "changedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Operator"
+   },
+   "changedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node (ADR-0005)"
+   }
+  }
+ },
  "AccessPoint": {
   "x-ticvai-persistence": "access.access_point",
   "type": "object",
@@ -7,7 +82,7 @@
    "code",
    "name",
    "venueId",
-   "mode",
+   "operatingMode",
    "isActive"
   ],
   "properties": {
@@ -29,81 +104,29 @@
     "type": "string"
    },
    "externalCredentialSources": {
-    "type": "array",
-    "description": "BL-108. **A hotel room card admitting a guest to a water park** — externally issued, and the platform validates it without having sold it.\n**The entitlement is created on first use, not on check-in.** A hotel with 400 rooms does not want 400 entitlements a night for guests who never visit.\n",
-    "items": {
-     "type": "object",
-     "properties": {
-      "kind": {
-       "type": "string",
-       "enum": [
-        "hotelRoomCard",
-        "corporateBadge",
-        "cityPass",
-        "transitCard",
-        "partnerToken"
-       ]
-      },
-      "providerName": {
-       "type": "string"
-      },
-      "endpoint": {
-       "type": "string"
-      },
-      "credentialRef": {
-       "type": "string"
-      },
-      "grantsProductId": {
-       "type": "string",
-       "format": "uuid"
-      }
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExternalCredentialSourceList"
      }
-    }
+    ],
+    "description": "BL-108. **A hotel room card admitting a guest to a water park** — externally issued, and the platform validates it without having sold it.\n**The entitlement is created on first use, not on check-in.** A hotel with 400 rooms does not want 400 entitlements a night for guests who never visit.\n"
    },
    "scanAnomalyRules": {
-    "type": "array",
-    "description": "BL-104. **Rule-based scan anomalies, separated from the parked model-based engine** — device sharing, simultaneous entries at two gates, an impossible walking time between them.\n**These are deterministic and need no model**, which is why they are here and not in `ai`: two entries eight seconds apart at gates four hundred metres apart is arithmetic.\n",
-    "items": {
-     "type": "object",
-     "properties": {
-      "rule": {
-       "type": "string",
-       "enum": [
-        "simultaneousEntry",
-        "impossibleTravelTime",
-        "rapidReentry",
-        "sharedDevice",
-        "velocityBreach"
-       ]
-      },
-      "action": {
-       "type": "string",
-       "enum": [
-        "log",
-        "flag",
-        "requireSupervisor",
-        "deny"
-       ]
-      },
-      "thresholdSeconds": {
-       "type": "integer",
-       "nullable": true
-      }
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ScanAnomalyRuleList"
      }
-    }
+    ],
+    "description": "BL-104. **Rule-based scan anomalies, separated from the parked model-based engine** — device sharing, simultaneous entries at two gates, an impossible walking time between them.\n**These are deterministic and need no model**, which is why they are here and not in `ai`: two entries eight seconds apart at gates four hundred metres apart is arithmetic.\n"
    },
    "operatingMode": {
-    "type": "string",
-    "enum": [
-     "normal",
-     "freeFlow",
-     "dropArm",
-     "closed",
-     "podium",
-     "maintenance"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AccessPointOperatingMode"
+     }
     ],
     "default": "normal",
-    "description": "BL-107 and BL-109. **A closed turnstile and one in emergency drop-arm mode look the same in the model and are opposite in meaning.** Closed refuses everybody; drop-arm lets everybody through, and it is the state that exists for an evacuation.\n**`podium` is a supervised validation position** — a member of staff directing a group through a lane, validating by eye against a list. It scans nothing and it is how school parties actually enter.\n**`freeFlow` counts without validating.** Useful at a free event, and a mode that must be visibly distinct from a broken reader.\n"
+    "description": "**Set by the podium with `setTurnstileMode`, and it wins** (audit R221). BL-107 and BL-109. **A closed turnstile and one in emergency drop-arm mode look the same in the model and are opposite in meaning.** Closed refuses everybody; drop-arm lets everybody through, and it is the state that exists for an evacuation.\n**`podium` is a supervised validation position** — a member of staff directing a group through a lane, validating by eye against a list. It scans nothing and it is how school parties actually enter.\n**`freeFlow` counts without validating.** Useful at a free event, and a mode that must be visibly distinct from a broken reader.\n"
    },
    "vehicleLocationCapture": {
     "type": "boolean",
@@ -111,13 +134,43 @@
     "description": "BL-023. **Nothing helped a guest find their vehicle.** Where the access point is a car park entry, the level and zone are captured against the visit so the app can answer it — **the guest who cannot find their car at 11pm is the last impression of the day.**\n"
    },
    "mode": {
-    "$ref": "#/components/schemas/TurnstileMode"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/TurnstileMode"
+     }
+    ],
+    "nullable": true,
+    "description": "Narrows `operatingMode` only: `freeRotation` or `closed` within `normal` or `podium`, null otherwise and whenever the turnstile validates in its fixed `direction` (audit R221).\n"
    },
    "direction": {
-    "$ref": "#/components/schemas/Direction"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/Direction"
+     }
+    ],
+    "description": "**Fixed per access point** (audit R221): set in the back office by `createAccessPoint` and `updateAccessPoint`, never by the podium.\n"
    },
    "antiPassbackEnabled": {
     "type": "boolean"
+   },
+   "requiresExitBeforeReentry": {
+    "type": "boolean",
+    "default": false,
+    "description": "Written by `createAccessPoint` and `updateAccessPoint`, and returned so the edit form reads back what it wrote."
+   },
+   "driver": {
+    "type": "string",
+    "nullable": true,
+    "description": "Driver identifier for the controller behind this access point, as written by `createAccessPoint` and `updateAccessPoint`. Where the reader speaks OSDP the driver is standards-based; the controller layer above it is vendor-specific.\n"
+   },
+   "geofence": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AccessPointGeofence"
+     }
+    ],
+    "nullable": true,
+    "description": "Written by `setAccessPointGeofence`; null until one is set. **One `jsonb` column on the access point row** (`access.access_point.geofence`), read with the point when a handheld validates against it.\n"
    },
    "isActive": {
     "type": "boolean"
@@ -129,6 +182,53 @@
    }
   }
  },
+ "AccessPointGeofence": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "Where a handheld may validate for one access point, and what happens outside it. The body of `setAccessPointGeofence` and the value of `AccessPoint.geofence`.\n",
+  "required": [
+   "enforcement"
+  ],
+  "properties": {
+   "latitude": {
+    "type": "number"
+   },
+   "longitude": {
+    "type": "number"
+   },
+   "radiusMetres": {
+    "type": "integer",
+    "minimum": 5,
+    "maximum": 5000
+   },
+   "enforcement": {
+    "type": "string",
+    "enum": [
+     "off",
+     "warn",
+     "deny"
+    ],
+    "description": "`off` keeps the fence on record and checks nothing; `warn` lets a validation from outside the fence through with a warning; `deny` refuses it.\n"
+   },
+   "allowProximityBeacon": {
+    "type": "boolean",
+    "description": "Accept a BLE proximity assertion in place of GPS. Better indoors."
+   }
+  }
+ },
+ "AccessPointOperatingMode": {
+  "type": "string",
+  "description": "BL-107 and BL-109. **What the gate does, and what the podium sets** (`setTurnstileMode`, decided 28 September, audit R221). `closed` refuses everybody; `dropArm` lets everybody through and exists for an evacuation; `podium` is supervised validation by eye; `freeFlow` counts without validating; `maintenance` takes the lane out of use.\n",
+  "enum": [
+   "normal",
+   "freeFlow",
+   "dropArm",
+   "closed",
+   "podium",
+   "maintenance"
+  ]
+ },
  "Direction": {
   "type": "string",
   "enum": [
@@ -137,6 +237,40 @@
    "reentry",
    "crossover"
   ]
+ },
+ "ExternalCredentialSourceList": {
+  "type": "array",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "**One `jsonb` column on the access point row** (`access.access_point.external_credential_sources`). Read with the access point when a credential is presented; a source is never queried on its own.\n",
+  "items": {
+   "type": "object",
+   "properties": {
+    "kind": {
+     "type": "string",
+     "enum": [
+      "hotelRoomCard",
+      "corporateBadge",
+      "cityPass",
+      "transitCard",
+      "partnerToken"
+     ]
+    },
+    "providerName": {
+     "type": "string"
+    },
+    "endpoint": {
+     "type": "string"
+    },
+    "credentialRef": {
+     "type": "string"
+    },
+    "grantsProductId": {
+     "type": "string",
+     "format": "uuid"
+    }
+   }
+  }
  },
  "Page": {
   "type": "object",
@@ -157,13 +291,44 @@
    }
   }
  },
+ "ScanAnomalyRuleList": {
+  "type": "array",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "**One `jsonb` column on the access point row** (`access.access_point.scan_anomaly_rules`). Read with the access point at validation, and a rule is never queried on its own.\n",
+  "items": {
+   "type": "object",
+   "properties": {
+    "rule": {
+     "type": "string",
+     "enum": [
+      "simultaneousEntry",
+      "impossibleTravelTime",
+      "rapidReentry",
+      "sharedDevice",
+      "velocityBreach"
+     ]
+    },
+    "action": {
+     "type": "string",
+     "enum": [
+      "log",
+      "flag",
+      "requireSupervisor",
+      "deny"
+     ]
+    },
+    "thresholdSeconds": {
+     "type": "integer",
+     "nullable": true
+    }
+   }
+  }
+ },
  "TurnstileMode": {
   "type": "string",
+  "description": "**Reduced to two values — decided 28 September, audit R221.** Entry, exit, re-entry and crossover were the access point's `Direction` under another name, and two fields that could disagree left the gate to guess. Direction is fixed per access point; within `normal` or `podium` operation the turnstile may only be let spin free or held closed.\n",
   "enum": [
-   "entry",
-   "reentry",
-   "crossover",
-   "exit",
    "freeRotation",
    "closed"
   ]

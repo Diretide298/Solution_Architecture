@@ -1,6 +1,6 @@
 # WS12 — Access Control board 12
 
-**10 screens · 16 operations · 19 schemas · 3 permissions**
+**10 screens · 16 operations · 23 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

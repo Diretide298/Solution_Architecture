@@ -1,6 +1,6 @@
 # WS164 — Resource Management Configuration board 10
 
-**10 screens · 12 operations · 9 schemas · 6 permissions**
+**10 screens · 12 operations · 13 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

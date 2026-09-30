@@ -1,6 +1,6 @@
 # WS74 — Digital Asset Management DAM board 1
 
-**10 screens · 14 operations · 15 schemas · 2 permissions**
+**10 screens · 15 operations · 16 schemas · 3 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `AI_USE, ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,7 +61,7 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `CMS-061` | Digital Asset Management Command Center | listDetail | 2 | 0 | — |
-| `CMS-062` | Central Digital Asset Library | listDetail | 2 | 0 | — |
+| `CMS-062` | Central Digital Asset Library | listDetail | 3 | 0 | — |
 | `CMS-063` | Upload & Asset Ingestion Workspace | listDetail | 3 | 0 | — |
 | `CMS-064` | Folder, Collection & Workspace Management | listDetail | 2 | 0 | — |
 | `CMS-065` | Metadata & Taxonomy Management | listDetail | 2 | 0 | — |

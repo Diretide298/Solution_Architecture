@@ -1,6 +1,6 @@
 # P05-sell-02 — P05 · Sell (2 of 2)
 
-**6 screens · 10 operations · 21 schemas · 3 permissions**
+**6 screens · 10 operations · 27 schemas · 3 permissions**
 
 Platform P05 Guest Kiosk · ships as **guest** ·
 guest audience · kiosk ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 3 permissions apply here:
   `ORDER_CREATE, ORDER_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **2 of these operations work offline**: getOrder, listMerchandise
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -65,12 +64,12 @@ convincingly. It is never a caption.
 | `KSK-012` | Booking found | configEditor | 1 | 0 | — |
 | `KSK-013` | Call staff | configEditor | 1 | 0 | — |
 | `KSK-014` | Out of service | listDetail | 0 | 0 | — |
-| `KSK-016` | Order Food | statusTracker | 2 | 0 | — |
-| `KSK-017` | Shop | listDetail | 4 | 0 | — |
+| `KSK-016` | Order Food | statusTracker | 2 | 1 | — |
+| `KSK-017` | Shop | listDetail | 4 | 2 | — |
 
 ## Thin screens in this batch
 
-**KSK-012, KSK-013, KSK-014 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**KSK-011, KSK-013, KSK-014 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -97,13 +96,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "exitTo": [
     "KSK-001",
     "KSK-002",
-    "KSK-003"
+    "KSK-003",
+    "KSK-012"
    ],
    "inferred": false,
    "entryFrom": [
     "KSK-003"
    ],
-   "notes": "**Reached from KSK-003** — collecting is an alternative to buying, offered at the start. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely."
+   "notes": "**Reached from KSK-003** — collecting is an alternative to buying, offered at the start. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "KSK-012",
+     "trigger": "Booking found",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — KSK-012 declares entryState.params orderId and KSK-011 holds orderId, so an edge into it carries them"
+    }
+   ]
   },
   "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
   "density": "touchLarge",
@@ -122,7 +132,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected collect booking",
+       "label": "The order",
        "bindsTo": "Order",
        "columns": [
         "Order.id",
@@ -144,29 +154,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getOrder",
        "provenance": "contract orders.yaml GET /orders/{orderId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Lookup",
-       "operation": "lookupShopAndDrop",
-       "provenance": "contract retail.yaml GET /shop-and-drop/lookup"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
       },
       {
        "kind": "searchField",
@@ -177,15 +164,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "carried from the previous definition"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Lookup shop and drop",
+       "operation": "lookupShopAndDrop",
+       "provenance": "contract retail.yaml GET /shop-and-drop/lookup"
+      }
+     ]
     }
    ]
   },
   "states": {
-   "loading": "The collect booking list.",
+   "loading": "The collect booking, read by `getOrder`.",
    "error": "Could not load. Names which read failed and leaves the collect booking untouched.",
-   "emptyFirstRun": "No collect booking yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the collect booking are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No collect booking yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Not available"
   },
   "apis": [
@@ -193,7 +191,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "lookupShopAndDrop",
     "contract": "retail",
     "purpose": "Find a guest's dropped goods",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getOrder",
@@ -215,6 +213,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-011",
+   "derivedFrom": "wireframes/reference/Kiosk Board 2.dc.html",
    "note": "**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -273,13 +272,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`transferOrderTickets`) and no read of a population — it is settings, not a list",
   "purpose": "Confirm it is the right booking, then print.",
-  "gaps": [
-   {
-    "operation": "transferOrderTickets",
-    "why": "**`transferOrderTickets` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
-    "source": "contract orders.yaml POST /orders/{orderId}/transfer"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -289,7 +281,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Transfer",
+       "label": "Transfer order tickets",
        "operation": "transferOrderTickets",
        "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       }
@@ -300,17 +292,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "carried",
      "components": [
       {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
+       "kind": "multiSelect",
+       "label": "Ticket ids",
+       "operation": "transferOrderTickets",
+       "notes": "Required.",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "transferOrderTickets",
-       "provenance": "carried from the previous definition"
+       "kind": "textField",
+       "label": "Recipient",
+       "operation": "transferOrderTickets",
+       "notes": "Required.",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      },
+      {
+       "kind": "textField",
+       "label": "Message",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       }
      ]
     }
@@ -320,7 +319,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "loading": "Booking detail",
    "error": "Not found. Offers KSK-013",
    "emptyFirstRun": "No booking for that reference",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Not available"
   },
   "apis": [
@@ -344,6 +342,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-012",
+   "derivedFrom": "wireframes/reference/Kiosk Board 2.dc.html",
    "note": "**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -418,7 +417,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "End",
+       "label": "End kiosk assist",
        "operation": "endKioskAssist",
        "provenance": "contract marketing-crm.yaml POST /kiosk-assists/{sessionId}/end"
       }
@@ -426,20 +425,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     },
     {
      "name": "contentBody",
-     "slot": "carried",
      "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
       {
        "kind": "secondaryButton",
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
-       "impliedBy": "endKioskAssist",
-       "provenance": "carried from the previous definition"
+       "impliedBy": "endKioskAssist"
       }
      ]
     }
@@ -449,7 +441,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "loading": "Alerting staff",
    "error": "**Cannot reach staff.** Shows the counter location and opening hours instead of a spinner",
    "emptyFirstRun": "Not applicable",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Shows the counter location"
   },
   "apis": [
@@ -473,6 +464,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-013",
+   "derivedFrom": "wireframes/reference/Kiosk Board 2.dc.html",
    "note": "**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -543,14 +535,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "regions": [
     {
      "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
+     "components": []
     }
    ]
   },
@@ -558,8 +543,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "loading": "Not applicable",
    "error": "This is the error state",
    "emptyFirstRun": "Not applicable",
-   "emptyNoResults": "The filter narrowed it and the out service are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "This is the offline state. It does not attempt a cached sale"
   },
   "apis": [],
@@ -567,6 +550,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-014",
+   "derivedFrom": "wireframes/reference/Kiosk Board 2.dc.html",
    "note": "**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -616,10 +600,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "KSK-017",
      "trigger": "Shop",
      "carries": [
-      "cartId",
       "outletId"
      ],
-     "provenance": "derived — KSK-017 declares entryState.params cartId, outletId, so an edge into it must carry them"
+     "provenance": "derived — KSK-017 declares entryState.params outletId and KSK-016 holds outletId, so an edge into it carries them"
     }
    ]
   },
@@ -640,7 +623,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected order food",
+       "label": "The guest menu",
        "bindsTo": "GuestMenu",
        "columns": [
         "GuestMenu.outletId",
@@ -653,25 +636,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getGuestMenu",
        "provenance": "contract fnb.yaml GET /outlets/{outletId}/guest-menu"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createGuestFnbOrder",
-       "provenance": "contract fnb.yaml POST /guest-orders"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+      },
       {
        "kind": "cardList",
        "bindsTo": "Menu",
@@ -687,6 +652,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "primaryButton",
        "label": "Add to order",
        "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create guest F&B order",
+       "operation": "createGuestFnbOrder",
+       "provenance": "contract fnb.yaml POST /guest-orders"
       }
      ]
     }
@@ -726,9 +703,37 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-016",
+   "derivedFrom": "wireframes/reference/Kiosk Board 2.dc.html",
    "note": "**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateGuestFnbOrder",
+    "component": "modal",
+    "trigger": "Create guest F&B order",
+    "body": "**Collects what `createGuestFnbOrder` sends before it is called.** Required: `id`, `lines`, `quotedTotal`, `recordedAt`. Optional: `locationSessionId`, `outletId`, `fulfilment`, `paymentMethod`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateGuestOrderRequest",
+    "confirm": {
+     "label": "Create guest F&B order",
+     "operation": "createGuestFnbOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "lines",
+      "quotedTotal",
+      "recordedAt",
+      "locationSessionId",
+      "outletId",
+      "fulfilment",
+      "paymentMethod"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /guest-orders"
+   }
+  ],
   "_platform": {
    "code": "P05",
    "audience": "guest",
@@ -779,7 +784,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "outletId"
      ],
-     "provenance": "derived — KSK-016 declares entryState.params outletId, so an edge into it must carry them"
+     "provenance": "derived — KSK-016 declares entryState.params outletId and KSK-017 holds outletId, so an edge into it carries them"
     }
    ]
   },
@@ -799,8 +804,36 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Outlet id",
+       "operation": "listMerchandise",
+       "notes": "Sends `?outletId=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "textField",
+       "label": "Category id",
+       "operation": "listMerchandise",
+       "notes": "Sends `?categoryId=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "toggle",
+       "label": "In stock only",
+       "operation": "listMerchandise",
+       "notes": "Sends `?inStockOnly=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search",
+       "operation": "listMerchandise",
+       "notes": "Sends `?search=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every shop",
+       "label": "Every merchandise",
        "bindsTo": "MerchandiseItem",
        "columns": [
         "MerchandiseItem.id",
@@ -818,6 +851,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listMerchandise",
        "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Size",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Add",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reserve for collection",
+       "notes": "BL-019. **Reserve is not buy** — the guest pays at a till or on the app, and this screen is honest about which",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -827,7 +876,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected shop",
+       "label": "The selected merchandise",
        "bindsTo": "MerchandiseItem",
        "columns": [
         "MerchandiseItem.id",
@@ -857,43 +906,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Reserve",
+       "label": "Reserve merchandise",
        "operation": "reserveMerchandise",
        "provenance": "contract retail.yaml POST /outlets/{outletId}/reserve"
       },
       {
        "kind": "secondaryButton",
-       "label": "Add",
+       "label": "Add cart line",
        "operation": "addCartLine",
        "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
       },
       {
        "kind": "secondaryButton",
-       "label": "Lookup",
+       "label": "Lookup merchandise",
        "operation": "lookupMerchandise",
+       "notes": "The kiosk is a workstation, so the price check is at its own outlet and sends no `outletId` (a workstation caller's own outlet always wins); an inactive item is not found (decided 28 September, audit R215 (1)).",
        "provenance": "contract retail.yaml GET /merchandise/lookup"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "multiSelect",
-       "label": "Size",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "label": "Add",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reserve for collection",
-       "notes": "BL-019. **Reserve is not buy** — the guest pays at a till or on the app, and this screen is honest about which",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -935,7 +963,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "lookupMerchandise",
     "contract": "retail",
     "purpose": "Price and stock check by barcode",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -962,9 +990,56 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-017",
+   "derivedFrom": "wireframes/reference/Kiosk Board 2.dc.html",
    "note": "**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formReserveMerchandise",
+    "component": "modal",
+    "trigger": "Reserve merchandise",
+    "body": "**Collects what `reserveMerchandise` sends before it is called.** Required: `id`, `lines`, `expiresAt`. Optional: `subjectId`, `collectionNote`. **Expiry** (`expiresAt`) is picked from 15 minutes ahead up to the close of the venue's operating day, and the picker offers nothing outside that window (decided 28 September, audit R215 (2)). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reserve merchandise",
+     "operation": "reserveMerchandise"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "lines",
+      "expiresAt",
+      "subjectId",
+      "collectionNote"
+     ]
+    },
+    "provenance": "contract retail.yaml POST /outlets/{outletId}/reserve"
+   },
+   {
+    "id": "formAddCartLine",
+    "component": "modal",
+    "trigger": "Add cart line",
+    "body": "**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AddCartLineRequest",
+    "confirm": {
+     "label": "Add cart line",
+     "operation": "addCartLine"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "variantId",
+      "quantity",
+      "performanceId",
+      "seatIds",
+      "parentLineId",
+      "attributes"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
+   }
+  ],
   "_platform": {
    "code": "P05",
    "audience": "guest",
@@ -1086,7 +1161,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Order"
  },
@@ -1156,6 +1237,11 @@ Method, path, parameters, request and response for every operation these screens
    },
    {
     "name": "includeSiblingOutlets",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "outletId",
     "in": "query",
     "required": null
    }
@@ -1259,12 +1345,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid"
    },
+   "bookedWindow": {
+    "$ref": "#/components/schemas/BookedWindow"
+   },
+   "recommendationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather than guessed. Optional; sent by a page or till that shows the engine's recommendations. Not validated against the engine: an unknown id only fails to attribute.\n"
+   },
+   "tableReservationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A table deposit line (decided 29 September, rev 3 REV3-8b): the `fnb.TableReservation` in `awaitingDeposit` this pays for, sent with `variantId` set to the booking's `deposit.variantId` and `quantity` 1. The price is the booking's `deposit.amount`. A booking that is not awaiting a deposit is refused 422 `depositNotDue`.\n"
+   },
    "seatIds": {
     "type": "array",
+    "maxItems": 50,
+    "description": "At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); at most 10 per sale on staff and POS (audit R080 (c)). Over the limit is 422 `seatLimitExceeded`.",
     "items": {
      "type": "string",
      "format": "uuid"
     }
+   },
+   "resourceHoldId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant and `quantity` is 1. The hold is the line's capacity; no inventory lease is taken."
    },
    "parentLineId": {
     "type": "string",
@@ -1273,8 +1382,48 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "For an add-on attaching to a ticket already in the cart. **Removing the parent removes the child** — a locker with no admission is not a sale.\n"
    },
    "attributes": {
-    "type": "object",
-    "additionalProperties": true
+    "$ref": "#/components/schemas/OrderLineAttributes"
+   }
+  }
+ },
+ "AllergenCode": {
+  "type": "string",
+  "description": "**The fourteen declarable allergens, as one closed list.** Every allergen field in this contract uses it — the menu claim, the ticket line, a substitution's delta, a modifier option, the label on a bag — so a declared set and an actual set compare without anybody normalising case or synonyms. It was the `Allergen.contains` enum; the other fields were free text.\n",
+  "enum": [
+   "gluten",
+   "crustaceans",
+   "eggs",
+   "fish",
+   "peanuts",
+   "soybeans",
+   "milk",
+   "nuts",
+   "celery",
+   "mustard",
+   "sesame",
+   "sulphites",
+   "lupin",
+   "molluscs"
+  ]
+ },
+ "BookedWindow": {
+  "type": "object",
+  "nullable": true,
+  "x-ticvai-persistence": "none — embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line",
+  "description": "**The booked time window of an hourly product, such as a meeting room** (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). The guest picks a date, a length and a start time from `resources.listProductStartTimes`; the length is the product's `length` variant (1 hour, 2 hours, half day, full day), priced per variant, so the price is the variant's. **`endsAt` minus `startsAt` must equal the chosen variant's length** (its `length` dimension value's `durationMinutes`), or the line is refused 422 `windowLengthMismatch`. Required on a product with `catalogue.Product.requiresTimeWindow` true and refused on any other (`windowRequired`, `windowNotAllowed`). The room itself is not named here: the window holds capacity of the room type, and `resources.allocateResources` picks the room at checkout (26 August minute: a guest books a meeting room product, never a raw room).\n",
+  "required": [
+   "startsAt",
+   "endsAt"
+  ],
+  "properties": {
+   "startsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "endsAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "After `startsAt`, on the same venue day."
    }
   }
  },
@@ -1326,7 +1475,37 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "$ref": "#/components/schemas/CartConflict"
     }
    },
+   "consentQuestions": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**The consent questions this cart's products and flow ask** (decided 29 September, rev 3 REV3-26), computed on read at their current version as **the union of each line's published booking flow's `white-label.BookingFlow.settings.consentQuestionIds`** (the flow `getPublishedBookingFlow` resolves for the line's product: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig`, 29 September W12) **and every line's `catalogue.Product.consentQuestionIds`, each question once**: the flow's first, in its order, then each product's in cart-line order, a question already listed not repeated (its `lineIds` gain the line). The client asks them, in the order given, and sends the answers to `marketing.recordConsentAnswers`; `answered` then turns true. One or several, as the venue chose. `checkoutCart` refuses while a required one is unanswered.\n",
+    "items": {
+     "allOf": [
+      {
+       "$ref": "../satellite/marketing-crm.yaml#/components/schemas/ConsentQuestion"
+      },
+      {
+       "type": "object",
+       "properties": {
+        "lineIds": {
+         "type": "array",
+         "description": "The cart lines that ask it. Empty for a question the flow asks.",
+         "items": {
+          "type": "string",
+          "format": "uuid"
+         }
+        },
+        "answered": {
+         "type": "boolean",
+         "description": "Every person (for `perPerson`) or the booking (for `perBooking`) has an answer."
+        }
+       }
+      }
+     ]
+    }
+   },
    "subtotal": {
+    "x-ticvai-column": "net_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "discountTotal": {
@@ -1336,6 +1515,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "total": {
+    "x-ticvai-column": "gross_amount",
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "appliedPromotionIds": {
@@ -1344,6 +1524,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "items": {
      "type": "string",
      "format": "uuid"
+    }
+   },
+   "couponCodes": {
+    "type": "array",
+    "readOnly": true,
+    "description": "The promo codes the guest entered through `applyCartPromoCode` (decided 28 September, audit R073 (e)). **Sent as `couponCodes` on every promotions evaluation of this cart**, so a code is re-checked on each read like any promotion; a code that stops qualifying stays listed here and its promotion drops out of `appliedPromotionIds`.\n",
+    "items": {
+     "type": "string",
+     "maxLength": 100
     }
    },
    "expiresAt": {
@@ -1383,7 +1572,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "overlappingTime",
      "sameSessionDifferentVenue",
      "exceedsPartySize",
-     "requiresPrerequisite"
+     "requiresPrerequisite",
+     "consentBlocksBooking"
     ]
    },
    "lineIds": {
@@ -1398,7 +1588,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "isBlocking": {
     "type": "boolean",
-    "description": "Most are not. `requiresPrerequisite` is — an add-on with no ticket to attach to cannot be sold.\n"
+    "description": "Most are not. `requiresPrerequisite` is — an add-on with no ticket to attach to cannot be sold. So is `consentBlocksBooking`: a consent question answered with the answer the venue set to block the booking (decided 29 September, rev 3 REV3-26).\n"
    }
   }
  },
@@ -1432,12 +1622,43 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid",
     "nullable": true
    },
+   "bookedWindow": {
+    "$ref": "#/components/schemas/BookedWindow"
+   },
+   "recommendationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather than guessed. Set from `addCartLine`; checkout copies it to the order line.\n"
+   },
+   "tableReservationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the `fnb.TableReservation` this line secures. Priced from the deposit the booking snapshotted, not from the variant. Becomes an `orders.deposit` row at checkout, not revenue. A table booking with no deposit never has a line (rev 3 REV3-8).\n"
+   },
    "seatIds": {
     "type": "array",
+    "maxItems": 50,
     "items": {
      "type": "string",
      "format": "uuid"
     }
+   },
+   "resourceHoldId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `resources.ResourceHold` this line buys (decided 29 September, rev 3 REV3-15). While set, `leaseExpiresAt` is the hold's `expiresAt` and `inventoryHoldId` is null."
+   },
+   "attributes": {
+    "$ref": "#/components/schemas/OrderLineAttributes"
+   },
+   "parentLineId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The line this add-on is attached to, from `AddCartLineRequest.parentLineId`. Kept on the line because **removing the parent removes the child**, and `removeCartLine` has to be able to find the children.\n"
    },
    "overridePrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -1476,9 +1697,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "inventoryHoldId": {
     "type": "string",
-    "format": "uuid",
     "nullable": true,
-    "description": "The capacity held for this line. **Null for a product with no capacity** — a t-shirt needs stock, not a lease.\n"
+    "description": "The capacity held for this line — a `catalogue.InventoryHold.id`, typed as that id is. **Null for a product with no capacity** — a t-shirt needs stock, not a lease.\n"
    },
    "leaseExpiresAt": {
     "type": "string",
@@ -1514,7 +1734,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "menuItemId": {
     "type": "string",
@@ -1550,18 +1770,28 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "locationSessionId": {
     "type": "string",
+    "format": "uuid",
     "nullable": true,
-    "description": "Where the order is going. Required for delivery to a table, seat, cabana or named location. Absent for collection, where the outlet is named instead.\n"
+    "description": "From `claimLocationSession`. Where the order is going. Required for delivery to a table, seat, cabana or named location. Absent for collection, where the outlet is named instead.\n"
    },
    "outletId": {
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "Required for collection. Ignored where a table session is supplied."
+    "description": "Required for collection. Ignored where a location session is supplied — the session names its outlet."
+   },
+   "fulfilment": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/GuestOrderFulfilment"
+     }
+    ],
+    "nullable": true,
+    "description": "Required for takeaway and address delivery; refused with 422 when it breaks the outlet's `FnbDeliveryPolicy`."
    },
    "lines": {
     "type": "array",
@@ -1696,7 +1926,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
           "type": "array",
           "description": "Always present. Not a field a tenant may choose to omit.",
           "items": {
-           "type": "string"
+           "$ref": "#/components/schemas/AllergenCode"
           }
          },
          "preparationMinutes": {
@@ -1714,6 +1944,150 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       }
      }
     }
+   }
+  }
+ },
+ "GuestMerchandiseItem": {
+  "x-ticvai-persistence": "none — guest projection of MerchandiseItem",
+  "type": "object",
+  "description": "**What a guest caller of `listMerchandise` receives.** The fields a shop screen shows and the ids a guest needs to reserve or buy, and nothing else: no inventory link, no catalogue variant, no stock count, no serial-number flag. `additionalProperties: false` is the guarantee: a staff field added to `MerchandiseItem` does not reach a guest by default.\n",
+  "additionalProperties": false,
+  "required": [
+   "id",
+   "name",
+   "outletId",
+   "price",
+   "isAvailable"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sku": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "price": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "isAvailable": {
+    "type": "boolean",
+    "description": "True when the item is active and in stock at its outlet. An item with no `inventoryItemId` never runs out, so it is available while active.\n"
+   },
+   "isReturnable": {
+    "type": "boolean"
+   },
+   "returnWindowDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "imageAssetRef": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "GuestOrderFulfilment": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.order_fulfilment",
+  "description": "How a guest's order leaves the kitchen: collected, delivered to an address, or taken to a place in the venue.",
+  "required": [
+   "mode"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-column": "service_order_id",
+    "description": "The guest order this fulfils (`FnbOrder.id`). Set by the server from the order it arrives with."
+   },
+   "mode": {
+    "type": "string",
+    "enum": [
+     "collection",
+     "delivery",
+     "inVenue"
+    ],
+    "description": "`collection` from a counter, `delivery` to an address outside the venue, `inVenue` to a table, seat, cabana or named location (the location session). `GuestOrderResult.fulfilment` reports the same choice."
+   },
+   "collectionAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "windowStart": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "windowEnd": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "deliveryAddress": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "building": {
+      "type": "string",
+      "maxLength": 200
+     },
+     "unit": {
+      "type": "string",
+      "maxLength": 60,
+      "nullable": true
+     },
+     "emirate": {
+      "type": "string",
+      "maxLength": 60
+     },
+     "directions": {
+      "type": "string",
+      "maxLength": 500,
+      "nullable": true
+     }
+    }
+   },
+   "deliveryFee": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "readOnly": true,
+    "nullable": true
+   },
+   "cutlery": {
+    "type": "boolean",
+    "default": false
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
    }
   }
  },
@@ -1739,8 +2113,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "enum": [
      "collect",
      "deliverToLocation",
-     "tableService"
-    ]
+     "tableService",
+     "deliverToAddress"
+    ],
+    "description": "How the order reaches the guest, in the request's terms: `collect` is `GuestOrderFulfilment.mode` `collection`; `deliverToAddress` is `delivery`; `inVenue` is `tableService` where the location session is a table and `deliverToLocation` for a seat, cabana or named location. `KitchenTicket.serviceMode` is the kitchen's view and uses `ServiceMode`."
    },
    "deliveryLabel": {
     "type": "string",
@@ -1850,6 +2226,86 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "MerchandiseItem": {
+  "x-ticvai-persistence": "retail.merchandise",
+  "type": "object",
+  "required": [
+   "id",
+   "sku",
+   "name",
+   "outletId",
+   "variantId",
+   "price",
+   "onHand",
+   "isActive"
+  ],
+  "properties": {
+   "description": {
+    "type": "string",
+    "description": "What the item is, in the guest's words. Indexed for guest-app search.\n"
+   },
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sku": {
+    "type": "string"
+   },
+   "barcode": {
+    "type": "string",
+    "nullable": true
+   },
+   "name": {
+    "type": "string"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "variantId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The catalogue variant sold. Price and tax come from there."
+   },
+   "inventoryItemId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The stock item depleted on sale. Null means the item sells but never runs out, which is almost always a configuration error.\n"
+   },
+   "price": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "x-ticvai-column": "list_price"
+   },
+   "onHand": {
+    "type": "number"
+   },
+   "isReturnable": {
+    "type": "boolean",
+    "default": true
+   },
+   "returnWindowDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "requiresSerialNumber": {
+    "type": "boolean",
+    "default": false
+   },
+   "imageAssetRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
  "MerchandiseReservation": {
   "x-ticvai-persistence": "retail.reservation + retail.reservation_line",
   "type": "object",
@@ -1921,6 +2377,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "ModifierGroup": {
   "x-ticvai-persistence": "fnb.modifier_group + fnb.modifier_option",
   "type": "object",
+  "description": "**An F&B modifier is a choice added to a dish at the moment of ordering** — *no onions*, *extra cheese*, *cooked medium*. **It is not an Attribute**, the axis that generates catalogue variants (naming-and-style §3 lists *Modifier* as a banned synonym for that), and the two must not be merged: a variant is a different product with its own stock, a modifier is an instruction on a line with at most a price delta.\n",
   "required": [
    "id",
    "code",
@@ -1975,6 +2432,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       },
       "isAvailable": {
        "type": "boolean"
+      },
+      "allergens": {
+       "type": "array",
+       "description": "What choosing this option adds to the dish. `attachModifierGroup` refuses a group that adds one the item does not declare, and `verifyAllergens` reports it as `via` `modifier`.",
+       "items": {
+        "$ref": "#/components/schemas/AllergenCode"
+       }
       }
      }
     }
@@ -2005,10 +2469,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid",
+    "description": "The client UUIDv7 from `CreateOrderRequest.id`."
    },
    "orderNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "The number a guest reads and a cashier types. **Server-assigned: the venue prefix and a sequence per venue**, for example `DXB1-000123` (decided 28 September, audit R152). A till holds a reserved range of the venue sequence, so an order taken offline gets its number on the till and keeps it through `syncOrders`. **Not gapless**: an unused reserved range leaves a gap, and that is allowed. Only tax invoices are gapless, per legal entity. The receipt carries this number.\n"
    },
    "channel": {
     "allOf": [
@@ -2053,6 +2521,33 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "refundedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
+   "droppedPromotions": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Promotions left off this order at checkout because their budget cap would have been exceeded** (decided 28 September, audit R101 (8)). Empty when none was dropped. Returned by `checkoutCart` and `createOrder`, not stored.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "promotionId"
+     ],
+     "properties": {
+      "promotionId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "budgetCapReached"
+       ]
+      }
+     }
+    }
+   },
    "totalPriceVariance": {
     "allOf": [
      {
@@ -2083,12 +2578,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "shiftId": {
     "type": "string",
+    "format": "uuid",
     "nullable": true
    },
    "subjectId": {
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "holdLabel": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `label` a cashier gave when parking it with `holdOrder` — how they find it again. Null on an order never held."
+   },
+   "heldUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."
    },
    "createdAt": {
     "type": "string",
@@ -2120,7 +2630,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ]
  },
  "OrderLine": {
-  "x-ticvai-persistence": "orders.order_line",
+  "x-ticvai-persistence": "orders.order_line + orders.order_line_eligibility + orders.order_line_discount",
+  "x-ticvai-retired-columns": [
+   "promotion_id",
+   "name",
+   "reason"
+  ],
   "allOf": [
    {
     "$ref": "#/components/schemas/CreateOrderLine"
@@ -2161,8 +2676,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "entitlementIds": {
       "type": "array",
+      "description": "The entitlements this line issued. **These are the ticket ids** — `transferOrderTickets.ticketIds` and `reprintOrder.reissuedTicketIds` take and return them.",
       "items": {
-       "type": "string"
+       "type": "string",
+       "format": "uuid"
       }
      },
      "crossRegionRightIds": {
@@ -2171,10 +2688,43 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
        "type": "string"
       },
       "description": "Redemption rights propagated to other cells for this line."
+     },
+     "reprintCount": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0,
+      "readOnly": true,
+      "description": "How many times this line's tickets were reprinted or resent. `reprintOrder` increments it; repeated reprints are the signal worth surfacing."
+     },
+     "venueId": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order."
+     },
+     "discounts": {
+      "type": "array",
+      "readOnly": true,
+      "description": "**The discounts applied to this line, one row each** (system-design review SD-008, 29 September). Until then a discount object was flattened into the line as `promotion_id NOT NULL`, so a line with no promotion could not be inserted. A line with no discount has none.",
+      "items": {
+       "$ref": "#/components/schemas/OrderLineDiscount"
+      }
      }
     }
    }
   ]
+ },
+ "OrderLineAttributes": {
+  "type": "object",
+  "nullable": true,
+  "additionalProperties": true,
+  "x-ticvai-persistence": "none — embedded as attributes (jsonb) on orders.cart_line and orders.order_line",
+  "description": "Open attributes of a line, kept from the cart to the order line. **`transport` is the one with a defined shape** (decided 29 September, rev 3 REV3-21); other keys are free.\n",
+  "properties": {
+   "transport": {
+    "$ref": "#/components/schemas/TransportLineAttributes"
+   }
+  }
  },
  "OrderStatus": {
   "type": "string",
@@ -2223,10 +2773,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid"
    },
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid"
    },
    "tender": {
     "$ref": "#/components/schemas/TenderKind"
@@ -2245,7 +2797,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "The amount in `tenderCurrency`, at that currency's own scale."
    },
    "fxRate": {
-    "type": "number",
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
     "nullable": true,
     "description": "The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"
    },
@@ -2289,7 +2845,45 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "providerReference": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "The provider's own id for the charge (Stripe PaymentIntent, NI order reference). What `payments.receivePaymentProviderWebhook` matches an incoming event on (SD-034)."
+   },
+   "providerIdempotencyKey": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The idempotency key sent to the provider, which is this payment's `id` (SD-034, 29 September). A retried provider call cannot charge twice."
+   },
+   "terminalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The card terminal a till payment ran on (ECR flow, SD-034)."
+   },
+   "nextAction": {
+    "type": "object",
+    "nullable": true,
+    "x-ticvai-persisted": false,
+    "description": "**What the caller does while the payment is `pendingConfirmation`** (SD-034, 29 September). `redirect`: send the browser to `url` (3-D Secure challenge or hosted page); the provider returns the guest to `returnUrl` and the result arrives by webhook. `terminal`: the card terminal has been instructed; wait for its result. Null once the payment has an outcome.",
+    "properties": {
+     "kind": {
+      "type": "string",
+      "enum": [
+       "redirect",
+       "terminal"
+      ]
+     },
+     "url": {
+      "type": "string",
+      "format": "uri",
+      "nullable": true
+     },
+     "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
    },
    "lastInquiryAt": {
     "type": "string",
@@ -2321,6 +2915,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "merchandiseId": {
     "type": "string",
     "format": "uuid"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The outlet whose price and stock this is: the asking workstation's outlet, or `outletId` for a caller with none (decided 28 September, audit R215).\n"
    },
    "sku": {
     "type": "string"
@@ -2376,7 +2975,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "required": [
    "id",
    "dropReference",
-   "saleId",
    "collectionPointId",
    "status",
    "collectBy"
@@ -2390,7 +2988,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Short and readable. Printed on the slip a guest may or may not keep."
    },
    "saleId": {
-    "type": "string"
+    "type": "string",
+    "nullable": true,
+    "description": "The till sale. Null for an online order, which sets `orderId` (audit R236)."
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The paid online order that created this collection (audit R236)."
    },
    "entitlementId": {
     "type": "string",

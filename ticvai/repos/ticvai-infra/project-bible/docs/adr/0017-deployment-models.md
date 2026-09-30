@@ -111,7 +111,7 @@ product needs to be diagnosable by a person who is not an engineer.
 in writing. This is where the 62 uncounted DR requirements (CF-60) land hardest: an on-premise
 client will ask what the RPO is, and the answer is whatever their own backup schedule achieves.
 
-**AI is degraded or absent.** In-region inference (ADR-0009) assumed a cell in a cloud region
+**AI is degraded or absent.** In-region inference (ADR-0009, its vector-store section amended by ADR-0049) assumed a cell in a cloud region
 with a model endpoint. An on-premise site has neither unless the client buys hardware for it.
 Conversational features either call out — which contradicts "nothing leaves the site" — or do
 not run.

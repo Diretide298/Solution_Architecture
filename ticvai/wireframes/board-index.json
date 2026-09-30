@@ -2471,8 +2471,8 @@
   {
    "file": "APP guest.dc.html",
    "provenance": "clientPack",
-   "bytes": 335587,
-   "sha256": "3313117a6821d012",
+   "bytes": 731536,
+   "sha256": "bde2836a290d874f",
    "frames": 144,
    "screensFramed": 144,
    "screens": [
@@ -7596,8 +7596,8 @@
   {
    "file": "P02 Guest App.dc.html",
    "provenance": "generated",
-   "bytes": 157186,
-   "sha256": "97ae95fd93c54c6a",
+   "bytes": 553135,
+   "sha256": "b4df4676c15950be",
    "frames": 77,
    "screensFramed": 77,
    "screens": [

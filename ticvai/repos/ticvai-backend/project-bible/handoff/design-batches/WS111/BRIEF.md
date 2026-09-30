@@ -1,6 +1,6 @@
 # WS111 — ACCREDITATION board 4
 
-**9 screens · 8 operations · 4 schemas · 4 permissions**
+**9 screens · 9 operations · 8 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -65,9 +65,9 @@ convincingly. It is never a caption.
 | `BO-646` | Credential Media Configuration | listDetail | 1 | 0 | — |
 | `BO-647` | Badge Template Designer | listDetail | 1 | 0 | — |
 | `BO-648` | Badge Printing & Print Queue | listDetail | 2 | 0 | — |
-| `BO-649` | Digital & Mobile Credential Management | listDetail | 2 | 0 | — |
+| `BO-649` | Digital & Mobile Credential Management | listDetail | 3 | 0 | — |
 | `BO-650` | NFC & RFID Credential Encoding | listDetail | 1 | 0 | — |
-| `BO-651` | Credential Activation & Delivery | listDetail | 1 | 0 | — |
+| `BO-651` | Credential Activation & Delivery | listDetail | 2 | 0 | — |
 | `BO-653` | Credential Registry & Credential History | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch

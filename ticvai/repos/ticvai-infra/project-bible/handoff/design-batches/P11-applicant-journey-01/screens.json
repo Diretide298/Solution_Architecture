@@ -65,7 +65,8 @@
    "isEntryPoint": true,
    "exitTo": [
     "ACC-002",
-    "ACC-004"
+    "ACC-004",
+    "ACC-006"
    ],
    "notes": "**Corrected 9 September.** The previous `exitTo` also listed `ACC-003`, which is the review step inside the application and cannot be reached from a landing page. Inferred navigation had made every P11 screen a child of this one.\n",
    "transitions": [
@@ -77,6 +78,11 @@
     {
      "to": "ACC-004",
      "trigger": "Application Status Tracking",
+     "provenance": "structural — ACC-001 is P11's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ACC-006",
+     "trigger": "Reviewer Queue",
      "provenance": "structural — ACC-001 is P11's home screen and its exits are its launcher"
     }
    ]
@@ -128,13 +134,30 @@
   "pattern": "multiStepForm",
   "density": "compact",
   "purpose": "Collect who the applicant works for, what they intend to cover, and the documents that support it — in steps, with a draft that survives leaving.\n",
-  "apis": [],
-  "gaps": [
+  "apis": [
    {
-    "operation": "createAccreditationApplication",
-    "why": "**The registration form cannot register.** The screen declared `listApprovalRequests`, which is a reviewer's read, and nothing that creates an application. Removed 9 September rather than left in place: an operation that is on a screen because it was nearby is the residue pattern this package has now found five times.\n",
-    "source": "7 September workshop — accreditation form builder, categories and programme setup"
+    "operationId": "createAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "Register the applicant, the organisation and the coverage requested",
+    "trigger": "onAction",
+    "provenance": "readiness close-out, 29 September 2026"
    },
+   {
+    "operationId": "submitAccreditationDocument",
+    "contract": "accreditation",
+    "purpose": "Each supporting document, against the requirement it satisfies",
+    "trigger": "onAction",
+    "provenance": "readiness close-out, 29 September 2026"
+   },
+   {
+    "operationId": "updateAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "Save the draft as each step is completed (Save and finish later)",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "gaps": [
    {
     "operation": "saveAccreditationDraft",
     "why": "The pattern requires a draft that autosaves. **A four-step form that loses everything to a dropped connection is a form people do not come back to**, and the drawn frame offers *\"Save and finish later\"* against nothing.\n",
@@ -235,6 +258,10 @@
      "name": "applicationRef",
      "from": "deepLink",
      "optional": true
+    },
+    {
+     "name": "applicationId",
+     "from": "navigation"
     }
    ],
    "preloaded": [
@@ -253,17 +280,22 @@
    ],
    "transitions": [
     {
-     "to": "ACC-007",
-     "trigger": "A reviewer checks and approves",
-     "provenance": "flow F23 step 1→2"
-    },
-    {
      "to": "ACC-003",
      "trigger": "Application Review & Submit",
      "carries": [
+      "applicationId",
       "applicationRef"
      ],
-     "provenance": "derived — ACC-003 declares entryState.params applicationRef, so an edge into it must carry them"
+     "provenance": "derived — ACC-003 declares entryState.params applicationId, applicationRef and ACC-002 holds applicationId, applicationRef, so an edge into it carries them"
+    },
+    {
+     "to": "ACC-007",
+     "trigger": "A reviewer checks and approves",
+     "provenance": "flow F23 step 1→2",
+     "carries": [
+      "applicationId",
+      "documentId"
+     ]
     }
    ]
   },
@@ -314,12 +346,27 @@
   "pattern": "multiStepForm",
   "density": "compact",
   "purpose": "Show everything the applicant entered, let them change any of it, say what happens next, and submit.\n",
-  "apis": [],
-  "gaps": [
+  "apis": [
    {
-    "operation": "submitAccreditationApplication",
-    "why": "**The submit button has nothing behind it.** The screen declared no operation at all, and submit is the one act it exists for.\n",
-    "source": "frame claude-design/Accreditation Board.dc.html#acc-003"
+    "operationId": "createAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "Submit the reviewed application",
+    "trigger": "onAction",
+    "provenance": "readiness close-out, 29 September 2026"
+   },
+   {
+    "operationId": "submitAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "Submit the reviewed draft; blocking-submission requirements are checked here",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "updateAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "Apply a change made through a Change link",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "layout": {
@@ -398,6 +445,10 @@
     {
      "name": "applicationRef",
      "from": "ACC-002"
+    },
+    {
+     "name": "applicationId",
+     "from": "navigation"
     }
    ],
    "preloaded": [
@@ -418,17 +469,19 @@
      "to": "ACC-002",
      "trigger": "Registration Form",
      "carries": [
+      "applicationId",
       "applicationRef"
      ],
-     "provenance": "derived — ACC-002 declares entryState.params applicationRef, so an edge into it must carry them"
+     "provenance": "derived — ACC-002 declares entryState.params applicationId, applicationRef and ACC-003 holds applicationId, applicationRef, so an edge into it carries them"
     },
     {
      "to": "ACC-004",
      "trigger": "Application Status Tracking",
      "carries": [
+      "applicationId",
       "applicationRef"
      ],
-     "provenance": "derived — ACC-004 declares entryState.params applicationRef, so an edge into it must carry them"
+     "provenance": "derived — ACC-004 declares entryState.params applicationId, applicationRef and ACC-003 holds applicationId, applicationRef, so an edge into it carries them"
     }
    ]
   },
@@ -479,16 +532,47 @@
   "pattern": "statusTracker",
   "density": "compact",
   "purpose": "Tell an applicant where their application is and when they will hear — **with a date, not a queue position.**\n",
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listMyAccreditationApplications",
+    "contract": "accreditation",
+    "purpose": "The applicant's own applications, status, what is missing and decisionDueAt",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "withdrawAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "Withdraw this application",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "submitAccreditationDocument",
+    "contract": "accreditation",
+    "purpose": "Add a document the reviewer asked for",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "updateAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "Amend answers after a return for information",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "resubmitAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "Send it back after a return for information or a rejection",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
   "gaps": [
    {
     "operation": "getAccreditationApplicationByReference",
     "why": "**A status screen with no status read.** The screen declared no operation. It also cannot use the reviewer's `listApprovalRequests`: an applicant is not authenticated as a principal with approval permissions, and **the reference is the credential** — which is a deliberate design decision and needs an operation shaped for it.\n",
-    "source": "frame claude-design/Accreditation Board.dc.html#acc-004"
-   },
-   {
-    "operation": "withdrawAccreditationApplication",
-    "why": "The screen offers *Withdraw this application* and nothing performs it.",
     "source": "frame claude-design/Accreditation Board.dc.html#acc-004"
    },
    {
@@ -570,6 +654,10 @@
     {
      "name": "applicationRef",
      "from": "deepLink"
+    },
+    {
+     "name": "applicationId",
+     "from": "navigation"
     }
    ],
    "preloaded": [],
@@ -589,9 +677,10 @@
      "to": "ACC-005",
      "trigger": "Accreditation Badge",
      "carries": [
-      "applicationRef"
+      "applicationRef",
+      "holderId"
      ],
-     "provenance": "derived — ACC-005 declares entryState.params applicationRef, so an edge into it must carry them"
+     "provenance": "derived — ACC-005 declares entryState.params applicationRef, credentialId, holderId and ACC-004 holds applicationRef, holderId, so an edge into it carries them"
     }
    ]
   },
@@ -645,16 +734,25 @@
   "purpose": "Present the issued badge so it can be scanned, and say exactly where it is valid.\n",
   "apis": [
    {
-    "operationId": "listAccreditationBadges",
-    "contract": "approvals",
-    "purpose": "The badges issued against this application",
-    "trigger": "onLoad"
+    "operationId": "listMyAccreditationCredentials",
+    "contract": "accreditation",
+    "purpose": "The holder's own credentials with encodedIdentifier, symbology, zones and validity",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    },
    {
-    "operationId": "issueAccreditationBadge",
-    "contract": "approvals",
-    "purpose": "Issue the badge",
-    "trigger": "onAction"
+    "operationId": "issueMyAccreditationWalletPass",
+    "contract": "accreditation",
+    "purpose": "Add to Apple or Google Wallet",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "renewAccreditation",
+    "contract": "accreditation",
+    "purpose": "Renew, shown while the renewal window is open",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "gaps": [
@@ -742,6 +840,14 @@
      "name": "applicationRef",
      "from": "ACC-004",
      "optional": true
+    },
+    {
+     "name": "credentialId",
+     "from": "navigation"
+    },
+    {
+     "name": "holderId",
+     "from": "navigation"
     }
    ],
    "preloaded": [
@@ -764,13 +870,13 @@
      "carries": [
       "applicationRef"
      ],
-     "provenance": "derived — ACC-004 declares entryState.params applicationRef, so an edge into it must carry them"
+     "provenance": "derived — ACC-004 declares entryState.params applicationId, applicationRef and ACC-005 holds applicationRef, so an edge into it carries them"
     },
     {
      "to": "SCN-003",
      "trigger": "A steward scans it at a service gate",
      "provenance": "flow F23 step 3→4",
-     "operation": "issueAccreditationBadge",
+     "operation": "listMyAccreditationCredentials",
      "crossesDevice": true,
      "back": false
     }

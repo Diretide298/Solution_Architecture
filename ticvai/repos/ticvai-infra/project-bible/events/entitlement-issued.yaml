@@ -11,9 +11,9 @@ emittedBy:
 - access.issueOrderEntitlements
 payload:
 - field: entitlementId
-  type: string
+  type: uuid
 - field: orderId
-  type: string
+  type: uuid
 - field: mediaCode
   type: string
   notes: What the guest carries. Several entitlements may share one

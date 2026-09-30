@@ -1,6 +1,6 @@
 # WS61 — Ticket Media   Credential Management board 3
 
-**10 screens · 16 operations · 17 schemas · 7 permissions**
+**10 screens · 16 operations · 21 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

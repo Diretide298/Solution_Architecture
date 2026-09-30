@@ -1901,7 +1901,7 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Read only since 29
-    September** (decided 17 September, M17-04; applied 29 September, P29). Partners never create products,
+    September** (decided 17 September, M17-04; applied 29 September). Partners never create products,
     prices or performances through the API or this portal; product configuration stays in the venue back
     office (BO-007, BO-008, BO-009), and a partner reads the products assigned to its channel (`listProducts`,
     `getProduct`, `listProductVariants`) and its partner price lists (`listPriceLists`, `getPriceList`,

@@ -39,10 +39,7 @@
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-108 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-109",
@@ -69,12 +66,6 @@
      "operation": "listRevenue"
     },
     {
-     "to": "ADM-113",
-     "trigger": "Works in AI Recommendation Review & Decision Queue",
-     "provenance": "flow F149 step 9→10",
-     "operation": "listRevenue"
-    },
-    {
      "to": "ADM-114",
      "trigger": "Works in Automation Policy & Autonomous Pricing Orchestrator",
      "provenance": "flow F149 step 11→12",
@@ -97,14 +88,23 @@
      "trigger": "Works in AI Learning, Model Performance & Optimization Feedback",
      "provenance": "flow F149 step 17→18",
      "operation": "listRevenue"
+    },
+    {
+     "to": "ADM-113",
+     "trigger": "Works in AI Recommendation Review & Decision Queue",
+     "provenance": "flow F149 step 9→10",
+     "operation": "listRevenue",
+     "carries": [
+      "recommendationId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Revenue teams can monitor and act on pricing optimization opportunities across the organization from one centralized workspace.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each row displays) — counts over a population, then the population",
   "purpose": "Provide Revenue Managers with the operational control center for all dynamic pricing simulations, AI recommendations, automated changes, experiments and revenue optimization activity.",
-  "purposeNote": "Revenue teams can monitor and act on pricing optimization opportunities across the organization from one centralized workspace.",
   "gaps": [
    {
     "operation": null,
@@ -129,67 +129,67 @@
        "kind": "metricTile",
        "label": "Incremental Revenue Generated",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterView.incrementalRevenueGenerated"
+       "bindsTo": "RevenueOptimizationCommandCenterSummary.incrementalRevenueGenerated"
       },
       {
        "kind": "metricTile",
        "label": "Active Optimizations",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterView.activeOptimizations"
+       "bindsTo": "RevenueOptimizationCommandCenterSummary.activeOptimizations"
       },
       {
        "kind": "metricTile",
        "label": "Recommendations Awaiting Action",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterView.recommendationsAwaitingAction"
+       "bindsTo": "RevenueOptimizationCommandCenterSummary.recommendationsAwaitingAction"
       },
       {
        "kind": "metricTile",
        "label": "Pending Simulations",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterView.pendingSimulations"
+       "bindsTo": "RevenueOptimizationCommandCenterSummary.pendingSimulations"
       },
       {
        "kind": "metricTile",
        "label": "Auto-Executed Changes",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterView.autoExecutedChanges"
+       "bindsTo": "RevenueOptimizationCommandCenterSummary.autoExecutedChanges"
       },
       {
        "kind": "metricTile",
        "label": "Approval Required",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterView.approvalRequired"
+       "bindsTo": "RevenueOptimizationCommandCenterSummary.approvalRequired"
       },
       {
        "kind": "metricTile",
        "label": "Active A/B Tests",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterView.activeABTests"
+       "bindsTo": "RevenueOptimizationCommandCenterSummary.activeABTests"
       },
       {
        "kind": "metricTile",
        "label": "Pricing Exceptions",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterView.pricingExceptions"
+       "bindsTo": "RevenueOptimizationCommandCenterSummary.pricingExceptions"
       },
       {
        "kind": "metricTile",
        "label": "Revenue at Risk",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterView.revenueAtRisk"
+       "bindsTo": "RevenueOptimizationCommandCenterSummary.revenueAtRisk"
       },
       {
        "kind": "metricTile",
        "label": "Forecast Accuracy",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterView.forecastAccuracy"
+       "bindsTo": "RevenueOptimizationCommandCenterSummary.forecastAccuracy"
       },
       {
        "kind": "metricTile",
        "label": "Optimization Success Rate",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 114 §Display",
-       "bindsTo": "RevenueOptimizationCommandCenterView.optimizationSuccessRate"
+       "bindsTo": "RevenueOptimizationCommandCenterSummary.optimizationSuccessRate"
       }
      ]
     },
@@ -301,7 +301,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-108"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-108",
+   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-108"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 114. 23 of 23 labels bound to a contract property; 29 of 50 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -365,10 +366,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can safely evaluate a pricing recommendation or strategy against forecast commercial outcomes without modifying production prices.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Allow any proposed dynamic-pricing change to be tested before affecting live customers. This should become the sandbox of the Dynamic Pricing Engine.",
-  "purposeNote": "Authorized users can safely evaluate a pricing recommendation or strategy against forecast commercial outcomes without modifying production prices.",
   "gaps": [
    {
     "operation": null,
@@ -387,7 +388,7 @@
        "kind": "dataTable",
        "label": "Every pricing simulation",
        "columns": [
-        "PricingSimulationStudioView.simulationConfidence89",
+        "PricingSimulationStudioView.simulationConfidence",
         "PricingSimulationStudioView.dataVolume",
         "PricingSimulationStudioView.historicalSimilarity",
         "PricingSimulationStudioView.forecastConfidence",
@@ -409,7 +410,7 @@
        "label": "The selected pricing simulation",
        "bindsTo": "PricingSimulationStudioView",
        "columns": [
-        "PricingSimulationStudioView.simulationConfidence89",
+        "PricingSimulationStudioView.simulationConfidence",
         "PricingSimulationStudioView.dataVolume",
         "PricingSimulationStudioView.historicalSimilarity",
         "PricingSimulationStudioView.forecastConfidence",
@@ -475,15 +476,12 @@
     "operationId": "setPricing",
     "contract": "catalogue",
     "purpose": "Pricing Simulation Studio",
-    "trigger": "onAction",
-    "invalidates": [
-     "setPricing"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "preloaded": [
-    "PricingSimulationStudioView.simulationConfidence89",
+    "PricingSimulationStudioView.simulationConfidence",
     "PricingSimulationStudioView.dataVolume",
     "PricingSimulationStudioView.historicalSimilarity",
     "PricingSimulationStudioView.forecastConfidence",
@@ -494,7 +492,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-109"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-109",
+   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-109"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 115. 6 of 6 labels bound to a contract property; 20 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -558,14 +557,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Revenue teams can model alternative market and demand conditions and compare different pricing responses before implementation.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Scenario Modeling & What-If Analysis",
-  "purposeNote": "Revenue teams can model alternative market and demand conditions and compare different pricing responses before implementation.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Competitor Price Drop, Competitor Price Increase, Custom Scenario, Save, Duplicate, Compare, Submit for Review. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 11 actions on this screen and the screen declares 1 operation.** Unserved: Low Demand, Expected Demand, High Demand, Competitor Price Drop, Competitor Price Increase, Inventory Reduction, Custom Scenario, Save …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Support"
    },
    {
@@ -588,6 +587,21 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Low Demand",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Expected Demand",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "High Demand",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Competitor Price Drop",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Support"
       },
@@ -598,27 +612,17 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Inventory Reduction",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Custom Scenario",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Support"
       },
       {
        "kind": "secondaryButton",
        "label": "Save",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Allow users to"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Duplicate",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Allow users to"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Compare",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Allow users to"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Submit for Review",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 117 §Allow users to"
       }
      ]
@@ -646,19 +650,16 @@
   ],
   "entryState": {
    "preloaded": [
-    "ScenarioModelingWhatIfAnalysisView.lowDemand",
-    "ScenarioModelingWhatIfAnalysisView.expectedDemand",
-    "ScenarioModelingWhatIfAnalysisView.highDemand",
-    "ScenarioModelingWhatIfAnalysisView.sellOut",
-    "ScenarioModelingWhatIfAnalysisView.competitorPriceDrop"
+    "ScenarioModelingWhatIfAnalysisView.scenarioTypes"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-110"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-110",
+   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-110"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 117. 0 of 0 labels bound to a contract property; 7 of 52 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 117. 0 of 0 labels bound to a contract property; 11 of 52 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -720,10 +721,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can execute controlled pricing experiments and determine statistically whether one strategy performs better than another.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Allow TICVAI to scientifically test different pricing strategies using controlled customer groups. This is essential because AI should learn from actual customer behavior, not only historical assumptions.",
-  "purposeNote": "Authorized users can execute controlled pricing experiments and determine statistically whether one strategy performs better than another.",
   "layout": {
    "template": "split",
    "regions": [
@@ -790,10 +791,7 @@
     "operationId": "setPricingExperiment",
     "contract": "catalogue",
     "purpose": "A/B Pricing Experiment Studio",
-    "trigger": "onAction",
-    "invalidates": [
-     "setPricingExperiment"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -807,7 +805,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-111"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-111",
+   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-111"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 119. 4 of 4 labels bound to a contract property; 20 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -871,10 +870,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Approvers can clearly understand expected revenue, demand and customer consequences before authorizing a dynamic pricing action.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Forecast; Display) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Provide a dedicated commercial impact assessment before a dynamic-pricing action is approved or executed.",
-  "purposeNote": "Approvers can clearly understand expected revenue, demand and customer consequences before authorizing a dynamic pricing action.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -956,18 +955,13 @@
    }
   ],
   "entryState": {
-   "preloaded": [
-    "RevenueDemandImpactForecastingView.expectedRevenueAed245m",
-    "RevenueDemandImpactForecastingView.expectedDemand9800",
-    "RevenueDemandImpactForecastingView.expectedOccupancy91",
-    "RevenueDemandImpactForecastingView.expectedRevenueAed252m",
-    "RevenueDemandImpactForecastingView.expectedDemand9500"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-112"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-112",
+   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-112"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 120. 9 of 9 labels bound to a contract property; 9 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1031,10 +1025,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every material AI recommendation can be reviewed, explained, simulated, approved, modified or rejected with complete traceability.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide the human decision workspace for recommendations produced by Board 6. This should be the Revenue Manager's inbox.",
-  "purposeNote": "Every material AI recommendation can be reviewed, explained, simulated, approved, modified or rejected with complete traceability.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1097,8 +1091,43 @@
       {
        "kind": "banner",
        "label": "Permissions this screen separates",
-       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Accept, Reject, Modify, Simulate Again, Schedule, Send for Approval. Each needs attaching to the control it gates, or the screen needs the control.",
+       "notes": "**The pack separates these permissions; since 29 September the decision buttons are `decidePricingRecommendation` (AI_APPROVE)** — earlier text: Accept, Reject, Modify, Simulate Again, Schedule, Send for Approval. Each needs attaching to the control it gates, or the screen needs the control.",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 122 §Authorized users can"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Accept",
+       "operation": "decidePricingRecommendation",
+       "notes": "Sends `decision: accept`.",
+       "provenance": "contract catalogue.yaml POST /recommendation-review-decision/{recommendationId}/decision (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Modify",
+       "operation": "decidePricingRecommendation",
+       "notes": "Sends `decision: modify`.",
+       "provenance": "contract catalogue.yaml POST /recommendation-review-decision/{recommendationId}/decision (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reject",
+       "operation": "decidePricingRecommendation",
+       "notes": "Sends `decision: reject`.",
+       "provenance": "contract catalogue.yaml POST /recommendation-review-decision/{recommendationId}/decision (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Schedule",
+       "operation": "decidePricingRecommendation",
+       "notes": "Sends `decision: schedule`.",
+       "provenance": "contract catalogue.yaml POST /recommendation-review-decision/{recommendationId}/decision (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Send for approval",
+       "operation": "decidePricingRecommendation",
+       "notes": "Sends `decision: sendForApproval`.",
+       "provenance": "contract catalogue.yaml POST /recommendation-review-decision/{recommendationId}/decision (decided 29 September, readiness close-out)"
       }
      ]
     }
@@ -1117,6 +1146,12 @@
     "contract": "catalogue",
     "purpose": "AI Recommendation Review & Decision Queue",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "decidePricingRecommendation",
+    "contract": "catalogue",
+    "purpose": "Record a human decision on an AI pricing recommendation",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1127,12 +1162,19 @@
     "AiRecommendationReviewDecisionQueueView.currentPrice",
     "AiRecommendationReviewDecisionQueueView.recommendedPrice",
     "AiRecommendationReviewDecisionQueueView.change"
+   ],
+   "params": [
+    {
+     "name": "recommendationId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-113"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-113",
+   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-113"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 122. 11 of 11 labels bound to a contract property; 24 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1196,10 +1238,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "confidence, commercial guardrails and emergency safety controls.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Control when TICVAI is allowed to execute pricing changes automatically. Board 5 defines the strategy-level automation permission. This screen manages operational autonomous execution at scale.",
-  "purposeNote": "confidence, commercial guardrails and emergency safety controls.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1268,6 +1310,20 @@
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 123 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save dynamic pricing guardrail policy",
+       "operation": "setDynamicPricingGuardrailPolicy",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**Guardrails and automation policy, one row per scope** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /dynamic-pricing-controls"
+      }
+     ]
     }
    ]
   },
@@ -1283,14 +1339,61 @@
     "contract": "catalogue",
     "purpose": "Automation Policy & Autonomous Pricing Orchestrator",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setDynamicPricingGuardrailPolicy",
+    "contract": "catalogue",
+    "purpose": "Set the guardrails and automation level of dynamic pricing at one scope",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAutomationPolicyAutonomous"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-114"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-114",
+   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-114"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 123. 0 of 0 labels bound to a contract property; 12 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetDynamicPricingGuardrailPolicy",
+    "component": "modal",
+    "trigger": "Save dynamic pricing guardrail policy",
+    "body": "**Collects what `setDynamicPricingGuardrailPolicy` sends before it is called.** Required: `id`, `scopePath`, `scopeLevel`, `automationLevel`. Optional: `scopeId`, `absoluteMinimumPrice`, `absoluteMaximumPrice`, `minimumMarginPercent`, `maximumUpliftPercent`, `maximumReductionPercent`, `maximumSingleChangePercent`, `maximumDailyChangePercent`, `maximumWeeklyChangePercent`, `minimumChangeIntervalMinutes`, `maximumChangesPerDay`, `minimumInventory` and 21 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "DynamicPricingControl",
+    "confirm": {
+     "label": "Save dynamic pricing guardrail policy",
+     "operation": "setDynamicPricingGuardrailPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "scopeLevel",
+      "automationLevel",
+      "scopeId",
+      "absoluteMinimumPrice",
+      "absoluteMaximumPrice",
+      "minimumMarginPercent",
+      "maximumUpliftPercent",
+      "maximumReductionPercent",
+      "maximumSingleChangePercent",
+      "maximumDailyChangePercent",
+      "maximumWeeklyChangePercent",
+      "minimumChangeIntervalMinutes",
+      "maximumChangesPerDay",
+      "minimumInventory",
+      "maximumOccupancyTriggerPercent",
+      "protectedRateTypes"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /dynamic-pricing-controls"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1352,10 +1455,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Operations teams can monitor the real-time execution and distribution of dynamic prices across all applicable sales channels.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Each execution shows) and no metric row",
   "purpose": "Monitor pricing actions as they are executed across TICVAI's selling ecosystem.",
-  "purposeNote": "Operations teams can monitor the real-time execution and distribution of dynamic prices across all applicable sales channels.",
   "gaps": [
    {
     "operation": null,
@@ -1463,10 +1566,7 @@
     "operationId": "createLiveDynamicPrice",
     "contract": "catalogue",
     "purpose": "Live Dynamic Price Execution & Deployment Monitor",
-    "trigger": "onAction",
-    "invalidates": [
-     "createLiveDynamicPrice"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1482,7 +1582,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-115"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-115",
+   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-115"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 125. 10 of 11 labels bound to a contract property; 16 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1546,14 +1647,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "pricing strategies and AI recommendations.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Measure) and no metric row",
   "purpose": "Determine whether dynamic pricing actually improves TICVAI's commercial performance.",
-  "purposeNote": "pricing strategies and AI recommendations.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Strategy vs Strategy, Channel vs Channel. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Strategy vs Strategy, Venue vs Venue, Event vs Event, Channel vs Channel. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 126 §Support"
    }
   ],
@@ -1637,6 +1738,16 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Venue vs Venue",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 126 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Event vs Event",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 126 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Channel vs Channel",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 126 §Support"
       }
@@ -1672,9 +1783,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-116"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-116",
+   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-116"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 126. 18 of 18 labels bound to a contract property; 20 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 126. 18 of 18 labels bound to a contract property; 22 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1728,10 +1840,10 @@
    "notes": "**Reached from ADM-108, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "outcomes and provides governed feedback for improving future pricing intelligence. Board 7 — Final Screen Register # Backend Screen Core Responsibility 10.7. Revenue Optimization Command Center Optimization operations 1 # Backend Screen Core Responsibility 10.7. Pricing Simulation Studio Test proposed pricing 2 10.7. Commercial scenario",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Forecast; Track; Detect) and no metric row",
   "purpose": "Close the intelligence loop by comparing AI predictions and recommendations with actual commercial outcomes. This is what allows the system to improve over time.",
-  "purposeNote": "outcomes and provides governed feedback for improving future pricing intelligence. Board 7 — Final Screen Register # Backend Screen Core Responsibility 10.7. Revenue Optimization Command Center Optimization operations 1 # Backend Screen Core Responsibility 10.7. Pricing Simulation Studio Test proposed pricing 2 10.7. Commercial scenario",
   "layout": {
    "template": "split",
    "regions": [
@@ -1780,6 +1892,20 @@
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 128 §Forecast"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save signal registry policy",
+       "operation": "setSignalRegistryPolicy",
+       "permission": "AI_CONFIGURE",
+       "notes": "**AI governance of signals and models** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /signal-registry"
+      }
+     ]
     }
    ]
   },
@@ -1796,6 +1922,15 @@
     "contract": "catalogue",
     "purpose": "AI Learning, Model Performance & Optimization Feedback",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setSignalRegistryPolicy",
+    "contract": "catalogue",
+    "purpose": "Register a signal or model and set how far AI may trust it",
+    "trigger": "onAction",
+    "invalidates": [
+     "listLearningModelPerformance"
+    ]
    }
   ],
   "entryState": {
@@ -1811,9 +1946,47 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-117"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-117",
+   "workshopBoard": "wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-117"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 128. 7 of 8 labels bound to a contract property; 8 of 96 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetSignalRegistryPolicy",
+    "component": "modal",
+    "trigger": "Save signal registry policy",
+    "body": "**Collects what `setSignalRegistryPolicy` sends before it is called.** Required: `id`, `scopePath`, `registryKind`, `name`, `trustLevel`. Optional: `category`, `provider`, `source`, `internalExternal`, `marketCode`, `refreshFrequency`, `aiUsePermissions`, `fallbackPolicy`, `status`, `ownerPrincipalId`, `purpose`, `deployedAt` and 5 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SignalRegistryEntry",
+    "confirm": {
+     "label": "Save signal registry policy",
+     "operation": "setSignalRegistryPolicy"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "scopePath",
+      "registryKind",
+      "name",
+      "trustLevel",
+      "category",
+      "provider",
+      "source",
+      "internalExternal",
+      "marketCode",
+      "refreshFrequency",
+      "aiUsePermissions",
+      "fallbackPolicy",
+      "status",
+      "ownerPrincipalId",
+      "purpose",
+      "deployedAt",
+      "trainingWindow"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /signal-registry"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

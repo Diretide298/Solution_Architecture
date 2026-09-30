@@ -37,11 +37,11 @@ CREATE TABLE IF NOT EXISTS resources.booking (
     id                                uuid PRIMARY KEY NOT NULL,
     resource_id                       uuid NOT NULL,
     subject_id                        uuid,
-    order_id                          text,
+    order_id                          uuid,
     valid_from                        timestamptz NOT NULL,
     valid_to                          timestamptz NOT NULL,
     status                            text NOT NULL CONSTRAINT booking_status_chk CHECK (status IN ('reserved', 'checkedOut', 'returned', 'overdue', 'cancelled', 'noShow')),
-    hold_id                           text,
+    hold_id                           uuid,
     recurrence_group_id               uuid,
     deposit_authorisation_id          uuid,
     checked_out_at                    timestamptz,
@@ -189,7 +189,7 @@ CREATE TABLE IF NOT EXISTS resources.resource_dependency (
 -- Holds 15 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS resources.resource_hold (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     map_id                            uuid NOT NULL,
     resource_ids                      text[] NOT NULL,
     valid_from                        timestamptz NOT NULL,
@@ -238,7 +238,7 @@ CREATE TABLE IF NOT EXISTS resources.resource_relation (
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS resources.resource_request (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     kind                              text NOT NULL CONSTRAINT resource_request_kind_chk CHECK (kind IN ('replacementResource', 'additionalEquipment', 'resourceIssue', 'maintenanceRequest', 'assignmentChange', 'venueChange', 'scheduleClarification', 'other')),
     booking_id                        uuid,
     resource_id                       uuid,

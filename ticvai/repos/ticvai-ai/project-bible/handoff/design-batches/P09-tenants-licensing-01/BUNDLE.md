@@ -403,7 +403,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "id": "formOpenPlatformStaffGrant",
     "component": "modal",
     "trigger": "Open access grant",
-    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only — the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client UUIDv7), `permissions` (tenant permissions only — the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Open access grant",
      "operation": "openPlatformStaffGrant"
@@ -4006,7 +4006,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listProductionAccessRequests",
        "notes": "**Production keys only after certification** (17 September minutes, M17-06). The queue a TICVAI administrator works: each request names the certified integration, the tenants, the module scopes and the IP allow-list. Approving issues a new production client; the sandbox key is never promoted.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       },
       {
        "kind": "dataTable",
@@ -4023,7 +4023,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listApiAnomalies",
        "notes": "**Abnormal volume is flagged, not only throttled** (M17-07): calls above the client's own baseline, refusals from outside the allow-list, calls to operations it never uses.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     },
@@ -4158,13 +4158,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "primaryButton",
        "label": "Decide production access",
        "operation": "decideProductionAccess",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       },
       {
        "kind": "secondaryButton",
        "label": "Save anomaly rule",
        "operation": "setApiAnomalyRule",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     }
@@ -4240,7 +4240,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "public-api",
     "purpose": "The production key approval queue",
     "trigger": "onLoad",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "operationId": "decideProductionAccess",
@@ -4251,14 +4251,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "listProductionAccessRequests",
      "listApiClients"
     ],
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "operationId": "listApiAnomalies",
     "contract": "public-api",
     "purpose": "Flagged abnormal API traffic",
     "trigger": "onLoad",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "operationId": "setApiAnomalyRule",
@@ -4268,7 +4268,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listApiAnomalies"
     ],
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "entryState": {
@@ -4340,7 +4340,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       "credentialTtlDays"
      ]
     },
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "id": "formSetApiAnomalyRule",
@@ -4365,7 +4365,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       "isActive"
      ]
     },
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "_platform": {
@@ -6945,7 +6945,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "operatorPrincipalId": {
     "type": "string",

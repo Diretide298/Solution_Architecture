@@ -1,6 +1,6 @@
 # WS22 — B2B, Reseller & OTA Partner Management board 2
 
-**10 screens · 10 operations · 14 schemas · 2 permissions**
+**10 screens · 14 operations · 23 schemas · 4 permissions**
 
 Platform P10 Partner Web · ships as **ticvai-control** ·
 partner audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `PLATFORM_CELL_MANAGE, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `CREDIT_MANAGE, PARTNER_MANAGE, PLATFORM_CELL_MANAGE, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,20 +60,20 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `PTR-032` | Commercial Agreement Command Center | commandCentre | 1 | 0 | — |
+| `PTR-032` | Commercial Agreement Command Center | commandCentre | 2 | 0 | — |
 | `PTR-033` | Agreement & Contract Terms Builder | configEditor | 1 | 0 | — |
 | `PTR-034` | Partner Rate & Net Pricing Configuration | configEditor | 1 | 0 | — |
-| `PTR-035` | Commission, Margin & Incentive Management | listDetail | 1 | 0 | — |
-| `PTR-036` | Credit Limit & Exposure Management | configEditor | 1 | 0 | — |
-| `PTR-037` | Deposit, Guarantee & Financial Security Management | listDetail | 1 | 0 | — |
+| `PTR-035` | Commission, Margin & Incentive Management | listDetail | 2 | 1 | — |
+| `PTR-036` | Credit Limit & Exposure Management | configEditor | 2 | 1 | — |
+| `PTR-037` | Deposit, Guarantee & Financial Security Management | listDetail | 2 | 1 | — |
 | `PTR-038` | Payment Terms, Billing & Account Configuration | listDetail | 1 | 0 | — |
-| `PTR-039` | Commercial Allocation, Quota & Commitment Management | listDetail | 1 | 0 | — |
+| `PTR-039` | Commercial Allocation, Quota & Commitment Management | listDetail | 2 | 1 | — |
 | `PTR-040` | Booking Limits, Commercial Exceptions & Approval | configEditor | 1 | 0 | — |
 | `PTR-041` | Commercial Agreement 360°, Health & AI Review | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**PTR-035, PTR-037, PTR-038, PTR-041 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**PTR-035, PTR-041 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -107,7 +106,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "PTR-001"
    ],
    "exitTo": [
-    "PTR-001",
     "PTR-033",
     "PTR-034",
     "PTR-035",
@@ -122,15 +120,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
    "transitions": [
     {
-     "to": "PTR-001",
-     "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId",
-      "sessionId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
-    },
-    {
      "to": "PTR-033",
      "trigger": "Works in Agreement & Contract Terms Builder",
      "provenance": "flow F131 step 1→2",
@@ -140,18 +129,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "PTR-034",
      "trigger": "Works in Partner Rate & Net Pricing Configuration",
      "provenance": "flow F131 step 3→4",
-     "operation": "listCommercialAgreement"
-    },
-    {
-     "to": "PTR-035",
-     "trigger": "Works in Commission, Margin & Incentive Management",
-     "provenance": "flow F131 step 5→6",
-     "operation": "listCommercialAgreement"
-    },
-    {
-     "to": "PTR-036",
-     "trigger": "Works in Credit Limit & Exposure Management",
-     "provenance": "flow F131 step 7→8",
      "operation": "listCommercialAgreement"
     },
     {
@@ -167,12 +144,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "operation": "listCommercialAgreement"
     },
     {
-     "to": "PTR-039",
-     "trigger": "Works in Commercial Allocation, Quota & Commitment Management",
-     "provenance": "flow F131 step 13→14",
-     "operation": "listCommercialAgreement"
-    },
-    {
      "to": "PTR-040",
      "trigger": "Works in Booking Limits, Commercial Exceptions & Approval",
      "provenance": "flow F131 step 15→16",
@@ -183,14 +154,41 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "trigger": "Works in Commercial Agreement 360°, Health & AI Review",
      "provenance": "flow F131 step 17→18",
      "operation": "listCommercialAgreement"
+    },
+    {
+     "to": "PTR-035",
+     "trigger": "Works in Commission, Margin & Incentive Management",
+     "provenance": "flow F131 step 5→6",
+     "operation": "listCommercialAgreement",
+     "carries": [
+      "agreementId"
+     ]
+    },
+    {
+     "to": "PTR-036",
+     "trigger": "Works in Credit Limit & Exposure Management",
+     "provenance": "flow F131 step 7→8",
+     "operation": "listCommercialAgreement",
+     "carries": [
+      "agreementId"
+     ]
+    },
+    {
+     "to": "PTR-039",
+     "trigger": "Works in Commercial Allocation, Quota & Commitment Management",
+     "provenance": "flow F131 step 13→14",
+     "operation": "listCommercialAgreement",
+     "carries": [
+      "agreementId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Commercial management can understand the status, exposure, expiry and major commercial terms of every partner agreement from one central workspace.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each agreement should show) — counts over a population, then the population",
   "purpose": "Provide commercial and finance teams with a centralized view of all partner agreements and their current commercial health.",
-  "purposeNote": "Commercial management can understand the status, exposure, expiry and major commercial terms of every partner agreement from one central workspace.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -232,73 +230,73 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "metricTile",
        "label": "Active Agreements",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "CommercialAgreementCommandCenterView.activeAgreements"
+       "bindsTo": "CommercialAgreementCommandCenterSummary.activeAgreements"
       },
       {
        "kind": "metricTile",
        "label": "Draft Agreements",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "CommercialAgreementCommandCenterView.draftAgreements"
+       "bindsTo": "CommercialAgreementCommandCenterSummary.draftAgreements"
       },
       {
        "kind": "metricTile",
        "label": "Pending Approval",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "CommercialAgreementCommandCenterView.pendingApproval"
+       "bindsTo": "CommercialAgreementCommandCenterSummary.pendingApproval"
       },
       {
        "kind": "metricTile",
        "label": "Agreements Expiring Soon",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "CommercialAgreementCommandCenterView.agreementsExpiringSoon"
+       "bindsTo": "CommercialAgreementCommandCenterSummary.agreementsExpiringSoon"
       },
       {
        "kind": "metricTile",
        "label": "Expired Agreements",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "CommercialAgreementCommandCenterView.expiredAgreements"
+       "bindsTo": "CommercialAgreementCommandCenterSummary.expiredAgreements"
       },
       {
        "kind": "metricTile",
        "label": "Partners on Credit Hold",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "CommercialAgreementCommandCenterView.partnersOnCreditHold"
+       "bindsTo": "CommercialAgreementCommandCenterSummary.partnersOnCreditHold"
       },
       {
        "kind": "metricTile",
        "label": "Total Approved Credit",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "CommercialAgreementCommandCenterView.totalApprovedCredit"
+       "bindsTo": "CommercialAgreementCommandCenterSummary.totalApprovedCredit"
       },
       {
        "kind": "metricTile",
        "label": "Current Credit Exposure",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "CommercialAgreementCommandCenterView.currentCreditExposure"
+       "bindsTo": "CommercialAgreementCommandCenterSummary.currentCreditExposure"
       },
       {
        "kind": "metricTile",
        "label": "Outstanding Receivables",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "CommercialAgreementCommandCenterView.outstandingReceivables"
+       "bindsTo": "CommercialAgreementCommandCenterSummary.outstandingReceivables"
       },
       {
        "kind": "metricTile",
        "label": "Active Commercial Allocations",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "CommercialAgreementCommandCenterView.activeCommercialAllocations"
+       "bindsTo": "CommercialAgreementCommandCenterSummary.activeCommercialAllocations"
       },
       {
        "kind": "metricTile",
        "label": "Agreements With Exceptions",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "CommercialAgreementCommandCenterView.agreementsWithExceptions"
+       "bindsTo": "CommercialAgreementCommandCenterSummary.agreementsWithExceptions"
       },
       {
        "kind": "metricTile",
        "label": "Commercial Risk Alerts",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "CommercialAgreementCommandCenterView.commercialRiskAlerts"
+       "bindsTo": "CommercialAgreementCommandCenterSummary.commercialRiskAlerts"
       }
      ]
     },
@@ -315,11 +313,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "CommercialAgreementCommandCenterView.agreementType",
         "CommercialAgreementCommandCenterView.brandVenue",
         "CommercialAgreementCommandCenterView.market",
-        "CommercialAgreementCommandCenterView.effectiveFrom",
-        "CommercialAgreementCommandCenterView.effectiveTo",
+        "CommercialAgreementCommandCenterView.validFrom",
+        "CommercialAgreementCommandCenterView.validTo",
         "CommercialAgreementCommandCenterView.pricingModel",
         "CommercialAgreementCommandCenterView.commissionModel",
-        "CommercialAgreementCommandCenterView.paymentTerms",
+        "CommercialAgreementCommandCenterView.creditTermDays",
         "CommercialAgreementCommandCenterView.creditLimit",
         "CommercialAgreementCommandCenterView.currentExposure",
         "CommercialAgreementCommandCenterView.allocationModel",
@@ -346,11 +344,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "CommercialAgreementCommandCenterView.agreementType",
         "CommercialAgreementCommandCenterView.brandVenue",
         "CommercialAgreementCommandCenterView.market",
-        "CommercialAgreementCommandCenterView.effectiveFrom",
-        "CommercialAgreementCommandCenterView.effectiveTo",
+        "CommercialAgreementCommandCenterView.validFrom",
+        "CommercialAgreementCommandCenterView.validTo",
         "CommercialAgreementCommandCenterView.pricingModel",
         "CommercialAgreementCommandCenterView.commissionModel",
-        "CommercialAgreementCommandCenterView.paymentTerms",
+        "CommercialAgreementCommandCenterView.creditTermDays",
         "CommercialAgreementCommandCenterView.creditLimit",
         "CommercialAgreementCommandCenterView.currentExposure",
         "CommercialAgreementCommandCenterView.allocationModel",
@@ -377,12 +375,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "subscription",
     "purpose": "Commercial Agreement Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCommercialAgreementHealth",
+    "contract": "subscription",
+    "purpose": "Commercial Agreement 360°, Health & AI Review",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-032"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-032",
+   "workshopBoard": "wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-032"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 23. 30 of 38 labels bound to a contract property; 38 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -446,14 +451,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "every governed partner relationship.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Configure/reference) and no display directory — it is settings, not a population",
   "purpose": "Create the structured commercial agreement governing the partner relationship.",
-  "purposeNote": "every governed partner relationship.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Renewal Approval. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Manual Renewal, Renewal Notice Period, Renewal Approval. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Support"
    }
   ],
@@ -602,6 +607,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Manual Renewal",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Renewal Notice Period",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Renewal Approval",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Support"
       }
@@ -620,18 +635,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setAgreementContractTerm",
     "contract": "subscription",
     "purpose": "Agreement & Contract Terms Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setAgreementContractTerm"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-033"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-033",
+   "workshopBoard": "wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-033"
   },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 25. 0 of 0 labels bound to a contract property; 27 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 25. 0 of 0 labels bound to a contract property; 29 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -693,10 +706,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "the authoritative calculation service.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure by) and no display directory — it is settings, not a population",
   "purpose": "Define the commercial pricing basis available to a partner without recreating TICVAI's Pricing Engine.",
-  "purposeNote": "the authoritative calculation service.",
   "layout": {
    "template": "form",
    "regions": [
@@ -780,16 +793,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setPartnerRateNet",
     "contract": "subscription",
     "purpose": "Partner Rate & Net Pricing Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setPartnerRateNet"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-034"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-034",
+   "workshopBoard": "wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-034"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 27. 0 of 0 labels bound to a contract property; 10 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -859,11 +870,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Campaign Incentive. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 29 §Support"
-   },
-   {
-    "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
     "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 29"
    },
@@ -884,6 +890,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "primaryButton",
        "label": "Campaign Incentive",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 29 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save partner commission rules",
+       "operation": "setPartnerCommissionRules",
+       "permission": "PARTNER_MANAGE",
+       "notes": "The writer for PTR-035 (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml PUT /partner-agreements/{agreementId}/commission-rules"
       }
      ]
     },
@@ -913,14 +927,52 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "subscription",
     "purpose": "Commission, Margin & Incentive Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPartnerCommissionRules",
+    "contract": "subscription",
+    "purpose": "Replace the commission and incentive rules of an agreement",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCommissionMarginIncentive"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-035"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-035",
+   "workshopBoard": "wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-035"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 29. 0 of 0 labels bound to a contract property; 1 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetPartnerCommissionRules",
+    "component": "modal",
+    "trigger": "Save partner commission rules",
+    "body": "**Collects what `setPartnerCommissionRules` sends before it is called.** Required: `rules`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save partner commission rules",
+     "operation": "setPartnerCommissionRules"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "rules"
+     ]
+    },
+    "provenance": "contract subscription.yaml PUT /partner-agreements/{agreementId}/commission-rules"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "agreementId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -982,10 +1034,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "time visibility of available and utilized credit.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Control the financial exposure TICVAI permits for partners buying on account. This should be one of the strongest finance-control screens in the B2B module.",
-  "purposeNote": "time visibility of available and utilized credit.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1059,6 +1111,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Permissions this screen separates",
        "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Increase Limit, Reduce Limit, Temporary Increase, Place Credit Hold, Release Hold, Block Credit Transactions. Each needs attaching to the control it gates, or the screen needs the control.",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 30 §Authorized users can"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save partner credit profile",
+       "operation": "setPartnerCreditProfile",
+       "permission": "CREDIT_MANAGE",
+       "notes": "The writer for PTR-036 (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml PUT /partner-agreements/{agreementId}/credit-profile"
       }
      ]
     }
@@ -1076,23 +1136,75 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "subscription",
     "purpose": "Credit Limit & Exposure Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPartnerCreditProfile",
+    "contract": "subscription",
+    "purpose": "Set the credit controls of an agreement",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCreditLimitExposure"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "CreditLimitExposureManagementView.approvedCreditLimitAed500000",
     "Open Invoices: AED 210,000",
-    "CreditLimitExposureManagementView.unbilledTransactionsAed95000",
-    "CreditLimitExposureManagementView.activeHoldsReservationsAed40000",
-    "CreditLimitExposureManagementView.availableCreditAed155000"
+    "CreditLimitExposureManagementView.unbilledTransactions",
+    "CreditLimitExposureManagementView.activeHoldsReservations",
+    "CreditLimitExposureManagementView.availableCredit"
+   ],
+   "params": [
+    {
+     "name": "agreementId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-036"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-036",
+   "workshopBoard": "wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-036"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 30. 0 of 0 labels bound to a contract property; 22 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetPartnerCreditProfile",
+    "component": "modal",
+    "trigger": "Save partner credit profile",
+    "body": "**Collects what `setPartnerCreditProfile` sends before it is called.** Required: `id`, `partnerId`, `agreementId`, `creditEnabled`, `creditStatus`. Optional: `temporaryCreditLimit`, `temporaryLimitUntil`, `creditOwnerPrincipalId`, `approvalAuthority`, `riskClassification`, `warningThresholdPercent`, `highRiskThresholdPercent`, `blockThresholdPercent`, `effectiveFrom`, `effectiveTo`, `approvalRequestId`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PartnerCreditProfile",
+    "confirm": {
+     "label": "Save partner credit profile",
+     "operation": "setPartnerCreditProfile"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "partnerId",
+      "agreementId",
+      "creditEnabled",
+      "creditStatus",
+      "temporaryCreditLimit",
+      "temporaryLimitUntil",
+      "creditOwnerPrincipalId",
+      "approvalAuthority",
+      "riskClassification",
+      "warningThresholdPercent",
+      "highRiskThresholdPercent",
+      "blockThresholdPercent",
+      "effectiveFrom",
+      "effectiveTo",
+      "approvalRequestId",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract subscription.yaml PUT /partner-agreements/{agreementId}/credit-profile"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1154,17 +1266,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Finance can track all financial securities supporting partner exposure and automatically enforce configured controls when security becomes insufficient or expires.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Manage financial security required to support partner credit or commercial access.",
-  "purposeNote": "Finance can track all financial securities supporting partner exposure and automatically enforce configured controls when security becomes insufficient or expires.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Security Deposit. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Support"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1176,9 +1281,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every deposit guarantee financial",
        "columns": [
-        "DepositGuaranteeFinancialSecurityManagementView.creditExposureAed500000",
-        "DepositGuaranteeFinancialSecurityManagementView.guaranteeAed300000",
-        "DepositGuaranteeFinancialSecurityManagementView.unsecuredExposureAed200000"
+        "DepositGuaranteeFinancialSecurityManagementView.creditExposure",
+        "DepositGuaranteeFinancialSecurityManagementView.securityCoverage",
+        "DepositGuaranteeFinancialSecurityManagementView.unsecuredExposure"
        ],
        "bindsTo": "DepositGuaranteeFinancialSecurityManagementView",
        "operation": "listDepositGuaranteeFinancial",
@@ -1195,9 +1300,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected deposit guarantee financial",
        "bindsTo": "DepositGuaranteeFinancialSecurityManagementView",
        "columns": [
-        "DepositGuaranteeFinancialSecurityManagementView.creditExposureAed500000",
-        "DepositGuaranteeFinancialSecurityManagementView.guaranteeAed300000",
-        "DepositGuaranteeFinancialSecurityManagementView.unsecuredExposureAed200000"
+        "DepositGuaranteeFinancialSecurityManagementView.creditExposure",
+        "DepositGuaranteeFinancialSecurityManagementView.securityCoverage",
+        "DepositGuaranteeFinancialSecurityManagementView.unsecuredExposure"
        ],
        "notes": null,
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Display"
@@ -1210,8 +1315,31 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Cash Deposit",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Security Deposit",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Prepayment Balance",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Other Approved Security",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save partner security",
+       "operation": "setPartnerSecurity",
+       "permission": "CREDIT_MANAGE",
+       "notes": "The writer for PTR-037 (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml PUT /partners/{partnerId}/securities"
       }
      ]
     }
@@ -1230,21 +1358,70 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "subscription",
     "purpose": "Deposit, Guarantee & Financial Security Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPartnerSecurity",
+    "contract": "subscription",
+    "purpose": "Record, amend, verify or reject a partner's deposit or guarantee",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDepositGuaranteeFinancial"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "DepositGuaranteeFinancialSecurityManagementView.creditExposureAed500000",
-    "DepositGuaranteeFinancialSecurityManagementView.guaranteeAed300000",
-    "DepositGuaranteeFinancialSecurityManagementView.unsecuredExposureAed200000"
+    "DepositGuaranteeFinancialSecurityManagementView.creditExposure",
+    "DepositGuaranteeFinancialSecurityManagementView.securityCoverage",
+    "DepositGuaranteeFinancialSecurityManagementView.unsecuredExposure"
+   ],
+   "params": [
+    {
+     "name": "partnerId",
+     "from": "session"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-037"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-037",
+   "workshopBoard": "wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-037"
   },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 32. 3 of 3 labels bound to a contract property; 21 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 32. 3 of 3 labels bound to a contract property; 24 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetPartnerSecurity",
+    "component": "modal",
+    "trigger": "Save partner security",
+    "body": "**Collects what `setPartnerSecurity` sends before it is called.** Required: `id`, `partnerId`, `securityType`, `amount`, `currency`, `effectiveDate`, `verificationStatus`. Optional: `agreementId`, `issuingInstitution`, `reference`, `expiryDate`, `documentId`, `expiryAction`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PartnerSecurity",
+    "confirm": {
+     "label": "Save partner security",
+     "operation": "setPartnerSecurity"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "partnerId",
+      "securityType",
+      "amount",
+      "currency",
+      "effectiveDate",
+      "verificationStatus",
+      "agreementId",
+      "issuingInstitution",
+      "reference",
+      "expiryDate",
+      "documentId",
+      "expiryAction",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract subscription.yaml PUT /partners/{partnerId}/securities"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1306,10 +1483,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Every partner transaction can be routed to the correct approved payment and billing model based on its commercial agreement.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Define how the partner pays TICVAI and how transactions are financially grouped.",
-  "purposeNote": "Every partner transaction can be routed to the correct approved payment and billing model based on its commercial agreement.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Immediate Payment, Credit Account, Deposit Balance, Bank Transfer, Card, Prepaid Balance, Other approved method. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Support"
+   }
+  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1363,7 +1547,42 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Immediate Payment",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Credit Account",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Deposit Balance",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Bank Transfer",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Card",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Payment Link",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Prepaid Balance",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Other approved method",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference"
       }
      ]
@@ -1382,10 +1601,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setPaymentTermBilling",
     "contract": "subscription",
     "purpose": "Payment Terms, Billing & Account Configuration",
-    "trigger": "onAction",
-    "invalidates": [
-     "setPaymentTermBilling"
-    ]
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1401,9 +1617,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-038"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-038",
+   "workshopBoard": "wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-038"
   },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 33. 7 of 7 labels bound to a contract property; 17 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 33. 7 of 7 labels bound to a contract property; 24 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1465,17 +1682,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "permitted availability with central capacity management.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Define the commercial commitment of inventory to a partner. This differs from Area 4's operational channel allocation.",
-  "purposeNote": "permitted availability with central capacity management.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Guaranteed Allocation, On-Request Allocation, Shared Allocation, Percentage Allocation, Rolling Allocation, Seasonal Allocation. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1544,6 +1754,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       },
       {
        "kind": "secondaryButton",
+       "label": "Fixed Quantity",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Percentage Allocation",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support"
       },
@@ -1556,6 +1771,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "secondaryButton",
        "label": "Seasonal Allocation",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Take-or-pay where commercially applicable",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save partner allocations",
+       "operation": "setPartnerAllocations",
+       "permission": "PARTNER_MANAGE",
+       "notes": "The writer for PTR-039 (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml PUT /partner-agreements/{agreementId}/allocations"
       }
      ]
     }
@@ -1574,6 +1802,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "subscription",
     "purpose": "Commercial Allocation, Quota & Commitment Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPartnerAllocations",
+    "contract": "subscription",
+    "purpose": "Replace the allocations of an agreement",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCommercialAllocationQuota"
+    ]
    }
   ],
   "entryState": {
@@ -1584,14 +1821,41 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "CommercialAllocationQuotaCommitmentManagementView.returned",
     "CommercialAllocationQuotaCommitmentManagementView.remaining",
     "CommercialAllocationQuotaCommitmentManagementView.utilization"
+   ],
+   "params": [
+    {
+     "name": "agreementId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-039"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-039",
+   "workshopBoard": "wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-039"
   },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 35. 7 of 7 labels bound to a contract property; 25 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 35. 7 of 7 labels bound to a contract property; 27 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetPartnerAllocations",
+    "component": "modal",
+    "trigger": "Save partner allocations",
+    "body": "**Collects what `setPartnerAllocations` sends before it is called.** Required: `allocations`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save partner allocations",
+     "operation": "setPartnerAllocations"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "allocations"
+     ]
+    },
+    "provenance": "contract subscription.yaml PUT /partner-agreements/{agreementId}/allocations"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1653,14 +1917,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Transactions outside standard partner commercial rules cannot proceed without the appropriate documented exception and approval.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Capture) and no display directory — it is settings, not a population",
   "purpose": "Control transaction limits and provide a governed mechanism for commercial exceptions.",
-  "purposeNote": "Transactions outside standard partner commercial rules cannot proceed without the appropriate documented exception and approval.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Price Exception, Allocation Exception. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Price Exception, Credit Exception, Allocation Exception. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Support"
    }
   ],
@@ -1774,6 +2038,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       },
       {
        "kind": "secondaryButton",
+       "label": "Credit Exception",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Allocation Exception",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Support"
       },
@@ -1797,18 +2066,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "approveBookingLimitCommercial",
     "contract": "subscription",
     "purpose": "Booking Limits, Commercial Exceptions & Approval",
-    "trigger": "onAction",
-    "invalidates": [
-     "approveBookingLimitCommercial"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-040"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-040",
+   "workshopBoard": "wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-040"
   },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 37. 0 of 0 labels bound to a contract property; 21 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 37. 0 of 0 labels bound to a contract property; 22 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1862,10 +2129,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Management can evaluate the complete commercial relationship, financial exposure, performance and upcoming risks from a single Partner Commercial 360 workspace. Board 2 — Final Screen Register Screen Backend Screen Primary Responsibility",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Give management a single consolidated view of the complete commercial relationship with a partner. Board 3 manages the day-to-day operational and financial relationship with active B2B, reseller and OTA partners. The three boards now form a clean lifecycle: Board 1 — Who is the partner? Onboarding → Organization → Users → Territory → Compliance → Permissions → Activation Board 2 — Under what commercial terms can they transact? Agreement → Rates → Commission → Credit → Security → Billing → Allocation → Limits Board 3 — What happens once the partner starts doing business? Orders → Reservations → Cancellations → Statements → Reconciliation → Commission Settlement → Disputes → Performance → Risk → AI Optimization A key principle for Board 3 is that it should provide a Partner Operations 360° without rebuilding functionality already owned by Orders, Finance, Ticketing, Payment or Channel Management.",
-  "purposeNote": "Management can evaluate the complete commercial relationship, financial exposure, performance and upcoming risks from a single Partner Commercial 360 workspace. Board 2 — Final Screen Register Screen Backend Screen Primary Responsibility",
   "gaps": [
    {
     "operation": null,
@@ -1924,7 +2191,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "entryState": {
    "preloaded": [
     "CommercialAgreement360HealthAiReviewView.contractStatus",
-    "CommercialAgreement360HealthAiReviewView.effectiveDates",
     "CommercialAgreement360HealthAiReviewView.renewal",
     "CommercialAgreement360HealthAiReviewView.rateModel",
     "CommercialAgreement360HealthAiReviewView.averageDiscount"
@@ -1933,7 +2199,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-041"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-041",
+   "workshopBoard": "wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-041"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 38. 0 of 0 labels bound to a contract property; 6 of 109 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1978,7 +2245,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "BookingLimitsCommercialExceptionsApprovalInput",
   "responds": "BookingLimitsCommercialExceptionsApprovalView"
  },
@@ -2018,7 +2291,7 @@ Method, path, parameters, request and response for every operation these screens
     "required": false
    },
    {
-    "name": "expiry",
+    "name": "risk",
     "in": "query",
     "required": false
    },
@@ -2028,13 +2301,38 @@ Method, path, parameters, request and response for every operation these screens
     "required": false
    },
    {
-    "name": "risk",
+    "name": "expiringWithinDays",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "agreementType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "commercialOwner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "CommercialAgreementCommandCenterView"
+  "responds": "Page"
  },
  "listCommercialAgreementHealth": {
   "method": "GET",
@@ -2045,9 +2343,40 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "agreementId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "risk",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CommercialAgreement360HealthAiReviewView"
+  "responds": "Page"
  },
  "listCommercialAllocationQuota": {
   "method": "GET",
@@ -2058,9 +2387,35 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "eventId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "allocationModel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CommercialAllocationQuotaCommitmentManagementView"
+  "responds": "Page"
  },
  "listCommissionMarginIncentive": {
   "method": "GET",
@@ -2071,9 +2426,35 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "agreementId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "commissionModel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CommissionMarginIncentiveManagementView"
+  "responds": "Page"
  },
  "listCreditLimitExposure": {
   "method": "GET",
@@ -2084,9 +2465,35 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "creditStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "riskClassification",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CreditLimitExposureManagementView"
+  "responds": "Page"
  },
  "listDepositGuaranteeFinancial": {
   "method": "GET",
@@ -2097,9 +2504,40 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "securityType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "verificationStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "expiringWithinDays",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "DepositGuaranteeFinancialSecurityManagementView"
+  "responds": "Page"
  },
  "setAgreementContractTerm": {
   "method": "PUT",
@@ -2110,9 +2548,72 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "AgreementContractTermsBuilderInput",
   "responds": "AgreementContractTermsBuilderView"
+ },
+ "setPartnerAllocations": {
+  "method": "PUT",
+  "path": "/partner-agreements/{agreementId}/allocations",
+  "contract": "subscription",
+  "summary": "Replace the allocations of an agreement",
+  "permission": "PARTNER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PartnerApprovalRoutedResult"
+ },
+ "setPartnerCommissionRules": {
+  "method": "PUT",
+  "path": "/partner-agreements/{agreementId}/commission-rules",
+  "contract": "subscription",
+  "summary": "Replace the commission and incentive rules of an agreement",
+  "permission": "PARTNER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PartnerApprovalRoutedResult"
+ },
+ "setPartnerCreditProfile": {
+  "method": "PUT",
+  "path": "/partner-agreements/{agreementId}/credit-profile",
+  "contract": "subscription",
+  "summary": "Set the credit controls of an agreement",
+  "permission": "CREDIT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PartnerCreditProfile",
+  "responds": "PartnerApprovalRoutedResult"
  },
  "setPartnerRateNet": {
   "method": "PUT",
@@ -2123,9 +2624,34 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PartnerRateNetPricingConfigurationInput",
   "responds": "PartnerRateNetPricingConfigurationView"
+ },
+ "setPartnerSecurity": {
+  "method": "PUT",
+  "path": "/partners/{partnerId}/securities",
+  "contract": "subscription",
+  "summary": "Record, amend, verify or reject a partner's deposit or guarantee",
+  "permission": "CREDIT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PartnerSecurity",
+  "responds": "PartnerSecurity"
  },
  "setPaymentTermBilling": {
   "method": "PUT",
@@ -2136,7 +2662,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PaymentTermsBillingAccountConfigurationInput",
   "responds": "PaymentTermsBillingAccountConfigurationView"
  }
@@ -2152,24 +2684,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "AgreementContractTermsBuilderInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is control.api_licence at 6%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; stored as control.partner_agreement (PartnerAgreement), a new version per amendment; documents are control.partner_document rows with agreementId; legalEntity, commercialOwner and financeOwner land in legalEntityId, commercialOwnerPrincipalId and financeOwnerPrincipalId (data model DM4)",
   "description": "**What Agreement & Contract Terms Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "agreementId": {
     "type": "string",
-    "description": "Agreement ID"
+    "format": "uuid",
+    "description": "Agreement ID; omit to create"
    },
    "agreementName": {
     "type": "string",
     "description": "Agreement Name"
    },
-   "partner": {
+   "partnerId": {
     "type": "string",
+    "format": "uuid",
     "description": "Partner"
    },
    "agreementType": {
     "type": "string",
-    "description": "Agreement Type"
+    "description": "Agreement Type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate, distribution, apiCommercial (pack p.26)"
    },
    "contractReference": {
     "type": "string",
@@ -2179,150 +2713,193 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Legal Entity"
    },
-   "brand": {
+   "brandId": {
     "type": "string",
-    "description": "Brand"
+    "description": "Brand id",
+    "nullable": true
    },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
+   "allowedVenueIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "Venues the agreement covers"
    },
    "territory": {
     "type": "string",
     "description": "Territory"
    },
-   "currency": {
+   "settlementCurrency": {
     "type": "string",
-    "description": "Currency"
+    "pattern": "^[A-Z]{3}$",
+    "description": "Settlement currency, ISO 4217"
    },
-   "effectiveFrom": {
+   "validFrom": {
     "type": "string",
+    "format": "date",
     "description": "Effective From"
    },
-   "effectiveTo": {
+   "validTo": {
     "type": "string",
-    "description": "Effective To"
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
    },
    "renewalType": {
     "type": "string",
+    "enum": [
+     "manual",
+     "auto"
+    ],
     "description": "Renewal Type"
    },
    "commercialOwner": {
     "type": "string",
-    "description": "Commercial Owner"
+    "description": "Commercial Owner: staff principal id"
    },
    "financeOwner": {
     "type": "string",
-    "description": "Finance Owner"
+    "description": "Finance Owner: staff principal id"
    },
-   "paymentTerms": {
-    "type": "string",
-    "description": "Payment Terms"
+   "creditTermDays": {
+    "type": "integer",
+    "description": "Payment Terms in days (0 = due immediately; Net 7/15/30/45 or custom)"
    },
    "commissionTerms": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Commission Terms"
+    "type": "string",
+    "description": "Commission Terms: summary or reference to the commission rules (listCommissionMarginIncentive)",
+    "nullable": true
    },
    "pricingBasis": {
     "type": "string",
-    "description": "Pricing Basis"
+    "enum": [
+     "retailPrice",
+     "netRate",
+     "discountFromRetail",
+     "markup",
+     "derivedRate"
+    ],
+    "description": "Pricing Basis (pack p.27 pricing models)"
    },
    "creditTerms": {
     "type": "string",
-    "description": "Credit Terms"
+    "description": "Credit Terms",
+    "nullable": true
    },
    "allocationTerms": {
     "type": "string",
-    "description": "Allocation Terms"
+    "description": "Allocation Terms",
+    "nullable": true
    },
    "cancellationConditions": {
     "type": "string",
-    "description": "Cancellation Conditions"
+    "description": "Cancellation Conditions",
+    "nullable": true
    },
    "bookingRestrictions": {
     "type": "string",
-    "description": "Booking Restrictions"
+    "description": "Booking Restrictions",
+    "nullable": true
    },
    "settlementTerms": {
     "type": "string",
-    "description": "Settlement Terms"
+    "description": "Settlement Terms",
+    "nullable": true
    },
    "minimumCommitment": {
-    "type": "string",
-    "description": "Minimum Commitment"
+    "type": "integer",
+    "description": "Minimum Commitment: tickets over the agreement term",
+    "nullable": true
    },
    "salesTarget": {
-    "type": "string",
-    "description": "Sales Target"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Sales Target over the agreement term"
    },
-   "manualRenewal": {
-    "type": "string",
-    "description": "Manual Renewal"
-   },
-   "autoRenewal": {
-    "type": "string",
-    "description": "Auto-Renewal"
-   },
-   "renewalNoticePeriod": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Renewal Notice Period"
+   "renewalNoticeDays": {
+    "type": "integer",
+    "description": "Renewal Notice Period in days",
+    "nullable": true
    },
    "renegotiationRequired": {
     "type": "boolean",
     "description": "Renegotiation Required"
    },
-   "renewalApproval": {
-    "type": "string",
-    "description": "Renewal Approval"
+   "renewalRequiresApproval": {
+    "type": "boolean",
+    "description": "Renewal Approval: renewal needs approval"
    },
-   "signedContract": {
-    "type": "string",
-    "description": "Signed Contract"
+   "rateMode": {
+    "$ref": "#/components/schemas/PartnerRateMode",
+    "description": "Net rate or commission, as on PartnerAgreement"
    },
-   "addendum": {
+   "paymentModel": {
     "type": "string",
-    "description": "Addendum"
+    "enum": [
+     "creditAccount",
+     "prepaid",
+     "payPerTransaction"
+    ],
+    "description": "Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced periodically), prepaid (pre-funded wallet drawn down per sale) or payPerTransaction (card at each sale)"
    },
-   "rateSheet": {
-    "type": "number",
-    "description": "Rate Sheet"
-   },
-   "sla": {
+   "refundConditions": {
     "type": "string",
-    "description": "SLA"
+    "description": "Refund Conditions (pack p.26)",
+    "nullable": true
    },
-   "nda": {
-    "type": "string",
-    "description": "NDA"
+   "agreementValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Agreement value (MoM 31 Aug 4.4: each agreement captures term/value)"
    },
-   "commercialAnnex": {
-    "type": "string",
-    "description": "Commercial Annex"
+   "documents": {
+    "type": "array",
+    "description": "Document Association",
+    "items": {
+     "type": "object",
+     "properties": {
+      "documentType": {
+       "type": "string",
+       "enum": [
+        "signedContract",
+        "addendum",
+        "rateSheet",
+        "sla",
+        "nda",
+        "commercialAnnex"
+       ]
+      },
+      "documentId": {
+       "type": "string",
+       "format": "uuid"
+      }
+     }
+    }
    }
   }
  },
  "AgreementContractTermsBuilderView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_agreement and control.partner_document and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Agreement & Contract Terms Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "agreementId": {
     "type": "string",
-    "description": "Agreement ID"
+    "format": "uuid",
+    "description": "Agreement ID; omit to create"
    },
    "agreementName": {
     "type": "string",
     "description": "Agreement Name"
    },
-   "partner": {
+   "partnerId": {
     "type": "string",
+    "format": "uuid",
     "description": "Partner"
    },
    "agreementType": {
     "type": "string",
-    "description": "Agreement Type"
+    "description": "Agreement Type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate, distribution, apiCommercial (pack p.26)"
    },
    "contractReference": {
     "type": "string",
@@ -2332,219 +2909,263 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Legal Entity"
    },
-   "brand": {
+   "brandId": {
     "type": "string",
-    "description": "Brand"
+    "description": "Brand id",
+    "nullable": true
    },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
+   "allowedVenueIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "Venues the agreement covers"
    },
    "territory": {
     "type": "string",
     "description": "Territory"
    },
-   "currency": {
+   "settlementCurrency": {
     "type": "string",
-    "description": "Currency"
+    "pattern": "^[A-Z]{3}$",
+    "description": "Settlement currency, ISO 4217"
    },
-   "effectiveFrom": {
+   "validFrom": {
     "type": "string",
+    "format": "date",
     "description": "Effective From"
    },
-   "effectiveTo": {
+   "validTo": {
     "type": "string",
-    "description": "Effective To"
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
    },
    "renewalType": {
     "type": "string",
+    "enum": [
+     "manual",
+     "auto"
+    ],
     "description": "Renewal Type"
    },
    "commercialOwner": {
     "type": "string",
-    "description": "Commercial Owner"
+    "description": "Commercial Owner: staff principal id"
    },
    "financeOwner": {
     "type": "string",
-    "description": "Finance Owner"
+    "description": "Finance Owner: staff principal id"
    },
-   "paymentTerms": {
-    "type": "string",
-    "description": "Payment Terms"
+   "creditTermDays": {
+    "type": "integer",
+    "description": "Payment Terms in days (0 = due immediately; Net 7/15/30/45 or custom)"
    },
    "commissionTerms": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Commission Terms"
+    "type": "string",
+    "description": "Commission Terms: summary or reference to the commission rules (listCommissionMarginIncentive)",
+    "nullable": true
    },
    "pricingBasis": {
     "type": "string",
-    "description": "Pricing Basis"
+    "enum": [
+     "retailPrice",
+     "netRate",
+     "discountFromRetail",
+     "markup",
+     "derivedRate"
+    ],
+    "description": "Pricing Basis (pack p.27 pricing models)"
    },
    "creditTerms": {
     "type": "string",
-    "description": "Credit Terms"
+    "description": "Credit Terms",
+    "nullable": true
    },
    "allocationTerms": {
     "type": "string",
-    "description": "Allocation Terms"
+    "description": "Allocation Terms",
+    "nullable": true
    },
    "cancellationConditions": {
     "type": "string",
-    "description": "Cancellation Conditions"
+    "description": "Cancellation Conditions",
+    "nullable": true
    },
    "bookingRestrictions": {
     "type": "string",
-    "description": "Booking Restrictions"
+    "description": "Booking Restrictions",
+    "nullable": true
    },
    "settlementTerms": {
     "type": "string",
-    "description": "Settlement Terms"
+    "description": "Settlement Terms",
+    "nullable": true
    },
    "minimumCommitment": {
-    "type": "string",
-    "description": "Minimum Commitment"
+    "type": "integer",
+    "description": "Minimum Commitment: tickets over the agreement term",
+    "nullable": true
    },
    "salesTarget": {
-    "type": "string",
-    "description": "Sales Target"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Sales Target over the agreement term"
    },
-   "manualRenewal": {
-    "type": "string",
-    "description": "Manual Renewal"
-   },
-   "autoRenewal": {
-    "type": "string",
-    "description": "Auto-Renewal"
-   },
-   "renewalNoticePeriod": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Renewal Notice Period"
+   "renewalNoticeDays": {
+    "type": "integer",
+    "description": "Renewal Notice Period in days",
+    "nullable": true
    },
    "renegotiationRequired": {
     "type": "boolean",
     "description": "Renegotiation Required"
    },
-   "renewalApproval": {
-    "type": "string",
-    "description": "Renewal Approval"
+   "renewalRequiresApproval": {
+    "type": "boolean",
+    "description": "Renewal Approval: renewal needs approval"
    },
-   "signedContract": {
-    "type": "string",
-    "description": "Signed Contract"
+   "rateMode": {
+    "$ref": "#/components/schemas/PartnerRateMode",
+    "description": "Net rate or commission, as on PartnerAgreement"
    },
-   "addendum": {
+   "paymentModel": {
     "type": "string",
-    "description": "Addendum"
+    "enum": [
+     "creditAccount",
+     "prepaid",
+     "payPerTransaction"
+    ],
+    "description": "Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced periodically), prepaid (pre-funded wallet drawn down per sale) or payPerTransaction (card at each sale)"
    },
-   "rateSheet": {
-    "type": "number",
-    "description": "Rate Sheet"
-   },
-   "sla": {
+   "refundConditions": {
     "type": "string",
-    "description": "SLA"
+    "description": "Refund Conditions (pack p.26)",
+    "nullable": true
    },
-   "nda": {
-    "type": "string",
-    "description": "NDA"
+   "agreementValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Agreement value (MoM 31 Aug 4.4: each agreement captures term/value)"
    },
-   "commercialAnnex": {
-    "type": "string",
-    "description": "Commercial Annex"
+   "documents": {
+    "type": "array",
+    "description": "Document Association",
+    "items": {
+     "type": "object",
+     "properties": {
+      "documentType": {
+       "type": "string",
+       "enum": [
+        "signedContract",
+        "addendum",
+        "rateSheet",
+        "sla",
+        "nda",
+        "commercialAnnex"
+       ]
+      },
+      "documentId": {
+       "type": "string",
+       "format": "uuid"
+      }
+     }
+    }
+   },
+   "version": {
+    "type": "integer",
+    "description": "Agreement version; amendments create a new one"
+   },
+   "status": {
+    "$ref": "#/components/schemas/PartnerAgreementStatus",
+    "description": "Agreement status"
    }
   }
  },
  "BookingLimitsCommercialExceptionsApprovalInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is control.tenant_migration at 4%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; stored as control.partner_booking_limit (PartnerBookingLimit) for the limits and control.partner_commercial_exception (PartnerCommercialException) for a request or decision; the decision itself goes to approvals (data model DM4)",
   "description": "**What Booking Limits, Commercial Exceptions & Approval submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "maximumTicketsPerBooking": {
-    "type": "string",
-    "description": "Maximum Tickets Per Booking"
+    "type": "integer",
+    "description": "Maximum Tickets Per Booking",
+    "nullable": true
    },
    "maximumBookingValue": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Maximum Booking Value"
    },
    "dailyBookingLimit": {
     "type": "integer",
-    "description": "Daily Booking Limit"
+    "description": "Daily Booking Limit: bookings per day (MoM 31 Aug 4.4: transactions per day)",
+    "nullable": true
    },
    "monthlyBookingLimit": {
     "type": "integer",
-    "description": "Monthly Booking Limit"
+    "description": "Monthly Booking Limit: bookings per month",
+    "nullable": true
    },
    "eventLimit": {
     "type": "integer",
-    "description": "Event Limit"
+    "description": "Event Limit: tickets per event",
+    "nullable": true
    },
    "productLimit": {
     "type": "integer",
-    "description": "Product Limit"
+    "description": "Product Limit: tickets per product per day",
+    "nullable": true
    },
    "holdLimit": {
     "type": "integer",
-    "description": "Hold Limit"
+    "description": "Hold Limit: tickets on hold at once",
+    "nullable": true
    },
-   "reservationDuration": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Reservation Duration"
-   },
-   "cancellationLimit": {
+   "holdDurationMinutes": {
     "type": "integer",
-    "description": "Cancellation Limit"
+    "description": "Reservation Duration: hold duration in minutes",
+    "nullable": true
    },
-   "priceException": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price Exception"
+   "cancellationLimitPercent": {
+    "type": "number",
+    "description": "Cancellation Limit: percent of a booking that may be cancelled without approval (decided 29 September, readiness close-out)",
+    "nullable": true
    },
-   "creditException": {
+   "partnerId": {
     "type": "string",
-    "description": "Credit Exception"
+    "format": "uuid",
+    "description": "Partner; empty for the overall limit that applies to every partner",
+    "nullable": true
    },
-   "allocationException": {
+   "agreementId": {
     "type": "string",
-    "description": "Allocation Exception"
-   },
-   "commissionException": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Commission Exception"
-   },
-   "bookingLimitException": {
-    "type": "integer",
-    "description": "Booking Limit Exception"
-   },
-   "paymentTermException": {
-    "type": "string",
-    "description": "Payment-Term Exception"
-   },
-   "cancellationException": {
-    "type": "string",
-    "description": "Cancellation Exception"
-   },
-   "partner": {
-    "type": "string",
-    "description": "Partner"
-   },
-   "agreement": {
-    "type": "string",
-    "description": "Agreement"
+    "format": "uuid",
+    "description": "Agreement",
+    "nullable": true
    },
    "requestType": {
     "type": "string",
-    "description": "Request Type"
+    "enum": [
+     "priceException",
+     "creditException",
+     "allocationException",
+     "commissionException",
+     "bookingLimitException",
+     "paymentTermException",
+     "cancellationException"
+    ],
+    "description": "Exception Request type",
+    "nullable": true
    },
    "currentRule": {
     "type": "string",
-    "description": "Current Rule"
+    "description": "Current Rule",
+    "nullable": true
    },
    "requestedException": {
     "type": "string",
-    "description": "Requested Exception"
+    "description": "Requested Exception",
+    "nullable": true
    },
    "amountImpact": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
@@ -2552,109 +3173,124 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "reason": {
     "type": "string",
-    "description": "Reason"
+    "description": "Reason",
+    "nullable": true
    },
-   "effectivePeriod": {
+   "exceptionId": {
     "type": "string",
-    "format": "date-time",
-    "description": "Effective Period"
+    "format": "uuid",
+    "description": "Exception request id; omit to raise a new request",
+    "nullable": true
    },
-   "requester": {
+   "effectiveFrom": {
     "type": "string",
-    "description": "Requester"
+    "format": "date",
+    "description": "Effective Period start",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective Period end",
+    "nullable": true
+   },
+   "decision": {
+    "type": "string",
+    "enum": [
+     "approve",
+     "reject",
+     "returnForChanges"
+    ],
+    "description": "Approver's decision on exceptionId; empty when setting limits or raising a request",
+    "nullable": true
    }
   }
  },
  "BookingLimitsCommercialExceptionsApprovalView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_booking_limit and control.partner_commercial_exception and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Booking Limits, Commercial Exceptions & Approval displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "maximumTicketsPerBooking": {
-    "type": "string",
-    "description": "Maximum Tickets Per Booking"
+    "type": "integer",
+    "description": "Maximum Tickets Per Booking",
+    "nullable": true
    },
    "maximumBookingValue": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Maximum Booking Value"
    },
    "dailyBookingLimit": {
     "type": "integer",
-    "description": "Daily Booking Limit"
+    "description": "Daily Booking Limit: bookings per day (MoM 31 Aug 4.4: transactions per day)",
+    "nullable": true
    },
    "monthlyBookingLimit": {
     "type": "integer",
-    "description": "Monthly Booking Limit"
+    "description": "Monthly Booking Limit: bookings per month",
+    "nullable": true
    },
    "eventLimit": {
     "type": "integer",
-    "description": "Event Limit"
+    "description": "Event Limit: tickets per event",
+    "nullable": true
    },
    "productLimit": {
     "type": "integer",
-    "description": "Product Limit"
+    "description": "Product Limit: tickets per product per day",
+    "nullable": true
    },
    "holdLimit": {
     "type": "integer",
-    "description": "Hold Limit"
+    "description": "Hold Limit: tickets on hold at once",
+    "nullable": true
    },
-   "reservationDuration": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Reservation Duration"
-   },
-   "cancellationLimit": {
+   "holdDurationMinutes": {
     "type": "integer",
-    "description": "Cancellation Limit"
+    "description": "Reservation Duration: hold duration in minutes",
+    "nullable": true
    },
-   "priceException": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price Exception"
+   "cancellationLimitPercent": {
+    "type": "number",
+    "description": "Cancellation Limit: percent of a booking that may be cancelled without approval (decided 29 September, readiness close-out)",
+    "nullable": true
    },
-   "creditException": {
+   "partnerId": {
     "type": "string",
-    "description": "Credit Exception"
+    "format": "uuid",
+    "description": "Partner; empty for the overall limit that applies to every partner",
+    "nullable": true
    },
-   "allocationException": {
+   "agreementId": {
     "type": "string",
-    "description": "Allocation Exception"
-   },
-   "commissionException": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Commission Exception"
-   },
-   "bookingLimitException": {
-    "type": "integer",
-    "description": "Booking Limit Exception"
-   },
-   "paymentTermException": {
-    "type": "string",
-    "description": "Payment-Term Exception"
-   },
-   "cancellationException": {
-    "type": "string",
-    "description": "Cancellation Exception"
-   },
-   "partner": {
-    "type": "string",
-    "description": "Partner"
-   },
-   "agreement": {
-    "type": "string",
-    "description": "Agreement"
+    "format": "uuid",
+    "description": "Agreement",
+    "nullable": true
    },
    "requestType": {
     "type": "string",
-    "description": "Request Type"
+    "enum": [
+     "priceException",
+     "creditException",
+     "allocationException",
+     "commissionException",
+     "bookingLimitException",
+     "paymentTermException",
+     "cancellationException"
+    ],
+    "description": "Exception Request type",
+    "nullable": true
    },
    "currentRule": {
     "type": "string",
-    "description": "Current Rule"
+    "description": "Current Rule",
+    "nullable": true
    },
    "requestedException": {
     "type": "string",
-    "description": "Requested Exception"
+    "description": "Requested Exception",
+    "nullable": true
    },
    "amountImpact": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
@@ -2662,85 +3298,126 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "reason": {
     "type": "string",
-    "description": "Reason"
-   },
-   "effectivePeriod": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Effective Period"
+    "description": "Reason",
+    "nullable": true
    },
    "requester": {
     "type": "string",
-    "description": "Requester"
+    "description": "Requester",
+    "nullable": true
    },
-   "dependingOnExceptionType": {
+   "exceptionId": {
     "type": "string",
-    "description": "depending on exception type"
+    "format": "uuid",
+    "description": "Exception request id; omit to raise a new request",
+    "nullable": true
    },
-   "dependingOnExceptionValue": {
+   "effectiveFrom": {
     "type": "string",
-    "description": "depending on exception value"
+    "format": "date",
+    "description": "Effective Period start",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective Period end",
+    "nullable": true
+   },
+   "decision": {
+    "type": "string",
+    "enum": [
+     "approve",
+     "reject",
+     "returnForChanges"
+    ],
+    "description": "Approver's decision on exceptionId; empty when setting limits or raising a request",
+    "nullable": true
+   },
+   "approvalStatus": {
+    "type": "string",
+    "description": "Approval status of the exception: pendingApproval, approved, rejected, returned or expired",
+    "nullable": true
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "description": "Approval request",
+    "nullable": true
+   },
+   "aiImpactSummary": {
+    "type": "string",
+    "description": "Advisory AI impact summary",
+    "nullable": true
    }
   }
  },
  "CommercialAgreement360HealthAiReviewView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_agreement with control.partner_security, control.partner_allocation, control.partner_commission_rule, control.partner_rate and control.partner_commercial_exception and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Commercial Agreement 360°, Health & AI Review displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "contractStatus": {
-    "type": "string",
+    "$ref": "#/components/schemas/PartnerAgreementStatus",
     "description": "Contract status"
-   },
-   "effectiveDates": {
-    "type": "string",
-    "description": "Effective dates"
    },
    "renewal": {
     "type": "string",
-    "description": "Renewal"
+    "description": "Renewal: manual or auto, and whether a renewal workflow is open"
    },
    "rateModel": {
-    "type": "number",
+    "type": "string",
+    "enum": [
+     "retailPrice",
+     "netRate",
+     "discountFromRetail",
+     "markup",
+     "derivedRate"
+    ],
     "description": "Rate model"
    },
    "averageDiscount": {
     "type": "number",
-    "description": "Average discount"
+    "description": "Average discount from retail, percent"
    },
-   "currentCommission": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Current commission"
+   "currentCommissionPercent": {
+    "type": "number",
+    "description": "Current commission, percent",
+    "nullable": true
    },
    "incentives": {
-    "type": "string",
-    "description": "Incentives"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Active incentives"
    },
-   "limit": {
-    "type": "integer",
-    "description": "Limit"
+   "creditLimit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Credit limit"
    },
-   "exposure": {
-    "type": "string",
-    "description": "Exposure"
+   "creditExposure": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Credit exposure"
    },
    "availableCredit": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Available credit"
    },
    "depositGuarantee": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Deposit/guarantee"
+    "description": "Deposit/guarantee held"
    },
-   "expiry": {
+   "securityExpiry": {
     "type": "string",
-    "format": "date-time",
-    "description": "Expiry"
+    "format": "date",
+    "description": "Security expiry",
+    "nullable": true
    },
-   "paymentTerms": {
-    "type": "string",
-    "description": "Payment terms"
+   "creditTermDays": {
+    "type": "integer",
+    "description": "Payment terms in days",
+    "nullable": true
    },
    "outstandingBalance": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
@@ -2751,85 +3428,127 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Overdue amount"
    },
    "contractualAllocation": {
-    "type": "string",
-    "description": "Contractual allocation"
+    "type": "integer",
+    "description": "Contractual allocation, units"
    },
    "utilization": {
     "type": "number",
-    "description": "Utilization"
+    "description": "Allocation utilisation, percent"
    },
    "minimumSales": {
-    "type": "string",
-    "description": "Minimum sales"
+    "type": "integer",
+    "description": "Minimum sales commitment, units",
+    "nullable": true
    },
    "achievement": {
-    "type": "string",
-    "description": "Achievement"
+    "type": "number",
+    "description": "Commitment achievement, percent"
    },
    "activeApprovedExceptions": {
     "type": "integer",
     "description": "Active approved exceptions"
    },
-   "increaseReduceCredit": {
+   "partnerId": {
     "type": "string",
-    "description": "Increase/reduce credit"
+    "format": "uuid",
+    "description": "Partner"
    },
-   "rebalanceAllocation": {
+   "partnerName": {
     "type": "string",
-    "description": "Rebalance allocation"
+    "description": "Partner"
    },
-   "renewAgreement": {
+   "agreementId": {
     "type": "string",
-    "description": "Renew agreement"
+    "format": "uuid",
+    "description": "Agreement"
    },
-   "requestUpdatedGuarantee": {
+   "commercialOwner": {
     "type": "string",
-    "format": "date-time",
-    "description": "Request updated guarantee"
+    "description": "Commercial Owner"
    },
-   "reduceUnusedCommitment": {
+   "validFrom": {
     "type": "string",
-    "description": "Reduce unused commitment"
+    "format": "date",
+    "description": "Effective period start"
    },
-   "placePartnerUnderReview": {
+   "validTo": {
     "type": "string",
-    "description": "Place partner under review"
+    "format": "date",
+    "description": "Effective period end",
+    "nullable": true
    },
-   "startRenewal": {
+   "riskRating": {
     "type": "string",
-    "description": "Start Renewal"
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
+    "description": "Risk"
    },
-   "requestCommercialReview": {
-    "type": "string",
-    "description": "Request Commercial Review"
+   "healthScore": {
+    "type": "integer",
+    "description": "Commercial Health score, 0-100"
    },
-   "changeTerms": {
-    "type": "string",
-    "description": "Change Terms"
+   "healthBreakdown": {
+    "type": "object",
+    "description": "Commercial Health by component, each 0-100",
+    "properties": {
+     "agreement": {
+      "type": "integer"
+     },
+     "margin": {
+      "type": "integer"
+     },
+     "credit": {
+      "type": "integer"
+     },
+     "payment": {
+      "type": "integer"
+     },
+     "security": {
+      "type": "integer"
+     },
+     "allocation": {
+      "type": "integer"
+     },
+     "commitment": {
+      "type": "integer"
+     }
+    }
    },
-   "requestCreditReview": {
-    "type": "string",
-    "description": "Request Credit Review"
+   "recommendations": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "reviewRate",
+      "adjustCredit",
+      "rebalanceAllocation",
+      "renewAgreement",
+      "reviewCommission",
+      "requestUpdatedGuarantee",
+      "reduceUnusedCommitment",
+      "placePartnerUnderReview"
+     ]
+    },
+    "description": "Advisory AI Recommendations"
    },
-   "commercialRisk": {
-    "type": "string",
-    "description": "commercial risk"
-   },
-   "intelligence": {
-    "type": "string",
-    "description": "intelligence"
-   },
-   "channelAllocationArea4": {
-    "type": "string",
-    "description": "Channel Allocation — Area 4"
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Advisory AI Executive Review"
    }
   }
  },
- "CommercialAgreementCommandCenterView": {
+ "CommercialAgreementCommandCenterSummary": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
-  "description": "**What Commercial Agreement Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Commercial Agreement Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
   "properties": {
    "activeAgreements": {
     "type": "integer",
@@ -2837,34 +3556,34 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "draftAgreements": {
     "type": "integer",
-    "description": "Draft Agreements"
+    "description": "Draft Agreements: pendingApproval agreements not yet submitted to the approvals engine (decided 29 September, readiness close-out)"
    },
    "pendingApproval": {
     "type": "integer",
-    "description": "Pending Approval"
+    "description": "Pending Approval: pendingApproval agreements with an open approval request"
    },
    "agreementsExpiringSoon": {
-    "type": "string",
-    "description": "Agreements Expiring Soon"
+    "type": "integer",
+    "description": "Agreements Expiring Soon: status expiringSoon"
    },
    "expiredAgreements": {
     "type": "integer",
     "description": "Expired Agreements"
    },
    "partnersOnCreditHold": {
-    "type": "string",
+    "type": "integer",
     "description": "Partners on Credit Hold"
    },
    "totalApprovedCredit": {
-    "type": "integer",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Total Approved Credit"
    },
    "currentCreditExposure": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Current Credit Exposure"
    },
    "outstandingReceivables": {
-    "type": "integer",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Outstanding Receivables"
    },
    "activeCommercialAllocations": {
@@ -2878,253 +3597,457 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "commercialRiskAlerts": {
     "type": "integer",
     "description": "Commercial Risk Alerts"
-   },
+   }
+  }
+ },
+ "CommercialAgreementCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over control.partner_agreement with control.partner, control.partner_credit_profile, control.partner_allocation and control.partner_commission_rule and the existing subscription state, assembled at read time (data model DM4)",
+  "description": "**What Commercial Agreement Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
    "agreementId": {
     "type": "string",
+    "format": "uuid",
     "description": "Agreement ID"
    },
    "partner": {
     "type": "string",
-    "description": "Partner"
+    "description": "Partner trading name"
    },
    "agreementType": {
     "type": "string",
-    "description": "Agreement Type"
+    "description": "Agreement Type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate, distribution, apiCommercial (pack p.26)"
    },
    "brandVenue": {
     "type": "string",
-    "description": "Brand/Venue"
+    "description": "Brand/Venue summary of the agreement scope"
    },
    "market": {
     "type": "string",
     "description": "Market"
    },
-   "effectiveFrom": {
+   "validFrom": {
     "type": "string",
+    "format": "date",
     "description": "Effective From"
    },
-   "effectiveTo": {
+   "validTo": {
     "type": "string",
-    "description": "Effective To"
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
    },
    "pricingModel": {
     "type": "string",
-    "description": "Pricing Model"
+    "enum": [
+     "retailPrice",
+     "netRate",
+     "discountFromRetail",
+     "markup",
+     "derivedRate"
+    ],
+    "description": "Pricing Model (pack p.27)"
    },
    "commissionModel": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Commission Model"
+    "type": "string",
+    "enum": [
+     "fixedPercentage",
+     "fixedAmount",
+     "productSpecific",
+     "tiered",
+     "volumeBased",
+     "revenueBased",
+     "performanceIncentive",
+     "campaignIncentive",
+     "none"
+    ],
+    "description": "Commission Model (pack p.29); none for a net-rate agreement"
    },
-   "paymentTerms": {
+   "creditTermDays": {
     "type": "integer",
-    "description": "Payment Terms"
+    "description": "Payment Terms in days (0 = due immediately; Net 7/15/30/45 or custom)",
+    "nullable": true
    },
    "creditLimit": {
-    "type": "integer",
-    "description": "Credit Limit"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Credit Limit; empty unless the payment model is creditAccount"
    },
    "currentExposure": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Current Exposure"
    },
    "allocationModel": {
     "type": "string",
-    "description": "Allocation Model"
+    "enum": [
+     "guaranteed",
+     "onRequest",
+     "shared",
+     "fixedQuantity",
+     "percentage",
+     "rolling",
+     "seasonal",
+     "none"
+    ],
+    "description": "Allocation Model (pack p.35)"
    },
    "agreementStatus": {
-    "type": "integer",
+    "$ref": "#/components/schemas/PartnerAgreementStatus",
     "description": "Agreement Status"
    },
    "commercialOwner": {
     "type": "string",
     "description": "Commercial Owner"
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Partner"
+   },
+   "rateMode": {
+    "$ref": "#/components/schemas/PartnerRateMode",
+    "description": "Net rate or commission, as on PartnerAgreement"
+   },
+   "paymentModel": {
+    "type": "string",
+    "enum": [
+     "creditAccount",
+     "prepaid",
+     "payPerTransaction"
+    ],
+    "description": "Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced periodically), prepaid (pre-funded wallet drawn down per sale) or payPerTransaction (card at each sale)"
+   },
+   "riskRating": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
+    "description": "Commercial risk"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Advisory AI commercial-risk flags, e.g. expiry against forward bookings"
    }
   }
  },
  "CommercialAllocationQuotaCommitmentManagementView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_allocation (PartnerAllocation) and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Commercial Allocation, Quota & Commitment Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "guaranteedAllocation": {
-    "type": "string",
-    "description": "Guaranteed Allocation"
-   },
-   "onRequestAllocation": {
-    "type": "string",
-    "description": "On-Request Allocation"
-   },
-   "sharedAllocation": {
-    "type": "string",
-    "description": "Shared Allocation"
-   },
-   "fixedQuantity": {
-    "type": "integer",
-    "description": "Fixed Quantity"
-   },
-   "percentageAllocation": {
+   "allocationPercent": {
     "type": "number",
-    "description": "Percentage Allocation"
+    "description": "Percent of capacity, for the percentage model",
+    "nullable": true
    },
-   "rollingAllocation": {
+   "partnerId": {
     "type": "string",
-    "description": "Rolling Allocation"
-   },
-   "seasonalAllocation": {
-    "type": "string",
-    "description": "Seasonal Allocation"
-   },
-   "useItOrReleaseIt": {
-    "type": "string",
-    "description": "Use-it-or-release-it"
-   },
-   "takeOrPayWhereCommerciallyApplicable": {
-    "type": "string",
-    "description": "Take-or-pay where commercially applicable"
-   },
-   "guaranteedMinimum": {
-    "type": "string",
-    "description": "Guaranteed minimum"
-   },
-   "automaticRelease": {
-    "type": "string",
-    "description": "Automatic release"
-   },
-   "manualRelease": {
-    "type": "string",
-    "description": "Manual release"
-   },
-   "partner": {
-    "type": "string",
+    "format": "uuid",
     "description": "Partner"
    },
-   "agreement": {
+   "agreementId": {
     "type": "string",
+    "format": "uuid",
     "description": "Agreement"
    },
-   "venue": {
+   "venueId": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue id"
    },
-   "event": {
+   "eventId": {
     "type": "string",
-    "description": "Event"
+    "description": "Event id",
+    "nullable": true
    },
-   "product": {
+   "productId": {
     "type": "string",
-    "description": "Product"
+    "description": "Product id",
+    "nullable": true
    },
    "ticketType": {
     "type": "string",
-    "description": "Ticket Type"
+    "description": "Ticket Type",
+    "nullable": true
    },
    "quantity": {
     "type": "integer",
-    "description": "Quantity"
+    "description": "Contractual allocation quantity"
    },
    "minimumCommitment": {
-    "type": "string",
-    "description": "Minimum Commitment"
+    "type": "integer",
+    "description": "Minimum Commitment, units",
+    "nullable": true
    },
    "maximumAllocation": {
-    "type": "string",
-    "description": "Maximum Allocation"
+    "type": "integer",
+    "description": "Maximum Allocation, units",
+    "nullable": true
    },
    "returnRule": {
     "type": "string",
-    "description": "Return Rule"
+    "description": "Return Rule",
+    "nullable": true
    },
    "sellThroughTarget": {
-    "type": "string",
-    "description": "Sell-Through Target"
+    "type": "number",
+    "description": "Sell-Through Target, percent",
+    "nullable": true
    },
    "allocated": {
-    "type": "string",
+    "type": "integer",
     "description": "Allocated"
    },
    "booked": {
-    "type": "string",
+    "type": "integer",
     "description": "Booked"
    },
    "sold": {
-    "type": "string",
+    "type": "integer",
     "description": "Sold"
    },
    "returned": {
-    "type": "string",
+    "type": "integer",
     "description": "Returned"
    },
    "remaining": {
-    "type": "string",
+    "type": "integer",
     "description": "Remaining"
    },
    "utilization": {
     "type": "number",
-    "description": "Utilization"
+    "description": "Utilization, percent"
    },
    "commitmentAchievement": {
+    "type": "number",
+    "description": "Commitment Achievement, percent of the minimum commitment"
+   },
+   "allocationId": {
     "type": "string",
-    "description": "Commitment Achievement"
+    "format": "uuid",
+    "description": "Allocation id"
+   },
+   "allocationModel": {
+    "type": "string",
+    "enum": [
+     "guaranteed",
+     "onRequest",
+     "shared",
+     "fixedQuantity",
+     "percentage",
+     "rolling",
+     "seasonal"
+    ],
+    "description": "Allocation Model"
+   },
+   "commitmentRule": {
+    "type": "string",
+    "enum": [
+     "useItOrRelease",
+     "takeOrPay",
+     "guaranteedMinimum"
+    ],
+    "description": "Commitment Rule",
+    "nullable": true
+   },
+   "releaseMode": {
+    "type": "string",
+    "enum": [
+     "automatic",
+     "manual"
+    ],
+    "description": "Release: automatic or manual"
+   },
+   "releaseHoursBeforeEvent": {
+    "type": "integer",
+    "description": "Release Date as a deadline before the event (e.g. 48 hours)",
+    "nullable": true
+   },
+   "releaseDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Release Date as a fixed time",
+    "nullable": true
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Advisory AI under-utilisation forecast"
    }
   }
  },
  "CommissionMarginIncentiveManagementView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_commission_rule + control.partner_commission_rule_tier (PartnerCommissionRule) and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Commission, Margin & Incentive Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "fixedPercentage": {
-    "type": "number",
-    "description": "Fixed Percentage"
-   },
-   "fixedAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Fixed Amount"
-   },
-   "productSpecificCommission": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Product-Specific Commission"
-   },
-   "tieredCommission": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Tiered Commission"
-   },
-   "volumeBasedCommission": {
-    "type": "integer",
-    "description": "Volume-Based Commission"
-   },
-   "revenueBasedCommission": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue-Based Commission"
-   },
-   "performanceIncentive": {
+   "partnerId": {
     "type": "string",
-    "description": "Performance Incentive"
-   },
-   "campaignIncentive": {
-    "type": "string",
-    "description": "Campaign Incentive"
-   },
-   "partner": {
-    "type": "string",
+    "format": "uuid",
     "description": "Partner"
    },
-   "agreement": {
+   "agreementId": {
     "type": "string",
+    "format": "uuid",
     "description": "Agreement"
    },
-   "product": {
+   "productId": {
     "type": "string",
-    "description": "Product"
+    "description": "Product id",
+    "nullable": true
+   },
+   "ruleId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Commission rule id"
+   },
+   "commissionModel": {
+    "type": "string",
+    "enum": [
+     "fixedPercentage",
+     "fixedAmount",
+     "productSpecific",
+     "tiered",
+     "volumeBased",
+     "revenueBased",
+     "performanceIncentive",
+     "campaignIncentive"
+    ],
+    "description": "Commission Model"
+   },
+   "productCategory": {
+    "type": "string",
+    "description": "Product Category",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "description": "Venue",
+    "nullable": true
+   },
+   "eventId": {
+    "type": "string",
+    "description": "Event",
+    "nullable": true
+   },
+   "market": {
+    "type": "string",
+    "description": "Market",
+    "nullable": true
+   },
+   "salesChannel": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+     }
+    ],
+    "nullable": true,
+    "description": "Sales Channel"
+   },
+   "commissionPercent": {
+    "type": "number",
+    "description": "Commission percent, for percentage models",
+    "nullable": true
+   },
+   "commissionAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fixed commission per ticket, for fixedAmount"
+   },
+   "tiers": {
+    "type": "array",
+    "description": "Tiers for tiered/volume/revenue models, e.g. 0-1,000 tickets 8%, 1,001-5,000 10%, 5,001+ 12%",
+    "items": {
+     "type": "object",
+     "properties": {
+      "fromUnits": {
+       "type": "integer"
+      },
+      "commissionPercent": {
+       "type": "number"
+      }
+     }
+    }
+   },
+   "volumeWindow": {
+    "type": "string",
+    "enum": [
+     "calendarMonth",
+     "calendarQuarter",
+     "calendarYear",
+     "agreementYear",
+     "rolling12Months"
+    ],
+    "description": "Period over which volume is counted, as on PartnerAgreement",
+    "nullable": true
+   },
+   "incentiveType": {
+    "type": "string",
+    "enum": [
+     "volumeBonus",
+     "growthBonus",
+     "targetAchievement",
+     "seasonalIncentive",
+     "newProductIncentive",
+     "strategicPartnerBonus"
+    ],
+    "description": "Incentive type",
+    "nullable": true
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective from"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective to",
+    "nullable": true
+   },
+   "estimatedNetContribution": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Margin Visibility: retail price - partner rate - commission/incentive - commercial cost"
+   },
+   "validationIssues": {
+    "type": "array",
+    "description": "Conflict Detection",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "overlappingCommissionRule"
+       ]
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Advisory AI observations for this row; never acted on without a human decision"
    }
   }
  },
  "CreditLimitExposureManagementView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_credit_profile (PartnerCreditProfile) with control.partner_agreement.credit_limit and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Credit Limit & Exposure Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "creditEnabled": {
@@ -3132,20 +4055,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Credit Enabled"
    },
    "approvedCreditLimit": {
-    "type": "integer",
-    "description": "Approved Credit Limit"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Approved Credit Limit (PartnerAgreement.creditLimit)"
    },
    "currency": {
     "type": "string",
-    "description": "Currency"
+    "pattern": "^[A-Z]{3}$",
+    "description": "Currency of the limit (the agreement's settlement currency)"
    },
    "temporaryCreditLimit": {
-    "type": "integer",
-    "description": "Temporary Credit Limit"
-   },
-   "effectiveDates": {
-    "type": "string",
-    "description": "Effective Dates"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Temporary Credit Limit; empty when none"
    },
    "creditOwner": {
     "type": "string",
@@ -3153,107 +4073,126 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "riskClassification": {
     "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
     "description": "Risk Classification"
    },
    "approvalAuthority": {
     "type": "string",
     "description": "Approval Authority"
    },
-   "warningAt70": {
+   "warningThresholdPercent": {
     "type": "number",
-    "description": "Warning at 70%"
+    "description": "Threshold: warning at this utilisation percent, default 70 (decided 29 September, readiness close-out)"
    },
-   "highRiskAt90": {
+   "highRiskThresholdPercent": {
     "type": "number",
-    "description": "High Risk at 90%"
+    "description": "Threshold: high risk at this utilisation percent, default 90 (decided 29 September, readiness close-out)"
    },
-   "approvedCreditLimitAed500000": {
-    "type": "integer",
-    "description": "Approved Credit Limit: AED 500,000"
+   "unbilledTransactions": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Unbilled Transactions"
    },
-   "unbilledTransactionsAed95000": {
+   "activeHoldsReservations": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Active Holds/Reservations"
+   },
+   "availableCredit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Available Credit"
+   },
+   "partnerId": {
     "type": "string",
-    "description": "Unbilled Transactions: AED 95,000"
+    "format": "uuid",
+    "description": "Partner"
    },
-   "activeHoldsReservationsAed40000": {
-    "type": "integer",
-    "description": "Active Holds/Reservations: AED 40,000"
-   },
-   "availableCreditAed155000": {
+   "partnerName": {
     "type": "string",
-    "description": "Available Credit: AED 155,000"
+    "description": "Partner trading name"
    },
-   "increaseLimit": {
-    "type": "integer",
-    "description": "Increase Limit"
-   },
-   "reduceLimit": {
-    "type": "integer",
-    "description": "Reduce Limit"
-   },
-   "temporaryIncrease": {
+   "agreementId": {
     "type": "string",
-    "description": "Temporary Increase"
+    "format": "uuid",
+    "description": "Agreement"
    },
-   "placeCreditHold": {
+   "effectiveFrom": {
     "type": "string",
-    "description": "Place Credit Hold"
+    "format": "date",
+    "description": "Effective from"
    },
-   "unlessAnApprovedExceptionExists": {
+   "effectiveTo": {
     "type": "string",
-    "description": "unless an approved exception exists"
+    "format": "date",
+    "description": "Effective to",
+    "nullable": true
+   },
+   "temporaryLimitUntil": {
+    "type": "string",
+    "format": "date",
+    "description": "Temporary limit ends (e.g. until 31 December)",
+    "nullable": true
+   },
+   "blockThresholdPercent": {
+    "type": "number",
+    "description": "Threshold: block at this utilisation percent, default 100 (decided 29 September, readiness close-out)"
+   },
+   "openInvoices": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Open Invoices"
+   },
+   "utilizationPercent": {
+    "type": "number",
+    "description": "Credit Utilization, percent"
+   },
+   "creditStatus": {
+    "type": "string",
+    "description": "Credit status: notEnabled, withinLimit, warning, highRisk, onHold, blocked"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Advisory AI credit-pressure forecast"
    }
   }
  },
  "DepositGuaranteeFinancialSecurityManagementView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_security (PartnerSecurity) and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Deposit, Guarantee & Financial Security Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "cashDeposit": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Cash Deposit"
-   },
-   "bankGuarantee": {
-    "type": "string",
-    "description": "Bank Guarantee"
-   },
-   "securityDeposit": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Security Deposit"
-   },
-   "letterOfCredit": {
-    "type": "string",
-    "description": "Letter of Credit"
-   },
-   "prepaymentBalance": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Prepayment Balance"
-   },
-   "corporateGuarantee": {
-    "type": "string",
-    "description": "Corporate Guarantee"
-   },
-   "otherApprovedSecurity": {
-    "type": "string",
-    "description": "Other Approved Security"
-   },
    "securityId": {
     "type": "string",
     "description": "Security ID"
    },
-   "partner": {
+   "partnerId": {
     "type": "string",
+    "format": "uuid",
     "description": "Partner"
    },
-   "agreement": {
+   "agreementId": {
     "type": "string",
+    "format": "uuid",
     "description": "Agreement"
    },
-   "type": {
+   "securityType": {
     "type": "string",
-    "description": "Type"
+    "enum": [
+     "cashDeposit",
+     "bankGuarantee",
+     "securityDeposit",
+     "letterOfCredit",
+     "prepaymentBalance",
+     "corporateGuarantee",
+     "other"
+    ],
+    "description": "Security type"
    },
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
@@ -3261,6 +4200,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "currency": {
     "type": "string",
+    "pattern": "^[A-Z]{3}$",
     "description": "Currency"
    },
    "issuingInstitution": {
@@ -3273,289 +4213,1131 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "effectiveDate": {
     "type": "string",
-    "format": "date-time",
+    "format": "date",
     "description": "Effective Date"
    },
    "expiryDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "Expiry Date"
+    "format": "date",
+    "description": "Expiry Date",
+    "nullable": true
    },
-   "document": {
+   "documentId": {
     "type": "string",
-    "description": "Document"
+    "description": "Supporting document id",
+    "nullable": true
    },
    "verificationStatus": {
     "type": "string",
-    "description": "Verification Status"
+    "description": "Verification Status: pending, verified, rejected or expired"
    },
-   "creditExposureAed500000": {
-    "type": "string",
-    "description": "Credit Exposure: AED 500,000"
+   "creditExposure": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Coverage: partner credit exposure"
    },
-   "guaranteeAed300000": {
-    "type": "string",
-    "description": "Guarantee: AED 300,000"
+   "securityCoverage": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Coverage: verified security held for the partner"
    },
-   "unsecuredExposureAed200000": {
-    "type": "string",
-    "description": "Unsecured Exposure: AED 200,000"
+   "unsecuredExposure": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Coverage: exposure not covered by verified security"
    },
-   "generatesWarning": {
-    "type": "string",
-    "description": "Generates warning"
+   "daysToExpiry": {
+    "type": "integer",
+    "description": "Days until expiry",
+    "nullable": true
    },
-   "reducesCredit": {
+   "expiryAction": {
     "type": "string",
-    "description": "Reduces credit"
-   },
-   "blocksNewCreditSales": {
-    "type": "string",
-    "description": "Blocks new credit sales"
-   },
-   "placesPartnerOnHold": {
-    "type": "string",
-    "description": "Places partner on hold"
-   },
-   "requiresFinanceReview": {
-    "type": "string",
-    "description": "Requires finance review"
+    "enum": [
+     "generateWarning",
+     "reduceCredit",
+     "blockNewCreditSales",
+     "placePartnerOnHold",
+     "requireFinanceReview"
+    ],
+    "description": "Rules: what expiry of this security does"
    }
   }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PartnerAgreementStatus": {
+  "type": "string",
+  "enum": [
+   "pendingApproval",
+   "active",
+   "expiringSoon",
+   "expired",
+   "suspended",
+   "terminated"
+  ]
+ },
+ "PartnerAllocation": {
+  "type": "object",
+  "x-ticvai-persistence": "control.partner_allocation",
+  "description": "A contractual allocation under an agreement: the event or product, the quantity or percent of capacity, the commitment and the release rule. Booked, sold and remaining are counted from orders against it, not stored (decided 29 September, data model DM4)\n\n**Written by** setPartnerAllocations, which replaces the agreement's allocations as a set; a new or increased guaranteed allocation goes through approvals.request. The corporate allocations once held on `PartnerAgreement.corporateAllocations` are rows here, with `perMemberLimit` (decided 29 September, writers pass; DM4).",
+  "required": [
+   "id",
+   "partnerId",
+   "agreementId",
+   "allocationModel",
+   "releaseMode"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The partner (control.partner)."
+   },
+   "agreementId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The agreement (control.partner_agreement) this row belongs to."
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Venue."
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Event (catalogue.event)."
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Product (catalogue.product)."
+   },
+   "ticketType": {
+    "type": "string",
+    "nullable": true,
+    "description": "Ticket type."
+   },
+   "allocationModel": {
+    "type": "string",
+    "enum": [
+     "guaranteed",
+     "onRequest",
+     "shared",
+     "fixedQuantity",
+     "percentage",
+     "rolling",
+     "seasonal"
+    ],
+    "description": "Allocation model (pack p.35)."
+   },
+   "quantity": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Contractual allocation quantity."
+   },
+   "allocationPercent": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Percent of capacity, for the percentage model."
+   },
+   "minimumCommitment": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Minimum commitment, units."
+   },
+   "maximumAllocation": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Maximum allocation, units."
+   },
+   "commitmentRule": {
+    "type": "string",
+    "enum": [
+     "useItOrRelease",
+     "takeOrPay",
+     "guaranteedMinimum"
+    ],
+    "nullable": true,
+    "description": "Commitment rule."
+   },
+   "sellThroughTarget": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Sell-through target, percent."
+   },
+   "returnRule": {
+    "type": "string",
+    "nullable": true,
+    "description": "Return rule."
+   },
+   "releaseMode": {
+    "type": "string",
+    "enum": [
+     "automatic",
+     "manual"
+    ],
+    "description": "Release: automatic or manual."
+   },
+   "releaseHoursBeforeEvent": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Release deadline before the event (e.g. 48 hours)."
+   },
+   "releaseDate": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Release at a fixed time instead."
+   },
+   "perMemberLimit": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "For a corporate allocation: places one member (employee) may take from it; empty for no per-member limit. Carried over from the retired `PartnerAgreement.corporateAllocations` (decided 29 September, writers pass; DM4)"
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The approvals.request raised for this row when it was created or changed; the row is not in force until that request is approved, as a PartnerRate is not (decided 29 September, writers pass; DM4)"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The partition key (ADR-0005), written at `tenant` scope."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "PartnerApprovalRoutedResult": {
+  "type": "object",
+  "x-ticvai-persistence": "none — response only (decided 29 September, writers pass; DM4)",
+  "description": "The answer of a partner set operation whose change is money and goes through approvals (setPartnerCommissionRules, setPartnerCreditProfile, setPartnerAllocations), shaped like the approvePartnerStatuLifecycle response (decided 29 September, writers pass; DM4)",
+  "required": [
+   "applied"
+  ],
+  "properties": {
+   "applied": {
+    "type": "boolean",
+    "description": "True when the change is in force now; false when it awaits the approval below"
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The approvals.request raised; empty when none was needed"
+   },
+   "items": {
+    "type": "array",
+    "description": "The rows as saved (PartnerCommissionRule, PartnerCreditProfile or PartnerAllocation)",
+    "items": {
+     "oneOf": [
+      {
+       "$ref": "#/components/schemas/PartnerCommissionRule"
+      },
+      {
+       "$ref": "#/components/schemas/PartnerCreditProfile"
+      },
+      {
+       "$ref": "#/components/schemas/PartnerAllocation"
+      }
+     ]
+    }
+   }
+  }
+ },
+ "PartnerCommissionRule": {
+  "type": "object",
+  "x-ticvai-persistence": "control.partner_commission_rule + control.partner_commission_rule_tier",
+  "description": "One commission or incentive rule under an agreement: the model, the product, venue, event, market and channel it applies to, the percent, amount or tiers, and the dates. The agreement's own `commissionPercent` is the default these rules refine (decided 29 September, data model DM4)\n\n**Written by** setPartnerCommissionRules; a new or changed rule goes through approvals.request and is not in force until approved, as a partner rate below its guardrails is not (decided 29 September, writers pass; DM4).",
+  "required": [
+   "id",
+   "partnerId",
+   "agreementId",
+   "commissionModel",
+   "effectiveFrom"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The partner (control.partner)."
+   },
+   "agreementId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The agreement (control.partner_agreement) this row belongs to."
+   },
+   "commissionModel": {
+    "type": "string",
+    "enum": [
+     "fixedPercentage",
+     "fixedAmount",
+     "productSpecific",
+     "tiered",
+     "volumeBased",
+     "revenueBased",
+     "performanceIncentive",
+     "campaignIncentive"
+    ],
+    "description": "Commission model (pack p.29)."
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Product (catalogue.product)."
+   },
+   "productCategory": {
+    "type": "string",
+    "nullable": true,
+    "description": "Product category."
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Venue."
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Event (catalogue.event)."
+   },
+   "market": {
+    "type": "string",
+    "nullable": true,
+    "description": "Market."
+   },
+   "salesChannel": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+     }
+    ],
+    "nullable": true,
+    "description": "Sales channel; blank = all."
+   },
+   "commissionPercent": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Commission percent, for percentage models."
+   },
+   "commissionAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Fixed commission per ticket, for fixedAmount."
+   },
+   "tiers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "fromUnits",
+      "commissionPercent"
+     ],
+     "properties": {
+      "fromUnits": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "commissionPercent": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 100
+      }
+     }
+    },
+    "description": "Tiers for tiered/volume/revenue models, e.g. 0-1,000 tickets 8%, 1,001-5,000 10%, 5,001+ 12%. The rows of control.partner_commission_rule_tier."
+   },
+   "volumeWindow": {
+    "type": "string",
+    "enum": [
+     "calendarMonth",
+     "calendarQuarter",
+     "calendarYear",
+     "agreementYear",
+     "rolling12Months"
+    ],
+    "nullable": true,
+    "description": "Period over which volume is counted, as on PartnerAgreement."
+   },
+   "incentiveType": {
+    "type": "string",
+    "enum": [
+     "volumeBonus",
+     "growthBonus",
+     "targetAchievement",
+     "seasonalIncentive",
+     "newProductIncentive",
+     "strategicPartnerBonus"
+    ],
+    "nullable": true,
+    "description": "Incentive type."
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective from."
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "Effective to."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The approvals.request raised for this row when it was created or changed; the row is not in force until that request is approved, as a PartnerRate is not (decided 29 September, writers pass; DM4)"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The partition key (ADR-0005), written at `tenant` scope."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "PartnerCreditProfile": {
+  "type": "object",
+  "x-ticvai-persistence": "control.partner_credit_profile",
+  "description": "The credit controls around an agreement's approved limit: thresholds, a temporary limit and its end, the owner, the risk class and the credit status. The approved limit itself stays `PartnerAgreement.creditLimit`; this row is how it is watched (decided 29 September, data model DM4)\n\n**Written by** setPartnerCreditProfile; enabling credit, a temporary limit and loosened thresholds go through approvals.request, a manual hold applies at once (decided 29 September, writers pass; DM4).",
+  "required": [
+   "id",
+   "partnerId",
+   "agreementId",
+   "creditEnabled",
+   "creditStatus"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The partner (control.partner)."
+   },
+   "agreementId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The agreement (control.partner_agreement) this row belongs to."
+   },
+   "creditEnabled": {
+    "type": "boolean",
+    "default": false,
+    "description": "Credit enabled."
+   },
+   "temporaryCreditLimit": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Temporary credit limit; empty when none."
+   },
+   "temporaryLimitUntil": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "Temporary limit ends (e.g. until 31 December)."
+   },
+   "creditOwnerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Credit owner, a staff principal."
+   },
+   "approvalAuthority": {
+    "type": "string",
+    "nullable": true,
+    "description": "Approval authority."
+   },
+   "riskClassification": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
+    "nullable": true,
+    "description": "Risk classification."
+   },
+   "warningThresholdPercent": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100,
+    "default": 70,
+    "description": "Warning at this utilisation percent (decided 29 September, readiness close-out)."
+   },
+   "highRiskThresholdPercent": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100,
+    "default": 90,
+    "description": "High risk at this utilisation percent (decided 29 September, readiness close-out)."
+   },
+   "blockThresholdPercent": {
+    "type": "number",
+    "minimum": 0,
+    "default": 100,
+    "description": "Block at this utilisation percent (decided 29 September, readiness close-out)."
+   },
+   "creditStatus": {
+    "type": "string",
+    "enum": [
+     "notEnabled",
+     "withinLimit",
+     "warning",
+     "highRisk",
+     "onHold",
+     "blocked"
+    ],
+    "default": "notEnabled",
+    "description": "Credit status. withinLimit, warning and highRisk are recomputed from utilisation against the thresholds; onHold and blocked are set by finance and stay until lifted."
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective from."
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "Effective to."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The approvals.request raised when credit was enabled, a temporary limit set or a threshold loosened; those changes are not in force until it is approved (decided 29 September, writers pass; DM4)"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The partition key (ADR-0005), written at `tenant` scope."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "PartnerRateMode": {
+  "type": "string",
+  "description": "**Alternatives, not both.** A partner buys at a net rate and keeps the margin, or sells at face value and is paid commission. Both is being paid twice for the same sale.\n",
+  "enum": [
+   "netRate",
+   "commission"
+  ]
  },
  "PartnerRateNetPricingConfigurationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is control.api_licence at 10%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; stored as control.partner_rate + control.partner_rate_volume_band (PartnerRate); rateId is its id (data model DM4)",
   "description": "**What Partner Rate & Net Pricing Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "partner": {
+   "partnerId": {
     "type": "string",
+    "format": "uuid",
     "description": "Partner"
    },
-   "agreement": {
+   "agreementId": {
     "type": "string",
+    "format": "uuid",
     "description": "Agreement"
    },
    "product": {
     "type": "string",
-    "description": "Product"
+    "description": "Product id; blank = all in the family/venue",
+    "nullable": true
    },
    "productFamily": {
     "type": "string",
-    "description": "Product Family"
+    "description": "Product Family",
+    "nullable": true
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue id; rates may differ per venue (MoM 31 Aug 4.3)",
+    "nullable": true
    },
    "event": {
     "type": "string",
-    "description": "Event"
+    "description": "Event id",
+    "nullable": true
    },
    "ticketType": {
     "type": "string",
-    "description": "Ticket Type"
+    "description": "Ticket Type",
+    "nullable": true
    },
    "priceCategory": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price Category"
+    "type": "string",
+    "description": "Price Category",
+    "nullable": true
    },
    "market": {
     "type": "string",
-    "description": "Market"
+    "description": "Market",
+    "nullable": true
    },
    "channel": {
-    "type": "string",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+     }
+    ],
+    "nullable": true,
     "description": "Channel"
    },
    "effectiveFrom": {
     "type": "string",
+    "format": "date",
     "description": "Effective From"
    },
    "effectiveTo": {
     "type": "string",
-    "description": "Effective To"
+    "format": "date",
+    "description": "Effective To",
+    "nullable": true
    },
    "blackoutDates": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "date"
+    },
     "description": "Blackout Dates"
    },
    "eventExceptions": {
-    "type": "string",
-    "description": "Event Exceptions"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Event Exceptions: event ids this rate does not apply to"
    },
    "seasonalRate": {
-    "type": "number",
-    "description": "Seasonal Rate"
+    "type": "boolean",
+    "description": "Seasonal Rate: this row overrides the base rate within its dates"
    },
    "minimumPermittedRate": {
-    "type": "number",
-    "description": "Minimum permitted rate"
-   },
-   "maximumDiscount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Maximum discount"
+    "description": "Guardrail: minimum permitted rate"
+   },
+   "maxDiscountPercent": {
+    "type": "number",
+    "description": "Guardrail: maximum discount from retail, percent",
+    "nullable": true
    },
    "marginFloor": {
     "type": "number",
-    "description": "Margin floor"
+    "description": "Guardrail: margin floor, percent",
+    "nullable": true
    },
-   "manualOverride": {
-    "type": "string",
-    "description": "Manual override"
+   "manualOverrideAllowed": {
+    "type": "boolean",
+    "description": "Guardrail: manual override permitted"
    },
    "approvalThreshold": {
-    "type": "integer",
-    "description": "Approval threshold"
+    "type": "number",
+    "description": "Guardrail: discount percent above which the rate needs approval (pack p.37: discount > 15% requires approval)",
+    "nullable": true
+   },
+   "rateId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Rate id; omit to create"
+   },
+   "pricingModel": {
+    "type": "string",
+    "enum": [
+     "retailPrice",
+     "netRate",
+     "discountFromRetail",
+     "markup",
+     "derivedRate"
+    ],
+    "description": "Pricing Model: retail price, net rate, discount from retail, markup or derived from a pricing profile"
+   },
+   "netRate": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Partner net rate, for netRate"
+   },
+   "discountPercent": {
+    "type": "number",
+    "description": "Discount from retail, percent, for discountFromRetail",
+    "nullable": true
+   },
+   "maxMarkupPercent": {
+    "type": "number",
+    "description": "Permitted markup, percent, for markup",
+    "nullable": true
+   },
+   "pricingProfileId": {
+    "type": "string",
+    "description": "Approved pricing profile, for derivedRate",
+    "nullable": true
+   },
+   "volumeBands": {
+    "type": "array",
+    "description": "Tiered volume bands (MoM 31 Aug 4.4, MoM 1 Sep 4.3: e.g. 10% up to 1,000 tickets, 15% from 1,000-5,000); fromUnits as on PartnerAgreement.volumeTiers",
+    "items": {
+     "type": "object",
+     "properties": {
+      "fromUnits": {
+       "type": "integer"
+      },
+      "discountPercent": {
+       "type": "number"
+      }
+     }
+    }
    }
   }
  },
  "PartnerRateNetPricingConfigurationView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_rate (PartnerRate) and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Partner Rate & Net Pricing Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "partner": {
+   "partnerId": {
     "type": "string",
+    "format": "uuid",
     "description": "Partner"
    },
-   "agreement": {
+   "agreementId": {
     "type": "string",
+    "format": "uuid",
     "description": "Agreement"
    },
    "product": {
     "type": "string",
-    "description": "Product"
+    "description": "Product id; blank = all in the family/venue",
+    "nullable": true
    },
    "productFamily": {
     "type": "string",
-    "description": "Product Family"
+    "description": "Product Family",
+    "nullable": true
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue id; rates may differ per venue (MoM 31 Aug 4.3)",
+    "nullable": true
    },
    "event": {
     "type": "string",
-    "description": "Event"
+    "description": "Event id",
+    "nullable": true
    },
    "ticketType": {
     "type": "string",
-    "description": "Ticket Type"
+    "description": "Ticket Type",
+    "nullable": true
    },
    "priceCategory": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Price Category"
+    "type": "string",
+    "description": "Price Category",
+    "nullable": true
    },
    "market": {
     "type": "string",
-    "description": "Market"
+    "description": "Market",
+    "nullable": true
    },
    "channel": {
-    "type": "string",
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+     }
+    ],
+    "nullable": true,
     "description": "Channel"
    },
    "effectiveFrom": {
     "type": "string",
+    "format": "date",
     "description": "Effective From"
    },
    "effectiveTo": {
     "type": "string",
-    "description": "Effective To"
+    "format": "date",
+    "description": "Effective To",
+    "nullable": true
    },
    "blackoutDates": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "date"
+    },
     "description": "Blackout Dates"
    },
    "eventExceptions": {
-    "type": "string",
-    "description": "Event Exceptions"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Event Exceptions: event ids this rate does not apply to"
    },
    "seasonalRate": {
-    "type": "number",
-    "description": "Seasonal Rate"
+    "type": "boolean",
+    "description": "Seasonal Rate: this row overrides the base rate within its dates"
    },
    "minimumPermittedRate": {
-    "type": "number",
-    "description": "Minimum permitted rate"
-   },
-   "maximumDiscount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Maximum discount"
+    "description": "Guardrail: minimum permitted rate"
+   },
+   "maxDiscountPercent": {
+    "type": "number",
+    "description": "Guardrail: maximum discount from retail, percent",
+    "nullable": true
    },
    "marginFloor": {
     "type": "number",
-    "description": "Margin floor"
+    "description": "Guardrail: margin floor, percent",
+    "nullable": true
    },
-   "manualOverride": {
-    "type": "string",
-    "description": "Manual override"
+   "manualOverrideAllowed": {
+    "type": "boolean",
+    "description": "Guardrail: manual override permitted"
    },
    "approvalThreshold": {
-    "type": "integer",
-    "description": "Approval threshold"
+    "type": "number",
+    "description": "Guardrail: discount percent above which the rate needs approval (pack p.37: discount > 15% requires approval)",
+    "nullable": true
+   },
+   "rateId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Rate id; omit to create"
+   },
+   "pricingModel": {
+    "type": "string",
+    "enum": [
+     "retailPrice",
+     "netRate",
+     "discountFromRetail",
+     "markup",
+     "derivedRate"
+    ],
+    "description": "Pricing Model: retail price, net rate, discount from retail, markup or derived from a pricing profile"
+   },
+   "netRate": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Partner net rate, for netRate"
+   },
+   "discountPercent": {
+    "type": "number",
+    "description": "Discount from retail, percent, for discountFromRetail",
+    "nullable": true
+   },
+   "maxMarkupPercent": {
+    "type": "number",
+    "description": "Permitted markup, percent, for markup",
+    "nullable": true
+   },
+   "pricingProfileId": {
+    "type": "string",
+    "description": "Approved pricing profile, for derivedRate",
+    "nullable": true
+   },
+   "volumeBands": {
+    "type": "array",
+    "description": "Tiered volume bands (MoM 31 Aug 4.4, MoM 1 Sep 4.3: e.g. 10% up to 1,000 tickets, 15% from 1,000-5,000); fromUnits as on PartnerAgreement.volumeTiers",
+    "items": {
+     "type": "object",
+     "properties": {
+      "fromUnits": {
+       "type": "integer"
+      },
+      "discountPercent": {
+       "type": "number"
+      }
+     }
+    }
+   },
+   "publicRate": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Public rate from the price list, read-only, for comparison"
+   },
+   "rateHierarchyLevel": {
+    "type": "string",
+    "enum": [
+     "standardPrice",
+     "partnerTypeRate",
+     "partnerAgreementRate",
+     "productEventException"
+    ],
+    "description": "Rate Hierarchy level of this row"
+   },
+   "validationIssues": {
+    "type": "array",
+    "description": "Guardrail breaches and overlaps",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "belowMinimumRate",
+        "discountAboveMaximum",
+        "marginBelowFloor",
+        "overlappingRate"
+       ]
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Advisory AI margin-erosion or inconsistent-rate flags"
+   }
+  }
+ },
+ "PartnerSecurity": {
+  "type": "object",
+  "x-ticvai-persistence": "control.partner_security",
+  "description": "A deposit, guarantee or other financial security a partner has lodged, with its verification and what its expiry does. Verified, unexpired security is what covers credit exposure (decided 29 September, data model DM4)\n\n**Written by** setPartnerSecurity (record a security, then verify or reject it); only a `verified`, unexpired row counts against exposure (decided 29 September, writers pass; DM4).",
+  "required": [
+   "id",
+   "partnerId",
+   "securityType",
+   "amount",
+   "currency",
+   "effectiveDate",
+   "verificationStatus"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The partner (control.partner)."
+   },
+   "agreementId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The agreement (control.partner_agreement) this row belongs to; empty when it applies to the partner as a whole."
+   },
+   "securityType": {
+    "type": "string",
+    "enum": [
+     "cashDeposit",
+     "bankGuarantee",
+     "securityDeposit",
+     "letterOfCredit",
+     "prepaymentBalance",
+     "corporateGuarantee",
+     "other"
+    ],
+    "description": "Security type."
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Amount, in `currency`."
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "description": "Currency of the security, ISO 4217; a guarantee is issued in its own currency, not necessarily the settlement one."
+   },
+   "issuingInstitution": {
+    "type": "string",
+    "nullable": true,
+    "description": "Issuing institution."
+   },
+   "reference": {
+    "type": "string",
+    "nullable": true,
+    "description": "Reference."
+   },
+   "effectiveDate": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective date."
+   },
+   "expiryDate": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "Expiry date."
+   },
+   "documentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Supporting document (control.partner_document)."
+   },
+   "verificationStatus": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "verified",
+     "rejected",
+     "expired"
+    ],
+    "default": "pending",
+    "description": "Verification status."
+   },
+   "expiryAction": {
+    "type": "string",
+    "enum": [
+     "generateWarning",
+     "reduceCredit",
+     "blockNewCreditSales",
+     "placePartnerOnHold",
+     "requireFinanceReview"
+    ],
+    "nullable": true,
+    "description": "What expiry of this security does."
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The partition key (ADR-0005), written at `tenant` scope."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
  "PaymentTermsBillingAccountConfigurationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; stored as control.partner_billing_profile (PartnerBillingProfile); paymentModel and creditTermDays are control.partner_agreement columns, billingCurrency is its settlementCurrency, billingEntity lands in billingEntityName, the partner's own billing entity as text, not a ledger.legal_entity reference (decided 29 September, writers pass; DM4)",
   "description": "**What Payment Terms, Billing & Account Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "immediatePayment": {
-    "type": "string",
-    "description": "Immediate Payment"
-   },
-   "prepaid": {
-    "type": "string",
-    "description": "Prepaid"
-   },
-   "creditAccount": {
-    "type": "string",
-    "description": "Credit Account"
-   },
-   "depositBalance": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Deposit Balance"
-   },
-   "monthlyInvoice": {
-    "type": "string",
-    "description": "Monthly Invoice"
-   },
-   "weeklyInvoice": {
-    "type": "string",
-    "description": "Weekly Invoice"
-   },
-   "perTransactionBilling": {
-    "type": "string",
-    "description": "Per-Transaction Billing"
-   },
    "consolidatedBilling": {
-    "type": "string",
-    "description": "Consolidated Billing"
+    "type": "boolean",
+    "description": "Consolidated Billing: one invoice across the partner's branches"
    },
    "billingEntity": {
     "type": "string",
-    "description": "Billing Entity"
+    "description": "Billing Entity: the partner's own legal entity invoiced, as text; stored as PartnerBillingProfile.billingEntityName, not a ledger.legal_entity reference (decided 29 September, writers pass; DM4)"
    },
    "billingCurrency": {
     "type": "string",
-    "description": "Billing Currency"
+    "pattern": "^[A-Z]{3}$",
+    "description": "Billing Currency; equals the agreement settlementCurrency"
    },
    "invoiceFrequency": {
     "type": "string",
+    "enum": [
+     "perTransaction",
+     "weekly",
+     "monthly"
+    ],
     "description": "Invoice Frequency"
    },
    "invoiceGrouping": {
     "type": "string",
-    "description": "Invoice Grouping"
+    "enum": [
+     "perPartner",
+     "perBranch",
+     "perVenue",
+     "perEvent",
+     "perPurchaseOrder"
+    ],
+    "description": "Invoice Grouping (decided 29 September, readiness close-out)"
    },
    "taxProfile": {
     "type": "string",
-    "description": "Tax Profile"
+    "description": "Tax Profile id"
    },
    "purchaseOrderRequired": {
     "type": "boolean",
@@ -3563,95 +5345,104 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "statementFrequency": {
     "type": "string",
+    "enum": [
+     "weekly",
+     "monthly"
+    ],
     "description": "Statement Frequency"
    },
    "billingContact": {
     "type": "string",
-    "description": "Billing Contact"
+    "description": "Billing Contact (partner contact id)"
    },
    "financeEmail": {
     "type": "string",
-    "description": "Finance Email"
+    "description": "Finance Email",
+    "format": "email"
    },
-   "bankTransfer": {
+   "partnerId": {
     "type": "string",
-    "description": "Bank Transfer"
+    "format": "uuid",
+    "description": "Partner"
    },
-   "card": {
+   "agreementId": {
     "type": "string",
-    "description": "Card"
+    "format": "uuid",
+    "description": "Agreement"
    },
-   "paymentLink": {
+   "paymentModel": {
     "type": "string",
-    "description": "Payment Link"
+    "enum": [
+     "creditAccount",
+     "prepaid",
+     "payPerTransaction"
+    ],
+    "description": "Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced periodically), prepaid (pre-funded wallet drawn down per sale) or payPerTransaction (card at each sale)"
    },
-   "prepaidBalance": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Prepaid Balance"
+   "creditTermDays": {
+    "type": "integer",
+    "description": "Payment Terms in days: 0 due immediately, 7, 15, 30, 45 or custom (as on PartnerAgreement)"
    },
-   "otherApprovedMethod": {
-    "type": "string",
-    "description": "Other approved method"
+   "allowedPaymentMethods": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "creditAccount",
+      "bankTransfer",
+      "cheque",
+      "card",
+      "paymentLink",
+      "prepaidBalance",
+      "other"
+     ]
+    },
+    "description": "Payment Methods (cheque from MoM 31 Aug 4.4)"
    }
   }
  },
  "PaymentTermsBillingAccountConfigurationView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_billing_profile (PartnerBillingProfile) and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Payment Terms, Billing & Account Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "immediatePayment": {
-    "type": "string",
-    "description": "Immediate Payment"
-   },
-   "prepaid": {
-    "type": "string",
-    "description": "Prepaid"
-   },
-   "creditAccount": {
-    "type": "string",
-    "description": "Credit Account"
-   },
-   "depositBalance": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Deposit Balance"
-   },
-   "monthlyInvoice": {
-    "type": "string",
-    "description": "Monthly Invoice"
-   },
-   "weeklyInvoice": {
-    "type": "string",
-    "description": "Weekly Invoice"
-   },
-   "perTransactionBilling": {
-    "type": "string",
-    "description": "Per-Transaction Billing"
-   },
    "consolidatedBilling": {
-    "type": "string",
-    "description": "Consolidated Billing"
+    "type": "boolean",
+    "description": "Consolidated Billing: one invoice across the partner's branches"
    },
    "billingEntity": {
     "type": "string",
-    "description": "Billing Entity"
+    "description": "Billing Entity: the partner's own legal entity invoiced, as text; stored as PartnerBillingProfile.billingEntityName, not a ledger.legal_entity reference (decided 29 September, writers pass; DM4)"
    },
    "billingCurrency": {
     "type": "string",
-    "description": "Billing Currency"
+    "pattern": "^[A-Z]{3}$",
+    "description": "Billing Currency; equals the agreement settlementCurrency"
    },
    "invoiceFrequency": {
     "type": "string",
+    "enum": [
+     "perTransaction",
+     "weekly",
+     "monthly"
+    ],
     "description": "Invoice Frequency"
    },
    "invoiceGrouping": {
     "type": "string",
-    "description": "Invoice Grouping"
+    "enum": [
+     "perPartner",
+     "perBranch",
+     "perVenue",
+     "perEvent",
+     "perPurchaseOrder"
+    ],
+    "description": "Invoice Grouping (decided 29 September, readiness close-out)"
    },
    "taxProfile": {
     "type": "string",
-    "description": "Tax Profile"
+    "description": "Tax Profile id"
    },
    "purchaseOrderRequired": {
     "type": "boolean",
@@ -3659,65 +5450,107 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "statementFrequency": {
     "type": "string",
+    "enum": [
+     "weekly",
+     "monthly"
+    ],
     "description": "Statement Frequency"
    },
    "billingContact": {
     "type": "string",
-    "description": "Billing Contact"
+    "description": "Billing Contact (partner contact id)"
    },
    "financeEmail": {
     "type": "string",
-    "description": "Finance Email"
-   },
-   "bankTransfer": {
-    "type": "string",
-    "description": "Bank Transfer"
-   },
-   "card": {
-    "type": "string",
-    "description": "Card"
-   },
-   "paymentLink": {
-    "type": "string",
-    "description": "Payment Link"
+    "description": "Finance Email",
+    "format": "email"
    },
    "prepaidBalance": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Prepaid Balance"
-   },
-   "otherApprovedMethod": {
-    "type": "string",
-    "description": "Other approved method"
+    "description": "Prepaid wallet balance (payment model prepaid)"
    },
    "currentBalance": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Current Balance"
    },
    "outstanding": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Outstanding"
    },
    "overdue": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Overdue"
    },
    "availableCredit": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Available Credit"
    },
    "lastPayment": {
     "type": "string",
-    "format": "date-time",
-    "description": "Last Payment"
+    "format": "date",
+    "description": "Last Payment date",
+    "nullable": true
    },
    "nextInvoice": {
     "type": "string",
-    "format": "date-time",
-    "description": "Next Invoice"
+    "format": "date",
+    "description": "Next Invoice date",
+    "nullable": true
    },
    "oldestOutstandingInvoice": {
     "type": "string",
-    "description": "Oldest Outstanding Invoice"
+    "format": "date",
+    "description": "Due date of the Oldest Outstanding Invoice",
+    "nullable": true
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Partner"
+   },
+   "agreementId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Agreement"
+   },
+   "paymentModel": {
+    "type": "string",
+    "enum": [
+     "creditAccount",
+     "prepaid",
+     "payPerTransaction"
+    ],
+    "description": "Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced periodically), prepaid (pre-funded wallet drawn down per sale) or payPerTransaction (card at each sale)"
+   },
+   "creditTermDays": {
+    "type": "integer",
+    "description": "Payment Terms in days: 0 due immediately, 7, 15, 30, 45 or custom (as on PartnerAgreement)"
+   },
+   "allowedPaymentMethods": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "creditAccount",
+      "bankTransfer",
+      "cheque",
+      "card",
+      "paymentLink",
+      "prepaidBalance",
+      "other"
+     ]
+    },
+    "description": "Payment Methods (cheque from MoM 31 Aug 4.4)"
+   },
+   "applied": {
+    "type": "boolean",
+    "description": "False when the save changed `paymentModel` or `creditTermDays` and the agreement amendment awaits approval; the billing-profile fields are applied either way (decided 29 September, writers pass; DM4)"
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The approvals.request raised for the agreement amendment; empty when none was needed (decided 29 September, writers pass; DM4)"
    }
   }
  }

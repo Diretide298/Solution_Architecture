@@ -39,10 +39,7 @@
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-228 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-229",
@@ -119,21 +116,6 @@
       {
        "kind": "multiSelect",
        "label": "Filter by",
-       "columns": [
-        "PromotionPerformanceCommandCenterView.dateRange",
-        "PromotionPerformanceCommandCenterView.businessEntity",
-        "PromotionPerformanceCommandCenterView.venue",
-        "PromotionPerformanceCommandCenterView.attraction",
-        "PromotionPerformanceCommandCenterView.campaign",
-        "PromotionPerformanceCommandCenterView.promotion",
-        "PromotionPerformanceCommandCenterView.bundle",
-        "PromotionPerformanceCommandCenterView.channel",
-        "PromotionPerformanceCommandCenterView.customerSegment",
-        "PromotionPerformanceCommandCenterView.product",
-        "PromotionPerformanceCommandCenterView.partner",
-        "PromotionPerformanceCommandCenterView.market",
-        "PromotionPerformanceCommandCenterView.currency"
-       ],
        "notes": "The pack filters this screen by date range, business entity, venue, attraction, campaign, promotion and 7 more — which are present is a decision the pack already made.",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 142 §Global Filters"
       }
@@ -249,6 +231,18 @@
     "contract": "promotions",
     "purpose": "Promotion Performance Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPromotionHealthPerformance",
+    "contract": "promotions",
+    "purpose": "Promotion Health & Performance Monitor",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCampaignPromotionPerformance",
+    "contract": "promotions",
+    "purpose": "Campaign & Promotion Performance Explorer",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -264,7 +258,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-228"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-228",
+   "workshopBoard": "wireframes/WS115 Promotions   Bundles Management Board 10.dc.html#adm-228"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 142. 27 of 27 labels bound to a contract property; 28 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -354,6 +349,53 @@
        "derived": true,
        "impliedBy": "listCampaignPromotionPerformance",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?venueId=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Active at",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?activeAt=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "textField",
+       "label": "Owner principal id",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?ownerPrincipalId=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "searchField",
+       "label": "Q",
+       "operation": "listCommercialCampaigns",
+       "notes": "Sends `?q=` to `listCommercialCampaigns`.",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every commercial campaign",
+       "bindsTo": "CommercialCampaign",
+       "columns": [
+        "CommercialCampaign.id",
+        "CommercialCampaign.venueId",
+        "CommercialCampaign.code",
+        "CommercialCampaign.name",
+        "CommercialCampaign.description",
+        "CommercialCampaign.ownerPrincipalId",
+        "CommercialCampaign.legalEntityId",
+        "CommercialCampaign.validFrom",
+        "CommercialCampaign.validTo",
+        "CommercialCampaign.budgets"
+       ],
+       "operation": "listCommercialCampaigns",
+       "provenance": "contract promotions.yaml GET /commercial-campaigns"
       }
      ]
     }
@@ -372,21 +414,34 @@
     "contract": "promotions",
     "purpose": "Campaign & Promotion Performance Explorer",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPromotionPerformance",
+    "contract": "promotions",
+    "purpose": "Promotion Performance Command Center",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPromotionCampaign",
+    "contract": "promotions",
+    "purpose": "Promotion & Campaign Directory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCommercialCampaigns",
+    "contract": "promotions",
+    "purpose": "List commercial campaigns",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
-   "preloaded": [
-    "CampaignPromotionPerformanceExplorerView.aed38",
-    "CampaignPromotionPerformanceExplorerView.family20310k740k29118",
-    "CampaignPromotionPerformanceExplorerView.summer1Aed26",
-    "CampaignPromotionPerformanceExplorerView.aed41",
-    "CampaignPromotionPerformanceExplorerView.app1092k310k34132"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-229"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-229",
+   "workshopBoard": "wireframes/WS115 Promotions   Bundles Management Board 10.dc.html#adm-229"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 143. 0 of 0 labels bound to a contract property; 0 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -569,7 +624,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-230"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-230",
+   "workshopBoard": "wireframes/WS115 Promotions   Bundles Management Board 10.dc.html#adm-230"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 144. 8 of 18 labels bound to a contract property; 18 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -741,7 +797,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-231"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-231",
+   "workshopBoard": "wireframes/WS115 Promotions   Bundles Management Board 10.dc.html#adm-231"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 145. 11 of 11 labels bound to a contract property; 11 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -943,7 +1000,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-232"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-232",
+   "workshopBoard": "wireframes/WS115 Promotions   Bundles Management Board 10.dc.html#adm-232"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 146. 16 of 16 labels bound to a contract property; 16 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1148,7 +1206,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-233"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-233",
+   "workshopBoard": "wireframes/WS115 Promotions   Bundles Management Board 10.dc.html#adm-233"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 147. 16 of 16 labels bound to a contract property; 17 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1292,15 +1351,7 @@
        "kind": "dataTable",
        "label": "Every customer segment channel",
        "columns": [
-        "CustomerSegmentChannelPartnerAnalyticsView.b2c",
-        "CustomerSegmentChannelPartnerAnalyticsView.mobileApp",
-        "CustomerSegmentChannelPartnerAnalyticsView.pos",
-        "CustomerSegmentChannelPartnerAnalyticsView.kiosk",
-        "CustomerSegmentChannelPartnerAnalyticsView.b2b",
-        "CustomerSegmentChannelPartnerAnalyticsView.callCenter",
-        "CustomerSegmentChannelPartnerAnalyticsView.ota",
-        "CustomerSegmentChannelPartnerAnalyticsView.reseller",
-        "CustomerSegmentChannelPartnerAnalyticsView.api",
+        "CustomerSegmentChannelPartnerAnalyticsView.channel",
         "CustomerSegmentChannelPartnerAnalyticsView.partnerRevenue",
         "CustomerSegmentChannelPartnerAnalyticsView.partnerRedemptions",
         "CustomerSegmentChannelPartnerAnalyticsView.discountCost",
@@ -1324,15 +1375,7 @@
        "label": "The selected customer segment channel",
        "bindsTo": "CustomerSegmentChannelPartnerAnalyticsView",
        "columns": [
-        "CustomerSegmentChannelPartnerAnalyticsView.b2c",
-        "CustomerSegmentChannelPartnerAnalyticsView.mobileApp",
-        "CustomerSegmentChannelPartnerAnalyticsView.pos",
-        "CustomerSegmentChannelPartnerAnalyticsView.kiosk",
-        "CustomerSegmentChannelPartnerAnalyticsView.b2b",
-        "CustomerSegmentChannelPartnerAnalyticsView.callCenter",
-        "CustomerSegmentChannelPartnerAnalyticsView.ota",
-        "CustomerSegmentChannelPartnerAnalyticsView.reseller",
-        "CustomerSegmentChannelPartnerAnalyticsView.api",
+        "CustomerSegmentChannelPartnerAnalyticsView.channel",
         "CustomerSegmentChannelPartnerAnalyticsView.partnerRevenue",
         "CustomerSegmentChannelPartnerAnalyticsView.partnerRedemptions",
         "CustomerSegmentChannelPartnerAnalyticsView.discountCost",
@@ -1361,6 +1404,12 @@
     "contract": "promotions",
     "purpose": "Customer, Segment, Channel & Partner Analytics",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listChannelCustomerSegment",
+    "contract": "catalogue",
+    "purpose": "Channel, Customer Segment & Location Dynamic Rules",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -1376,7 +1425,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-234"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-234",
+   "workshopBoard": "wireframes/WS115 Promotions   Bundles Management Board 10.dc.html#adm-234"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 148. 26 of 26 labels bound to a contract property; 26 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1455,10 +1505,8 @@
        "label": "Every incrementality attribution cannibalization",
        "columns": [
         "Full-price customers moving to discounted products",
-        "IncrementalityAttributionCannibalizationAnalysisView.standardTicketDiscountedTicket",
-        "IncrementalityAttributionCannibalizationAnalysisView.higherMarginBundleLowerMarginPromotion",
-        "Existing member purchase replaced by unnecessary discount",
-        "IncrementalityAttributionCannibalizationAnalysisView.channelMigrationCausedByDiscounting"
+        "IncrementalityAttributionCannibalizationAnalysisView.cannibalizationType",
+        "Existing member purchase replaced by unnecessary discount"
        ],
        "bindsTo": "IncrementalityAttributionCannibalizationAnalysisView",
        "operation": "listIncrementalityAttributionCannibalization",
@@ -1476,10 +1524,8 @@
        "bindsTo": "IncrementalityAttributionCannibalizationAnalysisView",
        "columns": [
         "Full-price customers moving to discounted products",
-        "IncrementalityAttributionCannibalizationAnalysisView.standardTicketDiscountedTicket",
-        "IncrementalityAttributionCannibalizationAnalysisView.higherMarginBundleLowerMarginPromotion",
-        "Existing member purchase replaced by unnecessary discount",
-        "IncrementalityAttributionCannibalizationAnalysisView.channelMigrationCausedByDiscounting"
+        "IncrementalityAttributionCannibalizationAnalysisView.cannibalizationType",
+        "Existing member purchase replaced by unnecessary discount"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Answer the difficult question”, “Where sufficient data exists, support”, “Promotion-influenced revenue”, “Estimated baseline revenue”, “Estimated incremental revenue”, “AED 650K”.",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 149 §Detect"
@@ -1506,16 +1552,15 @@
   "entryState": {
    "preloaded": [
     "Full-price customers moving to discounted products",
-    "IncrementalityAttributionCannibalizationAnalysisView.standardTicketDiscountedTicket",
-    "IncrementalityAttributionCannibalizationAnalysisView.higherMarginBundleLowerMarginPromotion",
-    "Existing member purchase replaced by unnecessary discount",
-    "IncrementalityAttributionCannibalizationAnalysisView.channelMigrationCausedByDiscounting"
+    "IncrementalityAttributionCannibalizationAnalysisView.cannibalizationType",
+    "Existing member purchase replaced by unnecessary discount"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-235"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-235",
+   "workshopBoard": "wireframes/WS115 Promotions   Bundles Management Board 10.dc.html#adm-235"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 149. 3 of 5 labels bound to a contract property; 5 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1639,17 +1684,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "AiOptimizationNextBestActionCenterView.increaseDiscount",
-    "AiOptimizationNextBestActionCenterView.reduceDiscount",
-    "AiOptimizationNextBestActionCenterView.changeMechanic",
-    "AiOptimizationNextBestActionCenterView.endPromotion",
-    "AiOptimizationNextBestActionCenterView.changeThreshold"
+    "AiOptimizationNextBestActionCenterView.recommendation"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-236"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-236",
+   "workshopBoard": "wireframes/WS115 Promotions   Bundles Management Board 10.dc.html#adm-236"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 150. 0 of 0 labels bound to a contract property; 6 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1711,6 +1753,11 @@
   "gaps": [
    {
     "operation": null,
+    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Filter, Commercial, Revenue Management, Finance, Venue Management, Data Analyst. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 151 §Users can create reports using"
+   },
+   {
+    "operation": null,
     "why": "**Executive Promotion Intelligence & Reporting Studio declares no operation that writes anything** — its only declared call is `listExecutivePromotionReporting`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
     "source": "contract — the screen's declared operations"
    }
@@ -1755,6 +1802,36 @@
      "slot": "rowActions",
      "components": [
       {
+       "kind": "primaryButton",
+       "label": "Filter",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 151 §Users can create reports using"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Commercial",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 151 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Revenue Management",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 151 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Finance",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 151 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Venue Management",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 151 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Data Analyst",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 151 §Support"
+      },
+      {
        "kind": "banner",
        "label": "Permissions this screen separates",
        "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Excel, CSV, PDF, Power BI, API, Scheduled report. Each needs attaching to the control it gates, or the screen needs the control.",
@@ -1787,9 +1864,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-237"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-237",
+   "workshopBoard": "wireframes/WS115 Promotions   Bundles Management Board 10.dc.html#adm-237"
   },
-  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 151. 0 of 1 labels bound to a contract property; 9 of 137 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 151. 0 of 1 labels bound to a contract property; 15 of 137 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

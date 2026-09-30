@@ -1,6 +1,6 @@
 # WS193 — Wallet Configuration Backend Structure v1.0 board 8
 
-**10 screens · 11 operations · 8 schemas · 4 permissions**
+**10 screens · 16 operations · 15 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `AUDIT_VIEW, WALLET_CONFIGURE, WALLET_OPERATE, WALLET_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `AUDIT_VIEW, RISK_INVESTIGATE, RISK_REVIEW, WALLET_CONFIGURE, WALLET_OPERATE, WALLET_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -67,7 +67,7 @@ convincingly. It is never a caption.
 | `BO-1157` | Device, Credential & Account Security | listDetail | 2 | 0 | — |
 | `BO-1158` | AI Fraud & Anomaly Detection Studio | listDetail | 1 | 0 | — |
 | `BO-1159` | Automated Security Action Orchestration | configEditor | 2 | 0 | — |
-| `BO-1160` | Fraud Alert & Investigation Case Management | listDetail | 1 | 0 | — |
+| `BO-1160` | Fraud Alert & Investigation Case Management | listDetail | 6 | 0 | — |
 | `BO-1161` | Security Rules Testing, Simulation & AI Sandbox | listDetail | 1 | 0 | — |
 | `BO-1162` | Security Governance, Audit & Rule Publication | listDetail | 6 | 1 | — |
 

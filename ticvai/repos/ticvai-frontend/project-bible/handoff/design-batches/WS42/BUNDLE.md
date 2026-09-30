@@ -1,6 +1,6 @@
 # WS42 — Privacy  Consent   Preference Management board 2
 
-**10 screens · 10 operations · 13 schemas · 4 permissions**
+**10 screens · 11 operations · 21 schemas · 4 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -62,13 +62,13 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `CMS-031` | Privacy Operations Command Center | listDetail | 1 | 0 | — |
 | `CMS-032` | Customer Privacy, Consent & Preference 360° | listDetail | 1 | 0 | — |
-| `CMS-033` | Consent Evidence, History & Withdrawal Management | listDetail | 1 | 0 | — |
+| `CMS-033` | Consent Evidence, History & Withdrawal Management | listDetail | 2 | 0 | — |
 | `CMS-034` | Data Subject / Customer Privacy Request Management | listDetail | 1 | 0 | — |
 | `CMS-035` | Data Discovery, Access, Export & Correction Workspace | listDetail | 1 | 0 | — |
 | `CMS-036` | Deletion, Anonymization & Restriction Operations | listDetail | 1 | 2 | — |
 | `CMS-037` | Data Retention, Expiry & Legal Hold Operations | listDetail | 1 | 2 | — |
 | `CMS-038` | Privacy Compliance, Exception & Investigation Workspace | listDetail | 1 | 0 | — |
-| `CMS-039` | Privacy Audit, Evidence & Compliance Reporting | configEditor | 1 | 0 | — |
+| `CMS-039` | Privacy Audit, Evidence & Compliance Reporting | configEditor | 2 | 0 | — |
 | `CMS-040` | Privacy Analytics & AI Compliance Intelligence | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch
@@ -569,6 +569,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "marketing-crm",
     "purpose": "Consent Evidence, History & Withdrawal Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listDeviceConsents",
+    "contract": "marketing-crm",
+    "purpose": "Visitors' cookie decisions as evidence",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1601,6 +1608,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "marketing-crm",
     "purpose": "Privacy Audit, Evidence & Compliance Reporting",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listDeviceConsents",
+    "contract": "marketing-crm",
+    "purpose": "Cookie consent log for compliance reports",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -2073,6 +2087,75 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
+ "listDeviceConsents": {
+  "method": "GET",
+  "path": "/consent/device",
+  "contract": "marketing-crm",
+  "summary": "Visitors' cookie decisions, as evidence",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brandId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "action",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "category",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "claimed",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "consentKey",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listPrivacy": {
   "method": "GET",
   "path": "/privacy",
@@ -2317,6 +2400,186 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "ConsentEvidenceHistoryWithdrawalManagementView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over marketing.consent_record, marketing.consent_record_channel, marketing.consent_capture_point, marketing.consent_propagation (new)",
+  "description": "One consent event and, for a withdrawal, its propagation (pack 17.2.3 Consent Evidence Record, Consent Events, Withdrawal Propagation).",
+  "required": [
+   "evidenceId",
+   "subjectId",
+   "purpose",
+   "event",
+   "occurredAt"
+  ],
+  "properties": {
+   "evidenceId": {
+    "type": "string",
+    "description": "The `ConsentRecord.id`."
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The customer or participant."
+   },
+   "purpose": {
+    "$ref": "#/components/schemas/ConsentPurpose"
+   },
+   "consentVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "The notice version consented against."
+   },
+   "wordingReference": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "The exact wording/version reference shown at capture."
+   },
+   "event": {
+    "type": "string",
+    "enum": [
+     "presented",
+     "granted",
+     "declined",
+     "updated",
+     "withdrawn",
+     "expired",
+     "reconfirmed",
+     "superseded"
+    ]
+   },
+   "currentStatus": {
+    "type": "string",
+    "enum": [
+     "granted",
+     "declined",
+     "withdrawn",
+     "expired"
+    ],
+    "description": "The purpose's state now, which may differ from this event's."
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/MessageChannel"
+    }
+   },
+   "source": {
+    "$ref": "#/components/schemas/ConsentSource"
+   },
+   "withdrawalRoute": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "customerPortal",
+     "mobileApp",
+     "preferenceCenter",
+     "customerService",
+     "authorisedStaff",
+     "api"
+    ],
+    "description": "Only on `withdrawn`."
+   },
+   "brandId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "country": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$",
+    "nullable": true
+   },
+   "capturePointId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "actorType": {
+    "type": "string",
+    "enum": [
+     "customer",
+     "guardian",
+     "staff",
+     "system"
+    ]
+   },
+   "actorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The staff member for proxy capture (`recordedByPrincipalId`)."
+   },
+   "sourceSystem": {
+    "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+   },
+   "deviceSessionReference": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "Only where the capture point's configuration permits storing it."
+   },
+   "guardianSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "propagation": {
+    "type": "array",
+    "description": "Per target, for a withdrawal.",
+    "items": {
+     "type": "object",
+     "required": [
+      "target",
+      "status"
+     ],
+     "properties": {
+      "target": {
+       "type": "string",
+       "enum": [
+        "crm",
+        "marketing",
+        "campaignAudience",
+        "connectedSystem"
+       ]
+      },
+      "targetName": {
+       "type": "string",
+       "nullable": true
+      },
+      "status": {
+       "type": "string",
+       "enum": [
+        "requested",
+        "processed",
+        "propagated",
+        "acknowledged",
+        "failed",
+        "retryRequired"
+       ]
+      },
+      "attempts": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "updatedAt": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "error": {
+       "type": "string",
+       "maxLength": 500,
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
  "ConsentPurpose": {
   "type": "string",
   "enum": [
@@ -2337,8 +2600,34 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "pos",
    "callCentre",
    "import",
-   "agentRecorded"
-  ]
+   "agentRecorded",
+   "cookieBanner",
+   "checkout"
+  ],
+  "description": "`checkout` (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders `checkoutCart` `marketingConsents[]` and recorded by `recordCheckoutConsents`, bound to the order and the verified contact. `cookieBanner` (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by `claimDeviceConsent`. Kept apart from `website`, a form submission, because the audit trail (2.6.56) has to tell the two apart."
+ },
+ "CookieCategory": {
+  "type": "string",
+  "enum": [
+   "strictlyNecessary",
+   "functional",
+   "analytics",
+   "personalisation",
+   "marketing"
+  ],
+  "description": "2.6.53. The five categories the banner design (`CookieBannerPreferenceCenterDesignerView.categories`) offers; the matrix's \"preference\" category is `personalisation` (British spelling, as `ConsentPurpose`)."
+ },
+ "CookieConsentChannel": {
+  "type": "string",
+  "enum": [
+   "b2cWebsite",
+   "customerPortal",
+   "mobileApp",
+   "embeddedCheckout",
+   "whiteLabelSite",
+   "partnerMicrosite"
+  ],
+  "description": "The six governed surfaces, as the registry and the banner design name them (pack 17.1.5-17.1.6)."
  },
  "CustomerPrivacyConsentPreference360View": {
   "type": "object",
@@ -3189,6 +3478,629 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "DataSubjectCustomerPrivacyRequestManagementView": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.privacy_request",
+  "description": "One customer privacy request (pack 17.2.4 Case Information). The case layer over the cross-region `platform.dsar_request` fan-out, which it references when it raises one.",
+  "required": [
+   "subjectId",
+   "requestType",
+   "source",
+   "requesterRole",
+   "jurisdiction"
+  ],
+  "properties": {
+   "requestId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The person the request is about."
+   },
+   "requestType": {
+    "type": "string",
+    "maxLength": 60,
+    "description": "A configured request type code (`setPrivacyRequestTypes`), e.g. `access`, `dataExport`, `correction`, `deletion`, `anonymisation`, `restriction`, `objection`, `consentWithdrawal`, `marketingOptOut`."
+   },
+   "source": {
+    "type": "string",
+    "enum": [
+     "customerPortal",
+     "b2c",
+     "mobileApp",
+     "emailManual",
+     "customerService",
+     "pos",
+     "api"
+    ]
+   },
+   "requesterRole": {
+    "type": "string",
+    "enum": [
+     "self",
+     "guardian",
+     "authorisedRepresentative"
+    ]
+   },
+   "requesterSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The guardian or representative, when not `self`; verified like the subject."
+   },
+   "jurisdiction": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$",
+    "description": "Selects the response period configured for this request type."
+   },
+   "submittedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "dueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "`submittedAt` plus the jurisdiction's configured response period; null when none is configured."
+   },
+   "deadlineConfigured": {
+    "type": "boolean",
+    "readOnly": true
+   },
+   "daysRemaining": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Negative once overdue; null without a deadline."
+   },
+   "atRisk": {
+    "type": "boolean",
+    "readOnly": true,
+    "description": "Inside the request type's configured warning window before `dueAt`."
+   },
+   "slaState": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "onTrack",
+     "atRisk",
+     "overdue",
+     "escalated",
+     "noDeadline"
+    ]
+   },
+   "priority": {
+    "type": "string",
+    "enum": [
+     "P1",
+     "P2",
+     "P3",
+     "P4"
+    ],
+    "default": "P3"
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "verificationMethod": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "accountLogin",
+     "otp",
+     "emailVerification",
+     "mobileVerification",
+     "idReview",
+     "manualVerification"
+    ],
+    "description": "One of the methods the request type allows."
+   },
+   "verificationStatus": {
+    "type": "string",
+    "enum": [
+     "notStarted",
+     "pending",
+     "verified",
+     "failed"
+    ],
+    "default": "notStarted"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "submitted",
+     "inProgress",
+     "completed"
+    ],
+    "default": "submitted",
+    "description": "MoM 20 Aug lifecycle."
+   },
+   "stage": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true,
+    "description": "The configured workflow step within `inProgress` (a stage code of the request type)."
+   },
+   "outcome": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "fulfilled",
+     "partiallyFulfilled",
+     "refused",
+     "withdrawnByRequester"
+    ],
+    "description": "Required to complete. `refused` and `partiallyFulfilled` need `outcomeReason`."
+   },
+   "outcomeReason": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "escalated": {
+    "type": "boolean",
+    "default": false
+   },
+   "dsarRequestId": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The cross-region `DsarRequest.requestId`, when fulfilment fanned out."
+   },
+   "caseId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The customer-service case it came in through, if any."
+   },
+   "notes": {
+    "type": "string",
+    "maxLength": 4000,
+    "nullable": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "DeletionAnonymizationRestrictionOperationsView": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.privacy_action",
+  "description": "One governed privacy action on one subject (pack 17.2.6).",
+  "required": [
+   "subjectId",
+   "actionType"
+  ],
+  "properties": {
+   "actionId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "requestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The privacy request it fulfils; null when a retention run raised it."
+   },
+   "retentionRunId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "actionType": {
+    "type": "string",
+    "enum": [
+     "delete",
+     "anonymise",
+     "pseudonymise",
+     "restrictProcessing",
+     "suppressMarketing",
+     "removeBiometricReference",
+     "disconnectThirdPartyProfile",
+     "other"
+    ],
+    "description": "`pseudonymise` only where the tenant has configured it."
+   },
+   "otherActionLabel": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "requiresApproval": {
+    "type": "boolean",
+    "readOnly": true
+   },
+   "impact": {
+    "type": "array",
+    "readOnly": true,
+    "description": "Affected areas and what will happen to each, shown before execution.",
+    "items": {
+     "type": "object",
+     "required": [
+      "area",
+      "outcome"
+     ],
+     "properties": {
+      "area": {
+       "type": "string",
+       "enum": [
+        "customerProfile",
+        "marketingProfile",
+        "biometricReference",
+        "orders",
+        "invoices",
+        "ticketUsage",
+        "fraudInvestigation",
+        "consentEvidence",
+        "waiverRecords",
+        "connectedSystem"
+       ]
+      },
+      "outcome": {
+       "type": "string",
+       "enum": [
+        "delete",
+        "anonymise",
+        "pseudonymise",
+        "restrict",
+        "retain",
+        "hold"
+       ]
+      },
+      "reason": {
+       "type": "string",
+       "maxLength": 300,
+       "nullable": true,
+       "description": "Required for `retain` and `hold`, e.g. the retention policy code."
+      }
+     }
+    }
+   },
+   "checks": {
+    "type": "array",
+    "readOnly": true,
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "blocking"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "retentionRequirement",
+        "legalHold",
+        "financialRecord",
+        "activeTransaction",
+        "securityFraud",
+        "contractualObligation",
+        "jurisdictionRule"
+       ]
+      },
+      "blocking": {
+       "type": "boolean"
+      },
+      "detail": {
+       "type": "string",
+       "maxLength": 300
+      }
+     }
+    }
+   },
+   "approvals": {
+    "type": "array",
+    "readOnly": true,
+    "items": {
+     "type": "object",
+     "properties": {
+      "step": {
+       "type": "string",
+       "enum": [
+        "privacyOfficer",
+        "dataOwner"
+       ]
+      },
+      "outcome": {
+       "type": "string",
+       "enum": [
+        "approved",
+        "rejected"
+       ]
+      },
+      "principalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "reason": {
+       "type": "string",
+       "nullable": true
+      },
+      "decidedAt": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
+   },
+   "decision": {
+    "type": "object",
+    "writeOnly": true,
+    "nullable": true,
+    "description": "Sent to record an approval step or cancel.",
+    "required": [
+     "step",
+     "outcome"
+    ],
+    "properties": {
+     "step": {
+      "type": "string",
+      "enum": [
+       "privacyOfficer",
+       "dataOwner",
+       "cancel"
+      ]
+     },
+     "outcome": {
+      "type": "string",
+      "enum": [
+       "approved",
+       "rejected"
+      ]
+     },
+     "reason": {
+      "type": "string",
+      "maxLength": 500,
+      "nullable": true
+     }
+    }
+   },
+   "status": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "planned",
+     "awaitingApproval",
+     "approved",
+     "rejected",
+     "executing",
+     "completed",
+     "completedWithRetention",
+     "failed",
+     "manualActionRequired",
+     "cancelled"
+    ]
+   },
+   "systemResults": {
+    "type": "array",
+    "readOnly": true,
+    "description": "The execution monitor, per system.",
+    "items": {
+     "type": "object",
+     "required": [
+      "system",
+      "status"
+     ],
+     "properties": {
+      "system": {
+       "type": "string",
+       "maxLength": 100
+      },
+      "status": {
+       "type": "string",
+       "enum": [
+        "pending",
+        "processing",
+        "completed",
+        "retainedWithReason",
+        "failed",
+        "manualActionRequired"
+       ]
+      },
+      "reason": {
+       "type": "string",
+       "maxLength": 300,
+       "nullable": true
+      },
+      "updatedAt": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
+   },
+   "dsarRequestId": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "evidenceAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Completion evidence, as `runDataRetention` produces."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "DeviceConsent": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.device_consent + marketing.device_consent_category",
+  "description": "**One cookie decision by a visitor nobody has identified yet** (BL-073 §4b, decided 29 September). Append-only: a change of mind is a new row. Keyed for the visitor by `consentKey`, which the platform mints; the categories are child rows. The IP address and user agent, where recorded at all, are in `pii.consent_identifier` (`ConsentCaptureIdentifier`), never here.",
+  "required": [
+   "consentKey",
+   "channel",
+   "action",
+   "categories",
+   "noticeVersion",
+   "decidedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "consentKey": {
+    "type": "string",
+    "maxLength": 64,
+    "readOnly": true,
+    "description": "**Opaque, minted by us, not a device fingerprint.** It answers 2.6.55's \"user identifier/session ID\" and is the join key `claimDeviceConsent` needs. Shared by all the tenant's domains (2.6.62), never across tenants."
+   },
+   "channel": {
+    "$ref": "#/components/schemas/CookieConsentChannel"
+   },
+   "brandId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "bannerDesignId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The published `CookieBannerPreferenceCenterDesignerView` version the visitor was shown."
+   },
+   "action": {
+    "$ref": "#/components/schemas/DeviceConsentAction"
+   },
+   "categories": {
+    "type": "array",
+    "minItems": 1,
+    "description": "Every category of the design, with the decision this row gives it.",
+    "items": {
+     "type": "object",
+     "required": [
+      "category",
+      "decision"
+     ],
+     "properties": {
+      "category": {
+       "$ref": "#/components/schemas/CookieCategory"
+      },
+      "decision": {
+       "type": "string",
+       "enum": [
+        "granted",
+        "declined"
+       ]
+      }
+     }
+    }
+   },
+   "noticeVersion": {
+    "type": "string",
+    "description": "The cookie notice version decided against (white-label `setPolicy`, kind `cookie`)."
+   },
+   "language": {
+    "type": "string",
+    "maxLength": 10,
+    "nullable": true
+   },
+   "globalPrivacyControl": {
+    "type": "boolean",
+    "default": false,
+    "description": "The browser sent a Global Privacy Control signal; honoured as a CCPA/CPRA opt-out of sale and sharing."
+   },
+   "source": {
+    "$ref": "#/components/schemas/ConsentSource"
+   },
+   "country": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The edge's geolocation of the request, for the geographic statistics (2.6.63). The address is not kept here."
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**A device consent expires and a subject consent does not.** Set from the tenant's device-consent term; after it the banner asks again."
+   },
+   "claimedBySubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Set once, by `claimDeviceConsent`. Never cleared."
+   },
+   "claimedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005), tenant-scoped: a decision with no subject still belongs to one tenant."
+   }
+  }
+ },
+ "DeviceConsentAction": {
+  "type": "string",
+  "enum": [
+   "acceptAll",
+   "rejectNonEssential",
+   "savePreferences",
+   "withdraw",
+   "doNotSellOrShare"
+  ],
+  "description": "What the visitor pressed. `doNotSellOrShare` is the CCPA/CPRA opt-out link, shown where the design's `regulatoryRegimes` include `ccpaCpra`."
+ },
  "MessageChannel": {
   "type": "string",
   "enum": [
@@ -3412,6 +4324,115 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "asOf": {
     "type": "string",
     "format": "date-time"
+   }
+  }
+ },
+ "PrivacyAuditEvidenceComplianceReportingView": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.privacy_audit_event",
+  "description": "One privacy audit event (pack 17.2.9 Audit Fields). Append-only; written by the operation that performed the event, never through an API.",
+  "required": [
+   "eventId",
+   "action",
+   "occurredAt"
+  ],
+  "properties": {
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "action": {
+    "type": "string",
+    "enum": [
+     "consentGranted",
+     "consentWithdrawn",
+     "preferenceChanged",
+     "policyAccepted",
+     "privacyRequestCreated",
+     "identityVerified",
+     "dataExportGenerated",
+     "correctionRequested",
+     "deletionApproved",
+     "anonymisationExecuted",
+     "retentionAction",
+     "legalHold",
+     "administrativeOverride",
+     "configurationChange"
+    ]
+   },
+   "actorType": {
+    "type": "string",
+    "enum": [
+     "customer",
+     "guardian",
+     "staff",
+     "system",
+     "ai"
+    ]
+   },
+   "actorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "actorRole": {
+    "type": "string",
+    "nullable": true,
+    "description": "The role the actor held at the time."
+   },
+   "source": {
+    "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+   },
+   "channel": {
+    "type": "string",
+    "nullable": true,
+    "description": "A `ConsentSource` value or the staff surface it came through."
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "before": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": true,
+    "description": "The changed fields before, masked where the field is sensitive."
+   },
+   "after": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": true
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "approvalReference": {
+    "type": "string",
+    "nullable": true,
+    "description": "The approval that authorised it (privacy action approval, hold approval, package approval)."
+   },
+   "relatedRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "relatedCaseId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "evidenceReference": {
+    "type": "string",
+    "nullable": true,
+    "description": "e.g. the consent evidence id, the policy version, the export asset id."
    }
   }
  },

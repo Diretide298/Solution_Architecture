@@ -64,11 +64,11 @@
    "operations": 7
   },
   {
-   "contract": "fnb",
+   "contract": "catalogue",
    "operations": 5
   },
   {
-   "contract": "catalogue",
+   "contract": "fnb",
    "operations": 5
   },
   {

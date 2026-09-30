@@ -435,8 +435,6 @@ CREATE INDEX IF NOT EXISTS byok_enablement_decided_by_principal_id_idx ON ai.byo
 CREATE INDEX IF NOT EXISTS byok_enablement_platform_staff_grant_id_idx ON ai.byok_enablement (platform_staff_grant_id);
 -- convention, not declared: ai.byok_enablement.tenant_id -> platform.tenant
 CREATE INDEX IF NOT EXISTS byok_enablement_tenant_id_idx ON ai.byok_enablement (tenant_id);
--- convention, not declared: ai.chunk_embedding.parent_chunk_id -> ai.chunk_ref
-CREATE INDEX IF NOT EXISTS chunk_embedding_parent_chunk_id_idx ON ai.chunk_embedding (parent_chunk_id);
 -- convention, not declared: ai.forecast_version.decision_record_id -> ai.decision_record
 CREATE INDEX IF NOT EXISTS forecast_version_decision_record_id_idx ON ai.forecast_version (decision_record_id);
 -- convention, not declared: ai.guided_choice_suggestion.decision_record_id -> ai.decision_record
@@ -731,8 +729,6 @@ CREATE INDEX IF NOT EXISTS event_reschedule_new_space_id_idx ON catalogue.event_
 CREATE INDEX IF NOT EXISTS event_resource_plan_event_id_idx ON catalogue.event_resource_plan (event_id);
 -- convention, not declared: catalogue.event_schedule.event_id -> catalogue.event
 CREATE INDEX IF NOT EXISTS event_schedule_event_id_idx ON catalogue.event_schedule (event_id);
--- convention, not declared: catalogue.fee_rule.eligibility_ref_id -> ai.chunk_ref
-CREATE INDEX IF NOT EXISTS fee_rule_eligibility_ref_id_idx ON catalogue.fee_rule (eligibility_ref_id);
 -- convention, not declared: catalogue.fee_rule.fee_id -> catalogue.fee
 CREATE INDEX IF NOT EXISTS fee_rule_fee_id_idx ON catalogue.fee_rule (fee_id);
 -- convention, not declared: catalogue.group_package.product_id -> catalogue.product
@@ -787,8 +783,6 @@ CREATE INDEX IF NOT EXISTS price_assignment_price_list_id_idx ON catalogue.price
 CREATE INDEX IF NOT EXISTS price_assignment_product_id_idx ON catalogue.price_assignment (product_id);
 -- convention, not declared: catalogue.price_assignment.sales_channel_id -> catalogue.sales_channel
 CREATE INDEX IF NOT EXISTS price_assignment_sales_channel_id_idx ON catalogue.price_assignment (sales_channel_id);
--- convention, not declared: catalogue.price_assignment.scope_ref_id -> ai.chunk_ref
-CREATE INDEX IF NOT EXISTS price_assignment_scope_ref_id_idx ON catalogue.price_assignment (scope_ref_id);
 -- convention, not declared: catalogue.price_assignment.venue_id -> platform.scope
 CREATE INDEX IF NOT EXISTS price_assignment_venue_id_idx ON catalogue.price_assignment (venue_id);
 -- convention, not declared: catalogue.price_execution.approval_request_id -> approvals.request
@@ -1221,6 +1215,8 @@ CREATE INDEX IF NOT EXISTS transfer_close_short_signed_by_principal_id_idx ON in
 CREATE INDEX IF NOT EXISTS transfer_from_location_id_idx ON inventory.transfer (from_location_id);
 -- convention, not declared: inventory.transfer.to_location_id -> inventory.location
 CREATE INDEX IF NOT EXISTS transfer_to_location_id_idx ON inventory.transfer (to_location_id);
+-- convention, not declared: kernel.inbox.event_id -> catalogue.event
+CREATE INDEX IF NOT EXISTS inbox_event_id_idx ON kernel.inbox (event_id);
 -- convention, not declared: ledger.credit_memo.buyer_subject_id -> pii.subject
 CREATE INDEX IF NOT EXISTS credit_memo_buyer_subject_id_idx ON ledger.credit_memo (buyer_subject_id);
 -- convention, not declared: ledger.credit_memo.issued_by_principal_id -> identity.principal
@@ -2667,8 +2663,8 @@ CREATE INDEX IF NOT EXISTS case_evidence_added_by_principal_id_idx ON ai.case_ev
 CREATE INDEX IF NOT EXISTS case_evidence_case_id_idx ON ai.case_evidence (case_id);
 -- declared: ai.chunk_embedding.document_id -> ai.knowledge_document
 CREATE INDEX IF NOT EXISTS chunk_embedding_document_id_idx ON ai.chunk_embedding (document_id);
--- declared: ai.chunk_ref.document_id -> ai.knowledge_document
-CREATE INDEX IF NOT EXISTS chunk_ref_document_id_idx ON ai.chunk_ref (document_id);
+-- declared: ai.chunk_embedding.parent_chunk_id -> ai.chunk_embedding
+CREATE INDEX IF NOT EXISTS chunk_embedding_parent_chunk_id_idx ON ai.chunk_embedding (parent_chunk_id);
 -- declared: ai.config_session.conversation_id -> ai.conversation
 CREATE INDEX IF NOT EXISTS config_session_conversation_id_idx ON ai.config_session (conversation_id);
 -- declared: ai.config_session.plan_id -> ai.action_plan
@@ -4095,8 +4091,8 @@ CREATE INDEX IF NOT EXISTS shift_swap_assignment_id_idx ON workforce.shift_swap 
 CREATE INDEX IF NOT EXISTS work_assignment_department_id_idx ON workforce.work_assignment (department_id);
 -- declared: workforce.work_assignment.venue_id -> platform.scope
 CREATE INDEX IF NOT EXISTS work_assignment_venue_id_idx ON workforce.work_assignment (venue_id);
--- the relay polls unpublished rows oldest first (SD-030)
-CREATE INDEX IF NOT EXISTS outbox_unpublished_idx ON platform.outbox (created_at) WHERE published_at IS NULL;
+-- the relay polls unpublished rows oldest first (SD-030, ADR-0058)
+CREATE INDEX IF NOT EXISTS outbox_unpublished_idx ON platform.outbox (created_at, id) WHERE published_at IS NULL;
 -- unique per tenant (x-ticvai-unique): access.accreditation_credential.encoded_identifier
 CREATE UNIQUE INDEX IF NOT EXISTS accreditation_credential_encoded_identifier_uniq ON access.accreditation_credential (encoded_identifier);
 -- unique per tenant (x-ticvai-unique): access.blacklist.media_code

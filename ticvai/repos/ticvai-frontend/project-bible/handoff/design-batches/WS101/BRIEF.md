@@ -1,6 +1,6 @@
 # WS101 — Subscription Licensing AI Self Service board 4
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 6 operations · 8 schemas · 4 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `PARTNER_MANAGE, PLATFORM_BILLING_MANAGE, PLATFORM_PLAN_MANAGE, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-399` | Recommended Package Overview | listDetail | 0 | 0 | — |
-| `ADM-400` | Commercial Model & Tier Selection | listDetail | 0 | 0 | — |
-| `ADM-401` | Module Marketplace | listDetail | 0 | 0 | — |
-| `ADM-402` | AI Module & Package Recommendations | listDetail | 0 | 0 | — |
-| `ADM-403` | Module Detail & Commercial Treatment | listDetail | 0 | 0 | — |
-| `ADM-404` | Module Dependency & Compatibility Manager | listDetail | 0 | 0 | — |
-| `ADM-405` | Add-Ons, Capacity & Commercial Options | listDetail | 0 | 0 | — |
-| `ADM-406` | Commercial Package Simulator | listDetail | 0 | 0 | — |
-| `ADM-407` | Package Review & Commercial Summary | listDetail | 0 | 0 | — |
-| `ADM-408` | Final Package Approval & Handoff | listDetail | 0 | 0 | — |
+| `ADM-399` | Recommended Package Overview | listDetail | 1 | 0 | — |
+| `ADM-400` | Commercial Model & Tier Selection | listDetail | 2 | 0 | — |
+| `ADM-401` | Module Marketplace | listDetail | 1 | 0 | — |
+| `ADM-402` | AI Module & Package Recommendations | listDetail | 1 | 0 | — |
+| `ADM-403` | Module Detail & Commercial Treatment | listDetail | 1 | 0 | — |
+| `ADM-404` | Module Dependency & Compatibility Manager | listDetail | 2 | 0 | — |
+| `ADM-405` | Add-Ons, Capacity & Commercial Options | listDetail | 1 | 0 | — |
+| `ADM-406` | Commercial Package Simulator | listDetail | 1 | 0 | — |
+| `ADM-407` | Package Review & Commercial Summary | listDetail | 1 | 0 | — |
+| `ADM-408` | Final Package Approval & Handoff | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 

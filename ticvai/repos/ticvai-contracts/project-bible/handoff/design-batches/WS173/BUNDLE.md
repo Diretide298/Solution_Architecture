@@ -1,6 +1,6 @@
 # WS173 — Seat Management Venue Mapping Reference v1.0 board 9
 
-**10 screens · 5 operations · 5 schemas · 3 permissions**
+**10 screens · 5 operations · 6 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -1717,6 +1717,48 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "scopePath": {
     "type": "string"
+   }
+  }
+ },
+ "SeatRecommendation": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "seatIds",
+   "totalPrice",
+   "isContiguous",
+   "rank"
+  ],
+  "properties": {
+   "seatIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "displayLabels": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "totalPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "isContiguous": {
+    "type": "boolean"
+   },
+   "rank": {
+    "type": "integer",
+    "description": "Best first."
+   },
+   "rationale": {
+    "type": "string",
+    "description": "Why this option was chosen — closest to stage, best value in category, only contiguous block remaining. Shown to a call-centre agent, not the guest.\n"
    }
   }
  },

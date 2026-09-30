@@ -7,7 +7,7 @@ Nx 20 workspace, pnpm, TypeScript (strict). 13 apps (React Native and React web)
 | `packages/api-client` | the typed client for the API contracts |
 | `packages/design-tokens` | colours, type, spacing - depends on nothing |
 | `packages/ui` | shared components |
-| `packages/offline-core` | the one offline store: SQLite adapter, outbox, sync, ULIDs |
+| `packages/offline-core` | the one offline store: SQLite adapter, outbox, sync, ids (UUIDv7) |
 
 <!-- apps:begin (sync-frontend-apps.py) -->
 The apps are the package's own (`ticvai/frontend/*.yaml`), named by who operates them. A screen's
@@ -70,7 +70,8 @@ In one session, a document already read does not need reading again.
 - Apps depend only on packages (`.eslintrc.cjs` enforces it). A package never imports an app.
 - **No app talks to SQLite or does its own sync.** Everything offline goes through `@ticvai/offline-core`.
 - Clients never compute permissions; they read `effectivePermissions` from the session.
-- Ids created on a device are ULIDs from `newUlid()`.
+- Ids created on a device are UUIDv7 from `newId()`, the format the server mints; human codes
+  people read or type (order numbers, ticket codes) are separate fields.
 - Function components with hooks, named exports, no `any`.
 - The screen and its API calls come from ADAM: build what the screen and contract say.
 

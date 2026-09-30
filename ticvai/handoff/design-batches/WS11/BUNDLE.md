@@ -1,6 +1,6 @@
 # WS11 — Access Control board 11
 
-**10 screens · 17 operations · 17 schemas · 5 permissions**
+**10 screens · 18 operations · 23 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -60,13 +60,13 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `BO-244` | Access Security & Fraud Command Center | listDetail | 3 | 2 | — |
+| `BO-244` | Access Security & Fraud Command Center | listDetail | 4 | 2 | — |
 | `BO-245` | Fraud Detection Rule & Signal Library | listDetail | 2 | 0 | — |
 | `BO-246` | Credential Sharing & Concurrent Usage Detection | listDetail | 2 | 1 | — |
 | `BO-247` | Unified Identity & Credential Lock Manager | listDetail | 3 | 2 | — |
 | `BO-248` | Biometric & Identity Integrity Monitoring | listDetail | 4 | 2 | — |
 | `BO-249` | Relationship & Companion Fraud Monitoring | configEditor | 2 | 1 | — |
-| `BO-250` | Access Risk Scoring & Decision Engine | listDetail | 2 | 1 | — |
+| `BO-250` | Access Risk Scoring & Decision Engine | listDetail | 3 | 1 | — |
 | `BO-251` | Real-Time Security Response & Playbook Builder | listDetail | 1 | 0 | — |
 | `BO-252` | Security Investigation & Evidence Workspace | listDetail | 1 | 0 | — |
 | `BO-253` | Security Analytics, AI Detection & Governance | listDetail | 2 | 1 | — |
@@ -382,6 +382,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listAccessSecurityFraud"
     ]
+   },
+   {
+    "operationId": "getAccessRiskScore",
+    "contract": "access",
+    "purpose": "Risk score behind an alert's identity or credential",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1515,6 +1522,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listAccessRiskScoring"
     ]
+   },
+   {
+    "operationId": "getAccessRiskScore",
+    "contract": "access",
+    "purpose": "Look up the calculated score of a guest, credential or device with its signals",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -2108,6 +2122,40 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+ "getAccessRiskScore": {
+  "method": "GET",
+  "path": "/access-risk-scores",
+  "contract": "access",
+  "summary": "The current access risk score of a person, credential or device, with its signals",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "entitlementId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "deviceId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessRiskScore"
+ },
  "listAccessRiskScoring": {
   "method": "GET",
   "path": "/access-risk-scoring",
@@ -2571,7 +2619,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "entitlementId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The credential the Face Pass belongs to"
    },
@@ -2654,7 +2702,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "The ruleId setFraudDetectionRule is keyed by"
    },
    "scopePath": {
@@ -2700,10 +2748,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "unusualFaceChange",
      "multipleIdentitiesLinked",
      "suspiciousCompanionChanges",
-     "podNannyRelationshipAnomalies"
+     "podNannyRelationshipAnomalies",
+     "excessiveRefunds"
     ],
     "nullable": true,
-    "description": "signal rules"
+    "description": "signal rules. `excessiveRefunds` (added 29 September, build pass, 5.3.33) counts one guest's refund-driven credential revocations (`access.credential_event`, event refund) within timeWindow against threshold: the buy, use, refund pattern of ticket abuse."
    },
    "signalCategory": {
     "type": "string",
@@ -2909,7 +2958,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "array",
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     },
     "description": "The linked credentials (the list's associatedCredentialIds)"
    },
@@ -2974,6 +3023,122 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid",
     "nullable": true
+   }
+  }
+ },
+ "AccessRiskScore": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed at read time from access.risk_scoring_config, access.fraud_rule, access.security_alert, access.identity_lock and access.blacklist",
+  "description": "The current access risk score of one subject, credential or device, with what produced it (3.3.44; decided 29 September, build pass).",
+  "required": [
+   "score",
+   "band",
+   "calculatedAt"
+  ],
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "entitlementId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The scope whose risk configuration was applied."
+   },
+   "score": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100
+   },
+   "band": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
+    "description": "From the scope's mediumThreshold, highThreshold and criticalThreshold."
+   },
+   "signals": {
+    "type": "array",
+    "description": "Every fraud signal that contributed, highest weight first.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "fraudRuleId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "signal": {
+       "type": "string"
+      },
+      "weight": {
+       "type": "integer"
+      },
+      "occurrences": {
+       "type": "integer"
+      },
+      "lastDetectedAt": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "alertIds": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "uuid"
+       }
+      }
+     }
+    }
+   },
+   "contextFactors": {
+    "type": "array",
+    "description": "The configured context factors and what each added.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "factor": {
+       "type": "string",
+       "enum": [
+        "venue",
+        "product",
+        "ticketValue",
+        "event",
+        "accessZone",
+        "time",
+        "credentialType",
+        "historicalBehavior"
+       ]
+      },
+      "contribution": {
+       "type": "integer"
+      }
+     }
+    }
+   },
+   "identityLocked": {
+    "type": "boolean",
+    "description": "An active identity lock forces the critical band."
+   },
+   "blacklisted": {
+    "type": "boolean",
+    "description": "A blacklist entry forces the critical band."
+   },
+   "calculatedAt": {
+    "type": "string",
+    "format": "date-time"
    }
   }
  },
@@ -3140,13 +3305,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "fraudRuleId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The access fraud rule that raised the alert, if one did"
    },
    "entitlementId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The credential (the list's credentialId)"
    },
@@ -3216,6 +3381,231 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "AccessSecurityFraudCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Access Security & Fraud Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "severity": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ]
+   },
+   "alertId": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string",
+    "description": "e.g. Credential attempted simultaneous entry at two gates"
+   },
+   "credentialId": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string"
+   },
+   "zoneId": {
+    "type": "string"
+   },
+   "gateId": {
+    "type": "string"
+   },
+   "detectedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  },
+  "required": [
+   "alertId",
+   "severity"
+  ]
+ },
+ "AccessSecurityFraudCommandCenterViewSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none - aggregate computed at read time over the rows the page lists",
+  "description": "The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).",
+  "properties": {
+   "activeSecurityAlerts": {
+    "type": "integer",
+    "description": "Active Security Alerts"
+   },
+   "highRiskCredentials": {
+    "type": "integer",
+    "description": "High-Risk Credentials"
+   },
+   "credentialsLockedToday": {
+    "type": "integer",
+    "description": "Credentials Locked Today"
+   },
+   "suspiciousQrActivity": {
+    "type": "integer",
+    "description": "Suspicious QR Activity"
+   },
+   "deviceSharingAlerts": {
+    "type": "integer",
+    "description": "Device-Sharing Alerts"
+   },
+   "biometricAlerts": {
+    "type": "integer",
+    "description": "Biometric Alerts"
+   },
+   "duplicateAccessAttempts": {
+    "type": "integer"
+   },
+   "blacklistedCredentials": {
+    "type": "integer",
+    "description": "Blacklisted Credentials"
+   },
+   "activeInvestigations": {
+    "type": "integer",
+    "description": "Active Investigations"
+   },
+   "fraudPrevented": {
+    "type": "integer",
+    "description": "Fraud attempts prevented today"
+   },
+   "lowRisk": {
+    "type": "number",
+    "description": "Share of today's validations at low risk, percent"
+   },
+   "mediumRisk": {
+    "type": "number",
+    "description": "Share at medium risk, percent"
+   },
+   "highRisk": {
+    "type": "number",
+    "description": "Share at high risk, percent"
+   },
+   "critical": {
+    "type": "number",
+    "description": "Share at critical risk, percent"
+   }
+  }
+ },
+ "BiometricIdentityIntegrityMonitoringView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Biometric & Identity Integrity Monitoring displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "anomalyId": {
+    "type": "string"
+   },
+   "anomalyType": {
+    "type": "string",
+    "enum": [
+     "faceChanged",
+     "reEnrollment",
+     "repeatedFaceMismatch",
+     "multipleFacesOneCredential",
+     "oneFaceMultipleCredentials",
+     "suspiciousEnrollmentFrequency",
+     "unusualVerificationFailures"
+    ]
+   },
+   "successfulVisits": {
+    "type": "integer",
+    "description": "Successful Visits (the pack shows 28)"
+   },
+   "oldBiometricReference": {
+    "type": "string",
+    "description": "Opaque reference to the prior enrolment; never the raw template"
+   },
+   "newBiometricReference": {
+    "type": "string",
+    "description": "Opaque reference to the new enrolment; never the raw template"
+   },
+   "changeDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "change date"
+   },
+   "location": {
+    "type": "string",
+    "description": "location"
+   },
+   "operator": {
+    "type": "string",
+    "description": "operator"
+   },
+   "verificationProcess": {
+    "type": "string",
+    "description": "verification process"
+   },
+   "reason": {
+    "type": "string",
+    "description": "reason"
+   },
+   "approval": {
+    "type": "string",
+    "description": "approval"
+   },
+   "facePassId": {
+    "type": "string"
+   },
+   "originalEnrollmentAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  },
+  "required": [
+   "anomalyId",
+   "anomalyType"
+  ]
+ },
+ "CredentialSharingConcurrentUsageDetectionView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Credential Sharing & Concurrent Usage Detection displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "credentialId": {
+    "type": "string"
+   },
+   "additionalDevices": {
+    "type": "integer",
+    "description": "Additional Devices (the pack shows 3)"
+   },
+   "maximumActiveDevices": {
+    "type": "integer",
+    "description": "Maximum Active Devices (the pack shows 1)"
+   },
+   "responseActions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "increaseRisk",
+      "requireId",
+      "requireBiometric",
+      "requireOperator",
+      "lockSecondaryDevice",
+      "lockCredential",
+      "securityAlert"
+     ]
+    },
+    "description": "Responses applied when the limits are exceeded"
+   },
+   "primaryDeviceId": {
+    "type": "string"
+   },
+   "maximumDeviceChangesPerVisit": {
+    "type": "integer"
+   },
+   "detectedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  },
+  "required": [
+   "credentialId"
+  ]
+ },
  "FraudDetectionRuleSignalLibraryInput": {
   "type": "object",
   "x-ticvai-persistence": "none — request only; the write configures the rules the matching View reads back (decided 29 September, VM close-out)",
@@ -3230,7 +3620,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "ruleId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "Absent creates a rule"
    },
    "signal": {
@@ -3265,7 +3655,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "unusualFaceChange",
      "multipleIdentitiesLinked",
      "suspiciousCompanionChanges",
-     "podNannyRelationshipAnomalies"
+     "podNannyRelationshipAnomalies",
+     "excessiveRefunds"
     ]
    },
    "signalCategory": {
@@ -3383,7 +3774,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "unusualFaceChange",
      "multipleIdentitiesLinked",
      "suspiciousCompanionChanges",
-     "podNannyRelationshipAnomalies"
+     "podNannyRelationshipAnomalies",
+     "excessiveRefunds"
     ],
     "description": "The fraud signal this rule configures"
    },
@@ -3524,7 +3916,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "array",
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     }
    },
    "securityInvestigationId": {
@@ -3740,7 +4132,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "ruleId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "Absent creates a rule"
    },
    "relationshipRuleType": {
@@ -4021,6 +4413,113 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   },
   "required": [
    "investigationId"
+  ]
+ },
+ "UnifiedIdentityCredentialLockManagerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Unified Identity & Credential Lock Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "identityId": {
+    "type": "string"
+   },
+   "lockId": {
+    "type": "string"
+   },
+   "associatedCredentialTypes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "ticket",
+      "rfidWristband",
+      "dynamicQr",
+      "walletCredential",
+      "facePass",
+      "membership",
+      "fastPass"
+     ]
+    },
+    "description": "Kinds of credential linked to the locked identity"
+   },
+   "lockScope": {
+    "type": "string",
+    "enum": [
+     "credentialOnly",
+     "mediaOnly",
+     "entitlement",
+     "venue",
+     "allVenueAccess",
+     "fullIdentity"
+    ],
+    "description": "Vocabulary listed under Select."
+   },
+   "lockDuration": {
+    "type": "string",
+    "enum": [
+     "untilManuallyReleased",
+     "endOfDay",
+     "nHours",
+     "untilInvestigationComplete",
+     "permanent"
+    ]
+   },
+   "propagatedTo": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "centralPlatform",
+      "venueEdge",
+      "onlineGates",
+      "offlineRevocationPackage",
+      "mobileDevices"
+     ]
+    },
+    "description": "Channels the lock has reached"
+   },
+   "associatedCredentialIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "lockHours": {
+    "type": "integer",
+    "description": "Used when lockDuration is nHours"
+   },
+   "lockReason": {
+    "type": "string",
+    "enum": [
+     "credentialSharing",
+     "fraudSuspected",
+     "securityIncident",
+     "identityMismatch",
+     "stolenCredential",
+     "guestRemoval"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "released"
+    ]
+   },
+   "lockedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lockedBy": {
+    "type": "string"
+   }
+  },
+  "required": [
+   "lockId",
+   "identityId",
+   "lockScope",
+   "lockDuration"
   ]
  }
 }

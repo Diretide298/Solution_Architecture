@@ -324,7 +324,7 @@
     "id": "formOpenPlatformStaffGrant",
     "component": "modal",
     "trigger": "Open access grant",
-    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only — the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September, audit R098). Required: `id` (a client UUIDv7), `permissions` (tenant permissions only — the ones this screen's operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed). Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Open access grant",
      "operation": "openPlatformStaffGrant"
@@ -3927,7 +3927,7 @@
        ],
        "operation": "listProductionAccessRequests",
        "notes": "**Production keys only after certification** (17 September minutes, M17-06). The queue a TICVAI administrator works: each request names the certified integration, the tenants, the module scopes and the IP allow-list. Approving issues a new production client; the sandbox key is never promoted.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       },
       {
        "kind": "dataTable",
@@ -3944,7 +3944,7 @@
        ],
        "operation": "listApiAnomalies",
        "notes": "**Abnormal volume is flagged, not only throttled** (M17-07): calls above the client's own baseline, refusals from outside the allow-list, calls to operations it never uses.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     },
@@ -4079,13 +4079,13 @@
        "kind": "primaryButton",
        "label": "Decide production access",
        "operation": "decideProductionAccess",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       },
       {
        "kind": "secondaryButton",
        "label": "Save anomaly rule",
        "operation": "setApiAnomalyRule",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     }
@@ -4161,7 +4161,7 @@
     "contract": "public-api",
     "purpose": "The production key approval queue",
     "trigger": "onLoad",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "operationId": "decideProductionAccess",
@@ -4172,14 +4172,14 @@
      "listProductionAccessRequests",
      "listApiClients"
     ],
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "operationId": "listApiAnomalies",
     "contract": "public-api",
     "purpose": "Flagged abnormal API traffic",
     "trigger": "onLoad",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "operationId": "setApiAnomalyRule",
@@ -4189,7 +4189,7 @@
     "invalidates": [
      "listApiAnomalies"
     ],
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "entryState": {
@@ -4261,7 +4261,7 @@
       "credentialTtlDays"
      ]
     },
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "id": "formSetApiAnomalyRule",
@@ -4286,7 +4286,7 @@
       "isActive"
      ]
     },
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "_platform": {

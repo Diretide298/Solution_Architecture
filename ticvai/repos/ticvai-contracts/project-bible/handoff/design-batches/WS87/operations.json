@@ -50,9 +50,28 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Wallet"
+ },
+ "getWalletExitBalance": {
+  "method": "GET",
+  "path": "/wallets/{walletId}/exit-balance",
+  "contract": "wallet",
+  "summary": "What the holder owes or is owed on leaving",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WalletExitBalance"
  },
  "listGameplayTransactions": {
   "method": "GET",
@@ -135,6 +154,25 @@
   ],
   "requestBody": "GameKioskConfig",
   "responds": "GameKioskConfig"
+ },
+ "settleWalletAtExit": {
+  "method": "POST",
+  "path": "/wallets/{walletId}/exit-settlement",
+  "contract": "wallet",
+  "summary": "Settle a short balance, or refund a credit, when the holder leaves",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletExitSettlement"
  },
  "topUpWallet": {
   "method": "POST",

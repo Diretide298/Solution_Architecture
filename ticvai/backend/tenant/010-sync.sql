@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS sync.cross_cell_request (
 -- An offline record the server refused, with the reason. Kept, because a till that loses a
 -- rejected sale silently is worse than one that reports it
 CREATE TABLE IF NOT EXISTS sync.rejection (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     workstation_id                    uuid NOT NULL,
     kind                              text NOT NULL CONSTRAINT rejection_kind_chk CHECK (kind IN ('order', 'payment', 'refund', 'void', 'scan')),
     recorded_at                       timestamptz,
@@ -46,6 +46,6 @@ CREATE TABLE IF NOT EXISTS sync.rejection (
     resolved_at                       timestamptz,
     resolved_by_principal_id          uuid,
     resolution                        text CONSTRAINT rejection_resolution_chk CHECK (resolution IN ('posted', 'voided', 'refunded')),
-    resolved_record_id                text
+    resolved_record_id                uuid
 );
 

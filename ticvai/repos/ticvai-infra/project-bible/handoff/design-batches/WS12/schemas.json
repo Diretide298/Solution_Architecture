@@ -1,4 +1,101 @@
 {
+ "AccessMonitoringAnalyticsCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Access Monitoring & Analytics Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "venueId": {
+    "type": "string"
+   },
+   "venueName": {
+    "type": "string"
+   },
+   "venueEntries": {
+    "type": "integer"
+   },
+   "venueInVenue": {
+    "type": "integer"
+   },
+   "venueRejectedRate": {
+    "type": "number",
+    "description": "Percent"
+   },
+   "venueThroughputPerMinute": {
+    "type": "number"
+   }
+  },
+  "required": [
+   "venueId"
+  ]
+ },
+ "AccessMonitoringAnalyticsCommandCenterViewSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none - aggregate computed at read time over the rows the page lists",
+  "description": "The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).",
+  "properties": {
+   "totalAdmissionsToday": {
+    "type": "integer",
+    "description": "Total Admissions Today"
+   },
+   "entries": {
+    "type": "integer",
+    "description": "Entries"
+   },
+   "exits": {
+    "type": "integer",
+    "description": "Exits"
+   },
+   "currentlyInVenue": {
+    "type": "integer",
+    "description": "Currently In Venue"
+   },
+   "reEntries": {
+    "type": "integer",
+    "description": "Re-entries"
+   },
+   "crossovers": {
+    "type": "integer",
+    "description": "Crossovers"
+   },
+   "groupAdmissions": {
+    "type": "integer",
+    "description": "Group Admissions"
+   },
+   "fastPassUses": {
+    "type": "integer",
+    "description": "Fast Pass Uses"
+   },
+   "validScans": {
+    "type": "integer",
+    "description": "Valid Scans"
+   },
+   "rejectedScans": {
+    "type": "integer",
+    "description": "Rejected Scans"
+   },
+   "interventionRate": {
+    "type": "number",
+    "description": "Intervention Rate"
+   },
+   "averageValidationTime": {
+    "type": "number",
+    "description": "Seconds"
+   },
+   "activeGates": {
+    "type": "integer",
+    "description": "Active Gates"
+   },
+   "offlineDevices": {
+    "type": "integer",
+    "description": "Offline Devices"
+   },
+   "validationSuccessRate": {
+    "type": "number",
+    "description": "Percent"
+   }
+  }
+ },
  "AccessReportsScheduledReportingDataExportView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -189,6 +286,69 @@
     "type": "string",
     "readOnly": true,
     "description": "Always the venue's time zone (decided 28 September, audit R158), returned so a reader knows which. Not taken on a write."
+   }
+  }
+ },
+ "CreateReportRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "name",
+   "category",
+   "dataSource",
+   "columns",
+   "requiredPermission"
+  ],
+  "properties": {
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "category": {
+    "$ref": "#/components/schemas/ReportCategory"
+   },
+   "dataSource": {
+    "$ref": "#/components/schemas/DataSource"
+   },
+   "columns": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "$ref": "#/components/schemas/ReportColumn"
+    }
+   },
+   "filters": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ReportFilter"
+    }
+   },
+   "groupBy": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "parameters": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ReportParameter"
+    }
+   },
+   "requiredPermission": {
+    "$ref": "../shared/permissions.yaml#/components/schemas/Permission",
+    "description": "Permission needed to run this report, from the shared `Permission` vocabulary. **The author cannot assign one they do not hold** — otherwise a venue user could build themselves a tenant-wide view.\n"
+   },
+   "maxDateRangeDays": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 1,
+    "default": 366,
+    "description": "Guards against a query spanning years of scan events. **When a report sets none, 366 days applies (decided 28 September, audit R158)**, so `runReport`'s date-range 400 always has a limit."
    }
   }
  },
@@ -573,6 +733,68 @@
     "format": "uuid"
    }
   }
+ },
+ "ReportDefinition": {
+  "x-ticvai-persistence": "reporting.report_definition + reporting.report_column + reporting.report_filter",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateReportRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "version",
+     "isSystem",
+     "isRetired",
+     "createdAt"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "version": {
+      "type": "string",
+      "description": "The current version. Assigned by the server on each publish; earlier ones are kept as `ReportDefinitionVersion`."
+     },
+     "isSystem": {
+      "type": "boolean",
+      "description": "Shipped with the platform — seeded at provisioning (BL-053, `SeededReport`). **Clone-only (decided 28 September, audit R096)**: `updateReport` and `deleteReport` refuse it with 409 `system-report`; a venue changes a copy made with `createReport`.\n"
+     },
+     "isRetired": {
+      "type": "boolean"
+     },
+     "estimatedCost": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high"
+      ],
+      "description": "Informs whether it may run inline or must be queued."
+     },
+     "createdByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     },
+     "createdAt": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "lastRunAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "scopePath": {
+      "type": "string",
+      "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+     }
+    }
+   }
+  ]
  },
  "ReportResult": {
   "x-ticvai-persistence": "none — result set, cached in object storage",

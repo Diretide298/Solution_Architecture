@@ -813,6 +813,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "name": "contentBody",
      "components": [
       {
+       "kind": "calendarView",
+       "label": "Calendar",
+       "operation": "listRealTimeAvailability",
+       "notes": "Rental availability by day and hour. Day, week, month and agenda views; the day starts at the venue's `calendarDayStartHour`. Filters the category on what it read.",
+       "provenance": "decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)"
+      },
+      {
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listRealTimeAvailability",
@@ -966,6 +973,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "name": "contentBody",
      "slot": "collection",
      "components": [
+      {
+       "kind": "calendarView",
+       "label": "Calendar",
+       "operation": "getResourceCalendar",
+       "notes": "Resource and equipment bookings by hour. Day, week, month and agenda views; the day starts at the venue's `calendarDayStartHour`. Filters the category on what it read.",
+       "provenance": "decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)"
+      },
       {
        "kind": "dataTable",
        "label": "Equipment timeline",
@@ -1730,7 +1744,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Close a product, location or window",
   "permission": "RENTAL_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1879,7 +1893,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Operating hours, rental windows, buffers and release rules",
   "permission": "RENTAL_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1898,7 +1912,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Minimum, maximum, increment, extension and turnaround",
   "permission": "RENTAL_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {

@@ -88,18 +88,63 @@
   "requestBody": null,
   "responds": "ApiClient"
  },
- "listApiVersions": {
+ "listApiScopes": {
   "method": "GET",
-  "path": "/api-versions",
+  "path": "/api-scopes",
   "contract": "public-api",
-  "summary": "Versions, their status and their sunset dates",
+  "summary": "The scope catalogue, one read and one write scope per module",
   "permission": "DEVELOPER_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "module",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ApiVersion"
+  "responds": "Page"
+ },
+ "listProductionAccessRequests": {
+  "method": "GET",
+  "path": "/production-access-requests",
+  "contract": "public-api",
+  "summary": "Production access requests, pending first",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listSeatMaps": {
   "method": "GET",
@@ -147,6 +192,35 @@
   "parameters": [],
   "requestBody": null,
   "responds": "WebhookDelivery"
+ },
+ "listWebhookEventTypes": {
+  "method": "GET",
+  "path": "/webhook-event-types",
+  "contract": "public-api",
+  "summary": "The events a webhook may subscribe to",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "publisher",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listWebhookSubscriptions": {
   "method": "GET",

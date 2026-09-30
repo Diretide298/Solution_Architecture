@@ -1,4 +1,55 @@
 {
+ "exportAccreditationData": {
+  "method": "POST",
+  "path": "/accreditation-exports",
+  "contract": "accreditation",
+  "summary": "Export holders, applications, credentials or access assignments",
+  "permission": "ACCREDITATION_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccreditationDataExport",
+  "responds": null
+ },
+ "exportReportResult": {
+  "method": "POST",
+  "path": "/report-executions/{executionId}/export",
+  "contract": "reporting",
+  "summary": "Export a completed result",
+  "permission": "REPORT_EXPORT",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getAccreditationExport": {
+  "method": "GET",
+  "path": "/accreditation-exports/{exportId}",
+  "contract": "accreditation",
+  "summary": "One export, and its download link once ready",
+  "permission": "ACCREDITATION_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AccreditationDataExport"
+ },
  "importAccreditationHolders": {
   "method": "POST",
   "path": "/accreditation-imports",
@@ -6,7 +57,7 @@
   "summary": "Load a roster supplied by an organisation",
   "permission": "ACCREDITATION_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -41,6 +92,35 @@
   ],
   "requestBody": null,
   "responds": "AccreditationAuditRecord"
+ },
+ "listAccreditationExports": {
+  "method": "GET",
+  "path": "/accreditation-exports",
+  "contract": "accreditation",
+  "summary": "Exports taken, by whom, of what",
+  "permission": "ACCREDITATION_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listAccreditationHolders": {
   "method": "GET",
@@ -105,12 +185,31 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "runReport": {
+  "method": "POST",
+  "path": "/reports/{reportId}/run",
+  "contract": "reporting",
+  "summary": "Run a report",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RunReportRequest",
+  "responds": "ReportResult"
+ },
  "sendTransactionalMessage": {
   "method": "POST",
   "path": "/messages",
   "contract": "marketing-crm",
   "summary": "Send a transactional message",
-  "permission": null,
+  "permission": "MARKETING_SEND",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -131,7 +230,7 @@
   "summary": "Who is told what, and when",
   "permission": "ACCREDITATION_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {

@@ -1636,7 +1636,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Reserve a rental",
   "permission": "RENTAL_BOOK",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1741,7 +1741,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "What this rental would cost, and the deposit it would hold",
   "permission": "RENTAL_VIEW",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1760,7 +1760,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Capture the signature, against a version",
   "permission": "RENTAL_BOOK",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1779,7 +1779,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Modify, cancel or mark a no-show",
   "permission": "RENTAL_BOOK",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {

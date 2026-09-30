@@ -228,7 +228,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listAiCapabilityHealth",
        "notes": "**Overall AI health in production** (21 September minutes, M21-13).",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       },
       {
        "kind": "chart",
@@ -236,7 +236,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "AiUsageReport",
        "operation": "getAiUsage",
        "notes": "`getAiUsage` grouped by `agent`, with the month-end projection labelled a forecast: which agents consume the most, and for what (M21-13).",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     },
@@ -341,14 +341,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "ai",
     "purpose": "Health per capability",
     "trigger": "onLoad",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    },
    {
     "operationId": "getAiUsage",
     "contract": "ai",
     "purpose": "Consumption by agent",
     "trigger": "onLoad",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "wireframe": {
@@ -1205,7 +1205,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listAiTrainingRuns",
        "notes": "**Per tenant, own data only** (AIP-149). A run that passes its shadow gate raises `promotionReady`; the admin promotes it here with `promoteAiRelease`. Nothing switches by itself (AI-D16).",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     }
@@ -1259,7 +1259,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "ai",
     "purpose": "The per-tenant training and backtest runs",
     "trigger": "onLoad",
-    "provenance": "29 September pass (P29 group A)"
+    "provenance": "29 September pass (group A)"
    }
   ],
   "wireframe": {

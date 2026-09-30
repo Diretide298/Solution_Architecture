@@ -86,7 +86,9 @@ resource "azurerm_postgresql_flexible_server" "primary" {
 resource "azurerm_postgresql_flexible_server_configuration" "extensions" {
   name      = "azure.extensions"
   server_id = azurerm_postgresql_flexible_server.primary.id
-  value     = "LTREE,PGCRYPTO,PG_STAT_STATEMENTS,VECTOR"
+  # Every extension the migrations create (backend/tenant/001-extensions.sql). No VECTOR: vectors live in
+  # Qdrant, one collection per tenant (ADR-0049, 30 September 2026).
+  value     = "LTREE,BTREE_GIST,PGCRYPTO,PG_STAT_STATEMENTS"
 }
 
 resource "azurerm_postgresql_flexible_server_configuration" "max_connections" {

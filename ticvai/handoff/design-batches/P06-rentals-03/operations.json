@@ -1,1 +1,125 @@
-{}
+{
+ "assessRentalDamage": {
+  "method": "POST",
+  "path": "/rental-bookings/{bookingId}/damage",
+  "contract": "rental",
+  "summary": "Price the damage, and say who approved it",
+  "permission": "RENTAL_OPERATE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalDamageAssessment",
+  "responds": "RentalDamageAssessment"
+ },
+ "getRentalBooking": {
+  "method": "GET",
+  "path": "/rental-bookings/{bookingId}",
+  "contract": "rental",
+  "summary": "One booking, its timeline and its readiness",
+  "permission": "RENTAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "RentalBooking"
+ },
+ "listRentalBookings": {
+  "method": "GET",
+  "path": "/rental-bookings",
+  "contract": "rental",
+  "summary": "Reservations across venues and locations",
+  "permission": "RENTAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "locationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RentalBooking"
+ },
+ "recordRentalInspection": {
+  "method": "POST",
+  "path": "/rental-bookings/{bookingId}/inspection",
+  "contract": "rental",
+  "summary": "Condition before or after, with evidence",
+  "permission": "RENTAL_OPERATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalInspection",
+  "responds": "RentalInspection"
+ },
+ "returnRental": {
+  "method": "POST",
+  "path": "/rental-bookings/{bookingId}/return",
+  "contract": "rental",
+  "summary": "Take it back, inspect it, and settle everything at once",
+  "permission": "RENTAL_OPERATE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalReturn",
+  "responds": "RentalSettlement"
+ },
+ "setAssetStatus": {
+  "method": "PUT",
+  "path": "/assets/{assetId}/status",
+  "contract": "maintenance",
+  "summary": "Take an asset out of service or return it",
+  "permission": "ASSET_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SetAssetStatusRequest",
+  "responds": "AssetStatusResult"
+ }
+}

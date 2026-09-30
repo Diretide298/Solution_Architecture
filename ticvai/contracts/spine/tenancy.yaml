@@ -338,7 +338,7 @@ paths:
           description: >
             Exact match on `AuditRecord.platformStaffGrantId`: what a platform operator did under
             one grant (audit R098).
-          schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+          schema: { type: string, format: uuid }
         - name: from
           in: query
           schema: { type: string, format: date-time }
@@ -2949,6 +2949,7 @@ components:
           readOnly: true
           description: The tenant. Retention is set at tenant scope only.
     AuditRecord:
+      x-ticvai-append-only: occurredAt
       type: object
       x-ticvai-persistence: "platform.audit_record"
       description: >
@@ -2989,7 +2990,7 @@ components:
           description: When. The list is ordered by this, most recent first.
         platformStaffGrantId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: >
             **Set when a TICVAI platform operator acted, naming the grant they acted under**
@@ -3096,7 +3097,7 @@ components:
           format: uuid
         idempotencyKey:
           type: string
-          maxLength: 26
+          format: uuid
         operationId:
           type: string
           maxLength: 100

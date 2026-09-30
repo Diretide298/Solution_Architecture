@@ -29,7 +29,11 @@
      "provenance": "flow F24 step 2→3",
      "operation": "handoverToAgent",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "caseId",
+      "conversationId"
+     ]
     }
    ]
   },
@@ -44,8 +48,8 @@
   "gaps": [
    {
     "operation": "getAvailability",
-    "why": "**1 declared operation reach no component on this screen**: getAvailability. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
+    "why": "**`getAvailability` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
+    "source": "contract catalogue.yaml GET /availability"
    }
   ],
   "layout": {
@@ -56,8 +60,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listProducts",
+       "notes": "Sends `?venueId=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listProducts",
+       "notes": "Sends `?kind=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is sellable",
+       "operation": "listProducts",
+       "notes": "Sends `?isSellable=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every assistant",
+       "label": "Every product",
        "bindsTo": "Product",
        "columns": [
         "Product.id",
@@ -75,6 +100,13 @@
        ],
        "operation": "listProducts",
        "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Availability",
+       "operation": "getAvailability",
+       "notes": "Shows `channelCapacityId`, `performanceId`, `capacity`, `sold`, `leased`, `remaining`, `byChannel` from `getAvailability`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.",
+       "provenance": "contract catalogue.yaml GET /availability"
       }
      ]
     },
@@ -84,43 +116,15 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Send",
+       "label": "Send AI message",
        "operation": "sendAiMessage",
        "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
       },
       {
        "kind": "secondaryButton",
-       "label": "Handover",
+       "label": "Handover to agent",
        "operation": "handoverToAgent",
        "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/handover"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "sendAiMessage",
-       "label": "Send ai message",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "cardList",
-       "derived": true,
-       "impliedBy": "listProducts",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "sendAiMessage",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -129,9 +133,9 @@
   "states": {
    "loading": "The assistant list.",
    "error": "Could not load. Names which read failed and leaves the assistant untouched.",
-   "emptyFirstRun": "No assistant yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the assistant are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No assistant yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the assistant are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -163,6 +167,13 @@
     "invalidates": [
      "listProducts"
     ]
+   },
+   {
+    "operationId": "recordAnswerFeedback",
+    "contract": "ai",
+    "purpose": "Say whether an answer helped",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -170,6 +181,10 @@
     {
      "name": "conversationId",
      "from": "deepLink"
+    },
+    {
+     "name": "messageId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom.",
@@ -179,9 +194,49 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-015",
+   "derivedFrom": "wireframes/reference/Kiosk Board 2.dc.html",
    "note": "**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSendAiMessage",
+    "component": "modal",
+    "trigger": "Send AI message",
+    "body": "**Collects what `sendAiMessage` sends before it is called.** Required: `content`. Optional: `collectionIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Send AI message",
+     "operation": "sendAiMessage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "content",
+      "collectionIds"
+     ]
+    },
+    "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
+   },
+   {
+    "id": "formHandoverToAgent",
+    "component": "modal",
+    "trigger": "Handover to agent",
+    "body": "**Collects what `handoverToAgent` sends before it is called.** Required: `reason`. Optional: `summary`, `preferredQueueId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Handover to agent",
+     "operation": "handoverToAgent"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason",
+      "summary",
+      "preferredQueueId"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/handover"
+   }
+  ],
   "_platform": {
    "code": "P05",
    "audience": "guest",

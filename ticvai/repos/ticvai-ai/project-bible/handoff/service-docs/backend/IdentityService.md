@@ -88,7 +88,7 @@
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreatePrincipalRequest`
 
@@ -147,7 +147,7 @@
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -308,13 +308,13 @@ Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Client-generated ULID for the grant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Client-generated UUIDv7 for the grant. |
 | permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes | What the operator may do in this tenant while the grant is open. (min items 1) |
 | reason | string | yes | (min length 3; max length 500) |
 | ticketRef | string |  | The support case this access serves, where there is one. (max length 100; nullable) |
@@ -324,7 +324,7 @@ Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes |  |
 | operatorPrincipalId | string (uuid) | yes | The platform operator, from the Control Plane token. (read-only) |
 | operatorDisplayName | string |  | (read-only) |
 | permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes |  |
@@ -365,7 +365,7 @@ Deactivation invalidates any live session immediately. **A change to `validTo`, 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | principalId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -426,7 +426,7 @@ Where the guest is linked across cells, the request fans out (ADR-0010).
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Response**: `object`
 
@@ -560,7 +560,7 @@ Ends this device's session. `allDevices` revokes every session for the subject, 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 | allDevices | query |  | boolean |  |
 
 **Responses**
@@ -594,7 +594,7 @@ An unverified account signs in and may browse and fill a cart; the checkout gate
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -663,7 +663,7 @@ Where the provider's verified email matches an existing account, the identities 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -731,7 +731,7 @@ Government onboarding has lead time and should be started before it becomes the 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -800,7 +800,7 @@ A guest who bought without an account, then registered. **The guest names one bo
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -844,7 +844,7 @@ Email or mobile. Verification follows via OTP; the account exists but is unverif
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `RegisterGuestRequest`
 
@@ -918,7 +918,7 @@ Delivered by WhatsApp, SMS or email. Rate-limited per identifier and per source 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -968,7 +968,7 @@ Creates a `pending` verification. `409` while another is pending for this guest;
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `IdentityGuestDocumentSubmission`
 
@@ -1029,7 +1029,7 @@ Creates a `pending` verification. `409` while another is pending for this guest;
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1101,7 +1101,7 @@ Held to `setPasswordPolicy` (length, breach check); a PIN is held to the length 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ChangeCredentialRequest`
 
@@ -1146,7 +1146,7 @@ Includes what is held and where it came from. **Excludes another guest's data ev
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | subjectId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1191,7 +1191,7 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 | sessionId | path | yes | string (uuid) |  |
 
 **Request body**
@@ -1297,7 +1297,7 @@ Covers a primary holder assigning entitlements, a group leader holding tickets, 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | subjectId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1441,7 +1441,7 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `LoginRequest`
 
@@ -1538,7 +1538,7 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1583,7 +1583,7 @@ Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with sever
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1658,7 +1658,7 @@ Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with sever
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `IdentityGuestVerificationPolicy`
 
@@ -1732,7 +1732,7 @@ BL-144. **Modelled on NIST SP 800-63B rather than on habit.** Length beats compo
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `PasswordPolicy`
 
@@ -1816,7 +1816,7 @@ Two modes on one operation: **`send` issues a single-use token; `confirm` consum
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1868,7 +1868,7 @@ A session that authenticated hours ago is not the same as a person present at th
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1915,7 +1915,7 @@ Returns a secret or challenge to complete enrolment. **The method is not active 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1990,7 +1990,7 @@ Refused where it is the only active method and the principal holds a permission 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | methodId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Responses**
 
@@ -2022,7 +2022,7 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | challengeId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2096,7 +2096,7 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | methodId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2315,7 +2315,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes |  |
+| id | uuid | yes |  |
 | operator_principal_id | uuid | yes | The platform operator, from the Control Plane token. |
 | operator_display_name | text | no |  |
 | permissions | text[] | yes |  |

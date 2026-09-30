@@ -1,12 +1,36 @@
-# ADR-0028: Sixteen services, and the data boundary decides where they split
+# ADR-0028: Seventeen modules, and the data boundary decides where they split
 
-**Status:** Accepted. **The data topology reopened by CF-161 on 24 August is settled by
+**Status:** Accepted · amended by [ADR-0055](0055-a-modular-monolith-deployed-as-five-units.md), 30 September 2026: the 17 services are modules of one .NET solution, deployed as five units, and the ownership rule below is rewritten so it is true. **The data topology reopened by CF-161 on 24 August is settled by
 [ADR-0038](0038-cell-is-a-region-database-per-tenant.md) — amended by ADR-0040 on how many
 instances a region holds, which changes nothing here:** the decomposition below is unchanged —
 no service spans a schema it does not own — and the 26 schemas now live once per tenant database
 rather than once per cell.
 **Date:** 24 August 2026
 **Related:** [ADR-0016](0016-read-write-separation.md) · [ADR-0020](0020-ai-isolation-boundary.md) · [ADR-0013](0013-local-first-point-of-sale.md) · [ADR-0010](0010-cross-jurisdiction-entitlements.md)
+
+---
+
+## Amended 30 September 2026 by ADR-0055
+
+**The module map below stands. Two things in this ADR no longer hold.**
+
+1. **The deployment shape.** The 17 services (sixteen when this was written; WalletService made
+   seventeen) are **modules** of one .NET solution, deployed as five units: `commerce` (Identity,
+   Tenancy, Catalogue, Order, Ledger, Wallet), `access` (Access), `operations` (F&B, Retail, Inventory,
+   VenueOps, Marketing, WhiteLabel, Reporting, Platform, CrossRegion), `ticvai-ai` (AI) and `workers`
+   (the outbox relay, event consumers and scheduled jobs). `handoff/service-decomposition.json` carries
+   the `deployable` of each module.
+2. **"No schema is written by two services" was not true.** On 30 September the lineage showed 35
+   tables written by more than one service and 894 cross-schema reads in 493 operations. The rule is
+   now: **the owner migrates its schemas; other modules read them only through views the owner
+   publishes (or its in-process query interface) and write them only through the owner's in-process
+   API, inside the caller's transaction; across deployables, modules talk by event or by the published
+   contract.** Enforcement is by architecture tests, a lineage check and one Postgres role per
+   deployable, not by per-schema grants.
+
+**The modular-monolith rejection under "Alternatives" is answered, not reversed.** Its two reasons
+stand, and both are now separate deployables: Access runs as its own unit (and at the edge), and AI
+stays isolated in `ticvai-ai` (ADR-0020, amended by ADR-0049).
 
 ---
 
@@ -20,7 +44,7 @@ isolated and merging later.
 **This ADR says one Postgres per cell with 26 schemas inside it.** Both were written the same day
 and neither knew about the other.
 
-**The service boundaries below are unaffected.** Sixteen services, five tiers, the rule that the
+**The service boundaries below are unaffected.** Sixteen services (now seventeen modules), five tiers, the rule that the
 owner defines a row and a foreign writer may only append — none of that depends on whether those
 schemas share a database. **What is reopened is the deployment of the data, not the decomposition
 of the code**, and this ADR should be read as a service decomposition with an open question about
@@ -45,10 +69,11 @@ That left 28 services, one per contract, which is a mapping rather than a decisi
 
 ## Decision
 
-**Sixteen services. The data boundary decides where they split.**
+**Seventeen modules (sixteen services when this was written). The data boundary decides where they split.**
 
-**No service spans a schema it does not own, and no schema is written by two services.** That was
-true before this document existed — the work was finding it, not creating it — and it is what makes
+**No service spans a schema it does not own, and no schema is written by two services.** *No longer
+true, and amended by ADR-0055: see the amendment at the top for the rule that replaced it.* That was
+thought true before this document existed — the work was finding it, not creating it — and it is what makes
 the split safe.
 
 ### The rule

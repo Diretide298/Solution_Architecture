@@ -144,6 +144,13 @@ def main() -> int:
     # platform or an app finished is a thing somebody can review; 40% of everything is not.
     ap.add_argument("--platform", metavar="P06", help="only batches on this platform")
     ap.add_argument("--app", metavar="venue-staff-mobile", help="only batches in this shipped app")
+    # **Every exported batch again, from today's package** (30 September). A folder is what Claude
+    # Design reads and nothing else, so one exported before a contract changed hands the design
+    # session yesterday's fields. tools/refresh.sh runs this, so a folder is never older than the
+    # package. Only folders that already exist, only batches in the manifest (the hand-written
+    # special folders -- B2B-OPTIONS, CMS-FLOW-BUILDER, DEMO-SITE, apps/ -- are not batches), and
+    # never a locked one.
+    ap.add_argument("--all", action="store_true", help="re-export every batch that already has a folder")
     a = ap.parse_args()
 
     if not MANIFEST.exists():
@@ -164,6 +171,15 @@ def main() -> int:
         if a.app and app_of.get(b.get("platform")) != a.app:
             return False
         return True
+
+    if a.all:
+        ops, schemas = contracts()
+        todo = [x for x in man["batches"]
+                if wanted(x) and x["status"] != "locked" and (OUT / x["id"]).is_dir()]
+        for x in todo:
+            export(x, ops, schemas, quiet=True)
+        print(f"  {len(todo)} batch folder(s) re-exported from the current package")
+        return 0
 
     if a.list or (not a.batch and not a.next):
         scope = [b for b in man["batches"] if wanted(b)]
@@ -202,10 +218,25 @@ def main() -> int:
         return 1
 
     ops, schemas = contracts()
+    return export(b, ops, schemas)
+
+
+_DOCS: list = []
+
+
+def _screen_docs() -> list:
+    """The screen files, read once per run: --all exports some 300 batches from the same files."""
+    if not _DOCS:
+        for f in sorted((ROOT / "screens").glob("P*.yaml")):
+            _DOCS.append(_sane(yaml.safe_load(f.read_text(encoding="utf-8"))))
+    return _DOCS
+
+
+def export(b: dict, ops: dict, schemas: dict, quiet: bool = False) -> int:
+    """Write one batch folder: screens, operations, schemas, BRIEF.md and BUNDLE.md."""
     wanted = set(b["screens"])
     screens, used_ops = [], set()
-    for f in sorted((ROOT / "screens").glob("P*.yaml")):
-        doc = _sane(yaml.safe_load(f.read_text(encoding="utf-8")))
+    for doc in _screen_docs():
         for s in doc["screens"]:
             if s["id"] not in wanted:
                 continue
@@ -387,6 +418,8 @@ convincingly. It is never a caption.
     ])
     (d / "BUNDLE.md").write_text(bundle, encoding="utf-8")
 
+    if quiet:
+        return 0
     print(f"  {b['id']} — {b['label']}")
     print(f"  {len(screens)} screens · {len(op_defs)} operations · {len(sch_defs)} schemas · "
           f"{len(perms)} permissions · {len(offline)} offline-capable")

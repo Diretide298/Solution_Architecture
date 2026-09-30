@@ -1,6 +1,6 @@
 # P05-ai-01 — P05 · AI
 
-**1 screens · 4 operations · 9 schemas · 2 permissions**
+**1 screens · 5 operations · 21 schemas · 2 permissions**
 
 Platform P05 Guest Kiosk · ships as **guest** ·
 guest audience · kiosk ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 2 permissions apply here:
   `AI_USE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **1 of these operations work offline**: listProducts
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,7 +60,7 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `KSK-015` | Assistant | listDetail | 4 | 0 | — |
+| `KSK-015` | Assistant | listDetail | 5 | 2 | — |
 
 ---
 
@@ -101,7 +100,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "provenance": "flow F24 step 2→3",
      "operation": "handoverToAgent",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "caseId",
+      "conversationId"
+     ]
     }
    ]
   },
@@ -116,8 +119,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "gaps": [
    {
     "operation": "getAvailability",
-    "why": "**1 declared operation reach no component on this screen**: getAvailability. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
+    "why": "**`getAvailability` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
+    "source": "contract catalogue.yaml GET /availability"
    }
   ],
   "layout": {
@@ -128,8 +131,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listProducts",
+       "notes": "Sends `?venueId=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listProducts",
+       "notes": "Sends `?kind=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is sellable",
+       "operation": "listProducts",
+       "notes": "Sends `?isSellable=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every assistant",
+       "label": "Every product",
        "bindsTo": "Product",
        "columns": [
         "Product.id",
@@ -147,6 +171,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listProducts",
        "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Availability",
+       "operation": "getAvailability",
+       "notes": "Shows `channelCapacityId`, `performanceId`, `capacity`, `sold`, `leased`, `remaining`, `byChannel` from `getAvailability`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.",
+       "provenance": "contract catalogue.yaml GET /availability"
       }
      ]
     },
@@ -156,43 +187,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Send",
+       "label": "Send AI message",
        "operation": "sendAiMessage",
        "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
       },
       {
        "kind": "secondaryButton",
-       "label": "Handover",
+       "label": "Handover to agent",
        "operation": "handoverToAgent",
        "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/handover"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "sendAiMessage",
-       "label": "Send ai message",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "cardList",
-       "derived": true,
-       "impliedBy": "listProducts",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "sendAiMessage",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -201,9 +204,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The assistant list.",
    "error": "Could not load. Names which read failed and leaves the assistant untouched.",
-   "emptyFirstRun": "No assistant yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the assistant are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No assistant yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the assistant are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -235,6 +238,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listProducts"
     ]
+   },
+   {
+    "operationId": "recordAnswerFeedback",
+    "contract": "ai",
+    "purpose": "Say whether an answer helped",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -242,6 +252,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "name": "conversationId",
      "from": "deepLink"
+    },
+    {
+     "name": "messageId",
+     "from": "navigation"
     }
    ],
    "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom.",
@@ -251,9 +265,49 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-015",
+   "derivedFrom": "wireframes/reference/Kiosk Board 2.dc.html",
    "note": "**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSendAiMessage",
+    "component": "modal",
+    "trigger": "Send AI message",
+    "body": "**Collects what `sendAiMessage` sends before it is called.** Required: `content`. Optional: `collectionIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Send AI message",
+     "operation": "sendAiMessage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "content",
+      "collectionIds"
+     ]
+    },
+    "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
+   },
+   {
+    "id": "formHandoverToAgent",
+    "component": "modal",
+    "trigger": "Handover to agent",
+    "body": "**Collects what `handoverToAgent` sends before it is called.** Required: `reason`. Optional: `summary`, `preferredQueueId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Handover to agent",
+     "operation": "handoverToAgent"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason",
+      "summary",
+      "preferredQueueId"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/handover"
+   }
+  ],
   "_platform": {
    "code": "P05",
    "audience": "guest",
@@ -304,10 +358,35 @@ Method, path, parameters, request and response for every operation these screens
     "name": "channelCapacityId",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "eventId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "PerformanceAvailabilityPage"
  },
  "handoverToAgent": {
   "method": "POST",
@@ -354,6 +433,21 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    },
    {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "segmentTag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "guidedAnswerIds",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -366,6 +460,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "recordAnswerFeedback": {
+  "method": "POST",
+  "path": "/messages/{messageId}/feedback",
+  "contract": "ai",
+  "summary": "Say whether an answer helped",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiAnswerFeedback"
  },
  "sendAiMessage": {
   "method": "POST",
@@ -395,6 +508,89 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AiAnswerFeedback": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.answer_feedback",
+  "description": "**What a person thought of an answer** (AIC-062). One label per message per person; it feeds the golden sets and the knowledge-gap list, never an online update (design 3.5).",
+  "required": [
+   "messageId",
+   "rating"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "messageId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "ai.message"
+   },
+   "conversationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.conversation"
+   },
+   "rating": {
+    "type": "string",
+    "enum": [
+     "helpful",
+     "notHelpful"
+    ]
+   },
+   "reason": {
+    "type": "string",
+    "enum": [
+     "wrong",
+     "outdated",
+     "incomplete",
+     "notGrounded",
+     "unsafe",
+     "other"
+    ],
+    "nullable": true
+   },
+   "comment": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 1000
+   },
+   "audience": {
+    "type": "string",
+    "enum": [
+     "staff",
+     "guest"
+    ],
+    "readOnly": true
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The guest, where the audience is `guest`."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
  "AiMessage": {
   "type": "object",
   "x-ticvai-persistence": "ai.message",
@@ -426,10 +622,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string"
    },
    "sources": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/AiSource"
-    }
+    "$ref": "#/components/schemas/AiSourceList"
    },
    "confidence": {
     "type": "number",
@@ -481,42 +674,31 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "gemini",
    "anthropic",
    "azureOpenai",
-   "localLlm"
-  ]
+   "localLlm",
+   "openaiCompatible"
+  ],
+  "description": "`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n"
  },
- "AiSource": {
-  "type": "object",
-  "x-ticvai-persistence": "none — embedded in the interaction",
-  "description": "What the answer was grounded in (8.3.70). **An answer with no sources is a guess**, and the interface should show it as one.\n",
-  "properties": {
-   "kind": {
-    "type": "string",
-    "enum": [
-     "document",
-     "product",
-     "entitlement",
-     "report",
-     "record"
-    ]
-   },
-   "id": {
-    "type": "string"
-   },
-   "title": {
-    "type": "string"
-   },
-   "collectionId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "excerpt": {
-    "type": "string"
-   },
-   "relevance": {
-    "type": "number"
-   }
+ "AiSourceList": {
+  "type": "array",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "**The sources an answer was grounded in, stored with the answer** (8.3.70). One `jsonb` column on the row that carries it — `ai.message.sources` and `ai.activity.sources` — because the grounding audit reads the list as it was when the answer was given, and a source is never queried on its own.\n",
+  "items": {
+   "$ref": "#/components/schemas/AiSource"
   }
+ },
+ "Channel": {
+  "type": "string",
+  "enum": [
+   "pos",
+   "kiosk",
+   "web",
+   "mobile",
+   "b2b",
+   "ota",
+   "callCentre"
+  ]
  },
  "Conversation": {
   "type": "object",
@@ -607,12 +789,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "queuePosition": {
     "type": "integer",
     "nullable": true,
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "Place among the unclaimed conversations in `queueId`, from the live agent queue (audit R149). Null once claimed."
    },
    "estimatedWaitSeconds": {
     "type": "integer",
     "nullable": true,
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "From the live agent queue — the conversations ahead divided across that queue's agents online now (audit R149). Null once claimed."
    },
    "handoverReason": {
     "type": "string",
@@ -704,7 +890,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "ConversationMessage": {
   "type": "object",
-  "x-ticvai-persistence": "marketing.conversation_message",
+  "x-ticvai-persistence": "marketing.conversation_message + marketing.conversation_message_attachment",
   "required": [
    "id",
    "sender",
@@ -787,6 +973,23 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "timedOut"
   ]
  },
+ "GuestListing": {
+  "type": "string",
+  "enum": [
+   "bookable",
+   "infoOnly",
+   "hidden"
+  ],
+  "default": "bookable",
+  "description": "**How a product appears to a guest** (decided 29 September, rev 3 REV3-14). `bookable`: listed and searched while it is on sale, and added to the basket. `infoOnly`: listed and searched with its details, photo and `notBookableLabel` whether or not it is on sale, and **never added to a basket** (`addCartLine` refuses it with `409`); the screen opens its details instead. `hidden`: never listed or searched for a guest, and reachable only where a staff channel sells it. Independent of `isSellable`, which says whether a channel may sell it at all.\n"
+ },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -803,6 +1006,473 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "hasMore": {
     "type": "boolean"
+   }
+  }
+ },
+ "PerformanceAvailability": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed on read from catalogue.channel_capacity and live leases",
+  "description": "Remaining capacity of one channel capacity of one performance (rev 3 REV3-1).",
+  "required": [
+   "channelCapacityId",
+   "performanceId",
+   "capacity",
+   "sold",
+   "leased",
+   "remaining"
+  ],
+  "properties": {
+   "channelCapacityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The performance this channel capacity belongs to (`ChannelCapacity.performanceId`), so rows for several performances can be told apart."
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "The performance's start, so a time tile and its day part (morning, afternoon, evening, split at the venue's `BookingFlowConfig.dayPartBoundaries`) come from this one call (rev 3 REV3-1)."
+   },
+   "capacity": {
+    "type": "integer"
+   },
+   "sold": {
+    "type": "integer"
+   },
+   "leased": {
+    "type": "integer",
+    "description": "Held by terminals but not yet sold."
+   },
+   "remaining": {
+    "type": "integer"
+   },
+   "byChannel": {
+    "type": "array",
+    "description": "Per-channel position. A guest seeing sold out online while units remain at the counter is correct behaviour, not a defect.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "channel": {
+       "$ref": "#/components/schemas/Channel"
+      },
+      "allocated": {
+       "type": "integer"
+      },
+      "sold": {
+       "type": "integer"
+      },
+      "remaining": {
+       "type": "integer"
+      }
+     }
+    }
+   }
+  }
+ },
+ "PerformanceAvailabilityPage": {
+  "x-ticvai-persistence": "none — computed on read",
+  "description": "The `getAvailability` answer (named 29 September, rev 3 REV3-1).",
+  "allOf": [
+   {
+    "$ref": "../shared/common.yaml#/components/schemas/Page"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "items": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/PerformanceAvailability"
+      }
+     }
+    }
+   }
+  ]
+ },
+ "Product": {
+  "x-ticvai-persistence": "catalogue.product",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "kind",
+   "venueId",
+   "scopePath",
+   "isSellable",
+   "hasVariants"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "familyKey": {
+    "type": "string",
+    "maxLength": 64,
+    "pattern": "^[A-Za-z0-9_-]+$",
+    "nullable": true,
+    "x-ticvai-unique": "venue",
+    "description": "**The same product at another location** (decided 29 September, rev 3 REV3-18). Optional. A tenant that sells one attraction at several venues gives each venue's product the same key, e.g. `aquarium-entry`; the key names the family across the tenant and each venue has at most one product in it, so a second product at the same venue with the key is refused with `409 duplicate-code`. **What it is for:** when a guest changes location on the booking screen (the 'Booking at' switcher, `BookingFlowConfig.locationSwitcher`), lines whose product shares a `familyKey` with a product at the new venue are carried over to that product, with times and prices refreshed; every other line is cleared. Null means the product belongs to no family and its lines always clear on a switch. Compared case-insensitively, like `code`.\n"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/ProductKind"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "createdByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "1.4.18. **The approval gate refuses an approver who is the author, and nothing recorded either.** `SeatBlock`, `DelegatedAccess` and `ManualDiscountRequest` all carry this and the product passing through approval did not.\n"
+   },
+   "approvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "responsibleDepartmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Who owns this product commercially. A scope node at `department` level."
+   },
+   "onSaleFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "1.4.8. **A seasonal product should not need somebody awake at midnight.** Archiving already runs on a timer in this contract, so the machinery exists; `effectiveFrom` appears on tax codes, FX rates and white-label policies and not here.\n"
+   },
+   "onSaleTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Retires the product automatically. **Retirement is not deletion** — the product stops selling and every order that referenced it still resolves.\n"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Taken from their `fnb.product` and `retail.product`, 20 September.** `catalogue.product_category` has existed since 20 August with two operations and nothing could be filed under it — a merchandise hierarchy with a tree and no leaves. Their per-domain product tables both carried this column and ours did not.\n"
+   },
+   "lifecycleState": {
+    "$ref": "#/components/schemas/ProductLifecycleState"
+   },
+   "isSellable": {
+    "type": "boolean",
+    "readOnly": true,
+    "description": "True only when live **and** carried by a published bundle. Approval and publication are different acts.\n**Derived, never set.** It changes when `transitionProductLifecycle` moves the product and when `publishBundle` carries it, so `updateProduct` does not take it — `withdraw` is how a product stops selling.\n"
+   },
+   "isStockTracked": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Taken from their `fnb.product`, 20 September.** Whether a sale decrements stock, which is not what `isSellable` asks. A ticket is sellable and tracks no stock; a bottle of water is both. Without it, an F&B sale cannot tell inventory whether to move.\n"
+   },
+   "hasVariants": {
+    "type": "boolean"
+   },
+   "variantCount": {
+    "type": "integer"
+   },
+   "segmentTags": {
+    "type": "array",
+    "description": "7.3.5. **A channel and a segment tag are mandatory and nothing required either.** A catalogue that cannot be filtered by segment is a catalogue nobody can report on.\n**Hierarchical, not flat** — `family/with-toddlers` narrows `family` without duplicating it, which is how the promotions engine already treats scope.\n**A level is a tag under `level/`** (decided 29 September, rev 3 REV3-19): `level/beginner`, `level/intermediate`, `level/advanced`, `level/expert` (proposed codes, client to correct). A guest screen filters on it with `listProducts` `segmentTag`, and the words a guest reads beside each option come from `ProductCategory.description`, not from the tag.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "codeSchema": {
+    "type": "string",
+    "readOnly": true,
+    "description": "7.3.4 specifies `[ParkCode]-[ProductType]-[Variant]`. **`Product.code` existed and nothing required a format**, so a venue with three thousand products had three thousand conventions.\nThe tenant sets the pattern and the platform generates against it. **Validation is the point, not the string** — a code typed by hand is a code that will not sort.\n"
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/Channel"
+    }
+   },
+   "entitlementTemplateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "What the buyer receives. Null for products that grant nothing — F&B and retail. Identity and entitlement are separate concerns.\n"
+   },
+   "blockedOffline": {
+    "type": "boolean",
+    "description": "True for seated and retail. Seated because a seat map is not a count; retail because stock depletes in real time.\n"
+   },
+   "dataMaskValues": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Custom fields. JSONB-backed, defined by the venue's data mask."
+   },
+   "guestListing": {
+    "$ref": "#/components/schemas/GuestListing"
+   },
+   "notBookableLabel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "The label a guest reads on an `infoOnly` product, e.g. *Info only* or *Not bookable online; ask at the desk* (decided 29 September, rev 3 REV3-14). Each value at most 60 characters. Null means the guest screen shows its default wording. Ignored unless `guestListing` is `infoOnly`.\n"
+   },
+   "salesContact": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ProductSalesContact"
+     }
+    ],
+    "nullable": true,
+    "description": "**Who a guest contacts to book a view-only product** (decided 29 September, W3), e.g. a training course listed with full details and no Book button. Shown as *Call sales* and *Email sales* on an `infoOnly` product. Null means the venue's own contact (white-label `getTenantAppStatus.contact`). Ignored unless `guestListing` is `infoOnly`.\n"
+   },
+   "bookingFlowId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
+   },
+   "displayTags": {
+    "type": "array",
+    "maxItems": 6,
+    "items": {
+     "$ref": "#/components/schemas/ProductDisplayTag"
+    },
+    "description": "**Short facts a guest reads on the ticket card and under *Read more***: *2 Hours*, *Min 1.10 m*, *Free adult entry*, *Valid 90 days*, *Emirates ID* (decided 29 September, 23SEP-3). Not `segmentTags`, which are for reporting and segmentation and which a guest never reads.\n**Derived on read when none are set.** When the venue has written no tags, a read returns tags derived from the product's duration (`clock`), entitlement validity (`calendar`) and the eligibility rule's `minHeightCm` (`height`), each marked `derived: true`; they are never stored. Once the venue writes any tag, only what it wrote is returned. Whether the guest screen shows them is `BookingFlowConfig.ticketTags` (white-label).\n"
+   },
+   "media": {
+    "type": "array",
+    "maxItems": 20,
+    "items": {
+     "$ref": "#/components/schemas/ProductMedia"
+    },
+    "description": "**The product's own photos and video** (decided 29 September, 23SEP-4). *Read more* opens on the `isPrimary` item, and a listing shows each product's primary image, so two tickets in one category no longer share the category's picture (`ProductCategory.imageAssetId`).\nEvery `assetId` names an asset of the asset library (`assets.yaml` `MediaAsset`) in status `ready` whose kind matches `kind`; anything else is a `422`. **Exactly one item is `isPrimary`** when the list is not empty, and an `assetId` appears once; otherwise `400`. Setting the list records each reference as asset usage (`MediaUsage` with `surface: product`, `referenceId` the product id, `isLive` true while the product is listed to guests), which is what stops a used asset being archived from under the product.\n"
+   },
+   "consentQuestionIds": {
+    "type": "array",
+    "maxItems": 10,
+    "uniqueItems": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "**The consent questions a guest answers when booking this product**, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*. Each id names a consent question defined in marketing-crm (`ConsentQuestion`), which owns the text, its version and whether it is asked per person or once per booking; the answer is stored there as a consent record (question version, answer, who answered, when). **One question or several, as the venue chooses.** A flow can carry its own list too (`white-label.BookingFlow.settings.consentQuestionIds`, on the product's published booking flow as `getPublishedBookingFlow` resolves it: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig` 29 September, W12); a booking asks the union of the flow's questions and those of every product in the cart, each question once (`orders.Cart.consentQuestions`). An id that names no active consent question of the tenant is a `422`.\n"
+   },
+   "requiresTimeWindow": {
+    "type": "boolean",
+    "default": false,
+    "description": "**True for a space sold by the hour**, e.g. a meeting room type (decided 29 September, rev 3 REV3-13). The product is the room type (*focus pod*, *majlis*, *boardroom*, *auditorium*), never a named room; its lengths are a `length` axis (`setProductAttributes`) whose values carry `durationMinutes`, and each length is a variant priced on its own in the price list, so price is the room rate for that length. The cart line carries the booked start and end (orders), the end being the start plus the chosen variant's `durationMinutes`; `resources.listProductStartTimes` supplies the start times for a variant and a date and `allocateResources` picks the room from the product's resource requirements (`setExperienceResourceRequirements`) at checkout. True requires every active variant to have a `durationMinutes`; otherwise `422`.\n"
+   },
+   "productOwnerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The product owner (29 September, data model DM3), set with `setProductContextOwnership`. `responsibleDepartmentId` is the owning department."
+   },
+   "operationalContact": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "description": "A principal id or a name, as the context screen takes it."
+   },
+   "businessUnitId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A `ledger.legal_entity`, read through finance."
+   },
+   "attractionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "siteId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "brandId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The brand, as the context screen names it (a catalogue brand category)."
+   },
+   "marketCode": {
+    "type": "string",
+    "maxLength": 40,
+    "nullable": true
+   },
+   "salesTerritory": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   }
+  }
+ },
+ "ProductDisplayTag": {
+  "x-ticvai-persistence": "none — jsonb column on catalogue.product",
+  "type": "object",
+  "required": [
+   "kind",
+   "label"
+  ],
+  "description": "One short fact on a ticket card (decided 29 September, 23SEP-3). `kind` picks the icon.",
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "clock",
+     "height",
+     "free",
+     "calendar",
+     "id"
+    ],
+    "description": "`clock` a duration, `height` a height rule, `free` something included free, `calendar` a validity, `id` a document the guest must bring."
+   },
+   "label": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "What the guest reads, e.g. *2 Hours*. Each language value at most 40 characters."
+   },
+   "derived": {
+    "type": "boolean",
+    "readOnly": true,
+    "default": false,
+    "description": "True on a tag the server derived on read because the venue set none. Never sent."
+   }
+  }
+ },
+ "ProductKind": {
+  "type": "string",
+  "description": "**`openDated` added 24 August** from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: **valid on any date within an eligible range, rather than for a named performance or a fixed date.**\nThe mechanism already existed — `access.entitlement` carries `valid_from`, `valid_to`, `entries_allowed` and `frozen_days`, which is exactly an open-dated pass. **What was missing was the product saying it is one**, so a catalogue could not offer it and a report could not count it.\n**`datedAdmission` is a different thing and the two were being conflated**: dated is *this Tuesday*, open-dated is *any Tuesday between March and June*. A guest buying the second and being sold the first has bought the wrong ticket.\n**Transport uses two existing kinds, not a new one** (decided 29 September, rev 3 REV3-21). A one-way trip is `timedAdmission`: `transport.createTransportRoute` creates the route's product with one variant per passenger type, and each departure is a performance. A multi-trip or unlimited pass is `openDated`: `transport.createTransportPassType` creates it, with `EntitlementTemplate.entriesAllowed` = the pass's trips (null for unlimited), the validity = `validityDays`, and `EntitlementTemplate.transportRestriction` naming the station pair the pass was bought for, so `access` refuses it on another journey. The sale path is unchanged: both are cart lines, priced by `transport.quoteTransportFare` (orders `TransportLineAttributes`).\n",
+  "enum": [
+   "admission",
+   "timedAdmission",
+   "datedAdmission",
+   "openDated",
+   "seated",
+   "membership",
+   "bundle",
+   "fnb",
+   "retail",
+   "rental",
+   "addOn",
+   "giftCard"
+  ]
+ },
+ "ProductLifecycleState": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "inReview",
+   "approved",
+   "live",
+   "withdrawn",
+   "archived"
+  ]
+ },
+ "ProductMedia": {
+  "x-ticvai-persistence": "catalogue.product_media",
+  "type": "object",
+  "required": [
+   "assetId",
+   "kind",
+   "isPrimary"
+  ],
+  "description": "One photo or video of a product, referencing the asset library (decided 29 September, 23SEP-4). One row per product and asset, so the asset library can answer which products use an asset.\n",
+  "properties": {
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "A `MediaAsset` of `assets.yaml`, in status `ready`."
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "image",
+     "video"
+    ]
+   },
+   "isPrimary": {
+    "type": "boolean",
+    "default": false,
+    "description": "The item *Read more* opens on and a listing shows. Exactly one per product."
+   },
+   "displayOrder": {
+    "type": "integer",
+    "default": 100
+   },
+   "altText": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true
+   }
+  }
+ },
+ "ProductSalesContact": {
+  "x-ticvai-persistence": "none — jsonb column on catalogue.product",
+  "type": "object",
+  "description": "Who to contact to book a view-only product (decided 29 September, W3). At least one of `phone` or `email`.\n",
+  "minProperties": 1,
+  "properties": {
+   "phone": {
+    "type": "string",
+    "maxLength": 32,
+    "nullable": true
+   },
+   "email": {
+    "type": "string",
+    "format": "email",
+    "maxLength": 254,
+    "nullable": true
+   },
+   "note": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "A line shown under the contact, e.g. *Group courses are booked by phone*. At most 200 characters per language."
    }
   }
  },
@@ -833,8 +1503,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "promotion",
      "operational",
      "financial",
-     "configuration"
-    ]
+     "configuration",
+     "content",
+     "audience"
+    ],
+    "description": "`content` (a marketing or storefront draft from `proposeMarketingContent`) and `audience` (a lookalike segment from `proposeLookalikeSegment`) added 29 September (build); both are applied by a person in the owning screen."
    },
    "targetContract": {
     "type": "string",
@@ -846,13 +1519,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "payload": {
     "type": "object",
     "additionalProperties": true,
-    "description": "The request body a person would submit, ready to review."
+    "description": "The request body a person would submit, ready to review. **Open on purpose: its shape is the request body of `targetOperation` in `targetContract`**, and it is validated against that operation, not restated here.\n"
    },
    "summary": {
     "type": "string"
    },
    "status": {
     "type": "string",
+    "description": "**Expiry (decided 28 September, audit R213)**: a `proposed` action expires 7 days after `proposedAt`; an `approved` action not applied expires 24 hours after `decidedAt`. Both are proposed values, client to correct, and `expiresAt` carries the one that applies.\n",
     "enum": [
      "proposed",
      "approved",
@@ -861,9 +1535,19 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "expired"
     ]
    },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "When the expiry timer moves this action to `expired` — `proposedAt` plus 7 days while `proposed`, `decidedAt` plus 24 hours once `approved`, null once `rejected`, `applied` or `expired` (audit R213)."
+   },
    "approvalLevel": {
     "type": "integer",
-    "description": "8.3.65. Multi-level, because a discount and a pricing change differ in authority."
+    "minimum": 1,
+    "maximum": 2,
+    "description": "8.3.65. Multi-level, because a discount and a pricing change differ in authority. **Two levels (decided 28 September, audit R213)**: `2` for anything touching prices or permissions (every `pricing` and `promotion` action, and any other whose payload sets a price, a discount, a role or a permission grant), which needs a manager other than the requester; `1` for everything else, which the requester approves themselves.\n"
    },
    "decidedByPrincipalId": {
     "type": "string",
@@ -883,6 +1567,32 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Added 29 September (AI design 3.1):** `ai.proposed_action` had no policy — its only references were nullable. The scope it was proposed at, and the partition key row-level security reads.\n"
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "ai.action_plan",
+    "description": "The plan this action presents for a decision (AI design 2.2 D, 3.8)."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `approvals` request deciding a tier 2 or matrix-caught action (AI design 2.3)."
+   },
+   "changeSetHash": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Hash of the change set approved; execution refuses a plan whose hash differs (AIC-181)."
    }
   }
  }

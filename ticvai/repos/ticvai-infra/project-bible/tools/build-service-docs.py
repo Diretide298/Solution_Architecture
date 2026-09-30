@@ -30,7 +30,8 @@ import csv
 import json
 import re
 import sys
-from collections import defaultdict
+import heapq
+from collections import Counter, defaultdict
 from pathlib import Path
 
 import yaml
@@ -389,10 +390,15 @@ def read_ddl() -> dict[str, dict]:
                 if m:
                     name, cols_ = f"{m.group(1)}.{m.group(2)}", []
                     continue
-                if name and line.startswith(");"):
+                # **A partitioned table closes with `) PARTITION BY RANGE (col);`** (ADR-0056), not
+                # `);`, and its key is a table constraint rather than a column.
+                if name and line.startswith(")"):
+                    pm = re.search(r"PARTITION BY \w+ \((\w+)\)", line)
                     tables[name] = {"db": db, "file": f.relative_to(ROOT).as_posix(), "columns": cols_,
-                                    "fks": set()}
+                                    "fks": set(), "partition_by": pm.group(1) if pm else ""}
                     name = None
+                    continue
+                if name and line.strip().startswith("CONSTRAINT "):
                     continue
                 m = re.match(r"\s+(\w+)\s+(.+?),?$", line)
                 if name and m:
@@ -400,7 +406,8 @@ def read_ddl() -> dict[str, dict]:
         fk = ROOT / "backend" / db / "900-foreign-keys.sql"
         if fk.exists():
             text = fk.read_text(encoding="utf-8").replace('"', "")
-            for m in re.finditer(r"ALTER TABLE (\w+\.\w+) ADD CONSTRAINT \w+ FOREIGN KEY \(\w+\) "
+            # `(venue_id, x)` as well as `(x)`: a composite venue key (ADR-0056) is still a key.
+            for m in re.finditer(r"ALTER TABLE (\w+\.\w+) ADD CONSTRAINT \w+ FOREIGN KEY \([\w, ]+\) "
                                  r"REFERENCES (\w+\.\w+)", text):
                 if m.group(1) in tables:
                     tables[m.group(1)]["fks"].add(m.group(2))
@@ -408,8 +415,8 @@ def read_ddl() -> dict[str, dict]:
         names = {c for c, _ in t["columns"]}
         t["rls"] = ("scope_path" if "scope_path" in names else
                     "venue_id" if "venue_id" in names else "")
-        # ADR-0044: a NOT NULL venue_id is what makes a table partition by venue.
-        t["partitioned"] = any(c == "venue_id" and "NOT NULL" in d for c, d in t["columns"])
+        # ADR-0056 (amends ADR-0044): release 1 partitions by month, and the SQL says which tables.
+        t["partitioned"] = bool(t.get("partition_by"))
     return tables
 
 
@@ -802,7 +809,7 @@ def main() -> int:
     # person scanning a list can tell them apart without opening the ticket.
     PREFIX = {"Frontend": "[FE]", "Backend": "[BE]", "Database": "[DB]", "DevOps": "[DevOps]",
               "Onboarding": "[Onboarding]", "Full stack": "[FE+BE]", "Setup": "[Setup]",
-              "Client": "[Client]", "AI": "[AI]"}
+              "AI": "[AI]"}
 
     def track_of(key, area):
         if key.startswith(("MIG", "VM-MIG", "VM-DB")):
@@ -814,7 +821,7 @@ def main() -> int:
         if area == "VM":
             return "Frontend" if key.startswith(("VM-BO-", "VM-FE")) else "Backend"
         return {"devops": "DevOps", "onboard": "Onboarding", "backend": "Backend",
-                "client": "Client", "ai": "AI"}.get(area, "Frontend")
+                "ai": "AI"}.get(area, "Frontend")
 
     by_key: dict[str, dict] = {}
 
@@ -926,24 +933,10 @@ def main() -> int:
     for k, subj, p, dep, detail in SETUP:
         task(k, "SETUP", "Task", subj, subj + ". " + detail, 1, pts=p, area="devops", assignee=devops, depends=dep)
 
-    # --- client-side prerequisites (audit R065, R252). Assigned to nobody here on purpose: the
-    # owner is the client's to name, and each ticket says so in its own text.
-    task("CLIENT", "", "Epic", "Client-side prerequisites: sandbox credentials and design sign-off",
-         "Deliverables only the client can produce, each blocking acceptance elsewhere in this plan "
-         "(decided 28 September, audit R065 and R252).", 1, area="client")
-    task("CLIENT-PAY-SANDBOX", "CLIENT", "Task",
-         "Deliver Stripe and Network International sandbox credentials",
-         "A named client owner [client to name: client finance / payments owner] delivers Stripe and "
-         "Network International sandbox credentials by a fixed date [client to set] (decided 28 September, "
-         "audit R065). Blocks acceptance of WEB-012 and SVC-ORDER-PAYMENT-1: the declined, unknown and "
-         "reconcile paths cannot be tested without a sandbox to fail against.",
-         1, pts=1, area="client")
-    task("CLIENT-DESIGN-REVIEWER", "CLIENT", "Task",
-         "Name one design reviewer; each wireframe batch signed off within 3 working days",
-         "The client names one design reviewer [client to name] (decided 28 September, audit R252). Each "
-         "wireframe batch is signed off within 3 working days of delivery, and frontend acceptance on the "
-         "Block A screen tickets depends on that sign-off - an unreviewed screen is not accepted, it is "
-         "waiting.", 1, pts=1, area="client")
+    # --- client-side prerequisites (audit R065, R252) were tickets here until 30 September. They are
+    # the client's to answer, not work anyone on the team can pull, so they moved to the sheet the
+    # client answers: "For you to answer" in handoff/TICVAI - Decisions Register.xlsx
+    # (tools/build-decisions-workbook.py). Acceptance that waits on them says so in its own text.
 
     # --- backend: one epic per service, a feature per tag, and tasks of at most four operations,
     # because a 30-operation feature cannot be estimated, started or finished as one thing.
@@ -1027,7 +1020,7 @@ def main() -> int:
          "each migration takes its schema's first-release tables from there. Order matters: each migration only "
          "references tables created by the ones before it.", 1, area="backend")
     task("MIG-BASELINE", "MIG", "Task", "Migration baseline: schemas, extensions, migration register, RLS helper "
-         "functions and the venue partition helper",
+         "functions and the monthly partition helpers (ADR-0056)",
          "From backend/tenant/000-schemas.sql, 001-extensions.sql, 002-migration-register.sql, the helper "
          "functions at the top of 920-row-level-security.sql and 930-partitioning.sql; the control database's "
          "own 000-002. Everything else in the MIG epic runs after this.", 1, pts=3, area="backend",
@@ -1342,24 +1335,144 @@ def main() -> int:
             task(t_["key"], t_["epic"], "Task", t_["subject"], t_["subject"] + ". " + t_["detail"], 1, pts=pts,
                  area="ai" if is_ai else "backend", assignee=who, depends=t_.get("depends") or ())
 
-    # **Acceptance that waits on the client** (audit R065): the payment-sandbox task blocks the
-    # tickets whose testing needs its credentials. Wired here, after every ticket exists, so the
-    # dependency survives however those keys are generated.
+    # **Services stand on the platform** (30 September). A service task used to wait only for its
+    # migration, so the build order put 60-odd service tasks in front of the kernel they run on (tenant
+    # routing, scope, auth) and every sale-path write in front of idempotency and the outbox. Now:
+    # every backend service task waits for PLATFORM-KERNEL; one whose operations write a table also
+    # waits for PLATFORM-IDEMPOTENCY; one that publishes an event (writes platform.outbox) also waits
+    # for PLATFORM-OUTBOX. The platform tasks themselves are exempt, so nothing waits on itself.
+    ops_of = defaultdict(set)
+    for o, k in list(op_task.items()) + list(vm_op_task.items()):
+        ops_of[k].add(o)
+    platform_keys = {"PLATFORM-KERNEL", "PLATFORM-IDEMPOTENCY", "PLATFORM-OUTBOX"}
+    if platform_keys <= set(by_key):
+        for k, found in ops_of.items():
+            t_ = by_key.get(k)
+            if not t_ or t_["type"] != "Task" or t_["track"] != "Backend":
+                continue
+            need = {"PLATFORM-KERNEL"}
+            writes = {w for o in found for w in (lineage.get(o) or {}).get("writes") or []
+                      if not w.startswith(("cache:", "qdrant"))}
+            if writes:
+                need.add("PLATFORM-IDEMPOTENCY")
+            if "platform.outbox" in writes:
+                need.add("PLATFORM-OUTBOX")
+            t_["dependsOn"] = " ".join(sorted(set(t_["dependsOn"].split()) | need))
+
+    # **A report waits for the data it reports on** (30 September, Chinmay). A backend task whose
+    # operations only read (reports, dashboards, analytics, exports) and read tables another task
+    # writes now waits for those writer tasks: a sales report built before orders exist has nothing
+    # to show and nothing to test against. Readers write nothing, so this can never close a loop.
+    writers_of = defaultdict(set)
+    for k, found in ops_of.items():
+        for o in found:
+            for w in (lineage.get(o) or {}).get("writes") or []:
+                if not w.startswith(("cache:", "qdrant")):
+                    writers_of[w].add(k)
+    for k, found in ops_of.items():
+        t_ = by_key.get(k)
+        if not t_ or t_["type"] != "Task" or t_["track"] != "Backend":
+            continue
+        writes = {w for o in found for w in (lineage.get(o) or {}).get("writes") or []
+                  if not w.startswith(("cache:", "qdrant"))}
+        if writes:
+            continue
+        reads = {r for o in found for r in (lineage.get(o) or {}).get("reads") or []
+                 if not r.startswith(("cache:", "qdrant"))}
+        feeds = {w for r in reads for w in writers_of.get(r, ())} - {k}
+        # Same phase only: a first-release report never waits on Venue Management work.
+        feeds = {w for w in feeds if by_key[w]["phase"] <= t_["phase"]}
+        if feeds:
+            t_["dependsOn"] = " ".join(sorted(set(t_["dependsOn"].split()) | feeds))
+
+    # **Generating a report waits for the services it reports on** (30 September, Chinmay). The report
+    # operations read only report definitions; the figures come from the other services' data through the
+    # semantic layer at run time, so the lineage above cannot connect them. The rule is explicit instead:
+    # a Reporting task that produces figures waits for every task that writes the business data -- orders,
+    # money, catalogue, admissions, food and drink, stock, retail, wallets -- in its phase or earlier.
+    REPORT_RUNS = {"runReport", "getDashboard", "askReportingQuestion", "getKpiValues", "createReportSchedule",
+                   "listAlerts"}
+    REPORT_SOURCES = {"OrderService", "LedgerService", "CatalogueService", "AccessService", "FnbService",
+                      "InventoryService", "RetailService", "WalletService"}
+    source_writers = [k for k, found in ops_of.items()
+                      if by_key.get(k) and by_key[k]["type"] == "Task" and by_key[k]["service"] in REPORT_SOURCES
+                      and any(w for o in found for w in (lineage.get(o) or {}).get("writes") or []
+                              if not w.startswith(("cache:", "qdrant")))]
+    for k, found in ops_of.items():
+        t_ = by_key.get(k)
+        if not t_ or t_["type"] != "Task" or t_["service"] != "ReportingService" or not (found & REPORT_RUNS):
+            continue
+        feeds = {w for w in source_writers if by_key[w]["phase"] <= t_["phase"]}
+        t_["dependsOn"] = " ".join(sorted(set(t_["dependsOn"].split()) | feeds))
+
+    # **Acceptance that waits on the client** (audit R065): the payment sandbox. It is the client's to
+    # deliver, so it is a question in the Decisions Register rather than a ticket, and the tickets whose
+    # testing needs its credentials say so. Wired here, after every ticket exists, so the note survives
+    # however those keys are generated.
     for k in ("APP-WEB-WEB-012", "SVC-ORDER-PAYMENT-1"):
         if k in by_key:
-            by_key[k]["dependsOn"] = " ".join(sorted(set((by_key[k]["dependsOn"] or "").split())
-                                                     | {"CLIENT-PAY-SANDBOX"}))
+            by_key[k]["description"] = (by_key[k]["description"].rstrip() + " Acceptance of the declined, "
+                                        "unknown and reconcile paths waits on the client's payment sandbox "
+                                        "credentials: see the client's answer in the Decisions Register.")
 
     # **Chronology.** Every task gets its place in the order work can happen: the first release before
     # Venue Management, then wave, then how many tasks stand in front of it, then database before
     # backend before frontend. `queue` is the same order within one person's list, so each developer's
     # board reads top to bottom as the order to work in.
-    TRACK_ORDER = {"Setup": 0, "Client": 0, "DevOps": 1, "Onboarding": 1, "Database": 2, "Backend": 3,
+    TRACK_ORDER = {"Setup": 0, "DevOps": 1, "Onboarding": 1, "Database": 2, "Backend": 3,
                    "AI": 3, "Full stack": 4, "Frontend": 5}
     for t_ in tasks:
         step_of(t_["key"])
-    ordered = sorted(tasks, key=lambda t_: (t_["phase"], int(t_["wave"] or 9), step[t_["key"]],
-                                            TRACK_ORDER[t_["track"]], t_["key"]))
+
+    # **Services are built in phases** (30 September, Chinmay): plumbing, then the services everything
+    # reads, then the sale path, then the per-module operations, then engagement, then reporting. The
+    # package's own reasoning: nothing runs without a scope (Tenancy, Identity); order, payment, entitlement
+    # and ledger commit in one transaction (ADR-0055); nothing that takes money depends on marketing or AI.
+    # WhiteLabel and Platform sit in phase 1 because Block A's white-label screens and tenant provisioning
+    # need them. A screen task takes the phase of the service it calls most, so a module is built when its
+    # main service is, and the extras it also touches (an AI suggestion, a report tile) connect as their
+    # service lands. The phase is a sort key inside a topological order: a task never comes before
+    # anything it waits on, whatever its phase.
+    SERVICE_PHASE = {"TenancyService": 1, "IdentityService": 1, "PlatformService": 1, "WhiteLabelService": 1,
+                     "CatalogueService": 2, "OrderService": 2, "LedgerService": 2, "AccessService": 2,
+                     "WalletService": 2, "VenueOpsService": 3, "FnbService": 3, "InventoryService": 3,
+                     "RetailService": 3, "MarketingService": 4, "AiService": 4, "ReportingService": 5,
+                     "CrossRegionService": 5}
+
+    def tier(t_):
+        if t_["type"] != "Task" or t_["track"] in ("Setup", "DevOps", "Onboarding", "Database", "AI"):
+            return 0
+        if t_["key"].startswith(("PLATFORM-", "KERNEL-", "ARCH-", "DB-", "OFFLINE-", "SETUP-", "MIG-", "POS-KDS")):
+            return 0
+        if t_["track"] == "Backend":
+            return SERVICE_PHASE.get(t_["service"], 3)
+        calls = Counter(by_key[d]["service"] for d in t_["dependsOn"].split()
+                        if d in by_key and by_key[d]["service"])
+        return SERVICE_PHASE.get(calls.most_common(1)[0][0], 3) if calls else 0
+
+    for t_ in tasks:
+        t_["tier"] = tier(t_)
+    prio = {t_["key"]: (t_["phase"], t_["tier"], int(t_["wave"] or 9), step[t_["key"]],
+                        TRACK_ORDER[t_["track"]], t_["key"]) for t_ in tasks}
+    waits = {t_["key"]: {d for d in t_["dependsOn"].split() if d in by_key and d != t_["key"]} for t_ in tasks}
+    freed = defaultdict(set)
+    for k, ds in waits.items():
+        for d in ds:
+            freed[d].add(k)
+    left = {k: len(ds) for k, ds in waits.items()}
+    ready = [prio[k] for k, n in left.items() if n == 0]
+    heapq.heapify(ready)
+    ordered, done = [], set()
+    while ready:
+        k = heapq.heappop(ready)[-1]
+        done.add(k)
+        ordered.append(by_key[k])
+        for n in freed[k]:
+            left[n] -= 1
+            if left[n] == 0:
+                heapq.heappush(ready, prio[n])
+    # A loop in the waits would strand its tasks; they follow in priority order rather than vanish.
+    ordered += sorted((t_ for t_ in tasks if t_["key"] not in done), key=lambda t_: prio[t_["key"]])
     queue_n = defaultdict(int)
     for i, t_ in enumerate(ordered, 1):
         t_["sequence"] = i
@@ -1386,7 +1499,9 @@ def main() -> int:
     tasks[:] = out_
 
     COLS = ["sequence", "queue", "key", "parent", "type", "track", "subject", "phase", "wave", "step", "points",
-            "assignee", "area", "platform", "service", "dependsOn", "description"]
+            "assignee", "area", "platform", "service", "dependsOn", "description",
+            # the build phase (0 plumbing, 1 foundation, 2 commerce, 3 operations, 4 engagement, 5 reporting)
+            "tier"]
     with (OUT / "tasks.csv").open("w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=COLS)
         w.writeheader()
@@ -1466,7 +1581,7 @@ def main() -> int:
     MIG_HEAD = ["Order", "Task", "Migration file", "Database", "Schema", "Tables", "Columns",
                 "References (created earlier or deferred)", "Assignee", "Points", "Owning service"]
     MIG_W = [6, 22, 40, 10, 16, 8, 9, 40, 20, 7, 20]
-    TAB_HEAD = ["Migration", "Table", "Database", "Columns", "Row-level security", "Partitioned by venue",
+    TAB_HEAD = ["Migration", "Table", "Database", "Columns", "Row-level security", "Partitioned by month",
                 "Operations reading", "Operations writing", "Foreign keys to", "Why it is in the release",
                 "Owning service", "Source DDL"]
     TAB_W = [20, 36, 10, 9, 14, 12, 10, 10, 50, 40, 20, 34]

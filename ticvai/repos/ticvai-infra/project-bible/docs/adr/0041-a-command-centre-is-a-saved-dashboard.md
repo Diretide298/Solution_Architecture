@@ -2,7 +2,7 @@
 
 **Status:** Accepted
 **Date:** 8 September 2026
-**Amends:** [ADR-0028](0028-service-decomposition.md) — no schema moves; 57 screens become rows in `reporting.dashboard`
+**Amends:** [ADR-0028](0028-service-decomposition.md) (also amended by ADR-0055 since) — no schema moves; 57 screens become rows in `reporting.dashboard`
 **Raises:** **CF-169** — the authoring screens this decision needs, and a dashboard that cannot be deleted
 
 ---

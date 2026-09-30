@@ -136,7 +136,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: getGuestLink
       x-ticvai-audience:
@@ -326,7 +326,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: getCrossRegionEntitlement
       x-ticvai-consumed-by:
@@ -389,7 +389,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: consumeCrossRegionEntitlement
       x-ticvai-consumed-by:
@@ -428,13 +428,13 @@ paths:
               properties:
                 id:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                 entries:
                   type: integer
                   minimum: 1
                 scanId:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                 recordedAt:
                   type: string
                   format: date-time
@@ -632,7 +632,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: captureWalletAuthorisation
       x-ticvai-audience:
@@ -688,7 +688,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: relinquishWalletAuthorisation
       x-ticvai-audience:
@@ -872,7 +872,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: getDsarRequest
       x-ticvai-audience:
@@ -1066,7 +1066,7 @@ components:
       properties:
         guestLinkId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: 'Pseudonymous. Not derived from any personal data. This is the only identifier
             that crosses a cell boundary.
 
@@ -1153,7 +1153,7 @@ components:
             '
         rightId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         ticketId:
           type: string
         guestLinkId:
@@ -1215,7 +1215,7 @@ components:
       properties:
         rightId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         ticketId:
           type: string
         guestLinkId:
@@ -1250,7 +1250,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         guestLinkId:
           type: string
         amount:

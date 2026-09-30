@@ -186,11 +186,11 @@
    "operations": 11
   },
   {
-   "contract": "cross-region",
+   "contract": "reporting",
    "operations": 5
   },
   {
-   "contract": "reporting",
+   "contract": "cross-region",
    "operations": 5
   },
   {

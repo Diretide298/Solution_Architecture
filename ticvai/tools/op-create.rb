@@ -19,7 +19,12 @@ apply = ENV["APPLY"] == "1"
 
 project = Project.find(PROJECT_ID)
 users = User.active.to_a.map { |u| [u.name, u] }.to_h
-author = User.find_by(login: ENV["AUTHOR"] || "admin") || User.where(admin: true).first
+# Everything these scripts write is authored by Chinmay Parab, never by whichever account happens to be the
+# instance admin: on 30 September tickets made with the old "admin, else the first admin" fallback showed up
+# under Sameer Shinde, who is not on the project. AUTHOR (a login or an email) overrides; nothing falls back.
+author = (ENV["AUTHOR"] && (User.find_by(login: ENV["AUTHOR"]) || User.find_by(mail: ENV["AUTHOR"]))) ||
+         User.active.detect { |u| u.name == "Chinmay Parab" }
+abort("author not found: no active user named Chinmay Parab; run with AUTHOR=<his login>") unless author
 version_col = WorkPackage.column_names.include?("version_id") ? :version_id : :fixed_version_id
 
 plan = items.map do |e|

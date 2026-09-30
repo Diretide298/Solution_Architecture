@@ -7020,8 +7020,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "referenceId": {
     "type": "string",
+    "format": "uuid",
     "nullable": true,
-    "description": "The source row's id: a work-order, inspection or incident ULID, or an `asset_status_change` id.\n"
+    "description": "The source row's id: a work order, inspection or incident, or an `asset_status_change` id. A uuid, as every id is (ADR-0056).\n"
    },
    "summary": {
     "type": "string"
@@ -7078,7 +7079,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "workOrderId": {
       "type": "string",
-      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "format": "uuid",
       "nullable": true
      }
     }
@@ -7915,7 +7916,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "title": {
     "type": "string",
@@ -8984,7 +8985,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "feedId": {
     "type": "string",
@@ -9076,11 +9077,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "batchId": {
     "type": "string",
@@ -9161,6 +9162,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "ledgerEntryId": {
     "type": "string",
+    "format": "uuid",
     "nullable": true,
     "description": "Written before the gateway is called."
    },
@@ -9488,7 +9490,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "inspectionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "Required for return to service where the asset demands it."
    },
@@ -9718,8 +9720,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "The client-generated ULID from `JoinQueueRequest.id`, and the `entryId` every entry path takes. `listMyWaitingGuests` gives it back to a guest who has lost it.\n"
+    "format": "uuid",
+    "description": "The client-generated UUIDv7 from `JoinQueueRequest.id`, and the `entryId` every entry path takes. `listMyWaitingGuests` gives it back to a guest who has lost it.\n"
    },
    "queueId": {
     "type": "string",
@@ -9878,7 +9880,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "workOrderNumber": {
     "type": "string",
@@ -9996,12 +9998,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "sourceInspectionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "sourceIncidentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "createdAt": {
@@ -10040,7 +10042,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "workOrderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "kind": {
     "type": "string",
@@ -10227,7 +10229,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "supersededByWorkOrderId": {
       "type": "string",
-      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "format": "uuid",
       "nullable": true,
       "description": "Set by `cancelWorkOrder` where the reason is `superseded`."
      },
@@ -10254,7 +10256,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "duplicateOfWorkOrderId": {
       "type": "string",
-      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "format": "uuid",
       "nullable": true,
       "description": "Set by `closeWorkOrder` where the outcome is `duplicate`."
      },

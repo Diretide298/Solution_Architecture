@@ -14,7 +14,7 @@ emittedBy:
 - createResaleListing
 payload:
 - field: entitlementId
-  type: string
+  type: uuid
 - field: fromSubjectId
   type: uuid
 - field: toSubjectId
@@ -23,7 +23,7 @@ payload:
   type: string
   notes: transfer or resale
 - field: sourceId
-  type: string
+  type: uuid
   notes: The `TicketTransfer.id` or `ResaleListing.id` that moved it
 - field: scopePath
   type: string

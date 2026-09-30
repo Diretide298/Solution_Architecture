@@ -227,7 +227,7 @@ A bundle is a product whose price differs from the sum of its parts. **The alloc
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateBundleRequest`
 
@@ -555,7 +555,7 @@ Publishing is the act that makes a configuration change visible at point of sale
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -613,7 +613,7 @@ Components and allocation are immutable once the bundle has been sold. Historic 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | bundleId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -789,7 +789,7 @@ Repricing every adult admission before a season is routine and currently means o
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -849,7 +849,7 @@ The clone starts as a draft with a new code. **Variants come with it; orders do 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | productId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -950,7 +950,7 @@ Refuses a job whose `outcome` is `nothingFound` or `unreadable`. **A commit that
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | jobId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Response**: `CatalogueImportJob`
 
@@ -1052,7 +1052,7 @@ Includes lapsed terms. **A guest deciding whether to renew is comparing against 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `WaitlistEntry`
 
@@ -1115,7 +1115,7 @@ Includes lapsed terms. **A guest deciding whether to renew is comparing against 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | entryId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Responses**
 
@@ -1159,7 +1159,7 @@ Lapsed terms are included — **a guest who let a pass expire is the guest most 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of GuestMembership | yes |  |
-| items[].entitlementId | string | yes | The access.Entitlement.id this membership is — a ULID, like every entitlement id. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].entitlementId | string (uuid) | yes | The access.Entitlement.id this membership is — a UUIDv7, like every entitlement id. |
 | items[].productId | string (uuid) | yes |  |
 | items[].name | string | yes |  |
 | items[].tier | string |  | (nullable) |
@@ -1275,7 +1275,7 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `RoundingProfile`
 
@@ -1347,7 +1347,7 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | ruleId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `DynamicPriceRuleDetail`
 
@@ -1464,7 +1464,7 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `DynamicPricingControl`
 
@@ -1597,7 +1597,7 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `PriceCategory`
 
@@ -1674,7 +1674,7 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1728,7 +1728,7 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 | Prefer | header |  | enum (validate-only) | Validate, do not write (29 September, AI system design 2.3 and 2.2 D step 4). |
 
 **Request body**
@@ -1813,7 +1813,7 @@ Creates the coupon campaign (`promotions.coupon_campaign`). **Writes `promotions
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateCouponCampaignRequest`
 
@@ -1971,7 +1971,7 @@ Up to fifty thousand at a time. Generation is asynchronous and the batch is expo
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | campaignId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2098,7 +2098,7 @@ Called at point of sale before applying. Returns whether the code is valid, why 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `BulkProductCreationCatalogueImportInput`
 
@@ -2175,7 +2175,7 @@ Called at point of sale before applying. Returns whether the code is valid, why 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `BookingVelocityTimeToEventRuleBuilderInput`
 
@@ -2278,7 +2278,7 @@ Called at point of sale before applying. Returns whether the code is valid, why 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `BundleComponentBuilderInput`
 
@@ -2338,7 +2338,7 @@ Called at point of sale before applying. Returns whether the code is valid, why 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `BundleDefinitionSetupInput`
 
@@ -2413,7 +2413,7 @@ Called at point of sale before applying. Returns whether the code is valid, why 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `BuyXGetYBogoRuleBuilderInput`
 
@@ -2507,7 +2507,7 @@ Called at point of sale before applying. Returns whether the code is valid, why 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CampaignBudgetFinancialLimitSetupInput`
 
@@ -2620,7 +2620,7 @@ Outbound sending runs through the CRM/marketing communication services, not a se
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CodeDistributionAssignmentManagerInput`
 
@@ -2682,7 +2682,7 @@ Outbound sending runs through the CRM/marketing communication services, not a se
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CouponPromoCodeBuilderInput`
 
@@ -2753,7 +2753,7 @@ Outbound sending runs through the CRM/marketing communication services, not a se
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CrossCategoryPromotionBuilderInput`
 
@@ -2816,7 +2816,7 @@ Outbound sending runs through the CRM/marketing communication services, not a se
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `DemandOccupancyAvailabilityRuleBuilderInput`
 
@@ -2900,7 +2900,7 @@ Outbound sending runs through the CRM/marketing communication services, not a se
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `EligibilityRuleBuilderInput`
 
@@ -2987,7 +2987,7 @@ The fixed promotional price is allocated back across the qualifying lines, and t
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `FixedPriceNForXOfferBuilderInput`
 
@@ -3054,7 +3054,7 @@ The fixed promotional price is allocated back across the qualifying lines, and t
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `GiftFreeProductAddedValueOfferBuilderInput`
 
@@ -3129,7 +3129,7 @@ The fixed promotional price is allocated back across the qualifying lines, and t
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `GuestChoiceBuildYourOwnBundleDesignerInput`
 
@@ -3194,7 +3194,7 @@ The fixed promotional price is allocated back across the qualifying lines, and t
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `PriceHierarchyInheritanceConfigurationInput`
 
@@ -3264,7 +3264,7 @@ The fixed promotional price is allocated back across the qualifying lines, and t
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `PriceListMasterConfigurationInput`
 
@@ -3359,7 +3359,7 @@ The fixed promotional price is allocated back across the qualifying lines, and t
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `PromotionRuleBuilderInput`
 
@@ -3454,7 +3454,7 @@ The fixed promotional price is allocated back across the qualifying lines, and t
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `RateStructureBuilderInput`
 
@@ -3541,7 +3541,7 @@ The resolution method defaults to `highestPriorityWins`; lowest-price-wins is ne
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `RulePriorityConflictInput`
 
@@ -3671,7 +3671,7 @@ The resolution method defaults to `highestPriorityWins`; lowest-price-wins is ne
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `EntitlementTemplate`
 
@@ -3701,10 +3701,10 @@ The resolution method defaults to `highestPriorityWins`; lowest-price-wins is ne
 | fastTrackTier | enum (none, priority, express, unlimited) |  | 19.2.20, BL-015. (nullable) |
 | entriesAllowed | integer |  | Null means unlimited. (nullable) |
 | transportRestriction | object |  | The journey a transport pass is good for (decided 29 September, rev 3 REV3-21). (nullable) |
-| transportRestriction.fromStationId | string | yes | A transport.Station. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| transportRestriction.toStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| transportRestriction.fromStationId | string (uuid) | yes | A transport.Station. |
+| transportRestriction.toStationId | string (uuid) | yes |  |
 | transportRestriction.bothDirections | boolean |  | Valid from either station to the other, as the prototype sells it. (default True) |
-| transportRestriction.routeIds | array of string |  | The routes it may be used on. |
+| transportRestriction.routeIds | array of string (uuid) |  | The routes it may be used on. |
 | reentryAllowed | boolean |  | (default False) |
 | purchaseEligibility | object |  | 1.1.38, 1.1.121, 1.1.125, 1.1.126. (nullable) |
 | purchaseEligibility.minAgeYears | integer |  | (nullable) |
@@ -3756,10 +3756,10 @@ The resolution method defaults to `highestPriorityWins`; lowest-price-wins is ne
 | fastTrackTier | enum (none, priority, express, unlimited) |  | 19.2.20, BL-015. (nullable) |
 | entriesAllowed | integer |  | Null means unlimited. (nullable) |
 | transportRestriction | object |  | The journey a transport pass is good for (decided 29 September, rev 3 REV3-21). (nullable) |
-| transportRestriction.fromStationId | string | yes | A transport.Station. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| transportRestriction.toStationId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| transportRestriction.fromStationId | string (uuid) | yes | A transport.Station. |
+| transportRestriction.toStationId | string (uuid) | yes |  |
 | transportRestriction.bothDirections | boolean |  | Valid from either station to the other, as the prototype sells it. (default True) |
-| transportRestriction.routeIds | array of string |  | The routes it may be used on. |
+| transportRestriction.routeIds | array of string (uuid) |  | The routes it may be used on. |
 | reentryAllowed | boolean |  | (default False) |
 | purchaseEligibility | object |  | 1.1.38, 1.1.121, 1.1.125, 1.1.126. (nullable) |
 | purchaseEligibility.minAgeYears | integer |  | (nullable) |
@@ -3818,7 +3818,7 @@ Terminals evaluate locally from the catalogue bundle. This endpoint serves onlin
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `EvaluatePromotionsRequest`
 
@@ -3909,7 +3909,7 @@ Terminals evaluate locally from the catalogue bundle. This endpoint serves onlin
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateEventRequest`
 
@@ -4109,7 +4109,7 @@ Terminals evaluate locally from the catalogue bundle. This endpoint serves onlin
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | eventId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -4162,7 +4162,7 @@ Moving a performance that has sold tickets is refused. Use cancellation, which n
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | performanceId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -4223,7 +4223,7 @@ Event board 1.3. **Most events are last year's event**, and the question is neve
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | eventId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -4268,7 +4268,7 @@ A change request above a configured impact routes through `approvals` — moving
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | eventId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -4316,13 +4316,13 @@ Where seating rules apply, holding a seat may implicitly buffer its neighbours �
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateSeatHoldRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes |  |
 | performanceId | string (uuid) | yes |  |
 | seatIds | array of string | yes | 50 is the ceiling of the venue setting, not the limit a caller gets. (min items 1; max items 50) |
 | ttlSeconds | integer |  | 8 minutes by default, extendable to 30 in all (decided 28 September, audit R169). (min 60; max 1800; default 480) |
@@ -4378,8 +4378,8 @@ For a guest still completing payment. Bounded by the venue's maximum, so a hold 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| holdId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| holdId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Response**: `SeatHold`
 
@@ -4428,7 +4428,7 @@ For a guest still completing payment. Bounded by the venue's maximum, so a hold 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| holdId | path | yes | string |  |
+| holdId | path | yes | string (uuid) |  |
 
 **Response**: `SeatHold`
 
@@ -4482,8 +4482,8 @@ Releases buffered neighbours alongside the held seats.
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| holdId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| holdId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Responses**
 
@@ -4524,7 +4524,7 @@ A `venueEdge` workstation acquires through its edge node, which holds the venue 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `AcquireLeaseRequest`
 
@@ -4533,7 +4533,7 @@ A `venueEdge` workstation acquires through its edge node, which holds the venue 
 | holderKind | InventoryHoldHolderKind: enum (workstation, cart) |  | Who holds the units (decided 29 September, SD-023). (default workstation) |
 | cartId | string (uuid) |  | Required when holderKind is cart, else 400. (nullable) |
 | channel | object |  | Which channel's allocation to draw from. |
-| id | string | yes | Client-generated ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Client-generated UUIDv7. |
 | channelCapacityId | string (uuid) | yes |  |
 | requestedUnits | integer | yes | (min 1) |
 | ttlSeconds | integer | yes | Short TTLs limit stranding when a terminal dies; long TTLs survive longer outages. (min 30; max 3600; default 900) |
@@ -4654,8 +4654,8 @@ Consumed units are reported and retained; the remainder returns to the pool imme
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| inventoryHoldId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| inventoryHoldId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -4718,8 +4718,8 @@ Reports consumption so far and extends the hold. A holder renews while the link 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| inventoryHoldId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| inventoryHoldId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -4785,7 +4785,7 @@ Next season's prices from this season's, uplifted by a percentage. The alternati
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | priceListId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -4863,7 +4863,7 @@ Next season's prices from this season's, uplifted by a percentage. The alternati
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 | Prefer | header |  | enum (validate-only) | Validate, do not write (29 September, AI system design 2.3 and 2.2 D step 4). |
 
 **Request body**: `CreatePriceListRequest`
@@ -4945,7 +4945,7 @@ Currency must match the region's currency and scale. A price in a currency the r
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | priceListId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 | Prefer | header |  | enum (validate-only) | Validate, do not write (29 September, AI system design 2.3 and 2.2 D step 4). |
 
 **Request body**
@@ -4996,7 +4996,7 @@ Currency must match the region's currency and scale. A price in a currency the r
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | priceListId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -5075,7 +5075,7 @@ Checks a party's declared ages and heights against every product in the booking 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `EligibilityCheckRequest`
 
@@ -5604,7 +5604,7 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | productId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -5648,7 +5648,7 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 | productId | path | yes | string |  |
 
 **Request body**: `GroupPackageDefinition`
@@ -5717,7 +5717,7 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 | productId | path | yes | string |  |
 
 **Request body**: `ProductEligibilityRule`
@@ -5792,7 +5792,7 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | productId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 | Prefer | header |  | enum (validate-only) | Validate, do not write (29 September, AI system design 2.3 and 2.2 D step 4). |
 
 **Request body**: `UpdateProductRequest`
@@ -5966,7 +5966,7 @@ Creates the campaign header (`promotions.campaign`) without budget lines, so a p
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateCommercialCampaignRequest`
 
@@ -6044,7 +6044,7 @@ Created in `draft`. A draft promotion never evaluates — publishing is the act 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreatePromotionRequest`
 
@@ -6362,7 +6362,7 @@ Runs conflict analysis first. A promotion that stacks with an existing one to pr
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | promotionId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Response**: `Promotion`
 
@@ -6476,7 +6476,7 @@ Amends the campaign header (`promotions.campaign`): name, code, description, own
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | campaignId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -6555,7 +6555,7 @@ Amending a live promotion changes behaviour mid-sale. Conditions and discount ar
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | promotionId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -6727,7 +6727,7 @@ BL-114. **Split by a stable hash of the subject, not at random per request** —
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | promotionId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -6786,7 +6786,7 @@ Returns contiguous groups where the party requires them — a family of four spl
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | performanceId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `SeatRecommendationRequest`
 
@@ -7664,7 +7664,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | valid_from | timestamptz | no |  |
 | valid_to | timestamptz | no |  |
 | redeemed_at | timestamptz | no |  |
-| redeemed_order_id | text | no |  |
+| redeemed_order_id | uuid | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
 | id | uuid | yes | Synthesised key. |
 
@@ -7792,7 +7792,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes | Stable for the life of the seat. |
+| id | uuid | yes | Stable for the life of the seat. |
 | section_code | text | yes |  |
 | row_label | text | yes |  |
 | seat_number | text | yes |  |

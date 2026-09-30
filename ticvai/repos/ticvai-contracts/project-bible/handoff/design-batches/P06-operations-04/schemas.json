@@ -49,6 +49,21 @@
    "requiresAcknowledgement": {
     "type": "boolean"
    },
+   "deliveryChannels": {
+    "type": "array",
+    "description": "How it reaches people (29 September, build, 18.1.5). `inApp` always; `push` to the targeted people's registered staff phones (tenancy `RegisteredDevice`, kind `mobileHandset`). `emergency` is sent by both whatever is set here.\n",
+    "items": {
+     "type": "string",
+     "enum": [
+      "inApp",
+      "push"
+     ]
+    },
+    "default": [
+     "inApp",
+     "push"
+    ]
+   },
    "expiresAt": {
     "type": "string",
     "format": "date-time",
@@ -129,7 +144,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid",
+    "description": "Client-generated UUIDv7 of the new order this creates, and its idempotency key — it must equal the `Idempotency-Key` header."
    },
    "lines": {
     "type": "array",
@@ -204,7 +220,8 @@
    "addedEntitlementIds": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "format": "uuid"
     }
    }
   }
@@ -221,10 +238,12 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid",
+    "description": "Client-generated UUIDv7 of the payment, and its idempotency key — it must equal the `Idempotency-Key` header."
    },
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid"
    },
    "tender": {
     "$ref": "#/components/schemas/TenderKind"
@@ -232,18 +251,42 @@
    "amount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
-   "tenderedAmount": {
+   "tenderCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "description": "The currency the guest handed over, where it is not the venue's — becomes `Payment.tenderCurrency`. Omit for a payment in the venue's own currency."
+   },
+   "tenderAmount": {
     "allOf": [
      {
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "Cash only. Change is the difference."
+    "description": "**What the guest handed over**, in `tenderCurrency` — becomes `Payment.tenderAmount`, one name for one concept (renamed from `tenderedAmount` on 26 September). For cash, change is the difference.\n"
    },
    "walletAuthorisationId": {
     "type": "string",
     "nullable": true,
     "description": "Cross-cell wallet hold, where the guest's home cell is elsewhere."
+   },
+   "walletHoldId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a `wallet` tender, the hold `wallet.holdWalletFunds` placed (SD-027). Capture debits it; the order service writes no wallet table."
+   },
+   "returnUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "description": "Where the provider returns the guest after a 3-D Secure challenge or hosted page (SD-034). Required for a card payment from the guest web or app."
+   },
+   "terminalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The card terminal to instruct, for a card payment at a till (ECR flow, SD-034)."
    },
    "deviceId": {
     "type": "string",
@@ -255,6 +298,13 @@
     "format": "date-time"
    }
   }
+ },
+ "DeviceCapability": {
+  "type": "string",
+  "description": "BL-179. **Something a driver reports, not something the platform provides.** The list grows as vendors are added, which is ADR-0015's whole position: adding a vendor is a driver plus configuration rather than a core change.\n**`genderClassification` is here because `VenueSettings.segregatedAccess. genderVerification` already offers `deviceAssisted` and nothing answered it** — a switch with no driver behind it. Where a venue's access hardware performs the check and the venue chooses to use it, the result is **advisory to the steward and never decisive at the turnstile** (`ValidationResult.advisory`). 3.2.45 asks for rejection; the package deviates deliberately and CF-130 records why.\n",
+  "enum": [
+   "genderClassification"
+  ]
  },
  "DeviceKind": {
   "type": "string",
@@ -278,8 +328,10 @@
    "wristbandEncoder",
    "signaturePad",
    "scale",
-   "camera"
-  ]
+   "camera",
+   "mobileHandset"
+  ],
+  "description": "`mobileHandset` (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation.\n"
  },
  "EntitlementStatus": {
   "type": "string",
@@ -293,64 +345,12 @@
    "surrendered"
   ]
  },
- "GuestSession": {
-  "x-ticvai-persistence": "none — Redis session registry",
-  "type": "object",
-  "required": [
-   "subjectId",
-   "tokens",
-   "isVerified",
-   "expiresAt"
-  ],
-  "properties": {
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "displayName": {
-    "type": "string",
-    "nullable": true
-   },
-   "tokens": {
-    "$ref": "#/components/schemas/TokenPair"
-   },
-   "isVerified": {
-    "type": "boolean",
-    "description": "False until an OTP or a verified provider identity confirms ownership. An unverified account may browse but not transact.\n"
-   },
-   "identityProviders": {
-    "type": "array",
-    "description": "Linked providers. Several may resolve to one account.",
-    "items": {
-     "type": "string",
-     "enum": [
-      "password",
-      "otp",
-      "apple",
-      "google",
-      "uaePass"
-     ]
-    }
-   },
-   "guestLinkId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Present where the guest is linked across cells (ADR-0010)."
-   },
-   "homeCellName": {
-    "type": "string",
-    "nullable": true
-   },
-   "preferredLanguage": {
-    "type": "string",
-    "nullable": true
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Longer lived than a staff session. No single-session rule — a guest may be signed in on a phone and a laptop at once.\n"
-   }
-  }
+ "ExchangeRateDecimal": {
+  "type": "string",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,6)",
+  "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n",
+  "pattern": "^\\d+(\\.\\d{1,6})?$"
  },
  "MediaAsset": {
   "x-ticvai-persistence": "assets.media_asset",
@@ -387,6 +387,14 @@
    },
    "title": {
     "$ref": "#/components/schemas/LocalisedText"
+   },
+   "description": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"
    },
    "altText": {
     "allOf": [
@@ -427,6 +435,12 @@
     "items": {
      "type": "string"
     }
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).\n"
    },
    "venueId": {
     "type": "string",
@@ -586,7 +600,8 @@
      "type": "object",
      "properties": {
       "entitlementId": {
-       "type": "string"
+       "type": "string",
+       "format": "uuid"
       },
       "name": {
        "type": "string"
@@ -605,7 +620,8 @@
        ]
       },
       "orderId": {
-       "type": "string"
+       "type": "string",
+       "format": "uuid"
       },
       "addedAt": {
        "type": "string",
@@ -649,11 +665,16 @@
  "MediaUsage": {
   "x-ticvai-persistence": "assets.media_usage",
   "type": "object",
+  "description": "One place an asset is used. **`surface: product` is written by catalogue** for each item of `Product.media` (decided 29 September, rev 3 23SEP-4): `referenceId` is the product id and `isLive` is true while the product is listed to guests, which is what stops an asset in use on a ticket card being archived from under it.\n",
   "required": [
    "surface",
    "referenceId"
   ],
   "properties": {
+   "extractedText": {
+    "type": "string",
+    "description": "**Text pulled out of an uploaded document**, after extraction. The generic retrieval path for anything a tenant uploads — a PDF nobody can search is a PDF nobody reads.\n"
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -686,6 +707,49 @@
    "isLive": {
     "type": "boolean",
     "description": "True where the referencing surface is published to guests."
+   }
+  }
+ },
+ "MfaEnrolment": {
+  "x-ticvai-persistence": "none — transient",
+  "type": "object",
+  "required": [
+   "methodId",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.\n"
+   },
+   "methodId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MfaKind"
+   },
+   "secret": {
+    "type": "string",
+    "nullable": true,
+    "description": "TOTP shared secret. Returned once, at enrolment, and never again."
+   },
+   "qrCodeUri": {
+    "type": "string",
+    "nullable": true
+   },
+   "recoveryCodes": {
+    "type": "array",
+    "description": "Returned once, in this enrolment response (`enrolMfaMethod` writes them, hashed, to `identity.mfa_recovery_code`). Not retrievable afterwards — `verifyMfaEnrolment` does not return them.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
    }
   }
  },
@@ -742,6 +806,35 @@
    }
   }
  },
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
+   }
+  }
+ },
  "Order": {
   "x-ticvai-persistence": "orders.sales_order + orders.order_line",
   "type": "object",
@@ -762,10 +855,14 @@
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid",
+    "description": "The client UUIDv7 from `CreateOrderRequest.id`."
    },
    "orderNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "The number a guest reads and a cashier types. **Server-assigned: the venue prefix and a sequence per venue**, for example `DXB1-000123` (decided 28 September, audit R152). A till holds a reserved range of the venue sequence, so an order taken offline gets its number on the till and keeps it through `syncOrders`. **Not gapless**: an unused reserved range leaves a gap, and that is allowed. Only tax invoices are gapless, per legal entity. The receipt carries this number.\n"
    },
    "channel": {
     "allOf": [
@@ -810,6 +907,33 @@
    "refundedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
+   "droppedPromotions": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Promotions left off this order at checkout because their budget cap would have been exceeded** (decided 28 September, audit R101 (8)). Empty when none was dropped. Returned by `checkoutCart` and `createOrder`, not stored.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "promotionId"
+     ],
+     "properties": {
+      "promotionId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "budgetCapReached"
+       ]
+      }
+     }
+    }
+   },
    "totalPriceVariance": {
     "allOf": [
      {
@@ -840,12 +964,27 @@
    },
    "shiftId": {
     "type": "string",
+    "format": "uuid",
     "nullable": true
    },
    "subjectId": {
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "holdLabel": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `label` a cashier gave when parking it with `holdOrder` — how they find it again. Null on an order never held."
+   },
+   "heldUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."
    },
    "createdAt": {
     "type": "string",
@@ -894,10 +1033,12 @@
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid"
    },
    "orderId": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid"
    },
    "tender": {
     "$ref": "#/components/schemas/TenderKind"
@@ -916,7 +1057,11 @@
     "description": "The amount in `tenderCurrency`, at that currency's own scale."
    },
    "fxRate": {
-    "type": "number",
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExchangeRateDecimal"
+     }
+    ],
     "nullable": true,
     "description": "The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"
    },
@@ -960,7 +1105,45 @@
    },
    "providerReference": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "The provider's own id for the charge (Stripe PaymentIntent, NI order reference). What `payments.receivePaymentProviderWebhook` matches an incoming event on (SD-034)."
+   },
+   "providerIdempotencyKey": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The idempotency key sent to the provider, which is this payment's `id` (SD-034, 29 September). A retried provider call cannot charge twice."
+   },
+   "terminalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The card terminal a till payment ran on (ECR flow, SD-034)."
+   },
+   "nextAction": {
+    "type": "object",
+    "nullable": true,
+    "x-ticvai-persisted": false,
+    "description": "**What the caller does while the payment is `pendingConfirmation`** (SD-034, 29 September). `redirect`: send the browser to `url` (3-D Secure challenge or hosted page); the provider returns the guest to `returnUrl` and the result arrives by webhook. `terminal`: the card terminal has been instructed; wait for its result. Null once the payment has an outcome.",
+    "properties": {
+     "kind": {
+      "type": "string",
+      "enum": [
+       "redirect",
+       "terminal"
+      ]
+     },
+     "url": {
+      "type": "string",
+      "format": "uri",
+      "nullable": true
+     },
+     "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
    },
    "lastInquiryAt": {
     "type": "string",
@@ -981,16 +1164,17 @@
  "RegisteredDevice": {
   "x-ticvai-persistence": "platform.device",
   "type": "object",
+  "description": "**The device register of record** (decided 29 September, build pass). Identity, enrolment, credential, firmware and push registration for every device in the estate live on this row. `access.access_device` places access-control devices in the gate topology and repeats serial, versions, health and lifecycle; the two are not merged yet, and where they disagree this row wins.\n",
   "required": [
    "id",
    "kind",
-   "driver",
-   "workstationId"
+   "driver"
   ],
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "kind": {
     "$ref": "#/components/schemas/DeviceKind"
@@ -1005,7 +1189,9 @@
    },
    "workstationId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "nullable": true,
+    "description": "Required for every kind except `mobileHandset`, which is bound to no workstation (18.1.5, 29 September); `registerDevice` refuses either mistake with `422`.\n"
    },
    "model": {
     "type": "string",
@@ -1015,7 +1201,8 @@
     "type": "string",
     "format": "password",
     "nullable": true,
-    "description": "BL-163. **Guest devices register for push and staff devices did not** — `registerGuestDevice` exists with a token, platform and failure count, and a scanner that cannot be told anything is a scanner somebody has to walk to.\nWrite-only. **A push token is a credential**, and the rule that no surface holds a provider key applies here too.\n"
+    "writeOnly": true,
+    "description": "BL-163. **Guest devices register for push and staff devices did not** — `registerGuestDevice` exists with a token, platform and failure count, and a scanner that cannot be told anything is a scanner somebody has to walk to.\nWrite-only, and marked `writeOnly`: accepted by `registerDevice` and never returned by `listDevices` or `getDevice`. **A push token is a credential**, and the rule that no surface holds a provider key applies here too.\n"
    },
    "pushPlatform": {
     "type": "string",
@@ -1030,6 +1217,7 @@
    "pushFailureCount": {
     "type": "integer",
     "default": 0,
+    "readOnly": true,
     "description": "**Consecutive failures.** A token that has failed repeatedly is a device that was wiped or reassigned, and continuing to push to it is how a notification queue fills with nothing.\n"
    },
    "offlineScope": {
@@ -1045,7 +1233,9 @@
    },
    "firmwareVersion": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true,
+    "description": "As the device last reported it on its heartbeat."
    },
    "isRequired": {
     "type": "boolean",
@@ -1053,6 +1243,7 @@
    },
    "status": {
     "type": "string",
+    "readOnly": true,
     "enum": [
      "online",
      "offline",
@@ -1060,11 +1251,13 @@
      "consumableLow",
      "needsAttention",
      "unknown"
-    ]
+    ],
+    "description": "What the device last said on its heartbeat; `unknown` until it has."
    },
    "batteryPercent": {
     "type": "integer",
     "nullable": true,
+    "readOnly": true,
     "minimum": 0,
     "maximum": 100,
     "description": "Board 1 of the client's POS design set, 20 August. **A wristband encoder at 8% is a gate that stops working in an hour**, and nothing in the package carried it.\n**Null where the device has no battery**, which is most of them — a receipt printer reporting 100% forever is worse than one reporting nothing.\n"
@@ -1073,6 +1266,7 @@
     "type": "string",
     "format": "date-time",
     "nullable": true,
+    "readOnly": true,
     "description": "**Distinct from `lastHeartbeatAt`.** A heartbeat is the workstation saying the device is attached; a check is the device answering. **A printer with no paper heartbeats perfectly**, which is why the client's board shows both columns.\n"
    },
    "health": {
@@ -1085,12 +1279,50 @@
      "unknown"
     ],
     "default": "unknown",
+    "readOnly": true,
     "description": "**Derived, not reported.** Computed from heartbeat age, battery, firmware currency and error rate — a device does not know whether it is healthy, and asking it produces a fleet that is 100% healthy and 12% broken.\n"
    },
    "lastHeartbeatAt": {
     "type": "string",
     "format": "date-time",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true
+   },
+   "capabilities": {
+    "type": "array",
+    "readOnly": true,
+    "items": {
+     "$ref": "#/components/schemas/DeviceCapability"
+    },
+    "description": "BL-179. **What this driver reports it can do, beyond reading media.** ADR-0015 is standards-first — the device does what the device does — and until now a venue could switch on a feature that depended on hardware without anything being able to say whether the hardware was there.\n**A capability absent is a capability unavailable**, not a capability assumed. A venue setting that requires one is refused where no device in scope reports it, rather than silently doing nothing at the gate.\n"
+   },
+   "enrolmentState": {
+    "type": "string",
+    "enum": [
+     "registered",
+     "enrolled",
+     "provisioned",
+     "active",
+     "deactivated",
+     "retired"
+    ],
+    "default": "registered",
+    "readOnly": true,
+    "description": "BL-160. **Where the device is in its life, which is not the same question as whether it is answering.** `enrolDevice` has taken the whole matrix — registered, enrolled, provisioned, active, deactivated, retired — since 16.1.2, and until now there was no column for it to land in, so the operation read this table and wrote nothing.\n**Distinct from `status` and from `health`.** `status` is what the device last said and `health` is what we computed from it; a decommissioned turnstile still sitting on the network is `online` and `retired` at once, and neither column contradicts the other. **A device that is `retired` is refused at the gate whatever its status says.**\nThe transition itself — who moved it, from what, and why — is a `tenancy.device_audit` record. It is not repeated here, because the latest transition stored in two places is one place to go stale.\n"
+   },
+   "retiredAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Set when `enrolmentState` reaches `retired`, and null otherwise.** Derivable from `tenancy.device_audit`, and kept as a column for the same reason `maintenance.asset.retired_on` is one: a retirement date you reconstruct from an audit log is a date nobody filters a fleet by.\n"
+   },
+   "configurationProfileId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The profile this device was provisioned with.** `enrolDevice` has accepted one since 16.1.3 and there was nowhere to keep it, so the answer to *\"what is this reader configured as\"* lived only in the request that set it.\n"
    }
   }
  },
@@ -1120,6 +1352,33 @@
    },
    "scopePath": {
     "type": "string"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For kind `media`, the asset (29 September, build; 23.1.6)."
+   },
+   "mediaType": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "image",
+     "video",
+     "audio",
+     "document"
+    ]
+   },
+   "matchedOn": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "title",
+     "description",
+     "tags",
+     "aiDescription"
+    ],
+    "description": "Which text the match came from, so a wrong hit can be traced to a wrong tag."
    }
   }
  },
@@ -1225,12 +1484,14 @@
    },
    "scopePath": {
     "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope**; the server sets it and ignores it in a request."
    }
   }
  },
  "TenderKind": {
   "type": "string",
+  "description": "`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n",
   "enum": [
    "cash",
    "card",
@@ -1242,28 +1503,6 @@
    "giftCard",
    "complimentary"
   ]
- },
- "TokenPair": {
-  "x-ticvai-persistence": "none — transient",
-  "type": "object",
-  "required": [
-   "accessToken",
-   "refreshToken",
-   "expiresIn"
-  ],
-  "properties": {
-   "accessToken": {
-    "type": "string",
-    "description": "JWT carrying `sid`, validated per request against the session registry."
-   },
-   "refreshToken": {
-    "type": "string"
-   },
-   "expiresIn": {
-    "type": "integer",
-    "description": "Seconds"
-   }
-  }
  },
  "TrainingRecord": {
   "type": "object",
@@ -1307,6 +1546,204 @@
    },
    "evidenceRef": {
     "type": "string"
+   }
+  }
+ },
+ "WorkforceSendStaffMessageRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only",
+  "required": [
+   "id",
+   "body",
+   "sentAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Client-generated UUIDv7; a replay of the same id returns the stored message."
+   },
+   "conversationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "An existing conversation the caller is in. Absent means `recipientPrincipalIds`."
+   },
+   "recipientPrincipalIds": {
+    "type": "array",
+    "maxItems": 49,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "Colleagues to message when there is no `conversationId`. One reuses the direct conversation; several start a group."
+   },
+   "title": {
+    "type": "string",
+    "maxLength": 120,
+    "nullable": true,
+    "description": "A new group's title; ignored otherwise."
+   },
+   "body": {
+    "type": "string",
+    "minLength": 1,
+    "maxLength": 2000
+   },
+   "attachmentAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "sentAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "WorkforceStaffConversation": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.staff_conversation",
+  "description": "**One direct or group conversation between staff of a venue** (18.9.5 Internal Messaging; decided 29 September, build pass). Created by `sendStaffMessage` the first time colleagues are messaged; its participants are `workforce.staff_conversation_participant` rows. Announcements stay the one-to-many channel; this is the one-to-one and small-group one.",
+  "required": [
+   "id",
+   "venueId",
+   "kind",
+   "createdByPrincipalId",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "direct",
+     "group"
+    ],
+    "description": "A direct conversation has exactly two participants and at most one exists per pair."
+   },
+   "title": {
+    "type": "string",
+    "maxLength": 120,
+    "nullable": true,
+    "description": "Group conversations only; null on a direct one."
+   },
+   "createdByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "lastMessageAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   }
+  }
+ },
+ "WorkforceStaffConversationSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over workforce.staff_conversation, its participants and its latest message, for the caller",
+  "description": "One row of `listStaffConversations`, as the caller sees it.",
+  "required": [
+   "conversation",
+   "unreadCount"
+  ],
+  "properties": {
+   "conversation": {
+    "$ref": "#/components/schemas/WorkforceStaffConversation"
+   },
+   "participants": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "principalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "displayName": {
+       "type": "string"
+      },
+      "onShift": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "lastMessage": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/WorkforceStaffMessage"
+     }
+    ],
+    "nullable": true
+   },
+   "unreadCount": {
+    "type": "integer",
+    "minimum": 0
+   }
+  }
+ },
+ "WorkforceStaffMessage": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.staff_message",
+  "description": "One message in a staff conversation (decided 29 September, build pass). Never edited through the API, so a conversation reads the same to everyone in it afterwards.",
+  "required": [
+   "id",
+   "staffConversationId",
+   "senderPrincipalId",
+   "body",
+   "sentAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The client-generated UUIDv7 from the send, the key an offline replay deduplicates on."
+   },
+   "staffConversationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "senderPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "body": {
+    "type": "string",
+    "maxLength": 2000
+   },
+   "attachmentAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "A photo or file, held as a media asset."
+   },
+   "sentAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "When the sender sent it, which for a message queued offline is before it arrived."
+   },
+   "receivedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "nullable": true
    }
   }
  },

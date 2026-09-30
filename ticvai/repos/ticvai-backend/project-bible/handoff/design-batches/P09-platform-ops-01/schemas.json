@@ -1,5 +1,6 @@
 {
  "DeadLetter": {
+  "x-ticvai-append-only": "createdAt",
   "type": "object",
   "x-ticvai-persistence": "platform.dead_letter",
   "description": "ADR-0033. **An outbox row whose delivery failed after its retry budget.**\n\n**A financial posting is never dead-lettered** — `ledger.journal_entry` is append-only and a failed posting is an incident. **Nor is a DSAR**: `platform.dsar_request` carries a legal clock, and a dead-lettered erasure nobody works is a regulatory failure with a timestamp on it. Both halt and alert.",

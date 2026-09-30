@@ -61,7 +61,7 @@
   "path": "/proposed-actions/{actionId}/decide",
   "contract": "ai",
   "summary": "Approve or reject a proposal",
-  "permission": "AI_APPROVE",
+  "permission": "AI_USE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -74,6 +74,32 @@
   ],
   "requestBody": null,
   "responds": "ProposedAction"
+ },
+ "getActionPlan": {
+  "method": "GET",
+  "path": "/action-plans/{planId}",
+  "contract": "ai",
+  "summary": "A plan with its steps",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiActionPlanDetail"
+ },
+ "getCommandCentre": {
+  "method": "GET",
+  "path": "/command-centre",
+  "contract": "reporting",
+  "summary": "The dashboards this login may see, grouped by module",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CommandCentre"
  },
  "getCountVariance": {
   "method": "GET",
@@ -107,6 +133,60 @@
   "requestBody": null,
   "responds": "DashboardData"
  },
+ "getForecast": {
+  "method": "GET",
+  "path": "/forecasts",
+  "contract": "ai",
+  "summary": "Forecast values",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "definitionKey",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "versionId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "dimensionKey",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scenarioId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "getStockValuation": {
   "method": "GET",
   "path": "/stock/valuation",
@@ -131,6 +211,50 @@
   "requestBody": null,
   "responds": "StockValuation"
  },
+ "listAiInsights": {
+  "method": "GET",
+  "path": "/insights",
+  "contract": "ai",
+  "summary": "Insights and anomalies",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "priority",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listAlerts": {
   "method": "GET",
   "path": "/alerts",
@@ -143,6 +267,26 @@
   "parameters": [
    {
     "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "severity",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "shiftId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "itemId",
     "in": "query",
     "required": null
    }
@@ -211,7 +355,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "StockBatch"
+  "responds": "Page"
  },
  "listOrders": {
   "method": "GET",
@@ -327,6 +471,21 @@
     "required": null
    },
    {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "segmentTag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "guidedAnswerIds",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -345,7 +504,7 @@
   "path": "/proposed-actions",
   "contract": "ai",
   "summary": "What the assistant has proposed and nobody has decided",
-  "permission": "AI_APPROVE",
+  "permission": "AI_USE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -363,6 +522,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -395,6 +559,25 @@
   ],
   "requestBody": null,
   "responds": "SegmentPreview"
+ },
+ "recordDashboardView": {
+  "method": "POST",
+  "path": "/dashboards/{dashboardId}/views",
+  "contract": "reporting",
+  "summary": "Record that a dashboard was opened",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "recordSuggestionOutcome": {
   "method": "POST",

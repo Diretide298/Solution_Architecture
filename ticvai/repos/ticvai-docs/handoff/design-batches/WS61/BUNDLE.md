@@ -1,6 +1,6 @@
 # WS61 — Ticket Media   Credential Management board 3
 
-**10 screens · 16 operations · 17 schemas · 7 permissions**
+**10 screens · 16 operations · 21 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -2830,7 +2830,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "Client-generated delivery attempt id"
    },
    "channel": {
@@ -2907,6 +2907,129 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "note": {
     "type": "string",
     "maxLength": 500
+   }
+  }
+ },
+ "CredentialGenerationIssuanceMonitorView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Credential Generation & Issuance Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "trigger": {
+    "type": "string",
+    "enum": [
+     "orderConfirmation",
+     "ticketIssuance",
+     "membershipActivation",
+     "customerRequest",
+     "staffAction",
+     "rfidCollection",
+     "walletRequest",
+     "faceEnrollment",
+     "api",
+     "bulkOperation",
+     "scheduledProcess"
+    ],
+    "description": "What triggered generation"
+   },
+   "requestId": {
+    "type": "string",
+    "description": "Request ID"
+   },
+   "virtualTicket": {
+    "type": "string",
+    "description": "Virtual Ticket"
+   },
+   "media": {
+    "type": "string",
+    "description": "Media"
+   },
+   "template": {
+    "type": "string",
+    "description": "Template"
+   },
+   "templateVersion": {
+    "type": "string",
+    "description": "Template Version"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "provider": {
+    "type": "string",
+    "description": "Provider"
+   },
+   "requestedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Requested At"
+   },
+   "generatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Generated At"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "requested",
+     "queued",
+     "templateResolved",
+     "dataMapped",
+     "credentialGenerated",
+     "bound",
+     "ready",
+     "delivered",
+     "failed"
+    ],
+    "description": "Generation stage"
+   },
+   "error": {
+    "type": "string",
+    "description": "Error"
+   },
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "language": {
+    "type": "string",
+    "description": "Language"
+   },
+   "customerContext": {
+    "type": "string",
+    "description": "Customer context"
+   },
+   "failureReason": {
+    "type": "string",
+    "enum": [
+     "templateMissing",
+     "requiredDataMissing",
+     "providerUnavailable",
+     "invalidPayload",
+     "tokenGenerationFailure",
+     "walletGenerationFailure",
+     "encoderUnavailable"
+    ],
+    "description": "Failure category when status is failed"
    }
   }
  },
@@ -3149,6 +3272,113 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "CredentialOperationsCommandCenterViewSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none - aggregate computed at read time over the rows the page lists",
+  "description": "The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).",
+  "properties": {
+   "virtualTicketsIssued": {
+    "type": "integer",
+    "description": "Virtual Tickets Issued"
+   },
+   "credentialsGenerated": {
+    "type": "integer",
+    "description": "Credentials Generated"
+   },
+   "activeCredentials": {
+    "type": "integer",
+    "description": "Active Credentials"
+   },
+   "pendingGeneration": {
+    "type": "integer",
+    "description": "Pending Generation"
+   },
+   "pendingDelivery": {
+    "type": "integer",
+    "description": "Pending Delivery"
+   },
+   "pendingBinding": {
+    "type": "integer",
+    "description": "Pending Binding"
+   },
+   "pendingActivation": {
+    "type": "integer",
+    "description": "Pending Activation"
+   },
+   "suspended": {
+    "type": "integer",
+    "description": "Suspended"
+   },
+   "revoked": {
+    "type": "integer",
+    "description": "Revoked"
+   },
+   "expired": {
+    "type": "integer",
+    "description": "Expired"
+   },
+   "failedGeneration": {
+    "type": "integer",
+    "description": "Failed Generation"
+   },
+   "failedDelivery": {
+    "type": "integer",
+    "description": "Failed Delivery"
+   },
+   "synchronizationExceptions": {
+    "type": "integer",
+    "description": "Synchronization Exceptions"
+   },
+   "multiMediaVirtualTickets": {
+    "type": "integer",
+    "description": "Multi-Media Virtual Tickets"
+   },
+   "virtualTicketsWithoutActiveMedia": {
+    "type": "integer",
+    "description": "Virtual Tickets Without Active Media"
+   },
+   "dynamicQr": {
+    "type": "integer",
+    "description": "Credentials of this media type"
+   },
+   "barcode": {
+    "type": "integer",
+    "description": "Credentials of this media type"
+   },
+   "pdf": {
+    "type": "integer",
+    "description": "Credentials of this media type"
+   },
+   "appleWallet": {
+    "type": "integer",
+    "description": "Credentials of this media type"
+   },
+   "googleWallet": {
+    "type": "integer",
+    "description": "Credentials of this media type"
+   },
+   "rfid": {
+    "type": "integer",
+    "description": "Credentials of this media type"
+   },
+   "nfc": {
+    "type": "integer",
+    "description": "Credentials of this media type"
+   },
+   "faceRecognitionReference": {
+    "type": "integer",
+    "description": "Credentials of this media type"
+   },
+   "card": {
+    "type": "integer",
+    "description": "Credentials of this media type"
+   },
+   "wristband": {
+    "type": "integer",
+    "description": "Credentials of this media type"
+   }
+  }
+ },
  "CredentialReplacementInput": {
   "type": "object",
   "x-ticvai-persistence": "none — request only (decided 29 September, VM close-out)",
@@ -3183,7 +3413,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "approvalRequestId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "The granted approval, where the replacement rule requires one"
    },
    "note": {
@@ -3251,6 +3481,156 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "reason"
   ]
  },
+ "CredentialSecurityAuditOperationalEvidenceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Credential Security, Audit & Operational Evidence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "virtualTicket": {
+    "type": "string",
+    "description": "Virtual Ticket"
+   },
+   "credential": {
+    "type": "string",
+    "description": "Credential"
+   },
+   "media": {
+    "type": "string",
+    "description": "Media"
+   },
+   "action": {
+    "type": "string",
+    "enum": [
+     "credentialRequested",
+     "generated",
+     "bound",
+     "delivered",
+     "activated",
+     "updated",
+     "presented",
+     "suspended",
+     "reactivated",
+     "replaced",
+     "revoked",
+     "expired",
+     "rebound",
+     "regenerated",
+     "deleted"
+    ],
+    "description": "Lifecycle action recorded"
+   },
+   "before": {
+    "type": "string",
+    "description": "Before"
+   },
+   "after": {
+    "type": "string",
+    "description": "After"
+   },
+   "actor": {
+    "type": "string",
+    "description": "Actor"
+   },
+   "source": {
+    "type": "string",
+    "description": "Source"
+   },
+   "device": {
+    "type": "string",
+    "description": "Device"
+   },
+   "dateTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date/time"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "approval": {
+    "type": "string",
+    "description": "Approval"
+   },
+   "providerReference": {
+    "type": "string",
+    "description": "Provider reference"
+   },
+   "relatedTransaction": {
+    "type": "string",
+    "description": "Related transaction"
+   },
+   "anomalyFlags": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "excessiveRegeneration",
+      "repeatedReplacement",
+      "suspiciousRebinding",
+      "multipleCredentialAssignments",
+      "unexpectedProviderTokenChanges",
+      "unauthorizedAdministrativeActions"
+     ]
+    },
+    "description": "Suspicious patterns flagged on this entry"
+   }
+  }
+ },
+ "CredentialUsageCrossMediaTraceabilityView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Credential Usage & Cross-Media Traceability displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "virtualTicket": {
+    "type": "string",
+    "description": "Virtual Ticket"
+   },
+   "credential": {
+    "type": "string",
+    "description": "Credential"
+   },
+   "media": {
+    "type": "string",
+    "description": "Media"
+   },
+   "presentationTimestamp": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Presentation timestamp"
+   },
+   "location": {
+    "type": "string",
+    "description": "Location"
+   },
+   "device": {
+    "type": "string",
+    "description": "Device"
+   },
+   "externalSystem": {
+    "type": "string",
+    "description": "External system"
+   },
+   "transactionType": {
+    "type": "string",
+    "description": "Transaction type"
+   },
+   "result": {
+    "type": "string",
+    "description": "Result"
+   },
+   "entitlementImpact": {
+    "type": "string",
+    "description": "Entitlement impact"
+   },
+   "synchronizationStatus": {
+    "type": "string",
+    "description": "Synchronization status"
+   }
+  }
+ },
  "FailedGenerationDeliveryCredentialExceptionManagemenView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -3259,7 +3639,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "exceptionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "The key `resolveCredentialException` acts on (decided 29 September, VM close-out)"
    },
    "lastAction": {

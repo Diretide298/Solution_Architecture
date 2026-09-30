@@ -1,6 +1,6 @@
 # WS141 — Marketing CRM Configuration Reference v1.0 board 7
 
-**10 screens · 18 operations · 20 schemas · 4 permissions**
+**10 screens · 19 operations · 25 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `AI_CONFIGURE, CASE_MANAGE, CASE_VIEW, GUEST_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `AI_CONFIGURE, AI_USE, CASE_MANAGE, CASE_VIEW, GUEST_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -64,7 +64,7 @@ convincingly. It is never a caption.
 | `BO-795` | Unified Inbox | listDetail | 2 | 0 | — |
 | `BO-796` | Guest Conversation 360 | listDetail | 2 | 0 | — |
 | `BO-797` | AI Chatbot Configuration | listDetail | 1 | 0 | — |
-| `BO-798` | Intent & Knowledge Management | listDetail | 1 | 0 | — |
+| `BO-798` | Intent & Knowledge Management | listDetail | 2 | 0 | — |
 | `BO-799` | Agent Workspace | listDetail | 4 | 0 | — |
 | `BO-800` | Routing & Queue Management | listDetail | 5 | 1 | — |
 | `BO-801` | Sales & Service Actions | listDetail | 1 | 0 | — |

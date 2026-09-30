@@ -3518,7 +3518,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "countId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "totalVarianceValue": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -3593,11 +3593,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "purchaseOrderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "locationId": {
     "type": "string",
@@ -3662,7 +3662,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "venueId": {
     "type": "string",
@@ -3728,7 +3728,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "itemId": {
     "type": "string",
@@ -3777,7 +3777,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "fromLocationId": {
     "type": "string",
@@ -3918,7 +3918,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "receiptNumber": {
     "type": "string",
@@ -3927,7 +3927,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "purchaseOrderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "locationId": {
     "type": "string",
@@ -3944,7 +3944,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "properties": {
       "lineId": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "format": "uuid",
        "readOnly": true,
        "description": "One batch or expiry line of the receipt. What `rejectReceivedGoods` addresses (decided 28 September, audit R171).\n"
       },
@@ -4469,7 +4469,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "countId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "reopenedLineIds": {
     "type": "array",
@@ -4559,7 +4559,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "requisitionNumber": {
     "type": "string"
@@ -4782,7 +4782,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "locationId": {
     "type": "string",
@@ -4827,7 +4827,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "locationId": {
     "type": "string",
@@ -5060,7 +5060,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "transferNumber": {
     "type": "string"

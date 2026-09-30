@@ -1,29 +1,127 @@
 {
- "approveUnifiedDecision": {
-  "method": "PUT",
-  "path": "/unified-decision",
+ "actOnWorkflowInstance": {
+  "method": "POST",
+  "path": "/workflow-instances/{instanceId}/actions",
   "contract": "approvals",
-  "summary": "Unified Approval Inbox & Decision Workspace",
-  "permission": "APPROVAL_REQUEST",
+  "summary": "An operator's intervention in a running workflow",
+  "permission": "APPROVAL_ACT",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": "UnifiedApprovalInboxDecisionWorkspaceInput",
-  "responds": "UnifiedApprovalInboxDecisionWorkspaceView"
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WorkflowInstanceActionInput",
+  "responds": "WorkflowInstance"
  },
  "createAutomationAutonomouAction": {
   "method": "POST",
   "path": "/automation-autonomou-action",
   "contract": "approvals",
   "summary": "Automation Execution & Autonomous Action Monitor",
-  "permission": "APPROVAL_REQUEST",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AutomationExecutionAutonomousActionMonitorInput",
+  "responds": "AutomationExecutionAutonomousActionMonitorView"
+ },
+ "decideApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests/{requestId}/decide",
+  "contract": "approvals",
+  "summary": "Approve, reject, return or ask for information",
+  "permission": "APPROVAL_DECIDE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalRequest"
+ },
+ "getApprovalRequestScore": {
+  "method": "GET",
+  "path": "/approval-requests/{approvalRequestId}/score",
+  "contract": "ai",
+  "summary": "The latest context score of an approval request",
+  "permission": "APPROVAL_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [],
-  "requestBody": "AutomationExecutionAutonomousActionMonitorInput",
-  "responds": "AutomationExecutionAutonomousActionMonitorView"
+  "requestBody": null,
+  "responds": "AiApprovalRequestScore"
+ },
+ "listApprovalRequests": {
+  "method": "GET",
+  "path": "/approval-requests",
+  "contract": "approvals",
+  "summary": "Requests awaiting a decision, or already decided",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "assignedToMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "raisedByMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "breachingWithinMinutes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "sort",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listCrossModuleOrchestration": {
   "method": "GET",
@@ -34,22 +132,64 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "correlationId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CrossModuleOrchestrationMonitorView"
+  "responds": "Page"
  },
  "listProcessAutomationOpportunity": {
   "method": "GET",
   "path": "/process-automation-opportunity",
   "contract": "approvals",
   "summary": "Process Optimization & Automation Opportunity Center",
-  "permission": "APPROVAL_VIEW",
+  "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "opportunityType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "module",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ProcessOptimizationAutomationOpportunityCenterView"
+  "responds": "Page"
  },
  "listSlaEscalationBottleneck": {
   "method": "GET",
@@ -60,9 +200,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "workflow",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "risk",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "escalationLevel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "SlaEscalationBottleneckMonitorView"
+  "responds": "Page"
  },
  "listWorkflow": {
   "method": "GET",
@@ -73,9 +239,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "module",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priority",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "WorkflowOperationsCommandCenterView"
+  "responds": "Page"
  },
  "listWorkflowAutonomouGovernance": {
   "method": "GET",
@@ -86,7 +278,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "autonomyLevel",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "AiWorkflowIntelligenceAutonomousGovernanceCenterView"
  },
@@ -99,9 +297,35 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "errorType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "module",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priority",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "WorkflowExceptionFailureRecoveryCenterView"
+  "responds": "Page"
  },
  "listWorkflowInstanceProcess": {
   "method": "GET",
@@ -112,16 +336,42 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "workflowInstance",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "sourceModule",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "currentStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "WorkflowInstanceMonitorProcessTimelineView"
+  "responds": "Page"
  },
  "listWorkflowProcessPerformance": {
   "method": "GET",
   "path": "/workflow-process-performance",
   "contract": "approvals",
   "summary": "Workflow Analytics & Process Performance",
-  "permission": "APPROVAL_VIEW",
+  "permission": "REPORT_VIEW_VENUE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
@@ -163,6 +413,26 @@
    },
    {
     "name": "user",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "minTransactionValue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "maxTransactionValue",
     "in": "query",
     "required": false
    }

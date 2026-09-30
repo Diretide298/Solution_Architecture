@@ -2108,7 +2108,7 @@ paths:
               properties:
                 upToMessageId:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
       responses:
         '204':
           headers:
@@ -2137,7 +2137,7 @@ paths:
         `publishAnnouncement` is the tool, with its targeting and acknowledgement.
 
 
-        **Queued offline and delivered once.** The client generates `id` (a ULID); a replay of the same `id`
+        **Queued offline and delivered once.** The client generates `id` (a UUIDv7); a replay of the same `id`
         returns the stored message rather than sending twice. New messages push to the recipients'' staff
         devices. Messages are workforce records under the tenant''s retention policy (ADR-0047); nothing here
         is guest data.
@@ -2253,7 +2253,7 @@ components:
           format: date-time
         lastReadMessageId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: Moved forward only, by `markStaffConversationRead`.
         mutedUntil:
@@ -2274,8 +2274,8 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: The client-generated ULID from the send, the key an offline replay deduplicates on.
+          format: uuid
+          description: The client-generated UUIDv7 from the send, the key an offline replay deduplicates on.
         staffConversationId:
           type: string
           format: uuid
@@ -2339,8 +2339,8 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: Client-generated ULID; a replay of the same id returns the stored message.
+          format: uuid
+          description: Client-generated UUIDv7; a replay of the same id returns the stored message.
         conversationId:
           type: string
           format: uuid

@@ -11,13 +11,13 @@ emittedBy:
 - decideApprovalRequest
 payload:
 - field: requestId
-  type: string
+  type: uuid
 - field: kind
   type: string
 - field: subjectContract
   type: string
 - field: subjectId
-  type: string
+  type: uuid
 - field: reason
   type: string
   notes: '**Required.** The only signal to the requester and to the analytics'

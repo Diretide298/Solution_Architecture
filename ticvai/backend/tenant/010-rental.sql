@@ -6,7 +6,7 @@
 CREATE TABLE IF NOT EXISTS rental.agreement (
     id                                uuid PRIMARY KEY,
     rental_number                     text NOT NULL CONSTRAINT agreement_rental_number_chk CHECK (char_length(rental_number) <= 50),
-    order_id                          text NOT NULL,
+    order_id                          uuid NOT NULL,
     customer_id                       uuid NOT NULL,
     venue_id                          uuid NOT NULL,
     scheduled_start_at                timestamptz NOT NULL,
@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS rental.booking (
     location_id                       uuid,
     return_location_id                uuid,
     customer_id                       uuid,
-    order_id                          text,
+    order_id                          uuid,
     valid_from                        timestamptz NOT NULL,
     valid_to                          timestamptz NOT NULL,
     quantity                          integer,

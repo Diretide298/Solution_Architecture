@@ -9,7 +9,7 @@ aggregate: order
 emittedWhen: OrderStatus paid to completed
 payload:
 - field: orderId
-  type: string
+  type: uuid
 - field: venueId
   type: uuid
 - field: completedAt

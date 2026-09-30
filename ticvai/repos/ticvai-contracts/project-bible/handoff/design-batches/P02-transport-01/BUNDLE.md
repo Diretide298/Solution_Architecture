@@ -1,6 +1,6 @@
 # P02-transport-01 — P02 · Transport
 
-**4 screens · 13 operations · 25 schemas · 0 permissions**
+**4 screens · 13 operations · 24 schemas · 0 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -1312,12 +1312,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); at most 10 per sale on staff and POS (audit R080 (c)). Over the limit is 422 `seatLimitExceeded`.",
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     }
    },
    "resourceHoldId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant and `quantity` is 1. The hold is the line's capacity; no inventory lease is taken."
    },
@@ -1568,12 +1568,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "maxItems": 50,
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     }
    },
    "resourceHoldId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The `resources.ResourceHold` this line buys (decided 29 September, rev 3 REV3-15). While set, `leaseExpiresAt` is the hold's `expiresAt` and `inventoryHoldId` is null."
    },
@@ -1723,7 +1723,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "pairedRouteId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The same line run the other way. The swap button lands on it."
    },
@@ -1760,14 +1760,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "departureId": {
-    "$ref": "#/components/schemas/Ulid"
+    "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "performanceId": {
     "type": "string",
     "format": "uuid"
    },
    "routeId": {
-    "$ref": "#/components/schemas/Ulid"
+    "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "routeCode": {
     "type": "string",
@@ -1818,7 +1818,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "routeId": {
-    "$ref": "#/components/schemas/Ulid"
+    "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "stopsTravelled": {
     "type": "integer",
@@ -1858,7 +1858,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     }
    },
    "passTypeId": {
-    "$ref": "#/components/schemas/Ulid"
+    "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "saving": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
@@ -1878,14 +1878,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "routeId": {
-    "$ref": "#/components/schemas/Ulid",
+    "$ref": "../shared/common.yaml#/components/schemas/Id",
     "description": "Omitted, the active route serving the two stations in this order."
    },
    "fromStationId": {
-    "$ref": "#/components/schemas/Ulid"
+    "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "toStationId": {
-    "$ref": "#/components/schemas/Ulid"
+    "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "passengers": {
     "type": "array",
@@ -1910,7 +1910,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     }
    },
    "passTypeId": {
-    "$ref": "#/components/schemas/Ulid"
+    "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "at": {
     "type": "string",
@@ -1933,10 +1933,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "properties": {
      "id": {
-      "$ref": "#/components/schemas/Ulid"
+      "$ref": "../shared/common.yaml#/components/schemas/Id"
      },
      "routeId": {
-      "$ref": "#/components/schemas/Ulid"
+      "$ref": "../shared/common.yaml#/components/schemas/Id"
      }
     }
    }
@@ -1955,17 +1955,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "description": "Unique per guest, venue and ordered pair of stations.",
   "properties": {
    "id": {
-    "$ref": "#/components/schemas/Ulid"
+    "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "venueId": {
     "type": "string",
     "format": "uuid"
    },
    "fromStationId": {
-    "$ref": "#/components/schemas/Ulid"
+    "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "toStationId": {
-    "$ref": "#/components/schemas/Ulid"
+    "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "fromStationName": {
     "type": "string",
@@ -2063,14 +2063,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "passTypeId": {
-    "$ref": "#/components/schemas/Ulid"
+    "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "catalogueProductId": {
     "type": "string",
     "format": "uuid"
    },
    "routeId": {
-    "$ref": "#/components/schemas/Ulid"
+    "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "name": {
     "type": "string"
@@ -2109,7 +2109,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "routeId": {
-    "$ref": "#/components/schemas/Ulid"
+    "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "lineCode": {
     "type": "string"
@@ -2130,7 +2130,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      ],
      "properties": {
       "stationId": {
-       "$ref": "#/components/schemas/Ulid"
+       "$ref": "../shared/common.yaml#/components/schemas/Id"
       },
       "sequence": {
        "type": "integer"
@@ -2206,7 +2206,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "properties": {
      "id": {
-      "$ref": "#/components/schemas/Ulid"
+      "$ref": "../shared/common.yaml#/components/schemas/Id"
      },
      "sequence": {
       "type": "integer",
@@ -2252,10 +2252,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      ],
      "properties": {
       "fromStationId": {
-       "$ref": "#/components/schemas/Ulid"
+       "$ref": "../shared/common.yaml#/components/schemas/Id"
       },
       "toStationId": {
-       "$ref": "#/components/schemas/Ulid"
+       "$ref": "../shared/common.yaml#/components/schemas/Id"
       },
       "fare": {
        "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -2291,7 +2291,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "properties": {
      "id": {
-      "$ref": "#/components/schemas/Ulid"
+      "$ref": "../shared/common.yaml#/components/schemas/Id"
      },
      "active": {
       "type": "boolean",
@@ -2325,7 +2325,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "properties": {
      "id": {
-      "$ref": "#/components/schemas/Ulid"
+      "$ref": "../shared/common.yaml#/components/schemas/Id"
      },
      "status": {
       "$ref": "#/components/schemas/TransportRouteStatus"
@@ -2365,12 +2365,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "suspended",
    "retired"
   ]
- },
- "Ulid": {
-  "type": "string",
-  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-  "x-ticvai-persistence-column": "text",
-  "description": "A ULID. **Stored as text, like every other ULID key in the package** (system-design review SD-009, 29 September); without this column type every transport key landed as jsonb."
  }
 }
 ```

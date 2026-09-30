@@ -1,1 +1,224 @@
-{}
+{
+ "createReportSchedule": {
+  "method": "POST",
+  "path": "/report-schedules",
+  "contract": "reporting",
+  "summary": "Schedule a report",
+  "permission": "REPORT_SCHEDULE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateReportScheduleRequest",
+  "responds": "ReportSchedule"
+ },
+ "createReportSubscription": {
+  "method": "POST",
+  "path": "/report-subscriptions",
+  "contract": "reporting",
+  "summary": "Send a report to somebody, on terms",
+  "permission": "REPORT_SCHEDULE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ReportSubscription",
+  "responds": "ReportSubscription"
+ },
+ "exportReportResult": {
+  "method": "POST",
+  "path": "/report-executions/{executionId}/export",
+  "contract": "reporting",
+  "summary": "Export a completed result",
+  "permission": "REPORT_EXPORT",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getReportExport": {
+  "method": "GET",
+  "path": "/report-exports/{exportId}",
+  "contract": "reporting",
+  "summary": "Export status and download link",
+  "permission": "REPORT_EXPORT",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ReportExport"
+ },
+ "listAccessPolicies": {
+  "method": "GET",
+  "path": "/access-policies",
+  "contract": "identity",
+  "summary": "Attribute-based access policies",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessPolicy"
+ },
+ "listDataRetentionSettings": {
+  "method": "GET",
+  "path": "/data-retention-settings",
+  "contract": "tenancy",
+  "summary": "How long the tenant keeps each class of data",
+  "permission": "TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "dataClass",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listReportDeliveries": {
+  "method": "GET",
+  "path": "/report-deliveries",
+  "contract": "reporting",
+  "summary": "What was sent, to whom, and what failed",
+  "permission": "REPORT_VIEW_TENANT",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "failedOnly",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ReportDelivery"
+ },
+ "listReportSchedules": {
+  "method": "GET",
+  "path": "/report-schedules",
+  "contract": "reporting",
+  "summary": "List scheduled reports",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listReportSubscriptions": {
+  "method": "GET",
+  "path": "/report-subscriptions",
+  "contract": "reporting",
+  "summary": "Who receives what, and by which route",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ReportSubscription"
+ },
+ "setApprovalRetentionPolicy": {
+  "method": "PUT",
+  "path": "/approval-retention",
+  "contract": "approvals",
+  "summary": "How long decision records are kept, and what survives",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApprovalRetentionPolicy",
+  "responds": "ApprovalRetentionPolicy"
+ },
+ "setDataRetentionSetting": {
+  "method": "PUT",
+  "path": "/data-retention-settings/{dataClass}",
+  "contract": "tenancy",
+  "summary": "Set how long the tenant keeps one class of data",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "TenantDataRetentionSetting",
+  "responds": "TenantDataRetentionSetting"
+ }
+}

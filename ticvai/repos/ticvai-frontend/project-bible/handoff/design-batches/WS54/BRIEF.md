@@ -1,6 +1,6 @@
 # WS54 — Promotions   Bundles Management board 10
 
-**10 screens · 10 operations · 10 schemas · 1 permissions**
+**10 screens · 14 operations · 16 schemas · 2 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 1 permissions apply here:
-  `PRICE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 2 permissions apply here:
+  `PRICE_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-228` | Promotion Performance Command Center | commandCentre | 1 | 0 | — |
-| `ADM-229` | Campaign & Promotion Performance Explorer | listDetail | 1 | 0 | — |
+| `ADM-228` | Promotion Performance Command Center | commandCentre | 3 | 0 | — |
+| `ADM-229` | Campaign & Promotion Performance Explorer | listDetail | 4 | 0 | — |
 | `ADM-230` | Redemption, Conversion & Funnel Analytics | commandCentre | 1 | 0 | — |
 | `ADM-231` | Discount, Margin & Profitability Analytics | commandCentre | 1 | 0 | — |
 | `ADM-232` | Bundle, BOGO & Advanced Offer Analytics | commandCentre | 1 | 0 | — |
 | `ADM-233` | Upsell, Cross-Sell & Attach-Rate Analytics | commandCentre | 1 | 0 | — |
-| `ADM-234` | Customer, Segment, Channel & Partner Analytics | commandCentre | 1 | 0 | — |
+| `ADM-234` | Customer, Segment, Channel & Partner Analytics | commandCentre | 2 | 0 | — |
 | `ADM-235` | Incrementality, Attribution & Cannibalization Analysis | listDetail | 1 | 0 | — |
 | `ADM-236` | AI Optimization & Next-Best-Action Center | listDetail | 1 | 0 | — |
 | `ADM-237` | Executive Promotion Intelligence & Reporting Studio | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**ADM-229, ADM-235, ADM-236, ADM-237 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-235, ADM-236 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

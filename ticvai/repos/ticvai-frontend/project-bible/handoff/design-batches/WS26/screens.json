@@ -39,10 +39,7 @@
     {
      "to": "SUP-001",
      "trigger": "Agent Login",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-019 holds none of them, so the edge carries nothing and SUP-001 opens cold"
     },
     {
      "to": "SUP-020",
@@ -101,10 +98,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Supervisors can understand the real-time operational state of Customer Service and identify the queues, channels and issues requiring immediate intervention.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Display) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Provide supervisors and management with a real-time view of customer-service operations across",
-  "purposeNote": "Supervisors can understand the real-time operational state of Customer Service and identify the queues, channels and issues requiring immediate intervention.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -183,19 +180,19 @@
        "kind": "metricTile",
        "label": "First Response Time",
        "provenance": "pack Customer Service_Reference.pdf, page 24 §Display",
-       "bindsTo": "ContactCenterOperationsCommandCenterView.firstResponseTime"
+       "bindsTo": "ContactCenterOperationsCommandCenterView.averageFirstResponseSeconds"
       },
       {
        "kind": "metricTile",
        "label": "Average Resolution Time",
        "provenance": "pack Customer Service_Reference.pdf, page 24 §Display",
-       "bindsTo": "ContactCenterOperationsCommandCenterView.averageResolutionTime"
+       "bindsTo": "ContactCenterOperationsCommandCenterView.averageResolutionSeconds"
       },
       {
        "kind": "metricTile",
        "label": "First Contact Resolution",
        "provenance": "pack Customer Service_Reference.pdf, page 24 §Display",
-       "bindsTo": "ContactCenterOperationsCommandCenterView.firstContactResolution"
+       "bindsTo": "ContactCenterOperationsCommandCenterView.firstContactResolutionRate"
       },
       {
        "kind": "metricTile",
@@ -247,7 +244,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-019"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-019",
+   "workshopBoard": "wireframes/WS43 Customer Service Board 2.dc.html#sup-019"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 24. 13 of 14 labels bound to a contract property; 15 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -310,14 +308,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can configure specialized service queues and supervisors can operationally adjust them without changing application code.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure and operate the queues through which customer-service cases are organized.",
-  "purposeNote": "Administrators can configure specialized service queues and supervisors can operationally adjust them without changing application code.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Membership, Group Sales Support. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Payments, Membership, Wallet, Group Sales Support, Access Control. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Customer Service_Reference.pdf, page 25 §Support configurable queues such as"
    }
   ],
@@ -427,6 +425,28 @@
        "kind": "selectField",
        "label": "Emergency handling",
        "provenance": "pack Customer Service_Reference.pdf, page 25 §Configure"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is active",
+       "operation": "listServiceQueues",
+       "notes": "Sends `?isActive=` to `listServiceQueues`.",
+       "provenance": "contract marketing-crm.yaml GET /service-queues"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every service queue",
+       "bindsTo": "ServiceQueue",
+       "columns": [
+        "ServiceQueue.id",
+        "ServiceQueue.code",
+        "ServiceQueue.name",
+        "ServiceQueue.overflowWaitSeconds",
+        "ServiceQueue.isActive",
+        "ServiceQueue.scopePath"
+       ],
+       "operation": "listServiceQueues",
+       "provenance": "contract marketing-crm.yaml GET /service-queues"
       }
      ]
     },
@@ -436,13 +456,36 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Payments",
+       "provenance": "pack Customer Service_Reference.pdf, page 25 §Support configurable queues such as"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Membership",
+       "provenance": "pack Customer Service_Reference.pdf, page 25 §Support configurable queues such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Wallet",
        "provenance": "pack Customer Service_Reference.pdf, page 25 §Support configurable queues such as"
       },
       {
        "kind": "secondaryButton",
        "label": "Group Sales Support",
        "provenance": "pack Customer Service_Reference.pdf, page 25 §Support configurable queues such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Access Control",
+       "provenance": "pack Customer Service_Reference.pdf, page 25 §Support configurable queues such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save service queue definition",
+       "operation": "setServiceQueueDefinition",
+       "permission": "CASE_MANAGE",
+       "notes": "**An upsert keyed on `code`**, which is unique in the venue and never changes once created.",
+       "provenance": "contract marketing-crm.yaml PUT /service-queues"
       }
      ]
     }
@@ -460,14 +503,56 @@
     "contract": "queue",
     "purpose": "List queues",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listServiceQueues",
+    "contract": "marketing-crm",
+    "purpose": "List customer-service queues",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setServiceQueueDefinition",
+    "contract": "marketing-crm",
+    "purpose": "Create or change a customer-service queue",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueues",
+     "listServiceQueues"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-020"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-020",
+   "workshopBoard": "wireframes/WS43 Customer Service Board 2.dc.html#sup-020"
   },
-  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 25. 0 of 0 labels bound to a contract property; 22 of 52 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 25. 0 of 0 labels bound to a contract property; 25 of 52 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetServiceQueueDefinition",
+    "component": "modal",
+    "trigger": "Save service queue definition",
+    "body": "**Collects what `setServiceQueueDefinition` sends before it is called.** Required: `id`, `code`, `name`, `isActive`. Optional: `overflowWaitSeconds`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ServiceQueue",
+    "confirm": {
+     "label": "Save service queue definition",
+     "operation": "setServiceQueueDefinition"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "code",
+      "name",
+      "isActive",
+      "overflowWaitSeconds",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml PUT /service-queues"
+   }
+  ],
   "_platform": {
    "code": "P12",
    "audience": "staff",
@@ -528,10 +613,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Customer cases are routed to appropriately skilled and available agents using governed routing rules with transparent assignment logic.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Determine the best agent or team to handle each customer request.",
-  "purposeNote": "Customer cases are routed to appropriately skilled and available agents using governed routing rules with transparent assignment logic.",
   "gaps": [
    {
     "operation": null,
@@ -567,6 +652,65 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
        "impliedBy": "setIntelligentRoutingSkill"
+      },
+      {
+       "kind": "textField",
+       "label": "Parent category id",
+       "operation": "listCaseCategories",
+       "notes": "Sends `?parentCategoryId=` to `listCaseCategories`.",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      },
+      {
+       "kind": "toggle",
+       "label": "Top level only",
+       "operation": "listCaseCategories",
+       "notes": "Sends `?topLevelOnly=` to `listCaseCategories`.",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is active",
+       "operation": "listCaseCategories",
+       "notes": "Sends `?isActive=` to `listCaseCategories`.",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every case category",
+       "bindsTo": "CaseCategory",
+       "columns": [
+        "CaseCategory.id",
+        "CaseCategory.code",
+        "CaseCategory.name",
+        "CaseCategory.parentCategoryId",
+        "CaseCategory.defaultPriority",
+        "CaseCategory.isActive",
+        "CaseCategory.scopePath"
+       ],
+       "operation": "listCaseCategories",
+       "provenance": "contract marketing-crm.yaml GET /case-categories"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is active",
+       "operation": "listServiceQueues",
+       "notes": "Sends `?isActive=` to `listServiceQueues`.",
+       "provenance": "contract marketing-crm.yaml GET /service-queues"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every service queue",
+       "bindsTo": "ServiceQueue",
+       "columns": [
+        "ServiceQueue.id",
+        "ServiceQueue.code",
+        "ServiceQueue.name",
+        "ServiceQueue.overflowWaitSeconds",
+        "ServiceQueue.isActive",
+        "ServiceQueue.scopePath"
+       ],
+       "operation": "listServiceQueues",
+       "provenance": "contract marketing-crm.yaml GET /service-queues"
       }
      ]
     }
@@ -584,16 +728,26 @@
     "operationId": "setIntelligentRoutingSkill",
     "contract": "marketing-crm",
     "purpose": "Intelligent Routing, Skills & Assignment Engine",
-    "trigger": "onAction",
-    "invalidates": [
-     "setIntelligentRoutingSkill"
-    ]
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listCaseCategories",
+    "contract": "marketing-crm",
+    "purpose": "List case categories and subcategories",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listServiceQueues",
+    "contract": "marketing-crm",
+    "purpose": "List customer-service queues",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-021"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-021",
+   "workshopBoard": "wireframes/WS43 Customer Service Board 2.dc.html#sup-021"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 27. 0 of 0 labels bound to a contract property; 0 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -656,10 +810,17 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "cases likely to breach.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Define and monitor service-level commitments for different customer-service scenarios.",
-  "purposeNote": "cases likely to breach.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Venue operating hours. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Customer Service_Reference.pdf, page 29 §Support"
+   }
+  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -698,6 +859,17 @@
        "provenance": "pack Customer Service_Reference.pdf, page 29 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Venue operating hours",
+       "provenance": "pack Customer Service_Reference.pdf, page 29 §Support"
+      }
+     ]
     }
    ]
   },
@@ -719,18 +891,16 @@
    "preloaded": [
     "SlaPolicyServiceLevelManagementView.withinSla",
     "SlaPolicyServiceLevelManagementView.atRisk",
-    "SlaPolicyServiceLevelManagementView.breached",
-    "SlaPolicyServiceLevelManagementView.averageResponse",
-    "SlaPolicyServiceLevelManagementView.averageResolution",
-    "SlaPolicyServiceLevelManagementView.slaCompliance"
+    "SlaPolicyServiceLevelManagementView.breached"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-022"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-022",
+   "workshopBoard": "wireframes/WS43 Customer Service Board 2.dc.html#sup-022"
   },
-  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 29. 0 of 0 labels bound to a contract property; 12 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 29. 0 of 0 labels bound to a contract property; 13 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P12",
    "audience": "staff",
@@ -791,10 +961,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Supervisors can understand workload distribution and rebalance service resources before queue or SLA performance deteriorates.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Give supervisors visibility and control over active customer-service resources.",
-  "purposeNote": "Supervisors can understand workload distribution and rebalance service resources before queue or SLA performance deteriorates.",
   "layout": {
    "template": "split",
    "regions": [
@@ -806,7 +976,7 @@
        "kind": "dataTable",
        "label": "Every agent workload availability",
        "columns": [
-        "AgentWorkloadAvailabilityWorkforceControlView.agent",
+        "AgentWorkloadAvailabilityWorkforceControlView.agentName",
         "AgentWorkloadAvailabilityWorkforceControlView.team",
         "AgentWorkloadAvailabilityWorkforceControlView.skills",
         "AgentWorkloadAvailabilityWorkforceControlView.languages",
@@ -814,9 +984,9 @@
         "AgentWorkloadAvailabilityWorkforceControlView.activeCases",
         "AgentWorkloadAvailabilityWorkforceControlView.chats",
         "AgentWorkloadAvailabilityWorkforceControlView.calls",
-        "AgentWorkloadAvailabilityWorkforceControlView.queue",
+        "AgentWorkloadAvailabilityWorkforceControlView.queues[].queueName",
         "AgentWorkloadAvailabilityWorkforceControlView.slaRiskCases",
-        "AgentWorkloadAvailabilityWorkforceControlView.averageHandleTime",
+        "AgentWorkloadAvailabilityWorkforceControlView.averageHandleSeconds",
         "AgentWorkloadAvailabilityWorkforceControlView.resolutionRate",
         "AgentWorkloadAvailabilityWorkforceControlView.utilization"
        ],
@@ -835,7 +1005,7 @@
        "label": "The selected agent workload availability",
        "bindsTo": "AgentWorkloadAvailabilityWorkforceControlView",
        "columns": [
-        "AgentWorkloadAvailabilityWorkforceControlView.agent",
+        "AgentWorkloadAvailabilityWorkforceControlView.agentName",
         "AgentWorkloadAvailabilityWorkforceControlView.team",
         "AgentWorkloadAvailabilityWorkforceControlView.skills",
         "AgentWorkloadAvailabilityWorkforceControlView.languages",
@@ -843,9 +1013,9 @@
         "AgentWorkloadAvailabilityWorkforceControlView.activeCases",
         "AgentWorkloadAvailabilityWorkforceControlView.chats",
         "AgentWorkloadAvailabilityWorkforceControlView.calls",
-        "AgentWorkloadAvailabilityWorkforceControlView.queue",
+        "AgentWorkloadAvailabilityWorkforceControlView.queues[].queueName",
         "AgentWorkloadAvailabilityWorkforceControlView.slaRiskCases",
-        "AgentWorkloadAvailabilityWorkforceControlView.averageHandleTime",
+        "AgentWorkloadAvailabilityWorkforceControlView.averageHandleSeconds",
         "AgentWorkloadAvailabilityWorkforceControlView.resolutionRate",
         "AgentWorkloadAvailabilityWorkforceControlView.utilization"
        ],
@@ -873,7 +1043,7 @@
   ],
   "entryState": {
    "preloaded": [
-    "AgentWorkloadAvailabilityWorkforceControlView.agent",
+    "AgentWorkloadAvailabilityWorkforceControlView.agentName",
     "AgentWorkloadAvailabilityWorkforceControlView.team",
     "AgentWorkloadAvailabilityWorkforceControlView.skills",
     "AgentWorkloadAvailabilityWorkforceControlView.languages",
@@ -884,7 +1054,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-023"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-023",
+   "workshopBoard": "wireframes/WS43 Customer Service Board 2.dc.html#sup-023"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 31. 13 of 13 labels bound to a contract property; 13 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -947,10 +1118,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Supervisors can identify, coordinate and resolve critical escalations and systemic service incidents from one central workspace.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide supervisors with one workspace for cases requiring elevated attention.",
-  "purposeNote": "Supervisors can identify, coordinate and resolve critical escalations and systemic service incidents from one central workspace.",
   "layout": {
    "template": "split",
    "regions": [
@@ -962,25 +1133,18 @@
        "kind": "dataTable",
        "label": "Every escalation critical case",
        "columns": [
-        "EscalationCriticalCaseMonitorView.escalatedCases",
-        "EscalationCriticalCaseMonitorView.criticalCases",
-        "EscalationCriticalCaseMonitorView.slaBreaches",
-        "EscalationCriticalCaseMonitorView.vipEscalations",
-        "EscalationCriticalCaseMonitorView.financialEscalations",
-        "EscalationCriticalCaseMonitorView.eventDayEscalations",
-        "EscalationCriticalCaseMonitorView.managementEscalations",
-        "EscalationCriticalCaseMonitorView.technicalEscalations",
-        "EscalationCriticalCaseMonitorView.case",
-        "EscalationCriticalCaseMonitorView.customer",
+        "EscalationCriticalCaseMonitorView.caseNumber",
+        "EscalationCriticalCaseMonitorView.customerName",
         "EscalationCriticalCaseMonitorView.reason",
         "EscalationCriticalCaseMonitorView.priority",
         "EscalationCriticalCaseMonitorView.transactionValue",
-        "EscalationCriticalCaseMonitorView.event",
-        "EscalationCriticalCaseMonitorView.assignedAgent",
-        "EscalationCriticalCaseMonitorView.escalatedTo",
-        "EscalationCriticalCaseMonitorView.escalationTime",
-        "EscalationCriticalCaseMonitorView.sla",
-        "EscalationCriticalCaseMonitorView.currentStatus"
+        "EscalationCriticalCaseMonitorView.eventName",
+        "EscalationCriticalCaseMonitorView.assignedToPrincipalId",
+        "EscalationCriticalCaseMonitorView.escalatedToPrincipalId",
+        "EscalationCriticalCaseMonitorView.escalatedAt",
+        "EscalationCriticalCaseMonitorView.slaDueAt",
+        "EscalationCriticalCaseMonitorView.isSlaBreached",
+        "EscalationCriticalCaseMonitorView.status"
        ],
        "bindsTo": "EscalationCriticalCaseMonitorView",
        "operation": "listEscalationCriticalCase",
@@ -997,25 +1161,18 @@
        "label": "The selected escalation critical case",
        "bindsTo": "EscalationCriticalCaseMonitorView",
        "columns": [
-        "EscalationCriticalCaseMonitorView.escalatedCases",
-        "EscalationCriticalCaseMonitorView.criticalCases",
-        "EscalationCriticalCaseMonitorView.slaBreaches",
-        "EscalationCriticalCaseMonitorView.vipEscalations",
-        "EscalationCriticalCaseMonitorView.financialEscalations",
-        "EscalationCriticalCaseMonitorView.eventDayEscalations",
-        "EscalationCriticalCaseMonitorView.managementEscalations",
-        "EscalationCriticalCaseMonitorView.technicalEscalations",
-        "EscalationCriticalCaseMonitorView.case",
-        "EscalationCriticalCaseMonitorView.customer",
+        "EscalationCriticalCaseMonitorView.caseNumber",
+        "EscalationCriticalCaseMonitorView.customerName",
         "EscalationCriticalCaseMonitorView.reason",
         "EscalationCriticalCaseMonitorView.priority",
         "EscalationCriticalCaseMonitorView.transactionValue",
-        "EscalationCriticalCaseMonitorView.event",
-        "EscalationCriticalCaseMonitorView.assignedAgent",
-        "EscalationCriticalCaseMonitorView.escalatedTo",
-        "EscalationCriticalCaseMonitorView.escalationTime",
-        "EscalationCriticalCaseMonitorView.sla",
-        "EscalationCriticalCaseMonitorView.currentStatus"
+        "EscalationCriticalCaseMonitorView.eventName",
+        "EscalationCriticalCaseMonitorView.assignedToPrincipalId",
+        "EscalationCriticalCaseMonitorView.escalatedToPrincipalId",
+        "EscalationCriticalCaseMonitorView.escalatedAt",
+        "EscalationCriticalCaseMonitorView.slaDueAt",
+        "EscalationCriticalCaseMonitorView.isSlaBreached",
+        "EscalationCriticalCaseMonitorView.status"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Major Issue Detection”, “Potential Major Incident”.",
        "provenance": "pack Customer Service_Reference.pdf, page 32 §Display"
@@ -1040,19 +1197,13 @@
    }
   ],
   "entryState": {
-   "preloaded": [
-    "EscalationCriticalCaseMonitorView.escalatedCases",
-    "EscalationCriticalCaseMonitorView.criticalCases",
-    "EscalationCriticalCaseMonitorView.slaBreaches",
-    "EscalationCriticalCaseMonitorView.vipEscalations",
-    "EscalationCriticalCaseMonitorView.financialEscalations",
-    "EscalationCriticalCaseMonitorView.eventDayEscalations"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-024"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-024",
+   "workshopBoard": "wireframes/WS43 Customer Service Board 2.dc.html#sup-024"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 32. 19 of 19 labels bound to a contract property; 19 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1115,10 +1266,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "findings into measurable coaching actions.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Measure whether customer-service interactions meet TICVAI's defined service-quality standards.",
-  "purposeNote": "findings into measurable coaching actions.",
   "gaps": [
    {
     "operation": null,
@@ -1179,18 +1330,13 @@
    }
   ],
   "entryState": {
-   "preloaded": [
-    "QualityManagementAgentEvaluationView.greeting",
-    "QualityManagementAgentEvaluationView.customerVerification",
-    "QualityManagementAgentEvaluationView.understanding",
-    "QualityManagementAgentEvaluationView.accuracy",
-    "QualityManagementAgentEvaluationView.policyCompliance"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-025"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-025",
+   "workshopBoard": "wireframes/WS43 Customer Service Board 2.dc.html#sup-025"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 34. 0 of 0 labels bound to a contract property; 1 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1253,14 +1399,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Management can understand what customers think about the service experience and trace negative trends back to their underlying operational causes.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Display) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Measure customer perception of TICVAI's support experience and identify recurring service problems.",
-  "purposeNote": "Management can understand what customers think about the service experience and trace negative trends back to their underlying operational causes.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Direct Customer Comment. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Service Rating, NPS where used, Direct Customer Comment. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Customer Service_Reference.pdf, page 35 §Support"
    }
   ],
@@ -1287,19 +1433,19 @@
        "kind": "metricTile",
        "label": "Positive %",
        "provenance": "pack Customer Service_Reference.pdf, page 35 §Display",
-       "bindsTo": "CustomerSatisfactionFeedbackVoiceOfCustomerView.positive"
+       "bindsTo": "CustomerSatisfactionFeedbackVoiceOfCustomerView.positiveRate"
       },
       {
        "kind": "metricTile",
        "label": "Neutral %",
        "provenance": "pack Customer Service_Reference.pdf, page 35 §Display",
-       "bindsTo": "CustomerSatisfactionFeedbackVoiceOfCustomerView.neutral"
+       "bindsTo": "CustomerSatisfactionFeedbackVoiceOfCustomerView.neutralRate"
       },
       {
        "kind": "metricTile",
        "label": "Negative %",
        "provenance": "pack Customer Service_Reference.pdf, page 35 §Display",
-       "bindsTo": "CustomerSatisfactionFeedbackVoiceOfCustomerView.negative"
+       "bindsTo": "CustomerSatisfactionFeedbackVoiceOfCustomerView.negativeRate"
       },
       {
        "kind": "metricTile",
@@ -1317,7 +1463,7 @@
        "kind": "metricTile",
        "label": "Customer Effort where measured",
        "provenance": "pack Customer Service_Reference.pdf, page 35 §Display",
-       "bindsTo": "CustomerSatisfactionFeedbackVoiceOfCustomerView.customerEffortWhereMeasured"
+       "bindsTo": "CustomerSatisfactionFeedbackVoiceOfCustomerView.customerEffortScore"
       }
      ]
     },
@@ -1327,6 +1473,16 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Service Rating",
+       "provenance": "pack Customer Service_Reference.pdf, page 35 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "NPS where used",
+       "provenance": "pack Customer Service_Reference.pdf, page 35 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Direct Customer Comment",
        "provenance": "pack Customer Service_Reference.pdf, page 35 §Support"
       }
@@ -1353,18 +1509,19 @@
    "preloaded": [
     "CustomerSatisfactionFeedbackVoiceOfCustomerView.csat",
     "CustomerSatisfactionFeedbackVoiceOfCustomerView.surveyResponseRate",
-    "CustomerSatisfactionFeedbackVoiceOfCustomerView.positive",
-    "CustomerSatisfactionFeedbackVoiceOfCustomerView.neutral",
-    "CustomerSatisfactionFeedbackVoiceOfCustomerView.negative",
+    "CustomerSatisfactionFeedbackVoiceOfCustomerView.positiveRate",
+    "CustomerSatisfactionFeedbackVoiceOfCustomerView.neutralRate",
+    "CustomerSatisfactionFeedbackVoiceOfCustomerView.negativeRate",
     "CustomerSatisfactionFeedbackVoiceOfCustomerView.complaints"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-026"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-026",
+   "workshopBoard": "wireframes/WS43 Customer Service Board 2.dc.html#sup-026"
   },
-  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 35. 8 of 8 labels bound to a contract property; 9 of 46 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 35. 8 of 8 labels bound to a contract property; 11 of 46 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P12",
    "audience": "staff",
@@ -1425,10 +1582,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Management can move beyond reporting case volumes and identify the actual product, process and technology issues generating customer demand.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Analyze; Compare) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Provide comprehensive analytics explaining why customers contact TICVAI and what is driving service demand.",
-  "purposeNote": "Management can move beyond reporting case volumes and identify the actual product, process and technology issues generating customer demand.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -1452,19 +1609,19 @@
        "kind": "metricTile",
        "label": "First Response Time",
        "provenance": "pack Customer Service_Reference.pdf, page 37 §Analyze",
-       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.firstResponseTime"
+       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.averageFirstResponseSeconds"
       },
       {
        "kind": "metricTile",
        "label": "Resolution Time",
        "provenance": "pack Customer Service_Reference.pdf, page 37 §Analyze",
-       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.resolutionTime"
+       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.averageResolutionSeconds"
       },
       {
        "kind": "metricTile",
        "label": "First Contact Resolution",
        "provenance": "pack Customer Service_Reference.pdf, page 37 §Analyze",
-       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.firstContactResolution"
+       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.firstContactResolutionRate"
       },
       {
        "kind": "metricTile",
@@ -1482,13 +1639,13 @@
        "kind": "metricTile",
        "label": "SLA Compliance",
        "provenance": "pack Customer Service_Reference.pdf, page 37 §Analyze",
-       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.slaCompliance"
+       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.slaComplianceRate"
       },
       {
        "kind": "metricTile",
        "label": "Cost per Case where available",
        "provenance": "pack Customer Service_Reference.pdf, page 37 §Analyze",
-       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.costPerCaseWhereAvailable"
+       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.costPerCase"
       },
       {
        "kind": "metricTile",
@@ -1499,7 +1656,8 @@
       {
        "kind": "metricTile",
        "label": "Refund Requests",
-       "provenance": "pack Customer Service_Reference.pdf, page 37 §Analyze"
+       "provenance": "pack Customer Service_Reference.pdf, page 37 §Analyze",
+       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.refundRequests"
       },
       {
        "kind": "metricTile",
@@ -1508,40 +1666,18 @@
        "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.complaintRate"
       },
       {
-       "kind": "metricTile",
-       "label": "Today vs Yesterday",
-       "provenance": "pack Customer Service_Reference.pdf, page 37 §Compare",
-       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.todayVsYesterday"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Week vs Week",
-       "provenance": "pack Customer Service_Reference.pdf, page 37 §Compare",
-       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.weekVsWeek"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Month vs Month",
-       "provenance": "pack Customer Service_Reference.pdf, page 37 §Compare",
-       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.monthVsMonth"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Event vs Event",
-       "provenance": "pack Customer Service_Reference.pdf, page 37 §Compare",
-       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.eventVsEvent"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Venue vs Venue",
-       "provenance": "pack Customer Service_Reference.pdf, page 37 §Compare",
-       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.venueVsVenue"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Product vs Product",
-       "provenance": "pack Customer Service_Reference.pdf, page 37 §Compare",
-       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.productVsProduct"
+       "kind": "dataTable",
+       "label": "Comparison",
+       "bindsTo": "ServiceAnalyticsRootCauseIntelligenceView.comparison.kpis[]",
+       "columns": [
+        "ServiceAnalyticsRootCauseIntelligenceView.comparison.kpis[].kpi",
+        "ServiceAnalyticsRootCauseIntelligenceView.comparison.kpis[].current",
+        "ServiceAnalyticsRootCauseIntelligenceView.comparison.kpis[].previous",
+        "ServiceAnalyticsRootCauseIntelligenceView.comparison.kpis[].changeRate"
+       ],
+       "operation": "listServiceRootCause",
+       "notes": "One comparison panel in place of the pack's six tiles (Today vs Yesterday, Week vs Week, Month vs Month, Event vs Event, Venue vs Venue, Product vs Product). The compare selector sends `?compare=` (previousDay, previousWeek, previousMonth, event, venue, product) and `?compareId=` to `listServiceRootCause`; the basis shown is `comparison.basis`.",
+       "provenance": "pack Customer Service_Reference.pdf, page 37 §Compare"
       }
      ]
     }
@@ -1566,15 +1702,16 @@
    "preloaded": [
     "ServiceAnalyticsRootCauseIntelligenceView.contactVolume",
     "ServiceAnalyticsRootCauseIntelligenceView.cases",
-    "ServiceAnalyticsRootCauseIntelligenceView.firstResponseTime",
-    "ServiceAnalyticsRootCauseIntelligenceView.resolutionTime",
-    "ServiceAnalyticsRootCauseIntelligenceView.firstContactResolution"
+    "ServiceAnalyticsRootCauseIntelligenceView.averageFirstResponseSeconds",
+    "ServiceAnalyticsRootCauseIntelligenceView.averageResolutionSeconds",
+    "ServiceAnalyticsRootCauseIntelligenceView.firstContactResolutionRate"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-027"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-027",
+   "workshopBoard": "wireframes/WS43 Customer Service Board 2.dc.html#sup-027"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 37. 17 of 17 labels bound to a contract property; 18 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1629,10 +1766,10 @@
    "notes": "**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "approved low-risk workflows without removing governance over customer-impacting decisions. Board 2 — Final Screen Register",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Forecast) and no metric row",
   "purpose": "Create the management-level AI intelligence layer for Customer Service. This is different from 10.1.10 AI Customer Service Copilot. Board 1 Copilot = helps one agent resolve one case. Board 2 AI Intelligence = improves the entire service operation.",
-  "purposeNote": "approved low-risk workflows without removing governance over customer-impacting decisions. Board 2 — Final Screen Register",
   "gaps": [
    {
     "operation": null,
@@ -1651,12 +1788,12 @@
        "kind": "dataTable",
        "label": "Every contact intelligence automation",
        "columns": [
-        "AiContactCenterIntelligenceAutomationStudioView.contactVolume",
-        "AiContactCenterIntelligenceAutomationStudioView.queueDemand",
-        "AiContactCenterIntelligenceAutomationStudioView.requiredAgents",
-        "AiContactCenterIntelligenceAutomationStudioView.slaRisk",
-        "AiContactCenterIntelligenceAutomationStudioView.expectedComplaints",
-        "AiContactCenterIntelligenceAutomationStudioView.eventDaySupportDemand"
+        "AiContactCenterIntelligenceAutomationStudioView.forecast.contactVolume",
+        "AiContactCenterIntelligenceAutomationStudioView.forecast.queueDemand[]",
+        "AiContactCenterIntelligenceAutomationStudioView.forecast.requiredAgents",
+        "AiContactCenterIntelligenceAutomationStudioView.forecast.slaRiskCases",
+        "AiContactCenterIntelligenceAutomationStudioView.forecast.expectedComplaints",
+        "AiContactCenterIntelligenceAutomationStudioView.forecast.eventDaySupportDemand"
        ],
        "bindsTo": "AiContactCenterIntelligenceAutomationStudioView",
        "operation": "listContactAutomation",
@@ -1673,12 +1810,12 @@
        "label": "The selected contact intelligence automation",
        "bindsTo": "AiContactCenterIntelligenceAutomationStudioView",
        "columns": [
-        "AiContactCenterIntelligenceAutomationStudioView.contactVolume",
-        "AiContactCenterIntelligenceAutomationStudioView.queueDemand",
-        "AiContactCenterIntelligenceAutomationStudioView.requiredAgents",
-        "AiContactCenterIntelligenceAutomationStudioView.slaRisk",
-        "AiContactCenterIntelligenceAutomationStudioView.expectedComplaints",
-        "AiContactCenterIntelligenceAutomationStudioView.eventDaySupportDemand"
+        "AiContactCenterIntelligenceAutomationStudioView.forecast.contactVolume",
+        "AiContactCenterIntelligenceAutomationStudioView.forecast.queueDemand[]",
+        "AiContactCenterIntelligenceAutomationStudioView.forecast.requiredAgents",
+        "AiContactCenterIntelligenceAutomationStudioView.forecast.slaRiskCases",
+        "AiContactCenterIntelligenceAutomationStudioView.forecast.expectedComplaints",
+        "AiContactCenterIntelligenceAutomationStudioView.forecast.eventDaySupportDemand"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Analyze governed information from”, “Workforce”, “Self-Service”, “Product Improvement”, “Operational Improvement”, “Incident Detection”.",
        "provenance": "pack Customer Service_Reference.pdf, page 39 §Forecast"
@@ -1704,18 +1841,19 @@
   ],
   "entryState": {
    "preloaded": [
-    "AiContactCenterIntelligenceAutomationStudioView.contactVolume",
-    "AiContactCenterIntelligenceAutomationStudioView.queueDemand",
-    "AiContactCenterIntelligenceAutomationStudioView.requiredAgents",
-    "AiContactCenterIntelligenceAutomationStudioView.slaRisk",
-    "AiContactCenterIntelligenceAutomationStudioView.expectedComplaints",
-    "AiContactCenterIntelligenceAutomationStudioView.eventDaySupportDemand"
+    "AiContactCenterIntelligenceAutomationStudioView.forecast.contactVolume",
+    "AiContactCenterIntelligenceAutomationStudioView.forecast.queueDemand[]",
+    "AiContactCenterIntelligenceAutomationStudioView.forecast.requiredAgents",
+    "AiContactCenterIntelligenceAutomationStudioView.forecast.slaRiskCases",
+    "AiContactCenterIntelligenceAutomationStudioView.forecast.expectedComplaints",
+    "AiContactCenterIntelligenceAutomationStudioView.forecast.eventDaySupportDemand"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P12 Venue Support.dc.html#sup-028"
+   "board": "wireframes/P12 Venue Support.dc.html#sup-028",
+   "workshopBoard": "wireframes/WS43 Customer Service Board 2.dc.html#sup-028"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 39. 6 of 6 labels bound to a contract property; 6 of 95 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

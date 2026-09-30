@@ -1,6 +1,6 @@
 # WS37 — Pricing   Revenue Management board 4
 
-**10 screens · 10 operations · 13 schemas · 2 permissions**
+**10 screens · 15 operations · 18 schemas · 4 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `PRICE_CONFIGURE, PRODUCT_APPROVE, PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-078` | Pricing Governance Command Center | listDetail | 1 | 0 | — |
-| `ADM-079` | Pricing Change Request & Workspace | configEditor | 1 | 0 | — |
+| `ADM-078` | Pricing Governance Command Center | listDetail | 2 | 0 | — |
+| `ADM-079` | Pricing Change Request & Workspace | configEditor | 3 | 0 | — |
 | `ADM-080` | Bulk Pricing Update, Import & Mass Maintenance | listDetail | 1 | 0 | — |
 | `ADM-081` | Pricing Version & Baseline Management | listDetail | 1 | 0 | — |
-| `ADM-082` | Pricing Change Impact Analysis | listDetail | 1 | 0 | — |
+| `ADM-082` | Pricing Change Impact Analysis | listDetail | 2 | 0 | — |
 | `ADM-083` | Pricing Approval Workflow & Authority Matrix | configEditor | 1 | 0 | — |
 | `ADM-084` | Pricing Publication & Effective-Date Scheduler | configEditor | 1 | 0 | — |
 | `ADM-085` | Pricing Distribution, Synchronization & Publication Monitor | listDetail | 1 | 0 | — |
-| `ADM-086` | Pricing Rollback & Emergency Control Center | listDetail | 1 | 0 | — |
+| `ADM-086` | Pricing Rollback & Emergency Control Center | listDetail | 3 | 2 | — |
 | `ADM-087` | Pricing History, Audit & Compliance Explorer | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**ADM-081, ADM-082, ADM-085, ADM-087 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-081, ADM-082, ADM-085 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

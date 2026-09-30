@@ -1,6 +1,6 @@
 # WS87 — Game and Ride board 10
 
-**10 screens · 7 operations · 6 schemas · 4 permissions**
+**10 screens · 9 operations · 10 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -63,7 +63,7 @@ convincingly. It is never a caption.
 | `BO-484` | Self-Service Experience Command Center | commandCentre | 1 | 0 | — |
 | `BO-485` | Self-Service Kiosk Profile & Channel Configuration | listDetail | 1 | 0 | — |
 | `BO-486` | Customer Card / Wallet Identification | listDetail | 1 | 0 | — |
-| `BO-487` | Customer Wallet & Balance Summary | listDetail | 1 | 0 | — |
+| `BO-487` | Customer Wallet & Balance Summary | listDetail | 3 | 0 | — |
 | `BO-488` | Self-Service Wallet Top-Up | listDetail | 1 | 0 | — |
 | `BO-489` | Bonus, Free Game & Benefit View | listDetail | 1 | 0 | — |
 | `BO-490` | Game & Ride Eligibility / “What Can I Play?” | listDetail | 1 | 0 | — |

@@ -6,7 +6,7 @@
   "summary": "Write a policy without writing code",
   "permission": "PERMISSION_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
    {

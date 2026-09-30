@@ -502,8 +502,9 @@
    },
    "referenceId": {
     "type": "string",
+    "format": "uuid",
     "nullable": true,
-    "description": "The source row's id: a work-order, inspection or incident ULID, or an `asset_status_change` id.\n"
+    "description": "The source row's id: a work order, inspection or incident, or an `asset_status_change` id. A uuid, as every id is (ADR-0056).\n"
    },
    "summary": {
     "type": "string"
@@ -560,7 +561,7 @@
      },
      "workOrderId": {
       "type": "string",
-      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "format": "uuid",
       "nullable": true
      }
     }
@@ -568,6 +569,7 @@
   }
  },
  "AuditRecord": {
+  "x-ticvai-append-only": "occurredAt",
   "type": "object",
   "x-ticvai-persistence": "platform.audit_record",
   "description": "26 September, pull audit R198. **One row of the platform audit trail, as `listAuditRecords` returns it.** It was a free-form object, so nothing said what an audit row carries. These are the fields the operation already filters on — who, where, on which workstation, what action, on what, and when — and nothing more. Written by the operations that audit themselves; never edited and never deleted.\n",
@@ -615,7 +617,7 @@
    },
    "platformStaffGrantId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "**Set when a TICVAI platform operator acted, naming the grant they acted under** (`identity.openPlatformStaffGrant`; decided 28 September, audit R098). Null for the tenant's own staff. Every platform action in a tenant carries one, so the tenant can see all of them.\n"
    }
@@ -1029,7 +1031,7 @@
    },
    "workOrderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    }
   }
@@ -1246,7 +1248,7 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "incidentNumber": {
     "type": "string",
@@ -1303,7 +1305,7 @@
    },
    "correctiveWorkOrderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "occurredAt": {
@@ -1343,7 +1345,7 @@
    },
    "incidentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "authority": {
     "type": "string",
@@ -1459,7 +1461,7 @@
    },
    "incidentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "note": {
     "type": "string",
@@ -1491,7 +1493,7 @@
    },
    "incidentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "kind": {
     "type": "string",
@@ -1932,7 +1934,7 @@
      "properties": {
       "ticketId": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "format": "uuid",
        "description": "The `Entitlement.id`."
       },
       "mediaCodes": {
@@ -1992,7 +1994,7 @@
       },
       "ticketId": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "format": "uuid",
        "description": "The `Entitlement.id` in the issuing cell."
       },
       "issuingCellId": {
@@ -3149,7 +3151,7 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "The play ID, generated on the reader, and returned as `PlayResult.playId`. Also the idempotency key: on `recordGamePlay` it must equal the `Idempotency-Key` header (a mismatch is the shared 409 `Conflict`); in a `syncGamePlays` batch it is the key on its own.\n"
    },
    "cardCode": {
@@ -3197,7 +3199,7 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "kind": {
     "$ref": "#/components/schemas/IncidentKind"
@@ -3426,6 +3428,7 @@
   }
  },
  "ScanEvent": {
+  "x-ticvai-append-only": "recordedAt",
   "x-ticvai-persistence": "access.scan_event",
   "type": "object",
   "required": [
@@ -3439,8 +3442,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "The scan's client-generated ULID, the key offline replay deduplicates on."
+    "format": "uuid",
+    "description": "The scan's client-generated UUIDv7, the key offline replay deduplicates on."
    },
    "accessPointId": {
     "type": "string",
@@ -3455,7 +3458,7 @@
    },
    "ticketId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The `Entitlement.id` scanned; null where the media resolved to nothing."
    },
@@ -3484,7 +3487,7 @@
    },
    "overridesScanId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "**Set only on an override row**, naming the denied scan it admits against (decided 28 September, audit R228). The denied scan itself is never updated: the denial and the override are two rows, and at most one override row names any scan. Null on every other scan.\n"
    },
@@ -3632,7 +3635,7 @@
    },
    "inspectionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "Required for return to service where the asset demands it."
    },
@@ -3721,7 +3724,7 @@
   "properties": {
    "ticketId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "Stable for the life of the ticket, independent of the media carrying it."
    },
    "mediaCode": {
@@ -3800,8 +3803,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID. Also the idempotency key and dedupe key."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7. Also the idempotency key and dedupe key."
    },
    "mediaCode": {
     "type": "string",
@@ -3842,7 +3845,7 @@
   "properties": {
    "scanId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "outcome": {
     "$ref": "#/components/schemas/ScanOutcome"
@@ -4678,8 +4681,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "The client-generated ULID from `JoinQueueRequest.id`, and the `entryId` every entry path takes. `listMyWaitingGuests` gives it back to a guest who has lost it.\n"
+    "format": "uuid",
+    "description": "The client-generated UUIDv7 from `JoinQueueRequest.id`, and the `entryId` every entry path takes. `listMyWaitingGuests` gives it back to a guest who has lost it.\n"
    },
    "queueId": {
     "type": "string",
@@ -4838,7 +4841,7 @@
    },
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "workOrderNumber": {
     "type": "string",
@@ -4956,12 +4959,12 @@
    },
    "sourceInspectionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "sourceIncidentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "createdAt": {

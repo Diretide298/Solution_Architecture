@@ -147,7 +147,7 @@ Distinct from expiry: this is a decision, and the recovery campaign must not cha
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | cartId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Responses**
 
@@ -191,7 +191,7 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | cartId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `AddCartLineRequest`
 
@@ -205,17 +205,17 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | tableReservationId | string (uuid) |  | A table deposit line (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation in awaitingDeposit this pays for, sent with variantId set to the booking's deposit.variantId and quantity 1. (nullable) |
-| seatIds | array of string |  | At most VenueSettings.seating.maxSeatsPerGuestOrder seats per booking on a guest channel (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); at most 10 per sale on staff and POS (audit… (max items 50) |
-| resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant and quantity is 1. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| seatIds | array of string (uuid) |  | At most VenueSettings.seating.maxSeatsPerGuestOrder seats per booking on a guest channel (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); at most 10 per sale on staff and POS (audit… (max items 50) |
+| resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant and quantity is 1. (nullable) |
 | parentLineId | string (uuid) |  | For an add-on attaching to a ticket already in the cart. (nullable) |
 | attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
-| attributes.transport.routeId | string | yes | The transport.TransportRoute. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| attributes.transport.fromStationId | string | yes | Boarding station, a stop of the route. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| attributes.transport.toStationId | string | yes | Alighting station, a later stop of the route. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| attributes.transport.routeId | string (uuid) | yes | The transport.TransportRoute. |
+| attributes.transport.fromStationId | string (uuid) | yes | Boarding station, a stop of the route. |
+| attributes.transport.toStationId | string (uuid) | yes | Alighting station, a later stop of the route. |
 | attributes.transport.passengerTypeCode | string |  | The fare table's passenger type (adult, child, ...). (pattern ^[a-z][a-zA-Z0-9]{0,31}$; nullable) |
-| attributes.transport.passTypeId | string |  | Pass purchase only. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
-| attributes.transport.passEntitlementId | string |  | A seat reserved with a pass already owned. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| attributes.transport.passTypeId | string (uuid) |  | Pass purchase only. (nullable) |
+| attributes.transport.passEntitlementId | string (uuid) |  | A seat reserved with a pass already owned. (nullable) |
 
 **Response**: `Cart`
 
@@ -238,8 +238,8 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].tableReservationId | string (uuid) |  | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. (nullable) |
-| lines[].seatIds | array of string |  | (max items 50) |
-| lines[].resourceHoldId | string |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].seatIds | array of string (uuid) |  | (max items 50) |
+| lines[].resourceHoldId | string (uuid) |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].parentLineId | string (uuid) |  | The line this add-on is attached to, from AddCartLineRequest.parentLineId. (nullable) |
@@ -266,7 +266,7 @@ Returns the cart with any conflicts the addition created (2.9.5) — golf at 13:
 | conflicts[].message | string |  |  |
 | conflicts[].isBlocking | boolean |  | Most are not. |
 | consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of each line's published booking flow's white-lab… (read-only) |
-| consentQuestions[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| consentQuestions[].id | string (uuid) | yes | (read-only) |
 | consentQuestions[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
 | consentQuestions[].text | object | yes | The question as the guest reads it, per locale. |
 | consentQuestions[].helpText | object |  | (nullable) |
@@ -338,7 +338,7 @@ Applying a code the cart already holds returns the cart unchanged.
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | cartId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ApplyCartPromoCodeRequest`
 
@@ -367,8 +367,8 @@ Applying a code the cart already holds returns the cart unchanged.
 | lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].tableReservationId | string (uuid) |  | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. (nullable) |
-| lines[].seatIds | array of string |  | (max items 50) |
-| lines[].resourceHoldId | string |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].seatIds | array of string (uuid) |  | (max items 50) |
+| lines[].resourceHoldId | string (uuid) |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].parentLineId | string (uuid) |  | The line this add-on is attached to, from AddCartLineRequest.parentLineId. (nullable) |
@@ -395,7 +395,7 @@ Applying a code the cart already holds returns the cart unchanged.
 | conflicts[].message | string |  |  |
 | conflicts[].isBlocking | boolean |  | Most are not. |
 | consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of each line's published booking flow's white-lab… (read-only) |
-| consentQuestions[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| consentQuestions[].id | string (uuid) | yes | (read-only) |
 | consentQuestions[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
 | consentQuestions[].text | object | yes | The question as the guest reads it, per locale. |
 | consentQuestions[].helpText | object |  | (nullable) |
@@ -478,7 +478,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | cartId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -498,7 +498,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | The client ULID from CreateOrderRequest.id. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
 | orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
 | venueId | string (uuid) | yes |  |
@@ -531,7 +531,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | totalPriceVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | lines | array of OrderLine | yes |  |
-| lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].performanceId | string (uuid) |  |  |
@@ -539,8 +539,8 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | lines[].bookedWindow.startsAt | string (date-time) | yes |  |
 | lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
-| lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].seatIds | array of string (uuid) |  | Seated products only, as seating.Seat.id. (max items 50) |
+| lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
@@ -576,7 +576,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | lines[].grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].grossAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].grossAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| lines[].entitlementIds | array of string |  | The entitlements this line issued. |
+| lines[].entitlementIds | array of string (uuid) |  | The entitlements this line issued. |
 | lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
 | lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
@@ -587,8 +587,8 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | lines[].discounts[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | lines[].discounts[].reason | string |  | A cashier's reason for a manual discount. (max length 200; nullable) |
 | payments | array of Payment |  |  |
-| payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| payments[].id | string (uuid) | yes |  |
+| payments[].orderId | string (uuid) | yes |  |
 | payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
@@ -620,7 +620,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | payments[].syncedAt | string (date-time) |  | (nullable) |
 | principalId | string (uuid) |  |  |
 | workstationId | string (uuid) |  |  |
-| shiftId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| shiftId | string (uuid) |  | (nullable) |
 | subjectId | string (uuid) |  | (nullable) |
 | holdLabel | string |  | The label a cashier gave when parking it with holdOrder — how they find it again. (max length 60; read-only; nullable) |
 | heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil. (read-only; nullable) |
@@ -662,7 +662,7 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | cartId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Response**: `CartMergeResult`
 
@@ -684,8 +684,8 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 | cart.lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | cart.lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | cart.lines[].tableReservationId | string (uuid) |  | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. (nullable) |
-| cart.lines[].seatIds | array of string |  | (max items 50) |
-| cart.lines[].resourceHoldId | string |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| cart.lines[].seatIds | array of string (uuid) |  | (max items 50) |
+| cart.lines[].resourceHoldId | string (uuid) |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (nullable) |
 | cart.lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | cart.lines[].parentLineId | string (uuid) |  | The line this add-on is attached to, from AddCartLineRequest.parentLineId. (nullable) |
 | cart.lines[].overridePrice | Money |  | On the wire this is three fields; in the database it is one column. |
@@ -702,7 +702,7 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 | cart.conflicts[].message | string |  |  |
 | cart.conflicts[].isBlocking | boolean |  | Most are not. |
 | cart.consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of each line's published booking flow's white-lab… (read-only) |
-| cart.consentQuestions[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| cart.consentQuestions[].id | string (uuid) | yes | (read-only) |
 | cart.consentQuestions[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
 | cart.consentQuestions[].text | object | yes | The question as the guest reads it, per locale. |
 | cart.consentQuestions[].helpText | object |  | (nullable) |
@@ -776,7 +776,7 @@ Created against a guest subject where one is known, or an anonymous token where 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -808,8 +808,8 @@ Created against a guest subject where one is known, or an anonymous token where 
 | lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].tableReservationId | string (uuid) |  | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. (nullable) |
-| lines[].seatIds | array of string |  | (max items 50) |
-| lines[].resourceHoldId | string |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].seatIds | array of string (uuid) |  | (max items 50) |
+| lines[].resourceHoldId | string (uuid) |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].parentLineId | string (uuid) |  | The line this add-on is attached to, from AddCartLineRequest.parentLineId. (nullable) |
@@ -836,7 +836,7 @@ Created against a guest subject where one is known, or an anonymous token where 
 | conflicts[].message | string |  |  |
 | conflicts[].isBlocking | boolean |  | Most are not. |
 | consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of each line's published booking flow's white-lab… (read-only) |
-| consentQuestions[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| consentQuestions[].id | string (uuid) | yes | (read-only) |
 | consentQuestions[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
 | consentQuestions[].text | object | yes | The question as the guest reads it, per locale. |
 | consentQuestions[].helpText | object |  | (nullable) |
@@ -907,7 +907,7 @@ Offered once, typically, and the interface should say it is the last extension r
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | cartId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Response**: `Cart`
 
@@ -930,8 +930,8 @@ Offered once, typically, and the interface should say it is the last extension r
 | lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].tableReservationId | string (uuid) |  | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. (nullable) |
-| lines[].seatIds | array of string |  | (max items 50) |
-| lines[].resourceHoldId | string |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].seatIds | array of string (uuid) |  | (max items 50) |
+| lines[].resourceHoldId | string (uuid) |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].parentLineId | string (uuid) |  | The line this add-on is attached to, from AddCartLineRequest.parentLineId. (nullable) |
@@ -958,7 +958,7 @@ Offered once, typically, and the interface should say it is the last extension r
 | conflicts[].message | string |  |  |
 | conflicts[].isBlocking | boolean |  | Most are not. |
 | consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of each line's published booking flow's white-lab… (read-only) |
-| consentQuestions[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| consentQuestions[].id | string (uuid) | yes | (read-only) |
 | consentQuestions[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
 | consentQuestions[].text | object | yes | The question as the guest reads it, per locale. |
 | consentQuestions[].helpText | object |  | (nullable) |
@@ -1052,8 +1052,8 @@ Returns the conflicts (2.9.5) and the leases with their remaining time, so the i
 | lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].tableReservationId | string (uuid) |  | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. (nullable) |
-| lines[].seatIds | array of string |  | (max items 50) |
-| lines[].resourceHoldId | string |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].seatIds | array of string (uuid) |  | (max items 50) |
+| lines[].resourceHoldId | string (uuid) |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].parentLineId | string (uuid) |  | The line this add-on is attached to, from AddCartLineRequest.parentLineId. (nullable) |
@@ -1080,7 +1080,7 @@ Returns the conflicts (2.9.5) and the leases with their remaining time, so the i
 | conflicts[].message | string |  |  |
 | conflicts[].isBlocking | boolean |  | Most are not. |
 | consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of each line's published booking flow's white-lab… (read-only) |
-| consentQuestions[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| consentQuestions[].id | string (uuid) | yes | (read-only) |
 | consentQuestions[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
 | consentQuestions[].text | object | yes | The question as the guest reads it, per locale. |
 | consentQuestions[].helpText | object |  | (nullable) |
@@ -1150,7 +1150,7 @@ Releases its lease immediately.
 |---|---|---|---|---|
 | cartId | path | yes | string (uuid) |  |
 | lineId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Response**: `Cart`
 
@@ -1173,8 +1173,8 @@ Releases its lease immediately.
 | lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].tableReservationId | string (uuid) |  | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. (nullable) |
-| lines[].seatIds | array of string |  | (max items 50) |
-| lines[].resourceHoldId | string |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].seatIds | array of string (uuid) |  | (max items 50) |
+| lines[].resourceHoldId | string (uuid) |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].parentLineId | string (uuid) |  | The line this add-on is attached to, from AddCartLineRequest.parentLineId. (nullable) |
@@ -1201,7 +1201,7 @@ Releases its lease immediately.
 | conflicts[].message | string |  |  |
 | conflicts[].isBlocking | boolean |  | Most are not. |
 | consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of each line's published booking flow's white-lab… (read-only) |
-| consentQuestions[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| consentQuestions[].id | string (uuid) | yes | (read-only) |
 | consentQuestions[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
 | consentQuestions[].text | object | yes | The question as the guest reads it, per locale. |
 | consentQuestions[].helpText | object |  | (nullable) |
@@ -1271,7 +1271,7 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 | cartId | path | yes | string (uuid) |  |
 | lineId | path | yes | string (uuid) |  |
 | If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1300,8 +1300,8 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 | lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].tableReservationId | string (uuid) |  | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. (nullable) |
-| lines[].seatIds | array of string |  | (max items 50) |
-| lines[].resourceHoldId | string |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].seatIds | array of string (uuid) |  | (max items 50) |
+| lines[].resourceHoldId | string (uuid) |  | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].parentLineId | string (uuid) |  | The line this add-on is attached to, from AddCartLineRequest.parentLineId. (nullable) |
@@ -1328,7 +1328,7 @@ Increasing extends the lease and may fail on capacity; decreasing releases part 
 | conflicts[].message | string |  |  |
 | conflicts[].isBlocking | boolean |  | Most are not. |
 | consentQuestions | array of object |  | The consent questions this cart's products and flow ask (decided 29 September, rev 3 REV3-26), computed on read at their current version as the union of each line's published booking flow's white-lab… (read-only) |
-| consentQuestions[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| consentQuestions[].id | string (uuid) | yes | (read-only) |
 | consentQuestions[].kind | ConsentQuestionKind: enum (swim, scuba, risk, custom) | yes | What the question is about (decided 29 September, rev 3 REV3-26). |
 | consentQuestions[].text | object | yes | The question as the guest reads it, per locale. |
 | consentQuestions[].helpText | object |  | (nullable) |
@@ -1401,14 +1401,14 @@ A lift removes cash from an open float mid-shift without closing it — the supe
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| shiftId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| shiftId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateCashMovementRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Client-generated ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Client-generated UUIDv7. |
 | kind | CashMovementKind: enum (openingFloat, lift, add) | yes | openingFloat is written by openShift; lift by createCashMovement and by withdrawFromDepositBox, which is a lift from one cashier's box; add by createCashMovement. |
 | amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -1416,10 +1416,10 @@ A lift removes cash from an open float mid-shift without closing it — the supe
 | amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | denominations | array of CashCountLine |  | A count is a list of lines and the line is the row. (min items 1) |
 | denominations[].id | string (uuid) |  |  |
-| denominations[].shiftId | string | yes | A ULID, as Shift.id and orders.pos_shift.id are. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| denominations[].shiftId | string (uuid) | yes | A UUIDv7, as Shift.id and orders.pos_shift.id are. |
 | denominations[].depositBoxId | string (uuid) |  | (nullable) |
 | denominations[].countKind | enum (openingFloat, close, movement) |  | Which count this line belongs to — the opening float (openShift), the close (closeShift) or a lift or add (createCashMovement). |
-| denominations[].cashMovementId | string |  | The movement this line counts, where countKind is movement. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| denominations[].cashMovementId | string (uuid) |  | The movement this line counts, where countKind is movement. (nullable) |
 | denominations[].denominationId | string (uuid) | yes | References platform.denomination — face value, kind and sort order live there. |
 | denominations[].countedQuantity | integer | yes | How many of this note or coin were in the drawer. (min 0) |
 | denominations[].countedValue | Money |  | On the wire this is three fields; in the database it is one column. |
@@ -1437,7 +1437,7 @@ A lift removes cash from an open float mid-shift without closing it — the supe
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Client-generated ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Client-generated UUIDv7. |
 | kind | CashMovementKind: enum (openingFloat, lift, add) | yes | openingFloat is written by openShift; lift by createCashMovement and by withdrawFromDepositBox, which is a lift from one cashier's box; add by createCashMovement. |
 | amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -1445,10 +1445,10 @@ A lift removes cash from an open float mid-shift without closing it — the supe
 | amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | denominations | array of CashCountLine |  | A count is a list of lines and the line is the row. (min items 1) |
 | denominations[].id | string (uuid) |  |  |
-| denominations[].shiftId | string | yes | A ULID, as Shift.id and orders.pos_shift.id are. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| denominations[].shiftId | string (uuid) | yes | A UUIDv7, as Shift.id and orders.pos_shift.id are. |
 | denominations[].depositBoxId | string (uuid) |  | (nullable) |
 | denominations[].countKind | enum (openingFloat, close, movement) |  | Which count this line belongs to — the opening float (openShift), the close (closeShift) or a lift or add (createCashMovement). |
-| denominations[].cashMovementId | string |  | The movement this line counts, where countKind is movement. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| denominations[].cashMovementId | string (uuid) |  | The movement this line counts, where countKind is movement. (nullable) |
 | denominations[].denominationId | string (uuid) | yes | References platform.denomination — face value, kind and sort order live there. |
 | denominations[].countedQuantity | integer | yes | How many of this note or coin were in the drawer. (min 0) |
 | denominations[].countedValue | Money |  | On the wire this is three fields; in the database it is one column. |
@@ -1461,7 +1461,7 @@ A lift removes cash from an open float mid-shift without closing it — the supe
 | reference | string |  | Safe drop reference or bag number. (max length 64) |
 | reason | string |  | (max length 500) |
 | recordedAt | string (date-time) | yes |  |
-| shiftId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| shiftId | string (uuid) | yes |  |
 | depositBoxId | string (uuid) |  | The box the cash moved in or out of. (nullable) |
 | witnessPrincipalId | string (uuid) |  | The cashier who countersigned a withdrawal. (nullable) |
 | withdrawalReason | object |  | (nullable) |
@@ -1499,7 +1499,7 @@ A lift removes cash from an open float mid-shift without closing it — the supe
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| shiftId | path | yes | string |  |
+| shiftId | path | yes | string (uuid) |  |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
@@ -1508,7 +1508,7 @@ A lift removes cash from an open float mid-shift without closing it — the supe
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of CashMovement | yes |  |
-| items[].id | string | yes | Client-generated ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].id | string (uuid) | yes | Client-generated UUIDv7. |
 | items[].kind | CashMovementKind: enum (openingFloat, lift, add) | yes | openingFloat is written by openShift; lift by createCashMovement and by withdrawFromDepositBox, which is a lift from one cashier's box; add by createCashMovement. |
 | items[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | items[].amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -1516,10 +1516,10 @@ A lift removes cash from an open float mid-shift without closing it — the supe
 | items[].amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | items[].denominations | array of CashCountLine |  | A count is a list of lines and the line is the row. (min items 1) |
 | items[].denominations[].id | string (uuid) |  |  |
-| items[].denominations[].shiftId | string | yes | A ULID, as Shift.id and orders.pos_shift.id are. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].denominations[].shiftId | string (uuid) | yes | A UUIDv7, as Shift.id and orders.pos_shift.id are. |
 | items[].denominations[].depositBoxId | string (uuid) |  | (nullable) |
 | items[].denominations[].countKind | enum (openingFloat, close, movement) |  | Which count this line belongs to — the opening float (openShift), the close (closeShift) or a lift or add (createCashMovement). |
-| items[].denominations[].cashMovementId | string |  | The movement this line counts, where countKind is movement. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| items[].denominations[].cashMovementId | string (uuid) |  | The movement this line counts, where countKind is movement. (nullable) |
 | items[].denominations[].denominationId | string (uuid) | yes | References platform.denomination — face value, kind and sort order live there. |
 | items[].denominations[].countedQuantity | integer | yes | How many of this note or coin were in the drawer. (min 0) |
 | items[].denominations[].countedValue | Money |  | On the wire this is three fields; in the database it is one column. |
@@ -1529,7 +1529,7 @@ A lift removes cash from an open float mid-shift without closing it — the supe
 | items[].reference | string |  | Safe drop reference or bag number. (max length 64) |
 | items[].reason | string |  | (max length 500) |
 | items[].recordedAt | string (date-time) | yes |  |
-| items[].shiftId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].shiftId | string (uuid) | yes |  |
 | items[].depositBoxId | string (uuid) |  | The box the cash moved in or out of. (nullable) |
 | items[].witnessPrincipalId | string (uuid) |  | The cashier who countersigned a withdrawal. (nullable) |
 | items[].withdrawalReason | object |  | (nullable) |
@@ -1628,7 +1628,7 @@ Charges the case's amount again, on a different saved card if one is given. **A 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 | caseId | path | yes | string (uuid) |  |
 
 **Request body**: `RetryDunningPaymentRequest`
@@ -1696,13 +1696,13 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | mediaCode | path | yes | string | The QR, wristband or card the guest is already carrying. |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `AppendEntitlementRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Client-generated ULID of the new order this creates, and its idempotency key — it must equal the Idempotency-Key header. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Client-generated UUIDv7 of the new order this creates, and its idempotency key — it must equal the Idempotency-Key header. |
 | lines | array of object | yes | (min items 1) |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].quantity | integer | yes | (min 1) |
@@ -1716,7 +1716,7 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | order | object | yes | A new order. |
-| order.id | string | yes | The client ULID from CreateOrderRequest.id. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| order.id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
 | order.orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | order.channel | object | yes | Where it came from. |
 | order.venueId | string (uuid) | yes |  |
@@ -1749,14 +1749,14 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | order.totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | order.totalPriceVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | order.lines | array of OrderLine | yes |  |
-| order.lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| order.lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | order.lines[].variantId | string (uuid) | yes |  |
 | order.lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | order.lines[].performanceId | string (uuid) |  |  |
 | order.lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | order.lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| order.lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
-| order.lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| order.lines[].seatIds | array of string (uuid) |  | Seated products only, as seating.Seat.id. (max items 50) |
+| order.lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | order.lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | order.lines[].quantity | integer | yes | (min 1) |
 | order.lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
@@ -1768,14 +1768,14 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | order.lines[].taxAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | order.lines[].netAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | order.lines[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
-| order.lines[].entitlementIds | array of string |  | The entitlements this line issued. |
+| order.lines[].entitlementIds | array of string (uuid) |  | The entitlements this line issued. |
 | order.lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | order.lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
 | order.lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
 | order.lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
 | order.payments | array of Payment |  |  |
-| order.payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| order.payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| order.payments[].id | string (uuid) | yes |  |
+| order.payments[].orderId | string (uuid) | yes |  |
 | order.payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | order.payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | order.payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
@@ -1795,7 +1795,7 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | order.payments[].syncedAt | string (date-time) |  | (nullable) |
 | order.principalId | string (uuid) |  |  |
 | order.workstationId | string (uuid) |  |  |
-| order.shiftId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| order.shiftId | string (uuid) |  | (nullable) |
 | order.subjectId | string (uuid) |  | (nullable) |
 | order.holdLabel | string |  | The label a cashier gave when parking it with holdOrder — how they find it again. (max length 60; read-only; nullable) |
 | order.heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil. (read-only; nullable) |
@@ -1810,10 +1810,10 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | media.invalidReason | string |  | (nullable) |
 | media.canAcceptMore | boolean |  | False where the media has been surrendered, expired or blocked. |
 | media.entitlements | array of object | yes |  |
-| media.entitlements[].entitlementId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| media.entitlements[].entitlementId | string (uuid) |  |  |
 | media.entitlements[].name | string |  |  |
 | media.entitlements[].kind | enum (admission, locker, fnb, retail, parking, rental, experience, membership) |  |  |
-| media.entitlements[].orderId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| media.entitlements[].orderId | string (uuid) |  |  |
 | media.entitlements[].addedAt | string (date-time) |  |  |
 | media.entitlements[].status | object |  | Replaced isRedeemed on 17 August. |
 | media.entitlements[].entriesUsed | integer |  |  |
@@ -1821,7 +1821,7 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | media.entitlements[].redeemedAt | string (date-time) |  | (nullable) |
 | media.entitlements[].transferredToSubjectId | string (uuid) |  | (nullable) |
 | media.entitlements[].validTo | string (date-time) |  | (nullable) |
-| addedEntitlementIds | array of string |  |  |
+| addedEntitlementIds | array of string (uuid) |  |  |
 
 **Responses**
 
@@ -1855,15 +1855,15 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| orderId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| orderId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ManualDiscountRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Client-generated ULID of this discount, and its idempotency key — it must equal the Idempotency-Key header. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| lineId | string |  | Omit to discount the order rather than a line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| id | string (uuid) | yes | Client-generated UUIDv7 of this discount, and its idempotency key — it must equal the Idempotency-Key header. |
+| lineId | string (uuid) |  | Omit to discount the order rather than a line. (nullable) |
 | amount | Money |  | On the wire this is three fields; in the database it is one column. |
 | amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -1878,7 +1878,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | The client ULID from CreateOrderRequest.id. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
 | orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
 | venueId | string (uuid) | yes |  |
@@ -1911,7 +1911,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | totalPriceVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | lines | array of OrderLine | yes |  |
-| lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].performanceId | string (uuid) |  |  |
@@ -1919,8 +1919,8 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | lines[].bookedWindow.startsAt | string (date-time) | yes |  |
 | lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
-| lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].seatIds | array of string (uuid) |  | Seated products only, as seating.Seat.id. (max items 50) |
+| lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
@@ -1956,7 +1956,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | lines[].grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].grossAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].grossAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| lines[].entitlementIds | array of string |  | The entitlements this line issued. |
+| lines[].entitlementIds | array of string (uuid) |  | The entitlements this line issued. |
 | lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
 | lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
@@ -1967,8 +1967,8 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | lines[].discounts[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | lines[].discounts[].reason | string |  | A cashier's reason for a manual discount. (max length 200; nullable) |
 | payments | array of Payment |  |  |
-| payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| payments[].id | string (uuid) | yes |  |
+| payments[].orderId | string (uuid) | yes |  |
 | payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
@@ -2000,7 +2000,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | payments[].syncedAt | string (date-time) |  | (nullable) |
 | principalId | string (uuid) |  |  |
 | workstationId | string (uuid) |  |  |
-| shiftId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| shiftId | string (uuid) |  | (nullable) |
 | subjectId | string (uuid) |  | (nullable) |
 | holdLabel | string |  | The label a cashier gave when parking it with holdOrder — how they find it again. (max length 60; read-only; nullable) |
 | heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil. (read-only; nullable) |
@@ -2036,8 +2036,8 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| transferId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| transferId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2049,9 +2049,9 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| ticketIds | array of string | yes | The entitlements offered — Entitlement.id values, since a ticket is an entitlement. |
+| id | string (uuid) | yes |  |
+| orderId | string (uuid) | yes |  |
+| ticketIds | array of string (uuid) | yes | The entitlements offered — Entitlement.id values, since a ticket is an entitlement. |
 | fromSubjectId | string (uuid) |  |  |
 | toSubjectId | string (uuid) |  | Set only on claim. (nullable) |
 | recipientAddressMasked | string |  |  |
@@ -2098,21 +2098,21 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateOrderRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Client-generated ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Client-generated UUIDv7. |
 | venueId | string (uuid) | yes |  |
 | channel | Channel: enum (pos, kiosk, web, mobile, b2b, ota, callCentre) | yes |  |
-| shiftId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| shiftId | string (uuid) |  |  |
 | subjectId | string (uuid) |  | Null for an anonymous sale. (nullable) |
 | guestLinkId | string |  | Present where the guest is linked across cells. (nullable) |
 | catalogueBundleVersion | string |  | The bundle the client priced from. |
 | lines | array of CreateOrderLine | yes | (min items 1) |
-| lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].performanceId | string (uuid) |  |  |
@@ -2120,8 +2120,8 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | lines[].bookedWindow.startsAt | string (date-time) | yes |  |
 | lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
-| lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].seatIds | array of string (uuid) |  | Seated products only, as seating.Seat.id. (max items 50) |
+| lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
@@ -2143,7 +2143,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | The client ULID from CreateOrderRequest.id. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
 | orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
 | venueId | string (uuid) | yes |  |
@@ -2176,7 +2176,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | totalPriceVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | lines | array of OrderLine | yes |  |
-| lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].performanceId | string (uuid) |  |  |
@@ -2184,8 +2184,8 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | lines[].bookedWindow.startsAt | string (date-time) | yes |  |
 | lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
-| lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].seatIds | array of string (uuid) |  | Seated products only, as seating.Seat.id. (max items 50) |
+| lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
@@ -2221,7 +2221,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | lines[].grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].grossAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].grossAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| lines[].entitlementIds | array of string |  | The entitlements this line issued. |
+| lines[].entitlementIds | array of string (uuid) |  | The entitlements this line issued. |
 | lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
 | lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
@@ -2232,8 +2232,8 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | lines[].discounts[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | lines[].discounts[].reason | string |  | A cashier's reason for a manual discount. (max length 200; nullable) |
 | payments | array of Payment |  |  |
-| payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| payments[].id | string (uuid) | yes |  |
+| payments[].orderId | string (uuid) | yes |  |
 | payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
@@ -2265,7 +2265,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | payments[].syncedAt | string (date-time) |  | (nullable) |
 | principalId | string (uuid) |  |  |
 | workstationId | string (uuid) |  |  |
-| shiftId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| shiftId | string (uuid) |  | (nullable) |
 | subjectId | string (uuid) |  | (nullable) |
 | holdLabel | string |  | The label a cashier gave when parking it with holdOrder — how they find it again. (max length 60; read-only; nullable) |
 | heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil. (read-only; nullable) |
@@ -2308,17 +2308,17 @@ The replacement is held before the original is released, never the other way rou
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| orderId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| orderId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ExchangeOrderRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Client-generated ULID of this exchange, and its idempotency key — it must equal the Idempotency-Key header. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| outgoingLineIds | array of string | yes | (min items 1) |
+| id | string (uuid) | yes | Client-generated UUIDv7 of this exchange, and its idempotency key — it must equal the Idempotency-Key header. |
+| outgoingLineIds | array of string (uuid) | yes | (min items 1) |
 | incomingLines | array of CreateOrderLine | yes | (min items 1) |
-| incomingLines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| incomingLines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | incomingLines[].variantId | string (uuid) | yes |  |
 | incomingLines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | incomingLines[].performanceId | string (uuid) |  |  |
@@ -2326,8 +2326,8 @@ The replacement is held before the original is released, never the other way rou
 | incomingLines[].bookedWindow.startsAt | string (date-time) | yes |  |
 | incomingLines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | incomingLines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| incomingLines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
-| incomingLines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| incomingLines[].seatIds | array of string (uuid) |  | Seated products only, as seating.Seat.id. (max items 50) |
+| incomingLines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | incomingLines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | incomingLines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | incomingLines[].quantity | integer | yes | (min 1) |
@@ -2351,7 +2351,7 @@ The replacement is held before the original is released, never the other way rou
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orderId | string (uuid) | yes |  |
 | outgoingValue | Money | yes | On the wire this is three fields; in the database it is one column. |
 | outgoingValue.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | outgoingValue.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -2368,9 +2368,9 @@ The replacement is held before the original is released, never the other way rou
 | difference.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | difference.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | difference.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| newLineIds | array of string |  |  |
-| revokedEntitlementIds | array of string |  |  |
-| issuedEntitlementIds | array of string |  |  |
+| newLineIds | array of string (uuid) |  |  |
+| revokedEntitlementIds | array of string (uuid) |  |  |
+| issuedEntitlementIds | array of string (uuid) |  |  |
 
 **Responses**
 
@@ -2417,10 +2417,10 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | invalidReason | string |  | (nullable) |
 | canAcceptMore | boolean |  | False where the media has been surrendered, expired or blocked. |
 | entitlements | array of object | yes |  |
-| entitlements[].entitlementId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| entitlements[].entitlementId | string (uuid) |  |  |
 | entitlements[].name | string |  |  |
 | entitlements[].kind | enum (admission, locker, fnb, retail, parking, rental, experience, membership) |  |  |
-| entitlements[].orderId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| entitlements[].orderId | string (uuid) |  |  |
 | entitlements[].addedAt | string (date-time) |  |  |
 | entitlements[].status | object |  | Replaced isRedeemed on 17 August. |
 | entitlements[].entriesUsed | integer |  |  |
@@ -2457,14 +2457,14 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| orderId | path | yes | string |  |
+| orderId | path | yes | string (uuid) |  |
 | X-Consistency-Token | header |  | string | Opaque token returned by a prior write: the database instance and its WAL LSN (SD-025, 29 September; ADR-0040 allows several instances per region, so an LSN alone is ambiguous). |
 
 **Response**: `Order`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | The client ULID from CreateOrderRequest.id. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
 | orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
 | venueId | string (uuid) | yes |  |
@@ -2497,7 +2497,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | totalPriceVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | lines | array of OrderLine | yes |  |
-| lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].performanceId | string (uuid) |  |  |
@@ -2505,8 +2505,8 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | lines[].bookedWindow.startsAt | string (date-time) | yes |  |
 | lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
-| lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].seatIds | array of string (uuid) |  | Seated products only, as seating.Seat.id. (max items 50) |
+| lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
@@ -2542,7 +2542,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | lines[].grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].grossAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].grossAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| lines[].entitlementIds | array of string |  | The entitlements this line issued. |
+| lines[].entitlementIds | array of string (uuid) |  | The entitlements this line issued. |
 | lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
 | lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
@@ -2553,8 +2553,8 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | lines[].discounts[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | lines[].discounts[].reason | string |  | A cashier's reason for a manual discount. (max length 200; nullable) |
 | payments | array of Payment |  |  |
-| payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| payments[].id | string (uuid) | yes |  |
+| payments[].orderId | string (uuid) | yes |  |
 | payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
@@ -2586,7 +2586,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | payments[].syncedAt | string (date-time) |  | (nullable) |
 | principalId | string (uuid) |  |  |
 | workstationId | string (uuid) |  |  |
-| shiftId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| shiftId | string (uuid) |  | (nullable) |
 | subjectId | string (uuid) |  | (nullable) |
 | holdLabel | string |  | The label a cashier gave when parking it with holdOrder — how they find it again. (max length 60; read-only; nullable) |
 | heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil. (read-only; nullable) |
@@ -2626,7 +2626,7 @@ Returns an iCalendar (RFC 5545) event per dated line: the venue, the session sta
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| orderId | path | yes | string |  |
+| orderId | path | yes | string (uuid) |  |
 
 **Responses**
 
@@ -2659,13 +2659,13 @@ Every payment, refund, void, modification and exchange in sequence, with the run
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| orderId | path | yes | string |  |
+| orderId | path | yes | string (uuid) |  |
 
 **Response**: `OrderStatement`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orderId | string (uuid) | yes |  |
 | orderNumber | string | yes |  |
 | currency | string | yes | Resolved from the region, not stored (ADR-0018, 24 August). (pattern ^[A-Z]{3}$) |
 | currencyScale | integer |  | Resolved from the region, not stored (ADR-0018, 24 August). |
@@ -2727,14 +2727,14 @@ Returns the reminder, or one with `enabled` false when the guest has never set o
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| orderId | path | yes | string |  |
+| orderId | path | yes | string (uuid) |  |
 
 **Response**: `VisitReminder`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) |  | (read-only) |
-| orderId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| orderId | string (uuid) |  | (read-only) |
 | subjectId | string (uuid) |  | The guest who set it. (read-only) |
 | enabled | boolean | yes |  |
 | leadTimeMinutes | integer |  | How long before each session starts. (min 15; max 10080; default 1440) |
@@ -2774,8 +2774,8 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| orderId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| orderId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2789,7 +2789,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | The client ULID from CreateOrderRequest.id. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
 | orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
 | venueId | string (uuid) | yes |  |
@@ -2822,7 +2822,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | totalPriceVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | lines | array of OrderLine | yes |  |
-| lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].performanceId | string (uuid) |  |  |
@@ -2830,8 +2830,8 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | lines[].bookedWindow.startsAt | string (date-time) | yes |  |
 | lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
-| lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].seatIds | array of string (uuid) |  | Seated products only, as seating.Seat.id. (max items 50) |
+| lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
@@ -2867,7 +2867,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | lines[].grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].grossAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].grossAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| lines[].entitlementIds | array of string |  | The entitlements this line issued. |
+| lines[].entitlementIds | array of string (uuid) |  | The entitlements this line issued. |
 | lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
 | lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
@@ -2878,8 +2878,8 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | lines[].discounts[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | lines[].discounts[].reason | string |  | A cashier's reason for a manual discount. (max length 200; nullable) |
 | payments | array of Payment |  |  |
-| payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| payments[].id | string (uuid) | yes |  |
+| payments[].orderId | string (uuid) | yes |  |
 | payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
@@ -2911,7 +2911,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | payments[].syncedAt | string (date-time) |  | (nullable) |
 | principalId | string (uuid) |  |  |
 | workstationId | string (uuid) |  |  |
-| shiftId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| shiftId | string (uuid) |  | (nullable) |
 | subjectId | string (uuid) |  | (nullable) |
 | holdLabel | string |  | The label a cashier gave when parking it with holdOrder — how they find it again. (max length 60; read-only; nullable) |
 | heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil. (read-only; nullable) |
@@ -2951,7 +2951,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 |---|---|---|---|---|
 | venueId | query |  | string (uuid) | Exact match. |
 | principalId | query |  | string (uuid) | The cashier who raised the order. |
-| shiftId | query |  | string | Exact match on the shift the order was taken in. |
+| shiftId | query |  | string (uuid) | Exact match on the shift the order was taken in. |
 | status | query |  | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) |  |
 | createdFrom | query |  | string (date-time) | Only orders whose createdAt is at or after this instant. |
 | createdTo | query |  | string (date-time) | Only orders whose createdAt is before this instant. |
@@ -2963,7 +2963,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of OrderSummary | yes |  |
-| items[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].id | string (uuid) | yes |  |
 | items[].orderNumber | string | yes |  |
 | items[].status | OrderStatus: enum (pending, held, paid, partiallyPaid, completed, voided, refunded, partiallyRefunded, …) | yes | held is a parked sale — the cashier freed the till and the guest will return. |
 | items[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
@@ -3014,16 +3014,16 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| orderId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| orderId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ModifyOrderRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Client-generated ULID of this modification, not of the order — the order is the path's orderId. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Client-generated UUIDv7 of this modification, not of the order — the order is the path's orderId. |
 | addLines | array of CreateOrderLine |  |  |
-| addLines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| addLines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | addLines[].variantId | string (uuid) | yes |  |
 | addLines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | addLines[].performanceId | string (uuid) |  |  |
@@ -3031,8 +3031,8 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | addLines[].bookedWindow.startsAt | string (date-time) | yes |  |
 | addLines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | addLines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| addLines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
-| addLines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| addLines[].seatIds | array of string (uuid) |  | Seated products only, as seating.Seat.id. (max items 50) |
+| addLines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | addLines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | addLines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | addLines[].quantity | integer | yes | (min 1) |
@@ -3048,7 +3048,7 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | addLines[].quotedUnitPrice.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | addLines[].holderName | string |  | (nullable) |
 | addLines[].dataMaskValues | object |  | Deliberately open. |
-| removeLineIds | array of string |  |  |
+| removeLineIds | array of string (uuid) |  |  |
 | reason | string |  | (max length 500) |
 | recordedAt | string (date-time) | yes |  |
 
@@ -3057,7 +3057,7 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | order | Order | yes |  |
-| order.id | string | yes | The client ULID from CreateOrderRequest.id. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| order.id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
 | order.orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | order.channel | object | yes | Where it came from. |
 | order.venueId | string (uuid) | yes |  |
@@ -3090,14 +3090,14 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | order.totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | order.totalPriceVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | order.lines | array of OrderLine | yes |  |
-| order.lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| order.lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | order.lines[].variantId | string (uuid) | yes |  |
 | order.lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | order.lines[].performanceId | string (uuid) |  |  |
 | order.lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | order.lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| order.lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
-| order.lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| order.lines[].seatIds | array of string (uuid) |  | Seated products only, as seating.Seat.id. (max items 50) |
+| order.lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | order.lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | order.lines[].quantity | integer | yes | (min 1) |
 | order.lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
@@ -3109,14 +3109,14 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | order.lines[].taxAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | order.lines[].netAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | order.lines[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
-| order.lines[].entitlementIds | array of string |  | The entitlements this line issued. |
+| order.lines[].entitlementIds | array of string (uuid) |  | The entitlements this line issued. |
 | order.lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | order.lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
 | order.lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
 | order.lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
 | order.payments | array of Payment |  |  |
-| order.payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| order.payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| order.payments[].id | string (uuid) | yes |  |
+| order.payments[].orderId | string (uuid) | yes |  |
 | order.payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | order.payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | order.payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
@@ -3136,7 +3136,7 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | order.payments[].syncedAt | string (date-time) |  | (nullable) |
 | order.principalId | string (uuid) |  |  |
 | order.workstationId | string (uuid) |  |  |
-| order.shiftId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| order.shiftId | string (uuid) |  | (nullable) |
 | order.subjectId | string (uuid) |  | (nullable) |
 | order.holdLabel | string |  | The label a cashier gave when parking it with holdOrder — how they find it again. (max length 60; read-only; nullable) |
 | order.heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil. (read-only; nullable) |
@@ -3155,9 +3155,9 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | balanceDue.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | balanceDue.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | balanceDue.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| refundId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
-| revokedEntitlementIds | array of string |  |  |
-| issuedEntitlementIds | array of string |  |  |
+| refundId | string (uuid) |  | (nullable) |
+| revokedEntitlementIds | array of string (uuid) |  |  |
+| issuedEntitlementIds | array of string (uuid) |  |  |
 
 **Responses**
 
@@ -3189,8 +3189,8 @@ Offline-capable, so it carries `recordedAt`: the moment the till reprinted, kept
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| orderId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| orderId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -3198,7 +3198,7 @@ Offline-capable, so it carries `recordedAt`: the moment the till reprinted, kept
 |---|---|---|---|
 | delivery | enum (print, email, sms, whatsapp, wallet) | yes |  |
 | destination | string |  |  |
-| lineIds | array of string |  | Omit to reprint every line. |
+| lineIds | array of string (uuid) |  | Omit to reprint every line. |
 | reason | enum (printerFault, guestRequest, lostTicket, notReceived, other) |  |  |
 | recordedAt | string (date-time) | yes | When the till reprinted — device time, as for every offline-capable write. |
 
@@ -3208,9 +3208,9 @@ Offline-capable, so it carries `recordedAt`: the moment the till reprinted, kept
 |---|---|---|---|
 | reprintCount | integer |  | The order's total, the sum of lines[].reprintCount. |
 | lines | array of object |  | The count per reprinted line, as recorded on OrderLine.reprintCount. |
-| lines[].lineId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| lines[].lineId | string (uuid) | yes |  |
 | lines[].reprintCount | integer | yes |  |
-| reissuedTicketIds | array of string |  | The entitlements reprinted. |
+| reissuedTicketIds | array of string (uuid) |  | The entitlements reprinted. |
 
 **Responses**
 
@@ -3244,15 +3244,15 @@ Where the new performance is priced differently, the balance settles as for an e
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| orderId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| orderId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | targetPerformanceId | string (uuid) | yes |  |
-| lineIds | array of string |  | Omit to move the whole order. |
+| lineIds | array of string (uuid) |  | Omit to move the whole order. |
 | waiveFee | boolean |  | (default False) |
 | reason | string |  | (max length 500) |
 | recordedAt | string (date-time) | yes |  |
@@ -3261,7 +3261,7 @@ Where the new performance is priced differently, the balance settles as for an e
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orderId | string (uuid) | yes |  |
 | outgoingValue | Money | yes | On the wire this is three fields; in the database it is one column. |
 | outgoingValue.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | outgoingValue.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -3278,9 +3278,9 @@ Where the new performance is priced differently, the balance settles as for an e
 | difference.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | difference.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | difference.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| newLineIds | array of string |  |  |
-| revokedEntitlementIds | array of string |  |  |
-| issuedEntitlementIds | array of string |  |  |
+| newLineIds | array of string (uuid) |  |  |
+| revokedEntitlementIds | array of string (uuid) |  |  |
+| issuedEntitlementIds | array of string (uuid) |  |  |
 
 **Responses**
 
@@ -3315,15 +3315,15 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| orderId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| orderId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Response**: `OrderResumeResult`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | order | Order | yes |  |
-| order.id | string | yes | The client ULID from CreateOrderRequest.id. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| order.id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
 | order.orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | order.channel | object | yes | Where it came from. |
 | order.venueId | string (uuid) | yes |  |
@@ -3356,14 +3356,14 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | order.totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | order.totalPriceVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | order.lines | array of OrderLine | yes |  |
-| order.lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| order.lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | order.lines[].variantId | string (uuid) | yes |  |
 | order.lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | order.lines[].performanceId | string (uuid) |  |  |
 | order.lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | order.lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| order.lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
-| order.lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| order.lines[].seatIds | array of string (uuid) |  | Seated products only, as seating.Seat.id. (max items 50) |
+| order.lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | order.lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | order.lines[].quantity | integer | yes | (min 1) |
 | order.lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
@@ -3375,14 +3375,14 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | order.lines[].taxAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | order.lines[].netAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | order.lines[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
-| order.lines[].entitlementIds | array of string |  | The entitlements this line issued. |
+| order.lines[].entitlementIds | array of string (uuid) |  | The entitlements this line issued. |
 | order.lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | order.lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
 | order.lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
 | order.lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
 | order.payments | array of Payment |  |  |
-| order.payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| order.payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| order.payments[].id | string (uuid) | yes |  |
+| order.payments[].orderId | string (uuid) | yes |  |
 | order.payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | order.payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | order.payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
@@ -3402,7 +3402,7 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | order.payments[].syncedAt | string (date-time) |  | (nullable) |
 | order.principalId | string (uuid) |  |  |
 | order.workstationId | string (uuid) |  |  |
-| order.shiftId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| order.shiftId | string (uuid) |  | (nullable) |
 | order.subjectId | string (uuid) |  | (nullable) |
 | order.holdLabel | string |  | The label a cashier gave when parking it with holdOrder — how they find it again. (max length 60; read-only; nullable) |
 | order.heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil. (read-only; nullable) |
@@ -3412,7 +3412,7 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | hasChanged | boolean | yes | True where anything moved while the sale was parked. |
 | changes | array of object |  |  |
 | changes[].kind | enum (priceChanged, promotionExpired, promotionNowApplies, soldOut, seatHoldExpired, productWithdrawn) |  |  |
-| changes[].lineId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| changes[].lineId | string (uuid) |  |  |
 | changes[].detail | string |  |  |
 | changes[].wasAmount | Money |  | On the wire this is three fields; in the database it is one column. |
 | changes[].wasAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -3454,16 +3454,16 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| orderId | path | yes | string |  |
+| orderId | path | yes | string (uuid) |  |
 | If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `VisitReminder`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) |  | (read-only) |
-| orderId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| orderId | string (uuid) |  | (read-only) |
 | subjectId | string (uuid) |  | The guest who set it. (read-only) |
 | enabled | boolean | yes |  |
 | leadTimeMinutes | integer |  | How long before each session starts. (min 15; max 10080; default 1440) |
@@ -3475,7 +3475,7 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) |  | (read-only) |
-| orderId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| orderId | string (uuid) |  | (read-only) |
 | subjectId | string (uuid) |  | The guest who set it. (read-only) |
 | enabled | boolean | yes |  |
 | leadTimeMinutes | integer |  | How long before each session starts. (min 15; max 10080; default 1440) |
@@ -3515,14 +3515,14 @@ The recipient receives a claim link. **Ownership moves only when they claim it**
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| orderId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| orderId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| ticketIds | array of string | yes | The entitlements to hand over. (min items 1) |
+| ticketIds | array of string (uuid) | yes | The entitlements to hand over. (min items 1) |
 | recipient | object | yes |  |
 | recipient.channel | enum (email, sms, whatsapp) | yes |  |
 | recipient.address | string | yes |  |
@@ -3532,9 +3532,9 @@ The recipient receives a claim link. **Ownership moves only when they claim it**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| ticketIds | array of string | yes | The entitlements offered — Entitlement.id values, since a ticket is an entitlement. |
+| id | string (uuid) | yes |  |
+| orderId | string (uuid) | yes |  |
+| ticketIds | array of string (uuid) | yes | The entitlements offered — Entitlement.id values, since a ticket is an entitlement. |
 | fromSubjectId | string (uuid) |  |  |
 | toSubjectId | string (uuid) |  | Set only on claim. (nullable) |
 | recipientAddressMasked | string |  |  |
@@ -3578,14 +3578,14 @@ Only before settlement and only within the same shift. After that it is a refund
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| orderId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| orderId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Client-generated ULID of this void, and its idempotency key — it must equal the Idempotency-Key header. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Client-generated UUIDv7 of this void, and its idempotency key — it must equal the Idempotency-Key header. |
 | reason | VoidReason: enum (guestChangedMind, enteredInError, itemUnavailable, qualityIssue, duplicate, other) | yes | The void reason list (decided 28 September, audit R125 (4)): the one list voidOrder takes, and the list fnb.amendFnbOrder and fnb.cancelFnbOrder point to. |
 | note | string |  | Required when reason is other (audit R222); optional otherwise. (min length 3; max length 500; nullable) |
 | recordedAt | string (date-time) | yes |  |
@@ -3594,7 +3594,7 @@ Only before settlement and only within the same shift. After that it is a refund
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | The client ULID from CreateOrderRequest.id. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
 | orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | channel | object | yes | Where it came from. |
 | venueId | string (uuid) | yes |  |
@@ -3627,7 +3627,7 @@ Only before settlement and only within the same shift. After that it is a refund
 | totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | totalPriceVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | lines | array of OrderLine | yes |  |
-| lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].performanceId | string (uuid) |  |  |
@@ -3635,8 +3635,8 @@ Only before settlement and only within the same shift. After that it is a refund
 | lines[].bookedWindow.startsAt | string (date-time) | yes |  |
 | lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
-| lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].seatIds | array of string (uuid) |  | Seated products only, as seating.Seat.id. (max items 50) |
+| lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
@@ -3672,7 +3672,7 @@ Only before settlement and only within the same shift. After that it is a refund
 | lines[].grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].grossAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].grossAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| lines[].entitlementIds | array of string |  | The entitlements this line issued. |
+| lines[].entitlementIds | array of string (uuid) |  | The entitlements this line issued. |
 | lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
 | lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
@@ -3683,8 +3683,8 @@ Only before settlement and only within the same shift. After that it is a refund
 | lines[].discounts[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | lines[].discounts[].reason | string |  | A cashier's reason for a manual discount. (max length 200; nullable) |
 | payments | array of Payment |  |  |
-| payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| payments[].id | string (uuid) | yes |  |
+| payments[].orderId | string (uuid) | yes |  |
 | payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
@@ -3716,7 +3716,7 @@ Only before settlement and only within the same shift. After that it is a refund
 | payments[].syncedAt | string (date-time) |  | (nullable) |
 | principalId | string (uuid) |  |  |
 | workstationId | string (uuid) |  |  |
-| shiftId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| shiftId | string (uuid) |  | (nullable) |
 | subjectId | string (uuid) |  | (nullable) |
 | holdLabel | string |  | The label a cashier gave when parking it with holdOrder — how they find it again. (max length 60; read-only; nullable) |
 | heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil. (read-only; nullable) |
@@ -3760,13 +3760,13 @@ Refuses where the entitlement is partly consumed, name-bound, or past its resale
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateResaleListingRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| entitlementId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| entitlementId | string (uuid) | yes |  |
 | askPrice | Money | yes | On the wire this is three fields; in the database it is one column. |
 | askPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | askPrice.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -3778,7 +3778,7 @@ Refuses where the entitlement is partly consumed, name-bound, or past its resale
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes | (read-only) |
-| entitlementId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| entitlementId | string (uuid) | yes |  |
 | sellerSubjectId | string (uuid) | yes |  |
 | askPrice | Money | yes | On the wire this is three fields; in the database it is one column. |
 | askPrice.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -3828,7 +3828,7 @@ Check the artwork with `printTicketProof` before activating.
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `TicketTemplateRequest`
 
@@ -3994,7 +3994,7 @@ BL-028. **`orders.group_booking` had ten columns and nothing read it** — a tab
 | quoteSentAt | string (date-time) |  | (read-only; nullable) |
 | riskAssessmentSentAt | string (date-time) |  | (read-only; nullable) |
 | preferredDate | string (date) |  | The date the guest asked for on requestGroupBooking — what its 409 dateUnavailable is checked against. (nullable) |
-| orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orderId | string (uuid) | yes |  |
 | leaderSubjectId | string (uuid) | yes |  |
 | organisationName | string |  | (nullable) |
 | expectedSize | integer | yes |  |
@@ -4047,7 +4047,7 @@ Returns the lines, the total and the deadline. **Never the guest's other orders*
 | link.expiresAt | string (date-time) | yes |  |
 | link.releaseHoldOnExpiry | boolean |  |  |
 | lines | array of OrderLine |  |  |
-| lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].performanceId | string (uuid) |  |  |
@@ -4055,8 +4055,8 @@ Returns the lines, the total and the deadline. **Never the guest's other orders*
 | lines[].bookedWindow.startsAt | string (date-time) | yes |  |
 | lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
-| lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].seatIds | array of string (uuid) |  | Seated products only, as seating.Seat.id. (max items 50) |
+| lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
@@ -4092,7 +4092,7 @@ Returns the lines, the total and the deadline. **Never the guest's other orders*
 | lines[].grossAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].grossAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].grossAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| lines[].entitlementIds | array of string |  | The entitlements this line issued. |
+| lines[].entitlementIds | array of string (uuid) |  | The entitlements this line issued. |
 | lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
 | lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
@@ -4141,13 +4141,13 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| entitlementId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| entitlementId | string (uuid) | yes |  |
 | platform | enum (apple, google) | yes |  |
 
 **Response**: `WalletPass`
@@ -4155,7 +4155,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
-| entitlementId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| entitlementId | string (uuid) | yes |  |
 | platform | enum (apple, google) | yes |  |
 | serialNumber | string | yes |  |
 | authenticationToken | string (password) |  | Write-only. |
@@ -4278,7 +4278,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of Order | yes |  |
-| items[].id | string | yes | The client ULID from CreateOrderRequest.id. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].id | string (uuid) | yes | The client UUIDv7 from CreateOrderRequest.id. |
 | items[].orderNumber | string |  | The number a guest reads and a cashier types. (read-only) |
 | items[].channel | object | yes | Where it came from. |
 | items[].venueId | string (uuid) | yes |  |
@@ -4311,14 +4311,14 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | items[].totalPriceVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].totalPriceVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | items[].lines | array of OrderLine | yes |  |
-| items[].lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | items[].lines[].variantId | string (uuid) | yes |  |
 | items[].lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | items[].lines[].performanceId | string (uuid) |  |  |
 | items[].lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | items[].lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| items[].lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
-| items[].lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| items[].lines[].seatIds | array of string (uuid) |  | Seated products only, as seating.Seat.id. (max items 50) |
+| items[].lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | items[].lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | items[].lines[].quantity | integer | yes | (min 1) |
 | items[].lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
@@ -4330,14 +4330,14 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | items[].lines[].taxAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | items[].lines[].netAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | items[].lines[].grossAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
-| items[].lines[].entitlementIds | array of string |  | The entitlements this line issued. |
+| items[].lines[].entitlementIds | array of string (uuid) |  | The entitlements this line issued. |
 | items[].lines[].crossRegionRightIds | array of string |  | Redemption rights propagated to other cells for this line. |
 | items[].lines[].reprintCount | integer |  | How many times this line's tickets were reprinted or resent. (min 0; default 0; read-only) |
 | items[].lines[].venueId | string (uuid) |  | The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order. (read-only) |
 | items[].lines[].discounts | array of OrderLineDiscount |  | The discounts applied to this line, one row each (system-design review SD-008, 29 September). (read-only) |
 | items[].payments | array of Payment |  |  |
-| items[].payments[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| items[].payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].payments[].id | string (uuid) | yes |  |
+| items[].payments[].orderId | string (uuid) | yes |  |
 | items[].payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | items[].payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | items[].payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
@@ -4357,7 +4357,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | items[].payments[].syncedAt | string (date-time) |  | (nullable) |
 | items[].principalId | string (uuid) |  |  |
 | items[].workstationId | string (uuid) |  |  |
-| items[].shiftId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| items[].shiftId | string (uuid) |  | (nullable) |
 | items[].subjectId | string (uuid) |  | (nullable) |
 | items[].holdLabel | string |  | The label a cashier gave when parking it with holdOrder — how they find it again. (max length 60; read-only; nullable) |
 | items[].heldUntil | string (date-time) |  | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil. (read-only; nullable) |
@@ -4449,7 +4449,7 @@ BL-072. **Payment against the link, by somebody with no account.**
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | token | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -4462,8 +4462,8 @@ BL-072. **Payment against the link, by somebody with no account.**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| orderId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| entitlementIds | array of string |  |  |
+| orderId | string (uuid) |  |  |
+| entitlementIds | array of string (uuid) |  |  |
 
 **Responses**
 
@@ -4496,8 +4496,8 @@ Voids the old, issues the new. **The reason is recorded and the original is trac
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| entitlementId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| entitlementId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -4511,8 +4511,8 @@ Voids the old, issues the new. **The reason is recorded and the original is trac
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| entitlementId | string | yes | The new entitlement. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| replacesEntitlementId | string | yes | The expired one, now voided. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| entitlementId | string (uuid) | yes | The new entitlement. |
+| replacesEntitlementId | string (uuid) | yes | The expired one, now voided. |
 | reason | enum (venueClosure, weather, goodwill, systemError, medicalIssue, bereavement) | yes |  |
 | validFrom | string (date) |  | (nullable) |
 | note | string |  | (nullable) |
@@ -4550,7 +4550,7 @@ Voids the old, issues the new. **The reason is recorded and the original is trac
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `GroupBookingRequest`
 
@@ -4583,7 +4583,7 @@ Voids the old, issues the new. **The reason is recorded and the original is trac
 | quoteSentAt | string (date-time) |  | (read-only; nullable) |
 | riskAssessmentSentAt | string (date-time) |  | (read-only; nullable) |
 | preferredDate | string (date) |  | The date the guest asked for on requestGroupBooking — what its 409 dateUnavailable is checked against. (nullable) |
-| orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orderId | string (uuid) | yes |  |
 | leaderSubjectId | string (uuid) | yes |  |
 | organisationName | string |  | (nullable) |
 | expectedSize | integer | yes |  |
@@ -4627,7 +4627,7 @@ CF-131. **Network International and Stripe for Phase 1** — two gateways, which
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `SetPaymentProviderRequest`
 
@@ -4730,8 +4730,8 @@ Governed by `EntitlementTemplate.canShareMedia`, which already exists and had no
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| entitlementId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| entitlementId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -4745,7 +4745,7 @@ Governed by `EntitlementTemplate.canShareMedia`, which already exists and had no
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
-| entitlementId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| entitlementId | string (uuid) | yes |  |
 | toSubjectId | string (uuid) | yes | The guest it is shared with. |
 | validFrom | string (date-time) |  |  |
 | validUntil | string (date-time) |  | Null means until revoked or until the entitlement itself ends. (nullable) |
@@ -4784,7 +4784,7 @@ BL-116. **The keystone.** Recurring membership billing, wallet auto-reload, one-
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -4841,7 +4841,7 @@ BL-116. **The keystone.** Recurring membership billing, wallet auto-reload, one-
 |---|---|---|---|---|
 | templateId | path | yes | string (uuid) |  |
 | If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `TicketTemplateRequest`
 
@@ -4910,8 +4910,8 @@ Where the terminal captured the tip, this records what it reported. Where the gu
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| paymentId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| paymentId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -4929,8 +4929,8 @@ Where the terminal captured the tip, this records what it reported. Where the gu
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes |  |
+| orderId | string (uuid) | yes |  |
 | tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
@@ -4991,8 +4991,8 @@ Captures an authorised payment. **Writes one `payments.payment_attempt` row for 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| paymentId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| paymentId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -5007,8 +5007,8 @@ Captures an authorised payment. **Writes one `payments.payment_attempt` row for 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes |  |
+| orderId | string (uuid) | yes |  |
 | tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
@@ -5074,14 +5074,14 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreatePaymentRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Client-generated ULID of the payment, and its idempotency key — it must equal the Idempotency-Key header. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Client-generated UUIDv7 of the payment, and its idempotency key — it must equal the Idempotency-Key header. |
+| orderId | string (uuid) | yes |  |
 | tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -5103,8 +5103,8 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes |  |
+| orderId | string (uuid) | yes |  |
 | tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
@@ -5169,15 +5169,15 @@ This queries the provider directly and reconciles. A background reconciler runs 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| paymentId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| paymentId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Response**: `Payment`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes |  |
+| orderId | string (uuid) | yes |  |
 | tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
 | tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
@@ -5241,13 +5241,13 @@ This queries the provider directly and reconciles. A background reconciler runs 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orderId | string (uuid) | yes |  |
 | frequency | enum (monthly, quarterly, custom) | yes |  |
 | instalmentCount | integer | yes | (min 2) |
 | firstDueDate | string (date) |  |  |
@@ -5259,7 +5259,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
-| orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orderId | string (uuid) | yes |  |
 | subjectId | string (uuid) |  | (nullable) |
 | frequency | enum (monthly, quarterly, custom) | yes |  |
 | paymentTokenId | string (uuid) |  |  |
@@ -5281,7 +5281,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | instalments[].amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | instalments[].amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | instalments[].status | enum (scheduled, paid, failed, waived, cancelled) | yes |  |
-| instalments[].paymentId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| instalments[].paymentId | string (uuid) |  | (nullable) |
 | instalments[].dunningCaseId | string (uuid) |  | (nullable) |
 | instalments[].attemptedAt | string (date-time) |  | (nullable) |
 | createdAt | string (date-time) |  |  |
@@ -5318,7 +5318,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `PaymentProviderConnection`
 
@@ -5397,7 +5397,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| orderId | query |  | string |  |
+| orderId | query |  | string (uuid) |  |
 | status | query |  | enum (active, completed, inArrears, cancelled) |  |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
@@ -5408,7 +5408,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 |---|---|---|---|
 | items | array of PayInstalmentPlan | yes |  |
 | items[].id | string (uuid) | yes |  |
-| items[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].orderId | string (uuid) | yes |  |
 | items[].subjectId | string (uuid) |  | (nullable) |
 | items[].frequency | enum (monthly, quarterly, custom) | yes |  |
 | items[].paymentTokenId | string (uuid) |  |  |
@@ -5427,7 +5427,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | items[].instalments[].dueDate | string (date) | yes |  |
 | items[].instalments[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | items[].instalments[].status | enum (scheduled, paid, failed, waived, cancelled) | yes |  |
-| items[].instalments[].paymentId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| items[].instalments[].paymentId | string (uuid) |  | (nullable) |
 | items[].instalments[].dunningCaseId | string (uuid) |  | (nullable) |
 | items[].instalments[].attemptedAt | string (date-time) |  | (nullable) |
 | items[].createdAt | string (date-time) |  |  |
@@ -5465,7 +5465,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `PayInstalmentPolicy`
 
@@ -5541,7 +5541,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 |---|---|---|---|---|
 | venueId | path | yes | string (uuid) |  |
 | If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `RefundPolicy`
 
@@ -5637,15 +5637,15 @@ Sequencing is ledger-first: the ledger entry is written, then the gateway is cal
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| orderId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| orderId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateRefundRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Client-generated ULID of the refund, and its idempotency key — it must equal the Idempotency-Key header. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| lineIds | array of string |  | Omit to refund the whole order. |
+| id | string (uuid) | yes | Client-generated UUIDv7 of the refund, and its idempotency key — it must equal the Idempotency-Key header. |
+| lineIds | array of string (uuid) |  | Omit to refund the whole order. |
 | amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -5662,8 +5662,8 @@ Sequencing is ledger-first: the ledger entry is written, then the gateway is cal
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes |  |
+| orderId | string (uuid) | yes |  |
 | batchId | string (uuid) |  | The RefundBatch that raised this refund, where createBulkRefund did. (read-only; nullable) |
 | fxRate | object |  | The rate on the original payment, not today's (BL-087, CF-118). (read-only; nullable) |
 | taxReversalEntryId | string (uuid) |  | A refund reverses the tax entry it created, and this is where that is stated rather than implied. (read-only; nullable) |
@@ -5682,7 +5682,7 @@ Sequencing is ledger-first: the ledger entry is written, then the gateway is cal
 | requestedByPrincipalId | string (uuid) |  |  |
 | secondaryPrincipalId | string (uuid) |  | (nullable) |
 | approvedByPrincipalId | string (uuid) |  | (nullable) |
-| ledgerEntryId | string |  | Written before the gateway is called. (nullable) |
+| ledgerEntryId | string (uuid) |  | Written before the gateway is called. (nullable) |
 | gatewayReference | string |  | (nullable) |
 | createdAt | string (date-time) | yes |  |
 | completedAt | string (date-time) |  | (nullable) |
@@ -5719,14 +5719,14 @@ Raised from the guest app. Enters the operations approval queue rather than refu
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| lineIds | array of string |  |  |
+| orderId | string (uuid) | yes |  |
+| lineIds | array of string (uuid) |  |  |
 | reason | string | yes | (min length 3; max length 1000) |
 
 **Response**: `object`
@@ -5766,7 +5766,7 @@ An unknown order, or one outside the caller's scope, is the shared 404; an order
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| orderId | path | yes | string |  |
+| orderId | path | yes | string (uuid) |  |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
@@ -5775,8 +5775,8 @@ An unknown order, or one outside the caller's scope, is the shared 404; an order
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of Refund | yes |  |
-| items[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| items[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].id | string (uuid) | yes |  |
+| items[].orderId | string (uuid) | yes |  |
 | items[].batchId | string (uuid) |  | The RefundBatch that raised this refund, where createBulkRefund did. (read-only; nullable) |
 | items[].fxRate | object |  | The rate on the original payment, not today's (BL-087, CF-118). (read-only; nullable) |
 | items[].taxReversalEntryId | string (uuid) |  | A refund reverses the tax entry it created, and this is where that is stated rather than implied. (read-only; nullable) |
@@ -5795,7 +5795,7 @@ An unknown order, or one outside the caller's scope, is the shared 404; an order
 | items[].requestedByPrincipalId | string (uuid) |  |  |
 | items[].secondaryPrincipalId | string (uuid) |  | (nullable) |
 | items[].approvedByPrincipalId | string (uuid) |  | (nullable) |
-| items[].ledgerEntryId | string |  | Written before the gateway is called. (nullable) |
+| items[].ledgerEntryId | string (uuid) |  | Written before the gateway is called. (nullable) |
 | items[].gatewayReference | string |  | (nullable) |
 | items[].createdAt | string (date-time) | yes |  |
 | items[].completedAt | string (date-time) |  | (nullable) |
@@ -5836,8 +5836,8 @@ Releases held capacity immediately rather than waiting for expiry. A guest cance
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| reservationId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| reservationId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Responses**
 
@@ -5869,18 +5869,18 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| reservationId | path | yes | string |  |
+| reservationId | path | yes | string (uuid) |  |
 
 **Response**: `Reservation`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes |  |
 | venueId | string (uuid) | yes |  |
 | subjectId | string (uuid) |  | The guest it is held for, from CreateReservationRequest.subjectId. (nullable) |
 | status | enum (held, converted, expired, cancelled) | yes |  |
 | lines | array of CreateOrderLine |  |  |
-| lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | lines[].variantId | string (uuid) | yes |  |
 | lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | lines[].performanceId | string (uuid) |  |  |
@@ -5888,8 +5888,8 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 | lines[].bookedWindow.startsAt | string (date-time) | yes |  |
 | lines[].bookedWindow.endsAt | string (date-time) | yes | After startsAt, on the same venue day. |
 | lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
-| lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| lines[].seatIds | array of string (uuid) |  | Seated products only, as seating.Seat.id. (max items 50) |
+| lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | lines[].attributes.transport | TransportLineAttributes |  | What a transport line is for (decided 29 September, rev 3 REV3-21). (nullable) |
 | lines[].quantity | integer | yes | (min 1) |
@@ -5907,7 +5907,7 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 | lines[].dataMaskValues | object |  | Deliberately open. |
 | expiresAt | string (date-time) | yes |  |
 | createdAt | string (date-time) | yes |  |
-| convertedOrderId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| convertedOrderId | string (uuid) |  | (nullable) |
 
 **Responses**
 
@@ -5949,19 +5949,19 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of Reservation | yes |  |
-| items[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].id | string (uuid) | yes |  |
 | items[].venueId | string (uuid) | yes |  |
 | items[].subjectId | string (uuid) |  | The guest it is held for, from CreateReservationRequest.subjectId. (nullable) |
 | items[].status | enum (held, converted, expired, cancelled) | yes |  |
 | items[].lines | array of CreateOrderLine |  |  |
-| items[].lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | items[].lines[].variantId | string (uuid) | yes |  |
 | items[].lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | items[].lines[].performanceId | string (uuid) |  |  |
 | items[].lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | items[].lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| items[].lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
-| items[].lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| items[].lines[].seatIds | array of string (uuid) |  | Seated products only, as seating.Seat.id. (max items 50) |
+| items[].lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | items[].lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | items[].lines[].quantity | integer | yes | (min 1) |
 | items[].lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
@@ -5970,7 +5970,7 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 | items[].lines[].dataMaskValues | object |  | Deliberately open. |
 | items[].expiresAt | string (date-time) | yes |  |
 | items[].createdAt | string (date-time) | yes |  |
-| items[].convertedOrderId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| items[].convertedOrderId | string (uuid) |  | (nullable) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -6008,8 +6008,8 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| shiftId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| shiftId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -6021,7 +6021,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Client-generated ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Client-generated UUIDv7. |
 | workstationId | string (uuid) | yes |  |
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
@@ -6111,7 +6111,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | boxId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -6132,7 +6132,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | cashierName | string |  | (read-only) |
 | venueId | string (uuid) | yes |  |
 | workstationId | string (uuid) |  | Where it is being used now. (nullable) |
-| shiftId | string |  | The shift trading from this box. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| shiftId | string (uuid) |  | The shift trading from this box. (nullable) |
 | status | DepositBoxStatus: enum (allocated, open, suspended, closing, closed, reconciled) |  |  |
 | openingFloat | Money | yes | On the wire this is three fields; in the database it is one column. |
 | openingFloat.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -6212,7 +6212,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `DepositBox`
 
@@ -6223,7 +6223,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | cashierName | string |  | (read-only) |
 | venueId | string (uuid) | yes |  |
 | workstationId | string (uuid) |  | Where it is being used now. (nullable) |
-| shiftId | string |  | The shift trading from this box. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| shiftId | string (uuid) |  | The shift trading from this box. (nullable) |
 | status | DepositBoxStatus: enum (allocated, open, suspended, closing, closed, reconciled) |  |  |
 | openingFloat | Money | yes | On the wire this is three fields; in the database it is one column. |
 | openingFloat.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -6279,7 +6279,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | cashierName | string |  | (read-only) |
 | venueId | string (uuid) | yes |  |
 | workstationId | string (uuid) |  | Where it is being used now. (nullable) |
-| shiftId | string |  | The shift trading from this box. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| shiftId | string (uuid) |  | The shift trading from this box. (nullable) |
 | status | DepositBoxStatus: enum (allocated, open, suspended, closing, closed, reconciled) |  |  |
 | openingFloat | Money | yes | On the wire this is three fields; in the database it is one column. |
 | openingFloat.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -6355,8 +6355,8 @@ A float that does not match the venue's expected amount holds the shift in `pend
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| shiftId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| shiftId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -6368,7 +6368,7 @@ A float that does not match the venue's expected amount holds the shift in `pend
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Client-generated ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Client-generated UUIDv7. |
 | workstationId | string (uuid) | yes |  |
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
@@ -6458,7 +6458,7 @@ A box closed without its holder present is flagged rather than blocked — **the
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -6474,10 +6474,10 @@ A box closed without its holder present is flagged rather than blocked — **the
 | counts[].countedTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | counts[].countedDenominations | array of CashCountLine |  | A count is a list of lines and the line is the row. (min items 1) |
 | counts[].countedDenominations[].id | string (uuid) |  |  |
-| counts[].countedDenominations[].shiftId | string | yes | A ULID, as Shift.id and orders.pos_shift.id are. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| counts[].countedDenominations[].shiftId | string (uuid) | yes | A UUIDv7, as Shift.id and orders.pos_shift.id are. |
 | counts[].countedDenominations[].depositBoxId | string (uuid) |  | (nullable) |
 | counts[].countedDenominations[].countKind | enum (openingFloat, close, movement) |  | Which count this line belongs to — the opening float (openShift), the close (closeShift) or a lift or add (createCashMovement). |
-| counts[].countedDenominations[].cashMovementId | string |  | The movement this line counts, where countKind is movement. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| counts[].countedDenominations[].cashMovementId | string (uuid) |  | The movement this line counts, where countKind is movement. (nullable) |
 | counts[].countedDenominations[].denominationId | string (uuid) | yes | References platform.denomination — face value, kind and sort order live there. |
 | counts[].countedDenominations[].countedQuantity | integer | yes | How many of this note or coin were in the drawer. (min 0) |
 | counts[].countedDenominations[].countedValue | Money |  | On the wire this is three fields; in the database it is one column. |
@@ -6521,8 +6521,8 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| shiftId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| shiftId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CloseShiftRequest`
 
@@ -6550,7 +6550,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | shift | Shift | yes | approvals and incidents are child rows (26 September, pull audit R099): orders.pos_shift_approval and orders.pos_shift_incident, one row per item, keyed to the shift. |
-| shift.id | string | yes | Client-generated ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| shift.id | string (uuid) | yes | Client-generated UUIDv7. |
 | shift.workstationId | string (uuid) | yes |  |
 | shift.venueId | string (uuid) | yes |  |
 | shift.scopePath | string | yes |  |
@@ -6666,7 +6666,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Client-generated ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Client-generated UUIDv7. |
 | workstationId | string (uuid) | yes |  |
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
@@ -6752,13 +6752,13 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| shiftId | path | yes | string |  |
+| shiftId | path | yes | string (uuid) |  |
 
 **Response**: `Shift`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Client-generated ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Client-generated UUIDv7. |
 | workstationId | string (uuid) | yes |  |
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
@@ -6895,7 +6895,7 @@ That separation is what makes a variance attributable to a person rather than to
 | items[].cashierName | string |  | (read-only) |
 | items[].venueId | string (uuid) | yes |  |
 | items[].workstationId | string (uuid) |  | Where it is being used now. (nullable) |
-| items[].shiftId | string |  | The shift trading from this box. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| items[].shiftId | string (uuid) |  | The shift trading from this box. (nullable) |
 | items[].status | DepositBoxStatus: enum (allocated, open, suspended, closing, closed, reconciled) |  |  |
 | items[].openingFloat | Money | yes | On the wire this is three fields; in the database it is one column. |
 | items[].openingFloat.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -6971,7 +6971,7 @@ That separation is what makes a variance attributable to a person rather than to
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of Shift | yes |  |
-| items[].id | string | yes | Client-generated ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| items[].id | string (uuid) | yes | Client-generated UUIDv7. |
 | items[].workstationId | string (uuid) | yes |  |
 | items[].venueId | string (uuid) | yes |  |
 | items[].scopePath | string | yes |  |
@@ -7062,7 +7062,7 @@ Fails if another shift is already open on this workstation. Where the venue is c
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `OpenShiftRequest`
 
@@ -7071,10 +7071,10 @@ Fails if another shift is already open on this workstation. Where the venue is c
 | workstationId | string (uuid) | yes |  |
 | openingFloat | array of CashCountLine | yes | A count is a list of lines and the line is the row. (min items 1) |
 | openingFloat[].id | string (uuid) |  |  |
-| openingFloat[].shiftId | string | yes | A ULID, as Shift.id and orders.pos_shift.id are. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| openingFloat[].shiftId | string (uuid) | yes | A UUIDv7, as Shift.id and orders.pos_shift.id are. |
 | openingFloat[].depositBoxId | string (uuid) |  | (nullable) |
 | openingFloat[].countKind | enum (openingFloat, close, movement) |  | Which count this line belongs to — the opening float (openShift), the close (closeShift) or a lift or add (createCashMovement). |
-| openingFloat[].cashMovementId | string |  | The movement this line counts, where countKind is movement. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| openingFloat[].cashMovementId | string (uuid) |  | The movement this line counts, where countKind is movement. (nullable) |
 | openingFloat[].denominationId | string (uuid) | yes | References platform.denomination — face value, kind and sort order live there. |
 | openingFloat[].countedQuantity | integer | yes | How many of this note or coin were in the drawer. (min 0) |
 | openingFloat[].countedValue | Money |  | On the wire this is three fields; in the database it is one column. |
@@ -7092,7 +7092,7 @@ Fails if another shift is already open on this workstation. Where the venue is c
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Client-generated ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Client-generated UUIDv7. |
 | workstationId | string (uuid) | yes |  |
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
@@ -7182,14 +7182,14 @@ Change for a guest, a dropped coin, correcting a float. Legitimate and routine.
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| shiftId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| shiftId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes |  |
 | reason | enum (changeForGuest, correctFloat, retrieveDroppedCash, tillCheck, other) | yes |  |
 | note | string |  | (max length 300) |
 | recordedAt | string (date-time) | yes |  |
@@ -7198,8 +7198,8 @@ Change for a guest, a dropped coin, correcting a float. Legitimate and routine.
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| shiftId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes |  |
+| shiftId | string (uuid) | yes |  |
 | workstationId | string (uuid) |  |  |
 | reason | string | yes |  |
 | note | string |  | (nullable) |
@@ -7240,8 +7240,8 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| shiftId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| shiftId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -7256,7 +7256,7 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Client-generated ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Client-generated UUIDv7. |
 | workstationId | string (uuid) | yes |  |
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
@@ -7345,8 +7345,8 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| shiftId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| shiftId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -7358,7 +7358,7 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Client-generated ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Client-generated UUIDv7. |
 | workstationId | string (uuid) | yes |  |
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
@@ -7451,7 +7451,7 @@ A cashier who closed the wrong till, or a count submitted before the drawer was 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `SetDenominationsRequest`
 
@@ -7502,8 +7502,8 @@ The break mechanism. The float and the shift stay intact; the workstation become
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| shiftId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| shiftId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -7516,7 +7516,7 @@ The break mechanism. The float and the shift stay intact; the workstation become
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Client-generated ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Client-generated UUIDv7. |
 | workstationId | string (uuid) | yes |  |
 | venueId | string (uuid) | yes |  |
 | scopePath | string | yes |  |
@@ -7589,7 +7589,7 @@ The break mechanism. The float and the shift stay intact; the workstation become
 5.8.8. **A mid-day skim, and it is not a variance.** Cash removed from a till for banking must reduce the expected close figure, or every busy cashier ends the day apparently short by the amount that was taken from them.
 Two people sign: the supervisor taking it and the cashier it came from.
 **Recorded as one `CashMovement` of kind `lift`** (F32 step 4: a safe drop "is recorded as a movement so the settlement adds up"; 26 September, pull audit R099/R104). The row carries this box's `depositBoxId` and `shiftId`, the caller as `authorisedByPrincipalId`, the witness, `withdrawalReason` from `reason`, and `note` as its `reason` text. It is the box-level form of the same lift `createCashMovement` records — **one withdrawal is one movement**, so the expected close figure falls once, and `withdrawnTotal` is the sum of the box's lifts.
-**`recordedAt` is the device's time** (offline-and-sync: offline data keeps both `recorded_at` and `synced_at`), and `id` is the client ULID that doubles as the idempotency key.
+**`recordedAt` is the device's time** (offline-and-sync: offline data keeps both `recorded_at` and `synced_at`), and `id` is the client UUIDv7 that doubles as the idempotency key.
 
 |  |  |
 |---|---|
@@ -7609,13 +7609,13 @@ Two people sign: the supervisor taking it and the cashier it came from.
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | boxId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | Client-generated ULID of the CashMovement this records. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes | Client-generated UUIDv7 of the CashMovement this records. |
 | amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
@@ -7634,7 +7634,7 @@ Two people sign: the supervisor taking it and the cashier it came from.
 | cashierName | string |  | (read-only) |
 | venueId | string (uuid) | yes |  |
 | workstationId | string (uuid) |  | Where it is being used now. (nullable) |
-| shiftId | string |  | The shift trading from this box. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| shiftId | string (uuid) |  | The shift trading from this box. (nullable) |
 | status | DepositBoxStatus: enum (allocated, open, suspended, closing, closed, reconciled) |  |  |
 | openingFloat | Money | yes | On the wire this is three fields; in the database it is one column. |
 | openingFloat.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -7716,7 +7716,7 @@ Every line is re-priced on ingest. Variances are returned per order and posted t
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -7724,22 +7724,22 @@ Every line is re-priced on ingest. Variances are returned per order and posted t
 |---|---|---|---|
 | deviceId | string (uuid) | yes |  |
 | orders | array of OfflineOrder | yes | (min items 1; max items 200) |
-| orders[].id | string | yes | Client-generated ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orders[].id | string (uuid) | yes | Client-generated UUIDv7. |
 | orders[].venueId | string (uuid) | yes |  |
 | orders[].channel | Channel: enum (pos, kiosk, web, mobile, b2b, ota, callCentre) | yes |  |
-| orders[].shiftId | string |  | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orders[].shiftId | string (uuid) |  |  |
 | orders[].subjectId | string (uuid) |  | Null for an anonymous sale. (nullable) |
 | orders[].guestLinkId | string |  | Present where the guest is linked across cells. (nullable) |
 | orders[].catalogueBundleVersion | string |  | The bundle the client priced from. |
 | orders[].lines | array of CreateOrderLine | yes | (min items 1) |
-| orders[].lines[].id | string | yes | Client-generated ULID of the line. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orders[].lines[].id | string (uuid) | yes | Client-generated UUIDv7 of the line. |
 | orders[].lines[].variantId | string (uuid) | yes |  |
 | orders[].lines[].recommendationId | string (uuid) |  | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… (nullable) |
 | orders[].lines[].performanceId | string (uuid) |  |  |
 | orders[].lines[].bookedWindow | BookedWindow |  | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). (nullable) |
 | orders[].lines[].inventoryHoldId | string |  | Lease the units were drawn from — a catalogue.InventoryHold.id. (nullable) |
-| orders[].lines[].seatIds | array of string |  | Seated products only, as seating.Seat.id. (max items 50) |
-| orders[].lines[].resourceHoldId | string |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; nullable) |
+| orders[].lines[].seatIds | array of string (uuid) |  | Seated products only, as seating.Seat.id. (max items 50) |
+| orders[].lines[].resourceHoldId | string (uuid) |  | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. (nullable) |
 | orders[].lines[].attributes | OrderLineAttributes |  | Open attributes of a line, kept from the cart to the order line. (nullable) |
 | orders[].lines[].quantity | integer | yes | (min 1) |
 | orders[].lines[].eligibilityDeclaration | array of object |  | What was declared for each guest on this line, kept as the record staff check at the gate. (nullable) |
@@ -7749,8 +7749,8 @@ Every line is re-priced on ingest. Variances are returned per order and posted t
 | orders[].recordedAt | string (date-time) | yes |  |
 | orders[].sequence | integer | yes | Monotonic per device. (min 1) |
 | orders[].payments | array of CreatePaymentRequest | yes |  |
-| orders[].payments[].id | string | yes | Client-generated ULID of the payment, and its idempotency key — it must equal the Idempotency-Key header. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
-| orders[].payments[].orderId | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| orders[].payments[].id | string (uuid) | yes | Client-generated UUIDv7 of the payment, and its idempotency key — it must equal the Idempotency-Key header. |
+| orders[].payments[].orderId | string (uuid) | yes |  |
 | orders[].payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | orders[].payments[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | orders[].payments[].tenderCurrency | string |  | The currency the guest handed over, where it is not the venue's — becomes Payment.tenderCurrency. (pattern ^[A-Z]{3}$; nullable) |
@@ -7769,7 +7769,7 @@ Every line is re-priced on ingest. Variances are returned per order and posted t
 | accepted | integer | yes |  |
 | stoppedAtSequence | integer |  | First entry that hit a transient failure (SD-028, 29 September): a refusal on the merits no longer stops the batch. (nullable) |
 | results | array of object | yes |  |
-| results[].id | string | yes | The OfflineOrder.id this result is about. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| results[].id | string (uuid) | yes | The OfflineOrder.id this result is about. |
 | results[].sequence | integer | yes |  |
 | results[].status | enum (accepted, duplicate, rejected, blockedByRejection) | yes | rejected: refused on its merits and quarantined in sync.rejection; the batch continues. |
 | results[].orderNumber | string |  | (nullable) |
@@ -7834,7 +7834,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | recommendation_id | uuid | no | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… |
 | table_reservation_id | uuid | no | Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the fnb.TableReservation this line secures. |
 | seat_ids | text[] | no |  |
-| resource_hold_id | text | no | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). |
+| resource_hold_id | uuid | no | The resources.ResourceHold this line buys (decided 29 September, rev 3 REV3-15). |
 | attributes | jsonb | no |  |
 | parent_line_id | uuid | no | The line this add-on is attached to, from AddCartLineRequest.parentLineId. |
 | override_price | numeric(18,4) | no |  |
@@ -7852,10 +7852,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | no |  |
-| shift_id | text | yes | A ULID, as Shift.id and orders.pos_shift.id are. |
+| shift_id | uuid | yes | A UUIDv7, as Shift.id and orders.pos_shift.id are. |
 | deposit_box_id | uuid | no |  |
 | count_kind | text | no | Which count this line belongs to — the opening float (openShift), the close (closeShift) or a lift or add (createCashMovement). |
-| cash_movement_id | text | no | The movement this line counts, where countKind is movement. |
+| cash_movement_id | uuid | no | The movement this line counts, where countKind is movement. |
 | denomination_id | uuid | yes | References platform.denomination — face value, kind and sort order live there. |
 | counted_quantity | integer | yes | How many of this note or coin were in the drawer. |
 | counted_value | numeric(18,4) | no | Quantity times face value, stored. |
@@ -7867,13 +7867,13 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes | Client-generated ULID. |
+| id | uuid | yes | Client-generated UUIDv7. |
 | kind | text | yes |  |
 | amount | numeric(18,4) | yes |  |
 | reference | text | no | Safe drop reference or bag number. |
 | reason | text | no |  |
 | recorded_at | timestamptz | yes |  |
-| shift_id | text | yes |  |
+| shift_id | uuid | yes |  |
 | deposit_box_id | uuid | no | The box the cash moved in or out of. |
 | witness_principal_id | uuid | no | The cashier who countersigned a withdrawal. |
 | withdrawal_reason | text | no |  |
@@ -7890,7 +7890,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | cashier_name | text | no |  |
 | venue_id | uuid | yes |  |
 | workstation_id | uuid | no | Where it is being used now. |
-| shift_id | text | no | The shift trading from this box. |
+| shift_id | uuid | no | The shift trading from this box. |
 | status | text | no |  |
 | opening_float | numeric(18,4) | yes |  |
 | withdrawn_total | numeric(18,4) | no | Reduces the expected close figure. |
@@ -7955,7 +7955,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | quote_sent_at | timestamptz | no |  |
 | risk_assessment_sent_at | timestamptz | no |  |
 | preferred_date | date | no | The date the guest asked for on requestGroupBooking — what its 409 dateUnavailable is checked against. |
-| order_id | text | yes |  |
+| order_id | uuid | yes |  |
 | leader_subject_id | uuid | yes |  |
 | organisation_name | text | no |  |
 | expected_size | integer | yes |  |
@@ -7969,8 +7969,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes |  |
-| shift_id | text | yes |  |
+| id | uuid | yes |  |
+| shift_id | uuid | yes |  |
 | workstation_id | uuid | no |  |
 | reason | text | yes |  |
 | note | text | no |  |
@@ -7983,7 +7983,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| order_id | text | yes |  |
+| order_id | uuid | yes |  |
 | reservation_id | uuid | no |  |
 | event_type | text | yes |  |
 | previous_state | text | no |  |
@@ -8003,15 +8003,15 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| sales_order_id | text | yes | The parent row. |
-| id | text | yes | Client-generated ULID of the line. |
+| sales_order_id | uuid | yes | The parent row. |
+| id | uuid | yes | Client-generated UUIDv7 of the line. |
 | variant_id | uuid | yes |  |
 | recommendation_id | uuid | no | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… |
 | performance_id | uuid | no |  |
 | booked_window | jsonb | no |  |
 | inventory_hold_id | text | no | Lease the units were drawn from — a catalogue.InventoryHold.id. |
 | seat_ids | text[] | no | Seated products only, as seating.Seat.id. |
-| resource_hold_id | text | no | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. |
+| resource_hold_id | uuid | no | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. |
 | attributes | jsonb | no |  |
 | quantity | integer | yes |  |
 | quoted_unit_price | numeric(18,4) | yes | What the client charged, from its local bundle. |
@@ -8031,7 +8031,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| order_line_id | text | yes | The parent row. |
+| order_line_id | uuid | yes | The parent row. |
 | id | uuid | yes |  |
 | promotion_id | uuid | no | The promotion that gave it. |
 | source | text | yes |  |
@@ -8042,7 +8042,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| order_line_id | text | yes | The parent row. |
+| order_line_id | uuid | yes | The parent row. |
 | age_band | text | no | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
 | age_years | integer | no |  |
 | height_band_index | integer | no |  |
@@ -8054,8 +8054,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes |  |
-| order_id | text | yes |  |
+| id | uuid | yes |  |
+| order_id | uuid | yes |  |
 | tender | text | yes |  |
 | tender_currency | text | no | 4.6.11. |
 | tender_amount | numeric(18,4) | no | The amount in tenderCurrency, at that currency's own scale. |
@@ -8078,8 +8078,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| order_id | text | yes |  |
-| reservation_id | text | no | Where the link was issued against a reservation rather than an order. |
+| order_id | uuid | yes |  |
+| reservation_id | uuid | no | Where the link was issued against a reservation rather than an order. |
 | token | text | yes | Write-only, single purpose, and it is the only thing the guest presents. |
 | status | text | yes |  |
 | channel | text | no |  |
@@ -8096,7 +8096,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes | Client-generated ULID. |
+| id | uuid | yes | Client-generated UUIDv7. |
 | workstation_id | uuid | yes |  |
 | venue_id | uuid | yes |  |
 | scope_path | text | yes |  |
@@ -8125,7 +8125,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| pos_shift_id | text | yes | The parent row. |
+| pos_shift_id | uuid | yes | The parent row. |
 | kind | text | yes | open from approveShiftOpen, close from approveShiftClose, variance from acceptShiftVariance. |
 | principal_id | uuid | yes |  |
 | at | timestamptz | yes |  |
@@ -8136,7 +8136,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| pos_shift_id | text | yes | The parent row. |
+| pos_shift_id | uuid | yes | The parent row. |
 | kind | text | no |  |
 | at | timestamptz | no |  |
 | principal_id | uuid | no |  |
@@ -8147,8 +8147,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes |  |
-| order_id | text | yes |  |
+| id | uuid | yes |  |
+| order_id | uuid | yes |  |
 | batch_id | uuid | no | The RefundBatch that raised this refund, where createBulkRefund did. |
 | fx_rate | numeric(18,6) | no | The rate on the original payment, not today's (BL-087, CF-118). |
 | tax_reversal_entry_id | uuid | no | A refund reverses the tax entry it created, and this is where that is stated rather than implied. |
@@ -8161,7 +8161,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | requested_by_principal_id | uuid | no |  |
 | secondary_principal_id | uuid | no |  |
 | approved_by_principal_id | uuid | no |  |
-| ledger_entry_id | text | no | Written before the gateway is called. |
+| ledger_entry_id | uuid | no | Written before the gateway is called. |
 | gateway_reference | text | no |  |
 | created_at | timestamptz | yes |  |
 | completed_at | timestamptz | no |  |
@@ -8193,7 +8193,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| entitlement_id | text | yes |  |
+| entitlement_id | uuid | yes |  |
 | seller_subject_id | uuid | yes |  |
 | ask_price | numeric(18,4) | yes |  |
 | price_cap_percent | numeric | no | A ceiling as a percentage of face value, because uncapped resale is a venue watching its own tickets sold at four times the price with its name on them. |
@@ -8213,27 +8213,27 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes |  |
+| id | uuid | yes |  |
 | venue_id | uuid | yes |  |
 | subject_id | uuid | no | The guest it is held for, from CreateReservationRequest.subjectId. |
 | status | text | yes |  |
 | expires_at | timestamptz | yes |  |
 | created_at | timestamptz | yes |  |
-| converted_order_id | text | no |  |
+| converted_order_id | uuid | no |  |
 
 ### `orders.reservation_line`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| reservation_id | text | yes | The parent row. |
-| id | text | yes | Client-generated ULID of the line. |
+| reservation_id | uuid | yes | The parent row. |
+| id | uuid | yes | Client-generated UUIDv7 of the line. |
 | variant_id | uuid | yes |  |
 | recommendation_id | uuid | no | The trackingId of the ai decideRecommendations item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather t… |
 | performance_id | uuid | no |  |
 | booked_window | jsonb | no |  |
 | inventory_hold_id | text | no | Lease the units were drawn from — a catalogue.InventoryHold.id. |
 | seat_ids | text[] | no | Seated products only, as seating.Seat.id. |
-| resource_hold_id | text | no | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. |
+| resource_hold_id | uuid | no | A resources.ResourceHold on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); variantId is the placed resource's price-band variant. |
 | attributes | jsonb | no |  |
 | quantity | integer | yes |  |
 | quoted_unit_price | numeric(18,4) | yes | What the client charged, from its local bundle. |
@@ -8244,7 +8244,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes | The client ULID from CreateOrderRequest.id. |
+| id | uuid | yes | The client UUIDv7 from CreateOrderRequest.id. |
 | order_number | text | no | The number a guest reads and a cashier types. |
 | channel | text | yes | Where it came from. |
 | venue_id | uuid | yes |  |
@@ -8257,7 +8257,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | total_price_variance | numeric(18,4) | no | Sum across lines. |
 | principal_id | uuid | no |  |
 | workstation_id | uuid | no |  |
-| shift_id | text | no |  |
+| shift_id | uuid | no |  |
 | subject_id | uuid | no |  |
 | hold_label | text | no | The label a cashier gave when parking it with holdOrder — how they find it again. |
 | held_until | timestamptz | no | When a held order expires and is voided (states/order.yaml), from holdOrder's holdUntil. |
@@ -8292,8 +8292,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes |  |
-| order_id | text | yes |  |
+| id | uuid | yes |  |
+| order_id | uuid | yes |  |
 | ticket_ids | text[] | yes | The entitlements offered — Entitlement.id values, since a ticket is an entitlement. |
 | from_subject_id | uuid | no |  |
 | to_subject_id | uuid | no | Set only on claim. |
@@ -8310,7 +8310,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | no |  |
-| order_id | text | no |  |
+| order_id | uuid | no |  |
 | subject_id | uuid | no | The guest who set it. |
 | is_enabled | boolean | yes |  |
 | lead_time_minutes | integer | no | How long before each session starts. |
@@ -8322,7 +8322,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| entitlement_id | text | yes |  |
+| entitlement_id | uuid | yes |  |
 | platform | text | yes |  |
 | serial_number | text | yes |  |
 | authentication_token | text | no | Write-only. |
@@ -8337,7 +8337,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | yes |  |
 | subject_id | uuid | no |  |
-| order_id | text | no | The order whose renewal failed. |
+| order_id | uuid | no | The order whose renewal failed. |
 | amount | numeric(18,4) | no |  |
 | state | text | yes |  |
 | decline_class | text | no | From the most recent attempt. |
@@ -8359,7 +8359,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | due_date | date | yes |  |
 | amount | numeric(18,4) | yes |  |
 | status | text | yes |  |
-| payment_id | text | no |  |
+| payment_id | uuid | no |  |
 | dunning_case_id | uuid | no |  |
 | attempted_at | timestamptz | no |  |
 | id | uuid | yes | Synthesised key. |
@@ -8369,7 +8369,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| order_id | text | yes |  |
+| order_id | uuid | yes |  |
 | subject_id | uuid | no |  |
 | frequency | text | yes |  |
 | payment_token_id | uuid | no |  |
@@ -8400,8 +8400,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | no |  |
-| payment_id | text | no | The orders.payment this attempt produced or belongs to. |
-| order_id | text | no | The order being paid for, so an abandoned attempt still counts against the order's conversion. |
+| payment_id | uuid | no | The orders.payment this attempt produced or belongs to. |
+| order_id | uuid | no | The order being paid for, so an abandoned attempt still counts against the order's conversion. |
 | provider_connection_id | uuid | yes |  |
 | payment_method_id | uuid | no |  |
 | card_type | text | no | Scheme and funding type as the provider reported it (for example visa-credit). |

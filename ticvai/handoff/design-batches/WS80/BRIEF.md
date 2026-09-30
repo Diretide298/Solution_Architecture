@@ -1,6 +1,6 @@
 # WS80 — Game and Ride board 3
 
-**10 screens · 12 operations · 7 schemas · 5 permissions**
+**10 screens · 16 operations · 13 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -62,7 +62,7 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `BO-414` | Wallet & Credit Management Dashboard | commandCentre | 2 | 0 | — |
 | `BO-415` | Wallet & Credit Type Configuration | configEditor | 2 | 0 | — |
-| `BO-416` | Wallet Account & Balance View | listDetail | 4 | 0 | — |
+| `BO-416` | Wallet Account & Balance View | listDetail | 8 | 0 | — |
 | `BO-417` | Top-Up Configuration | listDetail | 1 | 0 | — |
 | `BO-418` | Top-Up Bonus Rule Configuration | listDetail | 1 | 0 | — |
 | `BO-419` | Bonus Usage Restrictions | listDetail | 1 | 0 | — |

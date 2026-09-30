@@ -16,15 +16,16 @@ CREATE TABLE IF NOT EXISTS platform.audit_read (
 -- 1 operations read it and 10 write it; written by 5 contracts — finance, inventory, orders,
 -- payments.
 CREATE TABLE IF NOT EXISTS platform.audit_record (
-    id                                uuid PRIMARY KEY NOT NULL,
+    id                                uuid NOT NULL,
     principal_id                      uuid,
     org_unit_id                       uuid,
     workstation_id                    uuid,
     action                            text NOT NULL,
     subject_ref                       text,
     occurred_at                       timestamptz NOT NULL,
-    platform_staff_grant_id           text
-);
+    platform_staff_grant_id           uuid,
+    CONSTRAINT audit_record_pkey PRIMARY KEY (id, occurred_at)
+) PARTITION BY RANGE (occurred_at);
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
@@ -76,9 +77,9 @@ CREATE TABLE IF NOT EXISTS platform.connectivity_policy (
 -- access.entitlement, platform.guest_link. Reached by: 5 operations read it and 4 write it.
 CREATE TABLE IF NOT EXISTS platform.cross_region_entitlement (
     id                                uuid PRIMARY KEY,
-    right_id                          text NOT NULL,
-    ticket_id                         text NOT NULL,
-    guest_link_id                     text,
+    right_id                          uuid NOT NULL,
+    ticket_id                         uuid NOT NULL,
+    guest_link_id                     uuid,
     issuing_cell_name                 text NOT NULL,
     consuming_cell_name               text NOT NULL,
     media_codes                       text[],
@@ -97,7 +98,7 @@ CREATE TABLE IF NOT EXISTS platform.cross_region_entitlement (
 -- rather than a reference, because a dead letter you cannot replay is a log entry with a table's
 -- overhead. A financial posting and a DSAR are never dead-lettered — both halt and alert
 CREATE TABLE IF NOT EXISTS platform.dead_letter (
-    id                                uuid PRIMARY KEY NOT NULL,
+    id                                uuid NOT NULL,
     outbox_id                         uuid,
     event_name                        text,
     consumer                          text,
@@ -107,8 +108,9 @@ CREATE TABLE IF NOT EXISTS platform.dead_letter (
     last_attempt_at                   timestamptz,
     replay_count                      integer DEFAULT 0,
     scope_path                        ltree NOT NULL,
-    created_at                        timestamptz
-);
+    created_at                        timestamptz NOT NULL,
+    CONSTRAINT dead_letter_pkey PRIMARY KEY (id, created_at)
+) PARTITION BY RANGE (created_at);
 
 -- Cash denominations per region (Tanmay, review 20 August). isActive is the field that makes this
 -- a table — a note withdrawn from circulation is deactivated and stays in the count history, and a
@@ -162,8 +164,8 @@ CREATE TABLE IF NOT EXISTS platform.device_heartbeat (
 -- A data-subject request and its progress. The reason pii is a schema of its own
 CREATE TABLE IF NOT EXISTS platform.dsar_request (
     id                                uuid PRIMARY KEY,
-    request_id                        text NOT NULL,
-    guest_link_id                     text NOT NULL,
+    request_id                        uuid NOT NULL,
+    guest_link_id                     uuid NOT NULL,
     kind                              text NOT NULL CONSTRAINT dsar_request_kind_chk CHECK (kind IN ('access', 'rectification', 'erasure', 'portability', 'restriction')),
     status                            text NOT NULL CONSTRAINT dsar_request_status_chk CHECK (status IN ('pending', 'inProgress', 'completed', 'partiallyFailed')),
     created_at                        timestamptz NOT NULL,
@@ -172,7 +174,7 @@ CREATE TABLE IF NOT EXISTS platform.dsar_request (
 
 -- A pseudonymous link between cells (ADR-0010). Carries no personal data, which is the point
 CREATE TABLE IF NOT EXISTS platform.guest_link (
-    guest_link_id                     text PRIMARY KEY NOT NULL,
+    guest_link_id                     uuid PRIMARY KEY NOT NULL,
     home_cell_name                    text NOT NULL,
     consent_version                   text NOT NULL,
     linked_at                         timestamptz NOT NULL,
@@ -183,7 +185,7 @@ CREATE TABLE IF NOT EXISTS platform.guest_link (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS platform.idempotency_record (
     id                                uuid PRIMARY KEY NOT NULL,
-    idempotency_key                   text NOT NULL CONSTRAINT idempotency_record_idempotency_key_chk CHECK (char_length(idempotency_key) <= 26),
+    idempotency_key                   uuid NOT NULL,
     operation_id                      text NOT NULL CONSTRAINT idempotency_record_operation_id_chk CHECK (char_length(operation_id) <= 100),
     request_hash                      text NOT NULL CONSTRAINT idempotency_record_request_hash_chk CHECK (char_length(request_hash) <= 64),
     status                            text NOT NULL CONSTRAINT idempotency_record_status_chk CHECK (status IN ('inProgress', 'completed')),
@@ -210,17 +212,17 @@ CREATE TABLE IF NOT EXISTS platform.offline_policy (
 );
 
 -- Written in the same transaction as the state change, by the platform, not by an operation. That
--- is what makes it exactly-once Hangs off: reaches platform.scope through its keys. Reached by: 3
--- operations read it and 97 write it; 1 tables reference it; written by 20 contracts — access,
--- accreditation, approvals, catalogue.
+-- is what makes it exactly-once Hangs off: reaches platform.scope through its keys; references
+-- catalogue.event, platform.tenant. Reached by: 3 operations read it and 97 write it; 1 tables
+-- reference it; written by 20 contracts — access, accreditation, approvals, catalogue.
 CREATE TABLE IF NOT EXISTS platform.outbox (
-    id                                uuid PRIMARY KEY NOT NULL,
-    event_id                          text NOT NULL,
+    id                                uuid NOT NULL,
+    event_id                          uuid NOT NULL,
     event_name                        text NOT NULL,
     event_version                     integer,
     tenant_id                         uuid NOT NULL,
     aggregate_type                    text NOT NULL,
-    aggregate_id                      text NOT NULL CONSTRAINT outbox_aggregate_id_chk CHECK (char_length(aggregate_id) <= 64),
+    aggregate_id                      uuid NOT NULL,
     payload                           jsonb NOT NULL,
     scope_path                        ltree NOT NULL,
     sequence                          integer NOT NULL,
@@ -228,8 +230,9 @@ CREATE TABLE IF NOT EXISTS platform.outbox (
     published_at                      timestamptz,
     attempts                          integer DEFAULT 0,
     last_error                        text,
-    created_at                        timestamptz NOT NULL
-);
+    created_at                        timestamptz NOT NULL,
+    CONSTRAINT outbox_pkey PRIMARY KEY (id, created_at)
+) PARTITION BY RANGE (created_at);
 
 -- A commercial branch — a restaurant, a shop, a bar. A sibling of department rather than a child
 -- (CF-138, ADR-0018): a department has requisitions and rotas, an outlet has a menu and stock, and
@@ -374,13 +377,13 @@ CREATE TABLE IF NOT EXISTS platform.wallet_authorisation (
     allocation_currency               text,
     id                                uuid PRIMARY KEY,
     authorisation_id                  text NOT NULL,
-    guest_link_id                     text NOT NULL,
+    guest_link_id                     uuid NOT NULL,
     amount                            numeric(18,4) NOT NULL,
     captured_amount                   numeric(18,4),
     status                            text NOT NULL CONSTRAINT wallet_authorisation_status_chk CHECK (status IN ('held', 'captured', 'partiallyCaptured', 'released', 'expired')),
     home_cell_name                    text,
     consuming_cell_name               text,
-    order_id                          text,
+    order_id                          uuid,
     wallet_hold_id                    uuid,
     created_at                        timestamptz NOT NULL,
     expires_at                        timestamptz NOT NULL,

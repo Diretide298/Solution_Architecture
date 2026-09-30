@@ -332,6 +332,22 @@
      "name": "contentBody",
      "components": [
       {
+       "kind": "multiSelect",
+       "label": "Scopes, by module",
+       "bindsTo": "ApiScope",
+       "operation": "listApiScopes",
+       "notes": "**A scope picker grouped by module** (M17-05): `{module}.read` and `{module}.write`, with unlicensed modules shown and disabled rather than hidden. No scope opens a catalogue write (M17-04).",
+       "provenance": "decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)"
+      },
+      {
+       "kind": "banner",
+       "label": "Production access",
+       "bindsTo": "ProductionAccessRequest",
+       "operation": "listProductionAccessRequests",
+       "notes": "**Where production access stands** (M17-06): sandbox only, requested (pending), approved (a production client issued by TICVAI) or rejected with the reason. Production keys only after certification; a sandbox key is never promoted.",
+       "provenance": "decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)"
+      },
+      {
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listApiClients",
@@ -363,6 +379,20 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "listApiScopes",
+    "contract": "public-api",
+    "purpose": "Scopes to choose from, by module",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)"
+   },
+   {
+    "operationId": "listProductionAccessRequests",
+    "contract": "public-api",
+    "purpose": "Where production access stands for these clients",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)"
+   },
    {
     "operationId": "listApiClients",
     "contract": "public-api",
@@ -508,6 +538,13 @@
     "purpose": "Subscribe",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listWebhookEventTypes",
+    "contract": "public-api",
+    "purpose": "Events a subscription can take",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -614,11 +651,11 @@
   },
   "apis": [
    {
-    "operationId": "listApiVersions",
+    "operationId": "listWebhookEventTypes",
     "contract": "public-api",
-    "purpose": "The seat event catalogue",
+    "purpose": "The seat event catalogue (publisher=seating)",
     "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {

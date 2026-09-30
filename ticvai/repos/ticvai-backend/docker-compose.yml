@@ -29,9 +29,26 @@ services:
     ports: ["6379:6379"]
     command: redis-server --appendonly yes
 
+  # Event broker (ADR-0057): RabbitMQ locally until the client chooses RabbitMQ or Kafka for the
+  # cloud; modules use the kernel's IEventPublisher/IEventSubscriber, never the client library directly.
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    ports: ["5672:5672", "15672:15672"]
+
+  # Vectors (ADR-0049): Qdrant, one collection per tenant with a collection-scoped JWT.
+  qdrant:
+    image: qdrant/qdrant:v1.16.0
+    environment:
+      QDRANT__SERVICE__JWT_RBAC: "true"
+      QDRANT__SERVICE__API_KEY: dev
+    ports: ["6333:6333", "6334:6334"]
+    volumes:
+      - qdrantdata:/qdrant/storage
+
   jaeger:
     image: jaegertracing/all-in-one:latest
     ports: ["16686:16686", "4317:4317"]
 
 volumes:
   pgdata:
+  qdrantdata:

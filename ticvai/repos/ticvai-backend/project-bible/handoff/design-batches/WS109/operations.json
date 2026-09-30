@@ -36,6 +36,55 @@
   "requestBody": null,
   "responds": "AccreditationAuditRecord"
  },
+ "listAccreditationDocuments": {
+  "method": "GET",
+  "path": "/accreditation-documents",
+  "contract": "accreditation",
+  "summary": "Documents supplied, by holder, application, requirement or state",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "applicationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "holderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "requirementCode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "expiringWithinDays",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listAccreditationHolders": {
   "method": "GET",
   "path": "/accreditation-holders",
@@ -90,7 +139,7 @@
   "summary": "Decide whether two accreditation records are the same person",
   "permission": "ACCREDITATION_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -109,7 +158,7 @@
   "summary": "Supply a document against a requirement",
   "permission": "ACCREDITATION_APPLY",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "append",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -128,7 +177,7 @@
   "summary": "Amend identity, affiliation or contact details",
   "permission": "ACCREDITATION_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -147,7 +196,7 @@
   "summary": "Accept or refuse a submitted document",
   "permission": "ACCREDITATION_APPROVE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {

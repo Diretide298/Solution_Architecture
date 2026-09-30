@@ -1,6 +1,6 @@
 # WS136 — Marketing CRM Configuration Reference v1.0 board 2
 
-**10 screens · 21 operations · 21 schemas · 6 permissions**
+**10 screens · 23 operations · 26 schemas · 8 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 6 permissions apply here:
-  `AUDIT_VIEW, GUEST_MANAGE, GUEST_VIEW, GUEST_VIEW_PII, MARKETING_MANAGE, MARKETING_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 8 permissions apply here:
+  `AUDIT_VIEW, GUEST_MANAGE, GUEST_VIEW, GUEST_VIEW_PII, MARKETING_MANAGE, MARKETING_VIEW, TENANT_CONFIGURE, TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -67,7 +67,7 @@ convincingly. It is never a caption.
 | `BO-748` | Consent Capture & Versions | listDetail | 2 | 0 | — |
 | `BO-749` | Guest Preference Center | listDetail | 2 | 0 | — |
 | `BO-750` | Data Subject Requests | listDetail | 2 | 0 | — |
-| `BO-751` | Retention & Anonymization | listDetail | 2 | 0 | — |
+| `BO-751` | Retention & Anonymization | listDetail | 4 | 0 | — |
 | `BO-752` | Privacy & AI Governance | listDetail | 2 | 0 | — |
 | `BO-753` | Compliance Audit Dashboard | listDetail | 1 | 0 | — |
 

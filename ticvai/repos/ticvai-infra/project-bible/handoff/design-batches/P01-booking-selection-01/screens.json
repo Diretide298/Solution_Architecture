@@ -71,7 +71,7 @@
      "carries": [
       "productId"
      ],
-     "provenance": "decided 29 September 2026 (P29), W8"
+     "provenance": "decided 29 September 2026, W8"
     }
    ]
   },
@@ -164,14 +164,14 @@
        ],
        "operation": "getPublishedBookingFlow",
        "notes": "The steps of the published flow in their `sortOrder`, this one (tickets) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
-       "provenance": "decided 29 September 2026 (P29), W12; CMS-103 Booking Flows"
+       "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       },
       {
        "kind": "secondaryButton",
        "label": "Show everything",
        "operation": "listProducts",
        "notes": "Clears the Help me choose filter (W4).",
-       "provenance": "decided 29 September 2026 (P29), W4"
+       "provenance": "decided 29 September 2026, W4"
       }
      ]
     },
@@ -261,7 +261,7 @@
     "contract": "white-label",
     "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), W12"
+    "provenance": "decided 29 September 2026, W12"
    }
   ],
   "entryState": {
@@ -558,7 +558,7 @@
        ],
        "operation": "getPublishedBookingFlow",
        "notes": "The steps of the published flow in their `sortOrder`, this one (date and time) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
-       "provenance": "decided 29 September 2026 (P29), W12; CMS-103 Booking Flows"
+       "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       }
      ]
     }
@@ -623,7 +623,7 @@
     "contract": "white-label",
     "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), W12"
+    "provenance": "decided 29 September 2026, W12"
    }
   ],
   "wireframe": {
@@ -880,7 +880,7 @@
        ],
        "operation": "getPublishedBookingFlow",
        "notes": "The steps of the published flow in their `sortOrder`, this one (seats) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
-       "provenance": "decided 29 September 2026 (P29), W12; CMS-103 Booking Flows"
+       "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       }
      ]
     },
@@ -953,7 +953,7 @@
     "contract": "white-label",
     "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), W12"
+    "provenance": "decided 29 September 2026, W12"
    }
   ],
   "entryState": {
@@ -1239,7 +1239,7 @@
        ],
        "operation": "getPublishedBookingFlow",
        "notes": "The steps of the published flow in their `sortOrder`, this one (extras) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
-       "provenance": "decided 29 September 2026 (P29), W12; CMS-103 Booking Flows"
+       "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       }
      ]
     },
@@ -1303,7 +1303,7 @@
     "contract": "white-label",
     "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), W12"
+    "provenance": "decided 29 September 2026, W12"
    }
   ],
   "entryState": {

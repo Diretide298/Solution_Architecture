@@ -1,6 +1,6 @@
 # WS09 — Access Control board 9
 
-**10 screens · 19 operations · 20 schemas · 8 permissions**
+**10 screens · 19 operations · 28 schemas · 8 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -2741,6 +2741,96 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "CredentialDisableBlacklistWhitelistOperationsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Credential Disable, Blacklist & Whitelist Operations displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "entryId": {
+    "type": "string",
+    "description": "List entry identifier"
+   },
+   "reason": {
+    "type": "string",
+    "enum": [
+     "lostTicket",
+     "stolenCredential",
+     "fraudSuspected",
+     "guestRemoval",
+     "securityIncident",
+     "duplicateCredential",
+     "managementInstruction",
+     "other"
+    ],
+    "description": "Reason"
+   },
+   "disableScope": {
+    "type": "string",
+    "enum": [
+     "entireCredential",
+     "venueAccess",
+     "attractionAccess",
+     "reEntry",
+     "fastPass",
+     "specificEntitlement"
+    ],
+    "description": "What is disabled"
+   },
+   "durationType": {
+    "type": "string",
+    "enum": [
+     "permanent",
+     "untilEndOfDay",
+     "untilDateTime",
+     "untilManuallyRestored"
+    ],
+    "description": "How long the restriction lasts"
+   },
+   "distributedTo": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "centralPlatform",
+      "venueEdge",
+      "onlineGates",
+      "offlineRevocationPackage"
+     ]
+    },
+    "description": "Where the restriction has been distributed"
+   },
+   "credentialId": {
+    "type": "string",
+    "description": "Credential"
+   },
+   "listType": {
+    "type": "string",
+    "enum": [
+     "blacklist",
+     "whitelist"
+    ],
+    "description": "Blacklist or approved whitelist exception"
+   },
+   "until": {
+    "type": "string",
+    "format": "date-time",
+    "description": "End of restriction when durationType is untilDateTime"
+   },
+   "createdBy": {
+    "type": "string",
+    "description": "Who applied it"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "When it was applied"
+   }
+  },
+  "required": [
+   "entryId"
+  ]
+ },
  "DenyReason": {
   "type": "string",
   "description": "Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a boolean.\n",
@@ -2808,6 +2898,190 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     }
    }
   }
+ },
+ "LiveAccessOperationsCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Live Access Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "accessPointId": {
+    "type": "string",
+    "description": "Gate"
+   },
+   "name": {
+    "type": "string",
+    "description": "Gate name"
+   },
+   "mode": {
+    "type": "string",
+    "description": "Current gate mode"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "online",
+     "offline",
+     "degraded"
+    ],
+    "description": "Gate status"
+   },
+   "queueLevel": {
+    "type": "string",
+    "enum": [
+     "low",
+     "moderate",
+     "high"
+    ],
+    "description": "Queue level"
+   },
+   "throughputPerMinute": {
+    "type": "number",
+    "description": "Guests per minute at this gate"
+   },
+   "lastScanAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last scan"
+   },
+   "validPercent": {
+    "type": "number",
+    "description": "Valid scans percentage"
+   },
+   "yellowPercent": {
+    "type": "number",
+    "description": "Intervention scans percentage"
+   },
+   "rejectedPercent": {
+    "type": "number",
+    "description": "Rejected scans percentage"
+   }
+  },
+  "required": [
+   "accessPointId"
+  ]
+ },
+ "LiveAccessOperationsCommandCenterViewSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none - aggregate computed at read time over the rows the page lists",
+  "description": "The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).",
+  "properties": {
+   "guestsEnteredToday": {
+    "type": "integer",
+    "description": "Guests Entered Today"
+   },
+   "guestsExited": {
+    "type": "integer",
+    "description": "Guests Exited"
+   },
+   "guestsCurrentlyInPark": {
+    "type": "integer",
+    "description": "Guests Currently In Park"
+   },
+   "validScans": {
+    "type": "integer",
+    "description": "Valid Scans"
+   },
+   "rejectedScans": {
+    "type": "integer",
+    "description": "Rejected Scans"
+   },
+   "yellowInterventionScans": {
+    "type": "integer",
+    "description": "Yellow / Intervention Scans"
+   },
+   "overrides": {
+    "type": "integer",
+    "description": "Overrides"
+   },
+   "activeGates": {
+    "type": "integer",
+    "description": "Active Gates"
+   },
+   "offlineGates": {
+    "type": "integer",
+    "description": "Offline Gates"
+   },
+   "averageValidationTime": {
+    "type": "number",
+    "description": "Average validation time in seconds"
+   },
+   "guestsMinute": {
+    "type": "number",
+    "description": "Guests per minute"
+   },
+   "activeOperationalAlerts": {
+    "type": "integer",
+    "description": "Active Operational Alerts"
+   }
+  }
+ },
+ "LiveGateModeLaneControlView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Live Gate Mode & Lane Control displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "accessPointId": {
+    "type": "string",
+    "description": "Gate"
+   },
+   "availableModes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "normal",
+      "freeFlow",
+      "dropArm",
+      "closed",
+      "podium",
+      "maintenance"
+     ]
+    },
+    "description": "Operating modes this gate permits, in the AccessPointOperatingMode vocabulary (R221): derived at read time from `access.device_configuration.permittedOperatingModes` of the devices at the gate, the modes every one of them permits (decided 29 September, writers pass)"
+   },
+   "currentMode": {
+    "type": "string",
+    "enum": [
+     "normal",
+     "freeFlow",
+     "dropArm",
+     "closed",
+     "podium",
+     "maintenance"
+    ],
+    "description": "current mode"
+   },
+   "targetMode": {
+    "type": "string",
+    "enum": [
+     "normal",
+     "freeFlow",
+     "dropArm",
+     "closed",
+     "podium",
+     "maintenance"
+    ],
+    "description": "Target mode of the pending `access.gate_mode_change`, if any; with operator, reason and effective time from the same row (decided 29 September, writers pass)"
+   },
+   "operator": {
+    "type": "string",
+    "description": "operator"
+   },
+   "reason": {
+    "type": "string",
+    "description": "reason"
+   },
+   "effectiveTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "effective time"
+   }
+  },
+  "required": [
+   "accessPointId"
+  ]
  },
  "OperationalIncidentExceptionWorkspaceInput": {
   "type": "object",
@@ -2945,6 +3219,80 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "typesType"
   ]
  },
+ "OperationsAuditShiftHandoverControlSummaryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Operations Audit, Shift Handover & Control Summary displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "shiftId": {
+    "type": "string",
+    "description": "Shift identifier"
+   },
+   "operator": {
+    "type": "string",
+    "description": "Operator"
+   },
+   "role": {
+    "type": "string",
+    "description": "Role"
+   },
+   "podium": {
+    "type": "string",
+    "description": "Podium"
+   },
+   "device": {
+    "type": "string",
+    "description": "Device"
+   },
+   "login": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Login"
+   },
+   "logout": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Logout"
+   },
+   "ticketLookups": {
+    "type": "integer",
+    "description": "Ticket lookups"
+   },
+   "overrides": {
+    "type": "integer",
+    "description": "Overrides"
+   },
+   "manualOpenings": {
+    "type": "integer",
+    "description": "Manual openings"
+   },
+   "modeChanges": {
+    "type": "integer",
+    "description": "Mode changes"
+   },
+   "credentialDisables": {
+    "type": "integer",
+    "description": "Credential disables"
+   },
+   "blacklistChanges": {
+    "type": "integer",
+    "description": "Blacklist changes"
+   },
+   "groupAdjustments": {
+    "type": "integer",
+    "description": "Group adjustments"
+   },
+   "incidents": {
+    "type": "integer",
+    "description": "incidents"
+   }
+  },
+  "required": [
+   "shiftId",
+   "operator"
+  ]
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -3015,6 +3363,77 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "podiumId"
   ]
  },
+ "QueueThroughputLaneOptimizationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Queue, Throughput & Lane Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "accessPointId": {
+    "type": "string",
+    "description": "Lane / gate"
+   },
+   "laneType": {
+    "type": "string",
+    "enum": [
+     "standard",
+     "family",
+     "groupB2b",
+     "vip",
+     "podAccessible",
+     "reEntry",
+     "fastPass"
+    ],
+    "description": "Lane type"
+   },
+   "guestsPerMinute": {
+    "type": "number",
+    "description": "Guests per minute"
+   },
+   "rejectPercent": {
+    "type": "number",
+    "description": "Reject percentage"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "healthy",
+     "investigate"
+    ],
+    "description": "Lane status"
+   }
+  },
+  "required": [
+   "accessPointId"
+  ]
+ },
+ "QueueThroughputLaneOptimizationViewSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none - aggregate computed at read time over the rows the page lists",
+  "description": "The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).",
+  "properties": {
+   "guestsWaiting": {
+    "type": "integer",
+    "description": "Guests Waiting (the pack shows 486)"
+   },
+   "activeLanes": {
+    "type": "integer",
+    "description": "Active Lanes (the pack shows 12 / 16)"
+   },
+   "lanesTotal": {
+    "type": "integer",
+    "description": "Total lanes"
+   },
+   "throughputPer10Min": {
+    "type": "integer",
+    "description": "Guests admitted in the last 10 minutes"
+   },
+   "estimatedWaitMinutes": {
+    "type": "integer",
+    "description": "Estimated wait"
+   }
+  }
+ },
  "ScanAnomalyRuleList": {
   "type": "array",
   "x-ticvai-persistence-kind": "valueObject",
@@ -3057,6 +3476,68 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "overridden"
   ]
  },
+ "TicketCredentialInvestigationConsoleView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Ticket & Credential Investigation Console displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ticketId": {
+    "type": "string",
+    "description": "Ticket"
+   },
+   "transactionTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Transaction time"
+   },
+   "salesChannel": {
+    "type": "string",
+    "description": "Sales channel"
+   },
+   "pos": {
+    "type": "string",
+    "description": "POS"
+   },
+   "clerk": {
+    "type": "string",
+    "description": "Clerk"
+   },
+   "paymentReference": {
+    "type": "string",
+    "description": "Payment reference"
+   },
+   "paymentMethod": {
+    "type": "string",
+    "description": "Payment method"
+   },
+   "guestName": {
+    "type": "string",
+    "description": "Guest"
+   },
+   "visitDate": {
+    "type": "string",
+    "format": "date",
+    "description": "Visit date"
+   },
+   "firstEntryAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "First entry"
+   },
+   "reEntriesRemaining": {
+    "type": "integer",
+    "description": "Re-entries remaining"
+   },
+   "verificationMethod": {
+    "type": "string",
+    "description": "Verification method, e.g. dynamic QR locked"
+   }
+  },
+  "required": [
+   "ticketId"
+  ]
+ },
  "TicketStatus": {
   "x-ticvai-persistence": "none — computed from entitlement and scans",
   "description": "**A validation result, not a lifecycle**, despite the name. Computed at scan time from the entitlement and its scan history — `isValid`, `entriesUsed`, `isInsideVenue`.\n**The name misled a state model into anchoring on it** (`states/entitlement.yaml`, removed 18 August): six lifecycle states were checked against an object with no values, and `check-states` warned about it for a day before anyone read the schema.\nThe entitlement's lifecycle is `orders.EntitlementStatus`. **This is what a gate learns when it scans**, which is a different question with a similar name.\n",
@@ -3068,7 +3549,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "ticketId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "Stable for the life of the ticket, independent of the media carrying it."
    },
    "mediaCode": {
@@ -3196,7 +3677,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "scanId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "outcome": {
     "$ref": "#/components/schemas/ScanOutcome"

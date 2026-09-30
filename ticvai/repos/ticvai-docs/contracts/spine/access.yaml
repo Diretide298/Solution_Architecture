@@ -50,7 +50,7 @@ info:
     \ not *who is this*.\n- Ticket ID and Media Code are different things. Media can be re-linked; the\
     \ ticket ID\n  does not change.\n- Validation reads the primary unconditionally. A ticket sold at\
     \ the front gate and\n  scanned twenty metres later must not be refused by a lagging replica.\n- Scans\
-    \ recorded offline are appended, never conflicting, deduplicated on the\n  client-generated ULID.\n\
+    \ recorded offline are appended, never conflicting, deduplicated on the\n  client-generated UUIDv7.\n\
     - Deny is always explained. A gate operator facing a queue needs a reason, not a\n  boolean.\n\nCross-cell\
     \ (ADR-0014, ADR-0010): entitlements cross cells. A ticket issued in one cell is validated in another\
     \ as a REDEMPTION RIGHT — a narrow projection carrying only what a gate needs, with no personal data.\
@@ -206,7 +206,7 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
-          description: '**Newest first: `id` descending.** `Entitlement.id` is a ULID minted at issue, so
+          description: '**Newest first: `id` descending.** `Entitlement.id` is a UUIDv7 minted at issue, so
             its order is issue order and it is unique, which makes it the whole keyset — no timestamp
             column and no tiebreak are needed. A reissue is a new entitlement with a newer id.
 
@@ -305,7 +305,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: getEntitlement
       x-ticvai-consumed-by:
@@ -359,7 +359,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: getEntitlementCredential
       x-ticvai-consumed-by:
@@ -472,7 +472,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     get:
       operationId: getEntitlementHistory
       x-ticvai-consumed-by:
@@ -600,8 +600,8 @@ paths:
                   format: uuid
                 entitlementId:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-                  description: An `Entitlement.id`, which is a ULID.
+                  format: uuid
+                  description: An `Entitlement.id`, which is a UUIDv7.
                 template:
                   type: string
                   format: password
@@ -724,8 +724,8 @@ paths:
               properties:
                 entitlementId:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-                  description: An `Entitlement.id`, which is a ULID.
+                  format: uuid
+                  description: An `Entitlement.id`, which is a UUIDv7.
                 method:
                   type: string
                   enum:
@@ -852,8 +852,8 @@ paths:
                   format: uuid
                 entitlementId:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-                  description: An `Entitlement.id`, which is a ULID.
+                  format: uuid
+                  description: An `Entitlement.id`, which is a UUIDv7.
                 template:
                   type: string
                   format: password
@@ -1178,7 +1178,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: issueOrderEntitlements
       security:
@@ -1329,7 +1329,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+        format: uuid
     patch:
       operationId: updateParkingEntitlement
       x-ticvai-consumed-by:
@@ -1434,10 +1434,10 @@ paths:
               properties:
                 id:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                 scanId:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                   description: The denied scan being overridden.
                 reason:
                   type: string
@@ -1505,7 +1505,7 @@ paths:
         in: query
         schema:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
       responses:
         '200':
           description: Entitlement state
@@ -1546,7 +1546,7 @@ paths:
         it cannot accept, returning results for those processed — a scan that depends on a prior scan
         must not be evaluated out of order.
 
-        Deduplication is on the scan''s ULID. Replaying a batch after a crash is a no-op for entries already
+        Deduplication is on the scan''s UUIDv7. Replaying a batch after a crash is a no-op for entries already
         accepted.
 
         **Workstation-scoped: the replaying scanner''s own session.** A caller whose session has no
@@ -1637,7 +1637,7 @@ paths:
         description: An `Entitlement.id`, the ticket id every scan carries.
         schema:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
       - name: outcome
         in: query
         schema:
@@ -2366,7 +2366,7 @@ paths:
               properties:
                 id:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                 mediaCode:
                   type: string
                   maxLength: 256
@@ -12139,7 +12139,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: resolveCredentialException
       x-ticvai-consumed-by:
@@ -12254,7 +12254,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
       description: 'The Virtual Ticket: `access.entitlement.id`, which does not change when media are replaced (Ticket
         ID and Media Code are different things). The binding a call touches is `credentialBindingId` in the body or
         response (decided 29 September, writers pass)'
@@ -12263,7 +12263,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: deliverCredential
       x-ticvai-consumed-by:
@@ -12330,7 +12330,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
       description: 'The Virtual Ticket: `access.entitlement.id`, which does not change when media are replaced (Ticket
         ID and Media Code are different things). The binding a call touches is `credentialBindingId` in the body or
         response (decided 29 September, writers pass)'
@@ -12339,7 +12339,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: replaceCredential
       x-ticvai-consumed-by:
@@ -13855,7 +13855,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
       description: The Virtual Ticket (access.entitlement.id); decided 29 September, writers pass
     post:
       operationId: bindCredentialDevice
@@ -15015,7 +15015,7 @@ paths:
         in: query
         schema:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
       - name: deviceId
         in: query
         schema:
@@ -15148,7 +15148,7 @@ components:
           nullable: true
         entitlementId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         deviceId:
           type: string
@@ -15177,7 +15177,7 @@ components:
             properties:
               fraudRuleId:
                 type: string
-                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                format: uuid
               signal:
                 type: string
               weight:
@@ -15286,7 +15286,7 @@ components:
       properties:
         ruleId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: Absent creates a rule
         relationshipRuleType:
           type: string
@@ -15392,7 +15392,7 @@ components:
           type: array
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         securityInvestigationId:
           type: string
           format: uuid
@@ -15504,7 +15504,7 @@ components:
           nullable: true
         approvalRequestId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: The approval that released the current version
         version:
@@ -15538,7 +15538,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: The ruleId of setEntitlementConsumption
         name:
           type: string
@@ -15616,15 +15616,15 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: The credential binding id (credentialBindingId / bindingId in the views)
         entitlementId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: The Virtual Ticket the medium resolves to
         mediaTypeId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: access.media_type row of the medium
         credentialReference:
           type: string
@@ -15756,14 +15756,14 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: Client-generated delivery attempt id (CredentialDeliveryInput.id)
         entitlementId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         credentialBindingId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: The medium delivered, where one is bound
         channel:
@@ -15867,7 +15867,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: The ruleId (display rule) or policyId (transfer policy) of the operations
         kind:
           type: string
@@ -16038,14 +16038,14 @@ components:
           format: uuid
         entitlementId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         credentialBindingId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         mediaTypeId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         action:
           type: string
@@ -16114,7 +16114,7 @@ components:
           description: swapped only
         fromMediaTypeId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: swapped only
         fromMediaReference:
@@ -16124,7 +16124,7 @@ components:
           description: swapped only
         toMediaTypeId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: swapped only
         toMediaReference:
@@ -16134,7 +16134,7 @@ components:
           description: swapped only
         approvalRequestId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         providerReference:
           type: string
@@ -16261,7 +16261,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: The exceptionId resolveCredentialException acts on
         failureType:
           type: string
@@ -16290,11 +16290,11 @@ components:
           - critical
         entitlementId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         credentialBindingId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         credentialIssuanceId:
           type: string
@@ -16303,12 +16303,12 @@ components:
           description: The failed generation request, for generation failures
         credentialDeliveryId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: The failed delivery attempt, for delivery failures
         mediaTypeId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         failure:
           type: string
@@ -16406,15 +16406,15 @@ components:
           - scheduledProcess
         entitlementId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         credentialBindingId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: The credential generated, once bound
         mediaTypeId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         mediaTemplateId:
           type: string
           format: uuid
@@ -16652,10 +16652,10 @@ components:
           description: The guest (pii.subject)
         entitlementId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         credentialBindingId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         deviceId:
           type: string
@@ -16838,7 +16838,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: The integrationId of setHotelWalletExternal, or the partner mappingId
         integrationType:
           type: string
@@ -16930,7 +16930,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: The mediaTypeId of setMediaTypeTechnology (also the mediaProfileId of the media screens)
         name:
           type: string
@@ -17106,7 +17106,7 @@ components:
           type: array
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
           description: Ordered media types to use if this one cannot be used, e.g. face unavailable then RFID
         active:
           type: boolean
@@ -17138,36 +17138,36 @@ components:
           type: array
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         mandatoryMediaTypeIds:
           type: array
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         optionalMediaTypeIds:
           type: array
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         primaryMediaTypeId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         secondaryMediaTypeIds:
           type: array
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         backupMediaTypeIds:
           type: array
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         temporaryMediaTypeIds:
           type: array
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
         minimumMediaRequired:
           type: integer
           minimum: 0
@@ -17258,7 +17258,7 @@ components:
           format: uuid
         mediaTypeId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: The media profile being published (mediaProfileId)
         venueId:
           type: string
@@ -17293,7 +17293,7 @@ components:
           description: Required when publishing to a device with a compatibility warning
         approvalRequestId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         publishedAt:
           type: string
@@ -17322,14 +17322,14 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: The encodingProfileId of setMediaIssuanceEncoding (also the rfidNfcProfileId of setRfidNfc)
         name:
           type: string
           maxLength: 200
         mediaTypeId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: Required by setMediaIssuanceEncoding; setRfidNfc does not send one
         encodingFormat:
@@ -17731,7 +17731,7 @@ components:
             - encoder
         approvalRequestId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         status:
           type: string
@@ -19637,8 +19637,8 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: The profileId the biometric writes are keyed by (a ULID, as their inputs declare)
+          format: uuid
+          description: The profileId the biometric writes are keyed by (a UUIDv7, as their inputs declare)
         profileKind:
           type: string
           enum:
@@ -19864,7 +19864,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: The ruleId setGuestCompanionEligibility is keyed by
         venueId:
           type: string
@@ -20117,7 +20117,7 @@ components:
           description: The guest (pii.subject)
         entitlementId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: The credential the Face Pass belongs to
         existingProfileReference:
@@ -20222,7 +20222,7 @@ components:
           description: Simulation rows only
         biometricProfileId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: The biometric profile applied or tested
         subjectId:
@@ -20232,7 +20232,7 @@ components:
           description: The guest (the list's guestId)
         entitlementId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: The credential (the list's credentialId)
         credentialType:
@@ -20336,12 +20336,12 @@ components:
           description: e.g. Credential attempted simultaneous entry at two gates
         fraudRuleId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: The access fraud rule that raised the alert, if one did
         entitlementId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: The credential (the list's credentialId)
         subjectId:
@@ -20903,7 +20903,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: The ruleId setFraudDetectionRule is keyed by
         scopePath:
           type: string
@@ -21078,7 +21078,7 @@ components:
           description: ltree of the owning scope node
         entitlementId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: The credential (the list's credentialId)
         primaryDeviceId:
           type: string
@@ -21183,7 +21183,7 @@ components:
           type: array
           items:
             type: string
-            pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+            format: uuid
           description: The linked credentials (the list's associatedCredentialIds)
         associatedCredentialTypes:
           type: array
@@ -21377,7 +21377,7 @@ components:
           description: ltree of the owning scope node
         subjectEntitlementId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: The credential under investigation (the operation's subjectCredentialId)
         evidenceSources:
@@ -21451,7 +21451,7 @@ components:
       properties:
         ruleId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: Absent creates a rule
         venueId:
           type: string
@@ -21501,7 +21501,7 @@ components:
       properties:
         mediaTypeId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: Absent adds a media type
         name:
           type: string
@@ -21590,7 +21590,7 @@ components:
       properties:
         encodingProfileId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: Absent creates a profile
         name:
           type: string
@@ -21631,7 +21631,7 @@ components:
       properties:
         integrationId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: Absent creates an integration
         name:
           type: string
@@ -21682,7 +21682,7 @@ components:
       properties:
         profileId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: Absent creates a Face Tag profile
         venueId:
           type: string
@@ -21757,7 +21757,7 @@ components:
       properties:
         profileId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: Absent creates a threshold profile
         venueId:
           type: string
@@ -21835,7 +21835,7 @@ components:
       properties:
         policyId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: Absent creates a retention rule
         venueId:
           type: string
@@ -21880,7 +21880,7 @@ components:
       properties:
         ruleId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: Absent creates a rule
         venueId:
           type: string
@@ -22052,7 +22052,7 @@ components:
       properties:
         ruleId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: Absent creates a rule
         signal:
           type: string
@@ -22157,7 +22157,7 @@ components:
       properties:
         ruleId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: Absent creates a rule
         name:
           type: string
@@ -22394,7 +22394,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: Client-generated deployment id
         configurationVersion:
           type: string
@@ -22438,7 +22438,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         configurationVersion:
           type: string
         targetScope:
@@ -22729,7 +22729,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: Client-generated delivery attempt id
         channel:
           type: string
@@ -22792,7 +22792,7 @@ components:
           description: Code of the new physical media where one is encoded at the counter
         approvalRequestId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: The granted approval, where the replacement rule requires one
         note:
           type: string
@@ -22821,9 +22821,9 @@ components:
           maxLength: 30
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
-          description: The order's id, a ULID as in `/orders/{orderId}`.
+          description: The order's id, a UUIDv7 as in `/orders/{orderId}`.
         upgradeId:
           type: string
           format: uuid
@@ -22942,8 +22942,8 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: 'A ULID, matching `TicketStatus.ticketId` — **stable for the life of the ticket
+          format: uuid
+          description: 'A UUIDv7, matching `TicketStatus.ticketId` — **stable for the life of the ticket
             and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement
             with a new `mediaCode`.
 
@@ -22964,8 +22964,8 @@ components:
           format: uuid
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: The order's id, a ULID as in `/orders/{orderId}` (`orders.sales_order.id`).
+          format: uuid
+          description: The order's id, a UUIDv7 as in `/orders/{orderId}` (`orders.sales_order.id`).
         orderLineId:
           type: string
           format: uuid
@@ -23107,7 +23107,7 @@ components:
             '
         supersedesEntitlementId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: 'For a reissue or a resale. **The chain is traceable** — a ticket appearing from
             nowhere is indistinguishable from a fraudulent one.
@@ -23266,8 +23266,8 @@ components:
           format: uuid
         entitlementId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: The `Entitlement.id`, a ULID (`pii.subject_biometric.entitlement_id`).
+          format: uuid
+          description: The `Entitlement.id`, a UUIDv7 (`pii.subject_biometric.entitlement_id`).
         kind:
           $ref: '#/components/schemas/BiometricKind'
         retentionAnchor:
@@ -23457,8 +23457,8 @@ components:
           format: uuid
         orderId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: The order's id, a ULID as in `/orders/{orderId}` (`orders.sales_order.id`).
+          format: uuid
+          description: The order's id, a UUIDv7 as in `/orders/{orderId}` (`orders.sales_order.id`).
         subjectId:
           type: string
           format: uuid
@@ -23942,8 +23942,8 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: Client-generated ULID. Also the idempotency key and dedupe key.
+          format: uuid
+          description: Client-generated UUIDv7. Also the idempotency key and dedupe key.
         mediaCode:
           type: string
           maxLength: 256
@@ -23980,7 +23980,7 @@ components:
       properties:
         scanId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         outcome:
           $ref: '#/components/schemas/ScanOutcome'
         denyReason:
@@ -24066,7 +24066,7 @@ components:
       properties:
         ticketId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: Stable for the life of the ticket, independent of the media carrying it.
         mediaCode:
           type: string
@@ -24202,6 +24202,7 @@ components:
               error:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
     ScanEvent:
+      x-ticvai-append-only: recordedAt
       x-ticvai-persistence: access.scan_event
       type: object
       required:
@@ -24214,8 +24215,8 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: The scan's client-generated ULID, the key offline replay deduplicates on.
+          format: uuid
+          description: The scan's client-generated UUIDv7, the key offline replay deduplicates on.
         accessPointId:
           type: string
           format: uuid
@@ -24226,7 +24227,7 @@ components:
           type: string
         ticketId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: The `Entitlement.id` scanned; null where the media resolved to nothing.
         mediaCode:
@@ -24248,7 +24249,7 @@ components:
           nullable: true
         overridesScanId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
           description: '**Set only on an override row**, naming the denied scan it admits against (decided
             28 September, audit R228). The denied scan itself is never updated: the denial and the override
@@ -24617,7 +24618,7 @@ components:
             properties:
               ticketId:
                 type: string
-                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                format: uuid
                 description: The `Entitlement.id`.
               mediaCodes:
                 type: array
@@ -24666,7 +24667,7 @@ components:
                 type: string
               ticketId:
                 type: string
-                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                format: uuid
                 description: The `Entitlement.id` in the issuing cell.
               issuingCellId:
                 type: string
@@ -27947,7 +27948,7 @@ components:
       properties:
         exceptionId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           description: The key `resolveCredentialException` acts on (decided 29 September, VM close-out)
         lastAction:
           type: string
@@ -31134,9 +31135,9 @@ components:
           description: Biometric model this profile uses
         profileId:
           type: string
-          description: The profile row's key (access.biometric_profile.id, a ULID); absent creates one (decided 29 September,
+          description: The profile row's key (access.biometric_profile.id, a UUIDv7); absent creates one (decided 29 September,
             writers pass)
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
         selectType:
           type: string
           enum:

@@ -1,6 +1,6 @@
 # WS110 — ACCREDITATION board 3
 
-**9 screens · 8 operations · 16 schemas · 6 permissions**
+**9 screens · 12 operations · 18 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 6 permissions apply here:
-  `ACCREDITATION_APPROVE, ACCREDITATION_VIEW, APPROVAL_CONFIGURE, APPROVAL_REQUEST, PRICE_CONFIGURE, PRODUCT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 7 permissions apply here:
+  `ACCREDITATION_APPLY, ACCREDITATION_APPROVE, ACCREDITATION_VIEW, APPROVAL_CONFIGURE, APPROVAL_REQUEST, PRICE_CONFIGURE, PRODUCT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -61,11 +61,11 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `BO-635` | Accreditation Review Queue | listDetail | 1 | 0 | — |
-| `BO-636` | Application Review Workspace | listDetail | 2 | 0 | — |
+| `BO-636` | Application Review Workspace | listDetail | 4 | 0 | — |
 | `BO-637` | Approval Workflow Builder | listDetail | 1 | 0 | — |
 | `BO-638` | Approval Rules & Conditions | listDetail | 1 | 0 | — |
 | `BO-639` | Reviewer Assignment & Delegation | listDetail | 1 | 0 | — |
-| `BO-640` | Rejection & Resubmission Management | listDetail | 1 | 0 | — |
+| `BO-640` | Rejection & Resubmission Management | listDetail | 4 | 0 | — |
 | `BO-641` | Escalation & Exception Management | listDetail | 1 | 0 | — |
 | `BO-642` | Approval Decision History | listDetail | 1 | 0 | — |
 | `BO-643` | Approval Policy Validation & Publication | listDetail | 1 | 0 | — |

@@ -1,4 +1,17 @@
 {
+ "getInventoryKitDefinition": {
+  "method": "GET",
+  "path": "/inventory-items/{itemId}/kit-definition",
+  "contract": "inventory",
+  "summary": "The components a kit item is made of",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "InventoryKitDefinition"
+ },
  "listBundleAvailabilityChannel": {
   "method": "GET",
   "path": "/bundle-availability-channel",
@@ -21,9 +34,39 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "BundleAvailabilityForecastAlertsRecoveryView"
+ },
+ "listBundleCapacityPolicies": {
+  "method": "GET",
+  "path": "/bundles/{bundleId}/capacity-policies",
+  "contract": "promotions",
+  "summary": "List a bundle's capacity policies",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listBundleSellabilityDependency": {
   "method": "GET",
@@ -73,7 +116,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "DynamicBundleOperationsCommandCenterView"
  },
@@ -128,5 +177,24 @@
   "parameters": [],
   "requestBody": null,
   "responds": "RealTimeAvailabilityCheckoutValidationView"
+ },
+ "setBundleCapacityPolicy": {
+  "method": "PUT",
+  "path": "/bundles/{bundleId}/capacity-policies",
+  "contract": "promotions",
+  "summary": "Set a bundle's capacity policies",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  }
 }

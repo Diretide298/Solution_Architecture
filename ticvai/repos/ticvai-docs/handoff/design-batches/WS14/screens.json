@@ -17,44 +17,6 @@
    "component": "apps/ticvai-web/src/routes/platform/ApprovalWorkflowLibrary.tsx",
    "status": "notStarted"
   },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Provide a centralized directory of every approval workflow configured within the tenant.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 11"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 11"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": [
-    {
-     "name": "contentBody",
-     "components": []
-    }
-   ]
-  },
-  "states": {
-   "loading": "The approval workflow list.",
-   "error": "Could not load. Names which read failed and leaves the approval workflow untouched.",
-   "emptyFirstRun": "No approval workflow yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the approval workflow are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-319"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 0 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
     "ADM-002"
@@ -125,6 +87,82 @@
     }
    ]
   },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide a centralized directory of every approval workflow configured within the tenant.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 11"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 11"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listRuleWorkflow",
+       "bindsTo": "RulesWorkflowCommandCenterView",
+       "operation": "listRuleWorkflow",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "approveWorkflow",
+       "label": "Approve workflow",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "approveWorkflow"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The approval workflow list.",
+   "error": "Could not load. Names which read failed and leaves the approval workflow untouched.",
+   "emptyFirstRun": "No approval workflow yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the approval workflow are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listRuleWorkflow",
+    "contract": "approvals",
+    "purpose": "Every approval workflow definition",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, readiness close-out (QA wiring note)"
+   },
+   {
+    "operationId": "approveWorkflow",
+    "contract": "catalogue",
+    "purpose": "Approval Workflow Designer",
+    "trigger": "onAction"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-319",
+   "workshopBoard": "wireframes/WS31 Approval Workflows and Governance Board 2.dc.html#adm-319"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 0 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -166,6 +204,22 @@
    "route": "/platform/create-approval-workflow-adm-320",
    "component": "apps/ticvai-web/src/routes/platform/CreateApprovalWorkflow.tsx",
    "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-319"
+   ],
+   "exitTo": [
+    "ADM-319"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-319",
+     "trigger": "Back to Approval Workflow Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
   },
   "density": "compact",
   "pattern": "configEditor",
@@ -278,28 +332,24 @@
    "emptyFirstRun": "No create approval workflow configured yet. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setVisualWorkflow",
+    "contract": "approvals",
+    "purpose": "Create the workflow",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listWorkflow"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-320"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-320",
+   "workshopBoard": "wireframes/WS31 Approval Workflows and Governance Board 2.dc.html#adm-320"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 12. 0 of 0 labels bound to a contract property; 18 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ADM-319"
-   ],
-   "exitTo": [
-    "ADM-319"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-319",
-     "trigger": "Back to Approval Workflow Library",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -342,38 +392,6 @@
    "component": "apps/ticvai-web/src/routes/platform/ApprovalStageConfiguration.tsx",
    "status": "notStarted"
   },
-  "density": "compact",
-  "pattern": "configEditor",
-  "patternReason": "the pack gives this screen a configuration directory (§Configuration) and no display directory — it is settings, not a population",
-  "purpose": "Configure each approval stage in detail. When the administrator clicks an Approval Node in Screen 3, this screen/panel opens.",
-  "layout": {
-   "template": "form",
-   "regions": [
-    {
-     "name": "contentBody",
-     "slot": "fields",
-     "components": [
-      {
-       "kind": "textField",
-       "label": "Stage Name: Finance Manager Approval",
-       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 14 §Configuration"
-      }
-     ]
-    }
-   ]
-  },
-  "states": {
-   "loading": "The approval stage configuration as saved.",
-   "error": "Could not load. Names which read failed and leaves the approval stage untouched.",
-   "emptyFirstRun": "No approval stage configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-322"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 1 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
     "ADM-319"
@@ -390,6 +408,64 @@
     }
    ]
   },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configuration) and no display directory — it is settings, not a population",
+  "purpose": "Configure each approval stage in detail. When the administrator clicks an Approval Node in Screen 3, this screen/panel opens.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Stage Name: Finance Manager Approval",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 14 §Configuration"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setVisualWorkflow",
+       "label": "Save visual workflow",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setVisualWorkflow"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The approval stage configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the approval stage untouched.",
+   "emptyFirstRun": "No approval stage configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setVisualWorkflow",
+    "contract": "approvals",
+    "purpose": "Stages and approvers",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listWorkflow"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-322",
+   "workshopBoard": "wireframes/WS31 Approval Workflows and Governance Board 2.dc.html#adm-322"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 1 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -432,6 +508,22 @@
    "component": "apps/ticvai-web/src/routes/platform/ConditionDecisionRuleBuilder.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ADM-319"
+   ],
+   "exitTo": [
+    "ADM-319"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-319",
+     "trigger": "Back to Approval Workflow Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -458,7 +550,28 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setVisualBusinessRule",
+       "label": "Save visual business rule",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listConditionDecisionLogic",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setVisualBusinessRule"
+      }
+     ]
     }
    ]
   },
@@ -469,28 +582,31 @@
    "emptyNoResults": "The filter narrowed it and the condition decision rule are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setVisualBusinessRule",
+    "contract": "approvals",
+    "purpose": "Conditions and decision rules",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listConditionDecisionLogic"
+    ]
+   },
+   {
+    "operationId": "listConditionDecisionLogic",
+    "contract": "approvals",
+    "purpose": "Rules already defined",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-323"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-323",
+   "workshopBoard": "wireframes/WS31 Approval Workflows and Governance Board 2.dc.html#adm-323"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ADM-319"
-   ],
-   "exitTo": [
-    "ADM-319"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-319",
-     "trigger": "Back to Approval Workflow Library",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -533,6 +649,22 @@
    "component": "apps/ticvai-web/src/routes/platform/ApprovalSequenceParallelRouting.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ADM-319"
+   ],
+   "exitTo": [
+    "ADM-319"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-319",
+     "trigger": "Back to Approval Workflow Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -554,7 +686,22 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setVisualWorkflow",
+       "label": "Save visual workflow",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setVisualWorkflow"
+      }
+     ]
     }
    ]
   },
@@ -565,28 +712,24 @@
    "emptyNoResults": "The filter narrowed it and the approval sequence parallel are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setVisualWorkflow",
+    "contract": "approvals",
+    "purpose": "Sequence and parallel routing",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listWorkflow"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-324"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-324",
+   "workshopBoard": "wireframes/WS31 Approval Workflows and Governance Board 2.dc.html#adm-324"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 0 of 12 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ADM-319"
-   ],
-   "exitTo": [
-    "ADM-319"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-319",
-     "trigger": "Back to Approval Workflow Library",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -629,6 +772,22 @@
    "component": "apps/ticvai-web/src/routes/platform/WorkflowOutcomeActionConfiguration.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ADM-319"
+   ],
+   "exitTo": [
+    "ADM-319"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-319",
+     "trigger": "Back to Approval Workflow Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -650,7 +809,22 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setTriggerActionCross",
+       "label": "Save trigger action cross",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setTriggerActionCross"
+      }
+     ]
     }
    ]
   },
@@ -661,28 +835,24 @@
    "emptyNoResults": "The filter narrowed it and the workflow outcome action are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "setTriggerActionCross",
+    "contract": "approvals",
+    "purpose": "What happens on each outcome",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listCrossModuleOrchestration"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-325"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-325",
+   "workshopBoard": "wireframes/WS31 Approval Workflows and Governance Board 2.dc.html#adm-325"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ADM-319"
-   ],
-   "exitTo": [
-    "ADM-319"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-319",
-     "trigger": "Back to Approval Workflow Library",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -725,6 +895,22 @@
    "component": "apps/ticvai-web/src/routes/platform/WorkflowValidationSimulation.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ADM-319"
+   ],
+   "exitTo": [
+    "ADM-319"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-319",
+     "trigger": "Back to Approval Workflow Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -746,7 +932,21 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "simulateWorkflowTestingImpact",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "simulateWorkflowTestingImpact"
+      }
+     ]
     }
    ]
   },
@@ -757,28 +957,21 @@
    "emptyNoResults": "The filter narrowed it and the workflow validation simulation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "simulateWorkflowTestingImpact",
+    "contract": "approvals",
+    "purpose": "Simulate before publishing",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-326"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-326",
+   "workshopBoard": "wireframes/WS31 Approval Workflows and Governance Board 2.dc.html#adm-326"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 17. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ADM-319"
-   ],
-   "exitTo": [
-    "ADM-319"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-319",
-     "trigger": "Back to Approval Workflow Library",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -820,6 +1013,22 @@
    "route": "/platform/workflow-publication-lifecycle-adm-327",
    "component": "apps/ticvai-web/src/routes/platform/WorkflowPublicationLifecycle.tsx",
    "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-319"
+   ],
+   "exitTo": [
+    "ADM-319"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-319",
+     "trigger": "Back to Approval Workflow Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
   },
   "density": "compact",
   "pattern": "configEditor",
@@ -872,28 +1081,31 @@
    "emptyFirstRun": "No workflow publication lifecycle configured yet. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listRuleWorkflow",
+    "contract": "approvals",
+    "purpose": "The workflow definitions and their lifecycle",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, readiness close-out (QA wiring note)"
+   },
+   {
+    "operationId": "setVisualWorkflow",
+    "contract": "approvals",
+    "purpose": "Publish",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listWorkflow"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-327"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-327",
+   "workshopBoard": "wireframes/WS31 Approval Workflows and Governance Board 2.dc.html#adm-327"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 18. 0 of 0 labels bound to a contract property; 6 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ADM-319"
-   ],
-   "exitTo": [
-    "ADM-319"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-319",
-     "trigger": "Back to Approval Workflow Library",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -936,6 +1148,22 @@
    "component": "apps/ticvai-web/src/routes/platform/WorkflowVersioningChangeHistory.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ADM-319"
+   ],
+   "exitTo": [
+    "ADM-319"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-319",
+     "trigger": "Back to Approval Workflow Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
@@ -957,7 +1185,14 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listVersioningEffectiveDate",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
     }
    ]
   },
@@ -968,28 +1203,28 @@
    "emptyNoResults": "The filter narrowed it and the workflow versioning change are still there. The pack's own statuses are n By — the state names which is selected.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listVersioningEffectiveDate",
+    "contract": "marketing-crm",
+    "purpose": "Version history",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listRuleWorkflow",
+    "contract": "approvals",
+    "purpose": "The workflow being versioned",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, readiness close-out (QA wiring note)"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-328"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-328",
+   "workshopBoard": "wireframes/WS31 Approval Workflows and Governance Board 2.dc.html#adm-328"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 19. 0 of 0 labels bound to a contract property; 2 of 12 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ADM-319"
-   ],
-   "exitTo": [
-    "ADM-319"
-   ],
-   "transitions": [
-    {
-     "to": "ADM-319",
-     "trigger": "Back to Approval Workflow Library",
-     "provenance": "structural — pack board 2 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

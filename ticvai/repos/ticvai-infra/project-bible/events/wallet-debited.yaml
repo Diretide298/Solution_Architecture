@@ -14,7 +14,7 @@ payload:
 - field: walletId
   type: uuid
 - field: walletTransactionId
-  type: string
+  type: uuid
 - field: walletHoldId
   type: uuid
   required: false
@@ -23,7 +23,7 @@ payload:
 - field: availableAfter
   type: Money
 - field: orderId
-  type: string
+  type: uuid
   required: false
 consumers:
 - context: ledger

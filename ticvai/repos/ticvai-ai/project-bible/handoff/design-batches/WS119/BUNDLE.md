@@ -525,7 +525,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "AiForecastDefinition.producer",
        "operation": "setForecastDefinition",
        "notes": "`rule`, `statistical` or `ensemble` (M18-16). A model only arrives by promotion.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       },
       {
        "kind": "numberField",
@@ -533,7 +533,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "AiForecastDefinition.historyWindowMonths",
        "operation": "setForecastDefinition",
        "notes": "Default 36 (M18-16).",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       },
       {
        "kind": "selectField",
@@ -541,7 +541,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "AiForecastDefinition.coldStart",
        "operation": "setForecastDefinition",
        "notes": "**What the forecast stands on before there is history** (AI functions review): the venue AI profile with the venue-type pattern, a sister venue, a category, or imported history; the starting range and how many observations the prior is worth.",
-       "provenance": "29 September pass (P29 group A)"
+       "provenance": "29 September pass (group A)"
       }
      ]
     }

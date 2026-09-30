@@ -1,6 +1,6 @@
 # WS91 — Rental Management board 4
 
-**10 screens · 11 operations · 9 schemas · 5 permissions**
+**10 screens · 11 operations · 14 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

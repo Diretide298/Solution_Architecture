@@ -3,7 +3,7 @@
 -- its use** — orders reaches catalogue, catalogue reaches platform, and something
 -- reaches back. Tables first, constraints last, is the only ordering that terminates.
 --
--- 31 of 799 declared references. The ones that reach the
+-- 32 of 800 declared references. The ones that reach the
 -- other database are in ../990-cross-database-references.sql and are not constraints
 -- any more.
 
@@ -23,6 +23,7 @@ ALTER TABLE control.migration_run ADD CONSTRAINT migration_run_canary_cell_id_fk
 ALTER TABLE control.migration_run_cell ADD CONSTRAINT migration_run_cell_migration_run_id_fkey FOREIGN KEY (migration_run_id) REFERENCES control.migration_run(id);
 ALTER TABLE control.migration_run_tenant ADD CONSTRAINT migration_run_tenant_migration_run_id_fkey FOREIGN KEY (migration_run_id) REFERENCES control.migration_run(id);
 ALTER TABLE control.onboarding_application ADD CONSTRAINT onboarding_application_venue_type_template_id_fkey FOREIGN KEY (venue_type_template_id) REFERENCES control.venue_type_template(id);
+ALTER TABLE control.outbox_relay ADD CONSTRAINT outbox_relay_cell_tenant_id_fkey FOREIGN KEY (cell_tenant_id) REFERENCES control.cell_tenant(id);
 ALTER TABLE control.partner_agreement ADD CONSTRAINT partner_agreement_partner_id_fkey FOREIGN KEY (partner_id) REFERENCES control.partner(id);
 ALTER TABLE control.partner_application_review_task ADD CONSTRAINT partner_application_review_task_partner_application_id_fkey FOREIGN KEY (partner_application_id) REFERENCES control.partner_application(id);
 ALTER TABLE control.partner_commission_rule_tier ADD CONSTRAINT partner_commission_rule_tier_partner_commission_rule_id_fkey FOREIGN KEY (partner_commission_rule_id) REFERENCES control.partner_commission_rule(id);

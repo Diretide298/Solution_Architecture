@@ -1,6 +1,6 @@
 # WS23 — B2B, Reseller & OTA Partner Management board 3
 
-**10 screens · 10 operations · 10 schemas · 1 permissions**
+**10 screens · 17 operations · 25 schemas · 4 permissions**
 
 Platform P10 Partner Web · ships as **ticvai-control** ·
 partner audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 1 permissions apply here:
-  `PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `CASE_MANAGE, ORDER_MODIFY, PLATFORM_TENANT_VIEW, SETTLEMENT_RECONCILE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,20 +60,20 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `PTR-042` | Partner Operations Command Center | commandCentre | 1 | 0 | — |
+| `PTR-042` | Partner Operations Command Center | commandCentre | 2 | 0 | — |
 | `PTR-043` | Partner Orders & Booking Management | listDetail | 1 | 0 | — |
 | `PTR-044` | Reservations, Holds & Release Management | listDetail | 1 | 0 | — |
-| `PTR-045` | Partner Cancellations, Refunds & Amendments | listDetail | 1 | 0 | — |
+| `PTR-045` | Partner Cancellations, Refunds & Amendments | listDetail | 2 | 1 | — |
 | `PTR-046` | Partner Statement & Account Activity | commandCentre | 1 | 0 | — |
-| `PTR-047` | Partner Reconciliation & Exception Management | listDetail | 1 | 0 | — |
-| `PTR-048` | Commission Calculation & Settlement Management | listDetail | 1 | 0 | — |
-| `PTR-049` | Partner Disputes, Cases & Service Management | listDetail | 1 | 0 | — |
+| `PTR-047` | Partner Reconciliation & Exception Management | listDetail | 2 | 1 | — |
+| `PTR-048` | Commission Calculation & Settlement Management | listDetail | 3 | 2 | — |
+| `PTR-049` | Partner Disputes, Cases & Service Management | listDetail | 3 | 2 | — |
 | `PTR-050` | Partner Performance Scorecard & Risk Monitoring | listDetail | 1 | 0 | — |
 | `PTR-051` | Partner AI Intelligence & Relationship Optimization | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**PTR-044, PTR-045, PTR-047, PTR-048, PTR-050, PTR-051 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**PTR-045, PTR-050, PTR-051 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -107,7 +106,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "PTR-001"
    ],
    "exitTo": [
-    "PTR-001",
     "PTR-043",
     "PTR-044",
     "PTR-045",
@@ -121,15 +119,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "inferred": false,
    "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
    "transitions": [
-    {
-     "to": "PTR-001",
-     "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId",
-      "sessionId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
-    },
     {
      "to": "PTR-043",
      "trigger": "Works in Partner Orders & Booking Management",
@@ -187,10 +176,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can understand current partner activity, financial exposure and operational exceptions from one centralized workspace.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each partner should show) — counts over a population, then the population",
   "purpose": "Provide commercial, operations and finance teams with one real-time view of active B2B, reseller and OTA business.",
-  "purposeNote": "Authorized users can understand current partner activity, financial exposure and operational exceptions from one centralized workspace.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -231,19 +220,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "metricTile",
        "label": "Partner Sales Today",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.partnerSalesToday"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.partnerSalesToday"
       },
       {
        "kind": "metricTile",
        "label": "Partner Sales MTD",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.partnerSalesMtd"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.partnerSalesMtd"
       },
       {
        "kind": "metricTile",
        "label": "Active Partner Orders",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.activePartnerOrders"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.activePartnerOrders"
       },
       {
        "kind": "metricTile",
@@ -254,49 +243,49 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "metricTile",
        "label": "Tickets Sold",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.ticketsSold"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.ticketsSold"
       },
       {
        "kind": "metricTile",
        "label": "Cancellations",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.cancellations"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.cancellations"
       },
       {
        "kind": "metricTile",
        "label": "Refunds",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.refunds"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.refunds"
       },
       {
        "kind": "metricTile",
        "label": "Outstanding Receivables",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.outstandingReceivables"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.outstandingReceivables"
       },
       {
        "kind": "metricTile",
        "label": "Commission Payable",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.commissionPayable"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.commissionPayable"
       },
       {
        "kind": "metricTile",
        "label": "Pending Settlements",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.pendingSettlements"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.pendingSettlements"
       },
       {
        "kind": "metricTile",
        "label": "Operational Exceptions",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.operationalExceptions"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.operationalExceptions"
       },
       {
        "kind": "metricTile",
        "label": "Partners Requiring Attention",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.partnersRequiringAttention"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.partnersRequiringAttention"
       }
      ]
     },
@@ -373,12 +362,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "subscription",
     "purpose": "Partner Operations Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPartner",
+    "contract": "subscription",
+    "purpose": "Partner Management Command Center",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-042"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-042",
+   "workshopBoard": "wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-042"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 44. 30 of 35 labels bound to a contract property; 36 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -442,10 +438,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Operations can locate and service any partner transaction while preserving central order and commercial-rule integrity.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide a consolidated operational view of orders created by each partner.",
-  "purposeNote": "Operations can locate and service any partner transaction while preserving central order and commercial-rule integrity.",
   "layout": {
    "template": "split",
    "regions": [
@@ -491,7 +487,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "PartnerOrdersBookingManagementView.partnerReference",
         "Partner",
         "PartnerOrdersBookingManagementView.agentUser",
-        "PartnerOrdersBookingManagementView.customerGuestWhereApplicable",
+        "PartnerOrdersBookingManagementView.customerName",
         "Booking Date",
         "Event",
         "PartnerOrdersBookingManagementView.products",
@@ -523,7 +519,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "PartnerOrdersBookingManagementView.partnerReference",
         "Partner",
         "PartnerOrdersBookingManagementView.agentUser",
-        "PartnerOrdersBookingManagementView.customerGuestWhereApplicable",
+        "PartnerOrdersBookingManagementView.customerName",
         "Booking Date",
         "Event",
         "PartnerOrdersBookingManagementView.products",
@@ -576,14 +572,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "PartnerOrdersBookingManagementView.partnerReference",
     "Partner",
     "PartnerOrdersBookingManagementView.agentUser",
-    "PartnerOrdersBookingManagementView.customerGuestWhereApplicable",
+    "PartnerOrdersBookingManagementView.customerName",
     "Booking Date"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-043"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-043",
+   "workshopBoard": "wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-043"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 46. 12 of 27 labels bound to a contract property; 36 of 50 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -647,13 +644,68 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Partner reservations and holds cannot indefinitely block sellable capacity and are automatically governed by configured duration, allocation and approval rules.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Manage inventory temporarily reserved by B2B partners before final confirmation. This is particularly important for tour operators, corporate groups and travel-trade partners.",
-  "purposeNote": "Partner reservations and holds cannot indefinitely block sellable capacity and are automatically governed by configured duration, allocation and approval rules.",
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Active Holds",
+       "bindsTo": "ReservationsHoldsReleaseManagementSummary.activeHolds",
+       "operation": "listReservationHoldRelease",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Held Tickets",
+       "bindsTo": "ReservationsHoldsReleaseManagementSummary.heldTickets",
+       "operation": "listReservationHoldRelease",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Held Value",
+       "bindsTo": "ReservationsHoldsReleaseManagementSummary.heldValue",
+       "operation": "listReservationHoldRelease",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Expiring Today",
+       "bindsTo": "ReservationsHoldsReleaseManagementSummary.expiringToday",
+       "operation": "listReservationHoldRelease",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Expired Holds",
+       "bindsTo": "ReservationsHoldsReleaseManagementSummary.expiredHolds",
+       "operation": "listReservationHoldRelease",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Converted Holds",
+       "bindsTo": "ReservationsHoldsReleaseManagementSummary.convertedHolds",
+       "operation": "listReservationHoldRelease",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Released Inventory, tickets",
+       "bindsTo": "ReservationsHoldsReleaseManagementSummary.releasedInventory",
+       "operation": "listReservationHoldRelease",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -661,15 +713,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "dataTable",
        "label": "Every reservations holds release",
-       "columns": [
-        "ReservationsHoldsReleaseManagementView.activeHolds",
-        "ReservationsHoldsReleaseManagementView.heldTickets",
-        "ReservationsHoldsReleaseManagementView.heldValue",
-        "ReservationsHoldsReleaseManagementView.expiringToday",
-        "ReservationsHoldsReleaseManagementView.expiredHolds",
-        "ReservationsHoldsReleaseManagementView.convertedHolds",
-        "ReservationsHoldsReleaseManagementView.releasedInventory"
-       ],
        "bindsTo": "ReservationsHoldsReleaseManagementView",
        "operation": "listReservationHoldRelease",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 48 §Display"
@@ -684,15 +727,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "detailPanel",
        "label": "The selected reservations holds release",
        "bindsTo": "ReservationsHoldsReleaseManagementView",
-       "columns": [
-        "ReservationsHoldsReleaseManagementView.activeHolds",
-        "ReservationsHoldsReleaseManagementView.heldTickets",
-        "ReservationsHoldsReleaseManagementView.heldValue",
-        "ReservationsHoldsReleaseManagementView.expiringToday",
-        "ReservationsHoldsReleaseManagementView.expiredHolds",
-        "ReservationsHoldsReleaseManagementView.convertedHolds",
-        "ReservationsHoldsReleaseManagementView.releasedInventory"
-       ],
        "notes": "The pack groups this record's detail under its own headings: “When a hold expires”.",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 48 §Display"
       }
@@ -729,18 +763,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "ReservationsHoldsReleaseManagementView.activeHolds",
-    "ReservationsHoldsReleaseManagementView.heldTickets",
-    "ReservationsHoldsReleaseManagementView.heldValue",
-    "ReservationsHoldsReleaseManagementView.expiringToday",
-    "ReservationsHoldsReleaseManagementView.expiredHolds",
-    "ReservationsHoldsReleaseManagementView.convertedHolds"
+    "ReservationsHoldsReleaseManagementSummary.activeHolds",
+    "ReservationsHoldsReleaseManagementSummary.heldTickets",
+    "ReservationsHoldsReleaseManagementSummary.heldValue",
+    "ReservationsHoldsReleaseManagementSummary.expiringToday",
+    "ReservationsHoldsReleaseManagementSummary.expiredHolds",
+    "ReservationsHoldsReleaseManagementSummary.convertedHolds"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-044"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-044",
+   "workshopBoard": "wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-044"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 48. 7 of 7 labels bound to a contract property; 25 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -804,10 +839,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Partner booking changes are processed according to applicable commercial and product policies with complete financial and inventory impact visibility.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Manage post-booking changes according to the partner's commercial agreement and product policies.",
-  "purposeNote": "Partner booking changes are processed according to applicable commercial and product policies with complete financial and inventory impact visibility.",
   "gaps": [
    {
     "operation": null,
@@ -833,6 +868,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create partner change request",
+       "operation": "createPartnerChangeRequest",
+       "permission": "ORDER_MODIFY",
+       "notes": "The request raised from PTR-045 (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml POST /partner-change-requests"
+      }
+     ]
     }
    ]
   },
@@ -849,23 +898,56 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "subscription",
     "purpose": "Partner Cancellations, Refunds & Amendments",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "createPartnerChangeRequest",
+    "contract": "subscription",
+    "purpose": "A partner asks to cancel or amend a booking",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPartnerCancellationRefund"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "PartnerCancellationsRefundsAmendmentsView.fullCancellation",
-    "PartnerCancellationsRefundsAmendmentsView.partialCancellation",
-    "PartnerCancellationsRefundsAmendmentsView.dateChange",
-    "PartnerCancellationsRefundsAmendmentsView.performanceChange",
-    "PartnerCancellationsRefundsAmendmentsView.quantityReduction"
+    "PartnerCancellationsRefundsAmendmentsView.requestType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-045"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-045",
+   "workshopBoard": "wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-045"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 49. 0 of 0 labels bound to a contract property; 0 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreatePartnerChangeRequest",
+    "component": "modal",
+    "trigger": "Create partner change request",
+    "body": "**Collects what `createPartnerChangeRequest` sends before it is called.** Required: `orderId`, `requestType`. Optional: `quantity`, `targetPerformanceId`, `targetProductId`, `newCustomerName`, `feeWaiverRequested`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PartnerChangeRequestInput",
+    "confirm": {
+     "label": "Create partner change request",
+     "operation": "createPartnerChangeRequest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "orderId",
+      "requestType",
+      "quantity",
+      "targetPerformanceId",
+      "targetProductId",
+      "newCustomerName",
+      "feeWaiverRequested",
+      "reason"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /partner-change-requests"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -927,10 +1009,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Finance and authorized partner users can reconcile all commercial account activity against a clear running balance and supporting transaction references.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each line should show) — counts over a population, then the population",
   "purpose": "Give finance and commercial teams a complete financial statement for each partner account.",
-  "purposeNote": "Finance and authorized partner users can reconcile all commercial account activity against a clear running balance and supporting transaction references.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -942,67 +1024,67 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "metricTile",
        "label": "Opening Balance",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.openingBalance"
+       "bindsTo": "PartnerStatementAccountActivitySummary.openingBalance"
       },
       {
        "kind": "metricTile",
        "label": "Sales",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.sales"
+       "bindsTo": "PartnerStatementAccountActivitySummary.sales"
       },
       {
        "kind": "metricTile",
        "label": "Payments",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.payments"
+       "bindsTo": "PartnerStatementAccountActivitySummary.payments"
       },
       {
        "kind": "metricTile",
        "label": "Credits",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.credits"
+       "bindsTo": "PartnerStatementAccountActivitySummary.credits"
       },
       {
        "kind": "metricTile",
        "label": "Refunds",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.refunds"
+       "bindsTo": "PartnerStatementAccountActivitySummary.refunds"
       },
       {
        "kind": "metricTile",
        "label": "Commission",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.commission"
+       "bindsTo": "PartnerStatementAccountActivitySummary.commission"
       },
       {
        "kind": "metricTile",
        "label": "Adjustments",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.adjustments"
+       "bindsTo": "PartnerStatementAccountActivitySummary.adjustments"
       },
       {
        "kind": "metricTile",
        "label": "Closing Balance",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.closingBalance"
+       "bindsTo": "PartnerStatementAccountActivitySummary.closingBalance"
       },
       {
        "kind": "metricTile",
        "label": "Overdue Balance",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.overdueBalance"
+       "bindsTo": "PartnerStatementAccountActivitySummary.overdueBalance"
       },
       {
        "kind": "metricTile",
        "label": "Available Credit",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.availableCredit"
+       "bindsTo": "PartnerStatementAccountActivitySummary.availableCredit"
       },
       {
        "kind": "metricTile",
        "label": "Current",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.current"
+       "bindsTo": "PartnerStatementAccountActivitySummary.current"
       },
       {
        "kind": "metricTile",
@@ -1094,7 +1176,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-046"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-046",
+   "workshopBoard": "wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-046"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 51. 20 of 20 labels bound to a contract property; 24 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1158,13 +1241,75 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Partner operational and financial records can be reconciled systematically, with every unresolved difference tracked through resolution.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Reconcile operational bookings against financial and channel records and identify discrepancies.",
-  "purposeNote": "Partner operational and financial records can be reconciled systematically, with every unresolved difference tracked through resolution.",
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Records Reconciled",
+       "bindsTo": "PartnerReconciliationExceptionManagementSummary.recordsReconciled",
+       "operation": "listPartnerReconciliationException",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Unmatched Orders",
+       "bindsTo": "PartnerReconciliationExceptionManagementSummary.unmatchedOrders",
+       "operation": "listPartnerReconciliationException",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Amount Mismatches",
+       "bindsTo": "PartnerReconciliationExceptionManagementSummary.amountMismatches",
+       "operation": "listPartnerReconciliationException",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Missing Tickets",
+       "bindsTo": "PartnerReconciliationExceptionManagementSummary.missingTickets",
+       "operation": "listPartnerReconciliationException",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pricing Differences",
+       "bindsTo": "PartnerReconciliationExceptionManagementSummary.pricingDifferences",
+       "operation": "listPartnerReconciliationException",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Commission Differences",
+       "bindsTo": "PartnerReconciliationExceptionManagementSummary.commissionDifferences",
+       "operation": "listPartnerReconciliationException",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Payment Differences",
+       "bindsTo": "PartnerReconciliationExceptionManagementSummary.paymentDifferences",
+       "operation": "listPartnerReconciliationException",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pending Investigation",
+       "bindsTo": "PartnerReconciliationExceptionManagementSummary.pendingInvestigation",
+       "operation": "listPartnerReconciliationException",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -1172,16 +1317,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "dataTable",
        "label": "Every partner reconciliation exception",
-       "columns": [
-        "PartnerReconciliationExceptionManagementView.recordsReconciled",
-        "PartnerReconciliationExceptionManagementView.unmatchedOrders",
-        "PartnerReconciliationExceptionManagementView.amountMismatches",
-        "PartnerReconciliationExceptionManagementView.missingTickets",
-        "PartnerReconciliationExceptionManagementView.pricingDifferences",
-        "PartnerReconciliationExceptionManagementView.commissionDifferences",
-        "PartnerReconciliationExceptionManagementView.paymentDifferences",
-        "PartnerReconciliationExceptionManagementView.pendingInvestigation"
-       ],
        "bindsTo": "PartnerReconciliationExceptionManagementView",
        "operation": "listPartnerReconciliationException",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 52 §Display"
@@ -1196,16 +1331,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "detailPanel",
        "label": "The selected partner reconciliation exception",
        "bindsTo": "PartnerReconciliationExceptionManagementView",
-       "columns": [
-        "PartnerReconciliationExceptionManagementView.recordsReconciled",
-        "PartnerReconciliationExceptionManagementView.unmatchedOrders",
-        "PartnerReconciliationExceptionManagementView.amountMismatches",
-        "PartnerReconciliationExceptionManagementView.missingTickets",
-        "PartnerReconciliationExceptionManagementView.pricingDifferences",
-        "PartnerReconciliationExceptionManagementView.commissionDifferences",
-        "PartnerReconciliationExceptionManagementView.paymentDifferences",
-        "PartnerReconciliationExceptionManagementView.pendingInvestigation"
-       ],
        "notes": "The pack groups this record's detail under its own headings: “Partner Orders”, “Partner Reference OTA-82714”, “Exception Types”.",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 52 §Display"
       }
@@ -1220,6 +1345,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Permissions this screen separates",
        "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Match, Correct, Accept Difference, Create Adjustment, Assign, Escalate, Dispute. Each needs attaching to the control it gates, or the screen needs the control.",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 52 §Authorized users can"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Act on partner reconciliation exception",
+       "operation": "actOnPartnerReconciliationException",
+       "permission": "SETTLEMENT_RECONCILE",
+       "notes": "The owner actions on PTR-047 (decided 29 September, writers pass; DM4); the rows themselves are created and re-matched by the reconciliation job.",
+       "provenance": "contract subscription.yaml POST /partner-reconciliation-exceptions/{exceptionId}/actions"
       }
      ]
     }
@@ -1238,24 +1371,63 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "subscription",
     "purpose": "Partner Reconciliation & Exception Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "actOnPartnerReconciliationException",
+    "contract": "subscription",
+    "purpose": "Work a partner reconciliation exception",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPartnerReconciliationException"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "PartnerReconciliationExceptionManagementView.recordsReconciled",
-    "PartnerReconciliationExceptionManagementView.unmatchedOrders",
-    "PartnerReconciliationExceptionManagementView.amountMismatches",
-    "PartnerReconciliationExceptionManagementView.missingTickets",
-    "PartnerReconciliationExceptionManagementView.pricingDifferences",
-    "PartnerReconciliationExceptionManagementView.commissionDifferences"
+    "PartnerReconciliationExceptionManagementSummary.recordsReconciled",
+    "PartnerReconciliationExceptionManagementSummary.unmatchedOrders",
+    "PartnerReconciliationExceptionManagementSummary.amountMismatches",
+    "PartnerReconciliationExceptionManagementSummary.missingTickets",
+    "PartnerReconciliationExceptionManagementSummary.pricingDifferences",
+    "PartnerReconciliationExceptionManagementSummary.commissionDifferences"
+   ],
+   "params": [
+    {
+     "name": "exceptionId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-047"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-047",
+   "workshopBoard": "wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-047"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 52. 8 of 8 labels bound to a contract property; 15 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formActOnPartnerReconciliationException",
+    "component": "modal",
+    "trigger": "Act on partner reconciliation exception",
+    "body": "**Collects what `actOnPartnerReconciliationException` sends before it is called.** Required: `action`. Optional: `assigneePrincipalId`, `adjustmentRef`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Act on partner reconciliation exception",
+     "operation": "actOnPartnerReconciliationException"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "action",
+      "assigneePrincipalId",
+      "adjustmentRef",
+      "note"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /partner-reconciliation-exceptions/{exceptionId}/actions"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1317,13 +1489,82 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "until relevant transactions and adjustments have been reconciled.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Calculate, approve and settle commission or incentive amounts owed under partner commercial agreements.",
-  "purposeNote": "until relevant transactions and adjustments have been reconciled.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Per Transaction. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 54 §Support"
+   }
+  ],
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Commission Earned",
+       "bindsTo": "CommissionCalculationSettlementManagementSummary.commissionEarned",
+       "operation": "listCommissionCalculationSettlement",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Commission Pending",
+       "bindsTo": "CommissionCalculationSettlementManagementSummary.commissionPending",
+       "operation": "listCommissionCalculationSettlement",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Approved",
+       "bindsTo": "CommissionCalculationSettlementManagementSummary.approved",
+       "operation": "listCommissionCalculationSettlement",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "On Hold",
+       "bindsTo": "CommissionCalculationSettlementManagementSummary.onHold",
+       "operation": "listCommissionCalculationSettlement",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Paid",
+       "bindsTo": "CommissionCalculationSettlementManagementSummary.paid",
+       "operation": "listCommissionCalculationSettlement",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Reversed",
+       "bindsTo": "CommissionCalculationSettlementManagementSummary.reversed",
+       "operation": "listCommissionCalculationSettlement",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Incentives Earned",
+       "bindsTo": "CommissionCalculationSettlementManagementSummary.incentivesEarned",
+       "operation": "listCommissionCalculationSettlement",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Next Settlement date",
+       "bindsTo": "CommissionCalculationSettlementManagementSummary.nextSettlement",
+       "operation": "listCommissionCalculationSettlement",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -1331,16 +1572,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       {
        "kind": "dataTable",
        "label": "Every commission calculation settlement",
-       "columns": [
-        "CommissionCalculationSettlementManagementView.commissionEarned",
-        "CommissionCalculationSettlementManagementView.commissionPending",
-        "CommissionCalculationSettlementManagementView.approved",
-        "CommissionCalculationSettlementManagementView.onHold",
-        "CommissionCalculationSettlementManagementView.paid",
-        "CommissionCalculationSettlementManagementView.reversed",
-        "CommissionCalculationSettlementManagementView.incentivesEarned",
-        "CommissionCalculationSettlementManagementView.nextSettlement"
-       ],
        "bindsTo": "CommissionCalculationSettlementManagementView",
        "operation": "listCommissionCalculationSettlement",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 54 §Display"
@@ -1355,18 +1586,35 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "detailPanel",
        "label": "The selected commission calculation settlement",
        "bindsTo": "CommissionCalculationSettlementManagementView",
-       "columns": [
-        "CommissionCalculationSettlementManagementView.commissionEarned",
-        "CommissionCalculationSettlementManagementView.commissionPending",
-        "CommissionCalculationSettlementManagementView.approved",
-        "CommissionCalculationSettlementManagementView.onHold",
-        "CommissionCalculationSettlementManagementView.paid",
-        "CommissionCalculationSettlementManagementView.reversed",
-        "CommissionCalculationSettlementManagementView.incentivesEarned",
-        "CommissionCalculationSettlementManagementView.nextSettlement"
-       ],
        "notes": "The pack groups this record's detail under its own headings: “For each transaction”, “Automatically account for”, “Exception states”, “Settlement Batch”, “Important Boundary”.",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 54 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Per Transaction",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 54 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Act on partner commission line",
+       "operation": "actOnPartnerCommissionLine",
+       "permission": "SETTLEMENT_RECONCILE",
+       "notes": "The line actions on PTR-048 (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml POST /partner-commission-lines/{lineId}/actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Act on partner settlement batch",
+       "operation": "actOnPartnerSettlementBatch",
+       "permission": "SETTLEMENT_RECONCILE",
+       "notes": "The batch actions on PTR-048 (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml POST /partner-settlement-batches/{batchId}/actions"
       }
      ]
     }
@@ -1385,24 +1633,96 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "subscription",
     "purpose": "Commission Calculation & Settlement Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "actOnPartnerCommissionLine",
+    "contract": "subscription",
+    "purpose": "Hold, release, dispute or reverse a single commission line",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCommissionCalculationSettlement"
+    ]
+   },
+   {
+    "operationId": "actOnPartnerSettlementBatch",
+    "contract": "subscription",
+    "purpose": "Move a commission settlement batch through Finance",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCommissionCalculationSettlement"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "CommissionCalculationSettlementManagementView.commissionEarned",
-    "CommissionCalculationSettlementManagementView.commissionPending",
-    "CommissionCalculationSettlementManagementView.approved",
-    "CommissionCalculationSettlementManagementView.onHold",
-    "CommissionCalculationSettlementManagementView.paid",
-    "CommissionCalculationSettlementManagementView.reversed"
+    "CommissionCalculationSettlementManagementSummary.commissionEarned",
+    "CommissionCalculationSettlementManagementSummary.commissionPending",
+    "CommissionCalculationSettlementManagementSummary.approved",
+    "CommissionCalculationSettlementManagementSummary.onHold",
+    "CommissionCalculationSettlementManagementSummary.paid",
+    "CommissionCalculationSettlementManagementSummary.reversed"
+   ],
+   "params": [
+    {
+     "name": "lineId",
+     "from": "navigation",
+     "optional": true
+    },
+    {
+     "name": "batchId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-048"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-048",
+   "workshopBoard": "wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-048"
   },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 54. 8 of 8 labels bound to a contract property; 8 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 54. 8 of 8 labels bound to a contract property; 9 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formActOnPartnerCommissionLine",
+    "component": "modal",
+    "trigger": "Act on partner commission line",
+    "body": "**Collects what `actOnPartnerCommissionLine` sends before it is called.** Required: `action`. Optional: `reason`, `caseId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Act on partner commission line",
+     "operation": "actOnPartnerCommissionLine"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "action",
+      "reason",
+      "caseId"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /partner-commission-lines/{lineId}/actions"
+   },
+   {
+    "id": "formActOnPartnerSettlementBatch",
+    "component": "modal",
+    "trigger": "Act on partner settlement batch",
+    "body": "**Collects what `actOnPartnerSettlementBatch` sends before it is called.** Required: `action`. Optional: `scheduledDate`, `reason`, `caseId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Act on partner settlement batch",
+     "operation": "actOnPartnerSettlementBatch"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "action",
+      "scheduledDate",
+      "reason",
+      "caseId"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /partner-settlement-batches/{batchId}/actions"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1464,14 +1784,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Every partner dispute has a traceable owner, SLA, supporting evidence, financial context and documented resolution.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Monitor) and no metric row",
   "purpose": "Provide a structured case-management environment for partner operational and commercial disputes.",
-  "purposeNote": "Every partner dispute has a traceable owner, SLA, supporting evidence, financial context and documented resolution.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Booking Dispute, Pricing Dispute, Ticket Issue, Allocation Issue, Finance review, Technical review. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 8 actions on this screen; 6 are served since the writers pass (29 September): Booking Dispute, Pricing Dispute, Credit Dispute, Ticket Issue, Allocation Issue, API Issue by `createPartnerCase`.** Still unserved: Finance review, Technical review. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support"
    }
   ],
@@ -1532,12 +1852,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       },
       {
        "kind": "secondaryButton",
+       "label": "Credit Dispute",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Ticket Issue",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support"
       },
       {
        "kind": "secondaryButton",
        "label": "Allocation Issue",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "API Issue",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support"
       },
       {
@@ -1549,6 +1879,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "secondaryButton",
        "label": "Technical review",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create partner case",
+       "operation": "createPartnerCase",
+       "permission": "CASE_MANAGE",
+       "notes": "Raised from PTR-049 by staff or by the partner (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml POST /partner-cases"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Act on partner case",
+       "operation": "actOnPartnerCase",
+       "permission": "CASE_MANAGE",
+       "provenance": "contract subscription.yaml POST /partner-cases/{caseId}/actions"
       }
      ]
     }
@@ -1567,6 +1912,24 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "subscription",
     "purpose": "Partner Disputes, Cases & Service Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "createPartnerCase",
+    "contract": "subscription",
+    "purpose": "Open a partner dispute or service case",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPartnerDisputeCase"
+    ]
+   },
+   {
+    "operationId": "actOnPartnerCase",
+    "contract": "subscription",
+    "purpose": "Work a partner case",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPartnerDisputeCase"
+    ]
    }
   ],
   "entryState": {
@@ -1575,14 +1938,79 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "PartnerDisputesCasesServiceManagementView.resolutionTarget",
     "PartnerDisputesCasesServiceManagementView.timeOpen",
     "PartnerDisputesCasesServiceManagementView.slaBreach"
+   ],
+   "params": [
+    {
+     "name": "caseId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-049"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-049",
+   "workshopBoard": "wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-049"
   },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 56. 4 of 4 labels bound to a contract property; 25 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 56. 4 of 4 labels bound to a contract property; 27 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreatePartnerCase",
+    "component": "modal",
+    "trigger": "Create partner case",
+    "body": "**Collects what `createPartnerCase` sends before it is called.** Required: `id`, `partnerId`, `category`, `priority`, `description`, `status`, `resolutionTargetAt`. Optional: `contactId`, `orderId`, `invoiceReference`, `settlementBatchId`, `amountInDispute`, `evidence`, `ownerPrincipalId`, `slaPolicyId`, `firstResponseAt`, `resolvedAt`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PartnerCase",
+    "confirm": {
+     "label": "Create partner case",
+     "operation": "createPartnerCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "partnerId",
+      "category",
+      "priority",
+      "description",
+      "status",
+      "resolutionTargetAt",
+      "contactId",
+      "orderId",
+      "invoiceReference",
+      "settlementBatchId",
+      "amountInDispute",
+      "evidence",
+      "ownerPrincipalId",
+      "slaPolicyId",
+      "firstResponseAt",
+      "resolvedAt",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /partner-cases"
+   },
+   {
+    "id": "formActOnPartnerCase",
+    "component": "modal",
+    "trigger": "Act on partner case",
+    "body": "**Collects what `actOnPartnerCase` sends before it is called.** Required: `action`. Optional: `ownerPrincipalId`, `resolution`, `reason`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Act on partner case",
+     "operation": "actOnPartnerCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "action",
+      "ownerPrincipalId",
+      "resolution",
+      "reason",
+      "note"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /partner-cases/{caseId}/actions"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1644,10 +2072,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Management can objectively compare partners and identify commercial, operational or financial deterioration before it becomes a material issue.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Create a consistent scorecard for evaluating the quality and commercial value of every partner relationship.",
-  "purposeNote": "Management can objectively compare partners and identify commercial, operational or financial deterioration before it becomes a material issue.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1659,9 +2087,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every partner performance scorecard",
        "columns": [
-        "PartnerPerformanceScorecardRiskMonitoringView.improving",
-        "PartnerPerformanceScorecardRiskMonitoringView.stable",
-        "PartnerPerformanceScorecardRiskMonitoringView.declining"
+        "PartnerPerformanceScorecardRiskMonitoringView.trend"
        ],
        "bindsTo": "PartnerPerformanceScorecardRiskMonitoringView",
        "operation": "listPartnerPerformanceScorecard",
@@ -1678,9 +2104,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected partner performance scorecard",
        "bindsTo": "PartnerPerformanceScorecardRiskMonitoringView",
        "columns": [
-        "PartnerPerformanceScorecardRiskMonitoringView.improving",
-        "PartnerPerformanceScorecardRiskMonitoringView.stable",
-        "PartnerPerformanceScorecardRiskMonitoringView.declining"
+        "PartnerPerformanceScorecardRiskMonitoringView.trend"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Commercial”, “Allocation”, “Financial”, “Operational”, “Technical”, “Compliance”.",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 57 §Show"
@@ -1706,15 +2130,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "PartnerPerformanceScorecardRiskMonitoringView.improving",
-    "PartnerPerformanceScorecardRiskMonitoringView.stable",
-    "PartnerPerformanceScorecardRiskMonitoringView.declining"
+    "PartnerPerformanceScorecardRiskMonitoringView.trend"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-050"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-050",
+   "workshopBoard": "wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-050"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 57. 3 of 3 labels bound to a contract property; 3 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1770,10 +2193,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Management receives explainable partner-level intelligence and scenario modelling that supports growth, margin, allocation and risk decisions without bypassing commercial governance. Board 3 — Final Screen Register Screen Backend Screen Primary Responsibility 8.3.1 Partner Operations Command Center Live partner operations 8.3.2 Partner Orders & Booking Management Partner transactions",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Analyze) and no metric row",
   "purpose": "Provide TICVAI's AI decision-support layer across the complete partner lifecycle. This screen should combine information from Boards 1, 2 and 3.",
-  "purposeNote": "Management receives explainable partner-level intelligence and scenario modelling that supports growth, margin, allocation and risk decisions without bypassing commercial governance. Board 3 — Final Screen Register Screen Backend Screen Primary Responsibility 8.3.1 Partner Operations Command Center Live partner operations 8.3.2 Partner Orders & Booking Management Partner transactions",
   "layout": {
    "template": "split",
    "regions": [
@@ -1785,20 +2208,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every partner intelligence relationship",
        "columns": [
-        "PartnerAiIntelligenceRelationshipOptimizationView.partnerProfile",
-        "PartnerAiIntelligenceRelationshipOptimizationView.territory",
-        "PartnerAiIntelligenceRelationshipOptimizationView.agreements",
-        "PartnerAiIntelligenceRelationshipOptimizationView.rates",
-        "PartnerAiIntelligenceRelationshipOptimizationView.commission",
-        "PartnerAiIntelligenceRelationshipOptimizationView.credit",
-        "PartnerAiIntelligenceRelationshipOptimizationView.paymentBehavior",
-        "PartnerAiIntelligenceRelationshipOptimizationView.allocation",
-        "PartnerAiIntelligenceRelationshipOptimizationView.orders",
-        "PartnerAiIntelligenceRelationshipOptimizationView.cancellations",
-        "PartnerAiIntelligenceRelationshipOptimizationView.settlement",
-        "PartnerAiIntelligenceRelationshipOptimizationView.cases",
-        "PartnerAiIntelligenceRelationshipOptimizationView.channelPerformance",
-        "PartnerAiIntelligenceRelationshipOptimizationView.historicalTrends"
+        "PartnerAiIntelligenceRelationshipOptimizationView.inputsConsidered"
        ],
        "bindsTo": "PartnerAiIntelligenceRelationshipOptimizationView",
        "operation": "listPartnerRelationship",
@@ -1815,20 +2225,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected partner intelligence relationship",
        "bindsTo": "PartnerAiIntelligenceRelationshipOptimizationView",
        "columns": [
-        "PartnerAiIntelligenceRelationshipOptimizationView.partnerProfile",
-        "PartnerAiIntelligenceRelationshipOptimizationView.territory",
-        "PartnerAiIntelligenceRelationshipOptimizationView.agreements",
-        "PartnerAiIntelligenceRelationshipOptimizationView.rates",
-        "PartnerAiIntelligenceRelationshipOptimizationView.commission",
-        "PartnerAiIntelligenceRelationshipOptimizationView.credit",
-        "PartnerAiIntelligenceRelationshipOptimizationView.paymentBehavior",
-        "PartnerAiIntelligenceRelationshipOptimizationView.allocation",
-        "PartnerAiIntelligenceRelationshipOptimizationView.orders",
-        "PartnerAiIntelligenceRelationshipOptimizationView.cancellations",
-        "PartnerAiIntelligenceRelationshipOptimizationView.settlement",
-        "PartnerAiIntelligenceRelationshipOptimizationView.cases",
-        "PartnerAiIntelligenceRelationshipOptimizationView.channelPerformance",
-        "PartnerAiIntelligenceRelationshipOptimizationView.historicalTrends"
+        "PartnerAiIntelligenceRelationshipOptimizationView.inputsConsidered"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Commercial”, “Allocation”, “Credit”, “Risk”, “Growth”, “Natural-Language Analysis”.",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 59 §Analyze"
@@ -1854,18 +2251,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "PartnerAiIntelligenceRelationshipOptimizationView.partnerProfile",
-    "PartnerAiIntelligenceRelationshipOptimizationView.territory",
-    "PartnerAiIntelligenceRelationshipOptimizationView.agreements",
-    "PartnerAiIntelligenceRelationshipOptimizationView.rates",
-    "PartnerAiIntelligenceRelationshipOptimizationView.commission",
-    "PartnerAiIntelligenceRelationshipOptimizationView.credit"
+    "PartnerAiIntelligenceRelationshipOptimizationView.inputsConsidered"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-051"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-051",
+   "workshopBoard": "wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-051"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 59. 14 of 14 labels bound to a contract property; 14 of 96 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1901,6 +2294,125 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+ "actOnPartnerCase": {
+  "method": "POST",
+  "path": "/partner-cases/{caseId}/actions",
+  "contract": "subscription",
+  "summary": "Work a partner case",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PartnerCase"
+ },
+ "actOnPartnerCommissionLine": {
+  "method": "POST",
+  "path": "/partner-commission-lines/{lineId}/actions",
+  "contract": "subscription",
+  "summary": "Hold, release, dispute or reverse a single commission line",
+  "permission": "SETTLEMENT_RECONCILE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PartnerCommissionLine"
+ },
+ "actOnPartnerReconciliationException": {
+  "method": "POST",
+  "path": "/partner-reconciliation-exceptions/{exceptionId}/actions",
+  "contract": "subscription",
+  "summary": "Work a partner reconciliation exception",
+  "permission": "SETTLEMENT_RECONCILE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PartnerReconciliationException"
+ },
+ "actOnPartnerSettlementBatch": {
+  "method": "POST",
+  "path": "/partner-settlement-batches/{batchId}/actions",
+  "contract": "subscription",
+  "summary": "Move a commission settlement batch through Finance",
+  "permission": "SETTLEMENT_RECONCILE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PartnerSettlementBatch"
+ },
+ "createPartnerCase": {
+  "method": "POST",
+  "path": "/partner-cases",
+  "contract": "subscription",
+  "summary": "Open a partner dispute or service case",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PartnerCase",
+  "responds": "PartnerCase"
+ },
+ "createPartnerChangeRequest": {
+  "method": "POST",
+  "path": "/partner-change-requests",
+  "contract": "subscription",
+  "summary": "A partner asks to cancel or amend a booking",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "dryRun",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": "PartnerChangeRequestInput",
+  "responds": "PartnerChangeRequest"
+ },
  "listCommissionCalculationSettlement": {
   "method": "GET",
   "path": "/commission-calculation-settlement",
@@ -1910,9 +2422,124 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "settlementBatchId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "CommissionCalculationSettlementManagementView"
+  "responds": "Page"
+ },
+ "listPartner": {
+  "method": "GET",
+  "path": "/partner",
+  "contract": "subscription",
+  "summary": "Partner Management Command Center",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "brand",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "accountManager",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "risk",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "integrationType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partnerType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "territory",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "agreementStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "creditStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listPartner2": {
   "method": "GET",
@@ -1945,13 +2572,53 @@ Method, path, parameters, request and response for every operation these screens
     "required": false
    },
    {
-    "name": "date",
+    "name": "from",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partnerType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "accountManager",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "operationalStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "risk",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "PartnerOperationsCommandCenterView"
+  "responds": "Page"
  },
  "listPartnerCancellationRefund": {
   "method": "GET",
@@ -1962,9 +2629,45 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "requestType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PartnerCancellationsRefundsAmendmentsView"
+  "responds": "Page"
  },
  "listPartnerDisputeCase": {
   "method": "GET",
@@ -1975,9 +2678,50 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "category",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priority",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "owner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "slaBreach",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PartnerDisputesCasesServiceManagementView"
+  "responds": "Page"
  },
  "listPartnerOrderBooking": {
   "method": "GET",
@@ -2028,10 +2772,35 @@ Method, path, parameters, request and response for every operation these screens
     "name": "visitEventDate",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "agent",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "PartnerOrdersBookingManagementView"
+  "responds": "Page"
  },
  "listPartnerPerformanceScorecard": {
   "method": "GET",
@@ -2042,9 +2811,50 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partnerType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "market",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "riskRating",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "trend",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PartnerPerformanceScorecardRiskMonitoringView"
+  "responds": "Page"
  },
  "listPartnerReconciliationException": {
   "method": "GET",
@@ -2055,9 +2865,35 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "mismatchType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PartnerReconciliationExceptionManagementView"
+  "responds": "Page"
  },
  "listPartnerRelationship": {
   "method": "GET",
@@ -2068,9 +2904,40 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "category",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "opportunityClass",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PartnerAiIntelligenceRelationshipOptimizationView"
+  "responds": "Page"
  },
  "listPartnerStatementAccount": {
   "method": "GET",
@@ -2081,9 +2948,45 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "transactionType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PartnerStatementAccountActivityView"
+  "responds": "Page"
  },
  "listReservationHoldRelease": {
   "method": "GET",
@@ -2094,9 +2997,40 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "expiringBefore",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ReservationsHoldsReleaseManagementView"
+  "responds": "Page"
  }
 }
 ```
@@ -2107,143 +3041,190 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
- "CommissionCalculationSettlementManagementView": {
+ "CommissionCalculationSettlementManagementSummary": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
-  "description": "**What Commission Calculation & Settlement Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Commission Calculation & Settlement Management.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
   "properties": {
    "commissionEarned": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Commission Earned"
    },
    "commissionPending": {
-    "type": "integer",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Commission Pending"
    },
    "approved": {
-    "type": "integer",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Approved"
    },
    "onHold": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "On Hold"
    },
    "paid": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Paid"
    },
    "reversed": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Reversed"
    },
    "incentivesEarned": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Incentives Earned"
    },
    "nextSettlement": {
     "type": "string",
-    "format": "date-time",
-    "description": "Next Settlement"
-   },
-   "order": {
+    "format": "date",
+    "description": "Next Settlement date",
+    "nullable": true
+   }
+  }
+ },
+ "CommissionCalculationSettlementManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over control.partner_commission_line (PartnerCommissionLine) and control.partner_settlement_batch and the existing subscription state, assembled at read time (data model DM4)",
+  "description": "**What Commission Calculation & Settlement Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "orderNumber": {
     "type": "string",
-    "description": "Order"
+    "description": "Order number"
    },
    "partner": {
     "type": "string",
-    "description": "Partner"
+    "description": "Partner trading name"
    },
    "product": {
     "type": "string",
     "description": "Product"
    },
    "grossValue": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Gross Value"
    },
    "netRate": {
-    "type": "number",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Net Rate"
    },
    "commissionBasis": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Commission Basis"
    },
-   "commission": {
+   "commissionPercent": {
     "type": "number",
-    "description": "Commission %"
+    "description": "Commission %",
+    "nullable": true
    },
    "commissionAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Commission Amount"
    },
    "incentive": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Incentive"
    },
    "adjustment": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Adjustment"
    },
    "payableAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Payable Amount"
    },
-   "perTransaction": {
-    "type": "string",
-    "description": "Per Transaction"
-   },
-   "weekly": {
-    "type": "string",
-    "description": "Weekly"
-   },
-   "monthly": {
-    "type": "string",
-    "description": "Monthly"
-   },
-   "eventBased": {
-    "type": "string",
-    "description": "Event-Based"
-   },
-   "customCycle": {
-    "type": "string",
-    "description": "Custom Cycle"
-   },
-   "cancellation": {
-    "type": "string",
-    "description": "Cancellation"
-   },
-   "chargeback": {
-    "type": "string",
-    "description": "Chargeback"
-   },
-   "partialFulfillment": {
-    "type": "string",
-    "description": "Partial fulfillment"
-   },
-   "commissionCorrection": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Commission correction"
-   },
-   "incentiveQualification": {
-    "type": "string",
-    "description": "Incentive qualification"
-   },
-   "currency": {
-    "type": "string",
-    "description": "Currency"
-   },
    "period": {
     "type": "string",
-    "format": "date-time",
-    "description": "Period"
+    "description": "Settlement period label, e.g. 2026-09"
    },
    "legalEntity": {
     "type": "string",
     "description": "Legal Entity"
+   },
+   "lineId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Calculation line id"
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Order"
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Partner"
+   },
+   "agreementVersion": {
+    "type": "integer",
+    "description": "Agreement version in force at the time of the sale"
+   },
+   "settlementPeriod": {
+    "type": "string",
+    "enum": [
+     "perTransaction",
+     "weekly",
+     "monthly",
+     "eventBased",
+     "customCycle"
+    ],
+    "description": "Settlement Period"
+   },
+   "adjustmentReason": {
+    "type": "string",
+    "enum": [
+     "cancellation",
+     "refund",
+     "chargeback",
+     "partialFulfillment",
+     "commissionCorrection",
+     "incentiveQualification"
+    ],
+    "description": "Adjustment reason",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "description": "Settlement status: calculated, reconciled, financeReview, approved, scheduled, paid, onHold, disputed, reversed"
+   },
+   "settlementBatchId": {
+    "type": "string",
+    "description": "Settlement batch",
+    "nullable": true
    }
   }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PartnerAgreementStatus": {
+  "type": "string",
+  "enum": [
+   "pendingApproval",
+   "active",
+   "expiringSoon",
+   "expired",
+   "suspended",
+   "terminated"
+  ]
  },
  "PartnerAiIntelligenceRelationshipOptimizationView": {
   "type": "object",
@@ -2251,94 +3232,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
   "description": "**What Partner AI Intelligence & Relationship Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "partnerProfile": {
-    "type": "string",
-    "description": "Partner profile"
-   },
-   "territory": {
-    "type": "string",
-    "description": "Territory"
-   },
-   "agreements": {
-    "type": "string",
-    "description": "Agreements"
-   },
-   "rates": {
-    "type": "string",
-    "description": "Rates"
-   },
-   "commission": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Commission"
-   },
-   "credit": {
-    "type": "string",
-    "description": "Credit"
-   },
-   "paymentBehavior": {
-    "type": "string",
-    "description": "Payment behavior"
-   },
-   "allocation": {
-    "type": "string",
-    "description": "Allocation"
-   },
-   "orders": {
-    "type": "string",
-    "description": "Orders"
-   },
-   "cancellations": {
-    "type": "string",
-    "description": "Cancellations"
-   },
-   "settlement": {
-    "type": "string",
-    "description": "Settlement"
-   },
-   "cases": {
-    "type": "string",
-    "description": "Cases"
-   },
-   "channelPerformance": {
-    "type": "string",
-    "description": "Channel performance"
-   },
-   "historicalTrends": {
-    "type": "string",
-    "description": "Historical trends"
-   },
-   "releasing320Tickets": {
-    "type": "string",
-    "description": "releasing 320 tickets"
-   },
-   "velocity": {
-    "type": "string",
-    "description": "velocity"
-   },
-   "usingConfigurableBusinessCriteria": {
-    "type": "string",
-    "description": "using configurable business criteria"
-   },
-   "additionalSales": {
-    "type": "string",
-    "description": "Additional Sales"
-   },
-   "revenue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue"
-   },
-   "margin": {
-    "type": "number",
-    "description": "Margin"
-   },
-   "creditExposure": {
-    "type": "string",
-    "description": "Credit Exposure"
-   },
-   "inventoryRisk": {
-    "type": "string",
-    "description": "Inventory Risk"
-   },
    "recommendation": {
     "type": "string",
     "description": "Recommendation"
@@ -2352,229 +3245,896 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Expected Impact"
    },
    "confidence": {
-    "type": "string",
-    "description": "Confidence"
+    "type": "number",
+    "description": "Confidence, 0-1"
    },
    "risks": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Risks"
    },
    "supportingMetrics": {
-    "type": "string",
-    "description": "Supporting Metrics"
+    "type": "array",
+    "description": "Supporting Metrics",
+    "items": {
+     "type": "object",
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "value": {
+       "type": "string"
+      }
+     }
+    }
    },
-   "management": {
+   "recommendationId": {
     "type": "string",
-    "description": "management"
+    "format": "uuid",
+    "description": "Recommendation id"
    },
-   "screenBackendScreenPrimaryResponsibility": {
+   "partnerId": {
     "type": "string",
-    "description": "Screen Backend Screen Primary Responsibility"
+    "format": "uuid",
+    "description": "Partner"
    },
-   "partnerReconciliationExceptionOperationalFinancial": {
+   "partner": {
     "type": "string",
-    "description": "Partner Reconciliation & Exception Operational/financial"
+    "description": "Partner trading name"
    },
-   "area8CompleteArchitecture": {
+   "category": {
     "type": "string",
-    "description": "Area 8 — Complete Architecture"
+    "enum": [
+     "commercial",
+     "allocation",
+     "credit",
+     "risk",
+     "growth"
+    ],
+    "description": "Recommendation category"
    },
-   "whoIsThePartner": {
+   "opportunityClass": {
     "type": "string",
-    "description": "Who is the partner?"
+    "enum": [
+     "grow",
+     "maintain",
+     "review",
+     "restrict"
+    ],
+    "description": "Partner Opportunity Matrix class, from configurable business criteria"
    },
-   "board2CommercialManagement": {
-    "type": "string",
-    "description": "Board 2 — Commercial Management"
+   "inputsConsidered": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "partnerProfile",
+      "territory",
+      "agreements",
+      "rates",
+      "commission",
+      "credit",
+      "paymentBehavior",
+      "allocation",
+      "orders",
+      "cancellations",
+      "settlement",
+      "cases",
+      "channelPerformance",
+      "historicalTrends"
+     ]
+    },
+    "description": "AI Inputs the recommendation drew on"
    },
-   "billingAllocationLimits": {
-    "type": "string",
-    "description": "Billing → Allocation → Limits"
+   "scenarioEstimate": {
+    "type": "object",
+    "nullable": true,
+    "description": "Scenario Simulation estimate, where the recommendation carries one",
+    "properties": {
+     "additionalSales": {
+      "type": "integer"
+     },
+     "revenue": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "margin": {
+      "type": "number"
+     },
+     "creditExposure": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "inventoryRisk": {
+      "type": "string"
+     }
+    }
    },
-   "howIsTheRelationshipPerforming": {
+   "status": {
     "type": "string",
-    "description": "How is the relationship performing?"
+    "description": "Recommendation status: open, accepted, modified, rejected, assigned"
    },
-   "ai": {
+   "createdAt": {
     "type": "string",
-    "description": "AI"
-   },
-   "dashboard": {
-    "type": "string",
-    "description": "dashboard"
-   },
-   "launchTheAppropriateGovernedWorkflow": {
-    "type": "string",
-    "description": "launch the appropriate governed workflow"
-   },
-   "chartAddedAtTheEnd": {
-    "type": "string",
-    "description": "chart added at the end"
+    "format": "date-time",
+    "description": "Generated at"
    }
   }
  },
  "PartnerCancellationsRefundsAmendmentsView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_change_request (PartnerChangeRequest) and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Partner Cancellations, Refunds & Amendments displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "fullCancellation": {
-    "type": "string",
-    "description": "Full Cancellation"
-   },
-   "partialCancellation": {
-    "type": "string",
-    "description": "Partial Cancellation"
-   },
-   "dateChange": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Date Change"
-   },
-   "performanceChange": {
-    "type": "string",
-    "description": "Performance Change"
-   },
-   "quantityReduction": {
-    "type": "integer",
-    "description": "Quantity Reduction"
-   },
-   "productChange": {
-    "type": "string",
-    "description": "Product Change"
-   },
-   "ticketReissue": {
-    "type": "string",
-    "description": "Ticket Reissue"
-   },
-   "customerNameChangeWherePermitted": {
-    "type": "string",
-    "description": "Customer Name Change where permitted"
-   },
-   "transactionValue": {
-    "type": "string",
-    "description": "Transaction value"
-   },
-   "eventProximity": {
-    "type": "string",
-    "description": "Event proximity"
-   },
-   "cancellationPercentage": {
-    "type": "number",
-    "description": "Cancellation percentage"
-   },
-   "partnerStatus": {
-    "type": "string",
-    "description": "Partner status"
-   },
-   "exceptionRequest": {
-    "type": "string",
-    "description": "Exception request"
-   },
    "originalState": {
     "type": "string",
-    "description": "Original state"
+    "description": "Audit: original state of the booking (summary)"
    },
    "newState": {
-    "type": "integer",
-    "description": "New state"
-   },
-   "user": {
     "type": "string",
-    "description": "User"
+    "description": "Audit: new state of the booking (summary)",
+    "nullable": true
+   },
+   "requestedBy": {
+    "type": "string",
+    "description": "Audit: requesting user"
    },
    "reason": {
     "type": "string",
     "description": "Reason"
    },
    "financialImpact": {
-    "type": "string",
-    "description": "Financial impact"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Financial impact (net change to the partner account)"
    },
-   "approval": {
+   "approvedBy": {
     "type": "string",
-    "description": "Approval"
+    "description": "Approved by",
+    "nullable": true
+   },
+   "requestId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Amendment request id"
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Partner"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner trading name"
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Order"
+   },
+   "orderNumber": {
+    "type": "string",
+    "description": "Order number"
+   },
+   "requestType": {
+    "type": "string",
+    "enum": [
+     "fullCancellation",
+     "partialCancellation",
+     "dateChange",
+     "performanceChange",
+     "quantityReduction",
+     "productChange",
+     "ticketReissue",
+     "customerNameChange",
+     "refundRequest"
+    ],
+    "description": "Request type"
+   },
+   "quantity": {
+    "type": "integer",
+    "description": "Tickets affected",
+    "nullable": true
+   },
+   "originalValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Original Value"
+   },
+   "cancellationAllowed": {
+    "type": "boolean",
+    "description": "Cancellation/change allowed under the evaluated policy"
+   },
+   "cancellationFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Cancellation Fee"
+   },
+   "refundOrCredit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Refund/Credit to the partner"
+   },
+   "allocationImpact": {
+    "type": "integer",
+    "description": "Allocation impact, units returned (+) or taken (-)"
+   },
+   "commissionAdjustment": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Commission Adjustment"
+   },
+   "approvalReasons": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "transactionValue",
+      "eventProximity",
+      "cancellationPercentage",
+      "partnerStatus",
+      "exceptionRequest"
+     ]
+    },
+    "description": "Why approval is required; empty when none"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: requested, pendingApproval, approved, rejected, processed"
+   },
+   "requestedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Requested at"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Advisory AI unusual-cancellation-pattern flags"
+   }
+  }
+ },
+ "PartnerCase": {
+  "type": "object",
+  "x-ticvai-persistence": "control.partner_case",
+  "description": "A partner dispute or service case: category, priority, what it relates to, the amount in dispute, the evidence, the owner and the SLA. Partner cases stay apart from `marketing.case`, which is a guest's service case with a guest lifecycle (decided 29 September, data model DM4)\n\n**Written by** createPartnerCase and actOnPartnerCase (assign, investigate, wait on the partner or a team, propose, accept or reject a resolution, reopen, close) (decided 29 September, writers pass; DM4).",
+  "required": [
+   "id",
+   "partnerId",
+   "category",
+   "priority",
+   "description",
+   "status",
+   "resolutionTargetAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The partner (control.partner)."
+   },
+   "contactId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Partner contact (control.partner_contact)."
+   },
+   "category": {
+    "type": "string",
+    "enum": [
+     "bookingDispute",
+     "pricingDispute",
+     "commissionDispute",
+     "creditDispute",
+     "invoiceDispute",
+     "cancellationDispute",
+     "ticketIssue",
+     "allocationIssue",
+     "apiIssue",
+     "settlementDispute"
+    ],
+    "description": "Category."
+   },
+   "priority": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "urgent"
+    ],
+    "description": "Priority (decided 29 September, readiness close-out)."
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Related order (orders.sales_order)."
+   },
+   "invoiceReference": {
+    "type": "string",
+    "nullable": true,
+    "description": "Related invoice number."
+   },
+   "settlementBatchId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Related settlement (control.partner_settlement_batch)."
+   },
+   "amountInDispute": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Amount in dispute."
+   },
+   "description": {
+    "type": "string",
+    "description": "Description."
+   },
+   "evidence": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Evidence: attachment references."
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Owner, a staff principal."
+   },
+   "slaPolicyId": {
+    "x-ticvai-references": "approvals.sla_policy",
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The SLA policy applied (approvals.sla_policy, the approvals engine's ApprovalSlaPolicy), which sets the first-response and resolution targets and the reminder/breach behaviour; `resolutionTargetAt` is computed from it when the case is opened. Replaces the free-text `slaPolicy` (decided 29 September, writers pass; DM4)"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "assigned",
+     "investigating",
+     "waitingPartner",
+     "waitingInternal",
+     "resolutionProposed",
+     "resolved",
+     "closed"
+    ],
+    "default": "open",
+    "readOnly": true,
+    "description": "Status (states/partner-case.yaml). Created `open` by createPartnerCase and moved only by actOnPartnerCase (decided 29 September, writers pass; DM4)"
+   },
+   "firstResponseAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "First response at."
+   },
+   "resolutionTargetAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "Resolution target, computed from the SLA policy (`slaPolicyId`) when the case is opened; time in `waitingPartner` extends it (decided 29 September, writers pass; DM4)"
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Resolved at."
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The partition key (ADR-0005), written at `tenant` scope."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "PartnerChangeRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "control.partner_change_request",
+  "description": "A partner's request to cancel or amend a booking, with the outcome the policy evaluated: whether it is allowed, the fee, the refund or credit, and the allocation and commission impact. A refund it produces is an `orders.refund`; this row is the request and its evaluation (decided 29 September, data model DM4)\n\n**Written by** createPartnerChangeRequest, which creates the row and evaluates it against policy in the same call; approval, where needed, is decided in approvals and the order change is carried out in orders (decided 29 September, writers pass; DM4).",
+  "required": [
+   "id",
+   "partnerId",
+   "orderId",
+   "requestType",
+   "status",
+   "requestedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The partner (control.partner)."
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Order (orders.sales_order)."
+   },
+   "requestType": {
+    "type": "string",
+    "enum": [
+     "fullCancellation",
+     "partialCancellation",
+     "dateChange",
+     "performanceChange",
+     "quantityReduction",
+     "productChange",
+     "ticketReissue",
+     "customerNameChange",
+     "refundRequest"
+    ],
+    "description": "Request type."
+   },
+   "quantity": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Tickets affected."
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Reason."
+   },
+   "originalState": {
+    "type": "string",
+    "description": "Audit: original state of the booking (summary)."
+   },
+   "newState": {
+    "type": "string",
+    "nullable": true,
+    "description": "Audit: new state of the booking (summary)."
+   },
+   "originalValue": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Original value."
+   },
+   "cancellationAllowed": {
+    "type": "boolean",
+    "description": "Cancellation/change allowed under the evaluated policy."
+   },
+   "cancellationFee": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Cancellation fee."
+   },
+   "refundOrCredit": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Refund/credit to the partner."
+   },
+   "financialImpact": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Net change to the partner account."
+   },
+   "allocationImpact": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Allocation impact, units returned (+) or taken (-)."
+   },
+   "commissionAdjustment": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Commission adjustment."
+   },
+   "approvalReasons": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "transactionValue",
+      "eventProximity",
+      "cancellationPercentage",
+      "partnerStatus",
+      "exceptionRequest"
+     ]
+    },
+    "description": "Why approval is required; empty when none."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "requested",
+     "pendingApproval",
+     "approved",
+     "rejected",
+     "processed"
+    ],
+    "default": "requested",
+    "description": "Status."
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Requesting user."
+   },
+   "approvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Approver."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Approval request, when one was needed."
+   },
+   "refundId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The refund it produced (orders.refund), once processed."
+   },
+   "requestedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Requested at."
+   },
+   "targetPerformanceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The performance (catalogue.performance) asked for, for dateChange and performanceChange (decided 29 September, writers pass; DM4)"
+   },
+   "targetProductId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The product (catalogue.product) asked for, for productChange (decided 29 September, writers pass; DM4)"
+   },
+   "newCustomerName": {
+    "type": "string",
+    "nullable": true,
+    "description": "The name asked for, for customerNameChange (decided 29 September, writers pass; DM4)"
+   },
+   "feeWaiverRequested": {
+    "type": "boolean",
+    "default": false,
+    "description": "The partner asks for the cancellation fee to be waived; a waiver always needs approval (`approvalReasons` gains exceptionRequest) (decided 29 September, writers pass; DM4)"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The partition key (ADR-0005), written at `tenant` scope."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "PartnerChangeRequestInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; stored as control.partner_change_request (PartnerChangeRequest) with its evaluation (decided 29 September, writers pass; DM4)",
+  "description": "What a partner sends to cancel or amend a booking (createPartnerChangeRequest). The evaluation (allowed, fee, refund, impacts, status) is computed, never sent (decided 29 September, writers pass; DM4)",
+  "required": [
+   "orderId",
+   "requestType"
+  ],
+  "properties": {
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The partner's order (orders.sales_order)"
+   },
+   "requestType": {
+    "type": "string",
+    "enum": [
+     "fullCancellation",
+     "partialCancellation",
+     "dateChange",
+     "performanceChange",
+     "quantityReduction",
+     "productChange",
+     "ticketReissue",
+     "customerNameChange",
+     "refundRequest"
+    ]
+   },
+   "quantity": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "Tickets affected; required for partialCancellation and quantityReduction"
+   },
+   "targetPerformanceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Required for dateChange and performanceChange"
+   },
+   "targetProductId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Required for productChange"
+   },
+   "newCustomerName": {
+    "type": "string",
+    "nullable": true,
+    "description": "Required for customerNameChange"
+   },
+   "feeWaiverRequested": {
+    "type": "boolean",
+    "default": false
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "PartnerCommissionLine": {
+  "type": "object",
+  "x-ticvai-persistence": "control.partner_commission_line",
+  "description": "The commission calculated on one partner order under the agreement version in force at the sale, and where it stands in settlement. Amounts are in the agreement's settlement currency (decided 29 September, data model DM4)\n\n**Rows are created by the commission calculation job** when a partner order is confirmed (and a correcting line when one is cancelled or refunded); no operation creates one by hand. A single line is held, released, disputed or reversed with actOnPartnerCommissionLine; a line in a batch otherwise moves with actOnPartnerSettlementBatch (decided 29 September, writers pass; DM4).",
+  "required": [
+   "id",
+   "partnerId",
+   "agreementId",
+   "agreementVersion",
+   "orderId",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The partner (control.partner)."
+   },
+   "agreementId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The agreement (control.partner_agreement) this row belongs to."
+   },
+   "agreementVersion": {
+    "type": "integer",
+    "description": "Agreement version in force at the time of the sale."
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Order (orders.sales_order)."
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Product (catalogue.product)."
+   },
+   "grossValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Gross value."
+   },
+   "netRate": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Net rate."
+   },
+   "commissionBasis": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Commission basis."
+   },
+   "commissionPercent": {
+    "type": "number",
+    "nullable": true,
+    "description": "Commission percent."
+   },
+   "commissionAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Commission amount."
+   },
+   "incentive": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Incentive."
+   },
+   "adjustment": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Adjustment."
+   },
+   "adjustmentReason": {
+    "type": "string",
+    "enum": [
+     "cancellation",
+     "refund",
+     "chargeback",
+     "partialFulfillment",
+     "commissionCorrection",
+     "incentiveQualification"
+    ],
+    "nullable": true,
+    "description": "Adjustment reason."
+   },
+   "payableAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Payable amount."
+   },
+   "settlementPeriod": {
+    "type": "string",
+    "enum": [
+     "perTransaction",
+     "weekly",
+     "monthly",
+     "eventBased",
+     "customCycle"
+    ],
+    "description": "Settlement period."
+   },
+   "period": {
+    "type": "string",
+    "description": "Settlement period label, e.g. 2026-09."
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Legal entity (ledger.legal_entity)."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "calculated",
+     "reconciled",
+     "financeReview",
+     "approved",
+     "scheduled",
+     "paid",
+     "onHold",
+     "disputed",
+     "reversed"
+    ],
+    "default": "calculated",
+    "description": "Settlement status."
+   },
+   "settlementBatchId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Settlement batch (control.partner_settlement_batch)."
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The partition key (ADR-0005), written at `tenant` scope."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
  "PartnerDisputesCasesServiceManagementView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_case (PartnerCase) and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Partner Disputes, Cases & Service Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "bookingDispute": {
-    "type": "string",
-    "description": "Booking Dispute"
-   },
-   "pricingDispute": {
-    "type": "string",
-    "description": "Pricing Dispute"
-   },
-   "commissionDispute": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Commission Dispute"
-   },
-   "creditDispute": {
-    "type": "string",
-    "description": "Credit Dispute"
-   },
-   "invoiceDispute": {
-    "type": "string",
-    "description": "Invoice Dispute"
-   },
-   "cancellationDispute": {
-    "type": "string",
-    "description": "Cancellation Dispute"
-   },
-   "ticketIssue": {
-    "type": "string",
-    "description": "Ticket Issue"
-   },
-   "allocationIssue": {
-    "type": "string",
-    "description": "Allocation Issue"
-   },
-   "apiIssue": {
-    "type": "string",
-    "description": "API Issue"
-   },
-   "settlementDispute": {
-    "type": "string",
-    "description": "Settlement Dispute"
-   },
    "caseId": {
     "type": "string",
     "description": "Case ID"
    },
    "partner": {
     "type": "string",
-    "description": "Partner"
+    "description": "Partner trading name"
    },
    "contact": {
     "type": "string",
-    "description": "Contact"
+    "description": "Partner contact",
+    "nullable": true
    },
    "category": {
     "type": "string",
-    "description": "Category"
+    "enum": [
+     "bookingDispute",
+     "pricingDispute",
+     "commissionDispute",
+     "creditDispute",
+     "invoiceDispute",
+     "cancellationDispute",
+     "ticketIssue",
+     "allocationIssue",
+     "apiIssue",
+     "settlementDispute"
+    ],
+    "description": "Category (Case Types)"
    },
    "priority": {
     "type": "string",
-    "description": "Priority"
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "urgent"
+    ],
+    "description": "Priority (decided 29 September, readiness close-out)"
    },
    "relatedOrder": {
     "type": "string",
-    "description": "Related Order"
+    "description": "Related Order",
+    "nullable": true
    },
    "relatedInvoice": {
     "type": "string",
-    "description": "Related Invoice"
+    "description": "Related Invoice",
+    "nullable": true
    },
    "relatedSettlement": {
     "type": "string",
-    "description": "Related Settlement"
+    "description": "Related Settlement",
+    "nullable": true
    },
    "amountInDispute": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
@@ -2585,80 +4145,247 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Description"
    },
    "evidence": {
-    "type": "string",
-    "description": "Evidence"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Evidence: attachment references"
    },
    "owner": {
     "type": "string",
-    "description": "Owner"
+    "description": "Owner",
+    "nullable": true
    },
    "sla": {
     "type": "string",
-    "description": "SLA"
+    "description": "SLA policy applied"
    },
    "status": {
     "type": "string",
-    "description": "Status"
-   },
-   "proposedResolvedClosed": {
-    "type": "integer",
-    "description": "Proposed → Resolved → Closed"
+    "description": "Status: open, assigned, investigating, waitingPartner, waitingInternal, resolutionProposed, resolved, closed"
    },
    "firstResponse": {
     "type": "string",
-    "description": "First Response"
+    "format": "date-time",
+    "description": "First Response at",
+    "nullable": true
    },
    "resolutionTarget": {
     "type": "string",
+    "format": "date-time",
     "description": "Resolution Target"
    },
    "timeOpen": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Time Open"
+    "type": "integer",
+    "description": "Time Open, hours"
    },
    "slaBreach": {
-    "type": "string",
+    "type": "boolean",
     "description": "SLA Breach"
    },
-   "notes": {
+   "partnerId": {
     "type": "string",
-    "description": "Notes"
+    "format": "uuid",
+    "description": "Partner"
    },
-   "attachments": {
+   "aiSummary": {
     "type": "string",
-    "description": "Attachments"
-   },
-   "assignments": {
-    "type": "string",
-    "description": "Assignments"
-   },
-   "departmentEscalation": {
-    "type": "string",
-    "description": "Department escalation"
-   },
-   "financeReview": {
-    "type": "string",
-    "description": "Finance review"
-   },
-   "technicalReview": {
-    "type": "string",
-    "description": "Technical review"
+    "description": "Advisory AI case summary",
+    "nullable": true
    }
   }
  },
- "PartnerOperationsCommandCenterView": {
+ "PartnerManagementCommandCenterSummary": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
-  "description": "**What Partner Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Partner Management Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
+  "properties": {
+   "totalPartners": {
+    "type": "integer",
+    "description": "Total Partners"
+   },
+   "activePartners": {
+    "type": "integer",
+    "description": "Active Partners"
+   },
+   "pendingOnboarding": {
+    "type": "integer",
+    "description": "Pending Onboarding"
+   },
+   "pendingApproval": {
+    "type": "integer",
+    "description": "Pending Approval"
+   },
+   "suspendedPartners": {
+    "type": "integer",
+    "description": "Suspended Partners"
+   },
+   "expiringAgreements": {
+    "type": "integer",
+    "description": "Expiring Agreements: partners whose active agreement ends within its expiryAlertDays (default 30) (decided 29 September, readiness close-out)"
+   },
+   "documentationIssues": {
+    "type": "integer",
+    "description": "Documentation Issues: partners with a mandatory document missing, rejected, expiring or expired"
+   },
+   "partnersWithCreditHolds": {
+    "type": "integer",
+    "description": "Partners With Credit Holds: partners whose credit status is onHold or blocked"
+   },
+   "connectedOtaApiPartners": {
+    "type": "integer",
+    "description": "Connected OTA/API Partners"
+   },
+   "partnerSalesYtd": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Partner Sales YTD: gross value of partner orders this calendar year (decided 29 September, readiness close-out)"
+   },
+   "partnerRevenueYtd": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Partner Revenue YTD: partner sales net of commission this calendar year (decided 29 September, readiness close-out)"
+   },
+   "highRiskPartners": {
+    "type": "integer",
+    "description": "High-Risk Partners"
+   }
+  }
+ },
+ "PartnerManagementCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over control.partner (Partner), control.partner_credit_profile, control.partner_application, control.partner_scope_assignment and control.partner_distribution_right and the existing subscription state, assembled at read time (data model DM4)",
+  "description": "**What Partner Management Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Partner ID"
+   },
+   "tradingName": {
+    "type": "string",
+    "description": "Trading Name"
+   },
+   "legalEntity": {
+    "type": "string",
+    "description": "Legal Entity"
+   },
+   "partnerType": {
+    "type": "string",
+    "description": "Partner type code from the tenant's configurable partner-type list (MoM 31 Aug 4.3: configurable category/type), seeded with the pack's p.7 list: b2bReseller, travelAgent, tourOperator, ota, corporateCustomer, hotelConcierge, destinationManagementCompany, affiliate, wholesaler, distributor, governmentPartner, schoolInstitution, apiPartner, internalGroupCompany"
+   },
+   "country": {
+    "type": "string",
+    "description": "Country, ISO 3166-1 alpha-2"
+   },
+   "territory": {
+    "type": "string",
+    "description": "Territory: summary of the authorised markets (listTerritoryMarketDistribution)"
+   },
+   "assignedBrands": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Assigned Brand/Venue: brand names in the partner's business scope (setPartnerBrandVenue)"
+   },
+   "assignedVenues": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Assigned Brand/Venue: venue names in the partner's business scope (setPartnerBrandVenue)"
+   },
+   "commercialOwner": {
+    "type": "string",
+    "description": "Commercial Owner: staff display name of the account manager"
+   },
+   "distributionChannel": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "b2bPortal",
+      "api",
+      "otaConnection",
+      "agentPortal",
+      "affiliateLink",
+      "voucherDistribution",
+      "bulkTicketExport",
+      "other"
+     ]
+    },
+    "description": "Distribution Channel: Distribution methods: b2bPortal (the TICVAI B2B portal), api (partner consumes the TICVAI API), otaConnection (TICVAI integrates into the OTA, either direction per MoM 31 Aug 4.3), agentPortal, affiliateLink, voucherDistribution, bulkTicketExport (pre-generated QR tickets as CSV, MoM 5 Aug option 3), other"
+   },
+   "accountStatus": {
+    "type": "string",
+    "description": "Account Status: lead, applicant, underReview, approved, configuration, active, restricted, suspended, terminated or archived (pack p.6 and p.18 merged with MoM 31 Aug 4.3 lead -> submitted -> active -> suspended; \"submitted\" is applicant)"
+   },
+   "onboardingStatus": {
+    "type": "string",
+    "description": "Onboarding Status: the application stage (application, businessVerification, documentation, commercialReview, financeReview, technicalReview, approval, configuration, activation) or complete"
+   },
+   "agreementStatus": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/PartnerAgreementStatus"
+     }
+    ],
+    "nullable": true,
+    "description": "Agreement Status of the partner's current agreement; empty when none"
+   },
+   "creditStatus": {
+    "type": "string",
+    "description": "Credit Status: notEnabled, withinLimit, warning (at the warning threshold), highRisk, onHold or blocked (decided 29 September, readiness close-out)"
+   },
+   "integrationStatus": {
+    "type": "string",
+    "enum": [
+     "none",
+     "testing",
+     "connected",
+     "degraded",
+     "disconnected"
+    ],
+    "x-ticvai-persisted": false,
+    "description": "Integration Status: none, testing, connected, degraded or disconnected (decided 29 September, readiness close-out). **Derived at read time, not a column** (decided 29 September, writers pass; DM4), from the partner's OTA/API channel listings (control.channel_listing) and the health of its API clients (control.api_client, with webhook deliveries in control.webhook_delivery), first match wins: `none` when the partner has no channel listing and no API client; `disconnected` when every listing is `paused` or `delisted` or every production API client is `suspended` or `revoked`; `degraded` when a `live` listing's `lastPushedAt` is older than twice its `pushIntervalMinutes`, or webhook deliveries to the partner failed in the last hour; `connected` when a `live` listing or an `active` production client exists and none of the above holds; otherwise `testing` (only `draft` listings or only sandbox clients). The thresholds are proposed, the venue may correct them."
+   },
+   "lastActivity": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last Activity"
+   },
+   "riskRating": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
+    "description": "Risk rating, Low / Medium / High / Critical (pack p.58); drives the Risk filter and the High-Risk Partners KPI"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Partner Attention Required: advisory AI flags such as an agreement expiring against forward bookings (pack p.6)"
+   }
+  }
+ },
+ "PartnerOperationsCommandCenterSummary": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Partner Operations Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
   "properties": {
    "partnerSalesToday": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Partner Sales Today"
    },
    "partnerSalesMtd": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Partner Sales MTD"
    },
    "activePartnerOrders": {
@@ -2674,7 +4401,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Active Holds"
    },
    "ticketsSold": {
-    "type": "string",
+    "type": "integer",
     "description": "Tickets Sold"
    },
    "cancellations": {
@@ -2686,7 +4413,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Refunds"
    },
    "outstandingReceivables": {
-    "type": "integer",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Outstanding Receivables"
    },
    "commissionPayable": {
@@ -2702,16 +4429,44 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Operational Exceptions"
    },
    "partnersRequiringAttention": {
-    "type": "string",
+    "type": "integer",
     "description": "Partners Requiring Attention"
    },
+   "activityFeed": {
+    "type": "array",
+    "description": "Activity Feed: recent partner events, newest first",
+    "items": {
+     "type": "object",
+     "properties": {
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "partnerId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
+   }
+  }
+ },
+ "PartnerOperationsCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Partner Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
    "partner": {
     "type": "string",
-    "description": "Partner"
+    "description": "Partner trading name"
    },
    "partnerType": {
     "type": "string",
-    "description": "Partner Type"
+    "description": "Partner Type code"
    },
    "accountManager": {
     "type": "string",
@@ -2726,11 +4481,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Tickets"
    },
    "grossSales": {
-    "type": "integer",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Gross Sales"
    },
    "netSales": {
-    "type": "integer",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Net Sales"
    },
    "commission": {
@@ -2743,23 +4498,41 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "creditUtilization": {
     "type": "number",
-    "description": "Credit Utilization"
+    "description": "Credit Utilization, percent"
    },
    "allocationUtilization": {
     "type": "number",
-    "description": "Allocation Utilization"
+    "description": "Allocation Utilization, percent"
    },
    "cancellationRate": {
     "type": "number",
-    "description": "Cancellation Rate"
+    "description": "Cancellation Rate, percent"
    },
    "operationalStatus": {
-    "type": "integer",
-    "description": "Operational Status"
+    "type": "string",
+    "description": "Operational Status: normal, attention, restricted, suspended"
    },
    "risk": {
     "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
     "description": "Risk"
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Partner"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Advisory AI attention flags for this partner"
    }
   }
  },
@@ -2777,12 +4550,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Agent/User"
    },
-   "customerGuestWhereApplicable": {
+   "customerName": {
     "type": "string",
-    "description": "Customer/Guest where applicable"
+    "description": "Customer/Guest where applicable",
+    "nullable": true
    },
    "products": {
-    "type": "integer",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Products"
    },
    "quantity": {
@@ -2790,12 +4567,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Quantity"
    },
    "grossValue": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Gross Value"
    },
    "partnerRate": {
-    "type": "number",
-    "description": "Partner Rate"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Partner Rate applied"
    },
    "commission": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
@@ -2807,202 +4584,383 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "paymentMethod": {
     "type": "string",
-    "description": "Payment Method"
+    "enum": [
+     "creditAccount",
+     "prepaid",
+     "card"
+    ],
+    "description": "Payment Method (the three payment models)"
    },
    "billingStatus": {
-    "type": "integer",
-    "description": "Billing Status"
+    "type": "string",
+    "description": "Billing Status: unbilled, invoiced, paid, overdue or credited"
    },
    "fulfillmentStatus": {
-    "type": "integer",
-    "description": "Fulfillment Status"
-   },
-   "modify": {
     "type": "string",
-    "description": "Modify"
+    "description": "Fulfillment Status: pending, partiallyIssued, issued or delivered"
    },
-   "rebook": {
+   "orderId": {
     "type": "string",
-    "description": "Rebook"
+    "format": "uuid",
+    "description": "TICVAI Order ID"
    },
-   "agreement": {
+   "orderNumber": {
     "type": "string",
-    "description": "Agreement"
+    "description": "TICVAI order number"
    },
-   "productEligibility": {
+   "partnerId": {
     "type": "string",
-    "description": "Product eligibility"
+    "format": "uuid",
+    "description": "Partner"
    },
-   "rate": {
-    "type": "number",
-    "description": "Rate"
-   },
-   "allocation": {
+   "partnerName": {
     "type": "string",
-    "description": "Allocation"
+    "description": "Partner"
    },
-   "credit": {
+   "bookingDate": {
     "type": "string",
-    "description": "Credit"
+    "format": "date-time",
+    "description": "Booking Date"
    },
-   "bookingLimit": {
-    "type": "integer",
-    "description": "Booking limit"
-   },
-   "cancellationPolicy": {
+   "event": {
     "type": "string",
-    "description": "Cancellation policy"
+    "description": "Event",
+    "nullable": true
+   },
+   "visitDate": {
+    "type": "string",
+    "format": "date",
+    "description": "Visit/Event Date",
+    "nullable": true
+   },
+   "orderStatus": {
+    "type": "string",
+    "description": "Order status: draft, held, confirmed, partiallyFulfilled, fulfilled, cancelled, refunded, failed"
+   },
+   "salesChannel": {
+    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel",
+    "description": "Channel"
    }
   }
  },
  "PartnerPerformanceScorecardRiskMonitoringView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner, control.partner_document, control.partner_security, control.partner_allocation and control.partner_case and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Partner Performance Scorecard & Risk Monitoring displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "sales": {
-    "type": "string",
-    "description": "Sales"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Commercial: gross sales"
    },
    "revenue": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue"
+    "description": "Commercial: revenue net of commission"
    },
    "growth": {
-    "type": "string",
-    "description": "Growth"
+    "type": "number",
+    "description": "Commercial: growth against the previous period, percent"
    },
    "margin": {
     "type": "number",
-    "description": "Margin"
+    "description": "Commercial: margin, percent"
    },
    "averageOrderValue": {
-    "type": "number",
-    "description": "Average Order Value"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Commercial: average order value"
    },
    "utilization": {
     "type": "number",
-    "description": "Utilization"
+    "description": "Allocation: utilisation, percent"
    },
    "sellThrough": {
-    "type": "string",
-    "description": "Sell-through"
+    "type": "number",
+    "description": "Allocation: sell-through, percent"
    },
    "returnedInventory": {
-    "type": "string",
-    "description": "Returned Inventory"
+    "type": "integer",
+    "description": "Allocation: returned inventory, units"
    },
-   "paymentTimeliness": {
-    "type": "string",
-    "description": "Payment Timeliness"
+   "averagePaymentDelayDays": {
+    "type": "number",
+    "description": "Financial: average payment delay, days"
    },
    "creditUtilization": {
     "type": "number",
-    "description": "Credit Utilization"
+    "description": "Financial: credit utilisation, percent"
    },
    "overdueBalance": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Overdue Balance"
+    "description": "Financial: overdue balance"
    },
    "cancellationRate": {
     "type": "number",
-    "description": "Cancellation Rate"
+    "description": "Operational: cancellation rate, percent"
    },
    "errorRate": {
     "type": "number",
-    "description": "Error Rate"
+    "description": "Operational: error rate, percent"
    },
    "supportCases": {
-    "type": "string",
-    "description": "Support Cases"
+    "type": "integer",
+    "description": "Operational: support cases"
    },
-   "apiSuccess": {
-    "type": "string",
-    "description": "API Success"
+   "apiSuccessRate": {
+    "type": "number",
+    "description": "Technical: API success rate, percent",
+    "nullable": true
    },
    "transactionFailureRate": {
     "type": "number",
-    "description": "Transaction Failure Rate"
+    "description": "Technical: transaction failure rate, percent",
+    "nullable": true
    },
    "documentation": {
     "type": "string",
-    "description": "Documentation"
+    "description": "Compliance: documentation state, compliant, expiring, incomplete or nonCompliant"
    },
    "agreementStatus": {
-    "type": "string",
-    "description": "Agreement Status"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/PartnerAgreementStatus"
+     }
+    ],
+    "nullable": true,
+    "description": "Compliance: agreement status"
    },
    "securityGuaranteeStatus": {
     "type": "string",
-    "description": "Security/Guarantee Status"
+    "description": "Compliance: security/guarantee state, covered, partiallyCovered, expired or notRequired"
    },
-   "improving": {
+   "partnerId": {
     "type": "string",
-    "description": "Improving"
+    "format": "uuid",
+    "description": "Partner"
    },
-   "stable": {
+   "partner": {
     "type": "string",
-    "description": "Stable"
+    "description": "Partner trading name"
    },
-   "declining": {
+   "partnerType": {
     "type": "string",
-    "description": "Declining"
+    "description": "Partner Type code"
    },
-   "samePartnerType": {
+   "period": {
     "type": "string",
-    "description": "Same partner type"
+    "description": "Scorecard period, e.g. 2026-09"
    },
-   "sameMarket": {
-    "type": "string",
-    "description": "Same market"
-   },
-   "sameChannel": {
-    "type": "string",
-    "description": "Same channel"
-   },
-   "portfolioAverage": {
+   "refundRate": {
     "type": "number",
-    "description": "Portfolio average"
+    "description": "Operational: refund rate, percent"
+   },
+   "syncReliability": {
+    "type": "number",
+    "description": "Technical: sync reliability, percent",
+    "nullable": true
+   },
+   "overallScore": {
+    "type": "integer",
+    "description": "Partner Score, 0-100"
+   },
+   "dimensionScores": {
+    "type": "object",
+    "description": "Score by dimension, each 0-100",
+    "properties": {
+     "commercial": {
+      "type": "integer"
+     },
+     "financial": {
+      "type": "integer"
+     },
+     "allocation": {
+      "type": "integer"
+     },
+     "operational": {
+      "type": "integer"
+     },
+     "technical": {
+      "type": "integer"
+     },
+     "compliance": {
+      "type": "integer"
+     }
+    }
+   },
+   "riskRating": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
+    "description": "Risk Rating"
+   },
+   "trend": {
+    "type": "string",
+    "enum": [
+     "improving",
+     "stable",
+     "declining"
+    ],
+    "description": "Trend"
+   },
+   "benchmark": {
+    "type": "object",
+    "description": "Benchmarking: average overall score of the comparison groups",
+    "properties": {
+     "samePartnerType": {
+      "type": "number"
+     },
+     "sameMarket": {
+      "type": "number"
+     },
+     "sameChannel": {
+      "type": "number"
+     },
+     "portfolioAverage": {
+      "type": "number"
+     }
+    }
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Advisory AI risk detection"
    }
   }
  },
- "PartnerReconciliationExceptionManagementView": {
+ "PartnerReconciliationException": {
+  "type": "object",
+  "x-ticvai-persistence": "control.partner_reconciliation_exception",
+  "description": "A mismatch found reconciling a partner's records with TICVAI's: the source compared, the two amounts, the type, and who is resolving it. The difference is the two amounts subtracted, not stored (decided 29 September, data model DM4)\n\n**Rows are created by the partner reconciliation job**, which compares the partner's file or statement with TICVAI's records and re-matches open rows on each run; no operation creates one by hand. An owner works it with actOnPartnerReconciliationException (decided 29 September, writers pass; DM4).",
+  "required": [
+   "id",
+   "partnerId",
+   "comparedSource",
+   "mismatchType",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The partner (control.partner)."
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "TICVAI order (orders.sales_order), when one matched."
+   },
+   "partnerReference": {
+    "type": "string",
+    "nullable": true,
+    "description": "Partner reference."
+   },
+   "comparedSource": {
+    "type": "string",
+    "enum": [
+     "ticvaiOrders",
+     "ticketsIssued",
+     "partnerRates",
+     "paymentsCredit",
+     "commission",
+     "invoices",
+     "cancellationsRefunds"
+    ],
+    "description": "Reconciliation source the partner record was compared against."
+   },
+   "mismatchType": {
+    "type": "string",
+    "enum": [
+     "missingTransaction",
+     "duplicateTransaction",
+     "price",
+     "quantity",
+     "tax",
+     "commission",
+     "payment",
+     "cancellation",
+     "settlement"
+    ],
+    "description": "Exception type."
+   },
+   "partnerAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Partner amount."
+   },
+   "ticvaiAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "TICVAI amount."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "investigating",
+     "matched",
+     "corrected",
+     "differenceAccepted",
+     "adjusted",
+     "disputed",
+     "escalated"
+    ],
+    "default": "open",
+    "description": "Resolution status."
+   },
+   "assigneePrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Assigned to."
+   },
+   "rootCauseGroup": {
+    "type": "string",
+    "nullable": true,
+    "description": "Advisory AI root-cause group shared with similar exceptions."
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The partition key (ADR-0005), written at `tenant` scope."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "PartnerReconciliationExceptionManagementSummary": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
-  "description": "**What Partner Reconciliation & Exception Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Partner Reconciliation & Exception Management.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
   "properties": {
-   "ticvaiOrders": {
-    "type": "string",
-    "description": "↔ TICVAI Orders"
-   },
-   "ticketsIssued": {
-    "type": "string",
-    "description": "↔ Tickets Issued"
-   },
-   "partnerRates": {
-    "type": "string",
-    "description": "↔ Partner Rates"
-   },
-   "paymentsCredit": {
-    "type": "string",
-    "description": "↔ Payments/Credit"
-   },
-   "commission": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "↔ Commission"
-   },
-   "invoices": {
-    "type": "string",
-    "description": "↔ Invoices"
-   },
-   "cancellationsRefunds": {
-    "type": "string",
-    "description": "↔ Cancellations/Refunds"
-   },
    "recordsReconciled": {
-    "type": "string",
+    "type": "integer",
     "description": "Records Reconciled"
    },
    "unmatchedOrders": {
@@ -3032,14 +4990,22 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "pendingInvestigation": {
     "type": "integer",
     "description": "Pending Investigation"
-   },
-   "partnerAmountAed12450": {
+   }
+  }
+ },
+ "PartnerReconciliationExceptionManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over control.partner_reconciliation_exception (PartnerReconciliationException) and the existing subscription state, assembled at read time (data model DM4)",
+  "description": "**What Partner Reconciliation & Exception Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "partnerAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Partner Amount: AED 12,450"
+    "description": "Partner Amount"
    },
-   "differenceAed150": {
-    "type": "string",
-    "description": "Difference: AED 150"
+   "difference": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Difference (TICVAI minus partner)"
    },
    "mismatchType": {
     "type": "string",
@@ -3056,48 +5022,173 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "description": "Vocabulary listed under Exception Types."
    },
-   "match": {
+   "exceptionId": {
     "type": "string",
-    "description": "Match"
+    "format": "uuid",
+    "description": "Exception id"
    },
-   "correct": {
+   "partnerId": {
     "type": "string",
-    "description": "Correct"
+    "format": "uuid",
+    "description": "Partner"
    },
-   "acceptDifference": {
+   "partner": {
     "type": "string",
-    "description": "Accept Difference"
+    "description": "Partner trading name"
    },
-   "dispute": {
+   "partnerReference": {
     "type": "string",
-    "description": "Dispute"
+    "description": "Partner Reference"
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "TICVAI order",
+    "nullable": true
+   },
+   "comparedSource": {
+    "type": "string",
+    "enum": [
+     "ticvaiOrders",
+     "ticketsIssued",
+     "partnerRates",
+     "paymentsCredit",
+     "commission",
+     "invoices",
+     "cancellationsRefunds"
+    ],
+    "description": "Reconciliation source the partner record was compared against"
+   },
+   "ticvaiAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "TICVAI Amount"
+   },
+   "status": {
+    "type": "string",
+    "description": "Resolution status: open, investigating, matched, corrected, differenceAccepted, adjusted, disputed, escalated"
+   },
+   "assignee": {
+    "type": "string",
+    "description": "Assigned to",
+    "nullable": true
+   },
+   "rootCauseGroup": {
+    "type": "string",
+    "description": "Advisory AI root-cause group shared with similar exceptions",
+    "nullable": true
    }
   }
  },
- "PartnerStatementAccountActivityView": {
+ "PartnerSettlementBatch": {
+  "type": "object",
+  "x-ticvai-persistence": "control.partner_settlement_batch",
+  "description": "A commission settlement batch: the lines for one partner, currency, period and legal entity paid together. Its total is the sum of its lines (decided 29 September, data model DM4)\n\n**Batches are created by the settlement job** for each partner, currency, period and legal entity with reconciled lines; no operation creates one by hand. Finance moves a batch with actOnPartnerSettlementBatch (decided 29 September, writers pass; DM4).",
+  "required": [
+   "id",
+   "partnerId",
+   "currency",
+   "period",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The partner (control.partner)."
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Legal entity (ledger.legal_entity)."
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "description": "Settlement currency, ISO 4217."
+   },
+   "period": {
+    "type": "string",
+    "description": "Settlement period label, e.g. 2026-09."
+   },
+   "settlementPeriod": {
+    "type": "string",
+    "enum": [
+     "perTransaction",
+     "weekly",
+     "monthly",
+     "eventBased",
+     "customCycle"
+    ],
+    "description": "Settlement period."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "calculated",
+     "reconciled",
+     "financeReview",
+     "approved",
+     "scheduled",
+     "paid",
+     "onHold",
+     "disputed",
+     "reversed"
+    ],
+    "default": "calculated",
+    "description": "Settlement status."
+   },
+   "scheduledDate": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "Date the batch is scheduled to be paid."
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The partition key (ADR-0005), written at `tenant` scope."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "PartnerStatementAccountActivitySummary": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
-  "description": "**What Partner Statement & Account Activity displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Partner Statement & Account Activity.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
   "properties": {
    "openingBalance": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Opening Balance"
    },
    "sales": {
-    "type": "integer",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Sales"
    },
    "payments": {
-    "type": "integer",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Payments"
    },
    "credits": {
-    "type": "integer",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Credits"
    },
    "refunds": {
-    "type": "integer",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Refunds"
    },
    "commission": {
@@ -3105,7 +5196,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Commission"
    },
    "adjustments": {
-    "type": "integer",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Adjustments"
    },
    "closingBalance": {
@@ -3117,20 +5208,55 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Overdue Balance"
    },
    "availableCredit": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Available Credit"
    },
    "current": {
-    "type": "string",
-    "description": "Current"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Aging: current (not yet due)"
    },
+   "aged1To30": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Aging: 1-30 days"
+   },
+   "aged31To60": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Aging: 31-60 days"
+   },
+   "aged61To90": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Aging: 61-90 days"
+   },
+   "aged90Plus": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Aging: 90+ days"
+   }
+  }
+ },
+ "PartnerStatementAccountActivityView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Partner Statement & Account Activity displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
    "date": {
     "type": "string",
-    "format": "date-time",
+    "format": "date",
     "description": "Date"
    },
    "transactionType": {
     "type": "string",
+    "enum": [
+     "booking",
+     "invoice",
+     "payment",
+     "refund",
+     "creditNote",
+     "commission",
+     "manualAdjustment",
+     "deposit",
+     "settlement"
+    ],
     "description": "Transaction Type"
    },
    "reference": {
@@ -3139,14 +5265,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "orderInvoice": {
     "type": "string",
-    "description": "Order/Invoice"
+    "description": "Order/Invoice number",
+    "nullable": true
    },
    "debit": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Debit"
    },
    "credit": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Credit"
    },
    "runningBalance": {
@@ -3155,37 +5282,21 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "dueDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "Due Date"
+    "format": "date",
+    "description": "Due Date",
+    "nullable": true
    },
    "status": {
-    "type": "integer",
-    "description": "Status"
-   },
-   "daily": {
     "type": "string",
-    "description": "Daily"
-   },
-   "weekly": {
-    "type": "string",
-    "description": "Weekly"
-   },
-   "monthly": {
-    "type": "string",
-    "description": "Monthly"
-   },
-   "customDateRange": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Custom Date Range"
+    "description": "Status: open, partiallyPaid, paid, overdue or void"
    }
   }
  },
- "ReservationsHoldsReleaseManagementView": {
+ "ReservationsHoldsReleaseManagementSummary": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
-  "description": "**What Reservations, Holds & Release Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Reservations, Holds & Release Management.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
   "properties": {
    "activeHolds": {
     "type": "integer",
@@ -3196,11 +5307,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Held Tickets"
    },
    "heldValue": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Held Value"
    },
    "expiringToday": {
-    "type": "string",
+    "type": "integer",
     "description": "Expiring Today"
    },
    "expiredHolds": {
@@ -3212,16 +5323,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Converted Holds"
    },
    "releasedInventory": {
-    "type": "string",
-    "description": "Released Inventory"
-   },
+    "type": "integer",
+    "description": "Released Inventory, tickets"
+   }
+  }
+ },
+ "ReservationsHoldsReleaseManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Reservations, Holds & Release Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
    "holdId": {
     "type": "string",
+    "format": "uuid",
     "description": "Hold ID"
    },
    "partner": {
     "type": "string",
-    "description": "Partner"
+    "description": "Partner trading name"
    },
    "event": {
     "type": "string",
@@ -3235,16 +5355,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "description": "Quantity"
    },
-   "seatZoneWhereApplicable": {
+   "seatZone": {
     "type": "string",
-    "description": "Seat/Zone where applicable"
+    "description": "Seat/Zone where applicable",
+    "nullable": true
    },
-   "holdCreated": {
+   "holdCreatedAt": {
     "type": "string",
     "format": "date-time",
     "description": "Hold Created"
    },
-   "holdExpiry": {
+   "holdExpiresAt": {
     "type": "string",
     "format": "date-time",
     "description": "Hold Expiry"
@@ -3255,53 +5376,37 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Created By"
    },
    "commercialValue": {
-    "type": "string",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Commercial Value"
    },
    "allocationSource": {
     "type": "string",
+    "enum": [
+     "partnerAllocation",
+     "channelAllocation",
+     "generalCapacity"
+    ],
     "description": "Allocation Source"
    },
    "status": {
     "type": "string",
-    "description": "Status"
+    "description": "Status: active, extended, converted, released, expired"
    },
-   "maximumHoldQuantity": {
+   "extensionsUsed": {
     "type": "integer",
-    "description": "Maximum Hold Quantity"
+    "description": "Extensions used so far"
    },
-   "holdDuration": {
+   "partnerId": {
     "type": "string",
-    "format": "date-time",
-    "description": "Hold Duration"
+    "format": "uuid",
+    "description": "Partner"
    },
-   "numberOfExtensions": {
-    "type": "integer",
-    "description": "Number of Extensions"
-   },
-   "partnerHoldLimit": {
-    "type": "integer",
-    "description": "Partner Hold Limit"
-   },
-   "eventCutoff": {
-    "type": "string",
-    "description": "Event Cutoff"
-   },
-   "approvalRequirement": {
-    "type": "string",
-    "description": "Approval Requirement"
-   },
-   "reduceHold": {
-    "type": "string",
-    "description": "Reduce Hold"
-   },
-   "reassignWherePermitted": {
-    "type": "string",
-    "description": "Reassign where permitted"
-   },
-   "unlessAnApprovedExtensionExists": {
-    "type": "string",
-    "description": "unless an approved extension exists"
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Advisory AI conversion-probability and release suggestions"
    }
   }
  }

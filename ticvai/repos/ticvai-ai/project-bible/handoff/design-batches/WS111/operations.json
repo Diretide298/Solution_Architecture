@@ -6,7 +6,7 @@
   "summary": "Queue badges for printing",
   "permission": "ACCREDITATION_ISSUE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -18,6 +18,25 @@
   "requestBody": "BadgePrintJob",
   "responds": "BadgePrintJob"
  },
+ "deliverAccreditationCredential": {
+  "method": "POST",
+  "path": "/accreditation-credentials/{credentialId}/deliver",
+  "contract": "accreditation",
+  "summary": "Send a mobile credential to its holder",
+  "permission": "ACCREDITATION_ISSUE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationCredentialDelivery"
+ },
  "issueAccreditationCredential": {
   "method": "POST",
   "path": "/accreditation-credentials",
@@ -25,7 +44,7 @@
   "summary": "Produce a badge, a mobile credential, or both",
   "permission": "ACCREDITATION_ISSUE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -217,7 +236,7 @@
   "summary": "Design a badge",
   "permission": "ACCREDITATION_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {

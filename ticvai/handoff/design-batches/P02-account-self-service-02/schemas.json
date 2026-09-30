@@ -28,7 +28,7 @@
   "properties": {
    "entitlementId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "askPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -177,8 +177,8 @@
    },
    "entitlementId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "The `Entitlement.id`, a ULID (`pii.subject_biometric.entitlement_id`)."
+    "format": "uuid",
+    "description": "The `Entitlement.id`, a UUIDv7 (`pii.subject_biometric.entitlement_id`)."
    },
    "kind": {
     "$ref": "#/components/schemas/BiometricKind"
@@ -875,7 +875,7 @@
    },
    "entitlementId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "sellerSubjectId": {
     "type": "string",

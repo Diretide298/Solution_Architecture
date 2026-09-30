@@ -274,6 +274,13 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "calendarView",
+       "label": "Calendar",
+       "operation": "getResourceCalendar",
+       "notes": "The signed-in person's schedule and assignments. Day, week, month and agenda views; the day starts at the venue's `calendarDayStartHour`. Filters the category on what it read.",
+       "provenance": "decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)"
+      },
+      {
        "kind": "dataTable",
        "label": "Every schedule calendar",
        "columns": [

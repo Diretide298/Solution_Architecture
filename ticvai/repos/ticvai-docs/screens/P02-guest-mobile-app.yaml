@@ -79,10 +79,10 @@ platform:
       - GST-051
       - GST-012
       - GST-038
-      provenance: 'decided 29 September 2026 (P29), MOB-1, MOB-2: default tabs Home, Explore, Plan and
-        Tickets with the persistent Buy tickets button (GST-003); Map (GST-038 At the Venue) is an optional
-        tab per venue. The tab set is venue configuration (NavigationConfig bottomNavigation, LinkTarget
-        kind appSection).'
+      provenance: 'decided 29 September 2026, MOB-1, MOB-2: default tabs Home, Explore, Plan and Tickets
+        with the persistent Buy tickets button (GST-003); Map (GST-038 At the Venue) is an optional tab
+        per venue. The tab set is venue configuration (NavigationConfig bottomNavigation, LinkTarget kind
+        appSection).'
   appShell:
     tabs: 'Home (GST-001), Explore (GST-002), Plan (GST-051), Tickets (GST-012) by default, plus the Buy
       tickets button. The set, order, labels and icons are venue configuration (`NavigationConfig.bottomNavigation`
@@ -97,7 +97,7 @@ platform:
     introVideo: 'A first-launch state of GST-001 (MOB-5): `BrandIdentity.introVideoAssetRef` played full
       screen per `BrandIdentity.introVideoMode` (off by default, firstLaunch or everyLaunch), streamed,
       with **Skip introduction** always shown.'
-    provenance: decided 29 September 2026 (P29), MOB-1, MOB-2, MOB-5; mobile v4 prototype
+    provenance: decided 29 September 2026, MOB-1, MOB-2, MOB-5; mobile v4 prototype
 screens:
 - id: GST-001
   name: Home
@@ -471,10 +471,10 @@ screens:
       trigger: Opens a highlight (Item Detail)
       carries:
       - productId
-      provenance: decided 29 September 2026 (P29), MOB-3, MOB-4
+      provenance: decided 29 September 2026, MOB-3, MOB-4
     - to: GST-051
       trigger: Plan tab
-      provenance: decided 29 September 2026 (P29), MOB-1, MOB-6
+      provenance: decided 29 September 2026, MOB-1, MOB-6
     entryFrom:
     - GST-076
     uses:
@@ -593,26 +593,26 @@ screens:
         operation: getTenantConfig
         notes: 'The venue hero in the style the venue set on the Home section (`heroStyle`: carousel,
           video, poster or split). Video heroes stream; a missing asset falls back to the poster image.'
-        provenance: decided 29 September 2026 (P29), MOB-3
+        provenance: decided 29 September 2026, MOB-3
       - kind: detailPanel
         label: Venue overview
         bindsTo: TenantAppStatus.venues
         operation: getTenantAppStatus
         notes: '**Home is a venue overview** (MOB-3): the venue description, today''s opening hours (from
           `getTenantAppStatus.venues`), getting here and before-you-go info.'
-        provenance: decided 29 September 2026 (P29), MOB-3
+        provenance: decided 29 September 2026, MOB-3
       - kind: cardList
         label: Type tiles
         operation: listProductCategories
         notes: Rides, dining, events and shops (the venue's own categories). A tile opens Explore (GST-002)
           on that type.
-        provenance: decided 29 September 2026 (P29), MOB-3
+        provenance: decided 29 September 2026, MOB-3
       - kind: cardList
         label: Highlights per type
         operation: listProducts
         notes: One or two items per type (`itemsPerSection`, 1-2, set on CMS-007); a highlight opens Item
           Detail (GST-004). Each card shows its own primary image or clip (`Product.media`).
-        provenance: decided 29 September 2026 (P29), MOB-3
+        provenance: decided 29 September 2026, MOB-3
     - name: contextPanel
       slot: selection
       components:
@@ -771,12 +771,12 @@ screens:
     contract: catalogue
     purpose: One or two highlights per type (rides, dining, events, shops) for the Home sections (MOB-3)
     trigger: onLoad
-    provenance: decided 29 September 2026 (P29), MOB-3
+    provenance: decided 29 September 2026, MOB-3
   - operationId: listProductCategories
     contract: catalogue
     purpose: The type tiles on Home (rides, dining, events, shops)
     trigger: onLoad
-    provenance: decided 29 September 2026 (P29), MOB-3
+    provenance: decided 29 September 2026, MOB-3
   entryState:
     params:
     - name: subjectId
@@ -798,9 +798,9 @@ screens:
     prototype:
       file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (29 September build)
-      verified: '2026-09-29'
+      verified: '2026-09-30'
       match: exact
-      view: Home tab (launch → venue → Home); intro video on first launch
+      view: Home tab (Summit Peaks, after the intro)
       differences: The v4 home shows no ticket strip; `listMyEntitlements` feeds the visit-day venue suggestion
         only.
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
@@ -821,7 +821,7 @@ screens:
       carries: []
       discards:
       - the rest of the video
-    provenance: decided 29 September 2026 (P29), MOB-5; mobile v4 prototype, launch screen
+    provenance: decided 29 September 2026, MOB-5; mobile v4 prototype, launch screen
 - id: GST-002
   name: Explore
   module: Discovery & Browse
@@ -859,7 +859,7 @@ screens:
         holds productId, so an edge into it carries them
     - to: GST-063
       trigger: Searches (results in place)
-      provenance: decided 29 September 2026 (P29), MOB-1
+      provenance: decided 29 September 2026, MOB-1
     uses:
     - appTabs
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
@@ -935,13 +935,13 @@ screens:
         operation: searchCatalogue
         notes: Sends `?q=` to `searchCatalogue`; results replace the tiles in place (GST-063, the same
           implementation).
-        provenance: decided 29 September 2026 (P29), MOB-1
+        provenance: decided 29 September 2026, MOB-1
       - kind: cardList
         label: Inline video previews
         operation: listProducts
         notes: Cards play the product's own short clip muted in place (`Product.media` kind video, M17-10)
           and show the primary image otherwise; a card opens Item Detail (GST-004).
-        provenance: decided 29 September 2026 (P29), MOB-1
+        provenance: decided 29 September 2026, MOB-1
     - name: contextPanel
       slot: selection
       components:
@@ -993,7 +993,7 @@ screens:
     contract: catalogue
     purpose: Search from the top of Explore; results are GST-063, a state of this screen
     trigger: onAction
-    provenance: decided 29 September 2026 (P29), MOB-1
+    provenance: decided 29 September 2026, MOB-1
   entryState:
     preloaded:
     - Product.id
@@ -1008,7 +1008,7 @@ screens:
     prototype:
       file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (29 September build)
-      verified: '2026-09-29'
+      verified: '2026-09-30'
       match: exact
       view: Explore tab
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
@@ -1055,25 +1055,25 @@ screens:
       trigger: 'Book (a dated product: date, then time, then tickets)'
       carries:
       - productId
-      provenance: decided 29 September 2026 (P29), MOB-2
+      provenance: decided 29 September 2026, MOB-2
     - to: GST-008
       trigger: Book (an undated product, or a product-first flow such as a workshop)
       carries:
       - productId
-      provenance: decided 29 September 2026 (P29), MOB-2, W8
+      provenance: decided 29 September 2026, MOB-2, W8
     - to: GST-074
       trigger: Book (a spot on the venue map, where the flow picks on the map)
       carries:
       - productId
-      provenance: decided 29 September 2026 (P29), MOB-2, W6
+      provenance: decided 29 September 2026, MOB-2, W6
     - to: GST-075
       trigger: Book (a space by the hour)
       carries:
       - productId
-      provenance: decided 29 September 2026 (P29), MOB-2, W9
+      provenance: decided 29 September 2026, MOB-2, W9
     - to: GST-056
       trigger: Book a bundle (e.g. meal combo with admission)
-      provenance: decided 29 September 2026 (P29), MOB-2, MOB-4
+      provenance: decided 29 September 2026, MOB-2, MOB-4
     - to: BO-005
       trigger: A supervisor sees the queue building
       provenance: flow F21 step 2→3
@@ -1181,13 +1181,13 @@ screens:
         notes: '**Help me choose filters the list** (W4): the answers are sent as `guidedAnswerIds` to
           `listProducts` and only the suitable products stay; `GuidedChoice.behaviour` `recommend` opens
           one product instead. It is never a consent step.'
-        provenance: decided 29 September 2026 (P29), W4
+        provenance: decided 29 September 2026, W4
       - kind: secondaryButton
         label: Show everything
         operation: listProducts
         notes: Clears the Help me choose filter and lists every product again (`GuidedChoice.showEverything`,
           on by default).
-        provenance: decided 29 September 2026 (P29), W4
+        provenance: decided 29 September 2026, W4
       - kind: cardList
         label: Contact sales
         bindsTo: Product.salesContact
@@ -1195,7 +1195,7 @@ screens:
         notes: '**View-only products** (W3): a product with `guestListing` `infoOnly` shows its details
           and, instead of Book, **Call sales** and **Email sales** from `Product.salesContact` (the venue
           contact when it has none). Hidden when `showInfoOnly` is off.'
-        provenance: decided 29 September 2026 (P29), W3
+        provenance: decided 29 September 2026, W3
     - name: contextPanel
       slot: selection
       components:
@@ -1272,7 +1272,7 @@ screens:
     contract: white-label
     purpose: 'Help me choose: the venue''s questions whose answers filter this list (W4)'
     trigger: onLoad
-    provenance: decided 29 September 2026 (P29), W4
+    provenance: decided 29 September 2026, W4
   entryState:
     params:
     - name: eventId
@@ -1295,9 +1295,9 @@ screens:
     prototype:
       file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (29 September build)
-      verified: '2026-09-29'
+      verified: '2026-09-30'
       match: exact
-      view: Buy tickets (the centre button, any screen)
+      view: Buy tickets (the centre tab)
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -1369,10 +1369,10 @@ screens:
       trigger: Buy meal combo (a bundle that includes admission)
       carries:
       - bundleId
-      provenance: decided 29 September 2026 (P29), MOB-4
+      provenance: decided 29 September 2026, MOB-4
     - to: GST-038
       trigger: Show on the map (At the Venue, Map view)
-      provenance: decided 29 September 2026 (P29), MOB-4
+      provenance: decided 29 September 2026, MOB-4
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Cross-surface parity,
     31 August**: added listPerformances. **A guest does not know which surface they are on** — the same
@@ -1459,13 +1459,13 @@ screens:
         - VenuePoint.media
         operation: getVenueMap
         notes: Photos and clips from `VenuePoint.media` (else `Product.media`), with the point's description.
-        provenance: decided 29 September 2026 (P29), MOB-4
+        provenance: decided 29 September 2026, MOB-4
       - kind: seatMap
         label: Where it is
         operation: getVenueMap
         notes: The item's pin on the venue map, 2D or 3D per the venue; tapping it opens At the Venue
           on the Map view (GST-038 / GST-021) with directions.
-        provenance: decided 29 September 2026 (P29), MOB-4
+        provenance: decided 29 September 2026, MOB-4
       - kind: cardList
         label: The product for it
         bindsTo: VenuePoint.featuredOffer
@@ -1474,7 +1474,7 @@ screens:
           or a bundle (`getBundle`), on any kind of point. A restaurant proposes **Buy meal combo**: a
           bundle with an admission component and a meal component, so the park ticket is included and
           checkout is about three steps (GST-056 → GST-041).'
-        provenance: decided 29 September 2026 (P29), MOB-4
+        provenance: decided 29 September 2026, MOB-4
       - kind: secondaryButton
         label: Call sales / Email sales
         bindsTo: Product.salesContact
@@ -1482,7 +1482,7 @@ screens:
         notes: '**View-only product** (W3): with `guestListing` `infoOnly` there is no Book; the sales
           contact from `Product.salesContact` (phone, email, note; the venue contact when absent) is shown
           instead.'
-        provenance: decided 29 September 2026 (P29), W3
+        provenance: decided 29 September 2026, W3
     - name: contextPanel
       slot: selection
       components:
@@ -1598,12 +1598,12 @@ screens:
     contract: venue-map
     purpose: The item's point on the 2D/3D venue map, with its description, media and featured offer (MOB-4)
     trigger: onLoad
-    provenance: decided 29 September 2026 (P29), MOB-4
+    provenance: decided 29 September 2026, MOB-4
   - operationId: getBundle
     contract: promotions
     purpose: The featured offer when it is a bundle, e.g. meal combo with admission (MOB-4)
     trigger: onLoad
-    provenance: decided 29 September 2026 (P29), MOB-4
+    provenance: decided 29 September 2026, MOB-4
   entryState:
     params:
     - name: productId
@@ -1631,9 +1631,9 @@ screens:
     prototype:
       file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (29 September build)
-      verified: '2026-09-29'
+      verified: '2026-09-30'
       match: exact
-      view: Explore or Home → any item (Item detail)
+      view: Explore → Summit Coaster (Item detail)
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -1837,7 +1837,7 @@ screens:
       trigger: Book (date, then time, then tickets)
       carries:
       - productId
-      provenance: decided 29 September 2026 (P29), MOB-4, W12
+      provenance: decided 29 September 2026, MOB-4, W12
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
 
@@ -1929,9 +1929,9 @@ screens:
     prototype:
       file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (29 September build)
-      verified: '2026-09-29'
+      verified: '2026-09-30'
       match: exact
-      view: Explore → an event (Item detail)
+      view: Explore → Shows → Night of Nine → More info (Item detail, an event)
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -1982,7 +1982,7 @@ screens:
       trigger: Picks a date and time after choosing the workshop (product-first flow)
       carries:
       - performanceId
-      provenance: decided 29 September 2026 (P29), W8
+      provenance: decided 29 September 2026, W8
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
 
@@ -2106,13 +2106,13 @@ screens:
         operation: getPublishedBookingFlow
         notes: The steps of the published flow in their `sortOrder`, this one (date and time) highlighted.
           A step the flow has turned off is not shown and is skipped by Continue and Back.
-        provenance: decided 29 September 2026 (P29), W12; CMS-103 Booking Flows
+        provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
       - kind: datePicker
         label: Next 7 days
         operation: listPerformances
         notes: '**A date strip of the next `BookingFlowSettings.dateStripDays` days** (default 7, 3-31)
           with a calendar icon that opens the full month for later dates (M17-08).'
-        provenance: decided 29 September 2026 (P29), M17-08
+        provenance: decided 29 September 2026, M17-08
     - name: actionBar
       slot: rowActions
       components:
@@ -2172,7 +2172,7 @@ screens:
     contract: white-label
     purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
     trigger: onLoad
-    provenance: decided 29 September 2026 (P29), W12
+    provenance: decided 29 September 2026, W12
   entryState:
     params:
     - name: eventId
@@ -2194,9 +2194,9 @@ screens:
     prototype:
       file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (29 September build)
-      verified: '2026-09-29'
+      verified: '2026-09-30'
       match: partial
-      view: Buy tickets → a dated product → Booking (date and time step)
+      view: 'Buy tickets → Timed entry → Book now (step 1: date, then entry window)'
       differences: Booking in the app runs the website booking engine; per-flow step order.
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -2301,7 +2301,7 @@ screens:
       trigger: Workshop chosen, then date and time (product-first flow)
       carries:
       - productId
-      provenance: decided 29 September 2026 (P29), W8
+      provenance: decided 29 September 2026, W8
   notes: '**Rev 3 (decided 29 September).** **Ticket selection moved onto this screen** (GAP-D3): the
     name promised choosing tickets and add-ons and the definition was a ticket transfer, which stays on
     GST-014 / GST-045 (one implementation with two ids). Tickets come after the date and time (REV3-2);
@@ -2385,12 +2385,12 @@ screens:
         operation: getPublishedBookingFlow
         notes: The steps of the published flow in their `sortOrder`, this one (tickets) highlighted. A
           step the flow has turned off is not shown and is skipped by Continue and Back.
-        provenance: decided 29 September 2026 (P29), W12; CMS-103 Booking Flows
+        provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
       - kind: secondaryButton
         label: Show everything
         operation: listProducts
         notes: Clears the Help me choose filter (W4).
-        provenance: decided 29 September 2026 (P29), W4
+        provenance: decided 29 September 2026, W4
     - name: actionBar
       slot: rowActions
       components:
@@ -2437,7 +2437,7 @@ screens:
     contract: white-label
     purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
     trigger: onLoad
-    provenance: decided 29 September 2026 (P29), W12
+    provenance: decided 29 September 2026, W12
   entryState:
     params:
     - name: productId
@@ -2458,9 +2458,9 @@ screens:
     prototype:
       file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (29 September build)
-      verified: '2026-09-29'
+      verified: '2026-09-30'
       match: partial
-      view: Buy tickets → a product → Booking (tickets step)
+      view: 'Buy tickets → Dated day pass → Book now → Fri 2 Oct (step 2: tickets; add-ons are step 3)'
       differences: Booking in the app runs the website booking engine.
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -2594,20 +2594,20 @@ screens:
         operation: getPublishedBookingFlow
         notes: The steps of the published flow in their `sortOrder`, this one (review and payment) highlighted.
           A step the flow has turned off is not shown and is skipped by Continue and Back.
-        provenance: decided 29 September 2026 (P29), W12; CMS-103 Booking Flows
+        provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
       - kind: consentBlock
         label: Terms and conditions
         operation: checkoutCart
         notes: '**After the code the guest goes straight to the T&Cs tick and completes** (W1): no second
           name, email or phone form. The profile is created by `checkoutCart` and completed later.'
-        provenance: decided 29 September 2026 (P29), W1
+        provenance: decided 29 September 2026, W1
       - kind: toggle
         label: Send me offers and news
         operation: checkoutCart
         notes: '**Marketing opt-in beside the T&Cs, never pre-ticked** (M18-15), sent as `marketingConsents[]`
           on `checkoutCart`, bound to the order and the verified contact and attached to the profile on
           match.'
-        provenance: decided 29 September 2026 (P29), M18-15
+        provenance: decided 29 September 2026, M18-15
     - name: actionBar
       slot: rowActions
       components:
@@ -2689,7 +2689,7 @@ screens:
     contract: white-label
     purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
     trigger: onLoad
-    provenance: decided 29 September 2026 (P29), W12
+    provenance: decided 29 September 2026, W12
   entryState:
     params:
     - name: cartId
@@ -2706,17 +2706,24 @@ screens:
       it was refunded or the performance passed, says which and offers the order list rather than an error.'
   wireframe:
     status: notStarted
-    provenance: client-verified
+    provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-009
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
-      match: exact
-      view: Account → All screens → Wave 1 → Review & payment; also the "Confirm and pay" sheet in the
-        booking flow
-      differences: Prototype offers Tabby and wallet credit as payment methods; the YAML does not name
-        them.
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: Mobile App v4, 29 September 2026
+      match: none
+      note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
+        v4 look (the frame on this screen''s board, wireframes/frames/gst-009.html, and #GST-009 in handoff/design-batches/apps/1-guest-app/return/TICVAI
+        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
+        Account → All screens → Wave 1 → Review & payment; also the "Confirm and pay" sheet in the booking
+        flow (exact). What v2 did differently: Prototype offers Tabby and wallet credit as payment methods;
+        the YAML does not name them.'
+    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
+      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
+      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
+      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -3131,14 +3138,22 @@ screens:
     - WalletTransaction.orderId
   wireframe:
     status: notStarted
-    provenance: client-verified
+    provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-011
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
-      match: exact
-      view: Account → All screens → Wave 2 → Wallet overview
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: Mobile App v4, 29 September 2026
+      match: none
+      note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
+        v4 look (the frame on this screen''s board, wireframes/frames/gst-011.html, and #GST-011 in handoff/design-batches/apps/1-guest-app/return/TICVAI
+        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
+        Account → All screens → Wave 2 → Wallet overview (exact).'
+    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
+      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
+      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
+      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -3360,7 +3375,7 @@ screens:
     prototype:
       file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (29 September build)
-      verified: '2026-09-29'
+      verified: '2026-09-30'
       match: exact
       view: Tickets tab
   apisNote: Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack
@@ -4077,17 +4092,24 @@ screens:
     - BillingStatement.lines
   wireframe:
     status: notStarted
-    provenance: client-verified
+    provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-015
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
-      match: exact
-      view: Account → All screens → Wave 2 → Memberships; billing in "Also built, not in the plan" → Membership
-        billing (#billing)
-      differences: Prototype splits the screen in two (benefits and delegation vs billing statement and
-        dunning retries).
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: Mobile App v4, 29 September 2026
+      match: none
+      note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
+        v4 look (the frame on this screen''s board, wireframes/frames/gst-015.html, and #GST-015 in handoff/design-batches/apps/1-guest-app/return/TICVAI
+        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
+        Account → All screens → Wave 2 → Memberships; billing in "Also built, not in the plan" → Membership
+        billing (#billing) (exact). What v2 did differently: Prototype splits the screen in two (benefits
+        and delegation vs billing statement and dunning retries).'
+    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
+      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
+      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
+      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -4877,14 +4899,22 @@ screens:
     - OrderSummary.refundedAmount
   wireframe:
     status: notStarted
-    provenance: client-verified
+    provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-019
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
-      match: exact
-      view: Account → All screens → Wave 2 → Order history
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: Mobile App v4, 29 September 2026
+      match: none
+      note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
+        v4 look (the frame on this screen''s board, wireframes/frames/gst-019.html, and #GST-019 in handoff/design-batches/apps/1-guest-app/return/TICVAI
+        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
+        Account → All screens → Wave 2 → Order history (exact).'
+    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
+      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
+      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
+      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -5239,9 +5269,9 @@ screens:
     prototype:
       file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (29 September build)
-      verified: '2026-09-29'
+      verified: '2026-09-30'
       match: exact
-      view: At the venue → Map
+      view: At the venue → Map (the venue map, scrolled to the map and nearest-place filters)
     derivedFrom: wireframes/reference/Seat Board 4.dc.html
     note: '**Drawn by Claude Design on `Seat Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -5348,7 +5378,7 @@ screens:
     prototype:
       file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (29 September build)
-      verified: '2026-09-29'
+      verified: '2026-09-30'
       match: exact
       view: At the venue → Waits
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
@@ -7129,14 +7159,22 @@ screens:
       and by whom.
   wireframe:
     status: notStarted
-    provenance: client-verified
+    provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-031
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
-      match: exact
-      view: Account → All screens → Wave 2 → AI concierge – home
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: Mobile App v4, 29 September 2026
+      match: none
+      note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
+        v4 look (the frame on this screen''s board, wireframes/frames/gst-031.html, and #GST-031 in handoff/design-batches/apps/1-guest-app/return/TICVAI
+        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
+        Account → All screens → Wave 2 → AI concierge – home (exact).'
+    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
+      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
+      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
+      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -7372,14 +7410,22 @@ screens:
       error.
   wireframe:
     status: notStarted
-    provenance: client-verified
+    provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-032
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
-      match: exact
-      view: Account → All screens → Wave 2 → AI concierge – chat
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: Mobile App v4, 29 September 2026
+      match: none
+      note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
+        v4 look (the frame on this screen''s board, wireframes/frames/gst-032.html, and #GST-032 in handoff/design-batches/apps/1-guest-app/return/TICVAI
+        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
+        Account → All screens → Wave 2 → AI concierge – chat (exact).'
+    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
+      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
+      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
+      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -8036,14 +8082,22 @@ screens:
     provenance: build, 29 September 2026
   wireframe:
     status: notStarted
-    provenance: client-verified
+    provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-036
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
-      match: exact
-      view: Account → All screens → Wave 2 → Loyalty & rewards
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: Mobile App v4, 29 September 2026
+      match: none
+      note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
+        v4 look (the frame on this screen''s board, wireframes/frames/gst-036.html, and #GST-036 in handoff/design-batches/apps/1-guest-app/return/TICVAI
+        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
+        Account → All screens → Wave 2 → Loyalty & rewards (exact).'
+    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
+      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
+      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
+      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: Rebuilt 9 September 2026 from the operations this screen declares (4 then; evaluatePromotions
     removed 27 September), not from a workshop pack — it has none. Columns are every field the response
     schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes
@@ -8258,22 +8312,22 @@ screens:
         edge carries nothing and GST-001 opens cold
     - to: GST-021
       trigger: Map view
-      provenance: decided 29 September 2026 (P29), MOB-1
+      provenance: decided 29 September 2026, MOB-1
     - to: GST-022
       trigger: Waits view
-      provenance: decided 29 September 2026 (P29), MOB-1
+      provenance: decided 29 September 2026, MOB-1
     - to: GST-024
       trigger: Food
-      provenance: decided 29 September 2026 (P29), MOB-1
+      provenance: decided 29 September 2026, MOB-1
     - to: GST-026
       trigger: Shop
-      provenance: decided 29 September 2026 (P29), MOB-1
+      provenance: decided 29 September 2026, MOB-1
     - to: GST-029
       trigger: Services
-      provenance: decided 29 September 2026 (P29), MOB-1
+      provenance: decided 29 September 2026, MOB-1
     - to: GST-023
       trigger: Join a virtual queue
-      provenance: decided 29 September 2026 (P29), MOB-1
+      provenance: decided 29 September 2026, MOB-1
     uses:
     - appTabs
   notes: '**Mobile v4 (decided 29 September, MOB-1).** Retitled **At the Venue**, the in-venue mode and
@@ -8330,12 +8384,12 @@ screens:
       - kind: selectField
         label: Map · Waits · Food · Shows · Shop · Services
         notes: The view switcher. Map and Waits are GST-021 and GST-022 rendered in place.
-        provenance: decided 29 September 2026 (P29), MOB-1
+        provenance: decided 29 September 2026, MOB-1
       - kind: banner
         label: Happening now
         operation: getWaitTimes
         notes: Live orders, queue calls and the next show, from the guest's own orders and queues.
-        provenance: decided 29 September 2026 (P29), MOB-1
+        provenance: decided 29 September 2026, MOB-1
     - name: contextPanel
       slot: selection
       components:
@@ -8436,9 +8490,9 @@ screens:
     prototype:
       file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (29 September build)
-      verified: '2026-09-29'
+      verified: '2026-09-30'
       match: exact
-      view: At the venue (Home → At the venue, or the Map tab where the venue shows it)
+      view: Home → You're at Summit Peaks (At the venue · live, Map view)
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -8530,7 +8584,7 @@ screens:
         operation: updateMyProfile
         notes: 'For a profile created by guest checkout (W1): asks for what the pop-up did not, whenever
           the guest likes; never blocks anything.'
-        provenance: decided 29 September 2026 (P29), W1
+        provenance: decided 29 September 2026, W1
     - name: actionBar
       slot: publish
       components:
@@ -8569,16 +8623,24 @@ screens:
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   wireframe:
     status: notStarted
-    provenance: client-verified
+    provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-039
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
-      match: exact
-      view: Account → All screens → Wave 1 → Profile (also Account → Profile)
-      differences: Emirates ID upload is on Profile in the prototype; the YAML has uploadGuestDocument
-        on GST-066. Account also has a "Saved guests (heights on file)" row that no screen defines.
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: Mobile App v4, 29 September 2026
+      match: none
+      note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
+        v4 look (the frame on this screen''s board, wireframes/frames/gst-039.html, and #GST-039 in handoff/design-batches/apps/1-guest-app/return/TICVAI
+        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
+        Account → All screens → Wave 1 → Profile (also Account → Profile) (exact). What v2 did differently:
+        Emirates ID upload is on Profile in the prototype; the YAML has uploadGuestDocument on GST-066.
+        Account also has a "Saved guests (heights on file)" row that no screen defines.'
+    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
+      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
+      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
+      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -8923,7 +8985,7 @@ screens:
         operation: getPublishedBookingFlow
         notes: The steps of the published flow in their `sortOrder`, this one (basket) highlighted. A
           step the flow has turned off is not shown and is skipped by Continue and Back.
-        provenance: decided 29 September 2026 (P29), W12; CMS-103 Booking Flows
+        provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
     - name: promoCode
       slot: fields
       components:
@@ -9035,7 +9097,7 @@ screens:
     contract: white-label
     purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
     trigger: onLoad
-    provenance: decided 29 September 2026 (P29), W12
+    provenance: decided 29 September 2026, W12
   entryState:
     params:
     - name: cartId
@@ -9061,9 +9123,9 @@ screens:
     prototype:
       file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (29 September build)
-      verified: '2026-09-29'
+      verified: '2026-09-30'
       match: partial
-      view: Cart (bottom bar → basket)
+      view: Cart (header basket, after a booking is added to the cart)
       differences: Basket as a bottom bar on mobile.
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
@@ -9503,17 +9565,24 @@ screens:
       that used it (audit R167); a second-factor challenge is created in place, never arrives by link.'
   wireframe:
     status: notStarted
-    provenance: client-verified
+    provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-042
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
-      match: partial
-      view: 'Account → All screens → Wave 1 → Simple registration & OTP (same #ident screen) + "Log in
-        or register" sheet from home'
-      differences: Prototype has email code, Apple and Google only; the YAML also has password login,
-        UAE Pass and explicit registration.
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: Mobile App v4, 29 September 2026
+      match: none
+      note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
+        v4 look (the frame on this screen''s board, wireframes/frames/gst-042.html, and #GST-042 in handoff/design-batches/apps/1-guest-app/return/TICVAI
+        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
+        Account → All screens → Wave 1 → Simple registration & OTP (same #ident screen) + "Log in or register"
+        sheet from home (partial). What v2 did differently: Prototype has email code, Apple and Google
+        only; the YAML also has password login, UAE Pass and explicit registration.'
+    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
+      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
+      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
+      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: Rebuilt 9 September 2026 from the 18 operations this screen declares, not from a workshop
     pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
     them to the ones that matter is work a person still owes this screen.
@@ -10181,14 +10250,22 @@ screens:
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   wireframe:
     status: notStarted
-    provenance: client-verified
+    provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-048
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
-      match: exact
-      view: Account → All screens → Wave 2 → Upsell / cross-sell
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: Mobile App v4, 29 September 2026
+      match: none
+      note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
+        v4 look (the frame on this screen''s board, wireframes/frames/gst-048.html, and #GST-048 in handoff/design-batches/apps/1-guest-app/return/TICVAI
+        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
+        Account → All screens → Wave 2 → Upsell / cross-sell (exact).'
+    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
+      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
+      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
+      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -10371,9 +10448,9 @@ screens:
     prototype:
       file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (29 September build)
-      verified: '2026-09-29'
+      verified: '2026-09-30'
       match: partial
-      view: Buy tickets → a stadium or theatre event → seat map (← Whole map)
+      view: Union Arena → Buy tickets → Direct seat map → 2D plan → section 104 (← Whole map)
       differences: The app runs the website seat engine (2D and 3D).
     derivedFrom: wireframes/reference/Seat Board 4.dc.html
     note: '**Drawn by Claude Design on `Seat Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
@@ -10575,17 +10652,25 @@ screens:
     preloaded: []
   wireframe:
     status: notStarted
-    provenance: client-verified
+    provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-050
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
-      match: partial
-      view: Account → All screens → Wave 3 → Resource booking – cabana; Rev 3 feedback → Cabana map
-      differences: Rev 3 books from a map, with a hold countdown and sold-out cabanas; the YAML is a list
-        with addCartLine and no hold. YAML GST-070 also says cabanas are booked by staff (R073c), which
-        contradicts both this screen and the prototype.
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: Mobile App v4, 29 September 2026
+      match: none
+      note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
+        v4 look (the frame on this screen''s board, wireframes/frames/gst-050.html, and #GST-050 in handoff/design-batches/apps/1-guest-app/return/TICVAI
+        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
+        Account → All screens → Wave 3 → Resource booking – cabana; Rev 3 feedback → Cabana map (partial).
+        What v2 did differently: Rev 3 books from a map, with a hold countdown and sold-out cabanas; the
+        YAML is a list with addCartLine and no hold. YAML GST-070 also says cabanas are booked by staff
+        (R073c), which contradicts both this screen and the prototype.'
+    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
+      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
+      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
+      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -10644,13 +10729,13 @@ screens:
       - when: nothing suits the party
         to: GST-051
         note: Says which answer ruled everything out.
-      provenance: decided 29 September 2026 (P29), MOB-6; v4 prototype plan → planResult
+      provenance: decided 29 September 2026, MOB-6; v4 prototype plan → planResult
     - to: GST-052
       trigger: Take a ready-made plan
-      provenance: decided 29 September 2026 (P29), MOB-6
+      provenance: decided 29 September 2026, MOB-6
     - to: GST-001
       trigger: Home tab
-      provenance: decided 29 September 2026 (P29), MOB-1
+      provenance: decided 29 September 2026, MOB-1
   notes: 'Minuted 10 Aug §4.9. Benchmarked against Skidata. Tied to a ticket purchase and saved as a personal
     visit profile. **Out of the first release** (decided 28 September, audit R187): the itinerary planner
     is deferred and this screen is `wave: 4` with a `deferred` block. Kept, not deleted, for the release
@@ -10684,43 +10769,43 @@ screens:
       - kind: progressIndicator
         label: Plan your visit · n of 6
         notes: Six questions; Heights is skipped when no children are coming.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
     - name: fields
       slot: fields
       components:
       - kind: numberField
         label: Adults
         notes: Age 12 and over, at least 1, at most 8.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: numberField
         label: Children
         notes: Age 3 to 11, 0-8.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: selectField
         label: How tall are the children?
         operation: listProducts
         notes: 'Per child: under 1.0 m, 1.0-1.2 m, 1.2-1.4 m, 1.4 m and over (or an age where the venue
           sets age rules). Rides over a child''s limit are left out, from `ProductEligibilityRule`.'
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: multiSelect
         label: Which days are you visiting?
         notes: Up to three days; each day gets its own park at a multi-park venue.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: selectField
         label: How busy should each day be?
         notes: Packed, Balanced or Relaxed.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: multiSelect
         label: What are you most interested in?
         operation: listProducts
         notes: 'Interest tags from the venue''s points (`VenuePoint.interestTags`): thrill rides, family
           rides, shows, water, shopping.'
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: selectField
         label: What would you like for lunch?
         notes: Cuisines from the outlets (`VenuePoint.cuisineTags`); lunch is planned at a restaurant
           that serves it.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
     - name: submit
       slot: submit
       components:
@@ -10728,11 +10813,11 @@ screens:
         label: Make my plan
         operation: generateVisitPlan
         notes: 'Calls `generateVisitPlan`: the rules planner, no AI. Opens Your Plan (GST-053).'
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: secondaryButton
         label: Take a ready-made plan
         notes: Opens Suggested Itineraries (GST-052).
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
   states:
     loading: The plan builds in place; the inputs stay on screen.
     error: Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing.
@@ -10757,7 +10842,7 @@ screens:
     contract: venue-map
     purpose: Build a rules plan from the inputs (party, heights, dates, pace, interests, cuisine)
     trigger: onAction
-    provenance: decided 29 September 2026 (P29), MOB-6
+    provenance: decided 29 September 2026, MOB-6
   entryState:
     params:
     - name: venueId
@@ -10770,9 +10855,9 @@ screens:
     prototype:
       file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (29 September build)
-      verified: '2026-09-29'
+      verified: '2026-09-30'
       match: exact
-      view: Plan tab (Plan your visit · 1 of 6 … 6 of 6)
+      view: Plan tab (Plan your visit · 1 of 6)
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -10802,13 +10887,13 @@ screens:
       operation: generateVisitPlan
       carries:
       - planId
-      provenance: decided 29 September 2026 (P29), MOB-6
+      provenance: decided 29 September 2026, MOB-6
     - to: GST-051
       trigger: Make my own
-      provenance: decided 29 September 2026 (P29), MOB-6
+      provenance: decided 29 September 2026, MOB-6
     - to: GST-001
       trigger: Home tab
-      provenance: decided 29 September 2026 (P29), MOB-1
+      provenance: decided 29 September 2026, MOB-1
   notes: 'Minuted 10 Aug §4.9. ** wired 24 August.** The board drew four bespoke AI endpoints for itinerary
     planning; **one operation with a kind answers all of them** (ADR-0028), and recording the outcome
     is what lets a model replace the heuristic later. **`recordSuggestionOutcome` removed from the guest
@@ -10850,7 +10935,7 @@ screens:
         notes: 'The venue''s preset plans (e.g. *Thrill day*, *Family day*, *Relaxed day*), each a set
           of planner inputs; **Use this plan** runs `generateVisitPlan` with those inputs and the guest''s
           party size and date. Rules-built, not AI: seeded, not learned, on day one.'
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: dataTable
         label: Every bundle
         operation: listCatalogueBundles
@@ -10863,7 +10948,7 @@ screens:
         label: Use this plan
         operation: generateVisitPlan
         notes: Opens Your Plan (GST-053).
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
   states:
     loading: The plan builds in place; the inputs stay on screen.
     error: Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing.
@@ -10888,7 +10973,7 @@ screens:
     contract: venue-map
     purpose: Build a rules plan from the inputs (party, heights, dates, pace, interests, cuisine)
     trigger: onAction
-    provenance: decided 29 September 2026 (P29), MOB-6
+    provenance: decided 29 September 2026, MOB-6
   entryState:
     params:
     - name: venueId
@@ -10896,16 +10981,24 @@ screens:
     coldEntry: Lists the venue's ready-made plans; nothing is needed upstream.
   wireframe:
     status: notStarted
-    provenance: client-verified
+    provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-052
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
-      match: exact
-      view: Account → All screens → Wave 3 → Suggested itineraries
-      differences: 'Mobile v4 draws no ready-made plans list: its Plan tab goes straight to the questions.
-        Built from this definition in the v4 style.'
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: Mobile App v4, 29 September 2026
+      match: none
+      note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
+        v4 look (the frame on this screen''s board, wireframes/frames/gst-052.html, and #GST-052 in handoff/design-batches/apps/1-guest-app/return/TICVAI
+        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
+        Account → All screens → Wave 3 → Suggested itineraries (exact). What v2 did differently: Mobile
+        v4 draws no ready-made plans list: its Plan tab goes straight to the questions. Built from this
+        definition in the v4 style.'
+    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
+      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
+      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
+      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -10944,28 +11037,28 @@ screens:
       - when: an item sold out since the plan was made
         to: GST-053
         note: Names it and offers a swap; the rest of the plan is kept.
-      provenance: decided 29 September 2026 (P29), MOB-6; v4 prototype Book this plan
+      provenance: decided 29 September 2026, MOB-6; v4 prototype Book this plan
     - to: GST-054
       trigger: Refine with the AI planner
       carries:
       - planId
-      provenance: decided 29 September 2026 (P29), MOB-6
+      provenance: decided 29 September 2026, MOB-6
     - to: GST-051
       trigger: Change answers
-      provenance: decided 29 September 2026 (P29), MOB-6
+      provenance: decided 29 September 2026, MOB-6
     - to: GST-048
       trigger: More add-ons
       carries:
       - cartId
-      provenance: decided 29 September 2026 (P29), MOB-6
+      provenance: decided 29 September 2026, MOB-6
     - to: GST-059
       trigger: 'On the day: follow the plan'
       carries:
       - planId
-      provenance: decided 29 September 2026 (P29), MOB-6
+      provenance: decided 29 September 2026, MOB-6
     - to: GST-001
       trigger: Home tab
-      provenance: decided 29 September 2026 (P29), MOB-1
+      provenance: decided 29 September 2026, MOB-1
   notes: 'Minuted 10 Aug §4.9. **Group sharing agreed** — an in-app QR a friend scans to join the itinerary
     (Chinmay raised, Qossai confirmed). **Out of the first release** (decided 28 September, audit R187):
     the itinerary planner is deferred and this screen is `wave: 4` with a `deferred` block. Kept, not
@@ -11000,41 +11093,41 @@ screens:
         bindsTo: VisitPlan
         operation: getVisitPlan
         notes: Day 1 · Fri 2 Oct · Summit Peaks … one tab per chosen day.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: timeline
         label: The day
         bindsTo: VisitPlanItem
         operation: getVisitPlan
         notes: Arrive, then each timed item (ride, show, lunch at a restaurant serving the chosen cuisine)
           with its place and zone; Fast Track marked on the rides it covers.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: secondaryButton
         label: Swap
         operation: listVisitPlanAlternatives
         notes: Opens the swap sheet of candidates that suit everyone (`listVisitPlanAlternatives`); choosing
           one saves a new version.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: destructiveButton
         label: Remove
         operation: updateVisitPlan
         notes: Removes the item (not arrival or lunch); a new version, so Undo brings it back.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: secondaryButton
         label: + Add something
         operation: listVisitPlanAlternatives
         notes: The same sheet, adding to the day.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: secondaryButton
         label: Undo changes
         operation: updateVisitPlan
         notes: Returns the day to the previous version of the plan.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: banner
         label: Left out for your group
         operation: getVisitPlan
         notes: Items left out because of a child's height, with the limit (e.g. *Freefall Tower (needs
           1.40 m)*).
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
     - name: contextPanel
       slot: selection
       components:
@@ -11043,12 +11136,12 @@ screens:
         operation: updateVisitPlan
         notes: An add-on from the plan's `addOnSuggestions` (the product GST-048 sells), priced per guest,
           with the queuing time it saves.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: detailPanel
         label: Estimated total
         operation: getVisitPlan
         notes: Estimated price for the group and days; the guest confirms dates and tickets in the basket.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: detailPanel
         label: The wait time
         operation: getWaitTimes
@@ -11062,15 +11155,15 @@ screens:
         operation: bookVisitPlan
         notes: '`bookVisitPlan` turns the plan and add-ons into cart lines and returns the cart; lands
           on the basket (GST-041).'
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: secondaryButton
         label: Refine with the AI planner
         notes: Opens GST-054 when the venue has AI on.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: secondaryButton
         label: Change answers
         notes: Back to the questions (GST-051).
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
   states:
     loading: The plan builds in place; the inputs stay on screen.
     error: Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing.
@@ -11099,22 +11192,22 @@ screens:
     contract: venue-map
     purpose: 'The plan: days, timed items and add-on suggestions, at its current version'
     trigger: onLoad
-    provenance: decided 29 September 2026 (P29), MOB-6
+    provenance: decided 29 September 2026, MOB-6
   - operationId: updateVisitPlan
     contract: venue-map
     purpose: 'Swap, remove, add or undo: each change is a new version, so undo goes back one'
     trigger: onAction
-    provenance: decided 29 September 2026 (P29), MOB-6
+    provenance: decided 29 September 2026, MOB-6
   - operationId: listVisitPlanAlternatives
     contract: venue-map
     purpose: Swap candidates for one item that suit everyone in the party
     trigger: onAction
-    provenance: decided 29 September 2026 (P29), MOB-6
+    provenance: decided 29 September 2026, MOB-6
   - operationId: bookVisitPlan
     contract: venue-map
     purpose: 'Book this plan: turns the plan (and chosen add-ons) into cart lines and returns the cart'
     trigger: onAction
-    provenance: decided 29 September 2026 (P29), MOB-6
+    provenance: decided 29 September 2026, MOB-6
   entryState:
     params:
     - name: planId
@@ -11137,9 +11230,9 @@ screens:
     prototype:
       file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (29 September build)
-      verified: '2026-09-29'
+      verified: '2026-09-30'
       match: exact
-      view: Plan tab → answer the six questions → Make my plan (Your plan)
+      view: Plan tab → the six questions → Make my plan (Your plan)
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -11167,15 +11260,15 @@ screens:
       trigger: Back to your plan
       carries:
       - planId
-      provenance: decided 29 September 2026 (P29), MOB-6
+      provenance: decided 29 September 2026, MOB-6
     - to: GST-059
       trigger: They follow it through the day
       carries:
       - planId
-      provenance: decided 29 September 2026 (P29), MOB-6
+      provenance: decided 29 September 2026, MOB-6
     - to: GST-001
       trigger: Home tab
-      provenance: decided 29 September 2026 (P29), MOB-1
+      provenance: decided 29 September 2026, MOB-1
   notes: 'Minuted 10 Aug §4.9. **The AI half is Wave 2** — the manual planner must work without it (CF-41).
     **Guest concierge confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.**
     Still degrades to the manual planner rather than to an error. ** wired 24 August.** The board drew
@@ -11222,13 +11315,13 @@ screens:
         bindsTo: VisitPlanItem
         operation: getVisitPlan
         notes: The current plan version, updated as the agent changes it.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: assistantPanel
         label: Ask the planner
         operation: sendAiMessage
         notes: e.g. *More shows, fewer coasters on day 2*. The agent calls `requestSuggestion` kind `itinerary`
           and applies the result with `updateVisitPlan`; Undo on GST-053 reverts it.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
     - name: contextPanel
       slot: selection
       components:
@@ -11238,7 +11331,7 @@ screens:
         notes: '**The rules plan never fails over to an error**: with AI off, not licensed or failing,
           the guest keeps the rules plan and the Plan tab works in full. Shown when AI is off for the
           venue, the tenant has no AI licence, or the call fails or times out.'
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: detailPanel
         label: The wait time
         operation: getWaitTimes
@@ -11251,11 +11344,11 @@ screens:
         label: Apply this change
         operation: updateVisitPlan
         notes: Saves the agent's proposal as a new plan version.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: secondaryButton
         label: Back to your plan
         notes: GST-053.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
   states:
     loading: The plan builds in place; the inputs stay on screen.
     error: Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing.
@@ -11285,23 +11378,23 @@ screens:
     contract: venue-map
     purpose: 'The plan: days, timed items and add-on suggestions, at its current version'
     trigger: onLoad
-    provenance: decided 29 September 2026 (P29), MOB-6
+    provenance: decided 29 September 2026, MOB-6
   - operationId: updateVisitPlan
     contract: venue-map
     purpose: 'Swap, remove, add or undo: each change is a new version, so undo goes back one'
     trigger: onAction
-    provenance: decided 29 September 2026 (P29), MOB-6
+    provenance: decided 29 September 2026, MOB-6
   - operationId: createAiConversation
     contract: ai
     purpose: Open the planner conversation for this plan
     trigger: onLoad
-    provenance: decided 29 September 2026 (P29), MOB-6
+    provenance: decided 29 September 2026, MOB-6
   - operationId: requestSuggestion
     contract: ai
     purpose: 'A suggestion of kind `itinerary` (guest-allowed since 29 September): the planner agent''s
       proposal for the plan, applied through `updateVisitPlan`'
     trigger: onAction
-    provenance: decided 29 September 2026 (P29), MOB-6
+    provenance: decided 29 September 2026, MOB-6
   entryState:
     params:
     - name: planId
@@ -11320,9 +11413,9 @@ screens:
     prototype:
       file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (29 September build)
-      verified: '2026-09-29'
+      verified: '2026-09-30'
       match: partial
-      view: Plan tab → Your plan; Chat with the assistant (Assistant screen)
+      view: Ask Sahli (the assistant chat; v4 has no plan-specific chat)
       differences: v4 draws the rules plan and a general assistant chat; it has no plan-specific chat.
         Built from this definition.
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
@@ -11331,8 +11424,8 @@ screens:
   machine:
     key: plannerMode
     initial: rulesPlan
-    provenance: 'decided 29 September 2026 (P29), MOB-6; BRIEF decision 1: the rules planner with the
-      AI planner agent on top'
+    provenance: 'decided 29 September 2026, MOB-6; BRIEF decision 1: the rules planner with the AI planner
+      agent on top'
     states:
       rulesPlan:
         operation: getVisitPlan
@@ -11597,7 +11690,7 @@ screens:
       operation: addCartLine
       carries:
       - cartId
-      provenance: decided 29 September 2026 (P29), MOB-4
+      provenance: decided 29 September 2026, MOB-4
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
 
@@ -11724,14 +11817,22 @@ screens:
     - BundleSummary.signatureKeyId
   wireframe:
     status: notStarted
-    provenance: client-verified
+    provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-056
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
-      match: exact
-      view: Account → All screens → Wave 2 → Bundle package
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: Mobile App v4, 29 September 2026
+      match: none
+      note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
+        v4 look (the frame on this screen''s board, wireframes/frames/gst-056.html, and #GST-056 in handoff/design-batches/apps/1-guest-app/return/TICVAI
+        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
+        Account → All screens → Wave 2 → Bundle package (exact).'
+    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
+      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
+      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
+      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -12013,15 +12114,23 @@ screens:
     preloaded: []
   wireframe:
     status: notStarted
-    provenance: client-verified
+    provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-058
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
-      match: exact
-      view: Account → All screens → Wave 3 → Resource availability (cabana); Rev 3 feedback → Cabana map
-      differences: The Rev 3 cabana map puts availability and booking on one screen.
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: Mobile App v4, 29 September 2026
+      match: none
+      note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
+        v4 look (the frame on this screen''s board, wireframes/frames/gst-058.html, and #GST-058 in handoff/design-batches/apps/1-guest-app/return/TICVAI
+        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
+        Account → All screens → Wave 3 → Resource availability (cabana); Rev 3 feedback → Cabana map (exact).
+        What v2 did differently: The Rev 3 cabana map puts availability and booking on one screen.'
+    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
+      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
+      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
+      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -12052,13 +12161,13 @@ screens:
       trigger: See the whole plan
       carries:
       - planId
-      provenance: decided 29 September 2026 (P29), MOB-6
+      provenance: decided 29 September 2026, MOB-6
     - to: GST-038
       trigger: Directions (At the Venue, Map)
-      provenance: decided 29 September 2026 (P29), MOB-6
+      provenance: decided 29 September 2026, MOB-6
     - to: GST-001
       trigger: Home tab
-      provenance: decided 29 September 2026 (P29), MOB-1
+      provenance: decided 29 September 2026, MOB-1
   notes: 'Minuted 10 Aug §4.9. **The in-visit half of GST-051** — one capability, two moments. ** wired
     24 August.** The board drew four bespoke AI endpoints for itinerary planning; **one operation with
     a kind answers all of them** (ADR-0028), and recording the outcome is what lets a model replace the
@@ -12100,13 +12209,13 @@ screens:
         bindsTo: VisitPlanItem
         operation: getVisitPlan
         notes: Today's items with done, now and next; each ride with its live wait.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: banner
         label: Waits changed
         operation: getWaitTimes
         notes: When a wait makes the next item late, proposes a re-order or a swap (`listVisitPlanAlternatives`);
           the guest decides.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
     - name: actionBar
       slot: rowActions
       components:
@@ -12114,12 +12223,12 @@ screens:
         label: Re-order my day
         operation: updateVisitPlan
         notes: Saves the proposed order as a new plan version.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
       - kind: secondaryButton
         label: Swap
         operation: listVisitPlanAlternatives
         notes: Candidates that suit everyone, nearest first.
-        provenance: decided 29 September 2026 (P29), MOB-6
+        provenance: decided 29 September 2026, MOB-6
   states:
     loading: The plan builds in place; the inputs stay on screen.
     error: Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing.
@@ -12140,17 +12249,17 @@ screens:
     contract: venue-map
     purpose: 'The plan: days, timed items and add-on suggestions, at its current version'
     trigger: onLoad
-    provenance: decided 29 September 2026 (P29), MOB-6
+    provenance: decided 29 September 2026, MOB-6
   - operationId: updateVisitPlan
     contract: venue-map
     purpose: 'Swap, remove, add or undo: each change is a new version, so undo goes back one'
     trigger: onAction
-    provenance: decided 29 September 2026 (P29), MOB-6
+    provenance: decided 29 September 2026, MOB-6
   - operationId: listVisitPlanAlternatives
     contract: venue-map
     purpose: Swap candidates for one item that suit everyone in the party
     trigger: onAction
-    provenance: decided 29 September 2026 (P29), MOB-6
+    provenance: decided 29 September 2026, MOB-6
   entryState:
     params:
     - name: planId
@@ -12164,16 +12273,23 @@ screens:
       is none. `itemId` is the plan item the guest taps Swap on, picked on this screen.'
   wireframe:
     status: notStarted
-    provenance: client-verified
+    provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-059
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
-      match: exact
-      view: Account → All screens → Wave 3 → Plan my day – in progress
-      differences: Mobile v4 draws no in-progress view of the plan; built from this definition in the
-        v4 style.
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: Mobile App v4, 29 September 2026
+      match: none
+      note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
+        v4 look (the frame on this screen''s board, wireframes/frames/gst-059.html, and #GST-059 in handoff/design-batches/apps/1-guest-app/return/TICVAI
+        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
+        Account → All screens → Wave 3 → Plan my day – in progress (exact). What v2 did differently: Mobile
+        v4 draws no in-progress view of the plan; built from this definition in the v4 style.'
+    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
+      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
+      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
+      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -12455,12 +12571,12 @@ screens:
         edge carries nothing and GST-001 opens cold
     - to: GST-002
       trigger: Clears the search
-      provenance: decided 29 September 2026 (P29), MOB-1
+      provenance: decided 29 September 2026, MOB-1
     - to: GST-004
       trigger: Opens a result (Item Detail)
       carries:
       - productId
-      provenance: decided 29 September 2026 (P29), MOB-1, MOB-4
+      provenance: decided 29 September 2026, MOB-1, MOB-4
   notes: 'Added 17 August for parity with WEB-003. **Not on the wireframe board** — needs drawing. CF-93.
 
 
@@ -12544,9 +12660,9 @@ screens:
     prototype:
       file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (29 September build)
-      verified: '2026-09-29'
+      verified: '2026-09-30'
       match: exact
-      view: Explore tab → search
+      view: Explore tab → search ("coaster")
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -12923,17 +13039,25 @@ screens:
       here afterwards — never a 404, and never a screen that silently shows somebody else''s data (ADR-0030).'
   wireframe:
     status: notStarted
-    provenance: client-verified
+    provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-066
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
-      match: exact
-      view: Account → All screens → Wave 2 → Privacy & my data (#privacy; also Account → Data & privacy)
-      differences: The prototype labels this screen "GST-070 · Your data" (aria-label "GST-070 Data and
-        privacy"), but GST-070 is Reserve a Table in the YAML, so the label is wrong. Document upload
-        is on Profile instead.
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: Mobile App v4, 29 September 2026
+      match: none
+      note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
+        v4 look (the frame on this screen''s board, wireframes/frames/gst-066.html, and #GST-066 in handoff/design-batches/apps/1-guest-app/return/TICVAI
+        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
+        Account → All screens → Wave 2 → Privacy & my data (#privacy; also Account → Data & privacy) (exact).
+        What v2 did differently: The prototype labels this screen "GST-070 · Your data" (aria-label "GST-070
+        Data and privacy"), but GST-070 is Reserve a Table in the YAML, so the label is wrong. Document
+        upload is on Profile instead.'
+    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
+      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
+      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
+      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -14477,17 +14601,24 @@ screens:
       here afterwards — never a 404, and never a screen that silently shows somebody else''s data (ADR-0030).'
   wireframe:
     status: notStarted
-    provenance: client-verified
+    provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-073
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
-      match: partial
-      view: Account → All screens → Wave 2 → Security & sign-in
-      differences: Prototype offers two-step verification and a trusted-device skip, but the YAML says
-        guests have no second factor (R167). Either remove the toggle from the prototype or reopen the
-        decision.
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: Mobile App v4, 29 September 2026
+      match: none
+      note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
+        v4 look (the frame on this screen''s board, wireframes/frames/gst-073.html, and #GST-073 in handoff/design-batches/apps/1-guest-app/return/TICVAI
+        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
+        Account → All screens → Wave 2 → Security & sign-in (partial). What v2 did differently: Prototype
+        offers two-step verification and a trusted-device skip, but the YAML says guests have no second
+        factor (R167). Either remove the toggle from the prototype or reopen the decision.'
+    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
+      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
+      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
+      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -14758,14 +14889,22 @@ screens:
       and offers today on the current map. Nothing is held on arrival.'
   wireframe:
     status: notStarted
-    provenance: client-verified
+    provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-074
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
-      match: exact
-      view: Account → All screens → Rev 3 feedback → Cabana map (r3cabmap)
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: Mobile App v4, 29 September 2026
+      match: none
+      note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
+        v4 look (the frame on this screen''s board, wireframes/frames/gst-074.html, and #GST-074 in handoff/design-batches/apps/1-guest-app/return/TICVAI
+        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
+        Account → All screens → Rev 3 feedback → Cabana map (r3cabmap) (exact).'
+    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
+      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
+      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
+      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
   overlays:
@@ -14925,14 +15064,22 @@ screens:
     coldEntry: Resolves the venue the app is in and lists its room types; nothing is booked on arrival.
   wireframe:
     status: notStarted
-    provenance: client-verified
+    provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-075
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
-      match: exact
-      view: Account → All screens → Rev 3 feedback → Meeting room by the hour (r3room)
+      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      rev: Mobile App v4, 29 September 2026
+      match: none
+      note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
+        v4 look (the frame on this screen''s board, wireframes/frames/gst-075.html, and #GST-075 in handoff/design-batches/apps/1-guest-app/return/TICVAI
+        Guest App.dc.html). NOT client-verified: awaiting the client''s design reviewer. Build the layout
+        from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at:
+        Account → All screens → Rev 3 feedback → Meeting room by the hour (r3room) (exact).'
+    source: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
+    note: '**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified,
+      awaiting the client''s design reviewer.** `provenance: designed` because the accepted vocabulary
+      has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September
+      carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md.'
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
 - id: GST-076

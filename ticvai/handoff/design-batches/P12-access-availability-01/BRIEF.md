@@ -1,6 +1,6 @@
 # P12-access-availability-01 — P12 · Access & Availability
 
-**2 screens · 9 operations · 12 schemas · 2 permissions**
+**2 screens · 10 operations · 14 schemas · 2 permissions**
 
 Platform P12 Venue Support · ships as **venue-management** ·
 staff audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 2 permissions apply here:
   `CASE_MANAGE, SESSION_FORCE_LOGOUT`. A control nobody can use must say so,
   not sit enabled and fail.
-- **2 of these operations work offline**: getCurrentSession, getGuestSession
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,9 +60,5 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `SUP-001` | Venue Management Sign In | listDetail | 8 | 2 | — |
+| `SUP-001` | Venue Management Sign In | listDetail | 9 | 3 | — |
 | `SUP-003` | Availability & Routing Settings | configEditor | 1 | 0 | — |
-
-## Thin screens in this batch
-
-**SUP-003 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

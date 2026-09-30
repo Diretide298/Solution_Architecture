@@ -22,7 +22,6 @@
     "PTR-001"
    ],
    "exitTo": [
-    "PTR-001",
     "PTR-043",
     "PTR-044",
     "PTR-045",
@@ -36,15 +35,6 @@
    "inferred": false,
    "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
    "transitions": [
-    {
-     "to": "PTR-001",
-     "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId",
-      "sessionId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
-    },
     {
      "to": "PTR-043",
      "trigger": "Works in Partner Orders & Booking Management",
@@ -102,10 +92,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can understand current partner activity, financial exposure and operational exceptions from one centralized workspace.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each partner should show) — counts over a population, then the population",
   "purpose": "Provide commercial, operations and finance teams with one real-time view of active B2B, reseller and OTA business.",
-  "purposeNote": "Authorized users can understand current partner activity, financial exposure and operational exceptions from one centralized workspace.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -146,19 +136,19 @@
        "kind": "metricTile",
        "label": "Partner Sales Today",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.partnerSalesToday"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.partnerSalesToday"
       },
       {
        "kind": "metricTile",
        "label": "Partner Sales MTD",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.partnerSalesMtd"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.partnerSalesMtd"
       },
       {
        "kind": "metricTile",
        "label": "Active Partner Orders",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.activePartnerOrders"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.activePartnerOrders"
       },
       {
        "kind": "metricTile",
@@ -169,49 +159,49 @@
        "kind": "metricTile",
        "label": "Tickets Sold",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.ticketsSold"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.ticketsSold"
       },
       {
        "kind": "metricTile",
        "label": "Cancellations",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.cancellations"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.cancellations"
       },
       {
        "kind": "metricTile",
        "label": "Refunds",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.refunds"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.refunds"
       },
       {
        "kind": "metricTile",
        "label": "Outstanding Receivables",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.outstandingReceivables"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.outstandingReceivables"
       },
       {
        "kind": "metricTile",
        "label": "Commission Payable",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.commissionPayable"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.commissionPayable"
       },
       {
        "kind": "metricTile",
        "label": "Pending Settlements",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.pendingSettlements"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.pendingSettlements"
       },
       {
        "kind": "metricTile",
        "label": "Operational Exceptions",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.operationalExceptions"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.operationalExceptions"
       },
       {
        "kind": "metricTile",
        "label": "Partners Requiring Attention",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterView.partnersRequiringAttention"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.partnersRequiringAttention"
       }
      ]
     },
@@ -288,12 +278,19 @@
     "contract": "subscription",
     "purpose": "Partner Operations Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPartner",
+    "contract": "subscription",
+    "purpose": "Partner Management Command Center",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-042"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-042",
+   "workshopBoard": "wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-042"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 44. 30 of 35 labels bound to a contract property; 36 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -357,10 +354,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Operations can locate and service any partner transaction while preserving central order and commercial-rule integrity.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide a consolidated operational view of orders created by each partner.",
-  "purposeNote": "Operations can locate and service any partner transaction while preserving central order and commercial-rule integrity.",
   "layout": {
    "template": "split",
    "regions": [
@@ -406,7 +403,7 @@
         "PartnerOrdersBookingManagementView.partnerReference",
         "Partner",
         "PartnerOrdersBookingManagementView.agentUser",
-        "PartnerOrdersBookingManagementView.customerGuestWhereApplicable",
+        "PartnerOrdersBookingManagementView.customerName",
         "Booking Date",
         "Event",
         "PartnerOrdersBookingManagementView.products",
@@ -438,7 +435,7 @@
         "PartnerOrdersBookingManagementView.partnerReference",
         "Partner",
         "PartnerOrdersBookingManagementView.agentUser",
-        "PartnerOrdersBookingManagementView.customerGuestWhereApplicable",
+        "PartnerOrdersBookingManagementView.customerName",
         "Booking Date",
         "Event",
         "PartnerOrdersBookingManagementView.products",
@@ -491,14 +488,15 @@
     "PartnerOrdersBookingManagementView.partnerReference",
     "Partner",
     "PartnerOrdersBookingManagementView.agentUser",
-    "PartnerOrdersBookingManagementView.customerGuestWhereApplicable",
+    "PartnerOrdersBookingManagementView.customerName",
     "Booking Date"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-043"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-043",
+   "workshopBoard": "wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-043"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 46. 12 of 27 labels bound to a contract property; 36 of 50 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -562,13 +560,68 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Partner reservations and holds cannot indefinitely block sellable capacity and are automatically governed by configured duration, allocation and approval rules.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Manage inventory temporarily reserved by B2B partners before final confirmation. This is particularly important for tour operators, corporate groups and travel-trade partners.",
-  "purposeNote": "Partner reservations and holds cannot indefinitely block sellable capacity and are automatically governed by configured duration, allocation and approval rules.",
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Active Holds",
+       "bindsTo": "ReservationsHoldsReleaseManagementSummary.activeHolds",
+       "operation": "listReservationHoldRelease",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Held Tickets",
+       "bindsTo": "ReservationsHoldsReleaseManagementSummary.heldTickets",
+       "operation": "listReservationHoldRelease",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Held Value",
+       "bindsTo": "ReservationsHoldsReleaseManagementSummary.heldValue",
+       "operation": "listReservationHoldRelease",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Expiring Today",
+       "bindsTo": "ReservationsHoldsReleaseManagementSummary.expiringToday",
+       "operation": "listReservationHoldRelease",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Expired Holds",
+       "bindsTo": "ReservationsHoldsReleaseManagementSummary.expiredHolds",
+       "operation": "listReservationHoldRelease",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Converted Holds",
+       "bindsTo": "ReservationsHoldsReleaseManagementSummary.convertedHolds",
+       "operation": "listReservationHoldRelease",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Released Inventory, tickets",
+       "bindsTo": "ReservationsHoldsReleaseManagementSummary.releasedInventory",
+       "operation": "listReservationHoldRelease",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -576,15 +629,6 @@
       {
        "kind": "dataTable",
        "label": "Every reservations holds release",
-       "columns": [
-        "ReservationsHoldsReleaseManagementView.activeHolds",
-        "ReservationsHoldsReleaseManagementView.heldTickets",
-        "ReservationsHoldsReleaseManagementView.heldValue",
-        "ReservationsHoldsReleaseManagementView.expiringToday",
-        "ReservationsHoldsReleaseManagementView.expiredHolds",
-        "ReservationsHoldsReleaseManagementView.convertedHolds",
-        "ReservationsHoldsReleaseManagementView.releasedInventory"
-       ],
        "bindsTo": "ReservationsHoldsReleaseManagementView",
        "operation": "listReservationHoldRelease",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 48 §Display"
@@ -599,15 +643,6 @@
        "kind": "detailPanel",
        "label": "The selected reservations holds release",
        "bindsTo": "ReservationsHoldsReleaseManagementView",
-       "columns": [
-        "ReservationsHoldsReleaseManagementView.activeHolds",
-        "ReservationsHoldsReleaseManagementView.heldTickets",
-        "ReservationsHoldsReleaseManagementView.heldValue",
-        "ReservationsHoldsReleaseManagementView.expiringToday",
-        "ReservationsHoldsReleaseManagementView.expiredHolds",
-        "ReservationsHoldsReleaseManagementView.convertedHolds",
-        "ReservationsHoldsReleaseManagementView.releasedInventory"
-       ],
        "notes": "The pack groups this record's detail under its own headings: “When a hold expires”.",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 48 §Display"
       }
@@ -644,18 +679,19 @@
   ],
   "entryState": {
    "preloaded": [
-    "ReservationsHoldsReleaseManagementView.activeHolds",
-    "ReservationsHoldsReleaseManagementView.heldTickets",
-    "ReservationsHoldsReleaseManagementView.heldValue",
-    "ReservationsHoldsReleaseManagementView.expiringToday",
-    "ReservationsHoldsReleaseManagementView.expiredHolds",
-    "ReservationsHoldsReleaseManagementView.convertedHolds"
+    "ReservationsHoldsReleaseManagementSummary.activeHolds",
+    "ReservationsHoldsReleaseManagementSummary.heldTickets",
+    "ReservationsHoldsReleaseManagementSummary.heldValue",
+    "ReservationsHoldsReleaseManagementSummary.expiringToday",
+    "ReservationsHoldsReleaseManagementSummary.expiredHolds",
+    "ReservationsHoldsReleaseManagementSummary.convertedHolds"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-044"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-044",
+   "workshopBoard": "wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-044"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 48. 7 of 7 labels bound to a contract property; 25 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -719,10 +755,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Partner booking changes are processed according to applicable commercial and product policies with complete financial and inventory impact visibility.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Manage post-booking changes according to the partner's commercial agreement and product policies.",
-  "purposeNote": "Partner booking changes are processed according to applicable commercial and product policies with complete financial and inventory impact visibility.",
   "gaps": [
    {
     "operation": null,
@@ -748,6 +784,20 @@
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create partner change request",
+       "operation": "createPartnerChangeRequest",
+       "permission": "ORDER_MODIFY",
+       "notes": "The request raised from PTR-045 (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml POST /partner-change-requests"
+      }
+     ]
     }
    ]
   },
@@ -764,23 +814,56 @@
     "contract": "subscription",
     "purpose": "Partner Cancellations, Refunds & Amendments",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "createPartnerChangeRequest",
+    "contract": "subscription",
+    "purpose": "A partner asks to cancel or amend a booking",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPartnerCancellationRefund"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "PartnerCancellationsRefundsAmendmentsView.fullCancellation",
-    "PartnerCancellationsRefundsAmendmentsView.partialCancellation",
-    "PartnerCancellationsRefundsAmendmentsView.dateChange",
-    "PartnerCancellationsRefundsAmendmentsView.performanceChange",
-    "PartnerCancellationsRefundsAmendmentsView.quantityReduction"
+    "PartnerCancellationsRefundsAmendmentsView.requestType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-045"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-045",
+   "workshopBoard": "wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-045"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 49. 0 of 0 labels bound to a contract property; 0 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreatePartnerChangeRequest",
+    "component": "modal",
+    "trigger": "Create partner change request",
+    "body": "**Collects what `createPartnerChangeRequest` sends before it is called.** Required: `orderId`, `requestType`. Optional: `quantity`, `targetPerformanceId`, `targetProductId`, `newCustomerName`, `feeWaiverRequested`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PartnerChangeRequestInput",
+    "confirm": {
+     "label": "Create partner change request",
+     "operation": "createPartnerChangeRequest"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "orderId",
+      "requestType",
+      "quantity",
+      "targetPerformanceId",
+      "targetProductId",
+      "newCustomerName",
+      "feeWaiverRequested",
+      "reason"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /partner-change-requests"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -842,10 +925,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Finance and authorized partner users can reconcile all commercial account activity against a clear running balance and supporting transaction references.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each line should show) — counts over a population, then the population",
   "purpose": "Give finance and commercial teams a complete financial statement for each partner account.",
-  "purposeNote": "Finance and authorized partner users can reconcile all commercial account activity against a clear running balance and supporting transaction references.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -857,67 +940,67 @@
        "kind": "metricTile",
        "label": "Opening Balance",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.openingBalance"
+       "bindsTo": "PartnerStatementAccountActivitySummary.openingBalance"
       },
       {
        "kind": "metricTile",
        "label": "Sales",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.sales"
+       "bindsTo": "PartnerStatementAccountActivitySummary.sales"
       },
       {
        "kind": "metricTile",
        "label": "Payments",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.payments"
+       "bindsTo": "PartnerStatementAccountActivitySummary.payments"
       },
       {
        "kind": "metricTile",
        "label": "Credits",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.credits"
+       "bindsTo": "PartnerStatementAccountActivitySummary.credits"
       },
       {
        "kind": "metricTile",
        "label": "Refunds",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.refunds"
+       "bindsTo": "PartnerStatementAccountActivitySummary.refunds"
       },
       {
        "kind": "metricTile",
        "label": "Commission",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.commission"
+       "bindsTo": "PartnerStatementAccountActivitySummary.commission"
       },
       {
        "kind": "metricTile",
        "label": "Adjustments",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.adjustments"
+       "bindsTo": "PartnerStatementAccountActivitySummary.adjustments"
       },
       {
        "kind": "metricTile",
        "label": "Closing Balance",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.closingBalance"
+       "bindsTo": "PartnerStatementAccountActivitySummary.closingBalance"
       },
       {
        "kind": "metricTile",
        "label": "Overdue Balance",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.overdueBalance"
+       "bindsTo": "PartnerStatementAccountActivitySummary.overdueBalance"
       },
       {
        "kind": "metricTile",
        "label": "Available Credit",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.availableCredit"
+       "bindsTo": "PartnerStatementAccountActivitySummary.availableCredit"
       },
       {
        "kind": "metricTile",
        "label": "Current",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display",
-       "bindsTo": "PartnerStatementAccountActivityView.current"
+       "bindsTo": "PartnerStatementAccountActivitySummary.current"
       },
       {
        "kind": "metricTile",
@@ -1009,7 +1092,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-046"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-046",
+   "workshopBoard": "wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-046"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 51. 20 of 20 labels bound to a contract property; 24 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1073,13 +1157,75 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Partner operational and financial records can be reconciled systematically, with every unresolved difference tracked through resolution.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Reconcile operational bookings against financial and channel records and identify discrepancies.",
-  "purposeNote": "Partner operational and financial records can be reconciled systematically, with every unresolved difference tracked through resolution.",
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Records Reconciled",
+       "bindsTo": "PartnerReconciliationExceptionManagementSummary.recordsReconciled",
+       "operation": "listPartnerReconciliationException",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Unmatched Orders",
+       "bindsTo": "PartnerReconciliationExceptionManagementSummary.unmatchedOrders",
+       "operation": "listPartnerReconciliationException",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Amount Mismatches",
+       "bindsTo": "PartnerReconciliationExceptionManagementSummary.amountMismatches",
+       "operation": "listPartnerReconciliationException",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Missing Tickets",
+       "bindsTo": "PartnerReconciliationExceptionManagementSummary.missingTickets",
+       "operation": "listPartnerReconciliationException",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pricing Differences",
+       "bindsTo": "PartnerReconciliationExceptionManagementSummary.pricingDifferences",
+       "operation": "listPartnerReconciliationException",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Commission Differences",
+       "bindsTo": "PartnerReconciliationExceptionManagementSummary.commissionDifferences",
+       "operation": "listPartnerReconciliationException",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Payment Differences",
+       "bindsTo": "PartnerReconciliationExceptionManagementSummary.paymentDifferences",
+       "operation": "listPartnerReconciliationException",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pending Investigation",
+       "bindsTo": "PartnerReconciliationExceptionManagementSummary.pendingInvestigation",
+       "operation": "listPartnerReconciliationException",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -1087,16 +1233,6 @@
       {
        "kind": "dataTable",
        "label": "Every partner reconciliation exception",
-       "columns": [
-        "PartnerReconciliationExceptionManagementView.recordsReconciled",
-        "PartnerReconciliationExceptionManagementView.unmatchedOrders",
-        "PartnerReconciliationExceptionManagementView.amountMismatches",
-        "PartnerReconciliationExceptionManagementView.missingTickets",
-        "PartnerReconciliationExceptionManagementView.pricingDifferences",
-        "PartnerReconciliationExceptionManagementView.commissionDifferences",
-        "PartnerReconciliationExceptionManagementView.paymentDifferences",
-        "PartnerReconciliationExceptionManagementView.pendingInvestigation"
-       ],
        "bindsTo": "PartnerReconciliationExceptionManagementView",
        "operation": "listPartnerReconciliationException",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 52 §Display"
@@ -1111,16 +1247,6 @@
        "kind": "detailPanel",
        "label": "The selected partner reconciliation exception",
        "bindsTo": "PartnerReconciliationExceptionManagementView",
-       "columns": [
-        "PartnerReconciliationExceptionManagementView.recordsReconciled",
-        "PartnerReconciliationExceptionManagementView.unmatchedOrders",
-        "PartnerReconciliationExceptionManagementView.amountMismatches",
-        "PartnerReconciliationExceptionManagementView.missingTickets",
-        "PartnerReconciliationExceptionManagementView.pricingDifferences",
-        "PartnerReconciliationExceptionManagementView.commissionDifferences",
-        "PartnerReconciliationExceptionManagementView.paymentDifferences",
-        "PartnerReconciliationExceptionManagementView.pendingInvestigation"
-       ],
        "notes": "The pack groups this record's detail under its own headings: “Partner Orders”, “Partner Reference OTA-82714”, “Exception Types”.",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 52 §Display"
       }
@@ -1135,6 +1261,14 @@
        "label": "Permissions this screen separates",
        "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Match, Correct, Accept Difference, Create Adjustment, Assign, Escalate, Dispute. Each needs attaching to the control it gates, or the screen needs the control.",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 52 §Authorized users can"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Act on partner reconciliation exception",
+       "operation": "actOnPartnerReconciliationException",
+       "permission": "SETTLEMENT_RECONCILE",
+       "notes": "The owner actions on PTR-047 (decided 29 September, writers pass; DM4); the rows themselves are created and re-matched by the reconciliation job.",
+       "provenance": "contract subscription.yaml POST /partner-reconciliation-exceptions/{exceptionId}/actions"
       }
      ]
     }
@@ -1153,24 +1287,63 @@
     "contract": "subscription",
     "purpose": "Partner Reconciliation & Exception Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "actOnPartnerReconciliationException",
+    "contract": "subscription",
+    "purpose": "Work a partner reconciliation exception",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPartnerReconciliationException"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "PartnerReconciliationExceptionManagementView.recordsReconciled",
-    "PartnerReconciliationExceptionManagementView.unmatchedOrders",
-    "PartnerReconciliationExceptionManagementView.amountMismatches",
-    "PartnerReconciliationExceptionManagementView.missingTickets",
-    "PartnerReconciliationExceptionManagementView.pricingDifferences",
-    "PartnerReconciliationExceptionManagementView.commissionDifferences"
+    "PartnerReconciliationExceptionManagementSummary.recordsReconciled",
+    "PartnerReconciliationExceptionManagementSummary.unmatchedOrders",
+    "PartnerReconciliationExceptionManagementSummary.amountMismatches",
+    "PartnerReconciliationExceptionManagementSummary.missingTickets",
+    "PartnerReconciliationExceptionManagementSummary.pricingDifferences",
+    "PartnerReconciliationExceptionManagementSummary.commissionDifferences"
+   ],
+   "params": [
+    {
+     "name": "exceptionId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-047"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-047",
+   "workshopBoard": "wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-047"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 52. 8 of 8 labels bound to a contract property; 15 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formActOnPartnerReconciliationException",
+    "component": "modal",
+    "trigger": "Act on partner reconciliation exception",
+    "body": "**Collects what `actOnPartnerReconciliationException` sends before it is called.** Required: `action`. Optional: `assigneePrincipalId`, `adjustmentRef`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Act on partner reconciliation exception",
+     "operation": "actOnPartnerReconciliationException"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "action",
+      "assigneePrincipalId",
+      "adjustmentRef",
+      "note"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /partner-reconciliation-exceptions/{exceptionId}/actions"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1232,13 +1405,82 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "until relevant transactions and adjustments have been reconciled.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Calculate, approve and settle commission or incentive amounts owed under partner commercial agreements.",
-  "purposeNote": "until relevant transactions and adjustments have been reconciled.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Per Transaction. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 54 §Support"
+   }
+  ],
   "layout": {
    "template": "split",
    "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Commission Earned",
+       "bindsTo": "CommissionCalculationSettlementManagementSummary.commissionEarned",
+       "operation": "listCommissionCalculationSettlement",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Commission Pending",
+       "bindsTo": "CommissionCalculationSettlementManagementSummary.commissionPending",
+       "operation": "listCommissionCalculationSettlement",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Approved",
+       "bindsTo": "CommissionCalculationSettlementManagementSummary.approved",
+       "operation": "listCommissionCalculationSettlement",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "On Hold",
+       "bindsTo": "CommissionCalculationSettlementManagementSummary.onHold",
+       "operation": "listCommissionCalculationSettlement",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Paid",
+       "bindsTo": "CommissionCalculationSettlementManagementSummary.paid",
+       "operation": "listCommissionCalculationSettlement",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Reversed",
+       "bindsTo": "CommissionCalculationSettlementManagementSummary.reversed",
+       "operation": "listCommissionCalculationSettlement",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Incentives Earned",
+       "bindsTo": "CommissionCalculationSettlementManagementSummary.incentivesEarned",
+       "operation": "listCommissionCalculationSettlement",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Next Settlement date",
+       "bindsTo": "CommissionCalculationSettlementManagementSummary.nextSettlement",
+       "operation": "listCommissionCalculationSettlement",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
     {
      "name": "contentBody",
      "slot": "collection",
@@ -1246,16 +1488,6 @@
       {
        "kind": "dataTable",
        "label": "Every commission calculation settlement",
-       "columns": [
-        "CommissionCalculationSettlementManagementView.commissionEarned",
-        "CommissionCalculationSettlementManagementView.commissionPending",
-        "CommissionCalculationSettlementManagementView.approved",
-        "CommissionCalculationSettlementManagementView.onHold",
-        "CommissionCalculationSettlementManagementView.paid",
-        "CommissionCalculationSettlementManagementView.reversed",
-        "CommissionCalculationSettlementManagementView.incentivesEarned",
-        "CommissionCalculationSettlementManagementView.nextSettlement"
-       ],
        "bindsTo": "CommissionCalculationSettlementManagementView",
        "operation": "listCommissionCalculationSettlement",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 54 §Display"
@@ -1270,18 +1502,35 @@
        "kind": "detailPanel",
        "label": "The selected commission calculation settlement",
        "bindsTo": "CommissionCalculationSettlementManagementView",
-       "columns": [
-        "CommissionCalculationSettlementManagementView.commissionEarned",
-        "CommissionCalculationSettlementManagementView.commissionPending",
-        "CommissionCalculationSettlementManagementView.approved",
-        "CommissionCalculationSettlementManagementView.onHold",
-        "CommissionCalculationSettlementManagementView.paid",
-        "CommissionCalculationSettlementManagementView.reversed",
-        "CommissionCalculationSettlementManagementView.incentivesEarned",
-        "CommissionCalculationSettlementManagementView.nextSettlement"
-       ],
        "notes": "The pack groups this record's detail under its own headings: “For each transaction”, “Automatically account for”, “Exception states”, “Settlement Batch”, “Important Boundary”.",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 54 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Per Transaction",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 54 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Act on partner commission line",
+       "operation": "actOnPartnerCommissionLine",
+       "permission": "SETTLEMENT_RECONCILE",
+       "notes": "The line actions on PTR-048 (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml POST /partner-commission-lines/{lineId}/actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Act on partner settlement batch",
+       "operation": "actOnPartnerSettlementBatch",
+       "permission": "SETTLEMENT_RECONCILE",
+       "notes": "The batch actions on PTR-048 (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml POST /partner-settlement-batches/{batchId}/actions"
       }
      ]
     }
@@ -1300,24 +1549,96 @@
     "contract": "subscription",
     "purpose": "Commission Calculation & Settlement Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "actOnPartnerCommissionLine",
+    "contract": "subscription",
+    "purpose": "Hold, release, dispute or reverse a single commission line",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCommissionCalculationSettlement"
+    ]
+   },
+   {
+    "operationId": "actOnPartnerSettlementBatch",
+    "contract": "subscription",
+    "purpose": "Move a commission settlement batch through Finance",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCommissionCalculationSettlement"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "CommissionCalculationSettlementManagementView.commissionEarned",
-    "CommissionCalculationSettlementManagementView.commissionPending",
-    "CommissionCalculationSettlementManagementView.approved",
-    "CommissionCalculationSettlementManagementView.onHold",
-    "CommissionCalculationSettlementManagementView.paid",
-    "CommissionCalculationSettlementManagementView.reversed"
+    "CommissionCalculationSettlementManagementSummary.commissionEarned",
+    "CommissionCalculationSettlementManagementSummary.commissionPending",
+    "CommissionCalculationSettlementManagementSummary.approved",
+    "CommissionCalculationSettlementManagementSummary.onHold",
+    "CommissionCalculationSettlementManagementSummary.paid",
+    "CommissionCalculationSettlementManagementSummary.reversed"
+   ],
+   "params": [
+    {
+     "name": "lineId",
+     "from": "navigation",
+     "optional": true
+    },
+    {
+     "name": "batchId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-048"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-048",
+   "workshopBoard": "wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-048"
   },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 54. 8 of 8 labels bound to a contract property; 8 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 54. 8 of 8 labels bound to a contract property; 9 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formActOnPartnerCommissionLine",
+    "component": "modal",
+    "trigger": "Act on partner commission line",
+    "body": "**Collects what `actOnPartnerCommissionLine` sends before it is called.** Required: `action`. Optional: `reason`, `caseId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Act on partner commission line",
+     "operation": "actOnPartnerCommissionLine"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "action",
+      "reason",
+      "caseId"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /partner-commission-lines/{lineId}/actions"
+   },
+   {
+    "id": "formActOnPartnerSettlementBatch",
+    "component": "modal",
+    "trigger": "Act on partner settlement batch",
+    "body": "**Collects what `actOnPartnerSettlementBatch` sends before it is called.** Required: `action`. Optional: `scheduledDate`, `reason`, `caseId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Act on partner settlement batch",
+     "operation": "actOnPartnerSettlementBatch"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "action",
+      "scheduledDate",
+      "reason",
+      "caseId"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /partner-settlement-batches/{batchId}/actions"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1379,14 +1700,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every partner dispute has a traceable owner, SLA, supporting evidence, financial context and documented resolution.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Monitor) and no metric row",
   "purpose": "Provide a structured case-management environment for partner operational and commercial disputes.",
-  "purposeNote": "Every partner dispute has a traceable owner, SLA, supporting evidence, financial context and documented resolution.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Booking Dispute, Pricing Dispute, Ticket Issue, Allocation Issue, Finance review, Technical review. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 8 actions on this screen; 6 are served since the writers pass (29 September): Booking Dispute, Pricing Dispute, Credit Dispute, Ticket Issue, Allocation Issue, API Issue by `createPartnerCase`.** Still unserved: Finance review, Technical review. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support"
    }
   ],
@@ -1447,12 +1768,22 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Credit Dispute",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Ticket Issue",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support"
       },
       {
        "kind": "secondaryButton",
        "label": "Allocation Issue",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "API Issue",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support"
       },
       {
@@ -1464,6 +1795,21 @@
        "kind": "secondaryButton",
        "label": "Technical review",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create partner case",
+       "operation": "createPartnerCase",
+       "permission": "CASE_MANAGE",
+       "notes": "Raised from PTR-049 by staff or by the partner (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml POST /partner-cases"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Act on partner case",
+       "operation": "actOnPartnerCase",
+       "permission": "CASE_MANAGE",
+       "provenance": "contract subscription.yaml POST /partner-cases/{caseId}/actions"
       }
      ]
     }
@@ -1482,6 +1828,24 @@
     "contract": "subscription",
     "purpose": "Partner Disputes, Cases & Service Management",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "createPartnerCase",
+    "contract": "subscription",
+    "purpose": "Open a partner dispute or service case",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPartnerDisputeCase"
+    ]
+   },
+   {
+    "operationId": "actOnPartnerCase",
+    "contract": "subscription",
+    "purpose": "Work a partner case",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPartnerDisputeCase"
+    ]
    }
   ],
   "entryState": {
@@ -1490,14 +1854,79 @@
     "PartnerDisputesCasesServiceManagementView.resolutionTarget",
     "PartnerDisputesCasesServiceManagementView.timeOpen",
     "PartnerDisputesCasesServiceManagementView.slaBreach"
+   ],
+   "params": [
+    {
+     "name": "caseId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-049"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-049",
+   "workshopBoard": "wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-049"
   },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 56. 4 of 4 labels bound to a contract property; 25 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 56. 4 of 4 labels bound to a contract property; 27 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formCreatePartnerCase",
+    "component": "modal",
+    "trigger": "Create partner case",
+    "body": "**Collects what `createPartnerCase` sends before it is called.** Required: `id`, `partnerId`, `category`, `priority`, `description`, `status`, `resolutionTargetAt`. Optional: `contactId`, `orderId`, `invoiceReference`, `settlementBatchId`, `amountInDispute`, `evidence`, `ownerPrincipalId`, `slaPolicyId`, `firstResponseAt`, `resolvedAt`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PartnerCase",
+    "confirm": {
+     "label": "Create partner case",
+     "operation": "createPartnerCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "partnerId",
+      "category",
+      "priority",
+      "description",
+      "status",
+      "resolutionTargetAt",
+      "contactId",
+      "orderId",
+      "invoiceReference",
+      "settlementBatchId",
+      "amountInDispute",
+      "evidence",
+      "ownerPrincipalId",
+      "slaPolicyId",
+      "firstResponseAt",
+      "resolvedAt",
+      "scopePath"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /partner-cases"
+   },
+   {
+    "id": "formActOnPartnerCase",
+    "component": "modal",
+    "trigger": "Act on partner case",
+    "body": "**Collects what `actOnPartnerCase` sends before it is called.** Required: `action`. Optional: `ownerPrincipalId`, `resolution`, `reason`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Act on partner case",
+     "operation": "actOnPartnerCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "action",
+      "ownerPrincipalId",
+      "resolution",
+      "reason",
+      "note"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /partner-cases/{caseId}/actions"
+   }
+  ],
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1559,10 +1988,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Management can objectively compare partners and identify commercial, operational or financial deterioration before it becomes a material issue.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Create a consistent scorecard for evaluating the quality and commercial value of every partner relationship.",
-  "purposeNote": "Management can objectively compare partners and identify commercial, operational or financial deterioration before it becomes a material issue.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1574,9 +2003,7 @@
        "kind": "dataTable",
        "label": "Every partner performance scorecard",
        "columns": [
-        "PartnerPerformanceScorecardRiskMonitoringView.improving",
-        "PartnerPerformanceScorecardRiskMonitoringView.stable",
-        "PartnerPerformanceScorecardRiskMonitoringView.declining"
+        "PartnerPerformanceScorecardRiskMonitoringView.trend"
        ],
        "bindsTo": "PartnerPerformanceScorecardRiskMonitoringView",
        "operation": "listPartnerPerformanceScorecard",
@@ -1593,9 +2020,7 @@
        "label": "The selected partner performance scorecard",
        "bindsTo": "PartnerPerformanceScorecardRiskMonitoringView",
        "columns": [
-        "PartnerPerformanceScorecardRiskMonitoringView.improving",
-        "PartnerPerformanceScorecardRiskMonitoringView.stable",
-        "PartnerPerformanceScorecardRiskMonitoringView.declining"
+        "PartnerPerformanceScorecardRiskMonitoringView.trend"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Commercial”, “Allocation”, “Financial”, “Operational”, “Technical”, “Compliance”.",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 57 §Show"
@@ -1621,15 +2046,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "PartnerPerformanceScorecardRiskMonitoringView.improving",
-    "PartnerPerformanceScorecardRiskMonitoringView.stable",
-    "PartnerPerformanceScorecardRiskMonitoringView.declining"
+    "PartnerPerformanceScorecardRiskMonitoringView.trend"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-050"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-050",
+   "workshopBoard": "wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-050"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 57. 3 of 3 labels bound to a contract property; 3 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1685,10 +2109,10 @@
    "notes": "**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Management receives explainable partner-level intelligence and scenario modelling that supports growth, margin, allocation and risk decisions without bypassing commercial governance. Board 3 — Final Screen Register Screen Backend Screen Primary Responsibility 8.3.1 Partner Operations Command Center Live partner operations 8.3.2 Partner Orders & Booking Management Partner transactions",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Analyze) and no metric row",
   "purpose": "Provide TICVAI's AI decision-support layer across the complete partner lifecycle. This screen should combine information from Boards 1, 2 and 3.",
-  "purposeNote": "Management receives explainable partner-level intelligence and scenario modelling that supports growth, margin, allocation and risk decisions without bypassing commercial governance. Board 3 — Final Screen Register Screen Backend Screen Primary Responsibility 8.3.1 Partner Operations Command Center Live partner operations 8.3.2 Partner Orders & Booking Management Partner transactions",
   "layout": {
    "template": "split",
    "regions": [
@@ -1700,20 +2124,7 @@
        "kind": "dataTable",
        "label": "Every partner intelligence relationship",
        "columns": [
-        "PartnerAiIntelligenceRelationshipOptimizationView.partnerProfile",
-        "PartnerAiIntelligenceRelationshipOptimizationView.territory",
-        "PartnerAiIntelligenceRelationshipOptimizationView.agreements",
-        "PartnerAiIntelligenceRelationshipOptimizationView.rates",
-        "PartnerAiIntelligenceRelationshipOptimizationView.commission",
-        "PartnerAiIntelligenceRelationshipOptimizationView.credit",
-        "PartnerAiIntelligenceRelationshipOptimizationView.paymentBehavior",
-        "PartnerAiIntelligenceRelationshipOptimizationView.allocation",
-        "PartnerAiIntelligenceRelationshipOptimizationView.orders",
-        "PartnerAiIntelligenceRelationshipOptimizationView.cancellations",
-        "PartnerAiIntelligenceRelationshipOptimizationView.settlement",
-        "PartnerAiIntelligenceRelationshipOptimizationView.cases",
-        "PartnerAiIntelligenceRelationshipOptimizationView.channelPerformance",
-        "PartnerAiIntelligenceRelationshipOptimizationView.historicalTrends"
+        "PartnerAiIntelligenceRelationshipOptimizationView.inputsConsidered"
        ],
        "bindsTo": "PartnerAiIntelligenceRelationshipOptimizationView",
        "operation": "listPartnerRelationship",
@@ -1730,20 +2141,7 @@
        "label": "The selected partner intelligence relationship",
        "bindsTo": "PartnerAiIntelligenceRelationshipOptimizationView",
        "columns": [
-        "PartnerAiIntelligenceRelationshipOptimizationView.partnerProfile",
-        "PartnerAiIntelligenceRelationshipOptimizationView.territory",
-        "PartnerAiIntelligenceRelationshipOptimizationView.agreements",
-        "PartnerAiIntelligenceRelationshipOptimizationView.rates",
-        "PartnerAiIntelligenceRelationshipOptimizationView.commission",
-        "PartnerAiIntelligenceRelationshipOptimizationView.credit",
-        "PartnerAiIntelligenceRelationshipOptimizationView.paymentBehavior",
-        "PartnerAiIntelligenceRelationshipOptimizationView.allocation",
-        "PartnerAiIntelligenceRelationshipOptimizationView.orders",
-        "PartnerAiIntelligenceRelationshipOptimizationView.cancellations",
-        "PartnerAiIntelligenceRelationshipOptimizationView.settlement",
-        "PartnerAiIntelligenceRelationshipOptimizationView.cases",
-        "PartnerAiIntelligenceRelationshipOptimizationView.channelPerformance",
-        "PartnerAiIntelligenceRelationshipOptimizationView.historicalTrends"
+        "PartnerAiIntelligenceRelationshipOptimizationView.inputsConsidered"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Commercial”, “Allocation”, “Credit”, “Risk”, “Growth”, “Natural-Language Analysis”.",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 59 §Analyze"
@@ -1769,18 +2167,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "PartnerAiIntelligenceRelationshipOptimizationView.partnerProfile",
-    "PartnerAiIntelligenceRelationshipOptimizationView.territory",
-    "PartnerAiIntelligenceRelationshipOptimizationView.agreements",
-    "PartnerAiIntelligenceRelationshipOptimizationView.rates",
-    "PartnerAiIntelligenceRelationshipOptimizationView.commission",
-    "PartnerAiIntelligenceRelationshipOptimizationView.credit"
+    "PartnerAiIntelligenceRelationshipOptimizationView.inputsConsidered"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-051"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-051",
+   "workshopBoard": "wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-051"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 59. 14 of 14 labels bound to a contract property; 14 of 96 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

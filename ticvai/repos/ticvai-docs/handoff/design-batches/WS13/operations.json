@@ -80,6 +80,19 @@
   "requestBody": null,
   "responds": "ApprovalAnalytics"
  },
+ "getApprovalRequestScore": {
+  "method": "GET",
+  "path": "/approval-requests/{approvalRequestId}/score",
+  "contract": "ai",
+  "summary": "The latest context score of an approval request",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiApprovalRequestScore"
+ },
  "listApprovalRequests": {
   "method": "GET",
   "path": "/approval-requests",
@@ -112,6 +125,11 @@
    },
    {
     "name": "breachingWithinMinutes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "sort",
     "in": "query",
     "required": null
    },

@@ -58,6 +58,23 @@ services:
         limits:
           cpus: '1'
           memory: 1G
+  # **Vectors (ADR-0049):** in Azure, Qdrant self-hosted in UAE North as a 3-node HA cluster per cell
+  # (TLS, JWT RBAC, per-collection snapshots to UAE storage), one collection per tenant with a
+  # collection-scoped token. It is not a container in this file; the AI service reaches it by URL.
+  # **The event broker (ADR-0057, proposed).** rabbitmq (local/venue-local); cloud broker: client's
+  # choice. The client chooses RabbitMQ or Kafka for the cloud; development and the venue-local
+  # profile run RabbitMQ either way (ADR-0046 needs it on-premise). Modules never talk to it
+  # directly: the outbox relay in `workers` publishes through the kernel's IEventPublisher, and
+  # every consumer records what it handled in its tenant database's inbox (ADR-0058).
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    labels:
+      ticvai.broker: "rabbitmq (local/venue-local); cloud broker: client's choice"
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
   catalogueservice:
     build: ../services/CatalogueService
     environment:

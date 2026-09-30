@@ -1,6 +1,6 @@
 # WS45 — Promotions   Bundles Management board 1
 
-**10 screens · 11 operations · 14 schemas · 3 permissions**
+**10 screens · 16 operations · 26 schemas · 4 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `APPROVAL_DECIDE, APPROVAL_VIEW, PRICE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `APPROVAL_DECIDE, APPROVAL_VIEW, PRICE_CONFIGURE, PRICE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **1 of these operations work offline**: listPromotions
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -62,16 +61,16 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `ADM-138` | Promotion Command Center Dashboard | commandCentre | 2 | 0 | — |
-| `ADM-139` | Promotion & Campaign Directory | listDetail | 1 | 0 | — |
+| `ADM-139` | Promotion & Campaign Directory | listDetail | 5 | 2 | — |
 | `ADM-140` | Promotion Overview | listDetail | 1 | 0 | — |
 | `ADM-141` | Promotion Lifecycle & Status Manager | listDetail | 1 | 0 | — |
-| `ADM-142` | Campaign Calendar & Timeline | listDetail | 1 | 0 | — |
+| `ADM-142` | Campaign Calendar & Timeline | listDetail | 2 | 0 | — |
 | `ADM-143` | Promotion Channel & Publication Monitor | commandCentre | 1 | 1 | — |
 | `ADM-144` | Promotion Alerts & Exception Center | configEditor | 1 | 1 | — |
 | `ADM-145` | Promotion Approval Inbox | approvalInbox | 3 | 1 | — |
-| `ADM-146` | Promotion Health & Performance Monitor | commandCentre | 1 | 0 | — |
+| `ADM-146` | Promotion Health & Performance Monitor | commandCentre | 2 | 0 | — |
 | `ADM-147` | Promotion Audit, Activity & Version History | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**ADM-140, ADM-141, ADM-142, ADM-147 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-140, ADM-141, ADM-147 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

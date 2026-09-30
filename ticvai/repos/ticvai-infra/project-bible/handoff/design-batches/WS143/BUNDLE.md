@@ -1363,6 +1363,11 @@ Method, path, parameters, request and response for every operation these screens
     "required": false
    },
    {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
     "name": "agentPrincipalId",
     "in": "query",
     "required": false
@@ -1624,6 +1629,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true,
     "description": "Relative change in `csat` against the previous period of equal length."
    },
+   "aiSummary": {
+    "type": "object",
+    "nullable": true,
+    "description": "AI-derived narrative of the feedback matching the filters (22.5.12; 29 September, build pass, group G2), labelled as AI on screen. Null when AI is off or fewer than 5 items match.",
+    "required": [
+     "text",
+     "basedOnCount",
+     "modelVersion"
+    ],
+    "properties": {
+     "text": {
+      "type": "string",
+      "maxLength": 2000
+     },
+     "basedOnCount": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "The feedback items the summary was written from."
+     },
+     "modelVersion": {
+      "type": "string",
+      "maxLength": 60
+     },
+     "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   },
    "breakdown": {
     "type": "array",
     "description": "One row per value of the `groupBy` dimension, most responses first.",
@@ -1772,7 +1806,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       },
       "caseId": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "format": "uuid",
        "nullable": true
       },
       "agentPrincipalId": {
@@ -1792,7 +1826,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       },
       "followUpCaseId": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "format": "uuid",
        "nullable": true
       }
      }
@@ -2007,7 +2041,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "event": {
     "type": "string",
-    "description": "The platform event that fires it — `order.completed`, `access.validated`, `queue.turnApproaching`. **Named from the event catalogue** (`BusinessEvent.eventType`), so a trigger cannot bind to something nothing publishes. Its conditions are `MessageTriggerCondition` rows.\n"
+    "description": "The platform event that fires it — `order.completed`, `access.validated`, `queue.turnApproaching`. **Named from the event catalogue** (`BusinessEvent.eventType`), so a trigger cannot bind to something nothing publishes. Its conditions are `MessageTriggerCondition` rows.\n**`entitlement.expiringSoon` is in the catalogue since 29 September** (build pass, group G2; 5.5.30): the pre-expiry reminder for a ticket or pass. Its anchor is the event time; the notice period is the template's `expiryNoticeDays`, so `offsetMinutes` is normally 0.\n"
    },
    "templateId": {
     "type": "string",
@@ -2036,6 +2070,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "default": "transactional",
     "description": "**A queue-turn alert and a monthly newsletter are not the same urgency and were the same dispatch.** `operational` bypasses batching and quiet hours; `marketing` never does.\n"
+   },
+   "sendTimeMode": {
+    "type": "string",
+    "enum": [
+     "fixed",
+     "optimised"
+    ],
+    "default": "fixed",
+    "description": "**Only for `priority` `marketing`** (29 September, build pass, group G2; 22.9.16): `optimised` holds the notification to the recipient's suggested hour from `ai.requestSuggestion` (kind `sendTime`) within the next 24 hours, on the suggested consented channel. `operational` and `transactional` messages are never delayed for it, and a `setMessageTrigger` asking for it on them is refused (400)."
    },
    "isActive": {
     "type": "boolean",
@@ -2082,8 +2125,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID; equals the `Idempotency-Key` header."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7; equals the `Idempotency-Key` header."
    },
    "scopePath": {
     "type": "string",
@@ -2092,18 +2135,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "caseId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "Required for `fullRefund`, `partialRefund`, `feeWaiver`, `upgrade` and `discount`."
    },
    "lineIds": {
     "type": "array",
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     }
    },
    "requestType": {
@@ -2584,7 +2627,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "subjectId": {
     "type": "string",

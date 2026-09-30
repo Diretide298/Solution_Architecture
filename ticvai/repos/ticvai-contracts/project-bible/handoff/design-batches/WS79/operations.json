@@ -25,7 +25,7 @@
   "summary": "Take a registered device through enrolment to activation",
   "permission": "DEVICE_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {

@@ -136,7 +136,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "WEB-012",
      "trigger": "Guest code proved or signed in: straight to payment (details skipped)",
-     "provenance": "decided 29 September 2026 (P29), W1",
+     "provenance": "decided 29 September 2026, W1",
      "carries": [
       "orderId",
       "paymentId"
@@ -254,7 +254,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getPublishedBookingFlow",
        "notes": "The steps of the published flow in their `sortOrder`, this one (cart) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
-       "provenance": "decided 29 September 2026 (P29), W12; CMS-103 Booking Flows"
+       "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       }
      ]
     },
@@ -532,7 +532,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "white-label",
     "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), W12"
+    "provenance": "decided 29 September 2026, W12"
    }
   ],
   "entryState": {
@@ -660,7 +660,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "WEB-012",
      "trigger": "Skipped: nothing to ask (guest code proved, or signed in, and no attendee forms)",
-     "provenance": "decided 29 September 2026 (P29), W1"
+     "provenance": "decided 29 September 2026, W1"
     },
     {
      "to": "WEB-010",
@@ -766,7 +766,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getPublishedBookingFlow",
        "notes": "The steps of the published flow in their `sortOrder`, this one (details) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
-       "provenance": "decided 29 September 2026 (P29), W12; CMS-103 Booking Flows"
+       "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       }
      ]
     },
@@ -1132,7 +1132,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "white-label",
     "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), W12"
+    "provenance": "decided 29 September 2026, W12"
    }
   ],
   "entryState": {
@@ -1325,21 +1325,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getPublishedBookingFlow",
        "notes": "The steps of the published flow in their `sortOrder`, this one (payment) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
-       "provenance": "decided 29 September 2026 (P29), W12; CMS-103 Booking Flows"
+       "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       },
       {
        "kind": "consentBlock",
        "label": "Terms and conditions",
        "operation": "createOrder",
        "notes": "After the code the guest goes straight to the T&Cs tick and completes (W1).",
-       "provenance": "decided 29 September 2026 (P29), W1"
+       "provenance": "decided 29 September 2026, W1"
       },
       {
        "kind": "toggle",
        "label": "Send me offers and news",
        "operation": "createOrder",
        "notes": "Marketing opt-in beside the T&Cs, **never pre-ticked** (M18-15): `marketingConsents[]` on the order, bound to the verified contact.",
-       "provenance": "decided 29 September 2026 (P29), M18-15"
+       "provenance": "decided 29 September 2026, M18-15"
       }
      ]
     },
@@ -1423,7 +1423,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "white-label",
     "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), W12"
+    "provenance": "decided 29 September 2026, W12"
    }
   ],
   "entryState": {
@@ -2716,12 +2716,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); at most 10 per sale on staff and POS (audit R080 (c)). Over the limit is 422 `seatLimitExceeded`.",
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     }
    },
    "resourceHoldId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant and `quantity` is 1. The hold is the line's capacity; no inventory lease is taken."
    },
@@ -2789,12 +2789,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "readOnly": true
    },
    "questionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "questionVersion": {
     "type": "integer",
@@ -2834,14 +2834,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "readOnly": true,
     "description": "Set by `orders.checkoutCart` when the cart becomes an order."
    },
    "orderLineId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "readOnly": true
    },
@@ -3308,12 +3308,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "maxItems": 50,
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     }
    },
    "resourceHoldId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The `resources.ResourceHold` this line buys (decided 29 September, rev 3 REV3-15). While set, `leaseExpiresAt` is the hold's `expiresAt` and `inventoryHoldId` is null."
    },
@@ -3636,8 +3636,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID of the line. `lineIds` everywhere in this contract are these."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7 of the line. `lineIds` everywhere in this contract are these."
    },
    "variantId": {
     "type": "string",
@@ -3666,13 +3666,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "maxItems": 50,
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     },
     "description": "Seated products only, as `seating.Seat.id`. Not available offline. **At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel** (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); **at most 10 per sale on staff and POS** (audit R080 (c)), across all the lines of one order for one performance. `createOrder` refuses more with 422 `seatLimitExceeded` (problem type `seat-limit-exceeded`)."
    },
    "resourceHoldId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant. `createOrder` converts the hold into a `ResourceBooking` without releasing it. Not available offline."
    },
@@ -3752,8 +3752,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID. Also the idempotency key: it must equal the `Idempotency-Key` header, and a replay or a mismatch follows `IdempotencyKey` in `shared/common.yaml`. Offline replay through `syncOrders` carries no header, and this id alone deduplicates there.\n"
+    "format": "uuid",
+    "description": "Client-generated UUIDv7. Also the idempotency key: it must equal the `Idempotency-Key` header, and a replay or a mismatch follows `IdempotencyKey` in `shared/common.yaml`. Offline replay through `syncOrders` carries no header, and this id alone deduplicates there.\n"
    },
    "venueId": {
     "type": "string",
@@ -3764,7 +3764,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "shiftId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "subjectId": {
     "type": "string",
@@ -3806,12 +3806,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID of the payment, and its idempotency key — it must equal the `Idempotency-Key` header."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7 of the payment, and its idempotency key — it must equal the `Idempotency-Key` header."
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "tender": {
     "$ref": "#/components/schemas/TenderKind"
@@ -4441,8 +4441,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "The client ULID from `CreateOrderRequest.id`."
+    "format": "uuid",
+    "description": "The client UUIDv7 from `CreateOrderRequest.id`."
    },
    "orderNumber": {
     "type": "string",
@@ -4549,7 +4549,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "shiftId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "subjectId": {
@@ -4650,7 +4650,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "description": "The entitlements this line issued. **These are the ticket ids** — `transferOrderTickets.ticketIds` and `reprintOrder.reissuedTicketIds` take and return them.",
       "items": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+       "format": "uuid"
       }
      },
      "crossRegionRightIds": {
@@ -4786,11 +4786,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "tender": {
     "$ref": "#/components/schemas/TenderKind"
@@ -5159,7 +5159,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "properties": {
       "questionId": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+       "format": "uuid"
       },
       "questionVersion": {
        "type": "integer",
@@ -5261,7 +5261,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "mapId": {
     "type": "string",

@@ -1021,6 +1021,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": "venueId",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "basis",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -1430,6 +1435,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "type": "string",
      "format": "uuid"
     }
+   },
+   "basisApplied": {
+    "type": "string",
+    "enum": [
+     "minimum",
+     "forecastRequirement"
+    ],
+    "description": "Which figure `required` is for this row. With `higherOfBoth`, the larger; with `forecastRequirement` and no handed-over requirement for the period, `minimum`."
+   },
+   "minimumRequired": {
+    "type": "integer",
+    "nullable": true,
+    "description": "The configured minimum for the position and window."
+   },
+   "forecastRequired": {
+    "type": "number",
+    "nullable": true,
+    "description": "The forecast staff requirement (p50) for the position and window, from `workforce.forecast_requirement`. Null where none was handed over."
+   },
+   "forecastRequiredP90": {
+    "type": "number",
+    "nullable": true,
+    "description": "The busy-case requirement, for planning to the busy case."
+   },
+   "forecastVersionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The AI forecast version the requirement is bound to (AIP-067), so a manager can open the forecast behind it."
    }
   }
  }

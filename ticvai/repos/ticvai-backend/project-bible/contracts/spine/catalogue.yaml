@@ -749,7 +749,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: reinstateEntitlement
       x-ticvai-consumed-by:
@@ -811,7 +811,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: freezeEntitlement
       x-ticvai-consumed-by:
@@ -3254,7 +3254,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     delete:
       operationId: relinquishInventoryHold
       x-ticvai-consumed-by:
@@ -3335,7 +3335,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: renewInventoryHold
       x-ticvai-consumed-by:
@@ -3416,7 +3416,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: forceReleaseInventoryHold
       x-ticvai-consumed-by:
@@ -3479,7 +3479,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: convertInventoryHold
       x-ticvai-audience:
@@ -4517,7 +4517,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: suspendEntitlement
       x-ticvai-consumed-by:
@@ -16597,7 +16597,7 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           readOnly: true
         recommendationId:
           type: string
@@ -17866,8 +17866,8 @@ components:
       properties:
         entitlementId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: The `access.Entitlement.id` this membership is — a ULID, like every entitlement id.
+          format: uuid
+          description: The `access.Entitlement.id` this membership is — a UUIDv7, like every entitlement id.
         productId:
           type: string
           format: uuid
@@ -18276,11 +18276,11 @@ components:
           properties:
             fromStationId:
               type: string
-              pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+              format: uuid
               description: A `transport.Station`.
             toStationId:
               type: string
-              pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+              format: uuid
             bothDirections:
               type: boolean
               default: true
@@ -18290,7 +18290,7 @@ components:
               description: The routes it may be used on. Empty means any active route serving both stations.
               items:
                 type: string
-                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                format: uuid
         reentryAllowed:
           type: boolean
           default: false
@@ -20304,8 +20304,8 @@ components:
             '
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: Client-generated ULID. Also the idempotency key.
+          format: uuid
+          description: Client-generated UUIDv7. Also the idempotency key.
         channelCapacityId:
           type: string
           format: uuid

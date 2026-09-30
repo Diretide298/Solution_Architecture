@@ -1,6 +1,6 @@
 # WS167 — Seat Management Venue Mapping Reference v1.0 board 3
 
-**10 screens · 14 operations · 13 schemas · 3 permissions**
+**10 screens · 17 operations · 20 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, CAPACITY_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, AI_USE, CAPACITY_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -62,14 +62,14 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `BO-973` | Layout Command Center | listDetail | 1 | 0 | — |
 | `BO-974` | Template Library | listDetail | 2 | 0 | — |
-| `BO-975` | Event-Specific Layout | listDetail | 2 | 0 | — |
+| `BO-975` | Event-Specific Layout | listDetail | 5 | 0 | — |
 | `BO-976` | Clone & Inheritance | listDetail | 2 | 0 | — |
 | `BO-977` | Version Compare | listDetail | 1 | 0 | — |
 | `BO-978` | Multi-Performance Assignment | listDetail | 2 | 0 | — |
 | `BO-979` | Temporary Seat Blocking | listDetail | 2 | 0 | — |
 | `BO-980` | Scheduled Seat Release | listDetail | 2 | 0 | — |
 | `BO-981` | Conflict & Impact Simulation | listDetail | 1 | 0 | — |
-| `BO-982` | Approval, Publish & Rollback | listDetail | 2 | 0 | — |
+| `BO-982` | Approval, Publish & Rollback | listDetail | 3 | 0 | — |
 
 ## Thin screens in this batch
 
@@ -488,6 +488,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Publish it",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "decideProposedAction",
+    "contract": "ai",
+    "purpose": "Record which AI draft or proposal was used, or why it was refused",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "proposeSeatMapChanges",
+    "contract": "ai",
+    "purpose": "Propose categories, numbering, a stage variant or consistency findings for this map",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getActionPlan",
+    "contract": "ai",
+    "purpose": "The seat-map plan's steps before approval",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -500,6 +521,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "params": [
     {
      "name": "seatMapId",
+     "from": "navigation"
+    },
+    {
+     "name": "actionId",
+     "from": "navigation"
+    },
+    {
+     "name": "planId",
      "from": "navigation"
     }
    ]
@@ -1510,6 +1539,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "listSeatMaps",
      "getSeatMap"
     ]
+   },
+   {
+    "operationId": "proposeSeatMapChanges",
+    "contract": "ai",
+    "purpose": "Propose categories, numbering, a stage variant or consistency findings for this map",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1568,6 +1604,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -1634,6 +1675,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "SeatMapTemplate"
  },
+ "decideProposedAction": {
+  "method": "POST",
+  "path": "/proposed-actions/{actionId}/decide",
+  "contract": "ai",
+  "summary": "Approve or reject a proposal",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProposedAction"
+ },
  "diffSeatMapVersions": {
   "method": "GET",
   "path": "/seat-maps/{seatMapId}/diff",
@@ -1657,6 +1717,19 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": null,
   "responds": "SeatMapDiff"
+ },
+ "getActionPlan": {
+  "method": "GET",
+  "path": "/action-plans/{planId}",
+  "contract": "ai",
+  "summary": "A plan with its steps",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiActionPlanDetail"
  },
  "getSeatMap": {
   "method": "GET",
@@ -1750,6 +1823,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Page"
  },
+ "proposeSeatMapChanges": {
+  "method": "POST",
+  "path": "/ai/seat-maps/{seatMapId}/proposals",
+  "contract": "ai",
+  "summary": "Propose changes to an existing seat map, as a plan a person approves",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiSeatMapProposal"
+ },
  "publishSeatMap": {
   "method": "POST",
   "path": "/seat-maps/{seatMapId}/publish",
@@ -1835,6 +1927,378 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AiActionPlan": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.action_plan",
+  "description": "**A plan: plan, validate, simulate, approve, execute, with rollback** (design 2.2 D, 3.8; AIC-086..107). Independent of any conversation (AIC-102). Its steps are `ai.action_step`; the change set is hashed so what was approved is what runs (AIC-181).",
+  "required": [
+   "origin",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "origin": {
+    "type": "string",
+    "enum": [
+     "configurationSession",
+     "generateConfiguration",
+     "assistant",
+     "riskCase",
+     "operationalRequirement",
+     "rollback"
+    ]
+   },
+   "originRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "summary": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "validated",
+     "simulated",
+     "awaitingApproval",
+     "approved",
+     "executing",
+     "paused",
+     "completed",
+     "partiallyCompleted",
+     "failed",
+     "compensated",
+     "cancelled",
+     "rolledBack"
+    ],
+    "readOnly": true
+   },
+   "autonomyLevel": {
+    "$ref": "#/components/schemas/AiAutonomyLevel"
+   },
+   "approvalTier": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 2,
+    "description": "The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). Not an autonomy level."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `approvals` request, where tier 2 or the matrix caught the plan."
+   },
+   "proposedActionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "ai.proposed_action",
+    "description": "The `ai.proposed_action` the plan is presented as for a decision."
+   },
+   "changeSetHash": {
+    "type": "string",
+    "readOnly": true
+   },
+   "governanceOutcome": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AiGovernanceOutcome"
+     }
+    ],
+    "readOnly": true
+   },
+   "policyVersionRef": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The governance policy version that decided it."
+   },
+   "simulation": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4)."
+   },
+   "partialCompletionAllowed": {
+    "type": "boolean",
+    "default": false,
+    "description": "Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134)."
+   },
+   "rollbackOfPlanId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.action_plan"
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiActionPlanDetail": {
+  "type": "object",
+  "x-ticvai-persistence": "none — ai.action_plan with its ai.action_step rows",
+  "description": "A plan with its steps in DAG order.",
+  "required": [
+   "plan",
+   "steps"
+  ],
+  "properties": {
+   "plan": {
+    "$ref": "#/components/schemas/AiActionPlan"
+   },
+   "steps": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiActionStep"
+    }
+   }
+  }
+ },
+ "AiActionStep": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.action_step",
+  "description": "One step of a plan: a registered tool against `targetContract.targetOperation` at a contract version (AIC-095), with payload, provenance, compensation and the idempotency key `plan:{id}:step:{n}`. **Scoped through its plan** (`platform.apply_parent_rls`). Each step records its target object's version; drift pauses the plan (AIC-182).",
+  "required": [
+   "planId",
+   "stepNumber",
+   "toolKey",
+   "targetContract",
+   "targetOperation",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "ai.action_plan"
+   },
+   "stepNumber": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "dependsOn": {
+    "type": "array",
+    "items": {
+     "type": "integer",
+     "minimum": 1
+    },
+    "description": "Step numbers that must succeed first. The plan is a DAG."
+   },
+   "toolKey": {
+    "type": "string"
+   },
+   "targetContract": {
+    "type": "string"
+   },
+   "targetOperation": {
+    "type": "string"
+   },
+   "contractVersion": {
+    "type": "string"
+   },
+   "payload": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "The request body of `targetOperation`, validated against it before the plan is approved."
+   },
+   "provenance": {
+    "$ref": "#/components/schemas/AiProvenance"
+   },
+   "idempotencyKey": {
+    "type": "string",
+    "readOnly": true
+   },
+   "targetObjectRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "targetObjectVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "The version the step was planned against. A different version at execution is drift."
+   },
+   "reversible": {
+    "type": "boolean"
+   },
+   "compensation": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "validated",
+     "running",
+     "succeeded",
+     "failed",
+     "compensated",
+     "skipped",
+     "paused"
+    ],
+    "readOnly": true
+   },
+   "attempts": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 3,
+    "readOnly": true,
+    "description": "Bounded at 3 (AIC-135)."
+   },
+   "lastError": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "resultRef": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The owning service's response: success is its answer, not a model's judgement (AIC-097)."
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   }
+  }
+ },
+ "AiSeatMapProposal": {
+  "type": "object",
+  "x-ticvai-persistence": "none — the plan is ai.action_plan and ai.action_step, presented as one ai.proposed_action; the findings are the evidence of its decision record",
+  "description": "What `proposeSeatMapChanges` proposed: findings with the seats they concern, and except for `consistency` the plan a person approves (1.4.23, 1.4.25, 1.4.26, 1.4.29).",
+  "required": [
+   "kind",
+   "findings"
+  ],
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "categories",
+     "numbering",
+     "stageVariant",
+     "consistency"
+    ]
+   },
+   "seatMapId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `ai.action_plan`, readable with `getActionPlan`. Null for `consistency`."
+   },
+   "proposedActionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `ai.proposed_action` a person decides. Null for `consistency`."
+   },
+   "summary": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Counts: seats re-categorised or relabelled, seats blocked, capacity by category before and after."
+   },
+   "findings": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "code",
+      "severity"
+     ],
+     "properties": {
+      "code": {
+       "type": "string",
+       "description": "e.g. `accessibleSeatWithoutAccessiblePrice`, `restrictedViewInPremium`, `companionWithoutWheelchairSpace`, `sightLineLost`, `behindStage`, `numberingGap`, `duplicateLabel`, `categoryChange`, `labelChange`."
+      },
+      "severity": {
+       "type": "string",
+       "enum": [
+        "blocking",
+        "warning",
+        "info"
+       ]
+      },
+      "seatIds": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "uuid"
+       }
+      },
+      "sectionId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "current": {
+       "type": "string",
+       "nullable": true
+      },
+      "proposed": {
+       "type": "string",
+       "nullable": true
+      },
+      "reason": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "basis": {
+    "$ref": "#/components/schemas/SuggestionBasis"
+   },
+   "decisionRecordId": {
+    "type": "string",
+    "format": "uuid"
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -1996,6 +2460,126 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "required": [
    "policyId"
   ]
+ },
+ "ProposedAction": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.proposed_action",
+  "required": [
+   "id",
+   "kind",
+   "targetContract",
+   "targetOperation",
+   "payload",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "interactionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "pricing",
+     "promotion",
+     "operational",
+     "financial",
+     "configuration",
+     "content",
+     "audience"
+    ],
+    "description": "`content` (a marketing or storefront draft from `proposeMarketingContent`) and `audience` (a lookalike segment from `proposeLookalikeSegment`) added 29 September (build); both are applied by a person in the owning screen."
+   },
+   "targetContract": {
+    "type": "string",
+    "description": "Which contract would perform it. The assistant never performs it itself."
+   },
+   "targetOperation": {
+    "type": "string"
+   },
+   "payload": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "The request body a person would submit, ready to review. **Open on purpose: its shape is the request body of `targetOperation` in `targetContract`**, and it is validated against that operation, not restated here.\n"
+   },
+   "summary": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "description": "**Expiry (decided 28 September, audit R213)**: a `proposed` action expires 7 days after `proposedAt`; an `approved` action not applied expires 24 hours after `decidedAt`. Both are proposed values, client to correct, and `expiresAt` carries the one that applies.\n",
+    "enum": [
+     "proposed",
+     "approved",
+     "rejected",
+     "applied",
+     "expired"
+    ]
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "When the expiry timer moves this action to `expired` — `proposedAt` plus 7 days while `proposed`, `decidedAt` plus 24 hours once `approved`, null once `rejected`, `applied` or `expired` (audit R213)."
+   },
+   "approvalLevel": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 2,
+    "description": "8.3.65. Multi-level, because a discount and a pricing change differ in authority. **Two levels (decided 28 September, audit R213)**: `2` for anything touching prices or permissions (every `pricing` and `promotion` action, and any other whose payload sets a price, a discount, a role or a permission grant), which needs a manager other than the requester; `1` for everything else, which the requester approves themselves.\n"
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "decisionReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Required on rejection. **The only signal the assistant is proposing badly**, and without it a poor model degrades silently.\n"
+   },
+   "proposedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Added 29 September (AI design 3.1):** `ai.proposed_action` had no policy — its only references were nullable. The scope it was proposed at, and the partition key row-level security reads.\n"
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "ai.action_plan",
+    "description": "The plan this action presents for a decision (AI design 2.2 D, 3.8)."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `approvals` request deciding a tier 2 or matrix-caught action (AI design 2.3)."
+   },
+   "changeSetHash": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Hash of the change set approved; execution refuses a plan whose hash differs (AIC-181)."
+   }
+  }
  },
  "SeatHoldPool": {
   "type": "object",
@@ -2252,6 +2836,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "SeatMapStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "validated",
+   "published",
+   "archived"
+  ]
+ },
  "SeatMapSummary": {
   "x-ticvai-persistence": "seating.seat_map",
   "type": "object",
@@ -2397,6 +2990,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
    }
   }
+ },
+ "SuggestionBasis": {
+  "type": "string",
+  "description": "**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n",
+  "enum": [
+   "heuristic",
+   "statistical",
+   "model",
+   "hybrid",
+   "manual"
+  ]
  },
  "ValidationFinding": {
   "x-ticvai-persistence": "none — computed",

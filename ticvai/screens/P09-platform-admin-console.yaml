@@ -1892,8 +1892,8 @@ screens:
     component: modal
     trigger: Open access grant
     body: '**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September,
-      audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only — the ones this
-      screen''s operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
+      audit R098). Required: `id` (a client UUIDv7), `permissions` (tenant permissions only — the ones
+      this screen''s operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
       Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant
       sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
@@ -5193,7 +5193,7 @@ screens:
           a TICVAI administrator works: each request names the certified integration, the tenants, the
           module scopes and the IP allow-list. Approving issues a new production client; the sandbox key
           is never promoted.'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
       - kind: dataTable
         label: Flagged API traffic
         bindsTo: ApiAnomaly
@@ -5208,7 +5208,7 @@ screens:
         operation: listApiAnomalies
         notes: '**Abnormal volume is flagged, not only throttled** (M17-07): calls above the client''s
           own baseline, refusals from outside the allow-list, calls to operations it never uses.'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
     - name: contextPanel
       slot: selection
       components:
@@ -5315,11 +5315,11 @@ screens:
       - kind: primaryButton
         label: Decide production access
         operation: decideProductionAccess
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
       - kind: secondaryButton
         label: Save anomaly rule
         operation: setApiAnomalyRule
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
   states:
     loading: The api rate limit list.
     error: Could not load. Names which read failed and leaves the api rate limit untouched.
@@ -5373,7 +5373,7 @@ screens:
     contract: public-api
     purpose: The production key approval queue
     trigger: onLoad
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   - operationId: decideProductionAccess
     contract: public-api
     purpose: Approve or reject production keys for a certified integration
@@ -5381,19 +5381,19 @@ screens:
     invalidates:
     - listProductionAccessRequests
     - listApiClients
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   - operationId: listApiAnomalies
     contract: public-api
     purpose: Flagged abnormal API traffic
     trigger: onLoad
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   - operationId: setApiAnomalyRule
     contract: public-api
     purpose: When traffic is flagged, throttled or suspended
     trigger: onAction
     invalidates:
     - listApiAnomalies
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   entryState:
     params:
     - name: tenantId
@@ -5452,7 +5452,7 @@ screens:
       - reason
       - scopes
       - credentialTtlDays
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   - id: formSetApiAnomalyRule
     component: modal
     trigger: Save anomaly rule
@@ -5474,7 +5474,7 @@ screens:
       - windowMinutes
       - action
       - isActive
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
 - id: ADM-016
   name: White-Label Branding Management
   module: Branding & Localisation
@@ -5781,8 +5781,8 @@ screens:
     component: modal
     trigger: Open access grant
     body: '**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September,
-      audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only — the ones this
-      screen''s operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
+      audit R098). Required: `id` (a client UUIDv7), `permissions` (tenant permissions only — the ones
+      this screen''s operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
       Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant
       sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
@@ -6105,8 +6105,8 @@ screens:
     component: modal
     trigger: Open access grant
     body: '**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September,
-      audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only — the ones this
-      screen''s operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
+      audit R098). Required: `id` (a client UUIDv7), `permissions` (tenant permissions only — the ones
+      this screen''s operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
       Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant
       sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
@@ -6348,8 +6348,8 @@ screens:
     component: modal
     trigger: Open access grant
     body: '**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September,
-      audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only — the ones this
-      screen''s operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
+      audit R098). Required: `id` (a client UUIDv7), `permissions` (tenant permissions only — the ones
+      this screen''s operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
       Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant
       sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
@@ -6642,8 +6642,8 @@ screens:
     component: modal
     trigger: Open access grant
     body: '**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September,
-      audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only — the ones this
-      screen''s operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
+      audit R098). Required: `id` (a client UUIDv7), `permissions` (tenant permissions only — the ones
+      this screen''s operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
       Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant
       sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
@@ -9296,8 +9296,8 @@ screens:
     component: modal
     trigger: Open access grant
     body: '**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September,
-      audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only — the ones this
-      screen''s operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
+      audit R098). Required: `id` (a client UUIDv7), `permissions` (tenant permissions only — the ones
+      this screen''s operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
       Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant
       sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
@@ -10669,13 +10669,13 @@ screens:
           task; a second provider or a tenant key only where TICVAI enabled it (AI-D14). `taskKeys` binds
           a provider to named agent tasks (M21-03). **Fitness warnings are shown, never blocking** (M21-09):
           a model below a task''s floor is underpowered, one far above its ceiling is overpowered.'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
       - kind: banner
         label: Model fit warning
         operation: setAiProvider
         notes: 'Shown after `setAiProvider` returns `fitnessWarnings`: names the task, the score and the
           band.'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
     - name: actionBar
       slot: rowActions
       components:
@@ -10815,7 +10815,7 @@ screens:
     component: modal
     trigger: Open access grant
     body: '**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September,
-      audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only; `AI_CONFIGURE`
+      audit R098). Required: `id` (a client UUIDv7), `permissions` (tenant permissions only; `AI_CONFIGURE`
       and `SCOPE_VIEW` preselected for this screen), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
       Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant
       sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.'
@@ -18020,16 +18020,16 @@ screens:
         notes: '**Every calendar has day, week and month views, and the day view is broken into hours
           from the venue''s day start hour** (17 September minutes, M17-03). Built on the shared calendar
           view (`calendarView`, to be added to the component library); until then a timeline per view.'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
       - kind: multiSelect
         label: Category
         notes: '**Filtered by category, so a team sees only what is theirs** (M17-03).'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
       - kind: calendarView
         label: Calendar
         operation: listSeasonalCalendarDay
         notes: Entries of the view in force, placed by date and hour.
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
   states:
     loading: The seasonal calendar day list.
     error: Could not load. Names which read failed and leaves the seasonal calendar day untouched.
@@ -24823,16 +24823,16 @@ screens:
         notes: '**Every calendar has day, week and month views, and the day view is broken into hours
           from the venue''s day start hour** (17 September minutes, M17-03). Built on the shared calendar
           view (`calendarView`, to be added to the component library); until then a timeline per view.'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
       - kind: multiSelect
         label: Category
         notes: '**Filtered by category, so a team sees only what is theirs** (M17-03).'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
       - kind: calendarView
         label: Calendar
         operation: listCampaignCalendarTimeline
         notes: Entries of the view in force, placed by date and hour.
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
     - name: contextPanel
       slot: selection
       components:
@@ -54901,8 +54901,8 @@ screens:
     component: modal
     trigger: Open access grant
     body: '**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September,
-      audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only — the ones this
-      screen''s operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
+      audit R098). Required: `id` (a client UUIDv7), `permissions` (tenant permissions only — the ones
+      this screen''s operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
       Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant
       sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
@@ -55869,8 +55869,8 @@ screens:
     component: modal
     trigger: Open access grant
     body: '**Collects what `openPlatformStaffGrant` sends before it is called** (decided 28 September,
-      audit R098). Required: `id` (a client ULID), `permissions` (tenant permissions only — the ones this
-      screen''s operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
+      audit R098). Required: `id` (a client UUIDv7), `permissions` (tenant permissions only — the ones
+      this screen''s operations need, preselected), `reason`, `expiresAt` (at most 8 hours ahead, proposed).
       Optional: `ticketRef`. Requires step-up: the operator presents a second factor first. The tenant
       sees the grant and everything done under it. Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
@@ -60819,14 +60819,14 @@ screens:
         operation: getAiVenueSettings
         notes: '**What every AI answer stands on before the venue has history** (29 September, AI functions
           review). Collected at onboarding, here or by the configuration assistant in conversation.'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
     - name: actionBar
       slot: publish
       components:
       - kind: primaryButton
         label: Save venue AI profile
         operation: setAiVenueSettings
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
   states:
     loading: The readiness list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the readiness untouched.
@@ -60850,14 +60850,14 @@ screens:
     contract: ai
     purpose: The venue AI profile the baselines use
     trigger: onLoad
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   - operationId: setAiVenueSettings
     contract: ai
     purpose: Set it at onboarding
     trigger: onAction
     invalidates:
     - getAiVenueSettings
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-489
@@ -60896,7 +60896,7 @@ screens:
       - averageSpend
       - fnbAttachRate
       - staffProductivity
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
 - id: ADM-490
   name: Configuration Validation Results
   module: Platform
@@ -62301,13 +62301,13 @@ screens:
         bindsTo: AiForecastDefinition.producer
         operation: setForecastDefinition
         notes: '`rule`, `statistical` or `ensemble` (M18-16). A model only arrives by promotion.'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
       - kind: numberField
         label: History window (months)
         bindsTo: AiForecastDefinition.historyWindowMonths
         operation: setForecastDefinition
         notes: Default 36 (M18-16).
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
       - kind: selectField
         label: Cold start
         bindsTo: AiForecastDefinition.coldStart
@@ -62315,7 +62315,7 @@ screens:
         notes: '**What the forecast stands on before there is history** (AI functions review): the venue
           AI profile with the venue-type pattern, a sister venue, a category, or imported history; the
           starting range and how many observations the prior is worth.'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
   states:
     loading: The forecast forecasting strategy configuration as saved.
     error: Could not load. Names which read failed and leaves the forecast forecasting strategy untouched.
@@ -64441,7 +64441,7 @@ screens:
         notes: '**Starting, learning, established, learned** (AI functions review): where each answer
           stands, what it is based on and what the next stage needs. A `promotionReady` alert links from
           the row.'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
   states:
     loading: The governance list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the governance untouched.
@@ -64475,7 +64475,7 @@ screens:
     contract: ai
     purpose: Where each AI answer stands on the way to learned
     trigger: onLoad
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-519
@@ -65200,7 +65200,7 @@ screens:
         notes: '**Each conflict and the more restrictive result it resolved to** (18 September minutes,
           M18-01; AIC-161). A plan step that fails the owning module''s limit (a price above the configured
           maximum) is shown as governance-blocked and is never applied.'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
   states:
     loading: The policy conflict exception list.
     error: Could not load. Names which read failed and leaves the policy conflict exception untouched.
@@ -65248,7 +65248,7 @@ screens:
     trigger: Revoke AI policy exception
     body: '**Names the exception and what the capability falls back to** once it is revoked: the stricter
       policy applies at once to every scope the exception covered.'
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
 - id: ADM-527
   name: AI Policy Testing & Governance Simulation
   module: Platform
@@ -65707,13 +65707,13 @@ screens:
       - kind: primaryButton
         label: Save approval matrix
         operation: setApprovalMatrix
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
       - kind: secondaryButton
         label: Test a routing
         operation: evaluateApprovalRequirement
         notes: Evaluates a sample AI action (kind `aiRecommendation`, amount, scope) against the matrix
           and shows who would approve it.
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
     - name: contentBody
       slot: collection
       components:
@@ -65722,7 +65722,7 @@ screens:
         operation: listApprovalMatrices
         notes: '**AI actions route through the shared approval matrix** (18 September minutes, M18-02),
           kind `aiRecommendation`: an approver is authorised up to a limit and anything above it escalates.'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
   states:
     loading: The approval requirement routing list.
     error: Could not load. Names which read failed and leaves the approval requirement routing untouched.
@@ -65752,19 +65752,19 @@ screens:
     contract: approvals
     purpose: The matrices AI actions route through
     trigger: onLoad
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   - operationId: setApprovalMatrix
     contract: approvals
     purpose: Thresholds and levels for AI actions
     trigger: onAction
     invalidates:
     - listApprovalMatrices
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   - operationId: evaluateApprovalRequirement
     contract: approvals
     purpose: Who would approve this AI action
     trigger: onAction
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-530
@@ -65786,7 +65786,7 @@ screens:
       discards:
       - levels
       - thresholds
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
 - id: ADM-531
   name: AI Approval Review Workspace
   module: Platform
@@ -65942,11 +65942,11 @@ screens:
         operation: evaluateApprovalRequirement
         notes: '**Conditional authority** (M18-02): the approver''s limit for this kind and amount, and
           whether the action is within it or must escalate.'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
       - kind: dataTable
         label: Threshold ranges
         operation: listApprovalMatrices
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
   states:
     loading: The conditional approval approval list.
     error: Could not load. Names which read failed and leaves the conditional approval approval untouched.
@@ -65971,12 +65971,12 @@ screens:
     contract: approvals
     purpose: Whether this action is within the approver's limit
     trigger: onLoad
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   - operationId: listApprovalMatrices
     contract: approvals
     purpose: The threshold ranges
     trigger: onLoad
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-532
@@ -66178,23 +66178,23 @@ screens:
       - kind: dataTable
         label: Delegations in force
         operation: listApprovalDelegations
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
     - name: actionBar
       slot: rowActions
       components:
       - kind: secondaryButton
         label: Escalate
         operation: escalateApprovalRequest
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
       - kind: secondaryButton
         label: Delegate
         operation: createApprovalDelegation
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
       - kind: secondaryButton
         label: Save approval SLA
         operation: setApprovalSlaPolicy
         notes: Escalation, delegation and SLA apply to AI actions as to any approval (M18-02).
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
   states:
     loading: The escalation delegation approval list.
     error: Could not load. Names which read failed and leaves the escalation delegation approval untouched.
@@ -66219,24 +66219,24 @@ screens:
     contract: approvals
     purpose: Who is acting for whom
     trigger: onLoad
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   - operationId: escalateApprovalRequest
     contract: approvals
     purpose: Send an AI action to the next level
     trigger: onAction
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   - operationId: createApprovalDelegation
     contract: approvals
     purpose: Delegate approval authority
     trigger: onAction
     invalidates:
     - listApprovalDelegations
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   - operationId: setApprovalSlaPolicy
     contract: approvals
     purpose: The SLA and its escalation
     trigger: onAction
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-534
@@ -66339,21 +66339,21 @@ screens:
       - kind: secondaryButton
         label: Pause
         operation: pauseActionPlan
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
       - kind: secondaryButton
         label: Resume
         operation: resumeActionPlan
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
       - kind: destructiveButton
         label: Cancel plan
         operation: cancelActionPlan
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
       - kind: destructiveButton
         label: Roll back
         operation: rollbackActionPlan
         notes: '**Rollback on partial failure** (21 September minutes, M21-12): plans the compensating
           steps in reverse dependency order, for approval like any plan.'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
   states:
     loading: The live execution oversight list.
     error: Could not load. Names which read failed and leaves the live execution oversight untouched.
@@ -66388,7 +66388,7 @@ screens:
     contract: ai
     purpose: Plan the rollback of a partly executed plan
     trigger: onAction
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   entryState:
     preloaded:
     - Impact of Pausing
@@ -66413,13 +66413,13 @@ screens:
     trigger: Cancel plan
     body: '**Names the plan, the steps already executed and what stays applied**: cancelling stops the
       remaining steps; it does not undo the executed ones (that is Roll back).'
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   - id: confirmRollbackActionPlan
     component: confirmDialog
     trigger: Roll back
     body: '**Names each executed step and its compensation**, and that the rollback plan goes for approval
       before it runs.'
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
 - id: ADM-536
   name: Human Override & Manual Control Center
   module: Platform
@@ -66944,12 +66944,12 @@ screens:
         label: Venue
         operation: searchAiDecisions
         notes: 'Sent as `venueId` (18 September minutes, M18-03: searchable by venue).'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
       - kind: searchField
         label: Customer
         operation: searchAiDecisions
         notes: 'Sent as `subjectRef`, the guest profile id (M18-03: searchable by customer).'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
   states:
     loading: The decision search list.
     error: Could not load. Names which read failed and leaves the decision search untouched.
@@ -67878,14 +67878,14 @@ screens:
         - AiCapabilityHealth.dataFreshness
         operation: listAiCapabilityHealth
         notes: '**Overall AI health in production** (21 September minutes, M21-13).'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
       - kind: chart
         label: Spend by agent
         bindsTo: AiUsageReport
         operation: getAiUsage
         notes: '`getAiUsage` grouped by `agent`, with the month-end projection labelled a forecast: which
           agents consume the most, and for what (M21-13).'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
     - name: contentBody
       slot: headline
       components:
@@ -67953,12 +67953,12 @@ screens:
     contract: ai
     purpose: Health per capability
     trigger: onLoad
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   - operationId: getAiUsage
     contract: ai
     purpose: Consumption by agent
     trigger: onLoad
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-549
@@ -68531,7 +68531,7 @@ screens:
         operation: listAiTrainingRuns
         notes: '**Per tenant, own data only** (AIP-149). A run that passes its shadow gate raises `promotionReady`;
           the admin promotes it here with `promoteAiRelease`. Nothing switches by itself (AI-D16).'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
   states:
     loading: The quality behavior governance list.
     error: Could not load. Names which read failed and leaves the quality behavior governance untouched.
@@ -68571,7 +68571,7 @@ screens:
     contract: ai
     purpose: The per-tenant training and backtest runs
     trigger: onLoad
-    provenance: 29 September pass (P29 group A)
+    provenance: 29 September pass (group A)
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-554
@@ -70875,7 +70875,7 @@ screens:
         label: Average latency
         provenance: pack Payment_Payment_Orchestration.pdf, page 33 §Health Metrics
       - kind: metricTile
-        label: P95/P99 latency where available
+        label: 95th and 99th percentile latency where available
         provenance: pack Payment_Payment_Orchestration.pdf, page 33 §Health Metrics
       - kind: metricTile
         label: Webhook delay
@@ -76468,16 +76468,16 @@ screens:
         notes: '**Every calendar has day, week and month views, and the day view is broken into hours
           from the venue''s day start hour** (17 September minutes, M17-03). Built on the shared calendar
           view (`calendarView`, to be added to the component library); until then a timeline per view.'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
       - kind: multiSelect
         label: Category
         notes: '**Filtered by category, so a team sees only what is theirs** (M17-03).'
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
       - kind: calendarView
         label: Calendar
         operation: listMerchantAccounts
         notes: Entries of the view in force, placed by date and hour.
-        provenance: 29 September pass (P29 group A)
+        provenance: 29 September pass (group A)
     - name: contextPanel
       slot: selection
       components:

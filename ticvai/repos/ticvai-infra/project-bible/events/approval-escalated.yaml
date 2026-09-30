@@ -11,7 +11,7 @@ emittedBy:
 - escalateApprovalRequest
 payload:
 - field: requestId
-  type: string
+  type: uuid
 - field: kind
   type: string
 - field: scopePath

@@ -32,17 +32,17 @@
      "carries": [
       "planId"
      ],
-     "provenance": "decided 29 September 2026 (P29), MOB-6"
+     "provenance": "decided 29 September 2026, MOB-6"
     },
     {
      "to": "GST-038",
      "trigger": "Directions (At the Venue, Map)",
-     "provenance": "decided 29 September 2026 (P29), MOB-6"
+     "provenance": "decided 29 September 2026, MOB-6"
     },
     {
      "to": "GST-001",
      "trigger": "Home tab",
-     "provenance": "decided 29 September 2026 (P29), MOB-1"
+     "provenance": "decided 29 September 2026, MOB-1"
     }
    ]
   },
@@ -64,14 +64,14 @@
        "bindsTo": "VisitPlanItem",
        "operation": "getVisitPlan",
        "notes": "Today's items with done, now and next; each ride with its live wait.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "banner",
        "label": "Waits changed",
        "operation": "getWaitTimes",
        "notes": "When a wait makes the next item late, proposes a re-order or a swap (`listVisitPlanAlternatives`); the guest decides.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       }
      ]
     },
@@ -84,14 +84,14 @@
        "label": "Re-order my day",
        "operation": "updateVisitPlan",
        "notes": "Saves the proposed order as a new plan version.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "secondaryButton",
        "label": "Swap",
        "operation": "listVisitPlanAlternatives",
        "notes": "Candidates that suit everyone, nearest first.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       }
      ]
     }
@@ -117,21 +117,21 @@
     "contract": "venue-map",
     "purpose": "The plan: days, timed items and add-on suggestions, at its current version",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "operationId": "updateVisitPlan",
     "contract": "venue-map",
     "purpose": "Swap, remove, add or undo: each change is a new version, so undo goes back one",
     "trigger": "onAction",
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "operationId": "listVisitPlanAlternatives",
     "contract": "venue-map",
     "purpose": "Swap candidates for one item that suit everyone in the party",
     "trigger": "onAction",
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    }
   ],
   "entryState": {
@@ -154,16 +154,16 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "client-verified",
+   "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-059",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
-    "match": "exact",
-    "view": "Account → All screens → Wave 3 → Plan my day – in progress",
-    "differences": "Mobile v4 draws no in-progress view of the plan; built from this definition in the v4 style."
-   }
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "rev": "Mobile App v4, 29 September 2026",
+    "match": "none",
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-059.html, and #GST-059 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 3 → Plan my day – in progress (exact). What v2 did differently: Mobile v4 draws no in-progress view of the plan; built from this definition in the v4 style."
+   },
+   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {

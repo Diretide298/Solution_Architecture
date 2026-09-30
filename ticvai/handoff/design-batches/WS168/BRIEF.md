@@ -1,6 +1,6 @@
 # WS168 — Seat Management Venue Mapping Reference v1.0 board 4
 
-**10 screens · 11 operations · 18 schemas · 4 permissions**
+**10 screens · 11 operations · 21 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

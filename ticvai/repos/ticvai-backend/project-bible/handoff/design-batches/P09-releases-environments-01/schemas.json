@@ -46,6 +46,41 @@
    "activeClientCount": {
     "type": "integer",
     "readOnly": true
+   },
+   "changes": {
+    "type": "array",
+    "description": "**The developer changelog for this version** (17 September minutes, M17-14): every operation added, changed, deprecated or removed, and whether the change is breaking under ADR-0026. Generated at release from the contract diff; shown on DEV-001.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "operationId",
+      "kind"
+     ],
+     "properties": {
+      "operationId": {
+       "type": "string"
+      },
+      "contract": {
+       "type": "string"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "added",
+        "changed",
+        "deprecated",
+        "removed"
+       ]
+      },
+      "breaking": {
+       "type": "boolean",
+       "default": false
+      },
+      "summary": {
+       "type": "string"
+      }
+     }
+    }
    }
   }
  },
@@ -103,7 +138,17 @@
    "note": {
     "type": "string",
     "minLength": 3,
-    "maxLength": 2000
+    "maxLength": 2000,
+    "description": "Internal. Never shown to guests; `guestReleaseNotes` is."
+   },
+   "guestReleaseNotes": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "**The public, localised \"what's new\" for guests** (decided 29 September, rev 3 GAP-B2), one short text per locale, written for a guest and naming no person. Public once the release reaches the tenant's cell; read by the guest Help screen (WEB-025, WEB-045, GST-040) through `white-label.getTenantAppStatus`. Distinct from the staff-only `TenantAppStatus.recentChanges`, which names the principal behind each change and stays staff only.\n"
    },
    "breakingChanges": {
     "type": "array",
@@ -162,6 +207,60 @@
    "staging",
    "production"
   ]
+ },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
+ "Migration": {
+  "type": "object",
+  "x-ticvai-persistence": "control.migration",
+  "required": [
+   "version",
+   "module",
+   "isReversible",
+   "checksum"
+  ],
+  "properties": {
+   "version": {
+    "type": "string"
+   },
+   "module": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string"
+   },
+   "isReversible": {
+    "type": "boolean",
+    "description": "A rollback section exists and CI has executed it against a restored snapshot. A rollback nobody has run is a comment, not a rollback.\n"
+   },
+   "rollbackTestedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "checksum": {
+    "type": "string",
+    "description": "Compared on apply. A migration edited after it was applied somewhere is a defect the register catches, not a mystery to debug later.\n"
+   },
+   "estimatedLockMs": {
+    "type": "integer",
+    "nullable": true
+   },
+   "touchesPartitionedTable": {
+    "type": "boolean"
+   },
+   "appliedCellCount": {
+    "type": "integer"
+   },
+   "pendingCellCount": {
+    "type": "integer"
+   }
+  }
  },
  "MigrationPlan": {
   "type": "object",
@@ -334,7 +433,7 @@
    "cells": {
     "type": "array",
     "items": {
-     "$ref": "#/components/schemas/RolloutCell"
+     "$ref": "#/components/schemas/MigrationRunCell"
     }
    },
    "tenants": {
@@ -342,6 +441,69 @@
     "items": {
      "$ref": "#/components/schemas/RolloutTenant"
     }
+   }
+  }
+ },
+ "MigrationRunCell": {
+  "type": "object",
+  "x-ticvai-persistence": "none — rows of control.migration_run_cell, stored through MigrationRun",
+  "description": "One cell's rollup within one migration run. **The fields of `RolloutCell` without its `rolloutId`**: a migration run is not a rollout, and its parent key `migration_run_id` comes from `MigrationRun.cells`.\n",
+  "required": [
+   "cellId",
+   "status"
+  ],
+  "properties": {
+   "cellId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "cellName": {
+    "type": "string"
+   },
+   "regionName": {
+    "type": "string"
+   },
+   "countryCode": {
+    "type": "string"
+   },
+   "isCanary": {
+    "type": "boolean"
+   },
+   "wave": {
+    "type": "integer"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "running",
+     "complete",
+     "failed",
+     "skipped",
+     "rolledBack"
+    ]
+   },
+   "fromVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "toVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "error": {
+    "type": "string",
+    "nullable": true
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
    }
   }
  },
@@ -436,12 +598,12 @@
   "type": "object",
   "x-ticvai-persistence": "none — computed",
   "required": [
-   "reinventoryHoldId",
+   "releaseId",
    "canPromote",
    "gates"
   ],
   "properties": {
-   "reinventoryHoldId": {
+   "releaseId": {
     "type": "string",
     "format": "uuid"
    },
@@ -498,7 +660,7 @@
   "x-ticvai-persistence": "control.rollout",
   "required": [
    "id",
-   "reinventoryHoldId",
+   "releaseId",
    "environment",
    "status",
    "startedAt"
@@ -508,7 +670,7 @@
     "type": "string",
     "format": "uuid"
    },
-   "reinventoryHoldId": {
+   "releaseId": {
     "type": "string",
     "format": "uuid"
    },
@@ -551,72 +713,10 @@
    }
   }
  },
- "RolloutCell": {
-  "type": "object",
-  "x-ticvai-persistence": "control.rollout_cell",
-  "required": [
-   "cellId",
-   "status"
-  ],
-  "properties": {
-   "cellId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "cellName": {
-    "type": "string"
-   },
-   "regionName": {
-    "type": "string"
-   },
-   "countryCode": {
-    "type": "string"
-   },
-   "isCanary": {
-    "type": "boolean"
-   },
-   "wave": {
-    "type": "integer"
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "pending",
-     "running",
-     "complete",
-     "failed",
-     "skipped",
-     "rolledBack"
-    ]
-   },
-   "fromVersion": {
-    "type": "string",
-    "nullable": true
-   },
-   "toVersion": {
-    "type": "string",
-    "nullable": true
-   },
-   "error": {
-    "type": "string",
-    "nullable": true
-   },
-   "startedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "completedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
  "RolloutTenant": {
   "type": "object",
   "x-ticvai-persistence": "control.rollout_tenant",
-  "description": "What happened to one tenant database during one run. **The same shape as `RolloutCell` one level down**, and it serves the per-tenant rows of both a rollout and a migration run — which is the arrangement `RolloutCell` already has with `rollout_cell` and `migration_run_cell`.\n\n**`databaseName` is denormalised on purpose.** After a drop the run record still has to say what it touched, and a join to a row that no longer exists says nothing.\n",
+  "description": "What happened to one tenant database during one run. **The same shape as `RolloutCell` one level down**, and it serves the per-tenant rows of both a rollout and a migration run — the arrangement `RolloutCell` had with `rollout_cell` and `migration_run_cell` until `rollout_cell` needed its `rolloutId` parent key and the migration run's cells moved to `MigrationRunCell`.\n\n**`databaseName` is denormalised on purpose.** After a drop the run record still has to say what it touched, and a join to a row that no longer exists says nothing.\n",
   "required": [
    "tenantId",
    "cellId",

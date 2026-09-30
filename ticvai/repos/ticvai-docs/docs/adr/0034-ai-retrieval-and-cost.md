@@ -2,7 +2,7 @@
 
 **Status:** Accepted
 **Date:** 31 August 2026
-**Related:** [ADR-0020](0020-ai-isolation-boundary.md) · [ADR-0021](0021-qdrant-partitioning.md) · [ADR-0032](0032-load-shedding-and-pooling.md) · BL-151
+**Related:** [ADR-0020](0020-ai-isolation-boundary.md) (amended by ADR-0049) · [ADR-0021](0021-qdrant-partitioning.md) (amended by ADR-0049: a collection per tenant) · [ADR-0032](0032-load-shedding-and-pooling.md) · BL-151
 
 ---
 

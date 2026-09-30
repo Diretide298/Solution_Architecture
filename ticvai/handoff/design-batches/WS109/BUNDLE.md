@@ -1,6 +1,6 @@
 # WS109 — ACCREDITATION board 2
 
-**10 screens · 8 operations · 4 schemas · 4 permissions**
+**10 screens · 9 operations · 5 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -64,8 +64,8 @@ convincingly. It is never a caption.
 | `BO-626` | Accreditation Holder Profile | listDetail | 1 | 0 | — |
 | `BO-627` | Identity Details & Verification | listDetail | 1 | 0 | — |
 | `BO-628` | Photo Management | listDetail | 1 | 0 | — |
-| `BO-629` | Document Repository | listDetail | 1 | 0 | — |
-| `BO-630` | Document Verification Queue | listDetail | 1 | 0 | — |
+| `BO-629` | Document Repository | listDetail | 2 | 0 | — |
+| `BO-630` | Document Verification Queue | listDetail | 2 | 0 | — |
 | `BO-631` | Duplicate & Identity Conflict Detection | listDetail | 2 | 1 | — |
 | `BO-632` | Organization & Affiliation Management | listDetail | 1 | 0 | — |
 | `BO-633` | Profile Completeness & Compliance Monitor | listDetail | 1 | 0 | — |
@@ -794,6 +794,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "getAccreditationHolder"
     ]
+   },
+   {
+    "operationId": "listAccreditationDocuments",
+    "contract": "accreditation",
+    "purpose": "Documents stored, by holder or application",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -916,6 +923,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "getAccreditationHolder"
     ]
+   },
+   {
+    "operationId": "listAccreditationDocuments",
+    "contract": "accreditation",
+    "purpose": "The queue: status=submitted, oldest first",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1543,6 +1557,55 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "AccreditationAuditRecord"
  },
+ "listAccreditationDocuments": {
+  "method": "GET",
+  "path": "/accreditation-documents",
+  "contract": "accreditation",
+  "summary": "Documents supplied, by holder, application, requirement or state",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "applicationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "holderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "requirementCode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "expiringWithinDays",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listAccreditationHolders": {
   "method": "GET",
   "path": "/accreditation-holders",
@@ -1597,7 +1660,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Decide whether two accreditation records are the same person",
   "permission": "ACCREDITATION_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1616,7 +1679,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Supply a document against a requirement",
   "permission": "ACCREDITATION_APPLY",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "append",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1635,7 +1698,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Amend identity, affiliation or contact details",
   "permission": "ACCREDITATION_MANAGE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1654,7 +1717,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Accept or refuse a submitted document",
   "permission": "ACCREDITATION_APPROVE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1843,6 +1906,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "nullable": true
    },
+   "email": {
+    "type": "string",
+    "format": "email",
+    "nullable": true,
+    "description": "12.1.16. The holder's own address — where a mobile credential and renewal notices go"
+   },
+   "phone": {
+    "type": "string",
+    "nullable": true,
+    "description": "12.1.16. E.164"
+   },
    "identityDocumentVerified": {
     "type": "boolean",
     "default": false
@@ -1966,6 +2040,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "scopePath": {
     "type": "string"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
    }
   }
  }

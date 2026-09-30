@@ -234,6 +234,75 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listDeviceConsents": {
+  "method": "GET",
+  "path": "/consent/device",
+  "contract": "marketing-crm",
+  "summary": "Visitors' cookie decisions, as evidence",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brandId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "action",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "category",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "claimed",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "consentKey",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listPrivacy": {
   "method": "GET",
   "path": "/privacy",

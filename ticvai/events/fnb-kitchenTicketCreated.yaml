@@ -13,9 +13,9 @@ emittedBy:
 - fnb.acceptFnbOrder
 payload:
 - field: kitchenTicketId
-  type: string
+  type: uuid
 - field: fnbOrderId
-  type: string
+  type: uuid
 - field: outletId
   type: uuid
 - field: stationId
@@ -39,4 +39,4 @@ consumers:
 retention: 7 days after publication
 notes: '**Critical because a ticket that never reaches the pass is a meal nobody cooks.** Offline, the till
   delivers the ticket to the KDS over the venue LAN and this event is written when the order replays (open ADR,
-  P29 group S). No state model emits this: a ticket is created already open.'
+  the 29 September pass group S). No state model emits this: a ticket is created already open.'

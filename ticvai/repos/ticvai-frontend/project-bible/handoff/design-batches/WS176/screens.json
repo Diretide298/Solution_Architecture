@@ -936,6 +936,62 @@
     "invalidates": [
      "listAccessPolicies"
     ]
+   },
+   {
+    "operationId": "listAccessPolicyHistory",
+    "contract": "identity",
+    "purpose": "Versions of a policy, to compare and pick one to restore",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "restoreAccessPolicyVersion",
+    "contract": "identity",
+    "purpose": "Restore an approved version as a new version",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAccessPolicyEffectiveness",
+    "contract": "identity",
+    "purpose": "How each permission policy has behaved over a period",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listPermissionFindings",
+    "contract": "identity",
+    "purpose": "Excessive, missing and conflicting permissions, or those a draft would create",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAccessReviewCampaigns",
+    "contract": "identity",
+    "purpose": "Access review campaigns and progress",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "createAccessReviewCampaign",
+    "contract": "identity",
+    "purpose": "Start a periodic access review",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAccessReviewItems",
+    "contract": "identity",
+    "purpose": "Items of a campaign with their findings",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "decideAccessReviewItem",
+    "contract": "identity",
+    "purpose": "Certify or revoke a grant",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -948,6 +1004,14 @@
    "params": [
     {
      "name": "policyId",
+     "from": "navigation"
+    },
+    {
+     "name": "campaignId",
+     "from": "navigation"
+    },
+    {
+     "name": "itemId",
      "from": "navigation"
     }
    ]

@@ -1,4 +1,249 @@
 {
+ "AiDemandForecastingBookingCurveStudioView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What AI Demand Forecasting & Booking Curve Studio displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "venue": {
+    "type": "string",
+    "description": "Venue id"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product id",
+    "nullable": true
+   },
+   "event": {
+    "type": "string",
+    "description": "Event id",
+    "nullable": true
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance id",
+    "nullable": true
+   },
+   "date": {
+    "type": "string",
+    "description": "Date",
+    "format": "date"
+   },
+   "timeslot": {
+    "type": "string",
+    "description": "Timeslot",
+    "nullable": true
+   },
+   "priceCategory": {
+    "type": "string",
+    "description": "Price category",
+    "nullable": true
+   },
+   "sectionCode": {
+    "type": "string",
+    "nullable": true,
+    "description": "Seat-map section (`seating.Section.code`) the row forecasts; null for a row at price-category or performance level (29 September, build pass, group G2; 21.11.4)"
+   },
+   "channel": {
+    "$ref": "#/components/schemas/Channel",
+    "description": "Channel"
+   },
+   "confidence": {
+    "type": "number",
+    "description": "Forecast Confidence, percent"
+   },
+   "forecastFinalOccupancy": {
+    "type": "number",
+    "description": "Forecast Final Occupancy, percent"
+   },
+   "demand": {
+    "type": "integer",
+    "description": "Forecast demand"
+   },
+   "attendance": {
+    "type": "integer",
+    "description": "Forecast attendance"
+   },
+   "occupancy": {
+    "type": "number",
+    "description": "Forecast occupancy, percent"
+   },
+   "sellThrough": {
+    "type": "number",
+    "description": "Forecast sell-through, percent"
+   },
+   "expectedSellOutTime": {
+    "type": "string",
+    "description": "Expected Sell-Out Time; empty if no sell-out forecast",
+    "format": "date-time",
+    "nullable": true
+   },
+   "revenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Forecast revenue"
+   },
+   "conversion": {
+    "type": "number",
+    "description": "Forecast conversion, percent"
+   },
+   "remainingInventory": {
+    "type": "integer",
+    "description": "Forecast remaining inventory at event"
+   },
+   "mape": {
+    "type": "number",
+    "description": "MAPE over closed forecasts at this level, percent"
+   },
+   "forecastBias": {
+    "type": "number",
+    "description": "Forecast Bias (positive = over-forecast), percent"
+   },
+   "overForecast": {
+    "type": "number",
+    "description": "Share of closed forecasts that over-forecast, percent"
+   },
+   "underForecast": {
+    "type": "number",
+    "description": "Share of closed forecasts that under-forecast, percent"
+   },
+   "forecastId": {
+    "type": "string",
+    "description": "Forecast id"
+   },
+   "horizon": {
+    "type": "string",
+    "description": "Forecast Horizon",
+    "enum": [
+     "intraday",
+     "tomorrow",
+     "days7",
+     "days30",
+     "eventHorizon",
+     "seasonalHorizon"
+    ]
+   },
+   "bookingCurve": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "daysBeforeEvent": {
+       "type": "integer",
+       "description": "T minus days"
+      },
+      "historicalExpectedPercentSold": {
+       "type": "number",
+       "description": "Historical expected curve, percent sold"
+      },
+      "actualPercentSold": {
+       "type": "number",
+       "nullable": true,
+       "description": "Current actual curve, percent sold (empty for future points)"
+      },
+      "forecastPercentSold": {
+       "type": "number",
+       "description": "AI forecast curve, percent sold"
+      }
+     }
+    },
+    "description": "Booking Curve"
+   },
+   "signalContributions": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "signal": {
+       "type": "string",
+       "enum": [
+        "internalSales",
+        "bookingVelocity",
+        "occupancy",
+        "historicalEvents",
+        "nearbyEvent",
+        "weather",
+        "marketTourism",
+        "competitor",
+        "priceElasticity",
+        "other"
+       ],
+       "description": "Signal category"
+      },
+      "contributionPercent": {
+       "type": "number",
+       "description": "Explanatory share of the forecast"
+      }
+     }
+    },
+    "description": "Model Inputs: which signals contributed"
+   },
+   "confidenceReasons": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "strongHistoricalData",
+      "stableBookingPattern",
+      "reliableExternalSignals",
+      "limitedHistoricalData",
+      "volatileBookingPattern",
+      "degradedExternalSignals"
+     ]
+    },
+    "description": "Reasons behind the forecast confidence"
+   },
+   "modelVersion": {
+    "type": "string",
+    "description": "Model version that produced the forecast"
+   },
+   "generatedAt": {
+    "type": "string",
+    "description": "When the forecast was produced",
+    "format": "date-time"
+   }
+  }
+ },
+ "AssetHistoryEntry": {
+  "x-ticvai-persistence": "none — union view over work orders, inspections, incidents and asset status changes",
+  "type": "object",
+  "description": "**Every kind has a source.** `workOrder` is a work-order row, `inspection` an inspection, `incident` an incident, `statusChange` a `maintenance.asset_status_change` row. `partReplaced` is a completed work order whose `resolutionCode` is `partReplaced`, and `planCompleted` a completed work order with a `sourcePlanId` — both read from `maintenance.work_order`, not stored twice.\n",
+  "required": [
+   "kind",
+   "occurredAt",
+   "summary"
+  ],
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "workOrder",
+     "inspection",
+     "incident",
+     "statusChange",
+     "partReplaced",
+     "planCompleted"
+    ]
+   },
+   "referenceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The source row's id: a work order, inspection or incident, or an `asset_status_change` id. A uuid, as every id is (ADR-0056).\n"
+   },
+   "summary": {
+    "type": "string"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "BenchmarkNormalisation": {
   "type": "string",
   "description": "The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`.",
@@ -43,6 +288,18 @@
    }
   }
  },
+ "Channel": {
+  "type": "string",
+  "enum": [
+   "pos",
+   "kiosk",
+   "web",
+   "mobile",
+   "b2b",
+   "ota",
+   "callCentre"
+  ]
+ },
  "GeneratedQuery": {
   "x-ticvai-persistence": "none — embedded; stored whole in `reporting.natural_language_query`",
   "type": "object",
@@ -68,6 +325,11 @@
     "items": {
      "type": "string"
     }
+   },
+   "compiledSql": {
+    "type": "string",
+    "nullable": true,
+    "description": "The SQL the semantic spec compiled to, exactly as run on the analytical replica (29 September, design 5.7). The replica's row-level security applies beneath it, so it does not need to carry the caller's scope. Null on queries kept before the semantic compile.\n"
    }
   }
  },
@@ -81,6 +343,17 @@
    },
    "code": {
     "type": "string"
+   },
+   "bucketStart": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise."
+   },
+   "groupKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked."
    },
    "name": {
     "type": "string"
@@ -161,7 +434,7 @@
    "question",
    "interpretation",
    "result",
-   "confidence"
+   "reliability"
   ],
   "properties": {
    "conversationId": {
@@ -172,19 +445,59 @@
    },
    "interpretation": {
     "type": "string",
-    "description": "What the question was understood to mean, in plain language."
+    "description": "What the question was understood to mean, in plain language. When the question is outside the semantic model, the \"not available yet\" sentence."
+   },
+   "semanticSpec": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ReportingSemanticQuerySpec"
+     }
+    ],
+    "nullable": true,
+    "description": "What the model returned instead of SQL (design 2.2 E, 5.7): metric, dimensions, filters, period, comparison, as validated against the semantic model. Null when the question is outside it. **Also kept**, on `NaturalLanguageQuery`, so a follow-up edits it.\n"
    },
    "generatedQuery": {
-    "$ref": "#/components/schemas/GeneratedQuery",
-    "description": "The structured query produced — data source, columns, filters, grouping. Returned so the answer can be checked. An answer nobody can verify is worse than no answer. **Also kept, as `NaturalLanguageQuery`**, for `saveNaturalLanguageQuery`.\n"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/GeneratedQuery"
+     }
+    ],
+    "nullable": true,
+    "description": "The query the spec compiled to: data source, columns, filters, grouping, and the compiled SQL in `compiledSql`. Returned so the answer can be checked. An answer nobody can verify is worse than no answer. **Also kept, as `NaturalLanguageQuery`**, for `saveNaturalLanguageQuery`. Null when the question is outside the semantic model.\n"
    },
    "result": {
-    "$ref": "#/components/schemas/ReportResult"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ReportResult"
+     }
+    ],
+    "nullable": true,
+    "description": "Null when the question is outside the semantic model."
+   },
+   "dataAsOf": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Replica position the answer was read at, the result's `dataAsOf`, stated beside the answer so a figure that moved is not argued about. Null when nothing was run."
+   },
+   "reliability": {
+    "$ref": "#/components/schemas/ReportingAnswerReliability"
+   },
+   "unavailableReason": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ReportingUnavailableReason"
+     }
+    ],
+    "nullable": true,
+    "description": "Set only when `reliability` is `insufficientEvidence` because the question is outside the semantic model (\"not available yet\"); names which part is not modelled."
    },
    "confidence": {
     "type": "number",
     "minimum": 0,
-    "maximum": 1
+    "maximum": 1,
+    "deprecated": true,
+    "description": "Superseded by `reliability` on 29 September (design 5.6, never a bare percentage for analytics). Returned for one release, then removed."
    },
    "suggestedFollowUps": {
     "type": "array",
@@ -444,6 +757,105 @@
     "description": "Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it prevents an argument about a figure that moved.\n"
    }
   }
+ },
+ "ReportingAnswerReliability": {
+  "type": "string",
+  "description": "**How far an analytics answer can be relied on** (decided 29 September, AI system design 5.6): a category, never a bare percentage. `grounded`: every figure comes from a result of the compiled spec. `partial`: part of the question was answered and the rest was not modelled. `conflictingSources`: the result and a cited source disagree. `insufficientEvidence`: the question could not be answered, including \"not available yet\" outside the semantic model. The same four values as `ai.yaml`'s assistant answers.\n",
+  "enum": [
+   "grounded",
+   "partial",
+   "conflictingSources",
+   "insufficientEvidence"
+  ]
+ },
+ "ReportingSemanticQuerySpec": {
+  "x-ticvai-persistence": "none — embedded; stored whole in `reporting.natural_language_query`",
+  "type": "object",
+  "description": "**A question in the semantic model's own vocabulary** (decided 29 September, AI system design 2.2 E and 5.7). What the model returns for a live-number question instead of SQL, and what `runSemanticQuery` takes. Every code is a `SemanticModel` field code or a KPI code; Reporting validates the spec against the published model and compiles it deterministically, so the same spec compiles to the same SQL for the same model version.\n",
+  "required": [
+   "metric",
+   "period"
+  ],
+  "properties": {
+   "metric": {
+    "type": "string",
+    "description": "A measure field code in the `SemanticModel`, or a `KpiDefinition.code`. The governed definition the dashboards use, so the number matches them."
+   },
+   "dimensions": {
+    "type": "array",
+    "maxItems": 5,
+    "description": "Field codes to group by. Each must be reachable from the metric's dataset through a relationship the semantic model declares.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "filters": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "field",
+      "operator"
+     ],
+     "properties": {
+      "field": {
+       "type": "string",
+       "description": "A `SemanticModel` field code."
+      },
+      "operator": {
+       "type": "string",
+       "enum": [
+        "equals",
+        "notEquals",
+        "greaterThan",
+        "lessThan",
+        "between",
+        "in",
+        "notIn",
+        "isNull",
+        "isNotNull"
+       ]
+      },
+      "values": {
+       "type": "array",
+       "description": "**Open on purpose; typed by the field.** One value for the comparison operators, exactly two (from, to) for `between`, any number for `in` and `notIn`, none for `isNull` and `isNotNull`.\n",
+       "items": {}
+      }
+     }
+    }
+   },
+   "period": {
+    "type": "string",
+    "description": "ISO 8601 interval in the venue's time zone, e.g. `2026-09-21/2026-09-27`, the form `explainMetricChange` takes."
+   },
+   "comparison": {
+    "type": "string",
+    "nullable": true,
+    "description": "As `getKpiValues` `compareTo`. With one, each row carries the metric for the comparison beside the current value.",
+    "enum": [
+     "previousPeriod",
+     "samePeriodLastYear",
+     "target",
+     "benchmark"
+    ]
+   },
+   "semanticModelVersion": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "The `SemanticModel.version` the spec was validated and compiled against. Set by Reporting."
+   }
+  }
+ },
+ "ReportingUnavailableReason": {
+  "type": "string",
+  "description": "Which part of a question is outside the semantic model, so the answer is \"not available yet\" (design 5.7). A metric or field the caller may not see is reported as not modelled, so the reason does not reveal that it exists.",
+  "enum": [
+   "metricNotModelled",
+   "dimensionNotModelled",
+   "filterNotModelled",
+   "comparisonNotAvailable",
+   "periodOutsideHistory"
+  ]
  },
  "ResourceAuditEntry": {
   "type": "object",

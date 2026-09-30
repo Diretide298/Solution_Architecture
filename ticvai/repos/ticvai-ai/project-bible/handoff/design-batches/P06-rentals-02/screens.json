@@ -109,7 +109,22 @@
    "loading": "The active rental operations list; the counts above it resolve separately.",
    "offline": "TODO — not decided. Rental Management does not say what a staff device does here without a connection, and no minute has decided it."
   },
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "operationId": "listRentalBookings",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Rentals out right now",
+    "trigger": "onLoad"
+   },
+   {
+    "contract": "rental",
+    "operationId": "listOverdueRentals",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Due soon and late",
+    "trigger": "onLoad"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 78. 0 of 8 labels bound to a contract property; 16 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "entryState": {
    "preloaded": [
@@ -251,7 +266,19 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
-   "regions": [],
+   "regions": [
+    {
+     "components": [
+      {
+       "derived": true,
+       "impliedBy": "getRentalBooking",
+       "kind": "detailPanel",
+       "notes": "One record, read-only."
+      }
+     ],
+     "name": "contentBody"
+    }
+   ],
    "template": "split"
   },
   "states": {
@@ -274,7 +301,15 @@
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "operationId": "getRentalBooking",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "The live rental",
+    "trigger": "onAction"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 79. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -296,6 +331,14 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-082"
+  },
+  "entryState": {
+   "params": [
+    {
+     "from": "navigation",
+     "name": "bookingId"
+    }
+   ]
   },
   "_platform": {
    "code": "P06",
@@ -343,8 +386,85 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
-   "regions": [],
-   "template": "split"
+   "template": "split",
+   "regions": [
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Current rental",
+       "columns": [
+        "Start",
+        "Expected return",
+        "Current duration"
+       ],
+       "notes": "No rental read is bound; these are the pack's labels.",
+       "provenance": "pack Rental_Management.pdf, page 81"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Additional duration",
+       "notes": "+30, +60, +90 min or Custom; sets the `to` sent to `getRentalAvailability`.",
+       "operation": "getRentalAvailability",
+       "provenance": "contract rental.yaml GET /rental-availability"
+      },
+      {
+       "kind": "textField",
+       "label": "Requested new return",
+       "notes": "Computed from expected return plus the added duration; read-only.",
+       "provenance": "pack Rental_Management.pdf, page 81"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Extension check",
+       "bindsTo": "RentalAvailability",
+       "columns": [
+        "RentalAvailability.windows[].availableQuantity",
+        "RentalAvailability.blockedWindows[].from",
+        "RentalAvailability.blockedWindows[].to",
+        "RentalAvailability.blockedWindows[].reason",
+        "Blocking asset"
+       ],
+       "operation": "getRentalAvailability",
+       "notes": "EXTENSION AVAILABLE when the window stays open; otherwise the first blocking window's reason. The pack names the blocking asset (BIKE-017); no field does.",
+       "provenance": "pack Rental_Management.pdf, page 81"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Check availability",
+       "operation": "getRentalAvailability",
+       "notes": "Re-reads availability for the extended window.",
+       "provenance": "contract rental.yaml GET /rental-availability"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Continue to pricing",
+       "notes": "Hands over to Extension Pricing & Confirmation (pack page 82).",
+       "provenance": "pack Rental_Management.pdf, page 82"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "emptyFirstRun": "No rental extension request yet. Carries the create action; distinct from a filter that matched nothing.",
@@ -357,17 +477,20 @@
   "gaps": [
    {
     "operation": null,
-    "source": "pack Rental_Management.pdf, page 81",
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built."
-   },
-   {
-    "operation": null,
-    "source": "pack Rental_Management.pdf, page 81",
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Rental_Management.pdf, page 81"
    }
   ],
-  "apis": [],
-  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 81. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apis": [
+   {
+    "contract": "rental",
+    "operationId": "getRentalAvailability",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Can it be extended",
+    "trigger": "onLoad"
+   }
+  ],
+  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 81. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Rental_Management.pdf p.81; pack Rental_Management.pdf p.82; contract rental.yaml GET /rental-availability. Pack labels with no schema field yet (shown as plain labels): Rental start, Expected return, Current duration, Blocking asset (e.g. BIKE-017).",
   "navigation": {
    "entryFrom": [
     "EMP-081"
@@ -435,7 +558,26 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
-   "regions": [],
+   "regions": [
+    {
+     "components": [
+      {
+       "derived": true,
+       "impliedBy": "quoteRentalPrice",
+       "kind": "primaryButton",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "derived": true,
+       "impliedBy": "quoteRentalPrice",
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**"
+      }
+     ],
+     "name": "contentBody"
+    }
+   ],
    "template": "split"
   },
   "states": {
@@ -458,7 +600,26 @@
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "operationId": "quoteRentalPrice",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Price the extension",
+    "trigger": "onAction"
+   },
+   {
+    "contract": "rental",
+    "invalidates": [
+     "getRentalBooking",
+     "getRentalAvailability"
+    ],
+    "operationId": "extendRental",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Extend it",
+    "trigger": "onAction"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 82. 0 of 0 labels bound to a contract property; 0 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -480,6 +641,14 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-084"
+  },
+  "entryState": {
+   "params": [
+    {
+     "from": "navigation",
+     "name": "bookingId"
+    }
+   ]
   },
   "_platform": {
    "code": "P06",
@@ -527,7 +696,26 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
-   "regions": [],
+   "regions": [
+    {
+     "components": [
+      {
+       "derived": true,
+       "impliedBy": "swapRentalEquipment",
+       "kind": "primaryButton",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "derived": true,
+       "impliedBy": "swapRentalEquipment",
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**"
+      }
+     ],
+     "name": "contentBody"
+    }
+   ],
    "template": "split"
   },
   "states": {
@@ -550,7 +738,18 @@
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "invalidates": [
+     "getRentalBooking"
+    ],
+    "operationId": "swapRentalEquipment",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Replace a faulty item",
+    "trigger": "onAction"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 83. 0 of 0 labels bound to a contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -572,6 +771,14 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-085"
+  },
+  "entryState": {
+   "params": [
+    {
+     "from": "navigation",
+     "name": "bookingId"
+    }
+   ]
   },
   "_platform": {
    "code": "P06",
@@ -619,7 +826,26 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
-   "regions": [],
+   "regions": [
+    {
+     "components": [
+      {
+       "derived": true,
+       "impliedBy": "reportRentalIncident",
+       "kind": "primaryButton",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "derived": true,
+       "impliedBy": "reportRentalIncident",
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**"
+      }
+     ],
+     "name": "contentBody"
+    }
+   ],
    "template": "split"
   },
   "states": {
@@ -642,7 +868,18 @@
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "invalidates": [
+     "getRentalBooking"
+    ],
+    "operationId": "reportRentalIncident",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Record what happened",
+    "trigger": "onAction"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 84. 0 of 0 labels bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -711,7 +948,19 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
-   "regions": [],
+   "regions": [
+    {
+     "components": [
+      {
+       "derived": true,
+       "impliedBy": "listOverdueRentals",
+       "kind": "dataTable",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ],
+     "name": "contentBody"
+    }
+   ],
    "template": "split"
   },
   "states": {
@@ -734,7 +983,15 @@
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "operationId": "listOverdueRentals",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Due soon",
+    "trigger": "onLoad"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 85. 0 of 0 labels bound to a contract property; 0 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -803,7 +1060,33 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
-   "regions": [],
+   "regions": [
+    {
+     "components": [
+      {
+       "derived": true,
+       "impliedBy": "listOverdueRentals",
+       "kind": "dataTable",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "sendTransactionalMessage",
+       "label": "Send transactional message",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "sendTransactionalMessage"
+      }
+     ],
+     "name": "contentBody"
+    }
+   ],
    "template": "split"
   },
   "states": {
@@ -826,7 +1109,22 @@
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "operationId": "listOverdueRentals",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Late, and what it is accruing",
+    "trigger": "onLoad"
+   },
+   {
+    "contract": "marketing-crm",
+    "operationId": "sendTransactionalMessage",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Contact the guest about an overdue rental",
+    "trigger": "onAction"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 85. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -895,7 +1193,19 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
-   "regions": [],
+   "regions": [
+    {
+     "components": [
+      {
+       "derived": true,
+       "impliedBy": "getRentalBooking",
+       "kind": "detailPanel",
+       "notes": "One record, read-only."
+      }
+     ],
+     "name": "contentBody"
+    }
+   ],
    "template": "split"
   },
   "states": {
@@ -918,7 +1228,15 @@
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "operationId": "getRentalBooking",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "The group rental",
+    "trigger": "onAction"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 86. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -940,6 +1258,14 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-089"
+  },
+  "entryState": {
+   "params": [
+    {
+     "from": "navigation",
+     "name": "bookingId"
+    }
+   ]
   },
   "_platform": {
    "code": "P06",
@@ -1050,7 +1376,15 @@
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists."
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "operationId": "listOverdueRentals",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Operational alerts",
+    "trigger": "onLoad"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 87. 0 of 7 labels bound to a contract property; 7 of 74 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "entryState": {
    "preloaded": [

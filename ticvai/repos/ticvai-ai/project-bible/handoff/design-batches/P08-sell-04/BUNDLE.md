@@ -2529,6 +2529,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ]
  },
  "AuditRecord": {
+  "x-ticvai-append-only": "occurredAt",
   "type": "object",
   "x-ticvai-persistence": "platform.audit_record",
   "description": "26 September, pull audit R198. **One row of the platform audit trail, as `listAuditRecords` returns it.** It was a free-form object, so nothing said what an audit row carries. These are the fields the operation already filters on — who, where, on which workstation, what action, on what, and when — and nothing more. Written by the operations that audit themselves; never edited and never deleted.\n",
@@ -2576,7 +2577,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "platformStaffGrantId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "**Set when a TICVAI platform operator acted, naming the grant they acted under** (`identity.openPlatformStaffGrant`; decided 28 September, audit R098). Null for the tenant's own staff. Every platform action in a tenant carries one, so the tenant can see all of them.\n"
    }
@@ -2799,7 +2800,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "incidentNumber": {
     "type": "string",
@@ -2856,7 +2857,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "correctiveWorkOrderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "occurredAt": {
@@ -3686,7 +3687,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "kind": {
     "$ref": "#/components/schemas/IncidentKind"
@@ -4025,6 +4026,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "orderId": {
     "type": "string",
+    "format": "uuid",
     "nullable": true,
     "description": "The paid online order that created this collection (audit R236)."
    },

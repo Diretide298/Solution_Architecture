@@ -1,6 +1,6 @@
 # WS168 — Seat Management Venue Mapping Reference v1.0 board 4
 
-**10 screens · 11 operations · 18 schemas · 4 permissions**
+**10 screens · 11 operations · 21 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -1751,6 +1751,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -2046,13 +2051,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "id",
    "title",
    "venueId",
-   "priority",
    "recordedAt"
   ],
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "title": {
     "type": "string",
@@ -2083,7 +2087,23 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "default": "corrective"
    },
    "priority": {
-    "$ref": "#/components/schemas/WorkOrderPriority"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/WorkOrderPriority"
+     }
+    ],
+    "description": "**Optional since 29 September** (M17-01). Sent, it is `manual` and wins. Absent, the asset's `priorityOverride` applies, and failing that the venue's `WorkOrderPriorityPolicy` scores the fault.\n"
+   },
+   "faultAssessment": {
+    "$ref": "#/components/schemas/WorkOrderFaultAssessment"
+   },
+   "requiredQualificationCodes": {
+    "type": "array",
+    "maxItems": 10,
+    "items": {
+     "type": "string"
+    },
+    "description": "Skills the job needs, as qualification codes; `suggestWorkOrderAssignee` ranks by them (M17-13)."
    },
    "categoryId": {
     "type": "string",
@@ -2148,6 +2168,90 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "number"
    }
   }
+ },
+ "Seat": {
+  "x-ticvai-persistence": "seating.seat",
+  "type": "object",
+  "required": [
+   "id",
+   "sectionCode",
+   "rowLabel",
+   "seatNumber",
+   "attribute"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "**Stable for the life of the seat.** Section, row and number are display labels that change on a refit; this does not. A ticket sold today must still resolve after a renumbering.\n"
+   },
+   "sectionCode": {
+    "type": "string"
+   },
+   "rowLabel": {
+    "type": "string"
+   },
+   "seatNumber": {
+    "type": "string"
+   },
+   "displayLabel": {
+    "type": "string",
+    "description": "What the guest sees, e.g. `A2-7-11`."
+   },
+   "position": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/Point"
+     }
+    ],
+    "nullable": true
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "attribute": {
+    "$ref": "#/components/schemas/SeatAttribute"
+   },
+   "companionSeatIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Present on accessible seats. Sold together, released together."
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "SeatAttribute": {
+  "type": "string",
+  "description": "BL-168. **Extended from eight values on 18 August.** Amenity and view filters needed attributes the original set did not carry, and a guest filtering for *aisle seat with power* was filtering on something the model could not express.\n",
+  "enum": [
+   "standard",
+   "accessible",
+   "companion",
+   "obstructedView",
+   "restrictedLegroom",
+   "premium",
+   "houseSeat",
+   "buffer",
+   "aisle",
+   "endOfRow",
+   "extraLegroom",
+   "powerOutlet",
+   "tableService",
+   "shaded",
+   "covered",
+   "nearExit",
+   "nearAccessibleWc",
+   "wheelchairTransfer",
+   "limitedRecline",
+   "sofa",
+   "beanbag"
+  ]
  },
  "SeatAvailability": {
   "x-ticvai-persistence": "none — computed from seat, hold and block",
@@ -2784,7 +2888,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "workOrderNumber": {
     "type": "string",
@@ -2815,6 +2919,34 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "priority": {
     "$ref": "#/components/schemas/WorkOrderPriority"
+   },
+   "priorityScore": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The score the venue's policy gave the fault when raised; null when a person or the asset set the priority (M17-01)."
+   },
+   "prioritySource": {
+    "type": "string",
+    "enum": [
+     "scored",
+     "assetOverride",
+     "manual"
+    ],
+    "readOnly": true,
+    "description": "Where `priority` came from (M17-01). A change through `updateWorkOrder` makes it `manual`."
+   },
+   "faultAssessment": {
+    "$ref": "#/components/schemas/WorkOrderFaultAssessment"
+   },
+   "requiredQualificationCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Skills the job needs (M17-13)."
    },
    "kind": {
     "$ref": "#/components/schemas/WorkOrderKind"
@@ -2874,12 +3006,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "sourceInspectionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "sourceIncidentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "createdAt": {
@@ -2899,6 +3031,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "nullable": true
+   }
+  }
+ },
+ "WorkOrderFaultAssessment": {
+  "x-ticvai-persistence": "none — columns on maintenance.work_order",
+  "type": "object",
+  "description": "What the person raising a fault says about it, which the priority score reads (M17-01).",
+  "properties": {
+   "safetyRisk": {
+    "type": "boolean",
+    "default": false
+   },
+   "guestImpact": {
+    "type": "string",
+    "enum": [
+     "none",
+     "degraded",
+     "closed"
+    ],
+    "default": "none"
    }
   }
  },

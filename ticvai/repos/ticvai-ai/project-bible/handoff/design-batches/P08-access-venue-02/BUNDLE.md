@@ -3042,7 +3042,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "VenuePoint.description",
        "operation": "setVenuePoint",
        "notes": "**What the guest reads on Item Detail** (decided 29 September, MOB-4): rides, shows, restaurants and shops. Per language.",
-       "provenance": "agreed name venue-map VenuePoint.description (P29 brief)"
+       "provenance": "agreed name venue-map VenuePoint.description (the 29 September pass brief)"
       },
       {
        "kind": "multiSelect",
@@ -3050,7 +3050,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "VenuePoint.media",
        "operation": "searchMedia",
        "notes": "From the asset library; the first is the gallery cover on GST-004 Item Detail (MOB-4).",
-       "provenance": "agreed name venue-map VenuePoint.media (P29 brief)"
+       "provenance": "agreed name venue-map VenuePoint.media (the 29 September pass brief)"
       },
       {
        "kind": "selectField",
@@ -3058,7 +3058,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "VenuePoint.featuredOffer",
        "operation": "listProducts",
        "notes": "**The product or bundle the item detail proposes** (decided 29 September, MOB-4), on any kind of point, e.g. a restaurant's *meal combo with admission* (a bundle from BO-011). Products from `listProducts`, bundles from `listCatalogueBundles`.",
-       "provenance": "agreed name venue-map VenuePoint.featuredOffer (P29 brief)"
+       "provenance": "agreed name venue-map VenuePoint.featuredOffer (the 29 September pass brief)"
       },
       {
        "kind": "numberField",
@@ -3066,7 +3066,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "VenuePoint.typicalDurationMinutes",
        "operation": "setVenuePoint",
        "notes": "What the Plan tab's planner allows for this stop (MOB-6).",
-       "provenance": "agreed name venue-map VenuePoint.typicalDurationMinutes (P29 brief)"
+       "provenance": "agreed name venue-map VenuePoint.typicalDurationMinutes (the 29 September pass brief)"
       },
       {
        "kind": "multiSelect",
@@ -3074,7 +3074,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "VenuePoint.interestTags",
        "operation": "setVenuePoint",
        "notes": "Matched against the guest's interests on the Plan tab (MOB-6).",
-       "provenance": "agreed name venue-map VenuePoint.interestTags (P29 brief)"
+       "provenance": "agreed name venue-map VenuePoint.interestTags (the 29 September pass brief)"
       },
       {
        "kind": "multiSelect",
@@ -3082,7 +3082,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "VenuePoint.cuisineTags",
        "operation": "setVenuePoint",
        "notes": "For restaurants and kiosks; matched against the guest's cuisine choice on the Plan tab (MOB-6).",
-       "provenance": "agreed name venue-map VenuePoint.cuisineTags (P29 brief)"
+       "provenance": "agreed name venue-map VenuePoint.cuisineTags (the 29 September pass brief)"
       }
      ]
     }
@@ -3100,21 +3100,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "assets",
     "purpose": "Pick an item's photos and video (MOB-4)",
     "trigger": "onAction",
-    "provenance": "decided 29 September, MOB-4 (P29)"
+    "provenance": "decided 29 September, MOB-4 (the 29 September pass)"
    },
    {
     "operationId": "listProducts",
     "contract": "catalogue",
     "purpose": "Products a point can feature (MOB-4)",
     "trigger": "onAction",
-    "provenance": "decided 29 September, MOB-4 (P29)"
+    "provenance": "decided 29 September, MOB-4 (the 29 September pass)"
    },
    {
     "operationId": "listCatalogueBundles",
     "contract": "catalogue",
     "purpose": "Bundles a point can feature, e.g. a meal combo (MOB-4)",
     "trigger": "onAction",
-    "provenance": "decided 29 September, MOB-4 (P29)"
+    "provenance": "decided 29 September, MOB-4 (the 29 September pass)"
    },
    {
     "operationId": "getVenueMap",
@@ -5425,8 +5425,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "referenceId": {
     "type": "string",
+    "format": "uuid",
     "nullable": true,
-    "description": "The source row's id: a work-order, inspection or incident ULID, or an `asset_status_change` id.\n"
+    "description": "The source row's id: a work order, inspection or incident, or an `asset_status_change` id. A uuid, as every id is (ADR-0056).\n"
    },
    "summary": {
     "type": "string"
@@ -5483,7 +5484,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "workOrderId": {
       "type": "string",
-      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "format": "uuid",
       "nullable": true
      }
     }
@@ -5491,6 +5492,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   }
  },
  "AuditRecord": {
+  "x-ticvai-append-only": "occurredAt",
   "type": "object",
   "x-ticvai-persistence": "platform.audit_record",
   "description": "26 September, pull audit R198. **One row of the platform audit trail, as `listAuditRecords` returns it.** It was a free-form object, so nothing said what an audit row carries. These are the fields the operation already filters on — who, where, on which workstation, what action, on what, and when — and nothing more. Written by the operations that audit themselves; never edited and never deleted.\n",
@@ -5538,7 +5540,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "platformStaffGrantId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "**Set when a TICVAI platform operator acted, naming the grant they acted under** (`identity.openPlatformStaffGrant`; decided 28 September, audit R098). Null for the tenant's own staff. Every platform action in a tenant carries one, so the tenant can see all of them.\n"
    }
@@ -5952,7 +5954,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "workOrderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    }
   }
@@ -6169,7 +6171,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "incidentNumber": {
     "type": "string",
@@ -6226,7 +6228,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "correctiveWorkOrderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "occurredAt": {
@@ -6266,7 +6268,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "incidentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "authority": {
     "type": "string",
@@ -6382,7 +6384,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "incidentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "note": {
     "type": "string",
@@ -6414,7 +6416,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "incidentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "kind": {
     "type": "string",
@@ -6855,7 +6857,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "properties": {
       "ticketId": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "format": "uuid",
        "description": "The `Entitlement.id`."
       },
       "mediaCodes": {
@@ -6915,7 +6917,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       },
       "ticketId": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "format": "uuid",
        "description": "The `Entitlement.id` in the issuing cell."
       },
       "issuingCellId": {
@@ -8072,7 +8074,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "The play ID, generated on the reader, and returned as `PlayResult.playId`. Also the idempotency key: on `recordGamePlay` it must equal the `Idempotency-Key` header (a mismatch is the shared 409 `Conflict`); in a `syncGamePlays` batch it is the key on its own.\n"
    },
    "cardCode": {
@@ -8120,7 +8122,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "kind": {
     "$ref": "#/components/schemas/IncidentKind"
@@ -8349,6 +8351,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   }
  },
  "ScanEvent": {
+  "x-ticvai-append-only": "recordedAt",
   "x-ticvai-persistence": "access.scan_event",
   "type": "object",
   "required": [
@@ -8362,8 +8365,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "The scan's client-generated ULID, the key offline replay deduplicates on."
+    "format": "uuid",
+    "description": "The scan's client-generated UUIDv7, the key offline replay deduplicates on."
    },
    "accessPointId": {
     "type": "string",
@@ -8378,7 +8381,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "ticketId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The `Entitlement.id` scanned; null where the media resolved to nothing."
    },
@@ -8407,7 +8410,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "overridesScanId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "**Set only on an override row**, naming the denied scan it admits against (decided 28 September, audit R228). The denied scan itself is never updated: the denial and the override are two rows, and at most one override row names any scan. Null on every other scan.\n"
    },
@@ -8555,7 +8558,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "inspectionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "Required for return to service where the asset demands it."
    },
@@ -8644,7 +8647,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "ticketId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "Stable for the life of the ticket, independent of the media carrying it."
    },
    "mediaCode": {
@@ -8723,8 +8726,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID. Also the idempotency key and dedupe key."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7. Also the idempotency key and dedupe key."
    },
    "mediaCode": {
     "type": "string",
@@ -8765,7 +8768,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "scanId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "outcome": {
     "$ref": "#/components/schemas/ScanOutcome"
@@ -9601,8 +9604,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "The client-generated ULID from `JoinQueueRequest.id`, and the `entryId` every entry path takes. `listMyWaitingGuests` gives it back to a guest who has lost it.\n"
+    "format": "uuid",
+    "description": "The client-generated UUIDv7 from `JoinQueueRequest.id`, and the `entryId` every entry path takes. `listMyWaitingGuests` gives it back to a guest who has lost it.\n"
    },
    "queueId": {
     "type": "string",
@@ -9761,7 +9764,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "workOrderNumber": {
     "type": "string",
@@ -9879,12 +9882,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "sourceInspectionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "sourceIncidentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "createdAt": {

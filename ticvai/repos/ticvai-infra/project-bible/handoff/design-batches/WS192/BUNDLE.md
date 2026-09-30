@@ -1,6 +1,6 @@
 # WS192 — Wallet Configuration Backend Structure v1.0 board 7
 
-**10 screens · 13 operations · 13 schemas · 6 permissions**
+**10 screens · 13 operations · 16 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -2133,6 +2133,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -2145,7 +2150,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "A guest contests a wallet transaction",
   "permission": "WALLET_OPERATE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "append",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -2164,7 +2169,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Undo a top-up, in full or in part",
   "permission": "WALLET_OPERATE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -2209,6 +2214,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": "RefundPolicy",
@@ -2221,9 +2231,14 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "What a refund puts back, and where",
   "permission": "WALLET_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -2240,7 +2255,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Block, freeze or restrict a wallet",
   "permission": "WALLET_OPERATE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -2259,9 +2274,14 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Whether guests may move money to each other, and on what terms",
   "permission": "WALLET_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -2416,7 +2436,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "riskScoreAbove": {
     "type": "number",
     "nullable": true,
-    "description": "11.1.12. **Nothing supplies this yet** — risk scoring is parked with the model-dependent AI. The field exists so adding the engine later is configuration rather than a schema change.\n"
+    "description": "11.1.12. **Not matched against the AI risk score** (29 September, build pass, group G2). The AI assessment on a request (`ApprovalRequest.aiAssessment`, from `ai.scoreApprovalRequest`) is context for the reviewer only (MoM 8 September: AI never influences approve or reject), and routing a request to more approvers because of it would be influence. A rule with this set matches only a `riskScore` the requesting contract passes in `attributes` from its own deterministic rules (a payment's rule score, for example). Using the AI score here needs the client to say so.\n"
    },
    "condition": {
     "type": "string",
@@ -2479,6 +2499,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "integer",
     "nullable": true,
     "description": "11.1.53. An unanswered request eventually stops waiting."
+   },
+   "externalProviderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "11.1.65 (29 September). **This level is decided in an external workflow system** (`ApprovalExternalProvider`) rather than by a person in TICVAI. `approverRoleIds` stay required: they are who decides if the provider does not answer in time and its `onTimeout` is `fallBackToRoles`.\n"
    }
   }
  },
@@ -2493,14 +2519,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID of the refund, and its idempotency key — it must equal the `Idempotency-Key` header."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7 of the refund, and its idempotency key — it must equal the `Idempotency-Key` header."
    },
    "lineIds": {
     "type": "array",
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     },
     "description": "Omit to refund the whole order."
    },
@@ -2541,6 +2567,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "recordedAt": {
     "type": "string",
     "format": "date-time"
+   }
+  }
+ },
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
    }
   }
  },
@@ -3013,6 +3068,78 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string"
    }
   }
+ },
+ "WalletTransaction": {
+  "x-ticvai-persistence": "wallet.wallet_transaction",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "amount",
+   "balanceAfter",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "walletId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "wallet.wallet",
+    "description": "The wallet this movement is on (SD-027, 29 September). A shared wallet has many subjects, so the subject alone cannot say which balance moved."
+   },
+   "walletHoldId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "wallet.hold",
+    "description": "The hold a spend settled, where it came through `holdWalletFunds`."
+   },
+   "kind": {
+    "$ref": "#/components/schemas/WalletTransactionKind"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "balanceAfter": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "orderId": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "WalletTransactionKind": {
+  "type": "string",
+  "enum": [
+   "topUp",
+   "spend",
+   "refund",
+   "adjustment",
+   "bonus",
+   "expiry",
+   "transfer"
+  ]
  },
  "WalletTransferRules": {
   "type": "object",

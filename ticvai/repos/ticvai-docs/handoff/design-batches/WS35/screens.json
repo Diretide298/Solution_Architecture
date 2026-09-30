@@ -39,10 +39,7 @@
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-058 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-059",
@@ -96,19 +93,22 @@
      "to": "ADM-067",
      "trigger": "Works in Pricing Rule Priority, Conflict Resolution & Testing",
      "provenance": "flow F144 step 17→18",
-     "operation": "listPricingRule"
+     "operation": "listPricingRule",
+     "carries": [
+      "ruleId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can identify, search, and manage all contextual pricing rules from one workspace.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each rule should show) — counts over a population, then the population",
   "purpose": "Provide administrators with a centralized workspace for all pricing eligibility and contextual pricing rules.",
-  "purposeNote": "Administrators can identify, search, and manage all contextual pricing rules from one workspace.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 10 actions on this screen and the screen declares 1 operation.** Unserved: Customer Segment, Membership, Channel, Create Rule, Duplicate, Test Rule, Compare, Disable …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 13 actions on this screen and the screen declares 1 operation.** Unserved: Customer Segment, Membership, Channel, Quantity, Timeslot, Event, Create Rule, Duplicate …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Support"
    }
   ],
@@ -123,73 +123,73 @@
        "kind": "metricTile",
        "label": "Active Pricing Rules",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "PricingRuleCommandCenterView.activePricingRules"
+       "bindsTo": "PricingRuleCommandCenterSummary.activePricingRules"
       },
       {
        "kind": "metricTile",
        "label": "Draft Rules",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "PricingRuleCommandCenterView.draftRules"
+       "bindsTo": "PricingRuleCommandCenterSummary.draftRules"
       },
       {
        "kind": "metricTile",
        "label": "Customer Segment Rules",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "PricingRuleCommandCenterView.customerSegmentRules"
+       "bindsTo": "PricingRuleCommandCenterSummary.customerSegmentRules"
       },
       {
        "kind": "metricTile",
        "label": "Membership Rules",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "PricingRuleCommandCenterView.membershipRules"
+       "bindsTo": "PricingRuleCommandCenterSummary.membershipRules"
       },
       {
        "kind": "metricTile",
        "label": "Residency Rules",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "PricingRuleCommandCenterView.residencyRules"
+       "bindsTo": "PricingRuleCommandCenterSummary.residencyRules"
       },
       {
        "kind": "metricTile",
        "label": "Channel Rules",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "PricingRuleCommandCenterView.channelRules"
+       "bindsTo": "PricingRuleCommandCenterSummary.channelRules"
       },
       {
        "kind": "metricTile",
        "label": "Location Rules",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "PricingRuleCommandCenterView.locationRules"
+       "bindsTo": "PricingRuleCommandCenterSummary.locationRules"
       },
       {
        "kind": "metricTile",
        "label": "Quantity Rules",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "PricingRuleCommandCenterView.quantityRules"
+       "bindsTo": "PricingRuleCommandCenterSummary.quantityRules"
       },
       {
        "kind": "metricTile",
        "label": "Seasonal Rules",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "PricingRuleCommandCenterView.seasonalRules"
+       "bindsTo": "PricingRuleCommandCenterSummary.seasonalRules"
       },
       {
        "kind": "metricTile",
        "label": "Timeslot Rules",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "PricingRuleCommandCenterView.timeslotRules"
+       "bindsTo": "PricingRuleCommandCenterSummary.timeslotRules"
       },
       {
        "kind": "metricTile",
        "label": "Rule Conflicts",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "PricingRuleCommandCenterView.ruleConflicts"
+       "bindsTo": "PricingRuleCommandCenterSummary.ruleConflicts"
       },
       {
        "kind": "metricTile",
        "label": "Rules Expiring Soon",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Display",
-       "bindsTo": "PricingRuleCommandCenterView.rulesExpiringSoon"
+       "bindsTo": "PricingRuleCommandCenterSummary.rulesExpiringSoon"
       }
      ]
     },
@@ -270,6 +270,21 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Quantity",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Timeslot",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Event",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Create Rule",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Quick Actions"
       },
@@ -281,31 +296,13 @@
       {
        "kind": "secondaryButton",
        "label": "Test Rule",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Quick Actions"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Compare",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Quick Actions"
-      },
-      {
-       "kind": "destructiveButton",
-       "label": "Disable",
-       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Quick Actions"
+       "operation": "testPricingRule",
+       "provenance": "contract catalogue.yaml POST /pricing-rule/{ruleId}/test (decided 29 September, readiness close-out)"
       }
      ]
     }
    ]
   },
-  "overlays": [
-   {
-    "id": "confirmDisable",
-    "component": "confirmDialog",
-    "trigger": "Disable",
-    "body": "**Disable on a pricing rule is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
-    "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 23 §Quick Actions"
-   }
-  ],
   "states": {
    "loading": "The pricing rule list; the counts above it resolve separately.",
    "error": "Could not load. Names which read failed and leaves the pricing rule untouched.",
@@ -319,14 +316,35 @@
     "contract": "catalogue",
     "purpose": "Pricing Rule Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPricingRulePriority",
+    "contract": "catalogue",
+    "purpose": "Pricing Rule Priority, Conflict Resolution & Testing",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "testPricingRule",
+    "contract": "catalogue",
+    "purpose": "Test one pricing rule against a sample booking, on demand",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-058"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-058",
+   "workshopBoard": "wireframes/WS96 Pricing   Revenue Management Board 2.dc.html#adm-058"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 23. 25 of 25 labels bound to a contract property; 35 of 52 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 23. 25 of 25 labels bound to a contract property; 38 of 52 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "ruleId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -383,15 +401,18 @@
      "to": "ADM-058",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F144 step 2→3",
-     "operation": "listCustomerSegmentProfile"
+     "operation": "listCustomerSegmentProfile",
+     "carries": [
+      "ruleId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "segmentation.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure by; Capture) and no display directory — it is settings, not a population",
   "purpose": "Define price eligibility based on customer characteristics and commercial segments.",
-  "purposeNote": "segmentation.",
   "layout": {
    "template": "form",
    "regions": [
@@ -505,7 +526,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-059"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-059",
+   "workshopBoard": "wireframes/WS96 Pricing   Revenue Management Board 2.dc.html#adm-059"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 25. 0 of 0 labels bound to a contract property; 17 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -564,19 +586,22 @@
      "to": "ADM-058",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F144 step 4→5",
-     "operation": "listMembershipLoyaltyPricing"
+     "operation": "listMembershipLoyaltyPricing",
+     "carries": [
+      "ruleId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "entitlement logic.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure whether benefits apply to) and no display directory — it is settings, not a population",
   "purpose": "Control member-specific and loyalty-tier pricing.",
-  "purposeNote": "entitlement logic.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Customer Status. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Customer Status. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 26 §Support"
    }
   ],
@@ -635,6 +660,11 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Loyalty Tier",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 26 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Customer Status",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 26 §Support"
       }
@@ -659,9 +689,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-060"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-060",
+   "workshopBoard": "wireframes/WS96 Pricing   Revenue Management Board 2.dc.html#adm-060"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 26. 0 of 0 labels bound to a contract property; 9 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 26. 0 of 0 labels bound to a contract property; 10 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -718,15 +749,18 @@
      "to": "ADM-058",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F144 step 6→7",
-     "operation": "listResidencyNationalityMarket"
+     "operation": "listResidencyNationalityMarket",
+     "carries": [
+      "ruleId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Residency, nationality, and market-specific pricing can be applied only when the configured eligibility criteria are satisfied.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure by; Configure whether eligibility requires) and no display directory — it is settings, not a population",
   "purpose": "Support geographically differentiated commercial pricing.",
-  "purposeNote": "Residency, nationality, and market-specific pricing can be applied only when the configured eligibility criteria are satisfied.",
   "layout": {
    "template": "form",
    "regions": [
@@ -820,7 +854,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-061"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-061",
+   "workshopBoard": "wireframes/WS96 Pricing   Revenue Management Board 2.dc.html#adm-061"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 27. 0 of 0 labels bound to a contract property; 13 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -879,7 +914,10 @@
      "to": "ADM-058",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F144 step 8→9",
-     "operation": "listChannelBasedPricing"
+     "operation": "listChannelBasedPricing",
+     "carries": [
+      "ruleId"
+     ]
     }
    ]
   },
@@ -933,7 +971,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-062"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-062",
+   "workshopBoard": "wireframes/WS96 Pricing   Revenue Management Board 2.dc.html#adm-062"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 29. 0 of 0 labels bound to a contract property; 0 of 12 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -992,15 +1031,25 @@
      "to": "ADM-058",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F144 step 10→11",
-     "operation": "listLocationVenueEvent"
+     "operation": "listLocationVenueEvent",
+     "carries": [
+      "ruleId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "event, or performance context.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Allow rates to vary according to where and for which event/experience the product is sold.",
-  "purposeNote": "event, or performance context.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Attraction, Zone, Experience, Pop-up Venue, Temporary Event Location. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 30 §Support"
+   }
+  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1039,6 +1088,47 @@
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 30 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Venue",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Attraction",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Event",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Zone",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Experience",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Pop-up Venue",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 30 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Temporary Event Location",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 30 §Support"
+      }
+     ]
     }
    ]
   },
@@ -1059,9 +1149,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-063"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-063",
+   "workshopBoard": "wireframes/WS96 Pricing   Revenue Management Board 2.dc.html#adm-063"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 30. 0 of 0 labels bound to a contract property; 6 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 30. 0 of 0 labels bound to a contract property; 13 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1118,7 +1209,10 @@
      "to": "ADM-058",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F144 step 12→13",
-     "operation": "listQuantityGroupVolume"
+     "operation": "listQuantityGroupVolume",
+     "carries": [
+      "ruleId"
+     ]
     }
    ]
   },
@@ -1127,6 +1221,11 @@
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Support commercial rates based on purchased quantity or group size.",
   "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Minimum Quantity. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 31 §Support"
+   },
    {
     "operation": null,
     "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
@@ -1142,15 +1241,24 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "actionBar",
+     "slot": "rowActions",
      "components": [
       {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listQuantityGroupVolume",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "kind": "primaryButton",
+       "label": "Minimum Quantity",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 31 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Quantity Bands",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 31 §Support"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
     }
    ]
   },
@@ -1171,19 +1279,16 @@
   ],
   "entryState": {
    "preloaded": [
-    "QuantityGroupVolumePricingRulesView.minimumQuantity",
-    "QuantityGroupVolumePricingRulesView.quantityBands",
-    "QuantityGroupVolumePricingRulesView.groupSize",
-    "QuantityGroupVolumePricingRulesView.volumeThreshold",
-    "QuantityGroupVolumePricingRulesView.buyXRate"
+    "QuantityGroupVolumePricingRulesView.quantityModel"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-064"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-064",
+   "workshopBoard": "wireframes/WS96 Pricing   Revenue Management Board 2.dc.html#adm-064"
   },
-  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 31. 0 of 0 labels bound to a contract property; 0 of 7 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 31. 0 of 0 labels bound to a contract property; 2 of 7 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1240,15 +1345,18 @@
      "to": "ADM-058",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F144 step 14→15",
-     "operation": "listEffectiveDateSeason"
+     "operation": "listEffectiveDateSeason",
+     "carries": [
+      "ruleId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "day-based rules.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Control commercial price selection over time.",
-  "purposeNote": "day-based rules.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1317,7 +1425,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-065"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-065",
+   "workshopBoard": "wireframes/WS96 Pricing   Revenue Management Board 2.dc.html#adm-065"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 32. 0 of 0 labels bound to a contract property; 8 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1376,15 +1485,18 @@
      "to": "ADM-058",
      "trigger": "Returns to the board's landing screen",
      "provenance": "flow F144 step 16→17",
-     "operation": "listTimeslotPerformanceTime"
+     "operation": "listTimeslotPerformanceTime",
+     "carries": [
+      "ruleId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "time-of-day context.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Detect) and no metric row",
   "purpose": "Allow commercial pricing to differ across times within the same day or event.",
-  "purposeNote": "time-of-day context.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1396,9 +1508,7 @@
        "kind": "dataTable",
        "label": "Every timeslot performance time-of-day",
        "columns": [
-        "TimeslotPerformanceTimeOfDayPricingRulesView.overlappingTimeRanges",
-        "TimeslotPerformanceTimeOfDayPricingRulesView.missingTimeslotRate",
-        "TimeslotPerformanceTimeOfDayPricingRulesView.conflictingPerformanceRule"
+        "TimeslotPerformanceTimeOfDayPricingRulesView.validationIssues"
        ],
        "bindsTo": "TimeslotPerformanceTimeOfDayPricingRulesView",
        "operation": "listTimeslotPerformanceTime",
@@ -1415,9 +1525,7 @@
        "label": "The selected timeslot performance time-of-day",
        "bindsTo": "TimeslotPerformanceTimeOfDayPricingRulesView",
        "columns": [
-        "TimeslotPerformanceTimeOfDayPricingRulesView.overlappingTimeRanges",
-        "TimeslotPerformanceTimeOfDayPricingRulesView.missingTimeslotRate",
-        "TimeslotPerformanceTimeOfDayPricingRulesView.conflictingPerformanceRule"
+        "TimeslotPerformanceTimeOfDayPricingRulesView.validationIssues"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Supported Contexts”, “Museum Admission”, “Concert”.",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 33 §Detect"
@@ -1443,15 +1551,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "TimeslotPerformanceTimeOfDayPricingRulesView.overlappingTimeRanges",
-    "TimeslotPerformanceTimeOfDayPricingRulesView.missingTimeslotRate",
-    "TimeslotPerformanceTimeOfDayPricingRulesView.conflictingPerformanceRule"
+    "TimeslotPerformanceTimeOfDayPricingRulesView.validationIssues"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-066"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-066",
+   "workshopBoard": "wireframes/WS96 Pricing   Revenue Management Board 2.dc.html#adm-066"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 33. 3 of 3 labels bound to a contract property; 17 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1504,13 +1611,23 @@
     "ADM-058"
    ],
    "inferred": false,
-   "notes": "**Reached from ADM-058, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+   "notes": "**Reached from ADM-058, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-058",
+     "trigger": "Pricing Rule Command Center",
+     "carries": [
+      "ruleId"
+     ],
+     "provenance": "derived — ADM-058 declares entryState.params ruleId and ADM-067 holds ruleId, so an edge into it carries them"
+    }
+   ]
   },
   "density": "compact",
+  "purposeNote": "For any commercial transaction, TICVAI can deterministically resolve and explain exactly why a specific rate was selected. Board 2 — Final Screen Register",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Identify; Show) and no metric row",
   "purpose": "Define how TICVAI decides the final applicable rate when multiple pricing rules match. This is the critical control screen for Board 2. Board 1 established what commercial prices exist. Board 2 determines which commercial rate applies to a transaction.",
-  "purposeNote": "For any commercial transaction, TICVAI can deterministically resolve and explain exactly why a specific rate was selected. Board 2 — Final Screen Register",
   "layout": {
    "template": "split",
    "regions": [
@@ -1522,12 +1639,7 @@
        "kind": "dataTable",
        "label": "Every pricing rule priority",
        "columns": [
-        "PricingRulePriorityConflictResolutionTestingView.samePriorityMatches",
-        "PricingRulePriorityConflictResolutionTestingView.contradictoryRates",
-        "PricingRulePriorityConflictResolutionTestingView.circularFallback",
-        "PricingRulePriorityConflictResolutionTestingView.unreachableRule",
-        "PricingRulePriorityConflictResolutionTestingView.missingFallback",
-        "PricingRulePriorityConflictResolutionTestingView.overlappingTimeDateConditions"
+        "PricingRulePriorityConflictResolutionTestingView.validationIssues"
        ],
        "bindsTo": "PricingRulePriorityConflictResolutionTestingView",
        "operation": "listPricingRulePriority",
@@ -1544,15 +1656,22 @@
        "label": "The selected pricing rule priority",
        "bindsTo": "PricingRulePriorityConflictResolutionTestingView",
        "columns": [
-        "PricingRulePriorityConflictResolutionTestingView.samePriorityMatches",
-        "PricingRulePriorityConflictResolutionTestingView.contradictoryRates",
-        "PricingRulePriorityConflictResolutionTestingView.circularFallback",
-        "PricingRulePriorityConflictResolutionTestingView.unreachableRule",
-        "PricingRulePriorityConflictResolutionTestingView.missingFallback",
-        "PricingRulePriorityConflictResolutionTestingView.overlappingTimeDateConditions"
+        "PricingRulePriorityConflictResolutionTestingView.validationIssues"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Standard Rate”, “Inputs”, “Input”, “Candidate Rates”, “Resolved Rate”, “Reason”.",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 34 §Identify"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Test Rule",
+       "operation": "testPricingRule",
+       "provenance": "contract catalogue.yaml POST /pricing-rule/{ruleId}/test (decided 29 September, readiness close-out)"
       }
      ]
     }
@@ -1571,22 +1690,36 @@
     "contract": "catalogue",
     "purpose": "Pricing Rule Priority, Conflict Resolution & Testing",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPricingRule",
+    "contract": "catalogue",
+    "purpose": "The pricing rules to pick one to test",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "testPricingRule",
+    "contract": "catalogue",
+    "purpose": "Test one pricing rule against a sample booking, on demand",
+    "trigger": "onAction"
    }
   ],
   "entryState": {
    "preloaded": [
-    "PricingRulePriorityConflictResolutionTestingView.samePriorityMatches",
-    "PricingRulePriorityConflictResolutionTestingView.contradictoryRates",
-    "PricingRulePriorityConflictResolutionTestingView.circularFallback",
-    "PricingRulePriorityConflictResolutionTestingView.unreachableRule",
-    "PricingRulePriorityConflictResolutionTestingView.missingFallback",
-    "PricingRulePriorityConflictResolutionTestingView.overlappingTimeDateConditions"
+    "PricingRulePriorityConflictResolutionTestingView.validationIssues"
+   ],
+   "params": [
+    {
+     "name": "ruleId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-067"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-067",
+   "workshopBoard": "wireframes/WS96 Pricing   Revenue Management Board 2.dc.html#adm-067"
   },
   "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 34. 6 of 6 labels bound to a contract property; 6 of 102 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

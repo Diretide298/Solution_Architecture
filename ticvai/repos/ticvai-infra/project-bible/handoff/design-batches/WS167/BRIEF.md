@@ -1,6 +1,6 @@
 # WS167 — Seat Management Venue Mapping Reference v1.0 board 3
 
-**10 screens · 14 operations · 13 schemas · 3 permissions**
+**10 screens · 17 operations · 20 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `ACCESS_POINT_CONFIGURE, CAPACITY_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `ACCESS_POINT_CONFIGURE, AI_USE, CAPACITY_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -62,14 +62,14 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `BO-973` | Layout Command Center | listDetail | 1 | 0 | — |
 | `BO-974` | Template Library | listDetail | 2 | 0 | — |
-| `BO-975` | Event-Specific Layout | listDetail | 2 | 0 | — |
+| `BO-975` | Event-Specific Layout | listDetail | 5 | 0 | — |
 | `BO-976` | Clone & Inheritance | listDetail | 2 | 0 | — |
 | `BO-977` | Version Compare | listDetail | 1 | 0 | — |
 | `BO-978` | Multi-Performance Assignment | listDetail | 2 | 0 | — |
 | `BO-979` | Temporary Seat Blocking | listDetail | 2 | 0 | — |
 | `BO-980` | Scheduled Seat Release | listDetail | 2 | 0 | — |
 | `BO-981` | Conflict & Impact Simulation | listDetail | 1 | 0 | — |
-| `BO-982` | Approval, Publish & Rollback | listDetail | 2 | 0 | — |
+| `BO-982` | Approval, Publish & Rollback | listDetail | 3 | 0 | — |
 
 ## Thin screens in this batch
 

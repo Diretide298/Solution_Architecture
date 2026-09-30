@@ -1,6 +1,6 @@
 # WS23 — B2B, Reseller & OTA Partner Management board 3
 
-**10 screens · 10 operations · 10 schemas · 1 permissions**
+**10 screens · 17 operations · 25 schemas · 4 permissions**
 
 Platform P10 Partner Web · ships as **ticvai-control** ·
 partner audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 1 permissions apply here:
-  `PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `CASE_MANAGE, ORDER_MODIFY, PLATFORM_TENANT_VIEW, SETTLEMENT_RECONCILE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `PTR-042` | Partner Operations Command Center | commandCentre | 1 | 0 | — |
+| `PTR-042` | Partner Operations Command Center | commandCentre | 2 | 0 | — |
 | `PTR-043` | Partner Orders & Booking Management | listDetail | 1 | 0 | — |
 | `PTR-044` | Reservations, Holds & Release Management | listDetail | 1 | 0 | — |
-| `PTR-045` | Partner Cancellations, Refunds & Amendments | listDetail | 1 | 0 | — |
+| `PTR-045` | Partner Cancellations, Refunds & Amendments | listDetail | 2 | 1 | — |
 | `PTR-046` | Partner Statement & Account Activity | commandCentre | 1 | 0 | — |
-| `PTR-047` | Partner Reconciliation & Exception Management | listDetail | 1 | 0 | — |
-| `PTR-048` | Commission Calculation & Settlement Management | listDetail | 1 | 0 | — |
-| `PTR-049` | Partner Disputes, Cases & Service Management | listDetail | 1 | 0 | — |
+| `PTR-047` | Partner Reconciliation & Exception Management | listDetail | 2 | 1 | — |
+| `PTR-048` | Commission Calculation & Settlement Management | listDetail | 3 | 2 | — |
+| `PTR-049` | Partner Disputes, Cases & Service Management | listDetail | 3 | 2 | — |
 | `PTR-050` | Partner Performance Scorecard & Risk Monitoring | listDetail | 1 | 0 | — |
 | `PTR-051` | Partner AI Intelligence & Relationship Optimization | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**PTR-044, PTR-045, PTR-047, PTR-048, PTR-050, PTR-051 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**PTR-045, PTR-050, PTR-051 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

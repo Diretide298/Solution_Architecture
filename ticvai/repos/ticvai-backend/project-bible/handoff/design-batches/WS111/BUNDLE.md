@@ -1,6 +1,6 @@
 # WS111 — ACCREDITATION board 4
 
-**9 screens · 8 operations · 4 schemas · 4 permissions**
+**9 screens · 9 operations · 8 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -65,9 +65,9 @@ convincingly. It is never a caption.
 | `BO-646` | Credential Media Configuration | listDetail | 1 | 0 | — |
 | `BO-647` | Badge Template Designer | listDetail | 1 | 0 | — |
 | `BO-648` | Badge Printing & Print Queue | listDetail | 2 | 0 | — |
-| `BO-649` | Digital & Mobile Credential Management | listDetail | 2 | 0 | — |
+| `BO-649` | Digital & Mobile Credential Management | listDetail | 3 | 0 | — |
 | `BO-650` | NFC & RFID Credential Encoding | listDetail | 1 | 0 | — |
-| `BO-651` | Credential Activation & Delivery | listDetail | 1 | 0 | — |
+| `BO-651` | Credential Activation & Delivery | listDetail | 2 | 0 | — |
 | `BO-653` | Credential Registry & Credential History | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
@@ -855,6 +855,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "The print queue",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "deliverAccreditationCredential",
+    "contract": "accreditation",
+    "purpose": "Send a mobile credential to its holder",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -863,6 +870,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS04 ACCREDITATION Board 4.dc.html#bo-649"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 32. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "credentialId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1097,6 +1112,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "invalidates": [
      "listAccreditationCredentials"
     ]
+   },
+   {
+    "operationId": "deliverAccreditationCredential",
+    "contract": "accreditation",
+    "purpose": "Deliver, and optionally activate on open",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1105,6 +1127,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS04 ACCREDITATION Board 4.dc.html#bo-651"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 33. 0 of 0 labels bound to a contract property; 0 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "credentialId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1254,7 +1284,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Queue badges for printing",
   "permission": "ACCREDITATION_ISSUE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1266,6 +1296,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "BadgePrintJob",
   "responds": "BadgePrintJob"
  },
+ "deliverAccreditationCredential": {
+  "method": "POST",
+  "path": "/accreditation-credentials/{credentialId}/deliver",
+  "contract": "accreditation",
+  "summary": "Send a mobile credential to its holder",
+  "permission": "ACCREDITATION_ISSUE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationCredentialDelivery"
+ },
  "issueAccreditationCredential": {
   "method": "POST",
   "path": "/accreditation-credentials",
@@ -1273,7 +1322,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Produce a badge, a mobile credential, or both",
   "permission": "ACCREDITATION_ISSUE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1465,7 +1514,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Design a badge",
   "permission": "ACCREDITATION_CONFIGURE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1508,9 +1557,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "enum": [
      "printedBadge",
      "mobileCredential",
+     "qr",
      "nfcCard",
      "rfidCard",
      "wristband"
+    ]
+   },
+   "symbology": {
+    "type": "string",
+    "nullable": true,
+    "description": "12.1.22. **How `encodedIdentifier` is carried**, so a reader and a badge renderer agree: `qr` for a QR credential and the default for a `mobileCredential`, a barcode where a printed badge carries one, `nfcNdef` or `rfidEpc` for an encoded card, `none` where nothing is encoded.\n",
+    "enum": [
+     "qr",
+     "dataMatrix",
+     "pdf417",
+     "aztec",
+     "code128",
+     "nfcNdef",
+     "rfidEpc",
+     "none"
     ]
    },
    "serialNumber": {
@@ -1559,6 +1624,95 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "replacementCount": {
     "type": "integer",
     "default": 0
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "AccreditationCredentialDelivery": {
+  "type": "object",
+  "x-ticvai-persistence": "accreditation.mobile_credential_delivery",
+  "description": "12.1.21. **Issuing a mobile credential and getting it onto a phone are two acts**, and the second is recorded so *\"I never got it\"* has an answer. Written by `deliverAccreditationCredential` (the accreditation team sends it) and `issueMyAccreditationWalletPass` (the holder adds it to a wallet).\n",
+  "required": [
+   "credentialId",
+   "channel"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "credentialId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "channel": {
+    "type": "string",
+    "enum": [
+     "email",
+     "sms",
+     "holderApp",
+     "appleWallet",
+     "googleWallet"
+    ]
+   },
+   "destinationMasked": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The address or number used, masked (`j***@agency.com`). Always the holder's own"
+   },
+   "walletPassSerial": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "walletPassUrl": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Signed and expiring; adds the pass to the wallet"
+   },
+   "status": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "queued",
+     "sent",
+     "delivered",
+     "opened",
+     "failed",
+     "superseded"
+    ]
+   },
+   "failureReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "requestedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "deliveredAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    },
    "scopePath": {
     "type": "string"
@@ -1684,6 +1838,335 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "scopePath": {
     "type": "string"
+   }
+  }
+ },
+ "CredentialGenerationIssuanceMonitorView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Credential Generation & Issuance Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "trigger": {
+    "type": "string",
+    "enum": [
+     "orderConfirmation",
+     "ticketIssuance",
+     "membershipActivation",
+     "customerRequest",
+     "staffAction",
+     "rfidCollection",
+     "walletRequest",
+     "faceEnrollment",
+     "api",
+     "bulkOperation",
+     "scheduledProcess"
+    ],
+    "description": "What triggered generation"
+   },
+   "requestId": {
+    "type": "string",
+    "description": "Request ID"
+   },
+   "virtualTicket": {
+    "type": "string",
+    "description": "Virtual Ticket"
+   },
+   "media": {
+    "type": "string",
+    "description": "Media"
+   },
+   "template": {
+    "type": "string",
+    "description": "Template"
+   },
+   "templateVersion": {
+    "type": "string",
+    "description": "Template Version"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "provider": {
+    "type": "string",
+    "description": "Provider"
+   },
+   "requestedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Requested At"
+   },
+   "generatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Generated At"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "requested",
+     "queued",
+     "templateResolved",
+     "dataMapped",
+     "credentialGenerated",
+     "bound",
+     "ready",
+     "delivered",
+     "failed"
+    ],
+    "description": "Generation stage"
+   },
+   "error": {
+    "type": "string",
+    "description": "Error"
+   },
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "language": {
+    "type": "string",
+    "description": "Language"
+   },
+   "customerContext": {
+    "type": "string",
+    "description": "Customer context"
+   },
+   "failureReason": {
+    "type": "string",
+    "enum": [
+     "templateMissing",
+     "requiredDataMissing",
+     "providerUnavailable",
+     "invalidPayload",
+     "tokenGenerationFailure",
+     "walletGenerationFailure",
+     "encoderUnavailable"
+    ],
+    "description": "Failure category when status is failed"
+   }
+  }
+ },
+ "CredentialOperationsCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Credential Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "virtualTicketId": {
+    "type": "string",
+    "description": "Virtual Ticket ID"
+   },
+   "credentialId": {
+    "type": "string",
+    "description": "Credential ID"
+   },
+   "mediaType": {
+    "type": "string",
+    "description": "Media Type"
+   },
+   "customerParticipant": {
+    "type": "string",
+    "description": "Customer / Participant"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "credentialStatus": {
+    "type": "string",
+    "enum": [
+     "pendingGeneration",
+     "generated",
+     "pendingActivation",
+     "active",
+     "suspended",
+     "revoked",
+     "expired",
+     "failed"
+    ],
+    "description": "Credential status"
+   },
+   "deliveryStatus": {
+    "type": "string",
+    "enum": [
+     "notRequired",
+     "pending",
+     "sent",
+     "delivered",
+     "openedDownloaded",
+     "completed",
+     "failed",
+     "bounced",
+     "expired",
+     "cancelled"
+    ],
+    "description": "Delivery status (15.3.4)"
+   },
+   "activationStatus": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "scheduled",
+     "active",
+     "notRequired"
+    ],
+    "description": "Activation status"
+   },
+   "bindingStatus": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "bound",
+     "unbound",
+     "failed"
+    ],
+    "description": "Binding status"
+   },
+   "provider": {
+    "type": "string",
+    "description": "Provider"
+   },
+   "lastActivity": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last Activity"
+   },
+   "exception": {
+    "type": "string",
+    "description": "Exception"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   }
+  }
+ },
+ "CredentialOperationsCommandCenterViewSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none - aggregate computed at read time over the rows the page lists",
+  "description": "The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).",
+  "properties": {
+   "virtualTicketsIssued": {
+    "type": "integer",
+    "description": "Virtual Tickets Issued"
+   },
+   "credentialsGenerated": {
+    "type": "integer",
+    "description": "Credentials Generated"
+   },
+   "activeCredentials": {
+    "type": "integer",
+    "description": "Active Credentials"
+   },
+   "pendingGeneration": {
+    "type": "integer",
+    "description": "Pending Generation"
+   },
+   "pendingDelivery": {
+    "type": "integer",
+    "description": "Pending Delivery"
+   },
+   "pendingBinding": {
+    "type": "integer",
+    "description": "Pending Binding"
+   },
+   "pendingActivation": {
+    "type": "integer",
+    "description": "Pending Activation"
+   },
+   "suspended": {
+    "type": "integer",
+    "description": "Suspended"
+   },
+   "revoked": {
+    "type": "integer",
+    "description": "Revoked"
+   },
+   "expired": {
+    "type": "integer",
+    "description": "Expired"
+   },
+   "failedGeneration": {
+    "type": "integer",
+    "description": "Failed Generation"
+   },
+   "failedDelivery": {
+    "type": "integer",
+    "description": "Failed Delivery"
+   },
+   "synchronizationExceptions": {
+    "type": "integer",
+    "description": "Synchronization Exceptions"
+   },
+   "multiMediaVirtualTickets": {
+    "type": "integer",
+    "description": "Multi-Media Virtual Tickets"
+   },
+   "virtualTicketsWithoutActiveMedia": {
+    "type": "integer",
+    "description": "Virtual Tickets Without Active Media"
+   },
+   "dynamicQr": {
+    "type": "integer",
+    "description": "Credentials of this media type"
+   },
+   "barcode": {
+    "type": "integer",
+    "description": "Credentials of this media type"
+   },
+   "pdf": {
+    "type": "integer",
+    "description": "Credentials of this media type"
+   },
+   "appleWallet": {
+    "type": "integer",
+    "description": "Credentials of this media type"
+   },
+   "googleWallet": {
+    "type": "integer",
+    "description": "Credentials of this media type"
+   },
+   "rfid": {
+    "type": "integer",
+    "description": "Credentials of this media type"
+   },
+   "nfc": {
+    "type": "integer",
+    "description": "Credentials of this media type"
+   },
+   "faceRecognitionReference": {
+    "type": "integer",
+    "description": "Credentials of this media type"
+   },
+   "card": {
+    "type": "integer",
+    "description": "Credentials of this media type"
+   },
+   "wristband": {
+    "type": "integer",
+    "description": "Credentials of this media type"
    }
   }
  },

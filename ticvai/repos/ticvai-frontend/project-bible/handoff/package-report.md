@@ -11,14 +11,14 @@
 | Screens | 2445 |
 | Platforms | 16 |
 | Apps | 5 |
-| Tables | 1091 |
+| Tables | 1093 |
 | Stores | 10 |
-| Foreign Keys | 783 |
-| Indexes | 2826 |
-| Relationships | 3034 |
+| Foreign Keys | 796 |
+| Indexes | 2824 |
+| Relationships | 3033 |
 | Flows | 97 |
 | Boards | 218 |
-| Adrs | 48 |
+| Adrs | 56 |
 | Services | 17 |
 
 ## The chain
@@ -34,14 +34,14 @@
 | Operations with resolved lineage | 2653 / 2660 | 100% | names the tables it reads and writes -- the join the DDL cannot make itself |
 | Operations reaching a screen | 2430 / 2660 | 91% | sync, webhook and job operations legitimately have none |
 | Screens naming an operation | 2438 / 2445 | 100% | the rest are static, navigation shells or workshop-blocked |
-| Tables reached by an operation | 1090 / 1091 | 100% | a table nothing reaches is a missing operation or a table that should not exist |
-| Tables carrying a relationship | 1009 / 1091 | 92% | either end of a declared reference |
+| Tables reached by an operation | 1089 / 1093 | 100% | a table nothing reaches is a missing operation or a table that should not exist |
+| Tables carrying a relationship | 1010 / 1093 | 92% | either end of a declared reference |
 
 ## What crosses a service boundary
 
-**3034 declared references. 1839 stay inside one service; 1195 cross two.**
+**3033 declared references. 1839 stay inside one service; 1193 cross two.**
 
-**608 of the 1195 crossings land on three tables** -- `identity.principal`, `platform.scope`, `pii.subject`. The crossings concentrate on the foundation tier rather than spreading, which is what the tier is for.
+**608 of the 1193 crossings land on three tables** -- `identity.principal`, `platform.scope`, `pii.subject`. The crossings concentrate on the foundation tier rather than spreading, which is what the tier is for.
 
 | From | To | Edges |
 |---|---|---:|
@@ -75,14 +75,14 @@
 
 | Service | Tier | Ops | On a screen | Tables | Screens | Out | In |
 |---|---|---:|---:|---:|---:|---:|---:|
-| CatalogueService | commerce | 445 | 431 | 134 | 73 | 160 | 116 |
+| CatalogueService | commerce | 445 | 431 | 134 | 73 | 158 | 116 |
 | OrderService | commerce | 288 | 269 | 113 | 101 | 143 | 91 |
 | VenueOpsService | operations | 285 | 275 | 123 | 53 | 104 | 43 |
 | MarketingService | engagement | 264 | 211 | 130 | 40 | 153 | 16 |
 | AccessService | commerce | 246 | 240 | 76 | 29 | 131 | 19 |
-| PlatformService | platform | 212 | 191 | 102 | 42 | 83 | 36 |
+| PlatformService | platform | 212 | 191 | 103 | 42 | 83 | 36 |
 | TenancyService | foundation | 204 | 181 | 108 | 71 | 107 | 342 |
-| AiService | engagement | 141 | 128 | 74 | 21 | 70 | 6 |
+| AiService | engagement | 141 | 128 | 74 | 21 | 70 | 4 |
 | FnbService | operations | 120 | 109 | 48 | 57 | 57 | 6 |
 | IdentityService | foundation | 89 | 71 | 38 | 36 | 23 | 441 |
 | WhiteLabelService | platform | 79 | 77 | 25 | 25 | 10 | 4 |
@@ -164,7 +164,7 @@
 | Operations No Screen | 230 |
 | Screens No Operation | 7 |
 | Operations No Lineage | 7 |
-| Tables Not Reached | 1 |
+| Tables Not Reached | 4 |
 | Permissions Without Label | 70 |
 | Capability Pairs | 274 |
 | Modules With Capabilities | 33 |

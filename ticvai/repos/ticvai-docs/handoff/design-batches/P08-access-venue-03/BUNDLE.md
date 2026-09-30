@@ -1,6 +1,6 @@
 # P08-access-venue-03 — P08 · Access & Venue (3 of 3)
 
-**5 screens · 14 operations · 12 schemas · 7 permissions**
+**5 screens · 14 operations · 23 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -120,6 +120,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "name": "contentBody",
      "slot": "record",
      "components": [
+      {
+       "kind": "calendarView",
+       "label": "Calendar",
+       "operation": "getResourceAvailability",
+       "notes": "Each resource's bookings, blocks and cleanings placed by hour. Day, week, month and agenda views; the day starts at the venue's `calendarDayStartHour`. Filters the category on what it read.",
+       "provenance": "decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)"
+      },
       {
        "kind": "detailPanel",
        "label": "The resource availability",
@@ -1358,6 +1365,16 @@ Method, path, parameters, request and response for every operation these screens
     "name": "compareTo",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "interval",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -1557,6 +1574,229 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "AccessPoint": {
+  "x-ticvai-persistence": "access.access_point",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "venueId",
+   "operatingMode",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "externalCredentialSources": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ExternalCredentialSourceList"
+     }
+    ],
+    "description": "BL-108. **A hotel room card admitting a guest to a water park** — externally issued, and the platform validates it without having sold it.\n**The entitlement is created on first use, not on check-in.** A hotel with 400 rooms does not want 400 entitlements a night for guests who never visit.\n"
+   },
+   "scanAnomalyRules": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ScanAnomalyRuleList"
+     }
+    ],
+    "description": "BL-104. **Rule-based scan anomalies, separated from the parked model-based engine** — device sharing, simultaneous entries at two gates, an impossible walking time between them.\n**These are deterministic and need no model**, which is why they are here and not in `ai`: two entries eight seconds apart at gates four hundred metres apart is arithmetic.\n"
+   },
+   "operatingMode": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AccessPointOperatingMode"
+     }
+    ],
+    "default": "normal",
+    "description": "**Set by the podium with `setTurnstileMode`, and it wins** (audit R221). BL-107 and BL-109. **A closed turnstile and one in emergency drop-arm mode look the same in the model and are opposite in meaning.** Closed refuses everybody; drop-arm lets everybody through, and it is the state that exists for an evacuation.\n**`podium` is a supervised validation position** — a member of staff directing a group through a lane, validating by eye against a list. It scans nothing and it is how school parties actually enter.\n**`freeFlow` counts without validating.** Useful at a free event, and a mode that must be visibly distinct from a broken reader.\n"
+   },
+   "vehicleLocationCapture": {
+    "type": "boolean",
+    "default": false,
+    "description": "BL-023. **Nothing helped a guest find their vehicle.** Where the access point is a car park entry, the level and zone are captured against the visit so the app can answer it — **the guest who cannot find their car at 11pm is the last impression of the day.**\n"
+   },
+   "mode": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/TurnstileMode"
+     }
+    ],
+    "nullable": true,
+    "description": "Narrows `operatingMode` only: `freeRotation` or `closed` within `normal` or `podium`, null otherwise and whenever the turnstile validates in its fixed `direction` (audit R221).\n"
+   },
+   "direction": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/Direction"
+     }
+    ],
+    "description": "**Fixed per access point** (audit R221): set in the back office by `createAccessPoint` and `updateAccessPoint`, never by the podium.\n"
+   },
+   "antiPassbackEnabled": {
+    "type": "boolean"
+   },
+   "requiresExitBeforeReentry": {
+    "type": "boolean",
+    "default": false,
+    "description": "Written by `createAccessPoint` and `updateAccessPoint`, and returned so the edit form reads back what it wrote."
+   },
+   "driver": {
+    "type": "string",
+    "nullable": true,
+    "description": "Driver identifier for the controller behind this access point, as written by `createAccessPoint` and `updateAccessPoint`. Where the reader speaks OSDP the driver is standards-based; the controller layer above it is vendor-specific.\n"
+   },
+   "geofence": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AccessPointGeofence"
+     }
+    ],
+    "nullable": true,
+    "description": "Written by `setAccessPointGeofence`; null until one is set. **One `jsonb` column on the access point row** (`access.access_point.geofence`), read with the point when a handheld validates against it.\n"
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "lastHeartbeatAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "AccessPointGeofence": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "Where a handheld may validate for one access point, and what happens outside it. The body of `setAccessPointGeofence` and the value of `AccessPoint.geofence`.\n",
+  "required": [
+   "enforcement"
+  ],
+  "properties": {
+   "latitude": {
+    "type": "number"
+   },
+   "longitude": {
+    "type": "number"
+   },
+   "radiusMetres": {
+    "type": "integer",
+    "minimum": 5,
+    "maximum": 5000
+   },
+   "enforcement": {
+    "type": "string",
+    "enum": [
+     "off",
+     "warn",
+     "deny"
+    ],
+    "description": "`off` keeps the fence on record and checks nothing; `warn` lets a validation from outside the fence through with a warning; `deny` refuses it.\n"
+   },
+   "allowProximityBeacon": {
+    "type": "boolean",
+    "description": "Accept a BLE proximity assertion in place of GPS. Better indoors."
+   }
+  }
+ },
+ "AccessPointOperatingMode": {
+  "type": "string",
+  "description": "BL-107 and BL-109. **What the gate does, and what the podium sets** (`setTurnstileMode`, decided 28 September, audit R221). `closed` refuses everybody; `dropArm` lets everybody through and exists for an evacuation; `podium` is supervised validation by eye; `freeFlow` counts without validating; `maintenance` takes the lane out of use.\n",
+  "enum": [
+   "normal",
+   "freeFlow",
+   "dropArm",
+   "closed",
+   "podium",
+   "maintenance"
+  ]
+ },
+ "DenyReason": {
+  "type": "string",
+  "description": "Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a boolean.\n",
+  "enum": [
+   "notFound",
+   "notYetValid",
+   "expired",
+   "alreadyUsed",
+   "reentryLimitReached",
+   "exitRequiredBeforeReentry",
+   "wrongAccessPoint",
+   "wrongPerformance",
+   "outsideAdmissionWindow",
+   "entitlementSuspended",
+   "blacklisted",
+   "capacityReached",
+   "waiverRequired",
+   "accompanimentRequired",
+   "mediaDeactivated",
+   "unpaid",
+   "delegatedRightExhausted",
+   "delegatedRightRevoked",
+   "journeyNotCovered"
+  ]
+ },
+ "Direction": {
+  "type": "string",
+  "enum": [
+   "entry",
+   "exit",
+   "reentry",
+   "crossover"
+  ]
+ },
+ "ExternalCredentialSourceList": {
+  "type": "array",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "**One `jsonb` column on the access point row** (`access.access_point.external_credential_sources`). Read with the access point when a credential is presented; a source is never queried on its own.\n",
+  "items": {
+   "type": "object",
+   "properties": {
+    "kind": {
+     "type": "string",
+     "enum": [
+      "hotelRoomCard",
+      "corporateBadge",
+      "cityPass",
+      "transitCard",
+      "partnerToken"
+     ]
+    },
+    "providerName": {
+     "type": "string"
+    },
+    "endpoint": {
+     "type": "string"
+    },
+    "credentialRef": {
+     "type": "string"
+    },
+    "grantsProductId": {
+     "type": "string",
+     "format": "uuid"
+    }
+   }
+  }
+ },
  "KpiValue": {
   "type": "object",
   "description": "BI board 10.3. **Value, target, variance, direction and freshness in one read.**",
@@ -1567,6 +1807,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "code": {
     "type": "string"
+   },
+   "bucketStart": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise."
+   },
+   "groupKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked."
    },
    "name": {
     "type": "string"
@@ -1847,9 +2098,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
         "teardown",
         "maintenance",
         "blackout",
-        "closed"
+        "closed",
+        "cleaning"
        ],
-       "description": "`held` is a live `ResourceHold` (rev 3 REV3-15): taken now, free again if it expires.\n"
+       "description": "`held` is a live `ResourceHold` (rev 3 REV3-15): taken now, free again if it expires. `cleaning` is a cleaning the resource's `cleaningPolicy` places (W10, 29 September).\n"
       }
      }
     }
@@ -1898,7 +2150,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "holdId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The `ResourceHold` this booking was converted from, where a guest picked the resource on a venue map (rev 3 REV3-15). Null for a staff booking or an allocation.\n"
    },
@@ -1955,6 +2207,195 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "overdue",
    "cancelled",
    "noShow"
+  ]
+ },
+ "ResourceKind": {
+  "type": "string",
+  "description": "BL-135. **`locker` was an entitlement kind in `orders` and nothing issued, assigned or released one.** A locker is a specific object checked out to a named guest and returned — which is this context exactly, and modelling it as an entitlement would have needed a second check-out mechanism.\nA seed for `ResourceType` rather than the law (board 1.02): a customer adding a class does it with `createResourceType`, not by waiting for this list to grow.\n**`table` is a non-dining spot** (decided 29 September, rev 3 GAP-C2, confirmed by Chinmay): a beach or event table placed on a venue map, picked and sold like a cabana (`createResourceHold`, then the order). **A dining table is not this**: restaurant tables stay `fnb` tables, booked with `fnb.createTableReservation` and the waitlist (audit R073 (d)).\n",
+  "enum": [
+   "cabana",
+   "lounger",
+   "locker",
+   "wheelchair",
+   "stroller",
+   "equipment",
+   "room",
+   "auditorium",
+   "vehicle",
+   "instructor",
+   "staff",
+   "table",
+   "pitch",
+   "studio",
+   "other"
+  ],
+  "x-ticvai-refuses": {
+   "mealPlan": "**Listed by 5.5.8b and deliberately not a kind.** 5.5.8b groups meal plans with lockers and parking, but a meal plan is a balance rather than an object. It resolves to `retail.Wallet` with a `mealPlan` credit kind (CF-126), not to a resource — so it is not offered here, and a form built from this enum cannot offer it either."
+  }
+ },
+ "ScanAnomalyRuleList": {
+  "type": "array",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "jsonb",
+  "description": "**One `jsonb` column on the access point row** (`access.access_point.scan_anomaly_rules`). Read with the access point at validation, and a rule is never queried on its own.\n",
+  "items": {
+   "type": "object",
+   "properties": {
+    "rule": {
+     "type": "string",
+     "enum": [
+      "simultaneousEntry",
+      "impossibleTravelTime",
+      "rapidReentry",
+      "sharedDevice",
+      "velocityBreach"
+     ]
+    },
+    "action": {
+     "type": "string",
+     "enum": [
+      "log",
+      "flag",
+      "requireSupervisor",
+      "deny"
+     ]
+    },
+    "thresholdSeconds": {
+     "type": "integer",
+     "nullable": true
+    }
+   }
+  }
+ },
+ "ScanEvent": {
+  "x-ticvai-append-only": "recordedAt",
+  "x-ticvai-persistence": "access.scan_event",
+  "type": "object",
+  "required": [
+   "id",
+   "accessPointId",
+   "venueId",
+   "outcome",
+   "direction",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The scan's client-generated UUIDv7, the key offline replay deduplicates on."
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "ticketId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `Entitlement.id` scanned; null where the media resolved to nothing."
+   },
+   "mediaCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "outcome": {
+    "$ref": "#/components/schemas/ScanOutcome"
+   },
+   "denyReason": {
+    "$ref": "#/components/schemas/DenyReason"
+   },
+   "direction": {
+    "$ref": "#/components/schemas/Direction"
+   },
+   "operatorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "overridesScanId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Set only on an override row**, naming the denied scan it admits against (decided 28 September, audit R228). The denied scan itself is never updated: the denial and the override are two rows, and at most one override row names any scan. Null on every other scan.\n"
+   },
+   "overrideReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "The supervisor's justification, on the override row only. The overriding principal is that row's `operatorPrincipalId`."
+   },
+   "dynamicPolicyId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The dynamic access policy (`access.dynamic_policy`) whose result decided this scan; null when no dynamic policy matched and the entitlement alone decided (added 29 September, build pass, 3.3.48). `listDynamicPolicyEffectiveness` counts from it."
+   },
+   "dynamicPolicyVersion": {
+    "type": "integer",
+    "minimum": 1,
+    "nullable": true,
+    "description": "The version of that policy in force at the scan, so a report spanning a change counts each version apart."
+   },
+   "dynamicPolicyResult": {
+    "type": "string",
+    "enum": [
+     "allow",
+     "deny",
+     "review",
+     "requireId",
+     "requireBiometric",
+     "requireCompanion",
+     "requireSupervisor"
+    ],
+    "nullable": true,
+    "description": "What the policy decided, which for a step-up is not the same as the scan's outcome."
+   },
+   "quantity": {
+    "type": "integer",
+    "minimum": 1,
+    "default": 1,
+    "description": "Admissions this scan counted. More than one only for a group wave (`validateGroupAccess`) or a quantity entitlement consumed in one pass (added 29 September, data-model close-out DM1)."
+   },
+   "localSequence": {
+    "type": "integer",
+    "nullable": true,
+    "description": "The device-local sequence number of a scan recorded offline; null for an online scan (added 29 September, data-model close-out DM1)."
+   },
+   "packageVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "The offline package (`access.edge_package`) the device validated against; null for an online scan (added 29 September, data-model close-out DM1)."
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Null while pending. Differs from recordedAt for offline scans."
+   }
+  }
+ },
+ "ScanOutcome": {
+  "type": "string",
+  "enum": [
+   "admitted",
+   "denied",
+   "overridden"
   ]
  },
  "StoredValueAuthorisation": {
@@ -2025,6 +2466,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "prepaidEntitlement"
   ]
  },
+ "TurnstileMode": {
+  "type": "string",
+  "description": "**Reduced to two values — decided 28 September, audit R221.** Entry, exit, re-entry and crossover were the access point's `Direction` under another name, and two fields that could disagree left the gate to guess. Direction is fixed per access point; within `normal` or `podium` operation the turnstile may only be let spin free or held closed.\n",
+  "enum": [
+   "freeRotation",
+   "closed"
+  ]
+ },
  "VenueSettings": {
   "type": "object",
   "x-ticvai-persistence": "platform.venue_settings",
@@ -2041,6 +2490,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid",
     "readOnly": true,
     "description": "From the path of `setVenueSettings`."
+   },
+   "calendarDayStartHour": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 23,
+    "nullable": true,
+    "default": 6,
+    "description": "**Where the venue's calendar day starts** (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (`calendarView` in `screens/_components.yaml`), so a venue open 06:00 to 02:00 sees its night on the day it belongs to. Display only: it moves no booking, slot or business date. Null inherits the tenant default (proposed 6, client to correct).\n"
    },
    "currencyCode": {
     "type": "string",

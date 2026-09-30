@@ -4,17 +4,17 @@
  "counts": {
   "operations": 2660,
   "contracts": 33,
-  "tables": 1091,
+  "tables": 1093,
   "stores": 10,
-  "foreignKeys": 783,
-  "indexes": 2826,
-  "tablesWritten": 1089,
-  "relationships": 3034,
+  "foreignKeys": 796,
+  "indexes": 2824,
+  "tablesWritten": 1091,
+  "relationships": 3033,
   "states": 206,
   "events": 77,
   "flows": 97,
   "flowsDerived": 192,
-  "adrs": 48,
+  "adrs": 56,
   "screens": 2445,
   "platforms": 16,
   "frontends": 13,
@@ -73,24 +73,24 @@
   },
   {
    "link": "Tables reached by an operation",
-   "done": 1090,
-   "total": 1091,
+   "done": 1089,
+   "total": 1093,
    "percent": 100,
    "note": "a table nothing reaches is a missing operation or a table that should not exist"
   },
   {
    "link": "Tables carrying a relationship",
-   "done": 1009,
-   "total": 1091,
+   "done": 1010,
+   "total": 1093,
    "percent": 92,
    "note": "either end of a declared reference"
   }
  ],
  "boundaries": {
-  "edgesTotal": 3034,
+  "edgesTotal": 3033,
   "insideOneService": 1839,
-  "crossingTwoServices": 1195,
-  "endpointNotOwned": 0,
+  "crossingTwoServices": 1193,
+  "endpointNotOwned": 1,
   "note": "A reference inside one service is a foreign key the database enforces. A reference across two is a distributed read somebody has to design.",
   "heaviest": [
    {
@@ -208,7 +208,7 @@
    "tables": 134,
    "screens": 73,
    "operationsOnAScreen": 431,
-   "edgesOut": 160,
+   "edgesOut": 158,
    "edgesIn": 116
   },
   {
@@ -265,7 +265,7 @@
    "contracts": 3,
    "schemas": 2,
    "operations": 212,
-   "tables": 102,
+   "tables": 103,
    "screens": 42,
    "operationsOnAScreen": 191,
    "edgesOut": 83,
@@ -293,7 +293,7 @@
    "screens": 21,
    "operationsOnAScreen": 128,
    "edgesOut": 70,
-   "edgesIn": 6
+   "edgesIn": 4
   },
   {
    "service": "FnbService",
@@ -857,7 +857,7 @@
   "operationsNoScreen": 230,
   "screensNoOperation": 7,
   "operationsNoLineage": 7,
-  "tablesNotReached": 1,
+  "tablesNotReached": 4,
   "permissionsWithoutLabel": 70,
   "capabilityPairs": 274,
   "modulesWithCapabilities": 33

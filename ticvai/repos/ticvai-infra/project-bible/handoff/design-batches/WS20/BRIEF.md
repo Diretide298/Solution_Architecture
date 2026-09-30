@@ -1,6 +1,6 @@
 # WS20 — Approval Workflows and Governance board 8
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 6 operations · 10 schemas · 4 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `APPROVAL_CONFIGURE, APPROVAL_VIEW, PRICE_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-359` | Approval Executive KPI Dashboard | listDetail | 0 | 0 | — |
-| `ADM-360` | Approval Volume & Outcome Analytics | listDetail | 0 | 0 | — |
-| `ADM-361` | Approval Processing Time Analytics | listDetail | 0 | 0 | — |
-| `ADM-362` | Bottleneck Analysis & Heatmap | listDetail | 0 | 0 | — |
-| `ADM-363` | Approval Trend & Comparative Analytics | listDetail | 0 | 0 | — |
-| `ADM-364` | Approver & Team Performance Analytics | commandCentre | 0 | 0 | — |
-| `ADM-365` | Risk & Governance Analytics | listDetail | 0 | 0 | — |
-| `ADM-366` | AI Approval Intelligence Center | listDetail | 0 | 0 | — |
-| `ADM-367` | AI Optimization & What-If Simulator | listDetail | 0 | 0 | — |
-| `ADM-368` | AI Governance Executive Advisor | listDetail | 0 | 0 | — |
+| `ADM-359` | Approval Executive KPI Dashboard | listDetail | 1 | 0 | — |
+| `ADM-360` | Approval Volume & Outcome Analytics | listDetail | 1 | 0 | — |
+| `ADM-361` | Approval Processing Time Analytics | listDetail | 1 | 0 | — |
+| `ADM-362` | Bottleneck Analysis & Heatmap | listDetail | 1 | 0 | — |
+| `ADM-363` | Approval Trend & Comparative Analytics | listDetail | 1 | 0 | — |
+| `ADM-364` | Approver & Team Performance Analytics | commandCentre | 1 | 0 | — |
+| `ADM-365` | Risk & Governance Analytics | listDetail | 2 | 0 | — |
+| `ADM-366` | AI Approval Intelligence Center | listDetail | 2 | 0 | — |
+| `ADM-367` | AI Optimization & What-If Simulator | listDetail | 1 | 0 | — |
+| `ADM-368` | AI Governance Executive Advisor | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 

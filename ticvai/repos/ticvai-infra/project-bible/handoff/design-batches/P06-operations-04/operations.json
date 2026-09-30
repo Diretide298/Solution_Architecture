@@ -94,6 +94,25 @@
   "requestBody": "CreatePaymentRequest",
   "responds": "Payment"
  },
+ "enrolMfaMethod": {
+  "method": "POST",
+  "path": "/auth/mfa/methods",
+  "contract": "identity",
+  "summary": "Enrol an MFA method",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MfaEnrolment"
+ },
  "getAnnouncementReach": {
   "method": "GET",
   "path": "/announcements/{announcementId}/reach",
@@ -119,19 +138,6 @@
   "parameters": [],
   "requestBody": null,
   "responds": "Session"
- },
- "getGuestSession": {
-  "method": "GET",
-  "path": "/auth/guest/session",
-  "contract": "identity",
-  "summary": "Read the current guest session",
-  "permission": null,
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "GuestSession"
  },
  "getMediaAsset": {
   "method": "GET",
@@ -257,6 +263,59 @@
   "requestBody": null,
   "responds": "SsoProvider"
  },
+ "listStaffConversations": {
+  "method": "GET",
+  "path": "/staff-conversations",
+  "contract": "workforce",
+  "summary": "The caller's staff conversations, newest activity first",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "unreadOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listStaffMessages": {
+  "method": "GET",
+  "path": "/staff-conversations/{conversationId}/messages",
+  "contract": "workforce",
+  "summary": "Messages in one staff conversation, newest first",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listTrainingRecords": {
   "method": "GET",
   "path": "/training-records",
@@ -269,6 +328,25 @@
   "parameters": [],
   "requestBody": null,
   "responds": "TrainingRecord"
+ },
+ "markStaffConversationRead": {
+  "method": "POST",
+  "path": "/staff-conversations/{conversationId}/read",
+  "contract": "workforce",
+  "summary": "Mark a staff conversation read up to a message",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "publishAnnouncement": {
   "method": "POST",
@@ -308,6 +386,25 @@
   "requestBody": "RegisteredDevice",
   "responds": "RegisteredDevice"
  },
+ "removeMfaMethod": {
+  "method": "DELETE",
+  "path": "/auth/mfa/methods/{methodId}",
+  "contract": "identity",
+  "summary": "Remove an MFA method",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "semanticSearch": {
   "method": "POST",
   "path": "/search",
@@ -326,5 +423,43 @@
   ],
   "requestBody": null,
   "responds": "SearchResult"
+ },
+ "sendStaffMessage": {
+  "method": "POST",
+  "path": "/staff-messages",
+  "contract": "workforce",
+  "summary": "Send a message to a colleague or a small group",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WorkforceSendStaffMessageRequest",
+  "responds": "WorkforceStaffMessage"
+ },
+ "verifyMfaEnrolment": {
+  "method": "POST",
+  "path": "/auth/mfa/methods/{methodId}",
+  "contract": "identity",
+  "summary": "Complete enrolment",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MfaMethod"
  }
 }

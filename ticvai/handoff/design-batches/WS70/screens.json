@@ -17,11 +17,81 @@
    "component": "apps/venue-management-web/src/routes/analytics/AiAnalyticsCommandCenter.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-001"
+   ],
+   "exitTo": [
+    "ANL-001",
+    "ANL-052",
+    "ANL-053",
+    "ANL-054",
+    "ANL-055",
+    "ANL-056",
+    "ANL-057",
+    "ANL-058",
+    "ANL-059",
+    "ANL-060"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-001",
+     "trigger": "Back to Executive Command Center",
+     "provenance": "structural — pack board 9 wiring, 9 September 2026",
+     "back": true
+    },
+    {
+     "to": "ANL-060",
+     "trigger": "AI Analytics Governance & Model Control",
+     "provenance": "structural — pack board 9 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-052",
+     "trigger": "Ask TICVAI — Natural Language Analytics",
+     "provenance": "structural — pack board 9 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-053",
+     "trigger": "AI-Generated Dashboard Studio",
+     "provenance": "structural — pack board 9 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-054",
+     "trigger": "AI Report Generator",
+     "provenance": "structural — pack board 9 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-055",
+     "trigger": "Anomaly Detection Center",
+     "provenance": "structural — pack board 9 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-056",
+     "trigger": "Root-Cause Analysis Explorer",
+     "provenance": "structural — pack board 9 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-057",
+     "trigger": "Forecasting & Predictive Analytics Studio",
+     "provenance": "structural — pack board 9 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-058",
+     "trigger": "AI Recommendation & Next-Best-Action Center",
+     "provenance": "structural — pack board 9 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-059",
+     "trigger": "AI Insight History, Evidence & Explainability",
+     "provenance": "structural — pack board 9 wiring, 9 September 2026"
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "Management can review prioritized AI intelligence across all authorized business domains from one screen.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Show) and no metric row",
   "purpose": "Provide a centralized landing page for all AI-generated analytical intelligence across TICVAI.",
-  "purposeNote": "Management can review prioritized AI intelligence across all authorized business domains from one screen.",
   "gaps": [
    {
     "operation": null,
@@ -111,7 +181,15 @@
    "emptyNoResults": "The filter narrowed it and the analytics are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listAnalyticsAnomalies",
+    "contract": "reporting",
+    "purpose": "What the models noticed",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Executive Insights",
@@ -124,79 +202,10 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-051"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-051",
+   "workshopBoard": "wireframes/WS176 Unified BI Reporting and AI Analytics Platform Board 9.dc.html#anl-051"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 109. 0 of 20 labels bound to a contract property; 20 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-001"
-   ],
-   "exitTo": [
-    "ANL-001",
-    "ANL-052",
-    "ANL-053",
-    "ANL-054",
-    "ANL-055",
-    "ANL-056",
-    "ANL-057",
-    "ANL-058",
-    "ANL-059",
-    "ANL-060"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-001",
-     "trigger": "Back to Executive Command Center",
-     "provenance": "structural — pack board 9 wiring, 9 September 2026",
-     "back": true
-    },
-    {
-     "to": "ANL-060",
-     "trigger": "AI Analytics Governance & Model Control",
-     "provenance": "structural — pack board 9 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-052",
-     "trigger": "Ask TICVAI — Natural Language Analytics",
-     "provenance": "structural — pack board 9 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-053",
-     "trigger": "AI-Generated Dashboard Studio",
-     "provenance": "structural — pack board 9 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-054",
-     "trigger": "AI Report Generator",
-     "provenance": "structural — pack board 9 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-055",
-     "trigger": "Anomaly Detection Center",
-     "provenance": "structural — pack board 9 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-056",
-     "trigger": "Root-Cause Analysis Explorer",
-     "provenance": "structural — pack board 9 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-057",
-     "trigger": "Forecasting & Predictive Analytics Studio",
-     "provenance": "structural — pack board 9 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-058",
-     "trigger": "AI Recommendation & Next-Best-Action Center",
-     "provenance": "structural — pack board 9 wiring, 9 September 2026"
-    },
-    {
-     "to": "ANL-059",
-     "trigger": "AI Insight History, Evidence & Explainability",
-     "provenance": "structural — pack board 9 wiring, 9 September 2026"
-    }
-   ]
-  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -238,11 +247,27 @@
    "component": "apps/venue-management-web/src/routes/analytics/AskTicvaiNaturalLanguageAnalytics.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-051"
+   ],
+   "exitTo": [
+    "ANL-051"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-051",
+     "trigger": "Back to AI Analytics Command Center",
+     "provenance": "structural — pack board 9 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "Authorized business users can obtain governed analytics without knowing report names, database fields, SQL, or Power BI.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Allow users to query TICVAI business information using normal language instead of manually building reports.",
-  "purposeNote": "Authorized business users can obtain governed analytics without knowing report names, database fields, SQL, or Power BI.",
   "gaps": [
    {
     "operation": null,
@@ -257,7 +282,26 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "askReportingQuestion",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "askReportingQuestion"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The ask ticvai natural list.",
@@ -266,25 +310,33 @@
    "emptyNoResults": "The filter narrowed it and the ask ticvai natural are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "askReportingQuestion",
+    "contract": "reporting",
+    "purpose": "Ask in plain language",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "saveNaturalLanguageQuery",
+    "contract": "reporting",
+    "purpose": "Keep the question",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-052"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-052",
+   "workshopBoard": "wireframes/WS176 Unified BI Reporting and AI Analytics Platform Board 9.dc.html#anl-052"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 110. 0 of 0 labels bound to a contract property; 0 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-051"
-   ],
-   "exitTo": [
-    "ANL-051"
-   ],
-   "transitions": [
+  "entryState": {
+   "params": [
     {
-     "to": "ANL-051",
-     "trigger": "Back to AI Analytics Command Center",
-     "provenance": "structural — pack board 9 wiring, 9 September 2026",
-     "back": true
+     "name": "conversationId",
+     "from": "navigation"
     }
    ]
   },
@@ -329,11 +381,27 @@
    "component": "apps/venue-management-web/src/routes/analytics/AiGeneratedDashboardStudio.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-051"
+   ],
+   "exitTo": [
+    "ANL-051"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-051",
+     "trigger": "Back to AI Analytics Command Center",
+     "provenance": "structural — pack board 9 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "Users can convert natural-language analytical requirements into governed dashboard configurations.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Allow users to generate dashboards from natural-language requests.",
-  "purposeNote": "Users can convert natural-language analytical requirements into governed dashboard configurations.",
   "gaps": [
    {
     "operation": null,
@@ -353,7 +421,27 @@
   ],
   "layout": {
    "template": "split",
-   "regions": []
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createDashboard",
+       "label": "Create dashboard",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createDashboard"
+      }
+     ]
+    }
+   ]
   },
   "states": {
    "loading": "The ai-generated list.",
@@ -362,28 +450,24 @@
    "emptyNoResults": "The filter narrowed it and the ai-generated are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createDashboard",
+    "contract": "reporting",
+    "purpose": "Accept a generated dashboard",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listDashboards"
+    ]
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-053"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-053",
+   "workshopBoard": "wireframes/WS176 Unified BI Reporting and AI Analytics Platform Board 9.dc.html#anl-053"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 111. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-051"
-   ],
-   "exitTo": [
-    "ANL-051"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-051",
-     "trigger": "Back to AI Analytics Command Center",
-     "provenance": "structural — pack board 9 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -425,11 +509,27 @@
    "component": "apps/venue-management-web/src/routes/analytics/AiReportGenerator.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-051"
+   ],
+   "exitTo": [
+    "ANL-051"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-051",
+     "trigger": "Back to AI Analytics Command Center",
+     "provenance": "structural — pack board 9 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "AI-generated reports use the same approved semantic model, permissions, calculations and governance rules as manually created reports.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Generate detailed reports from natural-language instructions.",
-  "purposeNote": "AI-generated reports use the same approved semantic model, permissions, calculations and governance rules as manually created reports.",
   "gaps": [
    {
     "operation": null,
@@ -493,7 +593,18 @@
    "emptyNoResults": "The filter narrowed it and the report generator are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "createReport",
+    "contract": "reporting",
+    "purpose": "Accept a generated report",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
+     "listReports"
+    ]
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Selected Dataset",
@@ -506,25 +617,10 @@
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-054"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-054",
+   "workshopBoard": "wireframes/WS176 Unified BI Reporting and AI Analytics Platform Board 9.dc.html#anl-054"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 112. 0 of 7 labels bound to a contract property; 7 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-051"
-   ],
-   "exitTo": [
-    "ANL-051"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-051",
-     "trigger": "Back to AI Analytics Command Center",
-     "provenance": "structural — pack board 9 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -565,6 +661,22 @@
    "route": "/analytics/anomaly-detection-center-anl-055",
    "component": "apps/venue-management-web/src/routes/analytics/AnomalyDetectionCenter.tsx",
    "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ANL-051"
+   ],
+   "exitTo": [
+    "ANL-051"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-051",
+     "trigger": "Back to AI Analytics Command Center",
+     "provenance": "structural — pack board 9 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
   },
   "density": "compact",
   "pattern": "listDetail",
@@ -639,7 +751,36 @@
    "emptyNoResults": "The filter narrowed it and the anomaly detection are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listAnalyticsAnomalies",
+    "contract": "reporting",
+    "purpose": "Anomalies, with severity",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listAiInsights",
+    "contract": "ai",
+    "purpose": "Insights and anomalies",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "configureAnomalyDetector",
+    "contract": "ai",
+    "purpose": "Set up anomaly detection on a KPI",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAnomalyDetectors",
+    "contract": "ai",
+    "purpose": "Anomaly detectors",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "KPI",
@@ -648,29 +789,20 @@
     "Variance",
     "Severity",
     "Start Time"
+   ],
+   "params": [
+    {
+     "name": "detectorKey",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-055"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-055",
+   "workshopBoard": "wireframes/WS176 Unified BI Reporting and AI Analytics Platform Board 9.dc.html#anl-055"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 113. 0 of 10 labels bound to a contract property; 10 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-051"
-   ],
-   "exitTo": [
-    "ANL-051"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-051",
-     "trigger": "Back to AI Analytics Command Center",
-     "provenance": "structural — pack board 9 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -712,40 +844,6 @@
    "component": "apps/venue-management-web/src/routes/analytics/RootCauseAnalysisExplorer.tsx",
    "status": "notStarted"
   },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Help users understand why a KPI changed. This is one of the most important AI capabilities in the entire platform.",
-  "purposeNote": "Users can move from detecting a KPI change to understanding the strongest supported contributing factors.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 114"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 114"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": []
-  },
-  "states": {
-   "loading": "The root-cause analysis list.",
-   "error": "Could not load. Names which read failed and leaves the root-cause analysis untouched.",
-   "emptyFirstRun": "No root-cause analysis yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the root-cause analysis are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-056"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 114. 0 of 0 labels bound to a contract property; 0 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
     "ANL-051"
@@ -762,6 +860,88 @@
     }
    ]
   },
+  "density": "compact",
+  "purposeNote": "Users can move from detecting a KPI change to understanding the strongest supported contributing factors.",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Help users understand why a KPI changed. This is one of the most important AI capabilities in the entire platform.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 114"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 114"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listAnalyticsAnomalies",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "askReportingQuestion",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "askReportingQuestion"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The root-cause analysis list.",
+   "error": "Could not load. Names which read failed and leaves the root-cause analysis untouched.",
+   "emptyFirstRun": "No root-cause analysis yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the root-cause analysis are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listAnalyticsAnomalies",
+    "contract": "reporting",
+    "purpose": "Candidate causes",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "askReportingQuestion",
+    "contract": "reporting",
+    "purpose": "Follow the thread",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "explainMetricChange",
+    "contract": "ai",
+    "purpose": "Why did this metric change",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-056",
+   "workshopBoard": "wireframes/WS176 Unified BI Reporting and AI Analytics Platform Board 9.dc.html#anl-056"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 114. 0 of 0 labels bound to a contract property; 0 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -803,6 +983,22 @@
    "component": "apps/venue-management-web/src/routes/analytics/ForecastingPredictiveAnalyticsStudio.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-051"
+   ],
+   "exitTo": [
+    "ANL-051"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-051",
+     "trigger": "Back to AI Analytics Command Center",
+     "provenance": "structural — pack board 9 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
@@ -810,7 +1006,7 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Ticket Sales, Membership Renewals, Customer Churn. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 11 actions on this screen and the screen declares 0 operations.** Unserved: Revenue, Ticket Sales, Attendance, Capacity, Queue Demand, Cash Collection, Membership Renewals, Customer Churn …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Support forecasts for"
    },
    {
@@ -869,7 +1065,32 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Revenue",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Support forecasts for"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Ticket Sales",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Support forecasts for"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Attendance",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Support forecasts for"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Capacity",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Support forecasts for"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Queue Demand",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Support forecasts for"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cash Collection",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Support forecasts for"
       },
       {
@@ -892,25 +1113,54 @@
    "emptyFirstRun": "No forecasting predictive analytics configured yet. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getKpiValues",
+    "contract": "reporting",
+    "purpose": "The series being forecast",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listForecastDefinitions",
+    "contract": "ai",
+    "purpose": "What is forecast",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getForecast",
+    "contract": "ai",
+    "purpose": "Forecast values",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "createForecastScenario",
+    "contract": "ai",
+    "purpose": "Run a what-if",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "exportForecastVersion",
+    "contract": "ai",
+    "purpose": "Export the forecast version as CSV, Excel or JSON",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-057"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-057",
+   "workshopBoard": "wireframes/WS176 Unified BI Reporting and AI Analytics Platform Board 9.dc.html#anl-057"
   },
-  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 116. 0 of 0 labels bound to a contract property; 10 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-051"
-   ],
-   "exitTo": [
-    "ANL-051"
-   ],
-   "transitions": [
+  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 116. 0 of 0 labels bound to a contract property; 18 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
     {
-     "to": "ANL-051",
-     "trigger": "Back to AI Analytics Command Center",
-     "provenance": "structural — pack board 9 wiring, 9 September 2026",
-     "back": true
+     "name": "versionId",
+     "from": "navigation"
     }
    ]
   },
@@ -955,40 +1205,6 @@
    "component": "apps/venue-management-web/src/routes/analytics/AiRecommendationNextBestActionCenter.tsx",
    "status": "notStarted"
   },
-  "density": "compact",
-  "pattern": "listDetail",
-  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
-  "purpose": "Convert analytical insights into prioritized business recommendations.",
-  "purposeNote": "Recommendations are prioritized, explainable and measurable rather than presented as generic AI suggestions.",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 117"
-   },
-   {
-    "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 117"
-   }
-  ],
-  "layout": {
-   "template": "split",
-   "regions": []
-  },
-  "states": {
-   "loading": "The recommendation next-best-action list.",
-   "error": "Could not load. Names which read failed and leaves the recommendation next-best-action untouched.",
-   "emptyFirstRun": "No recommendation next-best-action yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the recommendation next-best-action are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
-  },
-  "apis": [],
-  "wireframe": {
-   "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-058"
-  },
-  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 117. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
     "ANL-051"
@@ -1005,6 +1221,68 @@
     }
    ]
   },
+  "density": "compact",
+  "purposeNote": "Recommendations are prioritized, explainable and measurable rather than presented as generic AI suggestions.",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Convert analytical insights into prioritized business recommendations.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 117"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 117"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listNextBestAction",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The recommendation next-best-action list.",
+   "error": "Could not load. Names which read failed and leaves the recommendation next-best-action untouched.",
+   "emptyFirstRun": "No recommendation next-best-action yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the recommendation next-best-action are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listAnalyticsAnomalies",
+    "contract": "reporting",
+    "purpose": "What to act on",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listAiInsights",
+    "contract": "ai",
+    "purpose": "Insights and anomalies",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-058",
+   "workshopBoard": "wireframes/WS176 Unified BI Reporting and AI Analytics Platform Board 9.dc.html#anl-058"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 117. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P16",
    "formFactor": "web",
@@ -1046,11 +1324,27 @@
    "component": "apps/venue-management-web/src/routes/analytics/AiInsightHistoryEvidenceExplainability.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-051"
+   ],
+   "exitTo": [
+    "ANL-051"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-051",
+     "trigger": "Back to AI Analytics Command Center",
+     "provenance": "structural — pack board 9 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
+  "purposeNote": "AI analytics remain auditable and traceable to supporting TICVAI data.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
   "purpose": "Create a full governance trail for AI-generated analytics and recommendations.",
-  "purposeNote": "AI analytics remain auditable and traceable to supporting TICVAI data.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1093,25 +1387,40 @@
    "emptyFirstRun": "No insight history evidence configured yet. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listAnalyticsAnomalies",
+    "contract": "reporting",
+    "purpose": "Past insights and their evidence",
+    "trigger": "onLoad",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listAiInsights",
+    "contract": "ai",
+    "purpose": "Insights and anomalies",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "decideAiInsight",
+    "contract": "ai",
+    "purpose": "Review, accept, reject or mark an insight actioned",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-059"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-059",
+   "workshopBoard": "wireframes/WS176 Unified BI Reporting and AI Analytics Platform Board 9.dc.html#anl-059"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 118. 0 of 0 labels bound to a contract property; 5 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-051"
-   ],
-   "exitTo": [
-    "ANL-051"
-   ],
-   "transitions": [
+  "entryState": {
+   "params": [
     {
-     "to": "ANL-051",
-     "trigger": "Back to AI Analytics Command Center",
-     "provenance": "structural — pack board 9 wiring, 9 September 2026",
-     "back": true
+     "name": "insightId",
+     "from": "navigation"
     }
    ]
   },
@@ -1156,6 +1465,22 @@
    "component": "apps/venue-management-web/src/routes/analytics/AiAnalyticsGovernanceModelControl.tsx",
    "status": "notStarted"
   },
+  "navigation": {
+   "entryFrom": [
+    "ANL-051"
+   ],
+   "exitTo": [
+    "ANL-051"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-051",
+     "trigger": "Back to AI Analytics Command Center",
+     "provenance": "structural — pack board 9 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Track) and no metric row",
@@ -1174,6 +1499,12 @@
      "name": "contentBody",
      "slot": "collection",
      "components": [
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishPromptTemplate",
+       "notes": "Declares `publishPromptTemplate`. **The gate names what the publish will affect before it happens**: which tenants, venues or capabilities take the new version, and that the previous one stays available to roll back to.",
+       "provenance": "check-screens publish rule, 29 September 2026"
+      },
       {
        "kind": "dataTable",
        "label": "Every analytics governance model",
@@ -1247,7 +1578,64 @@
    "emptyNoResults": "The filter narrowed it and the analytics governance model are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "listAiCapabilities",
+    "contract": "ai",
+    "purpose": "The capability registry",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "configureAiCapability",
+    "contract": "ai",
+    "purpose": "Register a capability, or change its owner, risk class or autonomy",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getEffectiveAiPolicy",
+    "contract": "ai",
+    "purpose": "The policy in force for a capability at a scope",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAiModels",
+    "contract": "ai",
+    "purpose": "The model catalogue",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listPromptTemplates",
+    "contract": "ai",
+    "purpose": "The prompt registry",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "publishPromptTemplate",
+    "contract": "ai",
+    "purpose": "Publish a prompt template version",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "runAiEvaluation",
+    "contract": "ai",
+    "purpose": "Evaluate a candidate",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAiEvaluations",
+    "contract": "ai",
+    "purpose": "Evaluation runs",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "AI Service",
@@ -1256,29 +1644,24 @@
     "Status",
     "Consumption",
     "Cost"
+   ],
+   "params": [
+    {
+     "name": "capabilityKey",
+     "from": "navigation"
+    },
+    {
+     "name": "templateKey",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
-   "board": "wireframes/P16 Venue Analytics.dc.html#anl-060"
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-060",
+   "workshopBoard": "wireframes/WS176 Unified BI Reporting and AI Analytics Platform Board 9.dc.html#anl-060"
   },
   "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 119. 0 of 13 labels bound to a contract property; 31 of 84 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "navigation": {
-   "entryFrom": [
-    "ANL-051"
-   ],
-   "exitTo": [
-    "ANL-051"
-   ],
-   "transitions": [
-    {
-     "to": "ANL-051",
-     "trigger": "Back to AI Analytics Command Center",
-     "provenance": "structural — pack board 9 wiring, 9 September 2026",
-     "back": true
-    }
-   ]
-  },
   "_platform": {
    "code": "P16",
    "formFactor": "web",

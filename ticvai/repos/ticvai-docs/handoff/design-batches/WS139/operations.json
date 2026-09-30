@@ -37,6 +37,25 @@
   "requestBody": "Journey",
   "responds": "Journey"
  },
+ "decideAiInsight": {
+  "method": "POST",
+  "path": "/insights/{insightId}/decide",
+  "contract": "ai",
+  "summary": "Review, accept, reject or mark an insight actioned",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiInsight"
+ },
  "getJourneyPerformance": {
   "method": "GET",
   "path": "/journeys/{journeyId}/performance",
@@ -108,6 +127,45 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listMarketingRecommendations": {
+  "method": "GET",
+  "path": "/marketing-recommendations",
+  "contract": "ai",
+  "summary": "Recommendations on marketing campaigns and journeys",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "targetKind",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "targetRef",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listMessageTriggers": {
   "method": "GET",
   "path": "/message-triggers",
@@ -131,6 +189,25 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "requestSuggestion": {
+  "method": "POST",
+  "path": "/ai/suggestions",
+  "contract": "ai",
+  "summary": "Ask for an answer, however it is currently produced",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Suggestion"
  },
  "setMessageTrigger": {
   "method": "POST",

@@ -83,6 +83,37 @@ services:
         limits:
           cpus: '2'
           memory: 8G
+  # **Vectors (ADR-0049): Qdrant, a single node on premise.** One collection per tenant (behind the
+  # alias tenant_<tenantId>) with a JWT scoped to it; the retrieval client always adds the venue filter.
+  # In Azure it is a self-hosted 3-node HA cluster in UAE North. Pinned to 1.16 or later: payload-filter
+  # RBAC was removed in 1.16, which is why tenants get collections, not filters.
+  qdrant:
+    image: qdrant/qdrant:v1.16.0
+    environment:
+      QDRANT__SERVICE__ENABLE_TLS: 'false'
+      QDRANT__SERVICE__JWT_RBAC: 'true'
+      QDRANT__SERVICE__API_KEY: venue-local-signing-key-from-the-vault
+    volumes:
+    - qdrant-data:/qdrant/storage
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+  # **The event broker (ADR-0057, proposed).** rabbitmq (local/venue-local); cloud broker: client's
+  # choice. The client chooses RabbitMQ or Kafka for the cloud; development and the venue-local
+  # profile run RabbitMQ either way (ADR-0046 needs it on-premise). Modules never talk to it
+  # directly: the outbox relay in `workers` publishes through the kernel's IEventPublisher, and
+  # every consumer records what it handled in its tenant database's inbox (ADR-0058).
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    labels:
+      ticvai.broker: "rabbitmq (local/venue-local); cloud broker: client's choice"
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
   pgbouncer:
     image: edoburu/pgbouncer:latest
     environment:
@@ -601,3 +632,5 @@ services:
     depends_on:
     - postgres-v3
     - redis-v3
+volumes:
+  qdrant-data:

@@ -1,6 +1,6 @@
 # WS160 — Resource Management Configuration board 6
 
-**10 screens · 24 operations · 32 schemas · 11 permissions**
+**10 screens · 24 operations · 42 schemas · 11 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

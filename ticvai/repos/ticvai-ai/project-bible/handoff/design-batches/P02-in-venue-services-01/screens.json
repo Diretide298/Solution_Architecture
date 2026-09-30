@@ -239,9 +239,9 @@
    "prototype": {
     "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-29",
+    "verified": "2026-09-30",
     "match": "exact",
-    "view": "At the venue → Map"
+    "view": "At the venue → Map (the venue map, scrolled to the map and nearest-place filters)"
    },
    "derivedFrom": "wireframes/reference/Seat Board 4.dc.html",
    "note": "**Drawn by Claude Design on `Seat Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
@@ -388,7 +388,7 @@
    "prototype": {
     "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-29",
+    "verified": "2026-09-30",
     "match": "exact",
     "view": "At the venue → Waits"
    }
@@ -2117,32 +2117,32 @@
     {
      "to": "GST-021",
      "trigger": "Map view",
-     "provenance": "decided 29 September 2026 (P29), MOB-1"
+     "provenance": "decided 29 September 2026, MOB-1"
     },
     {
      "to": "GST-022",
      "trigger": "Waits view",
-     "provenance": "decided 29 September 2026 (P29), MOB-1"
+     "provenance": "decided 29 September 2026, MOB-1"
     },
     {
      "to": "GST-024",
      "trigger": "Food",
-     "provenance": "decided 29 September 2026 (P29), MOB-1"
+     "provenance": "decided 29 September 2026, MOB-1"
     },
     {
      "to": "GST-026",
      "trigger": "Shop",
-     "provenance": "decided 29 September 2026 (P29), MOB-1"
+     "provenance": "decided 29 September 2026, MOB-1"
     },
     {
      "to": "GST-029",
      "trigger": "Services",
-     "provenance": "decided 29 September 2026 (P29), MOB-1"
+     "provenance": "decided 29 September 2026, MOB-1"
     },
     {
      "to": "GST-023",
      "trigger": "Join a virtual queue",
-     "provenance": "decided 29 September 2026 (P29), MOB-1"
+     "provenance": "decided 29 September 2026, MOB-1"
     }
    ],
    "uses": [
@@ -2207,14 +2207,14 @@
        "kind": "selectField",
        "label": "Map · Waits · Food · Shows · Shop · Services",
        "notes": "The view switcher. Map and Waits are GST-021 and GST-022 rendered in place.",
-       "provenance": "decided 29 September 2026 (P29), MOB-1"
+       "provenance": "decided 29 September 2026, MOB-1"
       },
       {
        "kind": "banner",
        "label": "Happening now",
        "operation": "getWaitTimes",
        "notes": "Live orders, queue calls and the next show, from the guest's own orders and queues.",
-       "provenance": "decided 29 September 2026 (P29), MOB-1"
+       "provenance": "decided 29 September 2026, MOB-1"
       }
      ]
     },
@@ -2336,9 +2336,9 @@
    "prototype": {
     "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-29",
+    "verified": "2026-09-30",
     "match": "exact",
-    "view": "At the venue (Home → At the venue, or the Map tab where the venue shows it)"
+    "view": "Home → You're at Summit Peaks (At the venue · live, Map view)"
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",

@@ -1953,7 +1953,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "incidentNumber": {
     "type": "string",
@@ -2010,7 +2010,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "correctiveWorkOrderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "occurredAt": {
@@ -2050,7 +2050,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "incidentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "authority": {
     "type": "string",
@@ -2166,7 +2166,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "incidentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "note": {
     "type": "string",
@@ -2198,7 +2198,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "incidentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "kind": {
     "type": "string",
@@ -2269,7 +2269,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "templateId": {
     "type": "string",
@@ -2337,7 +2337,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "inspectionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "templateItemId": {
     "type": "string",
@@ -2436,7 +2436,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       "type": "array",
       "items": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+       "format": "uuid"
       }
      },
      "productsSuspended": {
@@ -2623,6 +2623,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   }
  },
  "ScanEvent": {
+  "x-ticvai-append-only": "recordedAt",
   "x-ticvai-persistence": "access.scan_event",
   "type": "object",
   "required": [
@@ -2636,8 +2637,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "The scan's client-generated ULID, the key offline replay deduplicates on."
+    "format": "uuid",
+    "description": "The scan's client-generated UUIDv7, the key offline replay deduplicates on."
    },
    "accessPointId": {
     "type": "string",
@@ -2652,7 +2653,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "ticketId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The `Entitlement.id` scanned; null where the media resolved to nothing."
    },
@@ -2681,7 +2682,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "overridesScanId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "**Set only on an override row**, naming the denied scan it admits against (decided 28 September, audit R228). The denied scan itself is never updated: the denial and the override are two rows, and at most one override row names any scan. Null on every other scan.\n"
    },
@@ -2823,7 +2824,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "templateId": {
     "type": "string",
@@ -2890,8 +2891,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID. Also the idempotency key and dedupe key."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7. Also the idempotency key and dedupe key."
    },
    "mediaCode": {
     "type": "string",

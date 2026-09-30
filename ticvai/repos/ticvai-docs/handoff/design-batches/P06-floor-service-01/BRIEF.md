@@ -1,6 +1,6 @@
 # P06-floor-service-01 — P06 · Floor Service
 
-**10 screens · 31 operations · 26 schemas · 6 permissions**
+**10 screens · 38 operations · 43 schemas · 6 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -50,7 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 6 permissions apply here:
   `GUEST_MANAGE, GUEST_VIEW, ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW, PRODUCT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **19 of these operations work offline**: compItem, createFnbOrder, createPayment, fireCourse, getBill, getTableMap, holdCourse, joinRestaurantWaitlist
+- **22 of these operations work offline**: addGuestNote, compItem, createFnbOrder, createPayment, fireCourse, getBill, getTableMap, getTableVisit
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
@@ -62,12 +62,12 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `EMP-051` | Restaurant Service Command Center | listDetail | 3 | 0 | — |
-| `EMP-052` | Floor Plan & Table Map | statusTracker | 2 | 0 | — |
-| `EMP-053` | Table & Seating Configuration | configEditor | 1 | 0 | — |
+| `EMP-052` | Floor Plan & Table Map | statusTracker | 2 | 1 | — |
+| `EMP-053` | Table & Seating Configuration | configEditor | 4 | 0 | — |
 | `EMP-054` | Reservation Calendar & Timeline | listDetail | 1 | 0 | — |
-| `EMP-055` | Create / Edit Reservation | configEditor | 2 | 0 | — |
-| `EMP-056` | Walk-In & Waitlist Management | configEditor | 1 | 0 | — |
-| `EMP-057` | Guest Profile & Dining History | listDetail | 4 | 0 | — |
-| `EMP-058` | Live Table & Service Management | configEditor | 16 | 1 | — |
-| `EMP-059` | Table Order, Bill & Payment Management | statusTracker | 7 | 1 | — |
+| `EMP-055` | Create / Edit Reservation | configEditor | 2 | 1 | — |
+| `EMP-056` | Walk-In & Waitlist Management | configEditor | 2 | 1 | — |
+| `EMP-057` | Guest Profile & Dining History | listDetail | 5 | 2 | — |
+| `EMP-058` | Live Table & Service Management | configEditor | 17 | 14 | — |
+| `EMP-059` | Table Order, Bill & Payment Management | statusTracker | 8 | 7 | — |
 | `EMP-060` | Reservation & Table Performance | listDetail | 2 | 0 | — |

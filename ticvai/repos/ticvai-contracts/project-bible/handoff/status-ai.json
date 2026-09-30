@@ -33,7 +33,7 @@
   }
  ],
  "stores": {
-  "postgres": 123,
+  "postgres": 122,
   "postgres-analytical": 5,
   "redis": 9,
   "qdrant": 1
@@ -45,10 +45,10 @@
   "schemas": 122,
   "states": 42,
   "events": 47,
-  "tables": 138,
+  "tables": 137,
   "screens": 195,
   "flows": 11,
-  "documents": 46,
+  "documents": 55,
   "openConflicts": 1
  },
  "metrics": {
@@ -278,7 +278,7 @@
   "operations": []
  },
  "storage": {
-  "postgres": 123,
+  "postgres": 122,
   "postgres-analytical": 5,
   "redis": 9,
   "qdrant": 1
@@ -385,6 +385,11 @@
    "status": ""
   },
   {
+   "file": "docs\\active\\development-plan.md",
+   "title": "TICVAI development plan",
+   "status": ""
+  },
+  {
    "file": "docs\\active\\dump-audit-3-september.md",
    "title": "Audit \u2014 the 3 September dump, its checks, and what trickles down",
    "status": ""
@@ -487,12 +492,12 @@
   {
    "file": "docs\\adr\\0020-ai-isolation-boundary.md",
    "title": "ADR-0020 \u2014 Where AI runs, and what it is isolated from",
-   "status": "Proposed \u00b7 17 August 2026"
+   "status": "Accepted \u00b7 30 September 2026 \u00b7 Chinmay Parab \u2014 amended by [A"
   },
   {
    "file": "docs\\adr\\0021-qdrant-partitioning.md",
    "title": "ADR-0021 \u2014 Qdrant: one collection per embedding model, tenant is the shard, scope is the filter",
-   "status": "Proposed \u00b7 17 August 2026"
+   "status": "Accepted in part \u00b7 amended by [ADR-0049](0049-vectors-live-i"
   },
   {
    "file": "docs\\adr\\0023-pii-separation.md",
@@ -501,13 +506,13 @@
   },
   {
    "file": "docs\\adr\\0028-service-decomposition.md",
-   "title": "ADR-0028: Sixteen services, and the data boundary decides where they split",
-   "status": "Accepted. The data topology reopened by CF-161 on 24 August "
+   "title": "ADR-0028: Seventeen modules, and the data boundary decides where they split",
+   "status": "Accepted \u00b7 amended by [ADR-0055](0055-a-modular-monolith-dep"
   },
   {
    "file": "docs\\adr\\0033-outbox-and-dead-letters.md",
    "title": "ADR-0033: Every asynchronous handoff has an outbox and a place to fail",
-   "status": "Accepted"
+   "status": "Accepted \u00b7 amended by [ADR-0058](0058-one-relay-per-region-a"
   },
   {
    "file": "docs\\adr\\0034-ai-retrieval-and-cost.md",
@@ -525,6 +530,41 @@
    "status": "Accepted \u2014 the RPO floor decided 21 September; one number pe"
   },
   {
+   "file": "docs\\adr\\0049-vectors-live-in-qdrant-one-collection-per-tenant.md",
+   "title": "ADR-0049: Vectors live in Qdrant from day one, one collection per tenant, each with its own token",
+   "status": "Accepted \u00b7 30 September 2026 \u00b7 Chinmay Parab"
+  },
+  {
+   "file": "docs\\adr\\0050-one-autonomy-scale.md",
+   "title": "ADR-0050: One autonomy scale; the approval tier is not an autonomy level",
+   "status": "Accepted \u00b7 30 September 2026 \u00b7 Chinmay Parab \u2014 records AI-D0"
+  },
+  {
+   "file": "docs\\adr\\0051-ai-ships-on-a-baseline-and-learns-per-tenant.md",
+   "title": "ADR-0051: Every AI function ships on a baseline and learns per tenant; a model goes live only on evidence",
+   "status": "Accepted \u00b7 30 September 2026 \u00b7 Chinmay Parab"
+  },
+  {
+   "file": "docs\\adr\\0055-a-modular-monolith-deployed-as-five-units.md",
+   "title": "ADR-0055: A modular monolith, deployed as five units",
+   "status": "Accepted \u00b7 30 September 2026 \u00b7 Chinmay Parab"
+  },
+  {
+   "file": "docs\\adr\\0057-events-travel-on-rabbitmq-or-kafka.md",
+   "title": "ADR-0057: Events travel on RabbitMQ or Kafka, behind one kernel interface",
+   "status": "Proposed \u00b7 waiting on the client's choice between RabbitMQ a"
+  },
+  {
+   "file": "docs\\adr\\0058-one-relay-per-region-and-an-inbox-per-tenant-database.md",
+   "title": "ADR-0058: One relay per region reads every tenant's outbox, and every consumer has an inbox",
+   "status": "Accepted \u00b7 30 September 2026 \u00b7 Chinmay Parab"
+  },
+  {
+   "file": "docs\\adr\\0059-ai-phasing-against-the-six-month-plan.md",
+   "title": "ADR-0059: AI phasing against the six-month plan",
+   "status": "Accepted \u00b7 30 September 2026 \u00b7 Chinmay Parab"
+  },
+  {
    "file": "docs\\architecture\\ai-credentials.md",
    "title": "AI provider credentials \u2014 where the key lives and who can reach it",
    "status": ""
@@ -532,6 +572,11 @@
   {
    "file": "docs\\architecture\\ai-system-design.md",
    "title": "TICVAI AI subsystem: system design",
+   "status": ""
+  },
+  {
+   "file": "docs\\architecture\\data-model.md",
+   "title": "Data Model",
    "status": ""
   },
   {

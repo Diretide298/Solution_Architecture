@@ -9,7 +9,7 @@ aggregate: entitlement
 emittedWhen: freezeEntitlement, suspendEntitlement or reinstateEntitlement succeeds, or a membership renewal (orders renewMembership) extends the entitlement's validity
 payload:
 - field: entitlementId
-  type: string
+  type: uuid
 - field: change
   type: string
   notes: One of frozen, suspended, reinstated, validityExtended
@@ -17,7 +17,7 @@ payload:
   type: string
   required: false
 - field: membershipId
-  type: string
+  type: uuid
   required: false
   notes: Set when the entitlement belongs to a membership
 - field: episodeStart
@@ -30,7 +30,7 @@ payload:
   type: timestamp
   notes: The validity after the change
 - field: approvalRequestId
-  type: string
+  type: uuid
   required: false
 - field: changedAt
   type: timestamp

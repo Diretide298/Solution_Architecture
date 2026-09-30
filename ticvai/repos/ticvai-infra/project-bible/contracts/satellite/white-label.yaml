@@ -2697,7 +2697,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     patch:
       operationId: updateGuidedChoice
       x-ticvai-consumed-by:
@@ -2810,7 +2810,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: publishGuidedChoice
       x-ticvai-consumed-by:
@@ -2870,7 +2870,7 @@ paths:
       required: true
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     post:
       operationId: unpublishGuidedChoice
       x-ticvai-consumed-by:
@@ -3928,8 +3928,8 @@ components:
       properties:
         batchId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
-          description: ULID minted by the runtime; a retried beacon repeats it.
+          format: uuid
+          description: UUIDv7 minted by the runtime; a retried beacon repeats it.
         sessionRef:
           type: string
           maxLength: 128
@@ -4277,9 +4277,9 @@ components:
       properties:
         id:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           readOnly: true
-          description: ULID.
+          description: UUIDv7.
         venueId:
           type: string
           format: uuid
@@ -4340,9 +4340,9 @@ components:
             properties:
               id:
                 type: string
-                pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                format: uuid
                 readOnly: true
-                description: ULID. The row's own key.
+                description: UUIDv7. The row's own key.
               title:
                 $ref: '#/components/schemas/LocalisedText'
               kind:
@@ -4377,9 +4377,9 @@ components:
                   properties:
                     id:
                       type: string
-                      pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                      format: uuid
                       readOnly: true
-                      description: ULID. The row's own key.
+                      description: UUIDv7. The row's own key.
                     title:
                       $ref: '#/components/schemas/LocalisedText'
                     body:

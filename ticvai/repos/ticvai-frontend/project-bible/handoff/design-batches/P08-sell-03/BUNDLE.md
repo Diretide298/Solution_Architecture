@@ -423,7 +423,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "ProductCategory.bookingFlowId",
        "operation": "listBookingFlows",
        "notes": "**Every product filed here that names no flow of its own is sold through this one** (decided 29 September, W12). Empty means the venue's flow for each product's kind. Saved with `setProductCategories`.",
-       "provenance": "decided 29 September, W12; agreed name white-label listBookingFlows (P29 brief)"
+       "provenance": "decided 29 September, W12; agreed name white-label listBookingFlows (the 29 September pass brief)"
       }
      ]
     }
@@ -442,7 +442,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "white-label",
     "purpose": "The booking flows a category can default to (W12)",
     "trigger": "onAction",
-    "provenance": "decided 29 September, W12 (P29)"
+    "provenance": "decided 29 September, W12 (the 29 September pass)"
    },
    {
     "operationId": "listProductCategories",

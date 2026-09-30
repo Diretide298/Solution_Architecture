@@ -1,6 +1,6 @@
 # WS52 — Promotions   Bundles Management board 8
 
-**10 screens · 10 operations · 11 schemas · 2 permissions**
+**10 screens · 11 operations · 13 schemas · 2 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 2 permissions apply here:
   `PRICE_CONFIGURE, PRICE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -63,7 +62,7 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `ADM-208` | Stacking & Conflict Command Center | commandCentre | 1 | 0 | — |
 | `ADM-209` | Promotion Priority & Hierarchy Manager | listDetail | 1 | 0 | — |
-| `ADM-210` | Promotion Stacking Rule Builder | listDetail | 1 | 0 | — |
+| `ADM-210` | Promotion Stacking Rule Builder | listDetail | 2 | 0 | — |
 | `ADM-211` | Promotion Exclusion & Compatibility Matrix | listDetail | 1 | 0 | — |
 | `ADM-212` | Discount Calculation & Application Sequence | configEditor | 1 | 0 | — |
 | `ADM-213` | Best Offer & Customer Benefit Resolver | listDetail | 1 | 0 | — |
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-208 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-209",
@@ -300,7 +296,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-208"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-208",
+   "workshopBoard": "wireframes/WS113 Promotions   Bundles Management Board 8.dc.html#adm-208"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 109. 12 of 12 labels bound to a contract property; 12 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -427,7 +424,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-209"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-209",
+   "workshopBoard": "wireframes/WS113 Promotions   Bundles Management Board 8.dc.html#adm-209"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 110. 0 of 0 labels bound to a contract property; 0 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -546,16 +544,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setPromotionStackingRule",
     "contract": "promotions",
     "purpose": "Promotion Stacking Rule Builder",
-    "trigger": "onAction",
-    "invalidates": [
-     "setPromotionStackingRule"
-    ]
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "setPromotionRule",
+    "contract": "promotions",
+    "purpose": "Promotion Rule Builder",
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-210"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-210",
+   "workshopBoard": "wireframes/WS113 Promotions   Bundles Management Board 8.dc.html#adm-210"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 111. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -701,7 +703,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-211"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-211",
+   "workshopBoard": "wireframes/WS113 Promotions   Bundles Management Board 8.dc.html#adm-211"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 112. 8 of 8 labels bound to a contract property; 8 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -826,7 +829,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-212"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-212",
+   "workshopBoard": "wireframes/WS113 Promotions   Bundles Management Board 8.dc.html#adm-212"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 113. 0 of 0 labels bound to a contract property; 6 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -937,18 +941,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    }
   ],
   "entryState": {
-   "preloaded": [
-    "BestOfferCustomerBenefitResolverView.useTheHighestRankedPromotion",
-    "BestOfferCustomerBenefitResolverView.favorAStrategicallySelectedCampaign",
-    "BestOfferCustomerBenefitResolverView.honorContractualCustomerSpecificPricingFirst",
-    "BestOfferCustomerBenefitResolverView.family15Aed",
-    "BestOfferCustomerBenefitResolverView.bank1011750"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-213"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-213",
+   "workshopBoard": "wireframes/WS113 Promotions   Bundles Management Board 8.dc.html#adm-213"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 114. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1088,7 +1087,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-214"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-214",
+   "workshopBoard": "wireframes/WS113 Promotions   Bundles Management Board 8.dc.html#adm-214"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 115. 0 of 0 labels bound to a contract property; 9 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1173,15 +1173,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "dataTable",
        "label": "Every conflict detection resolution",
        "columns": [
-        "ConflictDetectionResolutionCenterView.sameProduct",
-        "ConflictDetectionResolutionCenterView.sameAudience",
-        "ConflictDetectionResolutionCenterView.sameChannel",
-        "ConflictDetectionResolutionCenterView.sameValidity",
-        "ConflictDetectionResolutionCenterView.incompatiblePromotions",
-        "ConflictDetectionResolutionCenterView.missingHierarchy",
-        "ConflictDetectionResolutionCenterView.missingStackingRule",
-        "ConflictDetectionResolutionCenterView.discountCapBreach",
-        "ConflictDetectionResolutionCenterView.circularDependency"
+        "ConflictDetectionResolutionCenterView.conflictType"
        ],
        "bindsTo": "ConflictDetectionResolutionCenterView",
        "operation": "listConflictDetectionResolution",
@@ -1198,15 +1190,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected conflict detection resolution",
        "bindsTo": "ConflictDetectionResolutionCenterView",
        "columns": [
-        "ConflictDetectionResolutionCenterView.sameProduct",
-        "ConflictDetectionResolutionCenterView.sameAudience",
-        "ConflictDetectionResolutionCenterView.sameChannel",
-        "ConflictDetectionResolutionCenterView.sameValidity",
-        "ConflictDetectionResolutionCenterView.incompatiblePromotions",
-        "ConflictDetectionResolutionCenterView.missingHierarchy",
-        "ConflictDetectionResolutionCenterView.missingStackingRule",
-        "ConflictDetectionResolutionCenterView.discountCapBreach",
-        "ConflictDetectionResolutionCenterView.circularDependency"
+        "ConflictDetectionResolutionCenterView.conflictType"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Customer qualifies for”, “Eligibility”, “Compatibility”, “Priority”, “Calculation sequence”, “Discount cap”.",
        "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 116 §Detect"
@@ -1257,18 +1241,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "ConflictDetectionResolutionCenterView.sameProduct",
-    "ConflictDetectionResolutionCenterView.sameAudience",
-    "ConflictDetectionResolutionCenterView.sameChannel",
-    "ConflictDetectionResolutionCenterView.sameValidity",
-    "ConflictDetectionResolutionCenterView.incompatiblePromotions",
-    "ConflictDetectionResolutionCenterView.missingHierarchy"
+    "ConflictDetectionResolutionCenterView.conflictType"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-215"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-215",
+   "workshopBoard": "wireframes/WS113 Promotions   Bundles Management Board 8.dc.html#adm-215"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 116. 9 of 9 labels bound to a contract property; 11 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1379,18 +1359,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    }
   ],
   "entryState": {
-   "preloaded": [
-    "PromotionDecisionTraceTransactionExplainerView.family20",
-    "PromotionDecisionTraceTransactionExplainerView.summer25",
-    "PromotionDecisionTraceTransactionExplainerView.bank10",
-    "PromotionDecisionTraceTransactionExplainerView.loyalty5",
-    "PromotionDecisionTraceTransactionExplainerView.family20Eligible"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-216"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-216",
+   "workshopBoard": "wireframes/WS113 Promotions   Bundles Management Board 8.dc.html#adm-216"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 117. 0 of 0 labels bound to a contract property; 0 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1516,7 +1491,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-217"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-217",
+   "workshopBoard": "wireframes/WS113 Promotions   Bundles Management Board 8.dc.html#adm-217"
   },
   "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 118. 0 of 0 labels bound to a contract property; 8 of 112 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1626,7 +1602,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "PromotionDecisionTraceTransactionExplainerView"
  },
@@ -1665,9 +1647,34 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "StackingConflictCommandCenterView"
+ },
+ "setPromotionRule": {
+  "method": "PUT",
+  "path": "/promotion-rule",
+  "contract": "promotions",
+  "summary": "Promotion Rule Builder",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PromotionRuleBuilderInput",
+  "responds": "PromotionRuleBuilderView"
  },
  "setPromotionStackingRule": {
   "method": "PUT",
@@ -1678,7 +1685,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PromotionStackingRuleBuilderInput",
   "responds": "PromotionStackingRuleBuilderView"
  }
@@ -1697,33 +1710,38 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Best Offer & Customer Benefit Resolver displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "useTheHighestRankedPromotion": {
+   "resolutionStrategy": {
     "type": "string",
-    "description": "Use the highest-ranked promotion"
+    "enum": [
+     "highestPriority",
+     "bestCustomerPrice",
+     "highestMargin",
+     "campaignPreference",
+     "contractualPriority"
+    ],
+    "description": "Configured strategy. Default highestPriority: conflicts resolve through the configured hierarchy, not lowest-price-wins (MoM 1 Sep)"
    },
-   "favorAStrategicallySelectedCampaign": {
-    "type": "string",
-    "description": "Favor a strategically selected campaign"
+   "eligibleOffers": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Eligible offers and combinations with their saving"
    },
-   "honorContractualCustomerSpecificPricingFirst": {
-    "type": "string",
-    "description": "Honor contractual/customer-specific pricing first"
-   },
-   "family15Aed": {
-    "type": "string",
-    "description": "FAMILY15 + AED"
-   },
-   "bank1011750": {
-    "type": "string",
-    "description": "BANK10 117.50"
+   "appliedOffers": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Offer or combination applied"
    },
    "saving": {
-    "type": "string",
-    "description": "Saving (the pack shows AED 117.50)"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Customer saving"
    },
-   "bestAvailableOfferAppliedAutomatically": {
+   "customerMessage": {
     "type": "string",
-    "description": "Best available offer applied automatically"
+    "description": "What the sales channel shows, e.g. 'Best available offer applied automatically'"
    }
   }
  },
@@ -1733,77 +1751,51 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Conflict Detection & Resolution Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "sameProduct": {
+   "conflictType": {
     "type": "string",
-    "description": "Same product"
+    "enum": [
+     "sameProduct",
+     "sameAudience",
+     "sameChannel",
+     "sameValidity",
+     "incompatiblePromotions",
+     "missingHierarchy",
+     "missingStackingRule",
+     "discountCapBreach",
+     "circularDependency"
+    ],
+    "description": "Conflict detected."
    },
-   "sameAudience": {
+   "resolutionMethod": {
     "type": "string",
-    "description": "Same audience"
+    "enum": [
+     "automatic",
+     "ruleBased",
+     "bestPrice",
+     "priority",
+     "manualIntervention"
+    ],
+    "description": "How the conflict is resolved."
    },
-   "sameChannel": {
+   "conflictId": {
     "type": "string",
-    "description": "Same channel"
+    "description": "Conflict ID"
    },
-   "sameValidity": {
+   "promotions": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Promotions in conflict"
+   },
+   "detectedAt": {
     "type": "string",
-    "description": "Same validity"
+    "format": "date-time",
+    "description": "When detected"
    },
-   "incompatiblePromotions": {
-    "type": "string",
-    "description": "Incompatible promotions"
-   },
-   "missingHierarchy": {
-    "type": "string",
-    "description": "Missing hierarchy"
-   },
-   "missingStackingRule": {
-    "type": "string",
-    "description": "Missing stacking rule"
-   },
-   "discountCapBreach": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Discount-cap breach"
-   },
-   "circularDependency": {
-    "type": "string",
-    "description": "Circular dependency"
-   },
-   "family20": {
-    "type": "string",
-    "description": "FAMILY20"
-   },
-   "vip15": {
-    "type": "string",
-    "description": "VIP15"
-   },
-   "summer25": {
-    "type": "string",
-    "description": "SUMMER25"
-   },
-   "bank10": {
-    "type": "string",
-    "description": "BANK10"
-   },
-   "automatic": {
-    "type": "string",
-    "description": "Automatic"
-   },
-   "ruleBased": {
-    "type": "string",
-    "description": "Rule-based"
-   },
-   "bestPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Best price"
-   },
-   "priority": {
-    "type": "string",
-    "description": "Priority"
-   },
-   "manualIntervention": {
-    "type": "string",
-    "description": "Manual intervention"
+   "resolved": {
+    "type": "boolean",
+    "description": "Whether the conflict has been resolved"
    }
   }
  },
@@ -1854,125 +1846,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "date-time",
     "description": "Date/time"
    },
-   "whoQualifies": {
+   "combinations": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Candidate combinations with saving, margin and validity"
+   },
+   "recommendedCombination": {
     "type": "string",
-    "description": "Who qualifies?"
-   },
-   "boards24PromotionMechanics": {
-    "type": "string",
-    "description": "Boards 2–4 — Promotion Mechanics"
-   },
-   "collectFinalAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Collect final amount"
-   },
-   "sameCentralizedEngine": {
-    "type": "string",
-    "description": "same centralized engine"
-   },
-   "paymentMethodOffers": {
-    "type": "string",
-    "description": "Payment-method offers"
-   },
-   "goldMember15": {
-    "type": "number",
-    "description": "Gold Member 15%"
-   },
-   "buy4Pay3": {
-    "type": "string",
-    "description": "Buy 4 Pay 3"
-   },
-   "summer20": {
-    "type": "string",
-    "description": "SUMMER20"
-   },
-   "bankAbc10": {
-    "type": "number",
-    "description": "Bank ABC 10%"
-   },
-   "gND": {
-    "type": "string",
-    "description": "g n d"
-   },
-   "member36": {
-    "type": "number",
-    "description": "Member 36% ✓"
-   },
-   "bogo29": {
-    "type": "number",
-    "description": "BOGO 29% ✓"
-   },
-   "coupon33": {
-    "type": "number",
-    "description": "Coupon 33% ✓"
-   },
-   "memberAed": {
-    "type": "string",
-    "description": "Member + AED"
-   },
-   "bogoBank24": {
-    "type": "number",
-    "description": "BOGO + Bank 24% ✓"
-   },
-   "bogoAed": {
-    "type": "string",
-    "description": "BOGO + AED"
-   },
-   "margin": {
-    "type": "number",
-    "description": "Margin (the pack shows 24%)"
-   },
-   "mutuallyExclusive": {
-    "type": "string",
-    "description": "mutually exclusive"
-   },
-   "estimatedProtectedMarginAed284kMonth": {
-    "type": "number",
-    "description": "Estimated protected margin: AED 284K/month"
-   },
-   "areCommercialLimitsRespected": {
-    "type": "string",
-    "description": "Are commercial limits respected?"
-   },
-   "calculateAuthoritativeFinalPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Calculate authoritative final price"
-   },
-   "marketingAdministrator": {
-    "type": "string",
-    "description": "Marketing Administrator"
-   },
-   "campaignManager": {
-    "type": "string",
-    "description": "Campaign Manager"
-   },
-   "commercialManager": {
-    "type": "string",
-    "description": "Commercial Manager"
-   },
-   "revenueManager": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Revenue Manager"
-   },
-   "finance": {
-    "type": "string",
-    "description": "Finance"
-   },
-   "b2bManager": {
-    "type": "string",
-    "description": "B2B Manager"
-   },
-   "systemAdministrator": {
-    "type": "string",
-    "description": "System Administrator"
-   },
-   "approver": {
-    "type": "string",
-    "description": "Approver"
-   },
-   "auditor": {
-    "type": "string",
-    "description": "Auditor"
+    "description": "Recommended combination"
    }
   }
  },
@@ -1982,77 +1865,43 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Discount Calculation & Application Sequence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "aed100Aed80": {
+   "calculationModel": {
     "type": "string",
-    "description": "AED 100 → AED 80"
+    "enum": [
+     "sequential",
+     "additivePercentage",
+     "fixedThenPercentage",
+     "percentageThenFixed",
+     "bestPriceOnly",
+     "highestValueDiscountOnly",
+     "lowestPriceResult",
+     "priorityOrder"
+    ],
+    "description": "How several discounts combine."
    },
-   "then10": {
-    "type": "number",
-    "description": "Then 10%"
-   },
-   "aed80Aed72": {
+   "taxBasis": {
     "type": "string",
-    "description": "AED 80 → AED 72"
+    "enum": [
+     "beforeTax",
+     "afterTax"
+    ],
+    "description": "Whether the promotion applies before or after tax."
    },
-   "aed100Aed70": {
+   "feeBasis": {
     "type": "string",
-    "description": "AED 100 → AED 70"
+    "enum": [
+     "beforeFee",
+     "afterFee"
+    ],
+    "description": "Whether the promotion applies before or after fees."
    },
-   "sequential": {
+   "applicationLevel": {
     "type": "string",
-    "description": "Sequential"
-   },
-   "additivePercentage": {
-    "type": "number",
-    "description": "Additive percentage"
-   },
-   "fixedThenPercentage": {
-    "type": "number",
-    "description": "Fixed then percentage"
-   },
-   "percentageThenFixed": {
-    "type": "number",
-    "description": "Percentage then fixed"
-   },
-   "bestPriceOnly": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Best price only"
-   },
-   "highestValueDiscountOnly": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Highest-value discount only"
-   },
-   "lowestPriceResult": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Lowest-price result"
-   },
-   "priorityOrder": {
-    "type": "string",
-    "description": "Priority order"
-   },
-   "beforeTax": {
-    "type": "string",
-    "description": "Before tax"
-   },
-   "afterTax": {
-    "type": "string",
-    "description": "After tax"
-   },
-   "beforeFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Before fee"
-   },
-   "afterFee": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "After fee"
-   },
-   "productOnly": {
-    "type": "string",
-    "description": "Product only"
-   },
-   "transactionTotal": {
-    "type": "string",
-    "description": "Transaction total"
+    "enum": [
+     "productOnly",
+     "transactionTotal"
+    ],
+    "description": "What the promotion applies to."
    }
   }
  },
@@ -2094,73 +1943,37 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Maximum promotions per basket"
    },
-   "membership15": {
-    "type": "number",
-    "description": "Membership 15%"
-   },
-   "bank10": {
-    "type": "number",
-    "description": "Bank 10%"
-   },
-   "coupon20": {
-    "type": "number",
-    "description": "Coupon 20%"
-   },
    "potentialCombinedBenefit": {
-    "type": "string",
-    "description": "Potential combined benefit (the pack shows 45%)"
+    "type": "number",
+    "description": "Potential combined benefit, percent"
    },
    "configuredMaximum": {
+    "type": "number",
+    "description": "Configured maximum, percent"
+   },
+   "limitLevel": {
     "type": "string",
-    "description": "Configured maximum (the pack shows 30%)"
+    "enum": [
+     "tenant",
+     "venue",
+     "category",
+     "campaign",
+     "customer",
+     "partner",
+     "channel",
+     "product",
+     "transaction"
+    ],
+    "description": "Where the limit is set."
    },
-   "tenant": {
+   "onExceed": {
     "type": "string",
-    "description": "Tenant"
-   },
-   "venue": {
-    "type": "string",
-    "description": "Venue"
-   },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "category": {
-    "type": "string",
-    "description": "Category"
-   },
-   "campaign": {
-    "type": "string",
-    "description": "Campaign"
-   },
-   "customer": {
-    "type": "string",
-    "description": "Customer"
-   },
-   "partner": {
-    "type": "string",
-    "description": "Partner"
-   },
-   "transaction": {
-    "type": "string",
-    "description": "Transaction"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
-   },
-   "reduceDiscount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Reduce discount"
-   },
-   "useBestPermittedCombination": {
-    "type": "string",
-    "description": "Use best permitted combination"
-   },
-   "requireApproval": {
-    "type": "boolean",
-    "description": "Require approval"
+    "enum": [
+     "reduceDiscount",
+     "useBestPermittedCombination",
+     "requireApproval"
+    ],
+    "description": "What happens when the combined benefit exceeds the cap."
    }
   }
  },
@@ -2170,49 +1983,48 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Promotion Decision Trace & Transaction Explainer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "family20": {
-    "type": "string",
-    "description": "FAMILY20 ✓"
-   },
-   "summer25": {
-    "type": "string",
-    "description": "SUMMER25 ✓"
-   },
-   "bank10": {
-    "type": "string",
-    "description": "BANK10 ✓"
-   },
-   "loyalty5": {
-    "type": "string",
-    "description": "LOYALTY5 ✓"
-   },
-   "family20Eligible": {
-    "type": "string",
-    "description": "FAMILY20 eligible"
-   },
-   "family20Retained": {
-    "type": "string",
-    "description": "FAMILY20 retained"
-   },
-   "bank10StackableWithFamily20": {
-    "type": "string",
-    "description": "BANK10 stackable with FAMILY20"
-   },
-   "bestPermittedCombinationCalculated": {
-    "type": "string",
-    "description": "Best permitted combination calculated"
-   },
-   "aed160": {
-    "type": "string",
-    "description": "−AED 160"
-   },
-   "aed64": {
-    "type": "string",
-    "description": "−AED 64"
-   },
    "totalSaving": {
-    "type": "integer",
-    "description": "Total Saving (the pack shows AED 224 / 28%)"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Total saving"
+   },
+   "transactionId": {
+    "type": "string",
+    "description": "Transaction ID"
+   },
+   "evaluatedPromotions": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Promotions evaluated"
+   },
+   "eligiblePromotions": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Promotions the transaction was eligible for"
+   },
+   "rejectedPromotions": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Promotions rejected, each with its reason"
+   },
+   "appliedPromotions": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Promotions applied, in application order"
+   },
+   "steps": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Decision steps in order (eligibility, hierarchy, stacking, caps, best permitted combination)"
    }
   }
  },
@@ -2222,30 +2034,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Promotion Exclusion & Compatibility Matrix displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "nHipTyKO": {
-    "type": "string",
-    "description": "n hip ty k O"
-   },
-   "allowed": {
-    "type": "boolean",
-    "description": "Allowed"
-   },
-   "notAllowed": {
-    "type": "boolean",
-    "description": "Not Allowed"
-   },
-   "conditional": {
-    "type": "string",
-    "description": "Conditional"
-   },
-   "priorityBased": {
-    "type": "string",
-    "description": "Priority Based"
-   },
-   "notConfigured": {
-    "type": "string",
-    "description": "Not Configured"
-   },
    "applicableProducts": {
     "type": "integer",
     "description": "Applicable products"
@@ -2277,6 +2065,25 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "exceptions": {
     "type": "integer",
     "description": "Exceptions"
+   },
+   "relationship": {
+    "type": "string",
+    "enum": [
+     "allowed",
+     "notAllowed",
+     "conditional",
+     "priorityBased",
+     "notConfigured"
+    ],
+    "description": "Compatibility between the two promotion types."
+   },
+   "promotionTypeA": {
+    "type": "string",
+    "description": "Row promotion type"
+   },
+   "promotionTypeB": {
+    "type": "string",
+    "description": "Column promotion type"
    }
   }
  },
@@ -2318,14 +2125,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "description": "Customer segment"
    },
-   "priority200": {
-    "type": "string",
-    "description": "Priority: 200"
-   },
-   "priority300": {
-    "type": "string",
-    "description": "Priority: 300"
-   },
    "tenant": {
     "type": "string",
     "description": "Tenant"
@@ -2348,55 +2147,227 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "PromotionRuleBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; saved as a `promotions.promotion_rule` row (PromotionRule, ruleType benefit) (DM5, 29 September: data model for the agreed operations)",
+  "description": "**What Promotion Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "ruleName": {
+    "type": "string",
+    "description": "Rule name"
+   },
+   "ruleId": {
+    "type": "string",
+    "description": "Rule ID"
+   },
+   "promotion": {
+    "type": "string",
+    "description": "Promotion"
+   },
+   "description": {
+    "type": "string",
+    "description": "Description"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "businessEntity": {
+    "type": "string",
+    "description": "Business entity"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "ruleStatus": {
+    "type": "string",
+    "description": "Rule status"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   },
+   "percentageDiscount": {
+    "type": "number",
+    "description": "Percentage discount"
+   },
+   "fixedDiscount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fixed discount"
+   },
+   "fixedSellingPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fixed selling price"
+   },
+   "freeProduct": {
+    "type": "string",
+    "description": "Free product"
+   },
+   "freeTicket": {
+    "type": "string",
+    "description": "Free ticket"
+   },
+   "addedValue": {
+    "type": "string",
+    "description": "Added value"
+   },
+   "voucher": {
+    "type": "string",
+    "description": "Voucher"
+   },
+   "rewardEntitlement": {
+    "type": "string",
+    "description": "Reward entitlement"
+   },
+   "nestedConditionGroups": {
+    "type": "string",
+    "description": "Nested condition groups"
+   },
+   "multipleOutcomes": {
+    "type": "string",
+    "description": "Multiple outcomes"
+   },
+   "ruleOrdering": {
+    "type": "string",
+    "description": "Rule ordering"
+   }
+  }
+ },
+ "PromotionRuleBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Promotion Rule Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ruleName": {
+    "type": "string",
+    "description": "Rule name"
+   },
+   "ruleId": {
+    "type": "string",
+    "description": "Rule ID"
+   },
+   "promotion": {
+    "type": "string",
+    "description": "Promotion"
+   },
+   "description": {
+    "type": "string",
+    "description": "Description"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "businessEntity": {
+    "type": "string",
+    "description": "Business entity"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "ruleStatus": {
+    "type": "string",
+    "description": "Rule status"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   },
+   "percentageDiscount": {
+    "type": "number",
+    "description": "Percentage discount"
+   },
+   "fixedDiscount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fixed discount"
+   },
+   "fixedSellingPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fixed selling price"
+   },
+   "freeProduct": {
+    "type": "string",
+    "description": "Free product"
+   },
+   "freeTicket": {
+    "type": "string",
+    "description": "Free ticket"
+   },
+   "addedValue": {
+    "type": "string",
+    "description": "Added value"
+   },
+   "voucher": {
+    "type": "string",
+    "description": "Voucher"
+   },
+   "rewardEntitlement": {
+    "type": "string",
+    "description": "Reward entitlement"
+   },
+   "nestedConditionGroups": {
+    "type": "string",
+    "description": "Nested condition groups"
+   },
+   "multipleOutcomes": {
+    "type": "string",
+    "description": "Multiple outcomes"
+   },
+   "ruleOrdering": {
+    "type": "string",
+    "description": "Rule ordering"
+   }
+  }
+ },
  "PromotionStackingRuleBuilderInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; the configurable part of a `promotions.stacking_rule` row (StackingRule composes it) (DM5, 29 September: data model for the agreed operations)",
   "description": "**What Promotion Stacking Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "promotionAPromotionB": {
+   "scope": {
     "type": "string",
-    "description": "Promotion A + Promotion B"
+    "enum": [
+     "entireTransaction",
+     "product",
+     "productCategory",
+     "individualTicket",
+     "bundleComponent",
+     "customer",
+     "channel"
+    ],
+    "description": "What the rule applies to."
    },
-   "onlyOnePromotionCanApply": {
+   "stackingModel": {
     "type": "string",
-    "description": "Only one promotion can apply"
+    "enum": [
+     "fullyStackable",
+     "nonStackable",
+     "conditional",
+     "categoryStacking",
+     "maximumN"
+    ],
+    "description": "Stacking model"
    },
-   "but": {
+   "maximumPromotions": {
+    "type": "integer",
+    "description": "For maximumN: most promotions per transaction"
+   },
+   "promotionTypeA": {
     "type": "string",
-    "description": "but"
+    "description": "First promotion type in the rule"
    },
-   "couponDiscount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Coupon Discount"
-   },
-   "entireTransaction": {
+   "promotionTypeB": {
     "type": "string",
-    "description": "Entire transaction"
+    "description": "Second promotion type in the rule"
    },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "productCategory": {
-    "type": "string",
-    "description": "Product category"
-   },
-   "individualTicket": {
-    "type": "string",
-    "description": "Individual ticket"
-   },
-   "bundleComponent": {
-    "type": "string",
-    "description": "Bundle component"
-   },
-   "customer": {
-    "type": "string",
-    "description": "Customer"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
+   "canStack": {
+    "type": "boolean",
+    "description": "Whether A can stack with B"
    }
   }
  },
@@ -2406,49 +2377,45 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
   "description": "**What Promotion Stacking Rule Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "promotionAPromotionB": {
+   "scope": {
     "type": "string",
-    "description": "Promotion A + Promotion B"
+    "enum": [
+     "entireTransaction",
+     "product",
+     "productCategory",
+     "individualTicket",
+     "bundleComponent",
+     "customer",
+     "channel"
+    ],
+    "description": "What the rule applies to."
    },
-   "onlyOnePromotionCanApply": {
+   "stackingModel": {
     "type": "string",
-    "description": "Only one promotion can apply"
+    "enum": [
+     "fullyStackable",
+     "nonStackable",
+     "conditional",
+     "categoryStacking",
+     "maximumN"
+    ],
+    "description": "Stacking model"
    },
-   "but": {
+   "maximumPromotions": {
+    "type": "integer",
+    "description": "For maximumN: most promotions per transaction"
+   },
+   "promotionTypeA": {
     "type": "string",
-    "description": "but"
+    "description": "First promotion type in the rule"
    },
-   "couponDiscount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Coupon Discount"
-   },
-   "entireTransaction": {
+   "promotionTypeB": {
     "type": "string",
-    "description": "Entire transaction"
+    "description": "Second promotion type in the rule"
    },
-   "product": {
-    "type": "string",
-    "description": "Product"
-   },
-   "productCategory": {
-    "type": "string",
-    "description": "Product category"
-   },
-   "individualTicket": {
-    "type": "string",
-    "description": "Individual ticket"
-   },
-   "bundleComponent": {
-    "type": "string",
-    "description": "Bundle component"
-   },
-   "customer": {
-    "type": "string",
-    "description": "Customer"
-   },
-   "channel": {
-    "type": "string",
-    "description": "Channel"
+   "canStack": {
+    "type": "boolean",
+    "description": "Whether A can stack with B"
    }
   }
  },

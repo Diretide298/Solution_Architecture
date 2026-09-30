@@ -1,1 +1,832 @@
-{}
+{
+ "AccessCondition": {
+  "type": "object",
+  "description": "**One attribute, one operator, one value** — and the attribute names are an enum rather than free text, because a policy that reads `venu.type` silently never matches.\nThe enum is the matrix, row by row: user (3.3.7), employee (3.3.8), membership (3.3.9), accreditation (3.3.10), customer segment (3.3.11), resource classification (3.3.12), venue (3.3.13), attraction (3.3.14), device (3.3.15), day of week (3.3.16), season (3.3.17), event (3.3.18), capacity (3.3.19), occupancy (3.3.20), risk score (3.3.21), location (3.3.2) and time (3.3.3).\n",
+  "required": [
+   "attribute",
+   "operator"
+  ],
+  "properties": {
+   "attribute": {
+    "type": "string",
+    "enum": [
+     "user.attribute",
+     "employee.attribute",
+     "employee.onShift",
+     "membership.tier",
+     "membership.status",
+     "accreditation.type",
+     "accreditation.status",
+     "customer.segment",
+     "resource.classification",
+     "venue.attribute",
+     "venue.id",
+     "attraction.attribute",
+     "device.kind",
+     "device.id",
+     "device.trusted",
+     "time.ofDay",
+     "time.dayOfWeek",
+     "time.season",
+     "time.withinOperatingHours",
+     "event.id",
+     "event.status",
+     "capacity.utilisationPercent",
+     "occupancy.level",
+     "risk.score",
+     "ticket.status",
+     "location.scopePath"
+    ]
+   },
+   "key": {
+    "type": "string",
+    "nullable": true,
+    "description": "For the `*.attribute` forms — which attribute, by code."
+   },
+   "operator": {
+    "type": "string",
+    "enum": [
+     "equals",
+     "notEquals",
+     "in",
+     "notIn",
+     "greaterThan",
+     "lessThan",
+     "between",
+     "contains",
+     "startsWith",
+     "exists"
+    ]
+   },
+   "value": {
+    "nullable": true,
+    "description": "The single comparand for `equals`, `notEquals`, `greaterThan`, `lessThan`, `contains` and `startsWith` — a string, number or boolean, by the attribute. Null for `exists`; `in`, `notIn` and `between` use `values`.\n"
+   },
+   "values": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "AccessPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "identity.access_policy",
+  "description": "3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). The package has two: this one, and the access contract's `AccessDynamicPolicy` (`access.dynamic_policy`). **This one governs who may do what in the software**: a principal's permissions on operations and screens (`permissions` names them), narrowed or extended by who, where, when and on what device, and decided by `evaluateAccess`. **`AccessDynamicPolicy` governs who may pass which gate**: a guest's, holder's or employee's admission at an access point, decided in the gate's validation with results such as `requireId` or `requireSupervisor` that mean nothing to a permission check. A staff member's badge opening a staff door is a gate decision (access); the same staff member approving a refund is a permission decision (here). The overlap that remains is listed in the build readiness open items rather than merged in this pass.\n",
+  "required": [
+   "code",
+   "name",
+   "effect"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "Assigned by the server on `createAccessPolicy`; the path names the policy on update."
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "isTemplate": {
+    "type": "boolean",
+    "default": false
+   },
+   "permissions": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "**Which permissions this policy speaks to.** A policy with an empty list speaks to all of them, which is powerful enough that it is worth being explicit about.\n"
+   },
+   "conditions": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AccessCondition"
+    }
+   },
+   "combining": {
+    "type": "string",
+    "enum": [
+     "allMustMatch",
+     "anyMayMatch"
+    ],
+    "default": "allMustMatch"
+   },
+   "effect": {
+    "type": "string",
+    "enum": [
+     "permit",
+     "deny"
+    ],
+    "description": "**Deny wins over permit when two policies disagree.** 3.3.32 asks for least-privilege, and a permit that can override a deny is not least-privilege by any reading — it is the union of every mistake anybody has made.\n"
+   },
+   "priority": {
+    "type": "integer",
+    "default": 0
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "3.3.40 to 3.3.43. **Tenant, venue and cross-venue policies are one mechanism**, because `scope_path` is prefix-comparable — `uae.dubai` contains `uae.dubai.marina` — and inheritance is the prefix walk rather than a second table.\n"
+   },
+   "appliesToRoleIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "status": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**Moved only by `setAccessPolicyState`.** A policy is created as a `draft`, and a status sent in a create or update body is ignored — otherwise a write could skip the approval 3.3.26 requires.\n",
+    "enum": [
+     "draft",
+     "pendingApproval",
+     "active",
+     "suspended",
+     "retired"
+    ]
+   },
+   "version": {
+    "type": "integer",
+    "default": 1,
+    "readOnly": true,
+    "description": "Set by the server; every `updateAccessPolicy` writes a new version."
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "delegatedAdminRoleIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "3.3.35. **Who may edit this policy without being a platform administrator.** A venue manager tuning their own opening-hours rule should not need someone who can edit every tenant's.\n"
+   }
+  }
+ },
+ "ApprovalKind": {
+  "type": "string",
+  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n",
+  "enum": [
+   "refund",
+   "priceOverride",
+   "discountOverride",
+   "complimentaryTicket",
+   "membershipCancellation",
+   "accessPermissionChange",
+   "configurationChange",
+   "aiRecommendation",
+   "releasePromotion",
+   "requisition",
+   "stockWriteOff",
+   "journalEntry",
+   "periodClose",
+   "periodReopen",
+   "purchaseOrderCancel",
+   "purchaseOrderShortClose",
+   "tenantMigration",
+   "productChange",
+   "pricingChange"
+  ]
+ },
+ "ApprovalRetentionPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.retention_policy",
+  "description": "Approvals board 6.7. **Approval records outlive what they approved.**",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "appliesToRequestKinds": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ApprovalKind"
+    }
+   },
+   "retainYears": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**Null takes the tenant's `approvalRecord` retention setting** (tenancy `setDataRetentionSetting`; decided 29 September, all data retention is tenant configuration). A value here applies to the request kinds this policy names and may only lengthen what the tenant setting keeps.\n"
+   },
+   "retainSignatures": {
+    "type": "boolean",
+    "default": true
+   },
+   "retainAttachments": {
+    "type": "boolean",
+    "default": false
+   },
+   "onExpiry": {
+    "type": "string",
+    "enum": [
+     "delete",
+     "anonymise",
+     "archive"
+    ],
+    "default": "archive"
+   },
+   "overridesPrivacyDeletion": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Can extend, never shorten, what privacy retention would delete.** The interaction is decided once here instead of argued per data-subject request.\n"
+   },
+   "legalBasis": {
+    "type": "string",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "Cadence": {
+  "x-ticvai-persistence": "none — embedded in schedule",
+  "type": "object",
+  "description": "**What each frequency needs (decided 28 September, audit R158).** `daily`: `timeOfDay`. `weekly`: `dayOfWeek` and `timeOfDay`. `monthly`: `dayOfMonth` and `timeOfDay`, a day past the month's end running on its last day. `quarterly`: `dayOfMonth` and `timeOfDay`, in the first month of each quarter. `onShiftClose` and `onPeriodClose`: nothing else, they run on the event. A field a frequency needs and does not have, or one it does not take, is the 400 on `createReportSchedule`. **Times are in the venue's time zone.**\n",
+  "required": [
+   "frequency"
+  ],
+  "properties": {
+   "frequency": {
+    "type": "string",
+    "enum": [
+     "daily",
+     "weekly",
+     "monthly",
+     "quarterly",
+     "onShiftClose",
+     "onPeriodClose"
+    ]
+   },
+   "dayOfWeek": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 6
+   },
+   "dayOfMonth": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 31
+   },
+   "timeOfDay": {
+    "type": "string",
+    "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+   },
+   "timeZone": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Always the venue's time zone (decided 28 September, audit R158), returned so a reader knows which. Not taken on a write."
+   }
+  }
+ },
+ "CreateReportScheduleRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "reportId",
+   "cadence",
+   "recipients",
+   "format"
+  ],
+  "properties": {
+   "reportId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "cadence": {
+    "$ref": "#/components/schemas/Cadence"
+   },
+   "parameters": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "As `RunReportRequest.parameters` — keyed by the report's `ReportParameter.key`, applied to every run."
+   },
+   "recipients": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "$ref": "#/components/schemas/Recipient"
+    }
+   },
+   "format": {
+    "$ref": "#/components/schemas/ExportFormat"
+   },
+   "includePersonalData": {
+    "type": "boolean",
+    "default": false
+   },
+   "skipIfEmpty": {
+    "type": "boolean",
+    "default": true,
+    "description": "An empty report every morning trains people to ignore the report."
+   }
+  }
+ },
+ "ExecutionStatus": {
+  "type": "string",
+  "enum": [
+   "queued",
+   "running",
+   "completed",
+   "failed",
+   "cancelled",
+   "expired"
+  ]
+ },
+ "ExportFormat": {
+  "type": "string",
+  "enum": [
+   "csv",
+   "xlsx",
+   "pdf",
+   "json"
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Recipient": {
+  "x-ticvai-persistence": "reporting.schedule_recipient",
+  "type": "object",
+  "description": "One recipient of a schedule. **A row of `reporting.schedule_recipient`, a child of `reporting.schedule`** — `ReportSchedule` declares the pair, which is what gives the table its `schedule_id`. Pull audit 26 September: declared on its own, the table had no column tying a recipient to its schedule.\n",
+  "required": [
+   "kind",
+   "address"
+  ],
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "principal",
+     "email",
+     "sftp",
+     "webhook"
+    ]
+   },
+   "address": {
+    "type": "string"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   }
+  }
+ },
+ "ReportDelivery": {
+  "type": "object",
+  "x-ticvai-persistence": "reporting.delivery",
+  "description": "BI boards 4.8 and 4.9. **A report that silently stopped arriving is worse than one that never existed.**\n",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subscriptionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "reportId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "attemptedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "delivered",
+     "failed",
+     "retrying",
+     "suppressed"
+    ]
+   },
+   "recipientCount": {
+    "type": "integer"
+   },
+   "failureReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "retryCount": {
+    "type": "integer",
+    "default": 0
+   },
+   "containedPersonalData": {
+    "type": "boolean",
+    "default": false
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "ReportExport": {
+  "x-ticvai-persistence": "reporting.export",
+  "type": "object",
+  "required": [
+   "id",
+   "executionId",
+   "format",
+   "status",
+   "requestedByPrincipalId",
+   "requestedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "executionId": {
+    "type": "string"
+   },
+   "format": {
+    "$ref": "#/components/schemas/ExportFormat"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "queued",
+     "generating",
+     "ready",
+     "failed",
+     "expired"
+    ]
+   },
+   "includesPersonalData": {
+    "type": "boolean"
+   },
+   "purpose": {
+    "type": "string",
+    "nullable": true
+   },
+   "downloadUrl": {
+    "type": "string",
+    "nullable": true,
+    "description": "Signed and expiring. Present only while status is `ready`."
+   },
+   "sizeBytes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "requestedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "ReportSchedule": {
+  "x-ticvai-persistence": "reporting.schedule + reporting.schedule_recipient",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateReportScheduleRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "ownerPrincipalId",
+     "isPaused",
+     "createdAt"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "ownerPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The schedule runs under this principal's permissions, not the recipients'. A standing grant of whatever the owner can see.\n"
+     },
+     "isPaused": {
+      "type": "boolean"
+     },
+     "lastRunAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "lastRunStatus": {
+      "$ref": "#/components/schemas/ExecutionStatus"
+     },
+     "nextRunAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "consecutiveFailures": {
+      "type": "integer"
+     },
+     "createdAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  ]
+ },
+ "ReportSubscription": {
+  "type": "object",
+  "x-ticvai-persistence": "reporting.subscription",
+  "description": "BI boards 4.3 and 4.4. **Not a schedule** — one schedule serves several of these.",
+  "required": [
+   "reportId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "reportId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scheduleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "recipients": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "principalId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "email": {
+       "type": "string",
+       "nullable": true
+      },
+      "external": {
+       "type": "boolean",
+       "default": false
+      }
+     }
+    }
+   },
+   "channel": {
+    "type": "string",
+    "enum": [
+     "email",
+     "sftp",
+     "webhook",
+     "inPlatform"
+    ]
+   },
+   "format": {
+    "type": "string",
+    "enum": [
+     "pdf",
+     "xlsx",
+     "csv",
+     "json"
+    ]
+   },
+   "includesPersonalData": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Gates on `REPORT_EXPORT_PII` and is audited.** A report that leaves the tenant with personal data in it is a fact somebody will ask about.\n"
+   },
+   "runsAsPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "**The report runs under the owner's permissions, not the recipient's.**"
+   },
+   "active": {
+    "type": "boolean",
+    "default": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "TenantDataRetentionClass": {
+  "type": "string",
+  "description": "**The data classes a tenant sets a retention period for** (decided 29 September, Chinmay: all data retention is tenant configuration, one setting per class). Defaults are ADR-0047's and the AI system design's (section 8, decision 5); a legal limit is the only thing the platform enforces.\n| Class | Default | Counted from | Legal limit (refused) | |---|---|---|---| | `guestProfile` | 5 years | last activity | none | | `paymentRecord` | 10 years | created | at least 10 years (4.3.4) | | `financialRecord` | 7 years | created | at least 7 years (6.1.78) | | `auditRecord` | 2 years (authorisation and device audit) | created | none | | `approvalRecord` | 7 years (approvals board 6.7) | decided | none | | `complianceInspection` | 7 years | created | none | | `faceTagBiometric` | 7 days | ticket expiry | make-or-break | | `facePassBiometric` | follows `guestProfile` | last activity | make-or-break | | `aiPrompts` | 90 days (prompts and responses) | created | none | | `aiConversations` | 90 days | last activity | none | | `aiDecisionRecords` | follows `auditRecord` (decision records and the approvals of AI actions) | decided | none | | `aiMetadataIndex` | always follows `aiDecisionRecords` (summaries, entities, embeddings) | created | none |\n**ADR-0047's floors and ceilings that are not law are defaults now, not refusals** (the audit floor of one year, the proposed seven-year guest-profile ceiling, the Face Tag thirty-day ceiling). Platform-owned copies — the burst environment copy, a decommissioned cell — are not tenant data classes and are not here.\n",
+  "enum": [
+   "guestProfile",
+   "paymentRecord",
+   "financialRecord",
+   "auditRecord",
+   "approvalRecord",
+   "complianceInspection",
+   "faceTagBiometric",
+   "facePassBiometric",
+   "aiPrompts",
+   "aiConversations",
+   "aiDecisionRecords",
+   "aiMetadataIndex"
+  ]
+ },
+ "TenantDataRetentionSetting": {
+  "type": "object",
+  "x-ticvai-persistence": "tenancy.data_retention_setting",
+  "description": "**One tenant's retention period for one data class** (decided 29 September, Chinmay). One row per tenant and class, written by `setDataRetentionSetting`; a class with no row takes the platform default. The limit and default fields are the platform's catalogue, computed for the response and not stored on the row.\n",
+  "required": [
+   "dataClass"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "dataClass": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/TenantDataRetentionClass"
+     }
+    ],
+    "x-ticvai-unique": "tenant",
+    "description": "One row per class per tenant. On a write it comes from the path; a body value is ignored."
+   },
+   "retainAmount": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "description": "The tenant's period. Null with no `followsDataClass` means the platform default applies. Zero means the data is not kept past the transaction that produced it.\n"
+   },
+   "retainUnit": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "days",
+     "months",
+     "years"
+    ],
+    "description": "Required with `retainAmount`."
+   },
+   "followsDataClass": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/TenantDataRetentionClass"
+     }
+    ],
+    "nullable": true,
+    "description": "Keep this class for as long as another class is kept. Set by default for `aiDecisionRecords` (follows `auditRecord`), `facePassBiometric` (follows `guestProfile`) and `aiMetadataIndex` (follows `aiDecisionRecords`, and cannot be changed).\n"
+   },
+   "onExpiry": {
+    "type": "string",
+    "enum": [
+     "archive",
+     "anonymise",
+     "delete"
+    ],
+    "default": "archive",
+    "description": "ADR-0047's stages. `archive` moves the data to the archive instance, from where it is erased on the class's own schedule; derived stores (the AI index, search) purge at archive, not later.\n"
+   },
+   "anchor": {
+    "type": "string",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "enum": [
+     "createdAt",
+     "lastActivity",
+     "decidedAt",
+     "ticketExpiry"
+    ],
+    "description": "What the period is counted from. Fixed per class by the platform."
+   },
+   "effectiveAmount": {
+    "type": "integer",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The period actually applied, after follows and defaults are resolved."
+   },
+   "effectiveUnit": {
+    "type": "string",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "enum": [
+     "days",
+     "months",
+     "years"
+    ]
+   },
+   "isDefault": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "True when the tenant has not set this class and the platform default applies."
+   },
+   "defaultAmount": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false
+   },
+   "defaultUnit": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "enum": [
+     "days",
+     "months",
+     "years"
+    ]
+   },
+   "legalMinimumAmount": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "A floor the law sets. A shorter period is refused (`422`)."
+   },
+   "legalMaximumAmount": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "A maximum the law sets. A longer period is refused (`422`). Null for every class until the biometric make-or-break is answered."
+   },
+   "legalLimitUnit": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "enum": [
+     "days",
+     "months",
+     "years"
+    ]
+   },
+   "legalBasis": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The law or requirement the limit comes from, e.g. `4.3.4`."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The tenant. Retention is set at tenant scope only."
+   }
+  }
+ }
+}

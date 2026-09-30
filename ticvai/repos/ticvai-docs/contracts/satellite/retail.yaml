@@ -178,7 +178,7 @@ paths:
       - name: dropId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: disposeShopAndDrop
       x-ticvai-consumed-by:
@@ -584,7 +584,7 @@ paths:
       - name: saleId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     get:
       operationId: getRetailSale
       x-ticvai-consumed-by:
@@ -676,7 +676,7 @@ paths:
       - name: saleId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: reprintReceipt
       x-ticvai-consumed-by:
@@ -1040,7 +1040,7 @@ paths:
               type: object
               required: [id, collectionPointId, recordedAt]
               properties:
-                id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                id: { type: string, format: uuid }
                 saleId:
                   type: string
                   nullable: true
@@ -1138,7 +1138,7 @@ paths:
       - name: dropId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: collectShopAndDrop
       x-ticvai-audience: [staff]
@@ -1235,7 +1235,7 @@ paths:
               type: object
               required: [id, lines]
               properties:
-                id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                id: { type: string, format: uuid }
                 subjectId: { type: string, format: uuid }
                 lines:
                   type: array
@@ -1656,7 +1656,7 @@ components:
       type: object
       required: [id, merchandiseId, quantity]
       properties:
-        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        id: { type: string, format: uuid }
         merchandiseId: { type: string, format: uuid }
         quantity: { type: integer, minimum: 1 }
         serialNumbers:
@@ -1674,7 +1674,7 @@ components:
       type: object
       required: [id, outletId, lines, recordedAt]
       properties:
-        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        id: { type: string, format: uuid }
         outletId: { type: string, format: uuid }
         shiftId: { type: string }
         subjectId: { type: string, format: uuid }
@@ -1785,7 +1785,7 @@ components:
       type: object
       required: [id, saleId, lines, reason, recordedAt]
       properties:
-        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        id: { type: string, format: uuid }
         saleId: { type: string }
         lines:
           type: array
@@ -1898,7 +1898,7 @@ components:
             refusedReason: { $ref: '#/components/schemas/ReturnRefusedReason' }
             refusalId:
               type: string
-              pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+              format: uuid
               description: >
                 The id of the `RetailReturn` recorded with `status: refused`. Assigned by the
                 server; not the request's `id`.
@@ -1948,7 +1948,7 @@ components:
       type: object
       required: [id, saleId, returnLines, replacementLines, recordedAt]
       properties:
-        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        id: { type: string, format: uuid }
         saleId: { type: string }
         returnLines:
           type: array
@@ -2022,6 +2022,7 @@ components:
           description: The till sale. Null for an online order, which sets `orderId` (audit R236).
         orderId:
           type: string
+          format: uuid
           nullable: true
           description: The paid online order that created this collection (audit R236).
         entitlementId:

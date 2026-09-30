@@ -292,7 +292,7 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -353,7 +353,7 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -444,7 +444,7 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | venueId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `BookingFlow`
 
@@ -536,7 +536,7 @@ Removed from the working draft; guests keep the published copy until the next pu
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | bookingFlowId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Responses**
 
@@ -818,7 +818,7 @@ A partial update of the working draft; guests see it after `publishTenantConfig`
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | bookingFlowId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -903,7 +903,7 @@ A partial update of the working draft; guests see it after `publishTenantConfig`
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | bookingFlowId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1040,7 +1040,7 @@ Source is a single 1024×1024 PNG without transparency; derived sizes are genera
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1091,7 +1091,7 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `BrandIdentity`
 
@@ -1257,7 +1257,7 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `BookingFlowConfig`
 
@@ -1425,7 +1425,7 @@ Scheduled by date window. A campaign banner set to run through a religious or na
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `Banner`
 
@@ -1503,7 +1503,7 @@ Always created as a `draft`; `id`, `status`, `isReferenced` and `scopePath` are 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 | Prefer | header |  | enum (validate-only) | Validate, do not write (29 September, AI system design 2.3 and 2.2 D step 4). |
 
 **Request body**: `ContentPage`
@@ -1571,13 +1571,13 @@ Always created as a `draft`; `id`, `status`, `isReferenced` and `scopePath` are 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | venueId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `GuidedChoice`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| id | string (uuid) | yes | UUIDv7. (read-only) |
 | venueId | string (uuid) | yes | From the path of createGuidedChoice. (read-only) |
 | name | string | yes | Staff-facing name, e.g. (max length 80) |
 | mode | enum (button, popupOnArrival, off) | yes | How the guest reaches it (rev 3 REV3-11). (default button) |
@@ -1585,12 +1585,12 @@ Always created as a `draft`; `id`, `status`, `isReferenced` and `scopePath` are 
 | behaviour | enum (filter, recommend) |  | filter (default) narrows the list; recommend ends on one result card (decided 29 September, W4). (default filter) |
 | showEverything | boolean |  | The "Show everything" link under a filtered list, which clears the answers (W4). (default True) |
 | questions | array of object | yes | One to four questions (decided 29 September, W4: the Deep Dive reference asks three or four; rev 3 REV3-11 allowed two). (min items 1; max items 4) |
-| questions[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].id | string (uuid) |  | UUIDv7. (read-only) |
 | questions[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | questions[].kind | enum (choice, yesNo, age, level, certification) |  | What the question asks (decided 29 September, W4). (default choice) |
 | questions[].sortOrder | integer | yes | (min 0) |
 | questions[].answers | array of object | yes | Two to four answers; the prototype shows three (proposed, client to correct, rev 3 REV3-11). (min items 2; max items 4) |
-| questions[].answers[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].answers[].id | string (uuid) |  | UUIDv7. (read-only) |
 | questions[].answers[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | questions[].answers[].body | object |  | The one-liner under the title, at most 140 characters in each language. |
 | questions[].answers[].icon | string |  | An icon name from the guest app's icon set. (max length 40; nullable) |
@@ -1611,7 +1611,7 @@ Always created as a `draft`; `id`, `status`, `isReferenced` and `scopePath` are 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| id | string (uuid) | yes | UUIDv7. (read-only) |
 | venueId | string (uuid) | yes | From the path of createGuidedChoice. (read-only) |
 | name | string | yes | Staff-facing name, e.g. (max length 80) |
 | mode | enum (button, popupOnArrival, off) | yes | How the guest reaches it (rev 3 REV3-11). (default button) |
@@ -1619,12 +1619,12 @@ Always created as a `draft`; `id`, `status`, `isReferenced` and `scopePath` are 
 | behaviour | enum (filter, recommend) |  | filter (default) narrows the list; recommend ends on one result card (decided 29 September, W4). (default filter) |
 | showEverything | boolean |  | The "Show everything" link under a filtered list, which clears the answers (W4). (default True) |
 | questions | array of object | yes | One to four questions (decided 29 September, W4: the Deep Dive reference asks three or four; rev 3 REV3-11 allowed two). (min items 1; max items 4) |
-| questions[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].id | string (uuid) |  | UUIDv7. (read-only) |
 | questions[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | questions[].kind | enum (choice, yesNo, age, level, certification) |  | What the question asks (decided 29 September, W4). (default choice) |
 | questions[].sortOrder | integer | yes | (min 0) |
 | questions[].answers | array of object | yes | Two to four answers; the prototype shows three (proposed, client to correct, rev 3 REV3-11). (min items 2; max items 4) |
-| questions[].answers[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].answers[].id | string (uuid) |  | UUIDv7. (read-only) |
 | questions[].answers[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | questions[].answers[].body | object |  | The one-liner under the title, at most 140 characters in each language. |
 | questions[].answers[].icon | string |  | An icon name from the guest app's icon set. (max length 40; nullable) |
@@ -1671,7 +1671,7 @@ Presentation only. A block may point at a promotion, but it does not create or p
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `PromoBlock`
 
@@ -1747,7 +1747,7 @@ Presentation only. A block may point at a promotion, but it does not create or p
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | bannerId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Responses**
 
@@ -1779,7 +1779,7 @@ Refused where the page is referenced by navigation or the homepage. Deleting a l
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | pageId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Responses**
 
@@ -1811,8 +1811,8 @@ A `published` choice is unpublished first, or 409.
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| guidedChoiceId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| guidedChoiceId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Responses**
 
@@ -1843,7 +1843,7 @@ A `published` choice is unpublished first, or 409.
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | promoBlockId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Responses**
 
@@ -1881,7 +1881,7 @@ A `published` choice is unpublished first, or 409.
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| id | string (uuid) | yes | UUIDv7. (read-only) |
 | venueId | string (uuid) | yes | From the path of createGuidedChoice. (read-only) |
 | name | string | yes | Staff-facing name, e.g. (max length 80) |
 | mode | enum (button, popupOnArrival, off) | yes | How the guest reaches it (rev 3 REV3-11). (default button) |
@@ -1889,12 +1889,12 @@ A `published` choice is unpublished first, or 409.
 | behaviour | enum (filter, recommend) |  | filter (default) narrows the list; recommend ends on one result card (decided 29 September, W4). (default filter) |
 | showEverything | boolean |  | The "Show everything" link under a filtered list, which clears the answers (W4). (default True) |
 | questions | array of object | yes | One to four questions (decided 29 September, W4: the Deep Dive reference asks three or four; rev 3 REV3-11 allowed two). (min items 1; max items 4) |
-| questions[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].id | string (uuid) |  | UUIDv7. (read-only) |
 | questions[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | questions[].kind | enum (choice, yesNo, age, level, certification) |  | What the question asks (decided 29 September, W4). (default choice) |
 | questions[].sortOrder | integer | yes | (min 0) |
 | questions[].answers | array of object | yes | Two to four answers; the prototype shows three (proposed, client to correct, rev 3 REV3-11). (min items 2; max items 4) |
-| questions[].answers[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].answers[].id | string (uuid) |  | UUIDv7. (read-only) |
 | questions[].answers[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | questions[].answers[].body | object |  | The one-liner under the title, at most 140 characters in each language. |
 | questions[].answers[].icon | string |  | An icon name from the guest app's icon set. (max length 40; nullable) |
@@ -2091,7 +2091,7 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of GuidedChoice | yes |  |
-| items[].id | string | yes | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| items[].id | string (uuid) | yes | UUIDv7. (read-only) |
 | items[].venueId | string (uuid) | yes | From the path of createGuidedChoice. (read-only) |
 | items[].name | string | yes | Staff-facing name, e.g. (max length 80) |
 | items[].mode | enum (button, popupOnArrival, off) | yes | How the guest reaches it (rev 3 REV3-11). (default button) |
@@ -2099,7 +2099,7 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 | items[].behaviour | enum (filter, recommend) |  | filter (default) narrows the list; recommend ends on one result card (decided 29 September, W4). (default filter) |
 | items[].showEverything | boolean |  | The "Show everything" link under a filtered list, which clears the answers (W4). (default True) |
 | items[].questions | array of object | yes | One to four questions (decided 29 September, W4: the Deep Dive reference asks three or four; rev 3 REV3-11 allowed two). (min items 1; max items 4) |
-| items[].questions[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| items[].questions[].id | string (uuid) |  | UUIDv7. (read-only) |
 | items[].questions[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | items[].questions[].kind | enum (choice, yesNo, age, level, certification) |  | What the question asks (decided 29 September, W4). (default choice) |
 | items[].questions[].sortOrder | integer | yes | (min 0) |
@@ -2200,13 +2200,13 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | venueId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| id | string (uuid) | yes | UUIDv7. (read-only) |
 | venueId | string (uuid) | yes | From the path of createGuidedChoice. (read-only) |
 | name | string | yes | Staff-facing name, e.g. (max length 80) |
 | mode | enum (button, popupOnArrival, off) | yes | How the guest reaches it (rev 3 REV3-11). (default button) |
@@ -2214,12 +2214,12 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 | behaviour | enum (filter, recommend) |  | filter (default) narrows the list; recommend ends on one result card (decided 29 September, W4). (default filter) |
 | showEverything | boolean |  | The "Show everything" link under a filtered list, which clears the answers (W4). (default True) |
 | questions | array of object | yes | One to four questions (decided 29 September, W4: the Deep Dive reference asks three or four; rev 3 REV3-11 allowed two). (min items 1; max items 4) |
-| questions[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].id | string (uuid) |  | UUIDv7. (read-only) |
 | questions[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | questions[].kind | enum (choice, yesNo, age, level, certification) |  | What the question asks (decided 29 September, W4). (default choice) |
 | questions[].sortOrder | integer | yes | (min 0) |
 | questions[].answers | array of object | yes | Two to four answers; the prototype shows three (proposed, client to correct, rev 3 REV3-11). (min items 2; max items 4) |
-| questions[].answers[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].answers[].id | string (uuid) |  | UUIDv7. (read-only) |
 | questions[].answers[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | questions[].answers[].body | object |  | The one-liner under the title, at most 140 characters in each language. |
 | questions[].answers[].icon | string |  | An icon name from the guest app's icon set. (max length 40; nullable) |
@@ -2240,7 +2240,7 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| id | string (uuid) | yes | UUIDv7. (read-only) |
 | venueId | string (uuid) | yes | From the path of createGuidedChoice. (read-only) |
 | name | string | yes | Staff-facing name, e.g. (max length 80) |
 | mode | enum (button, popupOnArrival, off) | yes | How the guest reaches it (rev 3 REV3-11). (default button) |
@@ -2248,12 +2248,12 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 | behaviour | enum (filter, recommend) |  | filter (default) narrows the list; recommend ends on one result card (decided 29 September, W4). (default filter) |
 | showEverything | boolean |  | The "Show everything" link under a filtered list, which clears the answers (W4). (default True) |
 | questions | array of object | yes | One to four questions (decided 29 September, W4: the Deep Dive reference asks three or four; rev 3 REV3-11 allowed two). (min items 1; max items 4) |
-| questions[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].id | string (uuid) |  | UUIDv7. (read-only) |
 | questions[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | questions[].kind | enum (choice, yesNo, age, level, certification) |  | What the question asks (decided 29 September, W4). (default choice) |
 | questions[].sortOrder | integer | yes | (min 0) |
 | questions[].answers | array of object | yes | Two to four answers; the prototype shows three (proposed, client to correct, rev 3 REV3-11). (min items 2; max items 4) |
-| questions[].answers[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].answers[].id | string (uuid) |  | UUIDv7. (read-only) |
 | questions[].answers[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | questions[].answers[].body | object |  | The one-liner under the title, at most 140 characters in each language. |
 | questions[].answers[].icon | string |  | An icon name from the guest app's icon set. (max length 40; nullable) |
@@ -2301,14 +2301,14 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| guidedChoiceId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| guidedChoiceId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Response**: `GuidedChoice`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| id | string (uuid) | yes | UUIDv7. (read-only) |
 | venueId | string (uuid) | yes | From the path of createGuidedChoice. (read-only) |
 | name | string | yes | Staff-facing name, e.g. (max length 80) |
 | mode | enum (button, popupOnArrival, off) | yes | How the guest reaches it (rev 3 REV3-11). (default button) |
@@ -2316,12 +2316,12 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 | behaviour | enum (filter, recommend) |  | filter (default) narrows the list; recommend ends on one result card (decided 29 September, W4). (default filter) |
 | showEverything | boolean |  | The "Show everything" link under a filtered list, which clears the answers (W4). (default True) |
 | questions | array of object | yes | One to four questions (decided 29 September, W4: the Deep Dive reference asks three or four; rev 3 REV3-11 allowed two). (min items 1; max items 4) |
-| questions[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].id | string (uuid) |  | UUIDv7. (read-only) |
 | questions[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | questions[].kind | enum (choice, yesNo, age, level, certification) |  | What the question asks (decided 29 September, W4). (default choice) |
 | questions[].sortOrder | integer | yes | (min 0) |
 | questions[].answers | array of object | yes | Two to four answers; the prototype shows three (proposed, client to correct, rev 3 REV3-11). (min items 2; max items 4) |
-| questions[].answers[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].answers[].id | string (uuid) |  | UUIDv7. (read-only) |
 | questions[].answers[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | questions[].answers[].body | object |  | The one-liner under the title, at most 140 characters in each language. |
 | questions[].answers[].icon | string |  | An icon name from the guest app's icon set. (max length 40; nullable) |
@@ -2370,7 +2370,7 @@ Also the grounding corpus for the AI concierge, which is why an answer here is c
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2419,7 +2419,7 @@ Also the grounding corpus for the AI concierge, which is why an answer here is c
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | policyKind | path | yes | PolicyKind: enum (privacy, termsAndConditions, refund, cookie, accessibility) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2474,14 +2474,14 @@ Returns it to `draft` (decided 29 September, rev 3 REV3-11). Guests stop seeing 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| guidedChoiceId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| guidedChoiceId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Response**: `GuidedChoice`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| id | string (uuid) | yes | UUIDv7. (read-only) |
 | venueId | string (uuid) | yes | From the path of createGuidedChoice. (read-only) |
 | name | string | yes | Staff-facing name, e.g. (max length 80) |
 | mode | enum (button, popupOnArrival, off) | yes | How the guest reaches it (rev 3 REV3-11). (default button) |
@@ -2489,12 +2489,12 @@ Returns it to `draft` (decided 29 September, rev 3 REV3-11). Guests stop seeing 
 | behaviour | enum (filter, recommend) |  | filter (default) narrows the list; recommend ends on one result card (decided 29 September, W4). (default filter) |
 | showEverything | boolean |  | The "Show everything" link under a filtered list, which clears the answers (W4). (default True) |
 | questions | array of object | yes | One to four questions (decided 29 September, W4: the Deep Dive reference asks three or four; rev 3 REV3-11 allowed two). (min items 1; max items 4) |
-| questions[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].id | string (uuid) |  | UUIDv7. (read-only) |
 | questions[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | questions[].kind | enum (choice, yesNo, age, level, certification) |  | What the question asks (decided 29 September, W4). (default choice) |
 | questions[].sortOrder | integer | yes | (min 0) |
 | questions[].answers | array of object | yes | Two to four answers; the prototype shows three (proposed, client to correct, rev 3 REV3-11). (min items 2; max items 4) |
-| questions[].answers[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].answers[].id | string (uuid) |  | UUIDv7. (read-only) |
 | questions[].answers[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | questions[].answers[].body | object |  | The one-liner under the title, at most 140 characters in each language. |
 | questions[].answers[].icon | string |  | An icon name from the guest app's icon set. (max length 40; nullable) |
@@ -2541,7 +2541,7 @@ Returns it to `draft` (decided 29 September, rev 3 REV3-11). Guests stop seeing 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | bannerId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2618,7 +2618,7 @@ Replaces the page's editable fields. `status` is taken only to archive the page 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | pageId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `UpdateContentPageRequest`
 
@@ -2679,8 +2679,8 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| guidedChoiceId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| guidedChoiceId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2697,7 +2697,7 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| id | string (uuid) | yes | UUIDv7. (read-only) |
 | venueId | string (uuid) | yes | From the path of createGuidedChoice. (read-only) |
 | name | string | yes | Staff-facing name, e.g. (max length 80) |
 | mode | enum (button, popupOnArrival, off) | yes | How the guest reaches it (rev 3 REV3-11). (default button) |
@@ -2705,12 +2705,12 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 | behaviour | enum (filter, recommend) |  | filter (default) narrows the list; recommend ends on one result card (decided 29 September, W4). (default filter) |
 | showEverything | boolean |  | The "Show everything" link under a filtered list, which clears the answers (W4). (default True) |
 | questions | array of object | yes | One to four questions (decided 29 September, W4: the Deep Dive reference asks three or four; rev 3 REV3-11 allowed two). (min items 1; max items 4) |
-| questions[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].id | string (uuid) |  | UUIDv7. (read-only) |
 | questions[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | questions[].kind | enum (choice, yesNo, age, level, certification) |  | What the question asks (decided 29 September, W4). (default choice) |
 | questions[].sortOrder | integer | yes | (min 0) |
 | questions[].answers | array of object | yes | Two to four answers; the prototype shows three (proposed, client to correct, rev 3 REV3-11). (min items 2; max items 4) |
-| questions[].answers[].id | string |  | ULID. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$; read-only) |
+| questions[].answers[].id | string (uuid) |  | UUIDv7. (read-only) |
 | questions[].answers[].title | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | questions[].answers[].body | object |  | The one-liner under the title, at most 140 characters in each language. |
 | questions[].answers[].icon | string |  | An icon name from the guest app's icon set. (max length 40; nullable) |
@@ -2760,7 +2760,7 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | promoBlockId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -2881,7 +2881,7 @@ The drag-and-drop builder. Sections are an ordered list; the order here is the o
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 | Prefer | header |  | enum (validate-only) | Validate, do not write (29 September, AI system design 2.3 and 2.2 D step 4). |
 
 **Request body**: `HomepageLayout`
@@ -2996,7 +2996,7 @@ Several are build-time on native apps and are flagged accordingly. A tenant enab
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -3034,7 +3034,7 @@ Enabling a language does not translate existing content. The response reports ho
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -3085,7 +3085,7 @@ A disabled module is **hidden from the guest app entirely** — not shown and re
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -3175,7 +3175,7 @@ A disabled module is **hidden from the guest app entirely** — not shown and re
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 | Prefer | header |  | enum (validate-only) | Validate, do not write (29 September, AI system design 2.3 and 2.2 D step 4). |
 
 **Request body**: `HeaderConfig`
@@ -3228,7 +3228,7 @@ Bottom navigation is capped at five visible items; the remainder moves to the ov
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 | Prefer | header |  | enum (validate-only) | Validate, do not write (29 September, AI system design 2.3 and 2.2 D step 4). |
 
 **Request body**: `NavigationConfig`
@@ -3690,13 +3690,13 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `WhiteLabelStorefrontSessionBatch`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| batchId | string | yes | ULID minted by the runtime; a retried beacon repeats it. (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| batchId | string (uuid) | yes | UUIDv7 minted by the runtime; a retried beacon repeats it. |
 | sessionRef | string | yes | The runtime's own session id, SHA-256 hashed in the browser; hashed again with the tenant key on arrival and published as storefront.sessionEvent.sessionRef. (max length 128) |
 | deviceIdHash | string |  | (max length 128; nullable) |
 | surface | enum (guestWeb, guestApp) | yes |  |
@@ -3746,7 +3746,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `StorefrontAnalyticsProvider`
 
@@ -3817,7 +3817,7 @@ Renders the branded maintenance screen with an expected-back time. Tenant-brande
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -3913,7 +3913,7 @@ A short-lived link rendering the working draft as the guest app would, for a cho
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -4103,7 +4103,7 @@ The response names any build-time change in the draft that will **not** reach gu
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -4163,7 +4163,7 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | version | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Response**: `TenantConfig`
 
@@ -4408,7 +4408,7 @@ Records the preset and which steps are done, skipped or in progress, so the buil
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `SiteSetupProgress`
 
@@ -4465,7 +4465,7 @@ Run before publishing. Reports missing translations, navigation pointing at disa
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Response**: `ConfigValidationReport`
 
@@ -4609,7 +4609,7 @@ Run before publishing. Reports missing translations, navigation pointing at disa
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 | Prefer | header |  | enum (validate-only) | Validate, do not write (29 September, AI system design 2.3 and 2.2 D step 4). |
 
 **Request body**: `FontConfig`
@@ -4664,7 +4664,7 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 | Prefer | header |  | enum (validate-only) | Validate, do not write (29 September, AI system design 2.3 and 2.2 D step 4). |
 
 **Request body**: `Theme`
@@ -4774,7 +4774,7 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -4862,7 +4862,7 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | domainId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Responses**
 
@@ -4898,7 +4898,7 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | domainId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Response**: `CustomDomain`
 
@@ -4953,7 +4953,7 @@ BL-172. **The CMS modelled configuration and not authoring** — a marketer coul
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ContentBlock`
 
@@ -5020,7 +5020,7 @@ Approval is separate from authoring where the tenant requires it — **the appro
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | blockId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -5077,7 +5077,7 @@ BL-002. **A header is chrome and a footer is a link surface**, which is why this
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `FooterConfig`
 
@@ -5326,7 +5326,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | text | yes | ULID. |
+| id | uuid | yes | UUIDv7. |
 | venue_id | uuid | yes | From the path of createGuidedChoice. |
 | name | text | yes | Staff-facing name, e.g. |
 | mode | text | yes | How the guest reaches it (rev 3 REV3-11). |
@@ -5344,8 +5344,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| guided_choice_id | text | yes | The parent row. |
-| id | text | no | ULID. |
+| guided_choice_id | uuid | yes | The parent row. |
+| id | uuid | no | UUIDv7. |
 | title | jsonb | yes |  |
 | kind | text | no | What the question asks (decided 29 September, W4). |
 | sort_order | integer | yes |  |
@@ -5354,8 +5354,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| guided_choice_id | text | yes | The parent row. |
-| id | text | no | ULID. |
+| guided_choice_id | uuid | yes | The parent row. |
+| id | uuid | no | UUIDv7. |
 | title | jsonb | yes |  |
 | kind | text | no | What the question asks (decided 29 September, W4). |
 | sort_order | integer | yes |  |

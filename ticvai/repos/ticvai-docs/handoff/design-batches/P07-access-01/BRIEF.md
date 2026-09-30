@@ -1,6 +1,6 @@
 # P07-access-01 — P07 · Access (1 of 2)
 
-**10 screens · 23 operations · 27 schemas · 10 permissions**
+**10 screens · 27 operations · 44 schemas · 10 permissions**
 
 Platform P07 Venue Scanner · ships as **venue-staff-mobile** ·
 staff audience · handheld ·
@@ -50,7 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 10 permissions apply here:
   `ACCESS_OVERRIDE, ACCESS_VALIDATE, ORDER_CREATE, ORDER_VIEW, PERMISSION_VIEW, REPORT_VIEW_VENUE, SCOPE_VIEW, SHIFT_OPEN, TICKET_LOOKUP, TURNSTILE_MODE_SET`. A control nobody can use must say so,
   not sit enabled and fail.
-- **13 of these operations work offline**: consumeCrossRegionEntitlement, getAccessPoint, getCrossRegionEntitlement, getCurrentSession, getCurrentShift, getGuestSession, listAccessPoints, listBlacklist
+- **14 of these operations work offline**: consumeCrossRegionEntitlement, endPodiumShift, getAccessPoint, getCrossRegionEntitlement, getCurrentSession, getCurrentShift, listAccessPoints, listBlacklist
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
@@ -61,13 +61,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `SCN-001` | Sign in | listDetail | 8 | 0 | — |
-| `SCN-002` | Access point & direction | listDetail | 3 | 0 | — |
-| `SCN-003` | Ready to scan | listDetail | 9 | 1 | — |
-| `SCN-007` | Group admission | listDetail | 7 | 1 | — |
-| `SCN-008` | Manual entry | listDetail | 7 | 1 | — |
-| `SCN-009` | Ticket lookup | listDetail | 7 | 1 | — |
-| `SCN-011` | Delegated right | statusTracker | 2 | 0 | — |
-| `SCN-013` | Offline journal | listDetail | 7 | 1 | — |
-| `SCN-014` | Sync & reconciliation | listDetail | 9 | 1 | — |
-| `SCN-015` | Offline package | listDetail | 7 | 1 | — |
+| `SCN-001` | Sign in | listDetail | 9 | 3 | — |
+| `SCN-002` | Access point & direction | listDetail | 5 | 3 | — |
+| `SCN-003` | Ready to scan | listDetail | 10 | 5 | — |
+| `SCN-007` | Group admission | listDetail | 7 | 4 | — |
+| `SCN-008` | Manual entry | listDetail | 7 | 4 | — |
+| `SCN-009` | Ticket lookup | listDetail | 7 | 4 | — |
+| `SCN-011` | Delegated right | statusTracker | 2 | 1 | — |
+| `SCN-013` | Offline journal | listDetail | 7 | 4 | — |
+| `SCN-014` | Sync & reconciliation | listDetail | 9 | 5 | — |
+| `SCN-015` | Offline package | listDetail | 7 | 4 | — |
+
+## Thin screens in this batch
+
+**SCN-011 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

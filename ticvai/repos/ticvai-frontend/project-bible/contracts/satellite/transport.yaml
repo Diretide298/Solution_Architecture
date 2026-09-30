@@ -207,7 +207,7 @@ paths:
       - name: stationId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     patch:
       operationId: updateTransportStation
       x-ticvai-consumed-by:
@@ -293,10 +293,10 @@ paths:
           schema: { type: string, format: uuid }
         - name: fromStationId
           in: query
-          schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+          schema: { type: string, format: uuid }
         - name: toStationId
           in: query
-          schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+          schema: { type: string, format: uuid }
         - name: status
           in: query
           schema: { $ref: '#/components/schemas/TransportRouteStatus' }
@@ -371,7 +371,7 @@ paths:
       - name: routeId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     get:
       operationId: getTransportRoute
       x-ticvai-consumed-by:
@@ -432,7 +432,7 @@ paths:
                 colour: { type: string, pattern: '^#[0-9a-fA-F]{6}$' }
                 pairedRouteId:
                   type: string
-                  pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+                  format: uuid
                   nullable: true
                 bookingCutoffMinutes: { type: integer, minimum: 0, maximum: 1440 }
                 stops:
@@ -467,7 +467,7 @@ paths:
       - name: routeId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     put:
       operationId: setTransportRouteStatus
       x-ticvai-consumed-by:
@@ -522,7 +522,7 @@ paths:
       - name: routeId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     get:
       operationId: getTransportRouteMap
       x-ticvai-consumed-by:
@@ -553,10 +553,10 @@ paths:
       parameters:
         - name: fromStationId
           in: query
-          schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+          schema: { type: string, format: uuid }
         - name: toStationId
           in: query
-          schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+          schema: { type: string, format: uuid }
       responses:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
@@ -579,7 +579,7 @@ paths:
       - name: routeId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     get:
       operationId: getTransportFareTable
       x-ticvai-consumed-by:
@@ -719,7 +719,7 @@ paths:
       - name: routeId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     get:
       operationId: listTransportTimetables
       x-ticvai-consumed-by:
@@ -794,7 +794,7 @@ paths:
       - name: timetableId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     patch:
       operationId: updateTransportTimetable
       x-ticvai-consumed-by:
@@ -851,7 +851,7 @@ paths:
       - name: timetableId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: publishTransportTimetable
       x-ticvai-consumed-by:
@@ -904,7 +904,7 @@ paths:
       - name: timetableId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: withdrawTransportTimetable
       x-ticvai-consumed-by:
@@ -984,11 +984,11 @@ paths:
         - name: fromStationId
           in: query
           required: true
-          schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+          schema: { type: string, format: uuid }
         - name: toStationId
           in: query
           required: true
-          schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+          schema: { type: string, format: uuid }
         - name: date
           in: query
           required: true
@@ -1068,11 +1068,11 @@ paths:
         - name: fromStationId
           in: query
           required: true
-          schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+          schema: { type: string, format: uuid }
         - name: toStationId
           in: query
           required: true
-          schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+          schema: { type: string, format: uuid }
         - name: after
           in: query
           schema: { type: string, format: date-time }
@@ -1106,7 +1106,7 @@ paths:
       - name: routeId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     get:
       operationId: listTransportRouteDepartures
       x-ticvai-consumed-by:
@@ -1153,7 +1153,7 @@ paths:
       - name: departureId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     patch:
       operationId: updateTransportDeparture
       x-ticvai-consumed-by:
@@ -1226,11 +1226,11 @@ paths:
         - name: fromStationId
           in: query
           required: true
-          schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+          schema: { type: string, format: uuid }
         - name: toStationId
           in: query
           required: true
-          schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/PageSize'
         - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
       responses:
@@ -1335,7 +1335,7 @@ paths:
       - name: passTypeId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     patch:
       operationId: updateTransportPassType
       x-ticvai-consumed-by:
@@ -1368,7 +1368,7 @@ paths:
                 validityDays: { type: integer, minimum: 1, maximum: 366 }
                 routeIds:
                   type: array
-                  items: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                  items: { type: string, format: uuid }
                 sortOrder: { type: integer, minimum: 0 }
                 active: { type: boolean }
       responses:
@@ -1458,8 +1458,8 @@ paths:
               required: [venueId, fromStationId, toStationId]
               properties:
                 venueId: { type: string, format: uuid }
-                fromStationId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
-                toStationId: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                fromStationId: { type: string, format: uuid }
+                toStationId: { type: string, format: uuid }
                 label: { type: string, maxLength: 60, nullable: true }
       responses:
         '429':
@@ -1495,7 +1495,7 @@ paths:
       - name: favouriteId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     delete:
       operationId: deleteFavouriteRoute
       x-ticvai-consumed-by:
@@ -1592,7 +1592,7 @@ paths:
       - name: importId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     get:
       operationId: getTransportNetworkImport
       x-ticvai-consumed-by:
@@ -1623,7 +1623,7 @@ paths:
       - name: importId
         in: path
         required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        schema: { type: string, format: uuid }
     post:
       operationId: applyTransportNetworkImport
       x-ticvai-consumed-by:
@@ -1736,7 +1736,7 @@ components:
       type: object
       required: [id, venueId, format, sourceRef, status]
       properties:
-        id: { $ref: '#/components/schemas/Ulid' }
+        id: { $ref: '../shared/common.yaml#/components/schemas/Id' }
         venueId: { type: string, format: uuid, readOnly: true }
         format: { type: string, enum: [csvBundle, gtfs] }
         sourceRef:
@@ -1768,13 +1768,6 @@ components:
     LocalisedText:
       type: object
       additionalProperties: { type: string }
-
-    Ulid:
-      type: string
-      pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
-      x-ticvai-persistence-column: text
-      description: A ULID. **Stored as text, like every other ULID key in the package** (system-design review
-        SD-009, 29 September); without this column type every transport key landed as jsonb.
 
     TransportRouteStatus:
       type: string
@@ -1831,7 +1824,7 @@ components:
         - type: object
           required: [id, active]
           properties:
-            id: { $ref: '#/components/schemas/Ulid' }
+            id: { $ref: '../shared/common.yaml#/components/schemas/Id' }
             active: { type: boolean, default: true }
 
     RouteStopInput:
@@ -1839,7 +1832,7 @@ components:
       type: object
       required: [stationId, offsetMinutes]
       properties:
-        stationId: { $ref: '#/components/schemas/Ulid' }
+        stationId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
         offsetMinutes:
           type: integer
           minimum: 0
@@ -1857,7 +1850,7 @@ components:
         - type: object
           required: [id, sequence]
           properties:
-            id: { $ref: '#/components/schemas/Ulid' }
+            id: { $ref: '../shared/common.yaml#/components/schemas/Id' }
             sequence: { type: integer, minimum: 1, description: 1 for the origin. }
             station: { $ref: '#/components/schemas/Station' }
 
@@ -1880,7 +1873,7 @@ components:
         colour: { type: string, pattern: '^#[0-9a-fA-F]{6}$' }
         pairedRouteId:
           type: string
-          pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
+          format: uuid
           nullable: true
           description: The same line run the other way. The swap button lands on it.
         bookingCutoffMinutes:
@@ -1905,7 +1898,7 @@ components:
         - type: object
           required: [id, status]
           properties:
-            id: { $ref: '#/components/schemas/Ulid' }
+            id: { $ref: '../shared/common.yaml#/components/schemas/Id' }
             status: { $ref: '#/components/schemas/TransportRouteStatus' }
             stops:
               type: array
@@ -1932,7 +1925,7 @@ components:
       type: object
       required: [routeId, stops]
       properties:
-        routeId: { $ref: '#/components/schemas/Ulid' }
+        routeId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
         lineCode: { type: string }
         colour: { type: string }
         stops:
@@ -1942,7 +1935,7 @@ components:
             type: object
             required: [stationId, sequence, name, onJourney]
             properties:
-              stationId: { $ref: '#/components/schemas/Ulid' }
+              stationId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
               sequence: { type: integer }
               name: { type: string, description: Localised to the caller. }
               shortName: { type: string }
@@ -2018,8 +2011,8 @@ components:
             type: object
             required: [fromStationId, toStationId, fare]
             properties:
-              fromStationId: { $ref: '#/components/schemas/Ulid' }
-              toStationId: { $ref: '#/components/schemas/Ulid' }
+              fromStationId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
+              toStationId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
               fare: { $ref: '../shared/common.yaml#/components/schemas/Money' }
         passengerTypes:
           type: array
@@ -2035,8 +2028,8 @@ components:
         - type: object
           required: [id, routeId]
           properties:
-            id: { $ref: '#/components/schemas/Ulid' }
-            routeId: { $ref: '#/components/schemas/Ulid' }
+            id: { $ref: '../shared/common.yaml#/components/schemas/Id' }
+            routeId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
 
     FareQuoteRequest:
       x-ticvai-persistence: "none — request only"
@@ -2044,10 +2037,10 @@ components:
       required: [fromStationId, toStationId]
       properties:
         routeId:
-          $ref: '#/components/schemas/Ulid'
+          $ref: '../shared/common.yaml#/components/schemas/Id'
           description: Omitted, the active route serving the two stations in this order.
-        fromStationId: { $ref: '#/components/schemas/Ulid' }
-        toStationId: { $ref: '#/components/schemas/Ulid' }
+        fromStationId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
+        toStationId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
         passengers:
           type: array
           maxItems: 10
@@ -2058,7 +2051,7 @@ components:
             properties:
               code: { type: string }
               count: { type: integer, minimum: 0, maximum: 99 }
-        passTypeId: { $ref: '#/components/schemas/Ulid' }
+        passTypeId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
         at:
           type: string
           format: date-time
@@ -2069,7 +2062,7 @@ components:
       type: object
       required: [routeId, stopsTravelled, adultFare, total]
       properties:
-        routeId: { $ref: '#/components/schemas/Ulid' }
+        routeId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
         stopsTravelled: { type: integer, minimum: 1 }
         adultFare: { $ref: '../shared/common.yaml#/components/schemas/Money' }
         lines:
@@ -2083,7 +2076,7 @@ components:
               count: { type: integer }
               unitPrice: { $ref: '../shared/common.yaml#/components/schemas/Money' }
               lineTotal: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-        passTypeId: { $ref: '#/components/schemas/Ulid' }
+        passTypeId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
         saving:
           $ref: '../shared/common.yaml#/components/schemas/Money'
           description: With `passTypeId`, single adult fare × `referenceTrips` minus the pass price.
@@ -2143,8 +2136,8 @@ components:
         - type: object
           required: [id, routeId, status]
           properties:
-            id: { $ref: '#/components/schemas/Ulid' }
-            routeId: { $ref: '#/components/schemas/Ulid' }
+            id: { $ref: '../shared/common.yaml#/components/schemas/Id' }
+            routeId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
             status: { $ref: '#/components/schemas/TransportTimetableStatus' }
             publishedAt: { type: string, format: date-time, nullable: true, readOnly: true }
             releasedThrough:
@@ -2153,16 +2146,16 @@ components:
               nullable: true
               readOnly: true
               description: The last date whose departures have been generated.
-            supersededById: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$', nullable: true, readOnly: true }
+            supersededById: { type: string, format: uuid, nullable: true, readOnly: true }
 
     Departure:
       x-ticvai-persistence: "transport.departure"
       type: object
       required: [id, routeId, timetableId, performanceId, serviceDate, departsAt, status, seatCapacity]
       properties:
-        id: { $ref: '#/components/schemas/Ulid' }
-        routeId: { $ref: '#/components/schemas/Ulid' }
-        timetableId: { $ref: '#/components/schemas/Ulid' }
+        id: { $ref: '../shared/common.yaml#/components/schemas/Id' }
+        routeId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
+        timetableId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
         performanceId:
           type: string
           format: uuid
@@ -2187,9 +2180,9 @@ components:
       type: object
       required: [departureId, performanceId, routeId, departsAt, arrivesAt, durationMinutes, seatsLeft, fare, period]
       properties:
-        departureId: { $ref: '#/components/schemas/Ulid' }
+        departureId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
         performanceId: { type: string, format: uuid }
-        routeId: { $ref: '#/components/schemas/Ulid' }
+        routeId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
         routeCode: { type: string, description: 'The price card''s label, e.g. `E101-Out`.' }
         departsAt: { type: string, format: date-time, description: At the boarding stop. }
         arrivesAt: { type: string, format: date-time, description: At the alighting stop. }
@@ -2242,7 +2235,7 @@ components:
         routeIds:
           type: array
           description: Routes it is sold on. Empty means every active route in the venue.
-          items: { $ref: '#/components/schemas/Ulid' }
+          items: { $ref: '../shared/common.yaml#/components/schemas/Id' }
         sortOrder: { type: integer, minimum: 0, default: 0 }
 
     PassType:
@@ -2252,7 +2245,7 @@ components:
         - type: object
           required: [id, active]
           properties:
-            id: { $ref: '#/components/schemas/Ulid' }
+            id: { $ref: '../shared/common.yaml#/components/schemas/Id' }
             active: { type: boolean, default: true }
             catalogueProductId:
               type: string
@@ -2265,9 +2258,9 @@ components:
       type: object
       required: [passTypeId, catalogueProductId, name, price, validityDays]
       properties:
-        passTypeId: { $ref: '#/components/schemas/Ulid' }
+        passTypeId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
         catalogueProductId: { type: string, format: uuid }
-        routeId: { $ref: '#/components/schemas/Ulid' }
+        routeId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
         name: { type: string }
         description: { type: string }
         kind: { type: string, enum: [multiTrip, unlimited] }
@@ -2282,10 +2275,10 @@ components:
       required: [id, venueId, fromStationId, toStationId, createdAt]
       description: Unique per guest, venue and ordered pair of stations.
       properties:
-        id: { $ref: '#/components/schemas/Ulid' }
+        id: { $ref: '../shared/common.yaml#/components/schemas/Id' }
         venueId: { type: string, format: uuid }
-        fromStationId: { $ref: '#/components/schemas/Ulid' }
-        toStationId: { $ref: '#/components/schemas/Ulid' }
+        fromStationId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
+        toStationId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
         fromStationName: { type: string, readOnly: true }
         toStationName: { type: string, readOnly: true }
         label: { type: string, nullable: true }

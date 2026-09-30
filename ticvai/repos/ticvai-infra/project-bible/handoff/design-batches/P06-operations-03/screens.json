@@ -26,34 +26,27 @@
    "notes": "**Reached from EMP-003** — the screen the device sits on between tasks. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
    "transitions": [
     {
-     "to": "EMP-032",
-     "trigger": "The sensor is wrong, so a wait is entered by hand",
-     "provenance": "flow F67 step 1→2"
-    },
-    {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-031 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-031 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-031 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+    },
+    {
+     "to": "EMP-032",
+     "trigger": "The sensor is wrong, so a wait is entered by hand",
+     "provenance": "flow F67 step 1→2",
      "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+      "queueId"
+     ]
     }
    ]
   },
@@ -62,13 +55,6 @@
   "pattern": "listDetail",
   "patternReason": "`listQueues` reads the population and `getQueue` reads one of them — list, select, act",
   "purpose": "See the queue from the floor.",
-  "gaps": [
-   {
-    "operation": "getWaitTimes",
-    "why": "**2 declared operations reach no component on this screen**: getWaitTimes, listQueueEntries. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -76,6 +62,20 @@
      "name": "contentBody",
      "slot": "collection",
      "components": [
+      {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listQueues",
+       "notes": "Sends `?venueId=` to `listQueues`.",
+       "provenance": "contract queue.yaml GET /queues"
+      },
+      {
+       "kind": "toggle",
+       "label": "Open only",
+       "operation": "listQueues",
+       "notes": "Sends `?openOnly=` to `listQueues`.",
+       "provenance": "contract queue.yaml GET /queues"
+      },
       {
        "kind": "dataTable",
        "label": "Every queue",
@@ -96,6 +96,27 @@
        ],
        "operation": "listQueues",
        "provenance": "contract queue.yaml GET /queues"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every waiting guest",
+       "bindsTo": "WaitingGuest",
+       "columns": [
+        "WaitingGuest.id",
+        "WaitingGuest.queueId",
+        "WaitingGuest.queueName",
+        "WaitingGuest.subjectId",
+        "WaitingGuest.partyNumber",
+        "WaitingGuest.partySize",
+        "WaitingGuest.status",
+        "WaitingGuest.positionInQueue",
+        "WaitingGuest.partiesAhead",
+        "WaitingGuest.estimatedCallAt",
+        "WaitingGuest.isFastPass",
+        "WaitingGuest.entitlementId"
+       ],
+       "operation": "listQueueEntries",
+       "provenance": "contract queue.yaml GET /queues/{queueId}/entries"
       }
      ]
     },
@@ -106,6 +127,51 @@
       {
        "kind": "detailPanel",
        "label": "The selected queue",
+       "bindsTo": "Queue",
+       "columns": [
+        "Queue.code",
+        "Queue.name",
+        "Queue.venueId",
+        "Queue.attractionProductId",
+        "Queue.assetId",
+        "Queue.accessPointId",
+        "Queue.kind",
+        "Queue.operatingWindows",
+        "Queue.parentQueueId",
+        "Queue.loadBalanceWithQueueIds",
+        "Queue.inQueueOfferEnabled",
+        "Queue.notifyBeforeCallMinutes",
+        "Queue.capacityPerCycle",
+        "Queue.cycleMinutes",
+        "Queue.maxPartySize",
+        "Queue.returnWindowMinutes"
+       ],
+       "operation": "listQueues",
+       "provenance": "contract queue.yaml GET /queues"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The wait time",
+       "bindsTo": "WaitTime",
+       "columns": [
+        "WaitTime.queueId",
+        "WaitTime.queueName",
+        "WaitTime.attractionProductId",
+        "WaitTime.attractionCategoryId",
+        "WaitTime.status",
+        "WaitTime.waitMinutes",
+        "WaitTime.source",
+        "WaitTime.isStale",
+        "WaitTime.heightRequirementCm",
+        "WaitTime.zone",
+        "WaitTime.asOf"
+       ],
+       "operation": "getWaitTimes",
+       "provenance": "contract queue.yaml GET /queues/wait-times"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The queue",
        "bindsTo": "QueueDetail",
        "columns": [
         "QueueDetail.nowServingPartyNumber",
@@ -125,47 +191,21 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Call",
+       "label": "Call next parties",
        "operation": "callNextParties",
        "provenance": "contract queue.yaml POST /queues/{queueId}/call-next"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save queue status",
        "operation": "setQueueStatus",
        "provenance": "contract queue.yaml PUT /queues/{queueId}/status"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save wait time",
        "operation": "setWaitTime",
        "provenance": "contract queue.yaml PUT /queues/{queueId}/wait-time"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listQueues",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "callNextParties",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -174,9 +214,9 @@
   "states": {
    "loading": "The queue list.",
    "error": "Could not load. Names which read failed and leaves the queue untouched.",
-   "emptyFirstRun": "No queue yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the queue are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No queue yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on venueId, openOnly and the queue are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Last synced view with its age"
   },
   "apis": [
@@ -190,7 +230,7 @@
     "operationId": "getQueue",
     "contract": "queue",
     "purpose": "Read a queue with live position",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "callNextParties",
@@ -211,7 +251,7 @@
     "operationId": "listQueueEntries",
     "contract": "queue",
     "purpose": "List entries in a queue",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "setQueueStatus",
@@ -230,6 +270,13 @@
     "invalidates": [
      "listQueues"
     ]
+   },
+   {
+    "operationId": "requestSuggestion",
+    "contract": "ai",
+    "purpose": "Queue-balancing suggestion (kind queueBalancing): return-slot allocation and redirection",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -241,11 +288,11 @@
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `queueId`.",
    "preloaded": [
-    "QueueDetail.nowServingPartyNumber",
-    "QueueDetail.lastCalledAt",
-    "QueueDetail.throughputLastHour",
-    "QueueDetail.noShowRatePercent",
-    "QueueDetail.feed"
+    "Queue.code",
+    "Queue.name",
+    "Queue.venueId",
+    "Queue.attractionProductId",
+    "Queue.assetId"
    ]
   },
   "wireframe": {
@@ -254,6 +301,64 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-031"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCallNextParties",
+    "component": "modal",
+    "trigger": "Call next parties",
+    "body": "**Collects what `callNextParties` sends before it is called.** Nothing in the body is required. Optional: `partyCount`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Call next parties",
+     "operation": "callNextParties"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "partyCount"
+     ]
+    },
+    "provenance": "contract queue.yaml POST /queues/{queueId}/call-next"
+   },
+   {
+    "id": "formSetQueueStatus",
+    "component": "modal",
+    "trigger": "Save queue status",
+    "body": "**Collects what `setQueueStatus` sends before it is called.** Required: `status`, `reason`. Optional: `guestMessage`, `expectedReopenAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save queue status",
+     "operation": "setQueueStatus"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "reason",
+      "guestMessage",
+      "expectedReopenAt"
+     ]
+    },
+    "provenance": "contract queue.yaml PUT /queues/{queueId}/status"
+   },
+   {
+    "id": "formSetWaitTime",
+    "component": "modal",
+    "trigger": "Save wait time",
+    "body": "**Collects what `setWaitTime` sends before it is called.** Required: `waitMinutes`. Optional: `expiresInMinutes`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save wait time",
+     "operation": "setWaitTime"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "waitMinutes",
+      "expiresInMinutes",
+      "note"
+     ]
+    },
+    "provenance": "contract queue.yaml PUT /queues/{queueId}/wait-time"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -310,27 +415,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-032 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-032 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-032 holds none of them, so the edge carries nothing and EMP-003 opens cold"
     },
     {
      "to": "BO-005",
@@ -338,7 +433,10 @@
      "provenance": "flow F21 step 4→5",
      "operation": "setWaitTime",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "queueId"
+     ]
     }
    ]
   },
@@ -347,13 +445,6 @@
   "pattern": "listDetail",
   "patternReason": "`listQueueEntries` reads the population and `getWaitTimes` reads one of them — list, select, act",
   "purpose": "Take over when the wait feed dies.",
-  "gaps": [
-   {
-    "operation": "getQueue",
-    "why": "**2 declared operations reach no component on this screen**: getQueue, listQueues. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -362,8 +453,15 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listQueueEntries",
+       "notes": "Sends `?status=` to `listQueueEntries`.",
+       "provenance": "contract queue.yaml GET /queues/{queueId}/entries"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every manual wait entry",
+       "label": "Every waiting guest",
        "bindsTo": "WaitingGuest",
        "columns": [
         "WaitingGuest.id",
@@ -381,6 +479,27 @@
        ],
        "operation": "listQueueEntries",
        "provenance": "contract queue.yaml GET /queues/{queueId}/entries"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every queue",
+       "bindsTo": "Queue",
+       "columns": [
+        "Queue.code",
+        "Queue.name",
+        "Queue.venueId",
+        "Queue.attractionProductId",
+        "Queue.assetId",
+        "Queue.accessPointId",
+        "Queue.kind",
+        "Queue.operatingWindows",
+        "Queue.parentQueueId",
+        "Queue.loadBalanceWithQueueIds",
+        "Queue.inQueueOfferEnabled",
+        "Queue.notifyBeforeCallMinutes"
+       ],
+       "operation": "listQueues",
+       "provenance": "contract queue.yaml GET /queues"
       }
      ]
     },
@@ -390,12 +509,52 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected manual wait entry",
+       "label": "The selected waiting guest",
+       "bindsTo": "WaitingGuest",
+       "columns": [
+        "WaitingGuest.id",
+        "WaitingGuest.queueId",
+        "WaitingGuest.queueName",
+        "WaitingGuest.subjectId",
+        "WaitingGuest.partyNumber",
+        "WaitingGuest.partySize",
+        "WaitingGuest.status",
+        "WaitingGuest.positionInQueue",
+        "WaitingGuest.partiesAhead",
+        "WaitingGuest.estimatedCallAt",
+        "WaitingGuest.isFastPass",
+        "WaitingGuest.entitlementId",
+        "WaitingGuest.calledAt",
+        "WaitingGuest.returnWindowEndsAt",
+        "WaitingGuest.redeemedAt",
+        "WaitingGuest.admittedCount"
+       ],
+       "operation": "listQueueEntries",
+       "provenance": "contract queue.yaml GET /queues/{queueId}/entries"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The queue",
+       "bindsTo": "QueueDetail",
+       "columns": [
+        "QueueDetail.nowServingPartyNumber",
+        "QueueDetail.lastCalledAt",
+        "QueueDetail.throughputLastHour",
+        "QueueDetail.noShowRatePercent",
+        "QueueDetail.feed"
+       ],
+       "operation": "getQueue",
+       "provenance": "contract queue.yaml GET /queues/{queueId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The wait time",
        "bindsTo": "WaitTime",
        "columns": [
         "WaitTime.queueId",
         "WaitTime.queueName",
         "WaitTime.attractionProductId",
+        "WaitTime.attractionCategoryId",
         "WaitTime.status",
         "WaitTime.waitMinutes",
         "WaitTime.source",
@@ -415,42 +574,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save wait time",
        "operation": "setWaitTime",
        "provenance": "contract queue.yaml PUT /queues/{queueId}/wait-time"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setWaitTime",
-       "label": "Save wait time",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listQueueEntries",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setWaitTime",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -459,9 +585,9 @@
   "states": {
    "loading": "The manual wait entry list.",
    "error": "Could not load. Names which read failed and leaves the manual wait entry untouched.",
-   "emptyFirstRun": "No manual wait entry yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the manual wait entry are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No manual wait entry yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on status and the manual wait entry are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `QUEUE_VIEW`, which `getQueue` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Queues locally.** Manual entry exists because a feed died, so it must not need the network the feed lost"
   },
   "apis": [
@@ -484,13 +610,13 @@
     "operationId": "getQueue",
     "contract": "queue",
     "purpose": "Read a queue with live position",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listQueueEntries",
     "contract": "queue",
     "purpose": "List entries in a queue",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listQueues",
@@ -521,6 +647,27 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-032"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formSetWaitTime",
+    "component": "modal",
+    "trigger": "Save wait time",
+    "body": "**Collects what `setWaitTime` sends before it is called.** Required: `waitMinutes`. Optional: `expiresInMinutes`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save wait time",
+     "operation": "setWaitTime"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "waitMinutes",
+      "expiresInMinutes",
+      "note"
+     ]
+    },
+    "provenance": "contract queue.yaml PUT /queues/{queueId}/wait-time"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -571,27 +718,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-033 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-033 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-033 holds none of them, so the edge carries nothing and EMP-003 opens cold"
     }
    ]
   },
@@ -608,8 +745,15 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Performance id",
+       "operation": "listChannelCapacities",
+       "notes": "Sends `?performanceId=` to `listChannelCapacities`.",
+       "provenance": "contract catalogue.yaml GET /channel-capacities"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every capacity",
+       "label": "Every channel capacity",
        "bindsTo": "ChannelCapacity",
        "columns": [
         "ChannelCapacity.id",
@@ -636,7 +780,28 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected capacity",
+       "label": "The selected channel capacity",
+       "bindsTo": "ChannelCapacity",
+       "columns": [
+        "ChannelCapacity.id",
+        "ChannelCapacity.performanceId",
+        "ChannelCapacity.name",
+        "ChannelCapacity.seatCategoryId",
+        "ChannelCapacity.oversellAllowance",
+        "ChannelCapacity.oversellBasis",
+        "ChannelCapacity.capacity",
+        "ChannelCapacity.sold",
+        "ChannelCapacity.leased",
+        "ChannelCapacity.remaining",
+        "ChannelCapacity.hasChannelAllocations",
+        "ChannelCapacity.isSeated"
+       ],
+       "operation": "listChannelCapacities",
+       "provenance": "contract catalogue.yaml GET /channel-capacities"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The channel allocation set",
        "bindsTo": "ChannelAllocationSet",
        "columns": [
         "ChannelAllocationSet.channelCapacityId",
@@ -657,60 +822,27 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create channel capacity",
        "operation": "createChannelCapacity",
        "provenance": "contract catalogue.yaml POST /channel-capacities"
       },
       {
        "kind": "secondaryButton",
-       "label": "Release hold",
+       "label": "Release channel allocation",
        "operation": "relinquishChannelAllocation",
        "provenance": "contract catalogue.yaml POST /channel-capacities/{channelCapacityId}/channel-allocations/release"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save channel allocations",
        "operation": "setChannelAllocations",
        "provenance": "contract catalogue.yaml PUT /channel-capacities/{channelCapacityId}/channel-allocations"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save channel capacity",
        "operation": "updateChannelCapacity",
        "provenance": "contract catalogue.yaml PATCH /channel-capacities/{channelCapacityId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listChannelCapacities",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createChannelCapacity",
-       "label": "Create envelope",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createChannelCapacity",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -719,9 +851,9 @@
   "states": {
    "loading": "The capacity list.",
    "error": "Could not load. Names which read failed and leaves the capacity untouched.",
-   "emptyFirstRun": "No capacity yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the capacity are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No capacity yet. Offers Create channel capacity (`createChannelCapacity`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on performanceId and the capacity are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listChannelCapacities` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Last synced, with age"
   },
   "apis": [
@@ -735,7 +867,7 @@
     "operationId": "getChannelAllocations",
     "contract": "catalogue",
     "purpose": "Capacity allocated to each channel",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createChannelCapacity",
@@ -783,11 +915,11 @@
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `channelCapacityId`.",
    "preloaded": [
-    "ChannelAllocationSet.channelCapacityId",
-    "ChannelAllocationSet.capacity",
-    "ChannelAllocationSet.allocations",
-    "ChannelAllocationSet.generalPoolUnits",
-    "ChannelAllocationSet.totalSold"
+    "ChannelCapacity.id",
+    "ChannelCapacity.performanceId",
+    "ChannelCapacity.name",
+    "ChannelCapacity.seatCategoryId",
+    "ChannelCapacity.oversellAllowance"
    ]
   },
   "wireframe": {
@@ -796,6 +928,82 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-033"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateChannelCapacity",
+    "component": "modal",
+    "trigger": "Create channel capacity",
+    "body": "**Collects what `createChannelCapacity` sends before it is called.** Required: `performanceId`, `name`, `capacity`. Optional: `seatCategoryId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateEnvelopeRequest",
+    "confirm": {
+     "label": "Create channel capacity",
+     "operation": "createChannelCapacity"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "performanceId",
+      "name",
+      "capacity",
+      "seatCategoryId"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /channel-capacities"
+   },
+   {
+    "id": "formRelinquishChannelAllocation",
+    "component": "modal",
+    "trigger": "Release channel allocation",
+    "body": "**Collects what `relinquishChannelAllocation` sends before it is called.** Required: `channels`. Optional: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Release channel allocation",
+     "operation": "relinquishChannelAllocation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "channels",
+      "reason"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /channel-capacities/{channelCapacityId}/channel-allocations/release"
+   },
+   {
+    "id": "formSetChannelAllocations",
+    "component": "modal",
+    "trigger": "Save channel allocations",
+    "body": "**Collects what `setChannelAllocations` sends before it is called.** Required: `allocations`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save channel allocations",
+     "operation": "setChannelAllocations"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "allocations"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /channel-capacities/{channelCapacityId}/channel-allocations"
+   },
+   {
+    "id": "formUpdateChannelCapacity",
+    "component": "modal",
+    "trigger": "Save channel capacity",
+    "body": "**Collects what `updateChannelCapacity` sends before it is called.** Nothing in the body is required. Optional: `name`, `capacity`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save channel capacity",
+     "operation": "updateChannelCapacity"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "capacity"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PATCH /channel-capacities/{channelCapacityId}"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -835,7 +1043,8 @@
     "EMP-001",
     "EMP-002",
     "EMP-003",
-    "EMP-035"
+    "EMP-035",
+    "EMP-036"
    ],
    "inferred": false,
    "entryFrom": [
@@ -844,34 +1053,32 @@
    "notes": "**Reached from EMP-003** — the screen the device sits on between tasks. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
    "transitions": [
     {
-     "to": "EMP-035",
-     "trigger": "The guest taps a card on the device",
-     "provenance": "flow F66 step 1→2"
-    },
-    {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-034 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-034 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-034 holds none of them, so the edge carries nothing and EMP-003 opens cold"
+    },
+    {
+     "to": "EMP-036",
+     "trigger": "Issue media",
+     "provenance": "derived — EMP-036 declares entryState.params mediaCode, mediaId and EMP-034 holds none of them, so the edge carries nothing and EMP-036 opens cold"
+    },
+    {
+     "to": "EMP-035",
+     "trigger": "The guest taps a card on the device",
+     "provenance": "flow F66 step 1→2",
      "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+      "paymentId"
+     ]
     }
    ]
   },
@@ -880,13 +1087,6 @@
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getOrder` reads one of them — list, select, act",
   "purpose": "Sell at the gate without a till.",
-  "gaps": [
-   {
-    "operation": "getOrderStatement",
-    "why": "**6 declared operations reach no component on this screen**: getOrderStatement, getProduct, listAlternativeCodes, listOrderRefunds, listOrders, listProductVariants. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -895,8 +1095,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listProducts",
+       "notes": "Sends `?venueId=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "textField",
+       "label": "Kind",
+       "operation": "listProducts",
+       "notes": "Sends `?kind=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is sellable",
+       "operation": "listProducts",
+       "notes": "Sends `?isSellable=` to `listProducts`.",
+       "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every walk-up sale",
+       "label": "Every product",
        "bindsTo": "Product",
        "columns": [
         "Product.id",
@@ -914,6 +1135,84 @@
        ],
        "operation": "listProducts",
        "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every alternative code",
+       "bindsTo": "AlternativeCode",
+       "columns": [
+        "AlternativeCode.code",
+        "AlternativeCode.partnerId",
+        "AlternativeCode.partnerName",
+        "AlternativeCode.variantId",
+        "AlternativeCode.note"
+       ],
+       "operation": "listAlternativeCodes",
+       "provenance": "contract catalogue.yaml GET /products/{productId}/alternative-codes"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every refund",
+       "bindsTo": "Refund",
+       "columns": [
+        "Refund.id",
+        "Refund.orderId",
+        "Refund.batchId",
+        "Refund.fxRate",
+        "Refund.taxReversalEntryId",
+        "Refund.settleTo",
+        "Refund.fxVariance",
+        "Refund.amount",
+        "Refund.appliedPercentage",
+        "Refund.status",
+        "Refund.reason",
+        "Refund.requestedByPrincipalId"
+       ],
+       "operation": "listOrderRefunds",
+       "provenance": "contract orders.yaml GET /orders/{orderId}/refunds"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every order",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount",
+        "OrderSummary.principalId",
+        "OrderSummary.holdLabel",
+        "OrderSummary.heldUntil"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every product variant",
+       "bindsTo": "ProductVariant",
+       "columns": [
+        "ProductVariant.id",
+        "ProductVariant.productId",
+        "ProductVariant.sku",
+        "ProductVariant.axisValues",
+        "ProductVariant.name",
+        "ProductVariant.barcode",
+        "ProductVariant.isDefault",
+        "ProductVariant.isActive"
+       ],
+       "operation": "listProductVariants",
+       "provenance": "contract catalogue.yaml GET /products/{productId}/variants"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -923,7 +1222,49 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected walk-up sale",
+       "label": "The selected product",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo",
+        "Product.categoryId",
+        "Product.lifecycleState",
+        "Product.isSellable",
+        "Product.isStockTracked"
+       ],
+       "operation": "getProduct",
+       "provenance": "contract catalogue.yaml GET /products/{productId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The order statement",
+       "bindsTo": "OrderStatement",
+       "columns": [
+        "OrderStatement.orderId",
+        "OrderStatement.orderNumber",
+        "OrderStatement.currency",
+        "OrderStatement.currencyScale",
+        "OrderStatement.entries",
+        "OrderStatement.totalPaid",
+        "OrderStatement.totalRefunded",
+        "OrderStatement.currentBalance"
+       ],
+       "operation": "getOrderStatement",
+       "provenance": "contract orders.yaml GET /orders/{orderId}/statement"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The order",
        "bindsTo": "Order",
        "columns": [
         "Order.id",
@@ -954,135 +1295,93 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create order",
        "operation": "createOrder",
        "provenance": "contract orders.yaml POST /orders"
       },
       {
        "kind": "secondaryButton",
-       "label": "Apply",
+       "label": "Apply manual discount",
        "operation": "applyManualDiscount",
        "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create refund",
        "operation": "createRefund",
        "provenance": "contract orders.yaml POST /orders/{orderId}/refunds"
       },
       {
        "kind": "secondaryButton",
-       "label": "Exchange",
+       "label": "Exchange order lines",
        "operation": "exchangeOrderLines",
        "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
       },
       {
        "kind": "secondaryButton",
-       "label": "Hold",
+       "label": "Hold order",
        "operation": "holdOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
       },
       {
        "kind": "secondaryButton",
-       "label": "Modify",
+       "label": "Modify order",
        "operation": "modifyOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reprint",
+       "label": "Reprint order",
        "operation": "reprintOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reschedule",
+       "label": "Reschedule order",
        "operation": "rescheduleOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
       },
       {
        "kind": "secondaryButton",
-       "label": "Resolve",
+       "label": "Resolve product by code",
        "operation": "resolveProductByCode",
        "provenance": "contract catalogue.yaml GET /products/resolve"
       },
       {
        "kind": "secondaryButton",
-       "label": "Resume",
+       "label": "Resume order",
        "operation": "resumeOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save alternative codes",
        "operation": "setAlternativeCodes",
        "provenance": "contract catalogue.yaml PUT /products/{productId}/alternative-codes"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save product attributes",
        "operation": "setProductAttributes",
        "provenance": "contract catalogue.yaml PUT /products/{productId}/attributes"
       },
       {
        "kind": "secondaryButton",
-       "label": "Transition",
+       "label": "Transition product lifecycle",
        "operation": "transitionProductLifecycle",
        "provenance": "contract catalogue.yaml POST /products/{productId}/lifecycle"
       },
       {
        "kind": "destructiveButton",
-       "label": "Void",
+       "label": "Void order",
        "operation": "voidOrder",
        "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createOrder",
-       "label": "Create order",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listProducts",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "destructiveButton",
-       "derived": true,
-       "impliedBy": "voidOrder",
-       "label": "Void order",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
-       "provenance": "carried from the previous definition"
       },
       {
        "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createOrder",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "confirmDialog",
-       "derived": true,
-       "label": "Confirm",
-       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
-       "provenance": "carried from the previous definition"
+       "label": "Split order",
+       "operation": "splitOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/split"
       }
      ]
     }
@@ -1092,17 +1391,269 @@
    {
     "id": "confirmVoidOrder",
     "component": "confirmDialog",
-    "trigger": "Void",
-    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A walk-up sale this affects should be identified in the dialog, not just counted.",
+    "trigger": "Void order",
+    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A walk-up sale this affects should be identified in the dialog, not just counted. **Collects what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`. `reason` is picked from the void reason list (guestChangedMind, enteredInError, itemUnavailable, qualityIssue, duplicate, other); **`note` is required when the reason is other**, refused 400 without it (decided 28 September, audit R125 (4), R222).",
     "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+   },
+   {
+    "id": "formSplitOrder",
+    "component": "modal",
+    "trigger": "Split order",
+    "body": "**Collects what `splitOrder` sends before it is called.** Required: `groups`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Split order",
+     "operation": "splitOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "groups"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/split"
+   },
+   {
+    "id": "formCreateOrder",
+    "component": "modal",
+    "trigger": "Create order",
+    "body": "**Collects what `createOrder` sends before it is called.** Required: `id`, `venueId`, `channel`, `lines`, `recordedAt`. Optional: `shiftId`, `subjectId`, `guestLinkId`, `catalogueBundleVersion`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateOrderRequest",
+    "confirm": {
+     "label": "Create order",
+     "operation": "createOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "venueId",
+      "channel",
+      "lines",
+      "recordedAt",
+      "shiftId",
+      "subjectId",
+      "guestLinkId",
+      "catalogueBundleVersion"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders"
+   },
+   {
+    "id": "formApplyManualDiscount",
+    "component": "modal",
+    "trigger": "Apply manual discount",
+    "body": "**Collects what `applyManualDiscount` sends before it is called.** Required: `id`, `reason`, `recordedAt`. Optional: `lineId`, `amount`, `percentage`, `reasonCode`, `approverPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ManualDiscountRequest",
+    "confirm": {
+     "label": "Apply manual discount",
+     "operation": "applyManualDiscount"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "reason",
+      "recordedAt",
+      "lineId",
+      "amount",
+      "percentage",
+      "reasonCode",
+      "approverPrincipalId"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
+   },
+   {
+    "id": "formCreateRefund",
+    "component": "modal",
+    "trigger": "Create refund",
+    "body": "**Collects what `createRefund` sends before it is called.** Required: `id`, `amount`, `reason`, `recordedAt`. Optional: `lineIds`, `secondaryAuthorisation`, `refundToOriginalTender`, `alternateTender`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateRefundRequest",
+    "confirm": {
+     "label": "Create refund",
+     "operation": "createRefund"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "amount",
+      "reason",
+      "recordedAt",
+      "lineIds",
+      "secondaryAuthorisation",
+      "refundToOriginalTender",
+      "alternateTender"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/refunds"
+   },
+   {
+    "id": "formExchangeOrderLines",
+    "component": "modal",
+    "trigger": "Exchange order lines",
+    "body": "**Collects what `exchangeOrderLines` sends before it is called.** Required: `id`, `outgoingLineIds`, `incomingLines`, `recordedAt`. Optional: `waiveFee`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ExchangeOrderRequest",
+    "confirm": {
+     "label": "Exchange order lines",
+     "operation": "exchangeOrderLines"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "outgoingLineIds",
+      "incomingLines",
+      "recordedAt",
+      "waiveFee",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
+   },
+   {
+    "id": "formHoldOrder",
+    "component": "modal",
+    "trigger": "Hold order",
+    "body": "**Collects what `holdOrder` sends before it is called.** Required: `recordedAt`. Optional: `label`, `holdUntil`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Hold order",
+     "operation": "holdOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "recordedAt",
+      "label",
+      "holdUntil"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
+   },
+   {
+    "id": "formModifyOrder",
+    "component": "modal",
+    "trigger": "Modify order",
+    "body": "**Collects what `modifyOrder` sends before it is called.** Required: `id`, `recordedAt`. Optional: `addLines`, `removeLineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ModifyOrderRequest",
+    "confirm": {
+     "label": "Modify order",
+     "operation": "modifyOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "recordedAt",
+      "addLines",
+      "removeLineIds",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
+   },
+   {
+    "id": "formReprintOrder",
+    "component": "modal",
+    "trigger": "Reprint order",
+    "body": "**Collects what `reprintOrder` sends before it is called.** Required: `delivery`, `recordedAt`. Optional: `destination`, `lineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reprint order",
+     "operation": "reprintOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "delivery",
+      "recordedAt",
+      "destination",
+      "lineIds",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
+   },
+   {
+    "id": "formRescheduleOrder",
+    "component": "modal",
+    "trigger": "Reschedule order",
+    "body": "**Collects what `rescheduleOrder` sends before it is called.** Required: `targetPerformanceId`, `recordedAt`. Optional: `lineIds`, `waiveFee`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reschedule order",
+     "operation": "rescheduleOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "targetPerformanceId",
+      "recordedAt",
+      "lineIds",
+      "waiveFee",
+      "reason"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
+   },
+   {
+    "id": "formSetAlternativeCodes",
+    "component": "modal",
+    "trigger": "Save alternative codes",
+    "body": "**Collects what `setAlternativeCodes` sends before it is called.** Required: `codes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save alternative codes",
+     "operation": "setAlternativeCodes"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "codes"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /products/{productId}/alternative-codes"
+   },
+   {
+    "id": "formSetProductAttributes",
+    "component": "modal",
+    "trigger": "Save product attributes",
+    "body": "**Collects what `setProductAttributes` sends before it is called.** Required: `axes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save product attributes",
+     "operation": "setProductAttributes"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "axes"
+     ]
+    },
+    "provenance": "contract catalogue.yaml PUT /products/{productId}/attributes"
+   },
+   {
+    "id": "formTransitionProductLifecycle",
+    "component": "modal",
+    "trigger": "Transition product lifecycle",
+    "body": "**Collects what `transitionProductLifecycle` sends before it is called.** Required: `transition`, `reason`. Optional: `effectiveAt`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Transition product lifecycle",
+     "operation": "transitionProductLifecycle"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "transition",
+      "reason",
+      "effectiveAt"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /products/{productId}/lifecycle"
    }
   ],
   "states": {
    "loading": "The walk-up sale list.",
    "error": "Could not load. Names which read failed and leaves the walk-up sale untouched.",
-   "emptyFirstRun": "No walk-up sale yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the walk-up sale are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No walk-up sale yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the walk-up sale are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Cash only offline.** Card completes nowhere the acquirer saw it"
   },
   "apis": [
@@ -1152,19 +1703,19 @@
     "operationId": "getOrder",
     "contract": "orders",
     "purpose": "Read an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getOrderStatement",
     "contract": "orders",
     "purpose": "Full financial history of an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getProduct",
     "contract": "catalogue",
     "purpose": "Read a product",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "holdOrder",
@@ -1179,13 +1730,13 @@
     "operationId": "listAlternativeCodes",
     "contract": "catalogue",
     "purpose": "External identifiers for a product",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listOrderRefunds",
     "contract": "orders",
     "purpose": "List refunds against an order",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listOrders",
@@ -1197,7 +1748,7 @@
     "operationId": "listProductVariants",
     "contract": "catalogue",
     "purpose": "List generated variants",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "modifyOrder",
@@ -1230,7 +1781,7 @@
     "operationId": "resolveProductByCode",
     "contract": "catalogue",
     "purpose": "Resolve a partner code to a product",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "resumeOrder",
@@ -1276,6 +1827,16 @@
     "invalidates": [
      "listProducts"
     ]
+   },
+   {
+    "operationId": "splitOrder",
+    "contract": "orders",
+    "purpose": "Break one order into independent orders",
+    "trigger": "onAction",
+    "provenance": "wiring gap, 19 September 2026 — the screen showed the noun and could not act on it",
+    "invalidates": [
+     "getOrder"
+    ]
    }
   ],
   "entryState": {
@@ -1291,11 +1852,11 @@
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error. **A shared product link after the product retired.** Shows what replaced it where a successor exists, and the catalogue where none does.",
    "preloaded": [
-    "Order.id",
-    "Order.orderNumber",
-    "Order.channel",
-    "Order.venueId",
-    "Order.scopePath"
+    "Product.id",
+    "Product.code",
+    "Product.name",
+    "Product.description",
+    "Product.kind"
    ]
   },
   "wireframe": {
@@ -1354,27 +1915,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-025 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-025 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-025 holds none of them, so the edge carries nothing and EMP-003 opens cold"
     }
    ]
   },
@@ -1391,8 +1942,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "datePicker",
+       "label": "Date",
+       "operation": "listAttendance",
+       "notes": "Sends `?date=` to `listAttendance`.",
+       "provenance": "contract workforce.yaml GET /attendance"
+      },
+      {
+       "kind": "textField",
+       "label": "Principal id",
+       "operation": "listAttendance",
+       "notes": "Sends `?principalId=` to `listAttendance`.",
+       "provenance": "contract workforce.yaml GET /attendance"
+      },
+      {
+       "kind": "toggle",
+       "label": "Exceptions only",
+       "operation": "listAttendance",
+       "notes": "Sends `?exceptionsOnly=` to `listAttendance`.",
+       "provenance": "contract workforce.yaml GET /attendance"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every break",
+       "label": "Every attendance",
        "bindsTo": "AttendanceRecord",
        "columns": [
         "AttendanceRecord.id",
@@ -1419,7 +1991,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected break",
+       "label": "The selected attendance",
        "bindsTo": "AttendanceRecord",
        "columns": [
         "AttendanceRecord.id",
@@ -1449,35 +2021,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Record",
+       "label": "Record attendance",
        "operation": "recordAttendance",
        "provenance": "contract workforce.yaml POST /attendance/clock"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listAttendance",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "recordAttendance",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1486,9 +2032,9 @@
   "states": {
    "loading": "The break list.",
    "error": "Could not load. Names which read failed and leaves the break untouched.",
-   "emptyFirstRun": "No break yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the break are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No break yet. Offers Record attendance (`recordAttendance`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on date, principalId, exceptionsOnly and the break are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `WORKFORCE_VIEW`, which `listAttendance` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Queues locally"
   },
   "apis": [
@@ -1530,6 +2076,30 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-025"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formRecordAttendance",
+    "component": "modal",
+    "trigger": "Record attendance",
+    "body": "**Collects what `recordAttendance` sends before it is called.** Required: `kind`, `occurredAt`. Optional: `assignmentId`, `accessPointId`, `latitude`, `longitude`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Record attendance",
+     "operation": "recordAttendance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "kind",
+      "occurredAt",
+      "assignmentId",
+      "accessPointId",
+      "latitude",
+      "longitude"
+     ]
+    },
+    "provenance": "contract workforce.yaml POST /attendance/clock"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -1586,35 +2156,31 @@
      "operation": "reportIncident"
     },
     {
-     "to": "EMP-027",
-     "trigger": "A supervisor reads it and adds detail",
-     "provenance": "flow F69 step 1→2",
-     "operation": "reportIncident"
-    },
-    {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-026 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-026 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
      "carries": [
-      "incidentId",
-      "shiftId"
+      "incidentId"
      ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-026 holds incidentId, so an edge into it carries them"
+    },
+    {
+     "to": "EMP-027",
+     "trigger": "A supervisor reads it and adds detail",
+     "provenance": "flow F69 step 1→2",
+     "operation": "reportIncident",
+     "carries": [
+      "incidentId"
+     ]
     }
    ]
   },
@@ -1631,8 +2197,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Severity",
+       "operation": "listIncidents",
+       "notes": "Sends `?severity=` to `listIncidents`.",
+       "provenance": "contract maintenance.yaml GET /incidents"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listIncidents",
+       "notes": "Sends `?status=` to `listIncidents`.",
+       "provenance": "contract maintenance.yaml GET /incidents"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is reportable",
+       "operation": "listIncidents",
+       "notes": "Sends `?isReportable=` to `listIncidents`.",
+       "provenance": "contract maintenance.yaml GET /incidents"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every incident report",
+       "label": "Every incident",
        "bindsTo": "Incident",
        "columns": [
         "Incident.id",
@@ -1659,7 +2246,32 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected incident report",
+       "label": "The selected incident",
+       "bindsTo": "Incident",
+       "columns": [
+        "Incident.id",
+        "Incident.incidentNumber",
+        "Incident.kind",
+        "Incident.severity",
+        "Incident.status",
+        "Incident.venueId",
+        "Incident.assetId",
+        "Incident.locationDescription",
+        "Incident.isReportable",
+        "Incident.notificationDueAt",
+        "Incident.notifiedAt",
+        "Incident.assignedToPrincipalId",
+        "Incident.reportedByPrincipalId",
+        "Incident.correctiveWorkOrderId",
+        "Incident.occurredAt",
+        "Incident.recordedAt"
+       ],
+       "operation": "listIncidents",
+       "provenance": "contract maintenance.yaml GET /incidents"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The incident",
        "bindsTo": "IncidentDetail",
        "columns": [
         "IncidentDetail.id",
@@ -1690,47 +2302,21 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Report",
+       "label": "Report incident",
        "operation": "reportIncident",
        "provenance": "contract maintenance.yaml POST /incidents"
       },
       {
        "kind": "secondaryButton",
-       "label": "Record",
+       "label": "Record authority notification",
        "operation": "recordAuthorityNotification",
        "provenance": "contract maintenance.yaml POST /incidents/{incidentId}/notify-authority"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save incident",
        "operation": "updateIncident",
        "provenance": "contract maintenance.yaml PATCH /incidents/{incidentId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listIncidents",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "reportIncident",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1739,9 +2325,9 @@
   "states": {
    "loading": "The incident report list.",
    "error": "Could not load. Names which read failed and leaves the incident report untouched.",
-   "emptyFirstRun": "No incident report yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the incident report are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No incident report yet. Offers Record authority notification (`recordAuthorityNotification`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on severity, status, isReportable and the incident report are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `INCIDENT_VIEW`, which `getIncident` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Queues locally with the highest sync priority"
   },
   "apis": [
@@ -1749,13 +2335,13 @@
     "operationId": "reportIncident",
     "contract": "maintenance",
     "purpose": "From the flow it appears in",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getIncident",
     "contract": "maintenance",
     "purpose": "Read an incident",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listIncidents",
@@ -1791,11 +2377,11 @@
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `incidentId`.",
    "preloaded": [
-    "IncidentDetail.id",
-    "IncidentDetail.incidentNumber",
-    "IncidentDetail.kind",
-    "IncidentDetail.severity",
-    "IncidentDetail.status"
+    "Incident.id",
+    "Incident.incidentNumber",
+    "Incident.kind",
+    "Incident.severity",
+    "Incident.status"
    ]
   },
   "wireframe": {
@@ -1804,6 +2390,85 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-026"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formReportIncident",
+    "component": "modal",
+    "trigger": "Report incident",
+    "body": "**Collects what `reportIncident` sends before it is called.** Required: `id`, `kind`, `severity`, `venueId`, `description`, `occurredAt`, `recordedAt`. Optional: `assetId`, `locationDescription`, `involvedSubjectIds`, `involvedStaffPrincipalIds`, `witnessCount`, `firstAidGiven`, `emergencyServicesCalled`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ReportIncidentRequest",
+    "confirm": {
+     "label": "Report incident",
+     "operation": "reportIncident"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "severity",
+      "venueId",
+      "description",
+      "occurredAt",
+      "recordedAt",
+      "assetId",
+      "locationDescription",
+      "involvedSubjectIds",
+      "involvedStaffPrincipalIds",
+      "witnessCount",
+      "firstAidGiven",
+      "emergencyServicesCalled",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "contract maintenance.yaml POST /incidents"
+   },
+   {
+    "id": "formRecordAuthorityNotification",
+    "component": "modal",
+    "trigger": "Record authority notification",
+    "body": "**Collects what `recordAuthorityNotification` sends before it is called.** Required: `authority`, `notifiedAt`. Optional: `reference`, `notifiedByPrincipalId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Record authority notification",
+     "operation": "recordAuthorityNotification"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "authority",
+      "notifiedAt",
+      "reference",
+      "notifiedByPrincipalId",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "contract maintenance.yaml POST /incidents/{incidentId}/notify-authority"
+   },
+   {
+    "id": "formUpdateIncident",
+    "component": "modal",
+    "trigger": "Save incident",
+    "body": "**Collects what `updateIncident` sends before it is called.** Nothing in the body is required. Optional: `status`, `severity`, `assignedToPrincipalId`, `investigationNote`, `rootCause`, `correctiveActions`, `correctiveWorkOrderId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save incident",
+     "operation": "updateIncident"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "severity",
+      "assignedToPrincipalId",
+      "investigationNote",
+      "rootCause",
+      "correctiveActions",
+      "correctiveWorkOrderId",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "contract maintenance.yaml PATCH /incidents/{incidentId}"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -1852,34 +2517,30 @@
    "notes": "**Reached from EMP-026** — a detail is reached from the incident it details. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
    "transitions": [
     {
-     "to": "EMP-050",
-     "trigger": "Where required, the authorities are notified",
-     "provenance": "flow F69 step 2→3"
-    },
-    {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-027 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-027 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
      "carries": [
-      "incidentId",
-      "shiftId"
+      "incidentId"
      ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-027 holds incidentId, so an edge into it carries them"
+    },
+    {
+     "to": "EMP-050",
+     "trigger": "Where required, the authorities are notified",
+     "provenance": "flow F69 step 2→3",
+     "carries": [
+      "incidentId"
+     ]
     }
    ]
   },
@@ -1895,6 +2556,27 @@
      "name": "contentBody",
      "slot": "collection",
      "components": [
+      {
+       "kind": "textField",
+       "label": "Severity",
+       "operation": "listIncidents",
+       "notes": "Sends `?severity=` to `listIncidents`.",
+       "provenance": "contract maintenance.yaml GET /incidents"
+      },
+      {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listIncidents",
+       "notes": "Sends `?status=` to `listIncidents`.",
+       "provenance": "contract maintenance.yaml GET /incidents"
+      },
+      {
+       "kind": "toggle",
+       "label": "Is reportable",
+       "operation": "listIncidents",
+       "notes": "Sends `?isReportable=` to `listIncidents`.",
+       "provenance": "contract maintenance.yaml GET /incidents"
+      },
       {
        "kind": "dataTable",
        "label": "Every incident",
@@ -1925,6 +2607,31 @@
       {
        "kind": "detailPanel",
        "label": "The selected incident",
+       "bindsTo": "Incident",
+       "columns": [
+        "Incident.id",
+        "Incident.incidentNumber",
+        "Incident.kind",
+        "Incident.severity",
+        "Incident.status",
+        "Incident.venueId",
+        "Incident.assetId",
+        "Incident.locationDescription",
+        "Incident.isReportable",
+        "Incident.notificationDueAt",
+        "Incident.notifiedAt",
+        "Incident.assignedToPrincipalId",
+        "Incident.reportedByPrincipalId",
+        "Incident.correctiveWorkOrderId",
+        "Incident.occurredAt",
+        "Incident.recordedAt"
+       ],
+       "operation": "listIncidents",
+       "provenance": "contract maintenance.yaml GET /incidents"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The incident",
        "bindsTo": "IncidentDetail",
        "columns": [
         "IncidentDetail.id",
@@ -1955,42 +2662,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save incident",
        "operation": "updateIncident",
        "provenance": "contract maintenance.yaml PATCH /incidents/{incidentId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "updateIncident",
-       "label": "Save incident",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listIncidents",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "updateIncident",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -1999,9 +2673,9 @@
   "states": {
    "loading": "The incident list.",
    "error": "Could not load. Names which read failed and leaves the incident untouched.",
-   "emptyFirstRun": "No incident yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the incident are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No incident yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on severity, status, isReportable and the incident are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `INCIDENT_VIEW`, which `getIncident` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Cached; updates queue"
   },
   "apis": [
@@ -2009,13 +2683,13 @@
     "operationId": "getIncident",
     "contract": "maintenance",
     "purpose": "From the flow it appears in",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "updateIncident",
     "contract": "maintenance",
     "purpose": "From the flow it appears in",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listIncidents",
@@ -2033,11 +2707,11 @@
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `incidentId`.",
    "preloaded": [
-    "IncidentDetail.id",
-    "IncidentDetail.incidentNumber",
-    "IncidentDetail.kind",
-    "IncidentDetail.severity",
-    "IncidentDetail.status"
+    "Incident.id",
+    "Incident.incidentNumber",
+    "Incident.kind",
+    "Incident.severity",
+    "Incident.status"
    ]
   },
   "wireframe": {
@@ -2046,6 +2720,32 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-027"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formUpdateIncident",
+    "component": "modal",
+    "trigger": "Save incident",
+    "body": "**Collects what `updateIncident` sends before it is called.** Nothing in the body is required. Optional: `status`, `severity`, `assignedToPrincipalId`, `investigationNote`, `rootCause`, `correctiveActions`, `correctiveWorkOrderId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save incident",
+     "operation": "updateIncident"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "severity",
+      "assignedToPrincipalId",
+      "investigationNote",
+      "rootCause",
+      "correctiveActions",
+      "correctiveWorkOrderId",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "contract maintenance.yaml PATCH /incidents/{incidentId}"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -2096,27 +2796,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-028 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-028 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-028 holds none of them, so the edge carries nothing and EMP-003 opens cold"
     }
    ]
   },
@@ -2133,8 +2823,36 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listCases",
+       "notes": "Sends `?status=` to `listCases`.",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "textField",
+       "label": "Assigned to principal id",
+       "operation": "listCases",
+       "notes": "Sends `?assignedToPrincipalId=` to `listCases`.",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "toggle",
+       "label": "Breached sla",
+       "operation": "listCases",
+       "notes": "Sends `?breachedSla=` to `listCases`.",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "textField",
+       "label": "Priority",
+       "operation": "listCases",
+       "notes": "Sends `?priority=` to `listCases`.",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every lost found",
+       "label": "Every case",
        "bindsTo": "Case",
        "columns": [
         "Case.id",
@@ -2161,7 +2879,32 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected lost found",
+       "label": "The selected case",
+       "bindsTo": "Case",
+       "columns": [
+        "Case.id",
+        "Case.caseNumber",
+        "Case.subjectId",
+        "Case.guestName",
+        "Case.subject",
+        "Case.kind",
+        "Case.channel",
+        "Case.recordedAt",
+        "Case.syncedAt",
+        "Case.categoryId",
+        "Case.status",
+        "Case.priority",
+        "Case.assignedToPrincipalId",
+        "Case.venueId",
+        "Case.relatedOrderId",
+        "Case.slaDueAt"
+       ],
+       "operation": "listCases",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The case",
        "bindsTo": "CaseDetail",
        "columns": [
         "CaseDetail.id",
@@ -2169,17 +2912,17 @@
         "CaseDetail.subjectId",
         "CaseDetail.guestName",
         "CaseDetail.subject",
+        "CaseDetail.kind",
+        "CaseDetail.channel",
+        "CaseDetail.recordedAt",
+        "CaseDetail.syncedAt",
         "CaseDetail.categoryId",
         "CaseDetail.status",
         "CaseDetail.priority",
         "CaseDetail.assignedToPrincipalId",
         "CaseDetail.venueId",
         "CaseDetail.relatedOrderId",
-        "CaseDetail.slaDueAt",
-        "CaseDetail.isSlaBreached",
-        "CaseDetail.slaPausedSeconds",
-        "CaseDetail.escalationCount",
-        "CaseDetail.resolvedAt"
+        "CaseDetail.slaDueAt"
        ],
        "operation": "getCase",
        "provenance": "contract marketing-crm.yaml GET /cases/{caseId}"
@@ -2192,66 +2935,33 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Create",
+       "label": "Create case",
        "operation": "createCase",
        "provenance": "contract marketing-crm.yaml POST /cases"
       },
       {
        "kind": "secondaryButton",
-       "label": "Add",
+       "label": "Add case message",
        "operation": "addCaseMessage",
        "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/messages"
       },
       {
        "kind": "secondaryButton",
-       "label": "Escalate",
+       "label": "Escalate case",
        "operation": "escalateCase",
        "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/escalate"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reopen",
+       "label": "Reopen case",
        "operation": "reopenCase",
        "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/reopen"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save case",
        "operation": "updateCase",
        "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "createCase",
-       "label": "Create case",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listCases",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "createCase",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -2260,9 +2970,9 @@
   "states": {
    "loading": "The lost found list.",
    "error": "Could not load. Names which read failed and leaves the lost found untouched.",
-   "emptyFirstRun": "No lost found yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the lost found are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No lost found yet. Offers Create case (`createCase`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on status, assignedToPrincipalId, breachedSla, priority and the lost found are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `CASE_VIEW`, which `getCase` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Queues locally and syncs on reconnect. The pending count is always current because it is local"
   },
   "apis": [
@@ -2297,7 +3007,7 @@
     "operationId": "getCase",
     "contract": "marketing-crm",
     "purpose": "Read a case with its thread",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listCases",
@@ -2333,11 +3043,11 @@
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `caseId`.",
    "preloaded": [
-    "CaseDetail.id",
-    "CaseDetail.caseNumber",
-    "CaseDetail.subjectId",
-    "CaseDetail.guestName",
-    "CaseDetail.subject"
+    "Case.id",
+    "Case.caseNumber",
+    "Case.subjectId",
+    "Case.guestName",
+    "Case.subject"
    ]
   },
   "wireframe": {
@@ -2346,6 +3056,116 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-028"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateCase",
+    "component": "modal",
+    "trigger": "Create case",
+    "body": "**Collects what `createCase` sends before it is called.** Required: `id`, `subject`, `description`, `channel`, `recordedAt`. Optional: `subjectId`, `categoryId`, `priority`, `kind`, `venueId`, `relatedOrderId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateCaseRequest",
+    "confirm": {
+     "label": "Create case",
+     "operation": "createCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "subject",
+      "description",
+      "channel",
+      "recordedAt",
+      "subjectId",
+      "categoryId",
+      "priority",
+      "kind",
+      "venueId",
+      "relatedOrderId",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases"
+   },
+   {
+    "id": "formAddCaseMessage",
+    "component": "modal",
+    "trigger": "Add case message",
+    "body": "**Collects what `addCaseMessage` sends before it is called.** Required: `id`, `body`, `isInternal`, `recordedAt`. Optional: `channel`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Add case message",
+     "operation": "addCaseMessage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "body",
+      "isInternal",
+      "recordedAt",
+      "channel",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/messages"
+   },
+   {
+    "id": "formEscalateCase",
+    "component": "modal",
+    "trigger": "Escalate case",
+    "body": "**Collects what `escalateCase` sends before it is called.** Required: `reason`. Optional: `assignToPrincipalId`, `newPriority`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Escalate case",
+     "operation": "escalateCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason",
+      "assignToPrincipalId",
+      "newPriority"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/escalate"
+   },
+   {
+    "id": "formReopenCase",
+    "component": "modal",
+    "trigger": "Reopen case",
+    "body": "**Collects what `reopenCase` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reopen case",
+     "operation": "reopenCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/reopen"
+   },
+   {
+    "id": "formUpdateCase",
+    "component": "modal",
+    "trigger": "Save case",
+    "body": "**Collects what `updateCase` sends before it is called.** Nothing in the body is required. Optional: `status`, `priority`, `assignedToPrincipalId`, `categoryId`, `resolutionNote`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save case",
+     "operation": "updateCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "priority",
+      "assignedToPrincipalId",
+      "categoryId",
+      "resolutionNote"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -2401,27 +3221,20 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-029 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-029 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
      "carries": [
-      "incidentId",
-      "shiftId"
+      "incidentId"
      ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-029 holds incidentId, so an edge into it carries them"
     }
    ]
   },
@@ -2430,13 +3243,6 @@
   "pattern": "listDetail",
   "patternReason": "`listCases` reads the population and `getCase` reads one of them — list, select, act",
   "purpose": "Help a guest without leaving the floor.",
-  "gaps": [
-   {
-    "operation": "getIncident",
-    "why": "**2 declared operations reach no component on this screen**: getIncident, listIncidents. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -2445,8 +3251,36 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listCases",
+       "notes": "Sends `?status=` to `listCases`.",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "textField",
+       "label": "Assigned to principal id",
+       "operation": "listCases",
+       "notes": "Sends `?assignedToPrincipalId=` to `listCases`.",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "toggle",
+       "label": "Breached sla",
+       "operation": "listCases",
+       "notes": "Sends `?breachedSla=` to `listCases`.",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "textField",
+       "label": "Priority",
+       "operation": "listCases",
+       "notes": "Sends `?priority=` to `listCases`.",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every guest assistance",
+       "label": "Every case",
        "bindsTo": "Case",
        "columns": [
         "Case.id",
@@ -2464,6 +3298,27 @@
        ],
        "operation": "listCases",
        "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every incident",
+       "bindsTo": "Incident",
+       "columns": [
+        "Incident.id",
+        "Incident.incidentNumber",
+        "Incident.kind",
+        "Incident.severity",
+        "Incident.status",
+        "Incident.venueId",
+        "Incident.assetId",
+        "Incident.locationDescription",
+        "Incident.isReportable",
+        "Incident.notificationDueAt",
+        "Incident.notifiedAt",
+        "Incident.assignedToPrincipalId"
+       ],
+       "operation": "listIncidents",
+       "provenance": "contract maintenance.yaml GET /incidents"
       }
      ]
     },
@@ -2473,7 +3328,57 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected guest assistance",
+       "label": "The selected case",
+       "bindsTo": "Case",
+       "columns": [
+        "Case.id",
+        "Case.caseNumber",
+        "Case.subjectId",
+        "Case.guestName",
+        "Case.subject",
+        "Case.kind",
+        "Case.channel",
+        "Case.recordedAt",
+        "Case.syncedAt",
+        "Case.categoryId",
+        "Case.status",
+        "Case.priority",
+        "Case.assignedToPrincipalId",
+        "Case.venueId",
+        "Case.relatedOrderId",
+        "Case.slaDueAt"
+       ],
+       "operation": "listCases",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The incident",
+       "bindsTo": "IncidentDetail",
+       "columns": [
+        "IncidentDetail.id",
+        "IncidentDetail.incidentNumber",
+        "IncidentDetail.kind",
+        "IncidentDetail.severity",
+        "IncidentDetail.status",
+        "IncidentDetail.venueId",
+        "IncidentDetail.assetId",
+        "IncidentDetail.locationDescription",
+        "IncidentDetail.isReportable",
+        "IncidentDetail.notificationDueAt",
+        "IncidentDetail.notifiedAt",
+        "IncidentDetail.assignedToPrincipalId",
+        "IncidentDetail.reportedByPrincipalId",
+        "IncidentDetail.correctiveWorkOrderId",
+        "IncidentDetail.occurredAt",
+        "IncidentDetail.recordedAt"
+       ],
+       "operation": "getIncident",
+       "provenance": "contract maintenance.yaml GET /incidents/{incidentId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The case",
        "bindsTo": "CaseDetail",
        "columns": [
         "CaseDetail.id",
@@ -2481,17 +3386,17 @@
         "CaseDetail.subjectId",
         "CaseDetail.guestName",
         "CaseDetail.subject",
+        "CaseDetail.kind",
+        "CaseDetail.channel",
+        "CaseDetail.recordedAt",
+        "CaseDetail.syncedAt",
         "CaseDetail.categoryId",
         "CaseDetail.status",
         "CaseDetail.priority",
         "CaseDetail.assignedToPrincipalId",
         "CaseDetail.venueId",
         "CaseDetail.relatedOrderId",
-        "CaseDetail.slaDueAt",
-        "CaseDetail.isSlaBreached",
-        "CaseDetail.slaPausedSeconds",
-        "CaseDetail.escalationCount",
-        "CaseDetail.resolvedAt"
+        "CaseDetail.slaDueAt"
        ],
        "operation": "getCase",
        "provenance": "contract marketing-crm.yaml GET /cases/{caseId}"
@@ -2504,77 +3409,51 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Report",
+       "label": "Report incident",
        "operation": "reportIncident",
        "provenance": "contract maintenance.yaml POST /incidents"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create case",
        "operation": "createCase",
        "provenance": "contract marketing-crm.yaml POST /cases"
       },
       {
        "kind": "secondaryButton",
-       "label": "Add",
+       "label": "Add case message",
        "operation": "addCaseMessage",
        "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/messages"
       },
       {
        "kind": "secondaryButton",
-       "label": "Escalate",
+       "label": "Escalate case",
        "operation": "escalateCase",
        "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/escalate"
       },
       {
        "kind": "secondaryButton",
-       "label": "Record",
+       "label": "Record authority notification",
        "operation": "recordAuthorityNotification",
        "provenance": "contract maintenance.yaml POST /incidents/{incidentId}/notify-authority"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reopen",
+       "label": "Reopen case",
        "operation": "reopenCase",
        "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/reopen"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save case",
        "operation": "updateCase",
        "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save incident",
        "operation": "updateIncident",
        "provenance": "contract maintenance.yaml PATCH /incidents/{incidentId}"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listCases",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "reportIncident",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -2583,9 +3462,9 @@
   "states": {
    "loading": "The guest assistance list.",
    "error": "Could not load. Names which read failed and leaves the guest assistance untouched.",
-   "emptyFirstRun": "No guest assistance yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the guest assistance are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No guest assistance yet. Offers Create case (`createCase`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on status, assignedToPrincipalId, breachedSla, priority and the guest assistance are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `CASE_VIEW`, which `getCase` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Queues locally and syncs on reconnect. The pending count is always current because it is local"
   },
   "apis": [
@@ -2629,13 +3508,13 @@
     "operationId": "getCase",
     "contract": "marketing-crm",
     "purpose": "Read a case with its thread",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getIncident",
     "contract": "maintenance",
     "purpose": "Read an incident",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "listCases",
@@ -2699,11 +3578,11 @@
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `caseId`, `incidentId`.",
    "preloaded": [
-    "CaseDetail.id",
-    "CaseDetail.caseNumber",
-    "CaseDetail.subjectId",
-    "CaseDetail.guestName",
-    "CaseDetail.subject"
+    "Case.id",
+    "Case.caseNumber",
+    "Case.subjectId",
+    "Case.guestName",
+    "Case.subject"
    ]
   },
   "wireframe": {
@@ -2712,6 +3591,193 @@
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-029"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 12 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formReportIncident",
+    "component": "modal",
+    "trigger": "Report incident",
+    "body": "**Collects what `reportIncident` sends before it is called.** Required: `id`, `kind`, `severity`, `venueId`, `description`, `occurredAt`, `recordedAt`. Optional: `assetId`, `locationDescription`, `involvedSubjectIds`, `involvedStaffPrincipalIds`, `witnessCount`, `firstAidGiven`, `emergencyServicesCalled`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "ReportIncidentRequest",
+    "confirm": {
+     "label": "Report incident",
+     "operation": "reportIncident"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "kind",
+      "severity",
+      "venueId",
+      "description",
+      "occurredAt",
+      "recordedAt",
+      "assetId",
+      "locationDescription",
+      "involvedSubjectIds",
+      "involvedStaffPrincipalIds",
+      "witnessCount",
+      "firstAidGiven",
+      "emergencyServicesCalled",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "contract maintenance.yaml POST /incidents"
+   },
+   {
+    "id": "formCreateCase",
+    "component": "modal",
+    "trigger": "Create case",
+    "body": "**Collects what `createCase` sends before it is called.** Required: `id`, `subject`, `description`, `channel`, `recordedAt`. Optional: `subjectId`, `categoryId`, `priority`, `kind`, `venueId`, `relatedOrderId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateCaseRequest",
+    "confirm": {
+     "label": "Create case",
+     "operation": "createCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "subject",
+      "description",
+      "channel",
+      "recordedAt",
+      "subjectId",
+      "categoryId",
+      "priority",
+      "kind",
+      "venueId",
+      "relatedOrderId",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases"
+   },
+   {
+    "id": "formAddCaseMessage",
+    "component": "modal",
+    "trigger": "Add case message",
+    "body": "**Collects what `addCaseMessage` sends before it is called.** Required: `id`, `body`, `isInternal`, `recordedAt`. Optional: `channel`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Add case message",
+     "operation": "addCaseMessage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "body",
+      "isInternal",
+      "recordedAt",
+      "channel",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/messages"
+   },
+   {
+    "id": "formEscalateCase",
+    "component": "modal",
+    "trigger": "Escalate case",
+    "body": "**Collects what `escalateCase` sends before it is called.** Required: `reason`. Optional: `assignToPrincipalId`, `newPriority`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Escalate case",
+     "operation": "escalateCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason",
+      "assignToPrincipalId",
+      "newPriority"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/escalate"
+   },
+   {
+    "id": "formRecordAuthorityNotification",
+    "component": "modal",
+    "trigger": "Record authority notification",
+    "body": "**Collects what `recordAuthorityNotification` sends before it is called.** Required: `authority`, `notifiedAt`. Optional: `reference`, `notifiedByPrincipalId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Record authority notification",
+     "operation": "recordAuthorityNotification"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "authority",
+      "notifiedAt",
+      "reference",
+      "notifiedByPrincipalId",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "contract maintenance.yaml POST /incidents/{incidentId}/notify-authority"
+   },
+   {
+    "id": "formReopenCase",
+    "component": "modal",
+    "trigger": "Reopen case",
+    "body": "**Collects what `reopenCase` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reopen case",
+     "operation": "reopenCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/reopen"
+   },
+   {
+    "id": "formUpdateCase",
+    "component": "modal",
+    "trigger": "Save case",
+    "body": "**Collects what `updateCase` sends before it is called.** Nothing in the body is required. Optional: `status`, `priority`, `assignedToPrincipalId`, `categoryId`, `resolutionNote`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save case",
+     "operation": "updateCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "priority",
+      "assignedToPrincipalId",
+      "categoryId",
+      "resolutionNote"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}"
+   },
+   {
+    "id": "formUpdateIncident",
+    "component": "modal",
+    "trigger": "Save incident",
+    "body": "**Collects what `updateIncident` sends before it is called.** Nothing in the body is required. Optional: `status`, `severity`, `assignedToPrincipalId`, `investigationNote`, `rootCause`, `correctiveActions`, `correctiveWorkOrderId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save incident",
+     "operation": "updateIncident"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "severity",
+      "assignedToPrincipalId",
+      "investigationNote",
+      "rootCause",
+      "correctiveActions",
+      "correctiveWorkOrderId",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "contract maintenance.yaml PATCH /incidents/{incidentId}"
+   }
+  ],
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -2768,27 +3834,17 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId and EMP-030 holds none of them, so the edge carries nothing and EMP-001 opens cold"
     },
     {
      "to": "EMP-002",
      "trigger": "Select venue & role",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — EMP-002 declares entryState.params  and EMP-030 holds none of them, so the edge carries nothing and EMP-002 opens cold"
     },
     {
      "to": "EMP-003",
      "trigger": "Home — on duty",
-     "carries": [
-      "incidentId",
-      "shiftId"
-     ],
-     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+     "provenance": "derived — EMP-003 declares entryState.params incidentId and EMP-030 holds none of them, so the edge carries nothing and EMP-003 opens cold"
     }
    ]
   },
@@ -2802,8 +3858,8 @@
   "purpose": "Find a gate, an exit or a colleague.",
   "gaps": [
    {
-    "operation": "listDeliveryLocations",
-    "why": "**2 declared operations reach no component on this screen**: listDeliveryLocations, getVenueMapLive. Either the screen is missing what calls them, or the declaration is residue.",
+    "operation": "getVenueMapLive",
+    "why": "**1 declared operation reach no component on this screen**: getVenueMapLive. Either the screen is missing what calls them, or the declaration is residue.",
     "source": "the screen's own declarations"
    }
   ],
@@ -2815,8 +3871,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "toggle",
+       "label": "Open now",
+       "operation": "listDiningOutlets",
+       "notes": "Sends `?openNow=` to `listDiningOutlets`.",
+       "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
+      },
+      {
+       "kind": "textField",
+       "label": "Ordering method",
+       "operation": "listDiningOutlets",
+       "notes": "Sends `?orderingMethod=` to `listDiningOutlets`.",
+       "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every venue map",
+       "label": "Every dining outlet",
        "bindsTo": "DiningOutlet",
        "columns": [
         "DiningOutlet.outletId",
@@ -2834,6 +3904,26 @@
        ],
        "operation": "listDiningOutlets",
        "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every delivery location",
+       "bindsTo": "DeliveryLocation",
+       "columns": [
+        "DeliveryLocation.id",
+        "DeliveryLocation.venueId",
+        "DeliveryLocation.kind",
+        "DeliveryLocation.label",
+        "DeliveryLocation.zone",
+        "DeliveryLocation.tableId",
+        "DeliveryLocation.seatId",
+        "DeliveryLocation.servingOutletIds",
+        "DeliveryLocation.isServiceable",
+        "DeliveryLocation.unserviceableReason",
+        "DeliveryLocation.walkTimeMinutes"
+       ],
+       "operation": "listDeliveryLocations",
+       "provenance": "contract fnb.yaml GET /venues/{venueId}/delivery-locations"
       }
      ]
     },
@@ -2843,7 +3933,28 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected venue map",
+       "label": "The selected dining outlet",
+       "bindsTo": "DiningOutlet",
+       "columns": [
+        "DiningOutlet.outletId",
+        "DiningOutlet.name",
+        "DiningOutlet.kind",
+        "DiningOutlet.zone",
+        "DiningOutlet.cuisine",
+        "DiningOutlet.isOpenNow",
+        "DiningOutlet.opensAt",
+        "DiningOutlet.closesAt",
+        "DiningOutlet.orderingMethod",
+        "DiningOutlet.estimatedWaitMinutes",
+        "DiningOutlet.imageAssetRef",
+        "DiningOutlet.menuId"
+       ],
+       "operation": "listDiningOutlets",
+       "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The venue map",
        "bindsTo": "VenueMapDetail",
        "columns": [
         "VenueMapDetail.map",
@@ -2854,33 +3965,15 @@
        "provenance": "contract venue-map.yaml GET /venue-maps/{mapId}"
       }
      ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listDiningOutlets",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
     }
    ]
   },
   "states": {
    "loading": "The venue map list.",
    "error": "Could not load. Names which read failed and leaves the venue map untouched.",
-   "emptyFirstRun": "No venue map yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the venue map are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No venue map yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on openNow, orderingMethod and the venue map are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `VENUE_MAP_VIEW`, which `getVenueMap` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Cached map. **The zone list always works** because it is text"
   },
   "apis": [
@@ -2922,15 +4015,18 @@
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `mapId`.",
    "preloaded": [
-    "VenueMapDetail.map",
-    "VenueMapDetail.points",
-    "VenueMapDetail.paths"
+    "DiningOutlet.outletId",
+    "DiningOutlet.name",
+    "DiningOutlet.kind",
+    "DiningOutlet.zone",
+    "DiningOutlet.cuisine"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-030",
+   "derivedFrom": "wireframes/reference/Seat Board 4.dc.html",
    "note": "**Drawn by Claude Design on `Seat Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",

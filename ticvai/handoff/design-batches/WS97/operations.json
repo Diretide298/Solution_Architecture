@@ -105,6 +105,16 @@
     "name": "compareTo",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "interval",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -199,6 +209,16 @@
    },
    {
     "name": "dateTo",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priceCategory",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "sectionCode",
     "in": "query",
     "required": false
    },

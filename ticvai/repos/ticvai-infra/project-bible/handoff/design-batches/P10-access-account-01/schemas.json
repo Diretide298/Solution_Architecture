@@ -364,7 +364,7 @@
      "properties": {
       "orderId": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+       "format": "uuid"
       },
       "amount": {
        "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -599,6 +599,7 @@
   ]
  },
  "MessageDispatch": {
+  "x-ticvai-append-only": "queuedAt",
   "x-ticvai-persistence": "marketing.message_dispatch",
   "type": "object",
   "required": [

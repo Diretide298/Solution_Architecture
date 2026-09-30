@@ -10,8 +10,8 @@ aggregate: storefrontSession
 emittedWhen: recordStorefrontSessionEvents accepts a batch (one event per accepted batch)
 payload:
 - field: batchId
-  type: string
-  notes: ULID minted by the storefront for the batch. The idempotency key; a retried beacon carries the same one
+  type: uuid
+  notes: UUIDv7 minted by the storefront for the batch. The idempotency key; a retried beacon carries the same one
 - field: sessionRef
   type: string
   notes: 'The storefront session id hashed with the tenant key. **The join to a later checkout**: the checkout

@@ -1,6 +1,6 @@
 # P12-access-availability-01 — P12 · Access & Availability
 
-**2 screens · 9 operations · 12 schemas · 2 permissions**
+**2 screens · 10 operations · 14 schemas · 2 permissions**
 
 Platform P12 Venue Support · ships as **venue-management** ·
 staff audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 2 permissions apply here:
   `CASE_MANAGE, SESSION_FORCE_LOGOUT`. A control nobody can use must say so,
   not sit enabled and fail.
-- **2 of these operations work offline**: getCurrentSession, getGuestSession
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,12 +60,8 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `SUP-001` | Venue Management Sign In | listDetail | 8 | 2 | — |
+| `SUP-001` | Venue Management Sign In | listDetail | 9 | 3 | — |
 | `SUP-003` | Availability & Routing Settings | configEditor | 1 | 0 | — |
-
-## Thin screens in this batch
-
-**SUP-003 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -93,12 +88,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "isEntryPoint": true,
    "inferred": true,
    "exitTo": [
+    "ANL-001",
+    "BO-001",
+    "CMS-001",
     "SUP-002",
     "SUP-003",
     "SUP-004",
-    "BO-001",
-    "CMS-001",
-    "ANL-001"
+    "SUP-005",
+    "SUP-006",
+    "SUP-007",
+    "SUP-008",
+    "SUP-009",
+    "SUP-019"
    ],
    "transitions": [
     {
@@ -130,6 +131,36 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "ANL-001",
      "trigger": "Executive Command Center",
      "provenance": "structural — SUP-001 is P12's home screen and its exits are its launcher"
+    },
+    {
+     "to": "SUP-005",
+     "trigger": "Live Chat Workspace",
+     "provenance": "derived — SUP-005 declares entryState.params caseId, conversationId and SUP-001 holds none of them, so the edge carries nothing and SUP-005 opens cold"
+    },
+    {
+     "to": "SUP-006",
+     "trigger": "Knowledge Base Search",
+     "provenance": "derived — SUP-006 declares entryState.params bannerId, pageId, policyKind, version and SUP-001 holds none of them, so the edge carries nothing and SUP-006 opens cold"
+    },
+    {
+     "to": "SUP-008",
+     "trigger": "Agent Performance & SLA View",
+     "provenance": "derived — SUP-008 declares entryState.params conversationId, reportId and SUP-001 holds none of them, so the edge carries nothing and SUP-008 opens cold"
+    },
+    {
+     "to": "SUP-007",
+     "trigger": "Canned Response Management",
+     "provenance": "structural — SUP-001 is P12's home screen and its exits are its launcher"
+    },
+    {
+     "to": "SUP-009",
+     "trigger": "Customer Service Command Center",
+     "provenance": "structural — SUP-001 is P12's home screen and its exits are its launcher"
+    },
+    {
+     "to": "SUP-019",
+     "trigger": "Contact Center Operations Command Center",
+     "provenance": "structural — SUP-001 is P12's home screen and its exits are its launcher"
     }
    ]
   },
@@ -138,13 +169,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listActiveSessions` reads the population and `getCurrentSession` reads one of them — list, select, act",
   "purpose": "Get someone into venue management, fast, on a device that may be shared, and resolve the session the back office, the CMS and analytics all read.",
-  "gaps": [
-   {
-    "operation": "getGuestSession",
-    "why": "**3 declared operations reach no component on this screen**: getGuestSession, listMfaMethods, listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -153,8 +177,29 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Venue id",
+       "operation": "listActiveSessions",
+       "notes": "Sends `?venueId=` to `listActiveSessions`.",
+       "provenance": "contract identity.yaml GET /auth/sessions"
+      },
+      {
+       "kind": "textField",
+       "label": "Principal id",
+       "operation": "listActiveSessions",
+       "notes": "Sends `?principalId=` to `listActiveSessions`.",
+       "provenance": "contract identity.yaml GET /auth/sessions"
+      },
+      {
+       "kind": "textField",
+       "label": "Workstation id",
+       "operation": "listActiveSessions",
+       "notes": "Sends `?workstationId=` to `listActiveSessions`.",
+       "provenance": "contract identity.yaml GET /auth/sessions"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every agent login",
+       "label": "Every active session",
        "bindsTo": "ActiveSession",
        "columns": [
         "ActiveSession.sessionId",
@@ -172,6 +217,38 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listActiveSessions",
        "provenance": "contract identity.yaml GET /auth/sessions"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every MFA method",
+       "bindsTo": "MfaMethod",
+       "columns": [
+        "MfaMethod.id",
+        "MfaMethod.kind",
+        "MfaMethod.label",
+        "MfaMethod.maskedTarget",
+        "MfaMethod.isActive",
+        "MfaMethod.isPrimary",
+        "MfaMethod.enrolledAt",
+        "MfaMethod.lastUsedAt"
+       ],
+       "operation": "listMfaMethods",
+       "provenance": "contract identity.yaml GET /auth/mfa/methods"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every SSO provider",
+       "bindsTo": "SsoProvider",
+       "columns": [
+        "SsoProvider.id",
+        "SsoProvider.displayName",
+        "SsoProvider.protocol",
+        "SsoProvider.iconAssetRef",
+        "SsoProvider.isEnforced",
+        "SsoProvider.scopePath"
+       ],
+       "operation": "listSsoProviders",
+       "provenance": "contract identity.yaml GET /auth/sso/providers"
       }
      ]
     },
@@ -181,7 +258,31 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected agent login",
+       "label": "The selected active session",
+       "bindsTo": "ActiveSession",
+       "columns": [
+        "ActiveSession.status",
+        "ActiveSession.sessionId",
+        "ActiveSession.principalId",
+        "ActiveSession.principalName",
+        "ActiveSession.roleId",
+        "ActiveSession.roleName",
+        "ActiveSession.workstationId",
+        "ActiveSession.workstationName",
+        "ActiveSession.venueId",
+        "ActiveSession.ipAddress",
+        "ActiveSession.deviceInfo",
+        "ActiveSession.hasOpenShift",
+        "ActiveSession.mfaSatisfied",
+        "ActiveSession.startedAt",
+        "ActiveSession.lastSeenAt"
+       ],
+       "operation": "listActiveSessions",
+       "provenance": "contract identity.yaml GET /auth/sessions"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The session",
        "bindsTo": "Session",
        "columns": [
         "Session.sessionId",
@@ -212,14 +313,35 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "contract identity.yaml POST /auth/login"
       },
       {
+       "kind": "textField",
+       "label": "Authentication code",
+       "operation": "verifyMfaChallenge",
+       "notes": "Shown only in the mfaRequired state, after `login`, for the authenticator-app code or the emailed code (decided 28 September, audit R135, R126 (5)).",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaChallenge",
+       "notes": "Completes sign-in; the session is usable only after it. Five wrong codes lock step-up (429 step-up-locked, audit R126 (6)).",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Email me a code instead",
+       "operation": "createMfaChallenge",
+       "notes": "The fallback: a new challenge with the email method (`emailOtp`) instead of the authenticator app (decided 28 September, audit R126 (5)).",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge"
+      },
+      {
        "kind": "destructiveButton",
-       "label": "Force",
+       "label": "Force logout",
        "operation": "forceLogout",
        "provenance": "contract identity.yaml POST /auth/sessions/{sessionId}/force-logout"
       },
       {
        "kind": "destructiveButton",
-       "label": "Revoke",
+       "label": "Revoke all sessions",
        "operation": "revokeAllSessions",
        "provenance": "contract identity.yaml POST /auth/sessions/revoke-all"
       }
@@ -231,31 +353,66 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmForceLogout",
     "component": "confirmDialog",
-    "trigger": "Force",
-    "body": "**Names what `forceLogout` changes and what it leaves alone**, in the consequence rather than the verb. A agent login this affects should be identified in the dialog, not just counted.",
+    "trigger": "Force logout",
+    "body": "**Names what `forceLogout` changes and what it leaves alone**, in the consequence rather than the verb. A agent login this affects should be identified in the dialog, not just counted. **Collects what `forceLogout` sends before it is called.** Required: `reason`.",
     "provenance": "contract identity.yaml POST /auth/sessions/{sessionId}/force-logout"
    },
    {
     "id": "confirmRevokeAllSessions",
     "component": "confirmDialog",
-    "trigger": "Revoke",
-    "body": "**Names what `revokeAllSessions` changes and what it leaves alone**, in the consequence rather than the verb. A agent login this affects should be identified in the dialog, not just counted.",
+    "trigger": "Revoke all sessions",
+    "body": "**Names what `revokeAllSessions` changes and what it leaves alone**, in the consequence rather than the verb. A agent login this affects should be identified in the dialog, not just counted. **Collects what `revokeAllSessions` sends before it is called.** Required: `reason`, `stepUpToken`. Optional: `venueId`, `excludeSelf`.",
     "provenance": "contract identity.yaml POST /auth/sessions/revoke-all"
+   },
+   {
+    "id": "formLogin",
+    "component": "modal",
+    "trigger": "Login",
+    "body": "**Collects what `login` sends before it is called.** Required: `username`, `credential`, `workstationId`. Optional: `method`, `deviceFingerprint`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "LoginRequest",
+    "confirm": {
+     "label": "Login",
+     "operation": "login"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "username",
+      "credential",
+      "workstationId",
+      "method",
+      "deviceFingerprint"
+     ]
+    },
+    "provenance": "contract identity.yaml POST /auth/login"
    }
   ],
   "states": {
    "loading": "The agent login list.",
    "error": "Could not load. Names which read failed and leaves the agent login untouched.",
-   "emptyFirstRun": "No agent login yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the agent login are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No agent login yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on venueId, principalId, workstationId and the agent login are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `SESSION_FORCE_LOGOUT`, which `listActiveSessions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "mfaRequired": "**Signed in, not yet through.** The principal holds a permission that requires MFA (ROLE_MANAGE, LEDGER_APPROVE, any platform-staff permission, or one the tenant added), so after `login` the screen calls `createMfaChallenge` and asks for the authenticator code; `verifyMfaChallenge` completes the sign-in. **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy's lockout minutes and the screen says so. A principal with no enrolled method is sent to enrol first (decided 28 September, audit R135, R126)."
   },
   "apis": [
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "Second factor after login when the principal holds a permission in mfaRequiredForPermissions; action `signIn`, the primary method (authenticator app), or the email method as the fallback (decided 28 September, audit R135, R126 (5))",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "verifyMfaChallenge",
+    "contract": "identity",
+    "purpose": "Completes sign-in with the code; the session is usable only after it. Five wrong codes lock step-up (audit R126 (6))",
+    "trigger": "onAction"
+   },
    {
     "operationId": "login",
     "contract": "identity",
     "purpose": "from page inventory",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "forceLogout",
@@ -270,12 +427,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getCurrentSession",
     "contract": "identity",
     "purpose": "Current session and effective permissions",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "getGuestSession",
-    "contract": "identity",
-    "purpose": "Read the current guest session",
     "trigger": "onLoad"
    },
    {
@@ -307,14 +458,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    }
   ],
   "entryState": {
-   "params": [],
+   "params": [
+    {
+     "name": "challengeId",
+     "from": "navigation"
+    }
+   ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "Session.sessionId",
-    "Session.principalId",
-    "Session.roleId",
-    "Session.displayName",
-    "Session.scope"
+    "ActiveSession.status",
+    "ActiveSession.sessionId",
+    "ActiveSession.principalId",
+    "ActiveSession.principalName",
+    "ActiveSession.roleId"
    ]
   },
   "wireframe": {
@@ -364,35 +520,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "inferred": true,
    "exitTo": [
-    "SUP-001",
-    "SUP-002",
-    "SUP-004"
+    "SUP-001"
    ],
    "transitions": [
     {
      "to": "SUP-001",
      "trigger": "Agent Login",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry them"
-    },
-    {
-     "to": "SUP-002",
-     "trigger": "Agent Dashboard",
-     "carries": [
-      "caseId"
-     ],
-     "provenance": "derived — SUP-002 declares entryState.params caseId, so an edge into it must carry them"
-    },
-    {
-     "to": "SUP-004",
-     "trigger": "Conversation Queue",
-     "carries": [
-      "caseId",
-      "conversationId"
-     ],
-     "provenance": "derived — SUP-004 declares entryState.params caseId, conversationId, so an edge into it must carry them"
+     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-003 holds none of them, so the edge carries nothing and SUP-001 opens cold"
     }
    ]
   },
@@ -404,13 +538,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`setAgentAvailability`) and no read of a population — it is settings, not a list",
   "purpose": "Change how availability behaves here, and see which level the current value came from.",
-  "gaps": [
-   {
-    "operation": "setAgentAvailability",
-    "why": "**`setAgentAvailability` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
-    "source": "contract marketing-crm.yaml PUT /agent-availability"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -420,7 +547,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Save changes",
+       "label": "Save agent availability",
        "operation": "setAgentAvailability",
        "provenance": "contract marketing-crm.yaml PUT /agent-availability"
       }
@@ -430,11 +557,23 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "name": "contentBody",
      "components": [
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setAgentAvailability"
+       "kind": "selectField",
+       "label": "State",
+       "operation": "setAgentAvailability",
+       "notes": "Required.",
+       "provenance": "contract marketing-crm.yaml PUT /agent-availability"
+      },
+      {
+       "kind": "numberField",
+       "label": "Max concurrent",
+       "operation": "setAgentAvailability",
+       "provenance": "contract marketing-crm.yaml PUT /agent-availability"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Queue ids",
+       "operation": "setAgentAvailability",
+       "provenance": "contract marketing-crm.yaml PUT /agent-availability"
       }
      ]
     }
@@ -443,8 +582,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The saved availability routing settings.",
    "error": "Could not load. Names which read failed and leaves the availability routing settings untouched.",
-   "emptyFirstRun": "No availability routing settings configured. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No availability routing settings configured. The form opens empty and `setAgentAvailability` saves the first one; it says what the platform does in the meantime.",
+   "emptyNoAccess": "Shown when the caller lacks `CASE_MANAGE`, which `setAgentAvailability` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -492,6 +631,25 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+ "createMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge",
+  "contract": "identity",
+  "summary": "Second factor at staff sign-in, and step-up for a sensitive action",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
  "forceLogout": {
   "method": "POST",
   "path": "/auth/sessions/{sessionId}/force-logout",
@@ -529,19 +687,6 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "Session"
  },
- "getGuestSession": {
-  "method": "GET",
-  "path": "/auth/guest/session",
-  "contract": "identity",
-  "summary": "Read the current guest session",
-  "permission": null,
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "GuestSession"
- },
  "listActiveSessions": {
   "method": "GET",
   "path": "/auth/sessions",
@@ -559,6 +704,11 @@ Method, path, parameters, request and response for every operation these screens
    },
    {
     "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "workstationId",
     "in": "query",
     "required": null
    },
@@ -657,6 +807,25 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
+  "responds": "AgentAvailability"
+ },
+ "verifyMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge/{challengeId}/verify",
+  "contract": "identity",
+  "summary": "Complete a sign-in or step-up challenge",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
   "responds": null
  }
 }
@@ -668,62 +837,133 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
- "GuestSession": {
+ "ActiveSession": {
   "x-ticvai-persistence": "none — Redis session registry",
   "type": "object",
   "required": [
-   "subjectId",
-   "tokens",
-   "isVerified",
-   "expiresAt"
+   "sessionId",
+   "principalId",
+   "status",
+   "startedAt",
+   "lastSeenAt"
   ],
   "properties": {
-   "subjectId": {
+   "status": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/SessionStatus"
+     }
+    ],
+    "description": "**A registry that only holds live sessions cannot answer why one ended.** Kept on the record so a supervisor asking *what happened to till 4* gets `terminated` or `expired` rather than an absence.\n"
+   },
+   "sessionId": {
+    "type": "string"
+   },
+   "principalId": {
     "type": "string",
     "format": "uuid"
    },
-   "displayName": {
+   "principalName": {
+    "type": "string"
+   },
+   "roleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "roleName": {
     "type": "string",
     "nullable": true
    },
-   "tokens": {
-    "$ref": "#/components/schemas/TokenPair"
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
    },
-   "isVerified": {
+   "workstationName": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "ipAddress": {
+    "type": "string",
+    "nullable": true
+   },
+   "deviceInfo": {
+    "type": "string",
+    "nullable": true
+   },
+   "hasOpenShift": {
     "type": "boolean",
-    "description": "False until an OTP or a verified provider identity confirms ownership. An unverified account may browse but not transact.\n"
+    "description": "Revoking this session leaves cash unreconciled."
    },
-   "identityProviders": {
+   "mfaSatisfied": {
+    "type": "boolean"
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lastSeenAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "AgentAvailability": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.agent_availability",
+  "required": [
+   "principalId",
+   "state"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "The caller."
+   },
+   "state": {
+    "type": "string",
+    "enum": [
+     "available",
+     "busy",
+     "away",
+     "offline"
+    ]
+   },
+   "maxConcurrent": {
+    "type": "integer",
+    "nullable": true
+   },
+   "queueIds": {
     "type": "array",
-    "description": "Linked providers. Several may resolve to one account.",
     "items": {
      "type": "string",
-     "enum": [
-      "password",
-      "otp",
-      "apple",
-      "google",
-      "uaePass"
-     ]
+     "format": "uuid"
     }
-   },
-   "guestLinkId": {
-    "type": "string",
-    "nullable": true,
-    "description": "Present where the guest is linked across cells (ADR-0010)."
-   },
-   "homeCellName": {
-    "type": "string",
-    "nullable": true
-   },
-   "preferredLanguage": {
-    "type": "string",
-    "nullable": true
    },
    "expiresAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Longer lived than a staff session. No single-session rule — a guest may be signed in on a phone and a laptop at once.\n"
+    "nullable": true,
+    "readOnly": true,
+    "description": "When this state lapses on its own — **availability expires** rather than persisting through a closed laptop."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -742,7 +982,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "credential": {
     "type": "string",
     "description": "Password, PIN, card token or RFID token depending on `method`.\n",
-    "maxLength": 512
+    "maxLength": 512,
+    "writeOnly": true
    },
    "method": {
     "type": "string",
@@ -776,11 +1017,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    {
     "type": "object",
     "required": [
-     "requiresRoleSelection"
+     "requiresRoleSelection",
+     "requiresMfa"
     ],
     "properties": {
      "requiresRoleSelection": {
       "type": "boolean"
+     },
+     "requiresMfa": {
+      "type": "boolean",
+      "description": "True when the principal holds any permission listed in `PasswordPolicy.mfaRequiredForPermissions` (decided 28 September, audit R135). The session is not usable until `verifyMfaChallenge` succeeds on a `signIn` challenge."
+     },
+     "hasMfaMethod": {
+      "type": "boolean",
+      "description": "Whether the principal has an active MFA method. With `requiresMfa` true and this false, the client must enrol one first (audit R135, R126 (5))."
+     },
+     "mfaMethods": {
+      "type": "array",
+      "description": "The principal's active methods, so the client can offer the right one for the `signIn` challenge. Empty when `requiresMfa` is false.",
+      "items": {
+       "$ref": "#/components/schemas/MfaMethod"
+      }
      },
      "availableRoles": {
       "type": "array",
@@ -957,6 +1214,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "SessionStatus": {
+  "type": "string",
+  "description": "**The life of one signed-in session, which is not the life of a shift.** A shift holds the float and survives a break; a session holds the person and does not. `ShiftStatus.suspended` is where a break lives — *break cover; float intact, workstation released* — and the release of the workstation is exactly why the session ends rather than pausing: the next person opens their own.\n**One principal, one active session per workstation.** Enforced by the `ActiveSession` registry rather than by a state, because it is a fact about the set of sessions and not about any one of them.\n",
+  "enum": [
+   "active",
+   "signedOut",
+   "terminated",
+   "expired"
+  ]
+ },
  "SsoProtocol": {
   "type": "string",
   "enum": [
@@ -993,7 +1260,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "scopePath": {
     "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope**; the server sets it and ignores it in a request."
    }
   }
  },

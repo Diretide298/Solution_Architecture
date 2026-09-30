@@ -6,12 +6,12 @@ This table was maintained by hand until 26 August and held **twelve rows against
 
 **A figure typed once is correct once.** `platform-P01.md` claimed 35 screens against a live 46; the viewer carried *654 operations* in 25 places against a live 1,023. This file is now derived for the same reason both of those were fixed.
 
-**16 platforms · 2445 screens · 8 drawn.**
+**16 platforms · 2445 screens · 27 drawn.**
 
 | | Short | Purpose | Audience | Form factor | App | Offline | Screens | Drawn |
 |---|---|---|---|---|---|---|---:|---:|
 | P01 | **Guest Web** | Guest Web — Storefront | guest | web | `guest-web` | no | 50 | 1 |
-| P02 | **Guest App** | Guest App — Mobile | guest | mobileApp | `guest-app` | yes | 77 | 0 |
+| P02 | **Guest App** | Guest App — Mobile | guest | mobileApp | `guest-app` | yes | 77 | 19 |
 | P04 | **Venue POS** | Venue POS — Terminal and Tablet | staff | posTerminal | `venue-pos` | yes | 30 | 7 |
 | P05 | **Guest Kiosk** | Guest Kiosk — Self-Service | guest | kiosk | `guest-app` | no | 17 | 0 |
 | P06 | **Venue Staff App** | Venue Staff App — Operations | staff | mobileApp | `venue-staff-app` | yes | 96 | 0 |

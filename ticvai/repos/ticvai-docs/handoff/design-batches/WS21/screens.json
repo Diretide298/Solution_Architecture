@@ -22,7 +22,6 @@
     "PTR-001"
    ],
    "exitTo": [
-    "PTR-001",
     "PTR-023",
     "PTR-024",
     "PTR-025",
@@ -36,15 +35,6 @@
    "inferred": false,
    "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
    "transitions": [
-    {
-     "to": "PTR-001",
-     "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId",
-      "sessionId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
-    },
     {
      "to": "PTR-023",
      "trigger": "Sets up the organisation record",
@@ -90,10 +80,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized administrators can identify every partner, its business relationship, current status and outstanding actions from a single workspace.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each partner record should display) — counts over a population, then the population",
   "purpose": "Provide a centralized management dashboard for all B2B, reseller, OTA and distribution partners across the TICVAI ecosystem.",
-  "purposeNote": "Authorized administrators can identify every partner, its business relationship, current status and outstanding actions from a single workspace.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -135,73 +125,73 @@
        "kind": "metricTile",
        "label": "Total Partners",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "PartnerManagementCommandCenterView.totalPartners"
+       "bindsTo": "PartnerManagementCommandCenterSummary.totalPartners"
       },
       {
        "kind": "metricTile",
        "label": "Active Partners",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "PartnerManagementCommandCenterView.activePartners"
+       "bindsTo": "PartnerManagementCommandCenterSummary.activePartners"
       },
       {
        "kind": "metricTile",
        "label": "Pending Onboarding",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "PartnerManagementCommandCenterView.pendingOnboarding"
+       "bindsTo": "PartnerManagementCommandCenterSummary.pendingOnboarding"
       },
       {
        "kind": "metricTile",
        "label": "Pending Approval",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "PartnerManagementCommandCenterView.pendingApproval"
+       "bindsTo": "PartnerManagementCommandCenterSummary.pendingApproval"
       },
       {
        "kind": "metricTile",
        "label": "Suspended Partners",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "PartnerManagementCommandCenterView.suspendedPartners"
+       "bindsTo": "PartnerManagementCommandCenterSummary.suspendedPartners"
       },
       {
        "kind": "metricTile",
        "label": "Expiring Agreements",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "PartnerManagementCommandCenterView.expiringAgreements"
+       "bindsTo": "PartnerManagementCommandCenterSummary.expiringAgreements"
       },
       {
        "kind": "metricTile",
        "label": "Documentation Issues",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "PartnerManagementCommandCenterView.documentationIssues"
+       "bindsTo": "PartnerManagementCommandCenterSummary.documentationIssues"
       },
       {
        "kind": "metricTile",
        "label": "Partners With Credit Holds",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "PartnerManagementCommandCenterView.partnersWithCreditHolds"
+       "bindsTo": "PartnerManagementCommandCenterSummary.partnersWithCreditHolds"
       },
       {
        "kind": "metricTile",
        "label": "Connected OTA/API Partners",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "PartnerManagementCommandCenterView.connectedOtaApiPartners"
+       "bindsTo": "PartnerManagementCommandCenterSummary.connectedOtaApiPartners"
       },
       {
        "kind": "metricTile",
        "label": "Partner Sales YTD",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "PartnerManagementCommandCenterView.partnerSalesYtd"
+       "bindsTo": "PartnerManagementCommandCenterSummary.partnerSalesYtd"
       },
       {
        "kind": "metricTile",
        "label": "Partner Revenue YTD",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "PartnerManagementCommandCenterView.partnerRevenueYtd"
+       "bindsTo": "PartnerManagementCommandCenterSummary.partnerRevenueYtd"
       },
       {
        "kind": "metricTile",
        "label": "High-Risk Partners",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "PartnerManagementCommandCenterView.highRiskPartners"
+       "bindsTo": "PartnerManagementCommandCenterSummary.highRiskPartners"
       }
      ]
     },
@@ -288,6 +278,12 @@
   },
   "apis": [
    {
+    "operationId": "listPartner2",
+    "contract": "subscription",
+    "purpose": "Partner Operations Command Center",
+    "trigger": "onLoad"
+   },
+   {
     "operationId": "listPartner",
     "contract": "subscription",
     "purpose": "Partner Management Command Center",
@@ -297,7 +293,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-022"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-022",
+   "workshopBoard": "wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-022"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 5. 31 of 38 labels bound to a contract property; 48 of 55 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -361,14 +358,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Each external partner has one governed master organization record that can be referenced by commercial, operational, finance and distribution processes.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
   "purpose": "Create the master business record for each external distribution partner.",
-  "purposeNote": "Each external partner has one governed master organization record that can be referenced by commercial, operational, finance and distribution processes.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: New Partner. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Key Account, New Partner. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Allow internal tags such as"
    }
   ],
@@ -467,6 +464,11 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Key Account",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Allow internal tags such as"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "New Partner",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Allow internal tags such as"
       }
@@ -485,18 +487,16 @@
     "operationId": "setPartnerProfileOrganization",
     "contract": "subscription",
     "purpose": "Partner Profile & Organization Setup",
-    "trigger": "onAction",
-    "invalidates": [
-     "setPartnerProfileOrganization"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-023"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-023",
+   "workshopBoard": "wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-023"
   },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 17 of 53 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 18 of 53 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -558,15 +558,15 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "New partners cannot become commercially active until the configured onboarding and approval stages have been successfully completed.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
   "purpose": "Manage the complete journey from a new partner application through internal review and activation.",
-  "purposeNote": "New partners cannot become commercially active until the configured onboarding and approval stages have been successfully completed.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Sequential approval, Parallel approval, Request More Information. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 8 §Support"
+    "why": "**The pack names 5 actions on this screen; 1 are served since the writers pass (29 September): Request More Information by `actOnPartnerApplicationReview`.** Still unserved: Product requirements, Sequential approval, Parallel approval, Rejection. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 8 §Operations"
    }
   ],
   "layout": {
@@ -634,6 +634,11 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Product requirements",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 8 §Operations"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Sequential approval",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 8 §Support"
       },
@@ -644,8 +649,21 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Rejection",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 8 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Request More Information",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 8 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Act on partner application review",
+       "operation": "actOnPartnerApplicationReview",
+       "permission": "PARTNER_MANAGE",
+       "notes": "The review actions on PTR-024 (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml POST /partner-applications/{applicationId}/review-actions"
       }
      ]
     }
@@ -663,14 +681,57 @@
     "contract": "subscription",
     "purpose": "Partner Onboarding & Application Workflow",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "actOnPartnerApplicationReview",
+    "contract": "subscription",
+    "purpose": "Move a partner application through its departmental review",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPartnerOnboardingApplication"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-024"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-024",
+   "workshopBoard": "wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-024"
   },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 13 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 15 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formActOnPartnerApplicationReview",
+    "component": "modal",
+    "trigger": "Act on partner application review",
+    "body": "**Collects what `actOnPartnerApplicationReview` sends before it is called.** Required: `action`. Optional: `department`, `assigneePrincipalId`, `note`, `documentIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PartnerApplicationReviewAction",
+    "confirm": {
+     "label": "Act on partner application review",
+     "operation": "actOnPartnerApplicationReview"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "action",
+      "department",
+      "assigneePrincipalId",
+      "note",
+      "documentIds"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /partner-applications/{applicationId}/review-actions"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "applicationId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -732,15 +793,15 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every external user accessing TICVAI on behalf of a partner is associated with a valid partner account and controlled through appropriate roles and permissions.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture; Configure) and no display directory — it is settings, not a population",
   "purpose": "Manage the individuals authorized to interact with TICVAI on behalf of each partner.",
-  "purposeNote": "Every external user accessing TICVAI on behalf of a partner is associated with a valid partner account and controlled through appropriate roles and permissions.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Password policy. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support/reference"
+    "why": "**The pack names 9 actions on this screen; 6 are served since the writers pass (29 September): Primary Contact, Commercial, Finance, Operations, Management, Emergency Contact by `setPartnerContact`.** Still unserved: Password policy, SSO where available …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support"
    }
   ],
   "layout": {
@@ -843,8 +904,59 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Primary Contact",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Commercial",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Finance",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Operations",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Management",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Emergency Contact",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Password policy",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support/reference"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "SSO where available",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support/reference"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save partner contact",
+       "operation": "setPartnerContact",
+       "permission": "PARTNER_MANAGE",
+       "notes": "The contact half of PTR-025 (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml PUT /partner-contacts"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create partner user",
+       "operation": "createPartnerUser",
+       "permission": "PARTNER_MANAGE",
+       "notes": "2.7.51.",
+       "provenance": "contract subscription.yaml POST /partners/{partnerId}/users"
       }
      ]
     }
@@ -862,14 +974,100 @@
     "contract": "subscription",
     "purpose": "Partner Contacts & User Administration",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPartnerContact",
+    "contract": "subscription",
+    "purpose": "Create, edit, disable, enable or revoke a partner contact",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPartnerContactUser"
+    ]
+   },
+   {
+    "operationId": "createPartnerUser",
+    "contract": "subscription",
+    "purpose": "Add a user to a partner branch",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPartnerContactUser"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-025"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-025",
+   "workshopBoard": "wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-025"
   },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 18 of 52 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 26 of 52 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetPartnerContact",
+    "component": "modal",
+    "trigger": "Save partner contact",
+    "body": "**Collects what `setPartnerContact` sends before it is called.** Required: `partnerId`. Optional: `contactId`, `action`, `name`, `position`, `department`, `email`, `mobile`, `telephone`, `language`, `timeZone`, `contactType`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PartnerContactInput",
+    "confirm": {
+     "label": "Save partner contact",
+     "operation": "setPartnerContact"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "partnerId",
+      "contactId",
+      "action",
+      "name",
+      "position",
+      "department",
+      "email",
+      "mobile",
+      "telephone",
+      "language",
+      "timeZone",
+      "contactType"
+     ]
+    },
+    "provenance": "contract subscription.yaml PUT /partner-contacts"
+   },
+   {
+    "id": "formCreatePartnerUser",
+    "component": "modal",
+    "trigger": "Create partner user",
+    "body": "**Collects what `createPartnerUser` sends before it is called.** Required: `id`, `partnerId`, `principalId`, `branchScopePath`. Optional: `role`, `salesLocation`, `currency`, `accountExpiresAt`, `allocationQuota`, `creditLimitOverride`, `canManageUsers`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PartnerUser",
+    "confirm": {
+     "label": "Create partner user",
+     "operation": "createPartnerUser"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "partnerId",
+      "principalId",
+      "branchScopePath",
+      "role",
+      "salesLocation",
+      "currency",
+      "accountExpiresAt",
+      "allocationQuota",
+      "creditLimitOverride",
+      "canManageUsers"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /partners/{partnerId}/users"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "partnerId",
+     "from": "session"
+    }
+   ]
+  },
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -923,10 +1121,10 @@
    "notes": "**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "partner is authorized to use.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Define where and through what business scope a partner is authorized to distribute TICVAI products.",
-  "purposeNote": "partner is authorized to use.",
   "layout": {
    "template": "form",
    "regions": [
@@ -955,6 +1153,20 @@
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 12 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save partner distribution rights",
+       "operation": "setPartnerDistributionRights",
+       "permission": "PARTNER_MANAGE",
+       "notes": "The writer for PTR-026 (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml PUT /partners/{partnerId}/distribution-rights"
+      }
+     ]
     }
    ]
   },
@@ -970,14 +1182,51 @@
     "contract": "subscription",
     "purpose": "Territory, Market & Distribution Rights",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPartnerDistributionRights",
+    "contract": "subscription",
+    "purpose": "Replace a partner's territory, market and distribution rights",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTerritoryMarketDistribution"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-026"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-026",
+   "workshopBoard": "wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-026"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 12. 0 of 0 labels bound to a contract property; 4 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetPartnerDistributionRights",
+    "component": "modal",
+    "trigger": "Save partner distribution rights",
+    "body": "**Collects what `setPartnerDistributionRights` sends before it is called.** Required: `rights`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save partner distribution rights",
+     "operation": "setPartnerDistributionRights"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "rights"
+     ]
+    },
+    "provenance": "contract subscription.yaml PUT /partners/{partnerId}/distribution-rights"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "partnerId",
+     "from": "session"
+    }
+   ]
+  },
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1039,10 +1288,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Every partner is associated only with the TICVAI brands, venues and business entities for which the commercial relationship has been approved.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Determine which TICVAI business entities the partner relationship covers. This is deliberately separate from product assignment, which is governed through the Sales Channel and commercial configuration layers.",
-  "purposeNote": "Every partner is associated only with the TICVAI brands, venues and business entities for which the commercial relationship has been approved.",
   "gaps": [
    {
     "operation": null,
@@ -1095,16 +1344,14 @@
     "operationId": "setPartnerBrandVenue",
     "contract": "subscription",
     "purpose": "Partner Brand, Venue & Business Scope Assignment",
-    "trigger": "onAction",
-    "invalidates": [
-     "setPartnerBrandVenue"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-027"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-027",
+   "workshopBoard": "wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-027"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 0 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1168,10 +1415,17 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "restrict commercial activity when mandatory documentation is missing or invalid.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture; Configure whether expiration should) and no display directory — it is settings, not a population",
   "purpose": "Maintain required partner documentation and ensure that commercial accounts remain compliant.",
-  "purposeNote": "restrict commercial activity when mandatory documentation is missing or invalid.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Commercial Registration, Bank Details, Signed Agreement, API Agreement. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 15 §Support configurable documents such as"
+   }
+  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1255,6 +1509,32 @@
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 15 §Configure whether expiration should"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Commercial Registration",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 15 §Support configurable documents such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Bank Details",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 15 §Support configurable documents such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Signed Agreement",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 15 §Support configurable documents such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "API Agreement",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 15 §Support configurable documents such as"
+      }
+     ]
     }
    ]
   },
@@ -1275,9 +1555,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-028"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-028",
+   "workshopBoard": "wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-028"
   },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 15 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 19 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1339,10 +1620,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Partner organizations can access only the capabilities authorized by TICVAI, regardless of permissions assigned to individual partner users.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure whether the partner may) and no display directory — it is settings, not a population",
   "purpose": "Control what a partner organization is permitted to do, beyond individual-user permissions.",
-  "purposeNote": "Partner organizations can access only the capabilities authorized by TICVAI, regardless of permissions assigned to individual partner users.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1451,6 +1732,14 @@
        "label": "Permissions this screen separates",
        "notes": "**The pack separates these permissions and no action on the screen claims them yet:** ↓, Permanent, Temporary, Seasonal, Event-specific. Each needs attaching to the control it gates, or the screen needs the control.",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 16 §Partner Permission Ceiling"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save partner capability grants",
+       "operation": "setPartnerCapabilityGrants",
+       "permission": "PARTNER_MANAGE",
+       "notes": "The writer for PTR-029's organisation ceiling (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml PUT /partners/{partnerId}/capability-grants"
       }
      ]
     }
@@ -1468,14 +1757,51 @@
     "contract": "subscription",
     "purpose": "Partner Access, Roles & Permission Profile",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPartnerCapabilityGrants",
+    "contract": "subscription",
+    "purpose": "Replace the capability ceiling of a partner",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPartnerAccessRole"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-029"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-029",
+   "workshopBoard": "wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-029"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 23 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetPartnerCapabilityGrants",
+    "component": "modal",
+    "trigger": "Save partner capability grants",
+    "body": "**Collects what `setPartnerCapabilityGrants` sends before it is called.** Required: `grants`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save partner capability grants",
+     "operation": "setPartnerCapabilityGrants"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "grants"
+     ]
+    },
+    "provenance": "contract subscription.yaml PUT /partners/{partnerId}/capability-grants"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "partnerId",
+     "from": "session"
+    }
+   ]
+  },
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1529,10 +1855,10 @@
    "notes": "**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Partner lifecycle changes are governed, effective-dated, auditable and do not unintentionally damage valid existing customer transactions.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
   "purpose": "Govern the complete business lifecycle of a partner after onboarding.",
-  "purposeNote": "Partner lifecycle changes are governed, effective-dated, auditable and do not unintentionally damage valid existing customer transactions.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1613,16 +1939,14 @@
     "operationId": "approvePartnerStatuLifecycle",
     "contract": "subscription",
     "purpose": "Partner Approval, Status & Lifecycle Management",
-    "trigger": "onAction",
-    "invalidates": [
-     "approvePartnerStatuLifecycle"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-030"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-030",
+   "workshopBoard": "wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-030"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 18. 0 of 0 labels bound to a contract property; 15 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1678,10 +2002,10 @@
    "notes": "**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Before activation, authorized management can evaluate the partner's complete organizational, compliance, access, commercial and technical readiness from one consolidated view. Board 1 — Final Screen Register Screen Backend Screen Primary Responsibility 8.1.1 Partner Management Command Center Partner portfolio & status Screen Backend Screen Primary Responsibility 8.1.2 Partner Profile & Organization Setup Master partner record 8.1.3 Partner Onboarding & Application Workflow Partner onboarding 8.1.4 Partner Contacts & User Administration Contacts and B2B users",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide one consolidated Partner 360 screen before activation and throughout the relationship. This should become one of the most useful screens for TICVAI commercial management. Board 1 established who the partner is and what they are authorized to access. Board 2 establishes the commercial rules under which that partner can transact with TICVAI.",
-  "purposeNote": "Before activation, authorized management can evaluate the partner's complete organizational, compliance, access, commercial and technical readiness from one consolidated view. Board 1 — Final Screen Register Screen Backend Screen Primary Responsibility 8.1.1 Partner Management Command Center Partner portfolio & status Screen Backend Screen Primary Responsibility 8.1.2 Partner Profile & Organization Setup Master partner record 8.1.3 Partner Onboarding & Application Workflow Partner onboarding 8.1.4 Partner Contacts & User Administration Contacts and B2B users",
   "gaps": [
    {
     "operation": null,
@@ -1737,7 +2061,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-031"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-031",
+   "workshopBoard": "wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-031"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 19. 0 of 0 labels bound to a contract property; 1 of 78 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {

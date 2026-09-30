@@ -1,6 +1,6 @@
 # P09-overview-health-01 — P09 · Overview & Health
 
-**5 screens · 22 operations · 27 schemas · 8 permissions**
+**5 screens · 25 operations · 38 schemas · 10 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 8 permissions apply here:
-  `AI_AUDIT_VIEW, PLATFORM_CELL_MANAGE, PLATFORM_CELL_VIEW, PLATFORM_RELEASE_PROMOTE, PLATFORM_RELEASE_VIEW, PLATFORM_TENANT_VIEW, TICKET_LOOKUP, USER_MANAGE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 10 permissions apply here:
+  `AI_AUDIT_VIEW, ORDER_VIEW, PLATFORM_CELL_MANAGE, PLATFORM_CELL_VIEW, PLATFORM_RELEASE_PROMOTE, PLATFORM_RELEASE_VIEW, PLATFORM_TENANT_VIEW, REGION_CONFIGURE, TICKET_LOOKUP, USER_MANAGE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **2 of these operations work offline**: getCrossRegionEntitlement, getTenantLicences
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -62,11 +61,7 @@ convincingly. It is never a caption.
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
 | `ADM-002` | Platform Dashboard | listDetail | 6 | 0 | — |
-| `ADM-003` | Cross-Tenant Health Dashboard | listDetail | 10 | 1 | — |
-| `ADM-004` | Platform Audit Log | listDetail | 1 | 0 | — |
-| `ADM-013` | Tenant Performance Monitor | listDetail | 7 | 1 | — |
-| `ADM-029` | Deployment Monitor | listDetail | 12 | 1 | — |
-
-## Thin screens in this batch
-
-**ADM-002, ADM-004 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+| `ADM-003` | Cross-Tenant Health Dashboard | listDetail | 12 | 5 | — |
+| `ADM-004` | Platform Audit Log | listDetail | 2 | 0 | — |
+| `ADM-013` | Tenant Performance Monitor | listDetail | 7 | 3 | — |
+| `ADM-029` | Deployment Monitor | listDetail | 12 | 6 | — |

@@ -1,6 +1,6 @@
 # WS55 — Rules  Workflow  Approval   Automation Engine board 1
 
-**10 screens · 10 operations · 17 schemas · 2 permissions**
+**10 screens · 12 operations · 19 schemas · 3 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `APPROVAL_REQUEST, APPROVAL_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -65,8 +64,8 @@ convincingly. It is never a caption.
 | `ADM-239` | Visual Business Rule Builder | listDetail | 1 | 0 | — |
 | `ADM-240` | Conditions, Decision Logic & Decision Tables | listDetail | 1 | 0 | — |
 | `ADM-241` | Visual Workflow Designer | configEditor | 1 | 0 | — |
-| `ADM-242` | Approval Matrix & Multi-Level Approval Configuration | configEditor | 1 | 0 | — |
-| `ADM-243` | Roles, Authority, Delegation & Approval Limits | configEditor | 1 | 0 | — |
+| `ADM-242` | Approval Matrix & Multi-Level Approval Configuration | configEditor | 2 | 0 | — |
+| `ADM-243` | Roles, Authority, Delegation & Approval Limits | configEditor | 3 | 0 | — |
 | `ADM-244` | SLA, Escalation, Reminder & Timeout Rules | configEditor | 1 | 0 | — |
 | `ADM-245` | Trigger, Action & Cross-Module Orchestration Configuration | configEditor | 1 | 0 | — |
 | `ADM-246` | Workflow Testing, Simulation & Impact Analysis | listDetail | 1 | 0 | — |

@@ -1,6 +1,6 @@
 # WS44 — Product Lifecycle   Catalogue Governance board 2
 
-**10 screens · 10 operations · 12 schemas · 2 permissions**
+**10 screens · 12 operations · 19 schemas · 3 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `AI_APPROVE, PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,20 +60,20 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-128` | Product Governance Command Center | listDetail | 1 | 0 | — |
+| `ADM-128` | Product Governance Command Center | listDetail | 2 | 1 | — |
 | `ADM-129` | Approval Workflow Designer | configEditor | 1 | 0 | — |
 | `ADM-130` | Approval Review & Decision Workspace | listDetail | 1 | 0 | — |
 | `ADM-131` | Product Version Management | listDetail | 1 | 0 | — |
 | `ADM-132` | Rollback & Recovery Management | listDetail | 1 | 0 | — |
-| `ADM-133` | Change Impact Analysis | listDetail | 1 | 0 | — |
-| `ADM-134` | Change Propagation & Dependency Control | listDetail | 1 | 0 | — |
+| `ADM-133` | Change Impact Analysis | listDetail | 2 | 0 | — |
+| `ADM-134` | Change Propagation & Dependency Control | listDetail | 2 | 0 | — |
 | `ADM-135` | Product Retirement, Suspension & Archive | configEditor | 1 | 3 | — |
 | `ADM-136` | Product Audit Trail & Change History | configEditor | 1 | 0 | — |
-| `ADM-137` | Governance Risk, AI Monitoring & Control Center | listDetail | 1 | 0 | — |
+| `ADM-137` | Governance Risk, AI Monitoring & Control Center | listDetail | 2 | 1 | — |
 
 ## Thin screens in this batch
 
-**ADM-130, ADM-131, ADM-132, ADM-133, ADM-134, ADM-137 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-130, ADM-132, ADM-133, ADM-134, ADM-137 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -124,10 +123,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-128 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-131",
@@ -135,7 +131,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "productId"
      ],
-     "provenance": "derived — ADM-131 declares entryState.params productId, so an edge into it must carry them"
+     "provenance": "derived — ADM-131 declares entryState.params productId and ADM-128 holds productId, so an edge into it carries them"
     },
     {
      "to": "ADM-129",
@@ -156,18 +152,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "operation": "listProductGovernance"
     },
     {
-     "to": "ADM-133",
-     "trigger": "Works in Change Impact Analysis",
-     "provenance": "flow F153 step 9→10",
-     "operation": "listProductGovernance"
-    },
-    {
-     "to": "ADM-134",
-     "trigger": "Works in Change Propagation & Dependency Control",
-     "provenance": "flow F153 step 11→12",
-     "operation": "listProductGovernance"
-    },
-    {
      "to": "ADM-135",
      "trigger": "Works in Product Retirement, Suspension & Archive",
      "provenance": "flow F153 step 13→14",
@@ -180,18 +164,39 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "operation": "listProductGovernance"
     },
     {
+     "to": "ADM-133",
+     "trigger": "Works in Change Impact Analysis",
+     "provenance": "flow F153 step 9→10",
+     "operation": "listProductGovernance",
+     "carries": [
+      "productId"
+     ]
+    },
+    {
+     "to": "ADM-134",
+     "trigger": "Works in Change Propagation & Dependency Control",
+     "provenance": "flow F153 step 11→12",
+     "operation": "listProductGovernance",
+     "carries": [
+      "productId"
+     ]
+    },
+    {
      "to": "ADM-137",
      "trigger": "Works in Governance Risk, AI Monitoring & Control Center",
      "provenance": "flow F153 step 17→18",
-     "operation": "listProductGovernance"
+     "operation": "listProductGovernance",
+     "carries": [
+      "findingId"
+     ]
     }
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized users can identify every product requiring governance attention and prioritize actions from a single dashboard.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§The dashboard shall display; Each record should display) and no metric row",
   "purpose": "Provide management and administrators with a single control center for all product governance activities.",
-  "purposeNote": "Authorized users can identify every product requiring governance attention and prioritize actions from a single dashboard.",
   "layout": {
    "template": "split",
    "regions": [
@@ -226,23 +231,89 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     },
     {
      "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Products awaiting approval",
+       "bindsTo": "ProductGovernanceCommandCenterSummary.productsAwaitingApproval",
+       "operation": "listProductGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Changes awaiting approval",
+       "bindsTo": "ProductGovernanceCommandCenterSummary.changesAwaitingApproval",
+       "operation": "listProductGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Rejected changes",
+       "bindsTo": "ProductGovernanceCommandCenterSummary.rejectedChanges",
+       "operation": "listProductGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Products with governance warnings",
+       "bindsTo": "ProductGovernanceCommandCenterSummary.productsWithGovernanceWarnings",
+       "operation": "listProductGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Scheduled changes",
+       "bindsTo": "ProductGovernanceCommandCenterSummary.scheduledChanges",
+       "operation": "listProductGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Products with unpublished changes",
+       "bindsTo": "ProductGovernanceCommandCenterSummary.productsWithUnpublishedChanges",
+       "operation": "listProductGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Products with dependency conflicts",
+       "bindsTo": "ProductGovernanceCommandCenterSummary.productsWithDependencyConflicts",
+       "operation": "listProductGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Products approaching retirement",
+       "bindsTo": "ProductGovernanceCommandCenterSummary.productsApproachingRetirement",
+       "operation": "listProductGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Recently published versions",
+       "bindsTo": "ProductGovernanceCommandCenterSummary.recentlyPublishedVersions",
+       "operation": "listProductGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      },
+      {
+       "kind": "metricTile",
+       "label": "High risk configuration changes",
+       "bindsTo": "ProductGovernanceCommandCenterSummary.highRiskConfigurationChanges",
+       "operation": "listProductGovernance",
+       "provenance": "moved from the row table to the list summary (decided 29 September, readiness close-out)"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
      "slot": "collection",
      "components": [
       {
        "kind": "dataTable",
        "label": "Every product governance",
        "columns": [
-        "ProductGovernanceCommandCenterView.productsAwaitingApproval",
-        "ProductGovernanceCommandCenterView.changesAwaitingApproval",
-        "ProductGovernanceCommandCenterView.rejectedChanges",
-        "ProductGovernanceCommandCenterView.productsWithGovernanceWarnings",
-        "ProductGovernanceCommandCenterView.scheduledChanges",
-        "ProductGovernanceCommandCenterView.productsWithUnpublishedChanges",
-        "ProductGovernanceCommandCenterView.productsWithDependencyConflicts",
-        "ProductGovernanceCommandCenterView.productsApproachingRetirement",
-        "ProductGovernanceCommandCenterView.recentlyPublishedVersions",
         "Failed publications/rollbacks",
-        "ProductGovernanceCommandCenterView.highRiskConfigurationChanges",
         "ProductGovernanceCommandCenterView.product",
         "ProductGovernanceCommandCenterView.venue",
         "ProductGovernanceCommandCenterView.productOwner",
@@ -272,17 +343,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The selected product governance",
        "bindsTo": "ProductGovernanceCommandCenterView",
        "columns": [
-        "ProductGovernanceCommandCenterView.productsAwaitingApproval",
-        "ProductGovernanceCommandCenterView.changesAwaitingApproval",
-        "ProductGovernanceCommandCenterView.rejectedChanges",
-        "ProductGovernanceCommandCenterView.productsWithGovernanceWarnings",
-        "ProductGovernanceCommandCenterView.scheduledChanges",
-        "ProductGovernanceCommandCenterView.productsWithUnpublishedChanges",
-        "ProductGovernanceCommandCenterView.productsWithDependencyConflicts",
-        "ProductGovernanceCommandCenterView.productsApproachingRetirement",
-        "ProductGovernanceCommandCenterView.recentlyPublishedVersions",
         "Failed publications/rollbacks",
-        "ProductGovernanceCommandCenterView.highRiskConfigurationChanges",
         "ProductGovernanceCommandCenterView.product",
         "ProductGovernanceCommandCenterView.venue",
         "ProductGovernanceCommandCenterView.productOwner",
@@ -301,6 +362,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 15 §The dashboard shall display"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Decide catalogue AI finding",
+       "operation": "decideCatalogueAiFinding",
+       "permission": "AI_APPROVE",
+       "notes": "**The human control on a governance risk or a channel recommendation** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml POST /ai-findings/{findingId}/decision"
+      }
+     ]
     }
    ]
   },
@@ -317,24 +392,63 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Product Governance Command Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "decideCatalogueAiFinding",
+    "contract": "catalogue",
+    "purpose": "Acknowledge, accept, dismiss or resolve an AI finding",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProductGovernance"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "ProductGovernanceCommandCenterView.productsAwaitingApproval",
-    "ProductGovernanceCommandCenterView.changesAwaitingApproval",
-    "ProductGovernanceCommandCenterView.rejectedChanges",
-    "ProductGovernanceCommandCenterView.productsWithGovernanceWarnings",
-    "ProductGovernanceCommandCenterView.scheduledChanges",
-    "ProductGovernanceCommandCenterView.productsWithUnpublishedChanges"
+    "ProductGovernanceCommandCenterSummary.productsAwaitingApproval",
+    "ProductGovernanceCommandCenterSummary.changesAwaitingApproval",
+    "ProductGovernanceCommandCenterSummary.rejectedChanges",
+    "ProductGovernanceCommandCenterSummary.productsWithGovernanceWarnings",
+    "ProductGovernanceCommandCenterSummary.scheduledChanges",
+    "ProductGovernanceCommandCenterSummary.productsWithUnpublishedChanges"
+   ],
+   "params": [
+    {
+     "name": "findingId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-128"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-128",
+   "workshopBoard": "wireframes/WS105 Product Lifecycle   Catalogue Governance Board 2.dc.html#adm-128"
   },
   "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 15. 26 of 34 labels bound to a contract property; 34 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formDecideCatalogueAiFinding",
+    "component": "modal",
+    "trigger": "Decide catalogue AI finding",
+    "body": "**Collects what `decideCatalogueAiFinding` sends before it is called.** Required: `decision`. Optional: `comment`, `ownerPrincipalId`, `dueDate`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Decide catalogue AI finding",
+     "operation": "decideCatalogueAiFinding"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "decision",
+      "comment",
+      "ownerPrincipalId",
+      "dueDate"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /ai-findings/{findingId}/decision"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -396,10 +510,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Administrators can configure product approval workflows without development work and route different types of changes through different approval paths.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Each workflow can define; Tax configuration) and no display directory — it is settings, not a population",
   "purpose": "Configure reusable approval workflows governing product creation and modification.",
-  "purposeNote": "Administrators can configure product approval workflows without development work and route different types of changes through different approval paths.",
   "layout": {
    "template": "form",
    "regions": [
@@ -523,16 +637,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "approveWorkflow",
     "contract": "catalogue",
     "purpose": "Approval Workflow Designer",
-    "trigger": "onAction",
-    "invalidates": [
-     "approveWorkflow"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-129"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-129",
+   "workshopBoard": "wireframes/WS105 Product Lifecycle   Catalogue Governance Board 2.dc.html#adm-129"
   },
   "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 17. 0 of 0 labels bound to a contract property; 18 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -596,10 +708,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "An approver can understand exactly what is changing, why it is changing and what it may affect before approving or rejecting the request.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Give approvers a clear interface for reviewing a proposed product or product change before making a decision.",
-  "purposeNote": "An approver can understand exactly what is changing, why it is changing and what it may affect before approving or rejecting the request.",
   "gaps": [
    {
     "operation": null,
@@ -652,16 +764,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "approveReviewDecision",
     "contract": "catalogue",
     "purpose": "Approval Review & Decision Workspace",
-    "trigger": "onAction",
-    "invalidates": [
-     "approveReviewDecision"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-130"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-130",
+   "workshopBoard": "wireframes/WS105 Product Lifecycle   Catalogue Governance Board 2.dc.html#adm-130"
   },
   "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 18. 0 of 0 labels bound to a contract property; 0 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -725,14 +835,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Every governed product modification creates a traceable version, and authorized users can compare any two versions.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Maintain controlled versions of every governed product configuration. The source matrix specifically requires version history for products and the ability to roll back to earlier versions.",
-  "purposeNote": "Every governed product modification creates a traceable version, and authorized users can compare any two versions.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Pricing. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Basic product information, Pricing, Capacity, Entitlements, Channels. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 19 §Users can compare"
    },
    {
@@ -755,21 +865,39 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Version 4.2 ↔ Version 4.1",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 19 §Users can compare"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Basic product information",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 19 §Users can compare"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Pricing",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 19 §Users can compare"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Capacity",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 19 §Users can compare"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Entitlements",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 19 §Users can compare"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Channels",
        "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 19 §Users can compare"
       }
      ]
     },
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listProductVersions",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
-      }
-     ]
+     "components": []
     }
    ]
   },
@@ -785,7 +913,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "listProductVersions",
     "contract": "catalogue",
     "purpose": "What this product used to be",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -795,21 +923,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "from": "navigation"
     }
    ],
-   "coldEntry": "**Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that list — never an empty form that looks configurable.",
-   "preloaded": [
-    "ProductVersion.productId",
-    "ProductVersion.publishedAt",
-    "ProductVersion.publishedByPrincipalId",
-    "ProductVersion.note",
-    "ProductVersion.isCurrent"
-   ]
+   "coldEntry": "**Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that list — never an empty form that looks configurable."
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-131"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-131",
+   "workshopBoard": "wireframes/WS105 Product Lifecycle   Catalogue Governance Board 2.dc.html#adm-131"
   },
-  "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 19. 0 of 0 labels bound to a contract property; 1 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 19. 0 of 0 labels bound to a contract property; 6 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -871,10 +993,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "An authorized user can restore a safe earlier configuration without corrupting historical sales, reservations or issued entitlements.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Safely restore an earlier product configuration when a newly published configuration causes an issue.",
-  "purposeNote": "An authorized user can restore a safe earlier configuration without corrupting historical sales, reservations or issued entitlements.",
   "gaps": [
    {
     "operation": null,
@@ -920,17 +1042,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   ],
   "entryState": {
    "preloaded": [
-    "RollbackRecoveryManagementView.identifyDependencies",
-    "RollbackRecoveryManagementView.enterRollbackReason",
-    "RollbackRecoveryManagementView.executeImmediateRollbackWhereAuthorized",
-    "RollbackRecoveryManagementView.monitorRollbackStatus",
-    "RollbackRecoveryManagementView.entireProduct"
+    "RollbackRecoveryManagementView.dependencies",
+    "RollbackRecoveryManagementView.reason",
+    "RollbackRecoveryManagementView.executionMode",
+    "RollbackRecoveryManagementView.status",
+    "RollbackRecoveryManagementView.scope"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-132"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-132",
+   "workshopBoard": "wireframes/WS105 Product Lifecycle   Catalogue Governance Board 2.dc.html#adm-132"
   },
   "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 20. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -994,10 +1117,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Before a material configuration change is approved or published, authorized users can see its potential cross-module and transactional impact.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Show administrators what will be affected before a product change is approved or published. This directly addresses the matrix requirement to perform impact analysis before product changes are published.",
-  "purposeNote": "Before a material configuration change is approved or published, authorized users can see its potential cross-module and transactional impact.",
   "gaps": [
    {
     "operation": null,
@@ -1023,6 +1146,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save product links",
+       "operation": "setProductLinks",
+       "permission": "PRODUCT_CONFIGURE",
+       "notes": "**Set whole, per source product** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /products/{productId}/links"
+      }
+     ]
     }
    ]
   },
@@ -1039,21 +1176,34 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Change Impact Analysis",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setProductLinks",
+    "contract": "catalogue",
+    "purpose": "Replace what depends on a product",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChangeImpactAnalysis"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "ChangeImpactAnalysisView.futureOrders",
-    "ChangeImpactAnalysisView.reservations",
-    "ChangeImpactAnalysisView.issuedTickets",
-    "ChangeImpactAnalysisView.capacity",
-    "ChangeImpactAnalysisView.pricing"
+    "ChangeImpactAnalysisView.area"
+   ],
+   "params": [
+    {
+     "name": "productId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-133"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-133",
+   "workshopBoard": "wireframes/WS105 Product Lifecycle   Catalogue Governance Board 2.dc.html#adm-133"
   },
   "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 21. 0 of 0 labels bound to a contract property; 0 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1117,10 +1267,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Product changes can propagate through defined relationships without unintentionally overwriting approved local exceptions.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Control whether approved product changes should automatically propagate to related products or dependent configurations. The source matrix requires controlled propagation of changes to linked products.",
-  "purposeNote": "Product changes can propagate through defined relationships without unintentionally overwriting approved local exceptions.",
   "gaps": [
    {
     "operation": null,
@@ -1146,6 +1296,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save product links",
+       "operation": "setProductLinks",
+       "permission": "PRODUCT_CONFIGURE",
+       "notes": "**Set whole, per source product** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml PUT /products/{productId}/links"
+      }
+     ]
     }
    ]
   },
@@ -1162,21 +1326,34 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Change Propagation & Dependency Control",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setProductLinks",
+    "contract": "catalogue",
+    "purpose": "Replace what depends on a product",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChangePropagationDependency"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
-    "ChangePropagationDependencyControlView.typesType",
-    "ChangePropagationDependencyControlView.adultAdmission",
-    "ChangePropagationDependencyControlView.childAdmission",
-    "ChangePropagationDependencyControlView.seniorAdmission",
-    "ChangePropagationDependencyControlView.residentAdmission"
+    "ChangePropagationDependencyControlView.dependencyType"
+   ],
+   "params": [
+    {
+     "name": "productId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-134"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-134",
+   "workshopBoard": "wireframes/WS105 Product Lifecycle   Catalogue Governance Board 2.dc.html#adm-134"
   },
   "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 22. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1240,10 +1417,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "A product can be safely removed from future sale while protecting existing valid customer transactions and identifying unresolved dependencies.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Administrator defines) and no display directory — it is settings, not a population",
   "purpose": "Provide a governed end-of-life process for products. The source matrix explicitly requires disabling or retiring products without affecting previously sold tickets.",
-  "purposeNote": "A product can be safely removed from future sale while protecting existing valid customer transactions and identifying unresolved dependencies.",
   "gaps": [
    {
     "operation": null,
@@ -1378,7 +1555,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-135"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-135",
+   "workshopBoard": "wireframes/WS105 Product Lifecycle   Catalogue Governance Board 2.dc.html#adm-135"
   },
   "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 23. 0 of 0 labels bound to a contract property; 14 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1442,10 +1620,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Every material product configuration and governance action is traceable to who performed it, when it occurred, what changed and under which approval.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Each entry should capture) and no display directory — it is settings, not a population",
   "purpose": "Provide a complete, immutable history of product configuration and governance activity. The matrix requires tracking configuration changes with timestamps and user information.",
-  "purposeNote": "Every material product configuration and governance action is traceable to who performed it, when it occurred, what changed and under which approval.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1574,7 +1752,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-136"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-136",
+   "workshopBoard": "wireframes/WS105 Product Lifecycle   Catalogue Governance Board 2.dc.html#adm-136"
   },
   "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 24. 6 of 10 labels bound to a contract property; 24 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1627,13 +1806,23 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "ADM-128"
    ],
    "inferred": false,
-   "notes": "**Reached from ADM-128, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+   "notes": "**Reached from ADM-128, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-128",
+     "trigger": "Product Governance Command Center",
+     "carries": [
+      "findingId"
+     ],
+     "provenance": "derived — ADM-128 declares entryState.params findingId and ADM-137 holds findingId, so an edge into it carries them"
+    }
+   ]
   },
   "density": "compact",
+  "purposeNote": "Administrators receive proactive governance intelligence with clear explanations and recommended actions while material product decisions remain controlled by the configured authorization framework. Board 2 — Final Screen Register",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Use TICVAI intelligence to continuously identify catalogue governance risks rather than relying entirely on administrators to discover them manually.",
-  "purposeNote": "Administrators receive proactive governance intelligence with clear explanations and recommended actions while material product decisions remain controlled by the configured authorization framework. Board 2 — Final Screen Register",
   "layout": {
    "template": "split",
    "regions": [
@@ -1684,6 +1873,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 26 §Display"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Decide catalogue AI finding",
+       "operation": "decideCatalogueAiFinding",
+       "permission": "AI_APPROVE",
+       "notes": "**The human control on a governance risk or a channel recommendation** (29 September, writers pass).",
+       "provenance": "contract catalogue.yaml POST /ai-findings/{findingId}/decision"
+      }
+     ]
     }
    ]
   },
@@ -1700,6 +1903,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Governance Risk, AI Monitoring & Control Center",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "decideCatalogueAiFinding",
+    "contract": "catalogue",
+    "purpose": "Acknowledge, accept, dismiss or resolve an AI finding",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGovernanceRiskMonitoring"
+    ]
    }
   ],
   "entryState": {
@@ -1710,14 +1922,44 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "GovernanceRiskAiMonitoringControlCenterView.venue",
     "GovernanceRiskAiMonitoringControlCenterView.businessImpact",
     "GovernanceRiskAiMonitoringControlCenterView.recommendedAction"
+   ],
+   "params": [
+    {
+     "name": "findingId",
+     "from": "navigation",
+     "optional": true
+    }
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-137"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-137",
+   "workshopBoard": "wireframes/WS105 Product Lifecycle   Catalogue Governance Board 2.dc.html#adm-137"
   },
   "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 26. 8 of 9 labels bound to a contract property; 9 of 55 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formDecideCatalogueAiFinding",
+    "component": "modal",
+    "trigger": "Decide catalogue AI finding",
+    "body": "**Collects what `decideCatalogueAiFinding` sends before it is called.** Required: `decision`. Optional: `comment`, `ownerPrincipalId`, `dueDate`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Decide catalogue AI finding",
+     "operation": "decideCatalogueAiFinding"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "decision",
+      "comment",
+      "ownerPrincipalId",
+      "dueDate"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /ai-findings/{findingId}/decision"
+   }
+  ],
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1760,7 +2002,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ApprovalReviewDecisionWorkspaceInput",
   "responds": "ApprovalReviewDecisionWorkspaceView"
  },
@@ -1773,9 +2021,34 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "ApprovalWorkflowDesignerInput",
   "responds": "ApprovalWorkflowDesignerView"
+ },
+ "decideCatalogueAiFinding": {
+  "method": "POST",
+  "path": "/ai-findings/{findingId}/decision",
+  "contract": "catalogue",
+  "summary": "Acknowledge, accept, dismiss or resolve an AI finding",
+  "permission": "AI_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CatalogueAiFinding"
  },
  "listChangeImpactAnalysis": {
   "method": "GET",
@@ -1786,7 +2059,33 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "changeRequestId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "area",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "minRisk",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "ChangeImpactAnalysisView"
  },
@@ -1799,9 +2098,40 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "changeRequestId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dependencyType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "conflictsOnly",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ChangePropagationDependencyControlView"
+  "responds": "Page"
  },
  "listGovernanceRiskMonitoring": {
   "method": "GET",
@@ -1812,9 +2142,45 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "severity",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "risk",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "owner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "GovernanceRiskAiMonitoringControlCenterView"
+  "responds": "Page"
  },
  "listProductGovernance": {
   "method": "GET",
@@ -1826,6 +2192,11 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
    {
     "name": "productType",
     "in": "query",
@@ -1852,7 +2223,22 @@ Method, path, parameters, request and response for every operation these screens
     "required": false
    },
    {
+    "name": "changeType",
+    "in": "query",
+    "required": false
+   },
+   {
     "name": "approver",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "effectiveFrom",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "effectiveTo",
     "in": "query",
     "required": false
    },
@@ -1860,10 +2246,20 @@ Method, path, parameters, request and response for every operation these screens
     "name": "channel",
     "in": "query",
     "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "ProductGovernanceCommandCenterView"
+  "responds": "Page"
  },
  "listProductRetirementSuspension": {
   "method": "GET",
@@ -1874,9 +2270,40 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "action",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "lifecycleState",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "ProductRetirementSuspensionArchiveView"
+  "responds": "Page"
  },
  "listProductTrailChange": {
   "method": "GET",
@@ -1889,7 +2316,37 @@ Method, path, parameters, request and response for every operation these screens
   "scopeLevel": "venue",
   "parameters": [
    {
-    "name": "date",
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "userId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "action",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "version",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "configurationArea",
     "in": "query",
     "required": false
    },
@@ -1907,10 +2364,25 @@ Method, path, parameters, request and response for every operation these screens
     "name": "risk",
     "in": "query",
     "required": false
+   },
+   {
+    "name": "environment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "ProductAuditTrailChangeHistoryView"
+  "responds": "Page"
  },
  "listProductVersions": {
   "method": "GET",
@@ -1934,9 +2406,59 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "scope",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "emergency",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "RollbackRecoveryManagementView"
+  "responds": "Page"
+ },
+ "setProductLinks": {
+  "method": "PUT",
+  "path": "/products/{productId}/links",
+  "contract": "catalogue",
+  "summary": "Replace what depends on a product",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ProductLink",
+  "responds": "ProductLink"
  }
 }
 ```
@@ -1953,74 +2475,32 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
   "description": "**What Approval Review & Decision Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "onD": {
+   "decision": {
     "type": "string",
-    "description": "on d"
+    "enum": [
+     "approve",
+     "reject",
+     "requestChanges",
+     "reassign",
+     "delegate",
+     "escalate"
+    ],
+    "description": "Approver action (pack p.18)"
    },
-   "refundableLe": {
+   "assignToPrincipalId": {
     "type": "string",
-    "description": "refundable le"
+    "description": "New approver for reassign/delegate/escalate",
+    "nullable": true
    },
-   "requestChanges": {
+   "changeRequestId": {
     "type": "string",
-    "description": "Request Changes"
+    "description": "Change request id",
+    "format": "uuid"
    },
-   "reassign": {
+   "comment": {
     "type": "string",
-    "description": "Reassign"
-   },
-   "delegate": {
-    "type": "string",
-    "description": "Delegate"
-   },
-   "requester": {
-    "type": "string",
-    "description": "Requester"
-   },
-   "reasonForChange": {
-    "type": "string",
-    "description": "Reason for change"
-   },
-   "businessJustification": {
-    "type": "string",
-    "description": "Business justification"
-   },
-   "attachments": {
-    "type": "string",
-    "description": "Attachments"
-   },
-   "effectiveDate": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Effective date"
-   },
-   "currentSales": {
-    "type": "string",
-    "description": "Current sales"
-   },
-   "futureReservations": {
-    "type": "string",
-    "description": "Future reservations"
-   },
-   "channelsAffected": {
-    "type": "string",
-    "description": "Channels affected"
-   },
-   "pricingImpact": {
-    "type": "string",
-    "description": "Pricing impact"
-   },
-   "capacityImpact": {
-    "type": "integer",
-    "description": "Capacity impact"
-   },
-   "financeImpact": {
-    "type": "string",
-    "description": "Finance impact"
-   },
-   "accessImpact": {
-    "type": "string",
-    "description": "Access impact"
+    "description": "Comment; required for reject and requestChanges",
+    "nullable": true
    }
   }
  },
@@ -2030,29 +2510,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Approval Review & Decision Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "onD": {
+   "approvalStatus": {
     "type": "string",
-    "description": "on d"
-   },
-   "refundableLe": {
-    "type": "string",
-    "description": "refundable le"
-   },
-   "requestChanges": {
-    "type": "string",
-    "description": "Request Changes"
-   },
-   "reassign": {
-    "type": "string",
-    "description": "Reassign"
-   },
-   "delegate": {
-    "type": "string",
-    "description": "Delegate"
+    "description": "Approval status after this decision: pending, changesRequested, approved, rejected, escalated or withdrawn"
    },
    "requester": {
     "type": "string",
-    "description": "Requester"
+    "description": "Requester (display name)"
    },
    "reasonForChange": {
     "type": "string",
@@ -2063,41 +2527,114 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Business justification"
    },
    "attachments": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "fileId": {
+       "type": "string"
+      },
+      "name": {
+       "type": "string"
+      }
+     }
+    },
     "description": "Attachments"
    },
    "effectiveDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "Effective date"
+    "description": "Effective date; empty = on approval",
+    "format": "date",
+    "nullable": true
    },
    "currentSales": {
-    "type": "string",
-    "description": "Current sales"
+    "type": "integer",
+    "description": "Tickets sold under the current version"
    },
    "futureReservations": {
-    "type": "string",
-    "description": "Future reservations"
+    "type": "integer",
+    "description": "Future reservations of the product"
    },
    "channelsAffected": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/Channel"
+    },
     "description": "Channels affected"
    },
    "pricingImpact": {
     "type": "string",
-    "description": "Pricing impact"
+    "description": "Pricing impact in plain language; the figures are in comparison"
    },
    "capacityImpact": {
     "type": "integer",
-    "description": "Capacity impact"
+    "description": "Change in capacity units (negative = reduction)"
    },
    "financeImpact": {
-    "type": "string",
-    "description": "Finance impact"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Estimated revenue difference over future reservations and forecast sales; advisory"
    },
    "accessImpact": {
     "type": "string",
-    "description": "Access impact"
+    "description": "Access impact in plain language"
+   },
+   "changeRequestId": {
+    "type": "string",
+    "description": "Change request id",
+    "format": "uuid"
+   },
+   "productId": {
+    "type": "string",
+    "description": "Product id",
+    "format": "uuid"
+   },
+   "comparison": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "configurationArea": {
+       "type": "string",
+       "enum": [
+        "basicInformation",
+        "validity",
+        "pricing",
+        "capacity",
+        "entitlements",
+        "eligibility",
+        "media",
+        "channels",
+        "policies",
+        "relationships",
+        "lifecycle"
+       ]
+      },
+      "field": {
+       "type": "string"
+      },
+      "currentValue": {
+       "type": "string",
+       "nullable": true
+      },
+      "proposedValue": {
+       "type": "string",
+       "nullable": true
+      },
+      "changed": {
+       "type": "boolean"
+      }
+     }
+    },
+    "description": "Change comparison, current vs proposed; changed rows are highlighted"
+   },
+   "aiSummary": {
+    "type": "string",
+    "description": "AI summary of the proposed change; advisory, the AI does not approve",
+    "nullable": true
    }
   }
  },
@@ -2112,68 +2649,114 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Workflow name"
    },
    "applicableProductTypes": {
-    "type": "string",
-    "description": "Applicable product types"
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ProductKind"
+    },
+    "description": "Applicable product types; empty = all"
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue id; empty = all venues",
+    "nullable": true
    },
    "department": {
     "type": "string",
-    "description": "Department"
+    "description": "Department",
+    "nullable": true
    },
-   "changeType": {
-    "type": "string",
-    "description": "Change type"
+   "changeTypes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "newProduct",
+      "description",
+      "price",
+      "validity",
+      "capacity",
+      "entitlement",
+      "eligibility",
+      "tax",
+      "channel",
+      "media",
+      "policy",
+      "relationship",
+      "retirement"
+     ]
+    },
+    "description": "Change types routed to this workflow (Conditional Approval: e.g. price -> Commercial + Finance)"
    },
    "approvalStages": {
-    "type": "string",
-    "description": "Approval stages"
-   },
-   "approverRole": {
-    "type": "string",
-    "description": "Approver role"
-   },
-   "specificApprover": {
-    "type": "string",
-    "description": "Specific approver"
-   },
-   "approvalGroup": {
-    "type": "string",
-    "description": "Approval group"
-   },
-   "sequentialParallelApproval": {
-    "type": "string",
-    "description": "Sequential/parallel approval"
-   },
-   "mandatoryOptionalStage": {
-    "type": "string",
-    "description": "Mandatory/optional stage"
-   },
-   "sla": {
-    "type": "string",
-    "description": "SLA"
-   },
-   "escalation": {
-    "type": "string",
-    "description": "Escalation"
-   },
-   "delegation": {
-    "type": "string",
-    "description": "Delegation"
-   },
-   "reminderFrequency": {
-    "type": "string",
-    "description": "Reminder frequency"
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "order": {
+       "type": "integer",
+       "description": "Stage order; stages sharing an order run in parallel, otherwise sequential"
+      },
+      "name": {
+       "type": "string"
+      },
+      "approverRole": {
+       "type": "string",
+       "nullable": true
+      },
+      "specificApproverId": {
+       "type": "string",
+       "nullable": true
+      },
+      "approvalGroupId": {
+       "type": "string",
+       "nullable": true
+      },
+      "mandatory": {
+       "type": "boolean"
+      },
+      "slaHours": {
+       "type": "integer",
+       "description": "SLA in hours"
+      },
+      "escalateToRole": {
+       "type": "string",
+       "nullable": true,
+       "description": "Escalation when the SLA is missed"
+      },
+      "delegationAllowed": {
+       "type": "boolean"
+      },
+      "reminderEveryHours": {
+       "type": "integer",
+       "nullable": true,
+       "description": "Reminder frequency"
+      }
+     }
+    },
+    "description": "Approval stages, e.g. Product Manager -> Commercial Manager -> Operations -> Finance -> Final Approval; each stage names a role, a specific approver or a group"
    },
    "rejectionBehavior": {
     "type": "string",
-    "description": "Rejection behavior"
+    "enum": [
+     "returnToDraft",
+     "returnToPreviousStage",
+     "closeRequest"
+    ],
+    "description": "What happens on rejection; default returnToDraft (decided 29 September, readiness close-out)"
    },
    "resubmissionBehavior": {
     "type": "string",
-    "description": "Resubmission behavior"
+    "enum": [
+     "restartFromFirstStage",
+     "resumeAtRejectingStage"
+    ],
+    "description": "Where a resubmitted request re-enters; default restartFromFirstStage (decided 29 September, readiness close-out)"
+   },
+   "workflowId": {
+    "type": "string",
+    "description": "Existing workflow to change; empty to create",
+    "format": "uuid",
+    "nullable": true
    }
   }
  },
@@ -2188,68 +2771,259 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Workflow name"
    },
    "applicableProductTypes": {
-    "type": "string",
-    "description": "Applicable product types"
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ProductKind"
+    },
+    "description": "Applicable product types; empty = all"
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue id; empty = all venues",
+    "nullable": true
    },
    "department": {
     "type": "string",
-    "description": "Department"
+    "description": "Department",
+    "nullable": true
    },
-   "changeType": {
-    "type": "string",
-    "description": "Change type"
+   "changeTypes": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "newProduct",
+      "description",
+      "price",
+      "validity",
+      "capacity",
+      "entitlement",
+      "eligibility",
+      "tax",
+      "channel",
+      "media",
+      "policy",
+      "relationship",
+      "retirement"
+     ]
+    },
+    "description": "Change types routed to this workflow (Conditional Approval: e.g. price -> Commercial + Finance)"
    },
    "approvalStages": {
-    "type": "string",
-    "description": "Approval stages"
-   },
-   "approverRole": {
-    "type": "string",
-    "description": "Approver role"
-   },
-   "specificApprover": {
-    "type": "string",
-    "description": "Specific approver"
-   },
-   "approvalGroup": {
-    "type": "string",
-    "description": "Approval group"
-   },
-   "sequentialParallelApproval": {
-    "type": "string",
-    "description": "Sequential/parallel approval"
-   },
-   "mandatoryOptionalStage": {
-    "type": "string",
-    "description": "Mandatory/optional stage"
-   },
-   "sla": {
-    "type": "string",
-    "description": "SLA"
-   },
-   "escalation": {
-    "type": "string",
-    "description": "Escalation"
-   },
-   "delegation": {
-    "type": "string",
-    "description": "Delegation"
-   },
-   "reminderFrequency": {
-    "type": "string",
-    "description": "Reminder frequency"
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "order": {
+       "type": "integer",
+       "description": "Stage order; stages sharing an order run in parallel, otherwise sequential"
+      },
+      "name": {
+       "type": "string"
+      },
+      "approverRole": {
+       "type": "string",
+       "nullable": true
+      },
+      "specificApproverId": {
+       "type": "string",
+       "nullable": true
+      },
+      "approvalGroupId": {
+       "type": "string",
+       "nullable": true
+      },
+      "mandatory": {
+       "type": "boolean"
+      },
+      "slaHours": {
+       "type": "integer",
+       "description": "SLA in hours"
+      },
+      "escalateToRole": {
+       "type": "string",
+       "nullable": true,
+       "description": "Escalation when the SLA is missed"
+      },
+      "delegationAllowed": {
+       "type": "boolean"
+      },
+      "reminderEveryHours": {
+       "type": "integer",
+       "nullable": true,
+       "description": "Reminder frequency"
+      }
+     }
+    },
+    "description": "Approval stages, e.g. Product Manager -> Commercial Manager -> Operations -> Finance -> Final Approval; each stage names a role, a specific approver or a group"
    },
    "rejectionBehavior": {
     "type": "string",
-    "description": "Rejection behavior"
+    "enum": [
+     "returnToDraft",
+     "returnToPreviousStage",
+     "closeRequest"
+    ],
+    "description": "What happens on rejection; default returnToDraft (decided 29 September, readiness close-out)"
    },
    "resubmissionBehavior": {
     "type": "string",
-    "description": "Resubmission behavior"
+    "enum": [
+     "restartFromFirstStage",
+     "resumeAtRejectingStage"
+    ],
+    "description": "Where a resubmitted request re-enters; default restartFromFirstStage (decided 29 September, readiness close-out)"
+   },
+   "workflowId": {
+    "type": "string",
+    "description": "Workflow id",
+    "format": "uuid"
+   }
+  }
+ },
+ "CatalogueAiFinding": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.ai_finding",
+  "description": "**Something the AI noticed about the catalogue or its channels, for a person to act on** (29 September, data model DM3). Merges governance risks (ADM-137) and channel optimisation recommendations (ADM-272). Advisory only: a finding never changes configuration; acting on it goes through the ordinary operations and their approvals. **Created by the AI monitoring job** (29 September, writers pass); a person acknowledges, accepts, dismisses or resolves it with `decideCatalogueAiFinding`, and the job resolves one whose condition has cleared (`states/catalogue-ai-finding.yaml`).",
+  "required": [
+   "id",
+   "scopePath",
+   "domain",
+   "findingType",
+   "status",
+   "detectedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "domain": {
+    "type": "string",
+    "enum": [
+     "productGovernance",
+     "channel"
+    ]
+   },
+   "findingType": {
+    "type": "string",
+    "maxLength": 60,
+    "description": "Governance: the `risk` value; channel: the recommendation `category`."
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "salesChannelIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "critical",
+     "high",
+     "medium",
+     "low",
+     null
+    ],
+    "nullable": true
+   },
+   "confidence": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 1
+   },
+   "summary": {
+    "type": "string",
+    "description": "The recommendation, or the risk in one line."
+   },
+   "explanation": {
+    "type": "string",
+    "nullable": true
+   },
+   "businessImpact": {
+    "type": "string",
+    "nullable": true
+   },
+   "recommendedAction": {
+    "type": "string",
+    "nullable": true
+   },
+   "constraints": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "signals": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "simulation": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "description": "Channel findings: `{expectedUnitsSold, revenueImpact, channelUtilization, risk, contractualConstraints}`."
+   },
+   "requiredApproval": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "dueDate": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "acknowledged",
+     "accepted",
+     "dismissed",
+     "resolved"
+    ],
+    "default": "open"
+   },
+   "modelVersion": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true
+   },
+   "detectedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
    }
   }
  },
@@ -2259,97 +3033,54 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Change Impact Analysis displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "futureOrders": {
+   "area": {
     "type": "string",
-    "description": "Future orders"
+    "enum": [
+     "futureOrders",
+     "reservations",
+     "issuedTickets",
+     "capacity",
+     "pricing",
+     "tax",
+     "promotions",
+     "membership",
+     "entitlements",
+     "accessControl",
+     "salesChannels",
+     "b2bPartners",
+     "otas",
+     "pos",
+     "b2c",
+     "kiosk",
+     "media",
+     "finance",
+     "reporting"
+    ],
+    "description": "Impact area (pack p.21-22)"
    },
-   "reservations": {
+   "changeRequestId": {
     "type": "string",
-    "description": "Reservations"
+    "description": "Change request analysed",
+    "format": "uuid"
    },
-   "issuedTickets": {
-    "type": "string",
-    "description": "Issued tickets"
-   },
-   "capacity": {
+   "affectedCount": {
     "type": "integer",
-    "description": "Capacity"
+    "description": "How many items in this area are affected (orders, reservations, agreements, channels...)"
    },
-   "pricing": {
+   "riskLevel": {
     "type": "string",
-    "description": "Pricing"
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
+    "description": "Risk classification"
    },
-   "tax": {
+   "explanation": {
     "type": "string",
-    "description": "Tax"
-   },
-   "promotions": {
-    "type": "string",
-    "description": "Promotions"
-   },
-   "membership": {
-    "type": "string",
-    "description": "Membership"
-   },
-   "entitlements": {
-    "type": "string",
-    "description": "Entitlements"
-   },
-   "accessControl": {
-    "type": "string",
-    "description": "Access control"
-   },
-   "salesChannels": {
-    "type": "string",
-    "description": "Sales channels"
-   },
-   "b2bPartners": {
-    "type": "string",
-    "description": "B2B partners"
-   },
-   "otas": {
-    "type": "string",
-    "description": "OTAs"
-   },
-   "pos": {
-    "type": "string",
-    "description": "POS"
-   },
-   "b2c": {
-    "type": "string",
-    "description": "B2C"
-   },
-   "kiosk": {
-    "type": "string",
-    "description": "Kiosk"
-   },
-   "media": {
-    "type": "string",
-    "description": "Media"
-   },
-   "finance": {
-    "type": "string",
-    "description": "Finance"
-   },
-   "reporting": {
-    "type": "string",
-    "description": "Reporting"
-   },
-   "low": {
-    "type": "string",
-    "description": "Low"
-   },
-   "medium": {
-    "type": "string",
-    "description": "Medium"
-   },
-   "high": {
-    "type": "string",
-    "description": "High"
-   },
-   "critical": {
-    "type": "string",
-    "description": "Critical"
+    "description": "AI explanation in business language; advisory",
+    "nullable": true
    }
   }
  },
@@ -2359,7 +3090,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Change Propagation & Dependency Control displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "typesType": {
+   "dependencyType": {
     "type": "string",
     "enum": [
      "parentProduct",
@@ -2376,33 +3107,54 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "salesChannel",
      "mediaTemplate"
     ],
-    "description": "Vocabulary listed under Dependency Types."
+    "description": "Dependency type (pack pp.22-23)"
    },
-   "adultAdmission": {
-    "type": "string",
-    "description": "Adult Admission"
+   "propagate": {
+    "type": "boolean",
+    "description": "Whether the change will propagate to this linked object"
    },
-   "childAdmission": {
-    "type": "string",
-    "description": "Child Admission"
+   "localOverrideConflict": {
+    "type": "boolean",
+    "description": "The linked object has a local override the change would overwrite"
    },
-   "seniorAdmission": {
+   "linkId": {
     "type": "string",
-    "description": "Senior Admission"
+    "description": "Link id",
+    "format": "uuid"
    },
-   "residentAdmission": {
+   "sourceProductId": {
     "type": "string",
-    "description": "Resident Admission"
+    "description": "Master product",
+    "format": "uuid"
    },
-   "propagates": {
+   "linkedObjectId": {
     "type": "string",
-    "description": "propagates"
+    "description": "Linked product or configuration id"
    },
-   "overwritten": {
+   "linkedObjectName": {
     "type": "string",
-    "description": "overwritten"
+    "description": "Linked object name"
+   },
+   "overriddenFields": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Fields the linked object overrides locally"
    }
   }
+ },
+ "Channel": {
+  "type": "string",
+  "enum": [
+   "pos",
+   "kiosk",
+   "web",
+   "mobile",
+   "b2b",
+   "ota",
+   "callCentre"
+  ]
  },
  "GovernanceRiskAiMonitoringControlCenterView": {
   "type": "object",
@@ -2410,50 +3162,105 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Governance Risk, AI Monitoring & Control Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "with": {
-    "type": "string",
-    "description": "with"
-   },
    "risk": {
     "type": "string",
-    "description": "Risk"
+    "enum": [
+     "productWithoutOwner",
+     "missingApproval",
+     "outdatedPricing",
+     "conflictingValidity",
+     "missingChannelConfiguration",
+     "orphanedDependency",
+     "unusedProduct",
+     "duplicateProduct",
+     "unusualConfigurationChange",
+     "highOverrideLevel",
+     "scheduledPublicationConflict",
+     "expiredCommercialConfiguration",
+     "activeAfterEventEnd",
+     "brokenDependency"
+    ],
+    "description": "Risk detected (AI Monitoring, pack p.26)"
    },
    "product": {
     "type": "string",
-    "description": "Product"
+    "description": "Product name"
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue name"
    },
    "businessImpact": {
     "type": "string",
-    "description": "Business impact"
+    "description": "Business impact, in plain language"
    },
    "recommendedAction": {
     "type": "string",
-    "description": "Recommended action"
+    "description": "Recommended action; advisory"
    },
    "owner": {
     "type": "string",
-    "description": "Owner"
+    "description": "Owner (display name)",
+    "nullable": true
    },
    "dueDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "Due date"
+    "description": "Due date",
+    "format": "date",
+    "nullable": true
    },
    "status": {
-    "type": "integer",
-    "description": "Status"
-   },
-   "configurations": {
     "type": "string",
-    "description": "configurations"
+    "description": "Status: open, acknowledged, inRemediation, resolved or dismissed (decided 29 September, readiness close-out)"
    },
-   "assessment": {
+   "riskId": {
     "type": "string",
-    "description": "assessment"
+    "description": "Risk id",
+    "format": "uuid"
+   },
+   "productId": {
+    "type": "string",
+    "description": "Product id",
+    "format": "uuid",
+    "nullable": true
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "critical",
+     "high",
+     "medium",
+     "low"
+    ],
+    "description": "Severity (Risk Dashboard)"
+   },
+   "explanation": {
+    "type": "string",
+    "description": "AI explanation, e.g. the two products share 96% of their configuration; advisory"
+   },
+   "detectedAt": {
+    "type": "string",
+    "description": "Detected",
+    "format": "date-time"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
    }
   }
  },
@@ -2465,83 +3272,161 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "dateTime": {
     "type": "string",
-    "format": "date-time",
-    "description": "Date/time"
+    "description": "Date/time",
+    "format": "date-time"
    },
    "user": {
     "type": "string",
-    "description": "User"
+    "description": "User (display name)"
    },
    "role": {
     "type": "string",
-    "description": "Role"
+    "description": "Role at the time"
    },
    "product": {
     "type": "string",
-    "description": "Product"
+    "description": "Product name"
    },
    "version": {
-    "type": "string",
-    "description": "Version"
+    "type": "integer",
+    "nullable": true,
+    "description": "Product version"
    },
    "action": {
     "type": "string",
-    "description": "Action"
+    "enum": [
+     "created",
+     "updated",
+     "submitted",
+     "approved",
+     "rejected",
+     "changesRequested",
+     "scheduled",
+     "published",
+     "rolledBack",
+     "suspended",
+     "retired",
+     "archived",
+     "imported",
+     "exported",
+     "duplicated"
+    ],
+    "description": "Action (decided 29 September, readiness close-out)"
    },
    "configurationArea": {
     "type": "string",
+    "enum": [
+     "basicInformation",
+     "validity",
+     "pricing",
+     "capacity",
+     "entitlements",
+     "eligibility",
+     "media",
+     "channels",
+     "policies",
+     "relationships",
+     "lifecycle"
+    ],
     "description": "Configuration area"
    },
    "previousValue": {
     "type": "string",
-    "description": "Previous value"
+    "description": "Previous value",
+    "nullable": true
    },
    "newValue": {
-    "type": "integer",
-    "description": "New value"
+    "type": "string",
+    "description": "New value",
+    "nullable": true
    },
    "reason": {
     "type": "string",
-    "description": "Reason"
+    "description": "Reason",
+    "nullable": true
    },
    "approvalReference": {
     "type": "string",
-    "description": "Approval reference"
+    "description": "Approval reference (change request id)",
+    "nullable": true
    },
    "sourceChannel": {
     "type": "string",
-    "description": "Source channel"
+    "enum": [
+     "backOffice",
+     "api",
+     "bulkImport",
+     "environmentTransfer",
+     "scheduler",
+     "aiAssistant"
+    ],
+    "description": "Where the change was made (decided 29 September, readiness close-out)"
    },
    "environment": {
     "type": "string",
+    "enum": [
+     "development",
+     "sandbox",
+     "uat",
+     "staging",
+     "production"
+    ],
     "description": "Environment"
    },
-   "ipDeviceMetadataWhereApplicable": {
-    "type": "string",
+   "deviceMetadata": {
+    "type": "object",
+    "nullable": true,
+    "properties": {
+     "ipAddress": {
+      "type": "string"
+     },
+     "userAgent": {
+      "type": "string"
+     },
+     "deviceId": {
+      "type": "string",
+      "nullable": true
+     }
+    },
     "description": "IP/device metadata where applicable"
+   },
+   "auditId": {
+    "type": "string",
+    "description": "Audit entry id",
+    "format": "uuid"
+   },
+   "productId": {
+    "type": "string",
+    "description": "Product id",
+    "format": "uuid"
+   },
+   "userId": {
+    "type": "string",
+    "description": "User principal id",
+    "format": "uuid"
    }
   }
  },
- "ProductGovernanceCommandCenterView": {
+ "ProductGovernanceCommandCenterSummary": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
-  "description": "**What Product Governance Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Product Governance Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
   "properties": {
    "productsAwaitingApproval": {
-    "type": "string",
+    "type": "integer",
     "description": "Products awaiting approval"
    },
    "changesAwaitingApproval": {
-    "type": "string",
+    "type": "integer",
     "description": "Changes awaiting approval"
    },
    "rejectedChanges": {
     "type": "integer",
-    "description": "Rejected changes"
+    "description": "Rejected changes (last 30 days) (decided 29 September, readiness close-out)"
    },
    "productsWithGovernanceWarnings": {
-    "type": "string",
+    "type": "integer",
     "description": "Products with governance warnings"
    },
    "scheduledChanges": {
@@ -2549,20 +3434,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Scheduled changes"
    },
    "productsWithUnpublishedChanges": {
-    "type": "string",
+    "type": "integer",
     "description": "Products with unpublished changes"
    },
    "productsWithDependencyConflicts": {
-    "type": "string",
+    "type": "integer",
     "description": "Products with dependency conflicts"
    },
    "productsApproachingRetirement": {
-    "type": "string",
-    "description": "Products approaching retirement"
+    "type": "integer",
+    "description": "Products approaching retirement: retirement date within 30 days (decided 29 September, readiness close-out)"
    },
    "recentlyPublishedVersions": {
     "type": "integer",
-    "description": "Recently published versions"
+    "description": "Recently published versions: published in the last 7 days (decided 29 September, readiness close-out)"
    },
    "failedPublications": {
     "type": "integer",
@@ -2574,61 +3459,225 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "highRiskConfigurationChanges": {
     "type": "integer",
-    "description": "High-risk configuration changes"
-   },
+    "description": "High-risk configuration changes (riskLevel high or critical) awaiting decision"
+   }
+  }
+ },
+ "ProductGovernanceCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Product Governance Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
    "product": {
     "type": "string",
-    "description": "Product"
+    "description": "Product name"
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue name"
    },
    "productOwner": {
     "type": "string",
-    "description": "Product owner"
+    "description": "Product owner (display name)"
    },
    "changeType": {
     "type": "string",
-    "description": "Change type"
+    "enum": [
+     "newProduct",
+     "description",
+     "price",
+     "validity",
+     "capacity",
+     "entitlement",
+     "eligibility",
+     "tax",
+     "channel",
+     "media",
+     "policy",
+     "relationship",
+     "retirement"
+    ],
+    "description": "Change type (decided 29 September, readiness close-out)"
    },
    "currentVersion": {
-    "type": "string",
-    "description": "Current version"
+    "type": "integer",
+    "nullable": true,
+    "description": "Current version number (ProductVersion.version); empty for a new product"
    },
    "proposedVersion": {
-    "type": "string",
-    "description": "Proposed version"
+    "type": "integer",
+    "description": "Proposed version number"
    },
    "requestedBy": {
     "type": "string",
-    "description": "Requested by"
+    "description": "Requested by (display name)"
    },
    "requestedDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "Requested date"
+    "description": "Requested date-time",
+    "format": "date-time"
    },
    "riskLevel": {
     "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
     "description": "Risk level"
    },
    "approvalStatus": {
     "type": "string",
-    "description": "Approval status"
+    "description": "Approval status: pending, changesRequested, approved, rejected, escalated or withdrawn"
    },
    "effectiveDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "Effective date"
+    "description": "Effective date of the change; empty = on approval",
+    "format": "date",
+    "nullable": true
    },
    "impactedChannels": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/Channel"
+    },
     "description": "Impacted channels"
    },
    "assignedApprover": {
     "type": "string",
-    "description": "Assigned approver"
+    "description": "Assigned approver (display name)",
+    "nullable": true
+   },
+   "changeRequestId": {
+    "type": "string",
+    "description": "Change request id",
+    "format": "uuid"
+   },
+   "productId": {
+    "type": "string",
+    "description": "Product id",
+    "format": "uuid"
+   },
+   "lifecycleState": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ProductLifecycleState"
+     }
+    ],
+    "description": "Product's current lifecycle state"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "AI insights: advisory only; the AI never approves, publishes, retires or changes a product (pack p.26-27)"
+   }
+  }
+ },
+ "ProductKind": {
+  "type": "string",
+  "description": "**`openDated` added 24 August** from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: **valid on any date within an eligible range, rather than for a named performance or a fixed date.**\nThe mechanism already existed — `access.entitlement` carries `valid_from`, `valid_to`, `entries_allowed` and `frozen_days`, which is exactly an open-dated pass. **What was missing was the product saying it is one**, so a catalogue could not offer it and a report could not count it.\n**`datedAdmission` is a different thing and the two were being conflated**: dated is *this Tuesday*, open-dated is *any Tuesday between March and June*. A guest buying the second and being sold the first has bought the wrong ticket.\n**Transport uses two existing kinds, not a new one** (decided 29 September, rev 3 REV3-21). A one-way trip is `timedAdmission`: `transport.createTransportRoute` creates the route's product with one variant per passenger type, and each departure is a performance. A multi-trip or unlimited pass is `openDated`: `transport.createTransportPassType` creates it, with `EntitlementTemplate.entriesAllowed` = the pass's trips (null for unlimited), the validity = `validityDays`, and `EntitlementTemplate.transportRestriction` naming the station pair the pass was bought for, so `access` refuses it on another journey. The sale path is unchanged: both are cart lines, priced by `transport.quoteTransportFare` (orders `TransportLineAttributes`).\n",
+  "enum": [
+   "admission",
+   "timedAdmission",
+   "datedAdmission",
+   "openDated",
+   "seated",
+   "membership",
+   "bundle",
+   "fnb",
+   "retail",
+   "rental",
+   "addOn",
+   "giftCard"
+  ]
+ },
+ "ProductLifecycleState": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "inReview",
+   "approved",
+   "live",
+   "withdrawn",
+   "archived"
+  ]
+ },
+ "ProductLink": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.product_link",
+  "description": "**What depends on a product, so a change can be propagated or held** (29 September, data model DM3). ADM-134. `propagatesChanges` says whether an approved change to the source flows to the linked object; `overriddenFields` are the local overrides a propagation must not overwrite (a conflict is reported, not resolved silently).",
+  "required": [
+   "id",
+   "scopePath",
+   "sourceProductId",
+   "dependencyType",
+   "linkedObjectId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "sourceProductId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "dependencyType": {
+    "type": "string",
+    "enum": [
+     "parentProduct",
+     "childProduct",
+     "bundle",
+     "addOn",
+     "upgrade",
+     "membership",
+     "package",
+     "promotion",
+     "priceProfile",
+     "capacityPool",
+     "entitlement",
+     "salesChannel",
+     "mediaTemplate"
+    ]
+   },
+   "linkedObjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "linkedObjectName": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true
+   },
+   "propagatesChanges": {
+    "type": "boolean",
+    "default": true
+   },
+   "overriddenFields": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -2638,86 +3687,96 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Product Retirement, Suspension & Archive displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "temporarilyDisable": {
+   "action": {
     "type": "string",
-    "description": "Temporarily Disable"
-   },
-   "endSale": {
-    "type": "string",
-    "description": "End Sale"
-   },
-   "retire": {
-    "type": "string",
-    "description": "Retire"
+    "enum": [
+     "suspendSales",
+     "temporarilyDisable",
+     "endSale",
+     "retire",
+     "archive"
+    ],
+    "description": "End-of-life action (Available Actions, pack pp.23-24)"
    },
    "retirementDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "Retirement date"
+    "description": "Retirement date",
+    "format": "date",
+    "nullable": true
    },
    "endOfSaleDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "End-of-sale date"
+    "description": "End-of-sale date",
+    "format": "date",
+    "nullable": true
    },
    "channels": {
-    "type": "string",
-    "description": "Channels"
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/Channel"
+    },
+    "description": "Channels the action applies to; empty = all"
    },
    "reason": {
     "type": "string",
     "description": "Reason"
    },
-   "replacementProduct": {
+   "replacementProductId": {
     "type": "string",
-    "description": "Replacement product"
+    "description": "Replacement product",
+    "format": "uuid",
+    "nullable": true
    },
    "existingReservationTreatment": {
     "type": "string",
-    "description": "Existing reservation treatment"
+    "enum": [
+     "honour",
+     "moveToReplacement",
+     "cancel"
+    ],
+    "description": "Existing reservation treatment; default honour (decided 29 September, readiness close-out)"
    },
    "existingTicketTreatment": {
     "type": "string",
-    "description": "Existing ticket treatment"
+    "enum": [
+     "remainValid",
+     "exchangeForReplacement",
+     "invalidate"
+    ],
+    "description": "Existing ticket treatment; default remainValid, and invalidate needs its own governed approval (decided 29 September, readiness close-out)"
    },
    "communicationRequirements": {
     "type": "string",
-    "description": "Communication requirements"
+    "description": "Communication requirements to holders and staff",
+    "nullable": true
    },
    "reportingTreatment": {
     "type": "string",
-    "description": "Reporting treatment"
-   },
-   "from": {
-    "type": "string",
-    "description": "from"
-   },
-   "validityOfPreviouslyIssuedTickets": {
-    "type": "string",
-    "description": "validity of previously issued tickets"
-   },
-   "validityOfPreviouslyIssuedEntitlements": {
-    "type": "string",
-    "description": "validity of previously issued entitlements"
+    "enum": [
+     "keepInReports",
+     "reportUnderReplacement",
+     "historicalOnly"
+    ],
+    "description": "Reporting treatment; default keepInReports (decided 29 September, readiness close-out)"
    },
    "activePromotions": {
     "type": "integer",
     "description": "Active promotions"
    },
    "bundles": {
-    "type": "string",
+    "type": "integer",
     "description": "Bundles"
    },
    "membershipBenefits": {
-    "type": "string",
+    "type": "integer",
     "description": "Membership benefits"
    },
    "resellerAgreements": {
-    "type": "string",
+    "type": "integer",
     "description": "Reseller agreements"
    },
    "futureReservations": {
-    "type": "string",
+    "type": "integer",
     "description": "Future reservations"
    },
    "activePriceLists": {
@@ -2725,8 +3784,29 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "Active price lists"
    },
    "channelAssignments": {
-    "type": "string",
+    "type": "integer",
     "description": "Channel assignments"
+   },
+   "productId": {
+    "type": "string",
+    "description": "Product id",
+    "format": "uuid"
+   },
+   "productName": {
+    "type": "string",
+    "description": "Product name"
+   },
+   "lifecycleState": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ProductLifecycleState"
+     }
+    ],
+    "description": "Current lifecycle state"
+   },
+   "upgradePaths": {
+    "type": "integer",
+    "description": "Upgrade paths"
    }
   }
  },
@@ -2779,57 +3859,96 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
   "description": "**What Rollback & Recovery Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "identifyDependencies": {
-    "type": "string",
-    "description": "Identify dependencies"
+   "dependencies": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Dependencies identified for the rollback"
    },
-   "enterRollbackReason": {
+   "reason": {
     "type": "string",
-    "description": "Enter rollback reason"
+    "description": "Rollback reason (mandatory)"
    },
-   "executeImmediateRollbackWhereAuthorized": {
+   "executionMode": {
     "type": "string",
-    "description": "Execute immediate rollback where authorized"
+    "enum": [
+     "immediate",
+     "scheduled"
+    ],
+    "description": "Immediate (where authorised) or scheduled"
    },
-   "monitorRollbackStatus": {
+   "status": {
     "type": "string",
-    "description": "Monitor rollback status"
+    "description": "Rollback status: requested, awaitingApproval, scheduled, executing, completed, failed or cancelled"
    },
-   "entireProduct": {
-    "type": "string",
-    "description": "Entire product"
+   "scope": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "entireProduct",
+      "pricingAssociation",
+      "channelAssociation",
+      "validityConfiguration",
+      "media",
+      "policy",
+      "entitlementConfiguration"
+     ]
+    },
+    "description": "Rollback scope"
    },
-   "pricingAssociation": {
+   "rollbackId": {
     "type": "string",
-    "description": "Pricing association"
+    "description": "Rollback id",
+    "format": "uuid"
    },
-   "channelAssociation": {
+   "productId": {
     "type": "string",
-    "description": "Channel association"
+    "description": "Product id",
+    "format": "uuid"
    },
-   "validityConfiguration": {
+   "productName": {
     "type": "string",
-    "description": "Validity configuration"
+    "description": "Product name"
    },
-   "media": {
-    "type": "string",
-    "description": "Media"
+   "fromVersion": {
+    "type": "integer",
+    "description": "Current version rolled back from"
    },
-   "policy": {
-    "type": "string",
-    "description": "Policy"
+   "toVersion": {
+    "type": "integer",
+    "description": "Earlier version restored"
    },
-   "entitlementConfiguration": {
-    "type": "string",
-    "description": "Entitlement configuration"
+   "emergency": {
+    "type": "boolean",
+    "description": "Emergency rollback"
    },
-   "subjectToSystemGovernance": {
+   "scheduledAt": {
     "type": "string",
-    "description": "subject to system governance"
+    "description": "Scheduled time",
+    "format": "date-time",
+    "nullable": true
    },
-   "enhancedAuditLogging": {
+   "requestedBy": {
     "type": "string",
-    "description": "enhanced audit logging"
+    "description": "Requested by (display name)"
+   },
+   "requestedAt": {
+    "type": "string",
+    "description": "Requested",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "description": "Completed",
+    "format": "date-time",
+    "nullable": true
+   },
+   "approvalReference": {
+    "type": "string",
+    "description": "Approval reference",
+    "nullable": true
    }
   }
  }

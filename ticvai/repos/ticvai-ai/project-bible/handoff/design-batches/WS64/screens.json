@@ -39,10 +39,7 @@
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-298 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-299",
@@ -101,10 +98,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "An authenticated customer can immediately identify which owned tickets are eligible for resale and begin the official resale process without manually proving ticket ownership.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Depending on ticket configuration) and no display directory — it is settings, not a population",
   "purpose": "Provide the authenticated ticket holder with a simple and secure entry point into the official resale journey. The preferred starting point should be the customer's existing: My Account → My Tickets rather than asking customers to manually enter ticket numbers or upload ticket PDFs.",
-  "purposeNote": "An authenticated customer can immediately identify which owned tickets are eligible for resale and begin the official resale process without manually proving ticket ownership.",
   "layout": {
    "template": "form",
    "regions": [
@@ -168,7 +165,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-298"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-298",
+   "workshopBoard": "wireframes/WS170 Ticket Resale Marketplace Board 3.dc.html#adm-298"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 40. 0 of 0 labels bound to a contract property; 7 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -232,10 +230,17 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Customers receive an immediate, understandable and authoritative resale eligibility decision before entering the listing process.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Explain whether the selected ticket can be resold before allowing a listing to be created.",
-  "purposeNote": "Customers receive an immediate, understandable and authoritative resale eligibility decision before entering the listing process.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Sell selected tickets. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Ticket Resale Marketplace_Reference.pdf, page 42 §Allow applicable configurations such as"
+   }
+  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -284,6 +289,17 @@
        "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 42 §Display"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Sell selected tickets",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 42 §Allow applicable configurations such as"
+      }
+     ]
     }
    ]
   },
@@ -315,9 +331,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-299"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-299",
+   "workshopBoard": "wireframes/WS170 Ticket Resale Marketplace Board 3.dc.html#adm-299"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 42. 7 of 8 labels bound to a contract property; 8 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 42. 7 of 8 labels bound to a contract property; 9 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -379,10 +396,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "A seller can select a valid resale price while TICVAI automatically enforces the operator's configured commercial rules.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Allow an eligible seller to select a resale price within the client's approved marketplace rules.",
-  "purposeNote": "A seller can select a valid resale price while TICVAI automatically enforces the operator's configured commercial rules.",
   "gaps": [
    {
     "operation": null,
@@ -428,17 +445,14 @@
   ],
   "entryState": {
    "preloaded": [
-    "CreateListingResalePriceSelectionView.faceValueOnly",
-    "CreateListingResalePriceSelectionView.fixedPrice",
-    "CreateListingResalePriceSelectionView.sellerSelectedPrice",
-    "CreateListingResalePriceSelectionView.cappedPrice",
-    "CreateListingResalePriceSelectionView.operatorControlled"
+    "CreateListingResalePriceSelectionView.pricingMode"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-300"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-300",
+   "workshopBoard": "wireframes/WS170 Ticket Resale Marketplace Board 3.dc.html#adm-300"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 43. 0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -502,10 +516,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "The seller understands the resale price, applicable fees, estimated proceeds and settlement conditions before submitting the ticket for listing.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide complete financial transparency before the seller commits to publishing the listing. This is essential to prevent later disputes.",
-  "purposeNote": "The seller understands the resale price, applicable fees, estimated proceeds and settlement conditions before submitting the ticket for listing.",
   "gaps": [
    {
     "operation": null,
@@ -550,18 +564,13 @@
    }
   ],
   "entryState": {
-   "preloaded": [
-    "FeesSellerProceedsListingConfirmationView.yourSellingPrice",
-    "FeesSellerProceedsListingConfirmationView.aed2200",
-    "FeesSellerProceedsListingConfirmationView.aed000",
-    "FeesSellerProceedsListingConfirmationView.youWillReceiveAed19800",
-    "FeesSellerProceedsListingConfirmationView.clearlyExplainApplicableSettlementRules"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-301"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-301",
+   "workshopBoard": "wireframes/WS170 Ticket Resale Marketplace Board 3.dc.html#adm-301"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 45. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -625,10 +634,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Sellers can independently understand and manage the complete status of their listings and settlements without contacting venue support for routine actions.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display; Show) and a per-row directory (§Each listing shows) — counts over a population, then the population",
   "purpose": "Give sellers a dedicated self-service workspace to manage their resale activity after publishing.",
-  "purposeNote": "Sellers can independently understand and manage the complete status of their listings and settlements without contacting venue support for routine actions.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -687,13 +696,13 @@
        "kind": "metricTile",
        "label": "Selling Price: AED 220",
        "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 46 §Show",
-       "bindsTo": "MyResaleListingsSellerDashboardView.sellingPriceAed220"
+       "bindsTo": "MyResaleListingsSellerDashboardView.listingPrice"
       },
       {
        "kind": "metricTile",
        "label": "Estimated Proceeds: AED 198",
        "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 46 §Show",
-       "bindsTo": "MyResaleListingsSellerDashboardView.estimatedProceedsAed198"
+       "bindsTo": "MyResaleListingsSellerDashboardView.sellerProceeds"
       },
       {
        "kind": "metricTile",
@@ -717,7 +726,7 @@
         "MyResaleListingsSellerDashboardView.listingPrice",
         "MyResaleListingsSellerDashboardView.originalPrice",
         "MyResaleListingsSellerDashboardView.marketplaceStatus",
-        "MyResaleListingsSellerDashboardView.viewsWhereApplicable",
+        "MyResaleListingsSellerDashboardView.views",
         "MyResaleListingsSellerDashboardView.listingDate",
         "MyResaleListingsSellerDashboardView.expiry",
         "MyResaleListingsSellerDashboardView.sellerProceeds",
@@ -744,7 +753,7 @@
         "MyResaleListingsSellerDashboardView.listingPrice",
         "MyResaleListingsSellerDashboardView.originalPrice",
         "MyResaleListingsSellerDashboardView.marketplaceStatus",
-        "MyResaleListingsSellerDashboardView.viewsWhereApplicable",
+        "MyResaleListingsSellerDashboardView.views",
         "MyResaleListingsSellerDashboardView.listingDate",
         "MyResaleListingsSellerDashboardView.expiry",
         "MyResaleListingsSellerDashboardView.sellerProceeds",
@@ -775,7 +784,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-302"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-302",
+   "workshopBoard": "wireframes/WS170 Ticket Resale Marketplace Board 3.dc.html#adm-302"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 46. 21 of 21 labels bound to a contract property; 22 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -839,14 +849,14 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Customers can discover legitimate resale inventory in a trusted marketplace without interacting directly with unknown sellers.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide buyers with a trusted client-branded marketplace for discovering authentic resale inventory.",
-  "purposeNote": "Customers can discover legitimate resale inventory in a trusted marketplace without interacting directly with unknown sellers.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Ticket Type, Price, Primary only. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Event, Venue, Ticket Type, Price, Quantity, Primary only. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Ticket Resale Marketplace_Reference.pdf, page 48 §Support"
    },
    {
@@ -869,12 +879,27 @@
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Event",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 48 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Venue",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 48 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Ticket Type",
        "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 48 §Support"
       },
       {
        "kind": "secondaryButton",
        "label": "Price",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 48 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Quantity",
        "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 48 §Support"
       },
       {
@@ -912,8 +937,7 @@
   ],
   "entryState": {
    "preloaded": [
-    "OfficialResaleMarketplaceBuyerDiscoveryView.officialTicketsOfficialResale",
-    "OfficialResaleMarketplaceBuyerDiscoveryView.asASeparateMarketplacePage",
+    "OfficialResaleMarketplaceBuyerDiscoveryView.inventoryFilter",
     "OfficialResaleMarketplaceBuyerDiscoveryView.event",
     "OfficialResaleMarketplaceBuyerDiscoveryView.venue",
     "OfficialResaleMarketplaceBuyerDiscoveryView.date"
@@ -922,9 +946,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-303"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-303",
+   "workshopBoard": "wireframes/WS170 Ticket Resale Marketplace Board 3.dc.html#adm-303"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 48. 0 of 0 labels bound to a contract property; 4 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 48. 0 of 0 labels bound to a contract property; 7 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -986,10 +1011,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "Buyers clearly understand whether a ticket is primary or resale inventory, its location/entitlements and the complete applicable price before checkout.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Allow customers to understand exactly what they are purchasing and distinguish resale inventory from primary inventory.",
-  "purposeNote": "Buyers clearly understand whether a ticket is primary or resale inventory, its location/entitlements and the complete applicable price before checkout.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1077,7 +1102,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-304"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-304",
+   "workshopBoard": "wireframes/WS170 Ticket Resale Marketplace Board 3.dc.html#adm-304"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 49. 12 of 12 labels bound to a contract property; 14 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1141,10 +1167,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "One buyer can securely purchase the resale ticket while TICVAI prevents concurrent purchase and maintains complete transaction integrity.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Select Resale Ticket) and no display directory — it is settings, not a population",
   "purpose": "Provide a normal, secure TICVAI checkout while protecting the resale listing from simultaneous purchase.",
-  "purposeNote": "One buyer can securely purchase the resale ticket while TICVAI prevents concurrent purchase and maintains complete transaction integrity.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1184,7 +1210,8 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-305"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-305",
+   "workshopBoard": "wireframes/WS170 Ticket Resale Marketplace Board 3.dc.html#adm-305"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 51. 0 of 0 labels bound to a contract property; 1 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1248,10 +1275,10 @@
    ]
   },
   "density": "compact",
+  "purposeNote": "After successful resale, the buyer receives control of the valid entitlement and applicable credentials, while the seller can no longer use the transferred ticket.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide the customer-facing completion experience after successful payment while the backend performs the secure entitlement transfer.",
-  "purposeNote": "After successful resale, the buyer receives control of the valid entitlement and applicable credentials, while the seller can no longer use the transferred ticket.",
   "gaps": [
    {
     "operation": null,
@@ -1296,18 +1323,13 @@
    }
   ],
   "entryState": {
-   "preloaded": [
-    "ResaleConfirmationOwnershipTransferTicketDeliveryView.followedBy",
-    "ResaleConfirmationOwnershipTransferTicketDeliveryView.yourTicketIsReady",
-    "ResaleConfirmationOwnershipTransferTicketDeliveryView.currentOwnerSellerA",
-    "ResaleConfirmationOwnershipTransferTicketDeliveryView.previousOwnerSellerA",
-    "ResaleConfirmationOwnershipTransferTicketDeliveryView.currentOwnerBuyerB"
-   ]
+   "preloaded": []
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-306"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-306",
+   "workshopBoard": "wireframes/WS170 Ticket Resale Marketplace Board 3.dc.html#adm-306"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 52. 0 of 0 labels bound to a contract property; 0 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1363,14 +1385,14 @@
    "notes": "**Reached from ADM-298, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Each TICVAI tenant can deploy a secure, branded resale marketplace using embedded, hosted or headless architecture without requiring a separate marketplace backend implementation. Board 3 — Final Screen Register # Customer / Experience Screen Primary Responsibility 3.3.1 My Tickets & Resale Marketplace Entry Seller marketplace entry",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "This is the key architecture/configuration screen It defines how each TICVAI client chooses to expose the resale marketplace to its customers. Deployment Model A — Embedded White-Label",
-  "purposeNote": "Each TICVAI tenant can deploy a secure, branded resale marketplace using embedded, hosted or headless architecture without requiring a separate marketplace backend implementation. Board 3 — Final Screen Register # Customer / Experience Screen Primary Responsibility 3.3.1 My Tickets & Resale Marketplace Entry Seller marketplace entry",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Domain configuration, Additional client languages. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Domain configuration, Analytics, Additional client languages, Secure sessions, Fraud integration, Data protection, Session expiry, Audit logging. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Support"
    }
   ],
@@ -1489,7 +1511,37 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Analytics",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Additional client languages",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Secure sessions",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Fraud integration",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Data protection",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Session expiry",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Audit logging",
        "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Support"
       }
      ]
@@ -1513,9 +1565,10 @@
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P09 TICVAI Web.dc.html#adm-307"
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-307",
+   "workshopBoard": "wireframes/WS170 Ticket Resale Marketplace Board 3.dc.html#adm-307"
   },
-  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 54. 0 of 0 labels bound to a contract property; 21 of 131 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 54. 0 of 0 labels bound to a contract property; 27 of 131 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

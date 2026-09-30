@@ -22,9 +22,64 @@
     "ADM-006",
     "ADM-007",
     "ADM-008",
+    "ADM-009",
+    "ADM-010",
+    "ADM-011",
     "ADM-012",
+    "ADM-013",
+    "ADM-014",
+    "ADM-015",
+    "ADM-016",
+    "ADM-017",
+    "ADM-018",
+    "ADM-019",
     "ADM-020",
     "ADM-021",
+    "ADM-022",
+    "ADM-023",
+    "ADM-024",
+    "ADM-025",
+    "ADM-026",
+    "ADM-027",
+    "ADM-028",
+    "ADM-029",
+    "ADM-030",
+    "ADM-031",
+    "ADM-032",
+    "ADM-033",
+    "ADM-034",
+    "ADM-035",
+    "ADM-036",
+    "ADM-037",
+    "ADM-038",
+    "ADM-048",
+    "ADM-058",
+    "ADM-068",
+    "ADM-078",
+    "ADM-088",
+    "ADM-098",
+    "ADM-108",
+    "ADM-118",
+    "ADM-128",
+    "ADM-138",
+    "ADM-148",
+    "ADM-158",
+    "ADM-168",
+    "ADM-178",
+    "ADM-188",
+    "ADM-198",
+    "ADM-208",
+    "ADM-218",
+    "ADM-228",
+    "ADM-238",
+    "ADM-248",
+    "ADM-258",
+    "ADM-268",
+    "ADM-278",
+    "ADM-288",
+    "ADM-298",
+    "ADM-308",
+    "ADM-318",
     "ADM-319",
     "ADM-329",
     "ADM-339",
@@ -37,7 +92,30 @@
     "ADM-409",
     "ADM-419",
     "ADM-449",
-    "ADM-459"
+    "ADM-459",
+    "ADM-469",
+    "ADM-479",
+    "ADM-489",
+    "ADM-499",
+    "ADM-509",
+    "ADM-519",
+    "ADM-529",
+    "ADM-539",
+    "ADM-549",
+    "ADM-559",
+    "ADM-569",
+    "ADM-579",
+    "ADM-589",
+    "ADM-599",
+    "ADM-609",
+    "ADM-619",
+    "ADM-629",
+    "ADM-639",
+    "ADM-649",
+    "ADM-659",
+    "ADM-669",
+    "ADM-679",
+    "ADM-689"
    ],
    "inferred": true,
    "transitions": [
@@ -74,7 +152,10 @@
     {
      "to": "ADM-003",
      "trigger": "Cross-Tenant Health Dashboard",
-     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher",
+     "carries": [
+      "cellId"
+     ]
     },
     {
      "to": "ADM-004",
@@ -84,27 +165,44 @@
     {
      "to": "ADM-005",
      "trigger": "Tenant Directory",
-     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher",
+     "carries": [
+      "tenantId"
+     ]
     },
     {
      "to": "ADM-006",
      "trigger": "Tenant Hierarchy Explorer",
-     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher",
+     "carries": [
+      "tenantId"
+     ]
     },
     {
      "to": "ADM-007",
      "trigger": "Module & Feature Entitlement",
-     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher",
+     "carries": [
+      "tenantId"
+     ]
     },
     {
      "to": "ADM-008",
      "trigger": "Subscription & Plan Management",
-     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher",
+     "carries": [
+      "planId",
+      "tenantId"
+     ]
     },
     {
      "to": "ADM-012",
      "trigger": "Tenant Isolation & Resource Pool",
-     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher",
+     "carries": [
+      "cellId",
+      "tenantId"
+     ]
     },
     {
      "to": "ADM-020",
@@ -156,6 +254,435 @@
      "to": "ADM-449",
      "trigger": "Usage & License Command Center",
      "provenance": "structural — pack board 9 wiring, 11 September 2026"
+    },
+    {
+     "to": "ADM-469",
+     "trigger": "AI Configuration Home & Start",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-479",
+     "trigger": "AI Configuration Build Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-489",
+     "trigger": "AI Configuration Readiness Center",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-499",
+     "trigger": "Forecasting Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-509",
+     "trigger": "Operational Forecasting Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-519",
+     "trigger": "AI Governance Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-529",
+     "trigger": "AI Human Oversight Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-539",
+     "trigger": "AI Explainability & Audit Command Center",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-549",
+     "trigger": "AI Governance Monitoring Command Center",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-559",
+     "trigger": "Payment Command Center\\t7",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-569",
+     "trigger": "Payment Orchestration Command Center\\t27",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-579",
+     "trigger": "Terminal & Card-Present Command Center\\t48",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-589",
+     "trigger": "Digital Payments Command Center\\t71",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-599",
+     "trigger": "Mixed Tender & Credit Command Center\\t93",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-609",
+     "trigger": "Refund & Payment Adjustment Command Center\\t116",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-619",
+     "trigger": "Reconciliation & Settlement Command Center\\t139",
+     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-629",
+     "trigger": "Payment Risk & Fraud Command Center\\t166",
+     "provenance": "structural — pack board 8 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-639",
+     "trigger": "Recommendation Command Center",
+     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-649",
+     "trigger": "Upsell & Upgrade Command Center",
+     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-659",
+     "trigger": "Cross-Sell Command Center",
+     "provenance": "structural — pack board 3 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-669",
+     "trigger": "Journey & Context Command Center",
+     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-679",
+     "trigger": "Personalization & NBO Command Center",
+     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-689",
+     "trigger": "Recommendation Performance Command Center",
+     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+    },
+    {
+     "to": "ADM-009",
+     "trigger": "Tenant Billing & Invoicing",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-009 declares entryState.params tenantId and ADM-002 holds tenantId, so an edge into it carries them"
+    },
+    {
+     "to": "ADM-010",
+     "trigger": "Usage Metering",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-010 declares entryState.params tenantId and ADM-002 holds tenantId, so an edge into it carries them"
+    },
+    {
+     "to": "ADM-011",
+     "trigger": "Licence & Seat Management",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-011 declares entryState.params tenantId and ADM-002 holds tenantId, so an edge into it carries them"
+    },
+    {
+     "to": "ADM-013",
+     "trigger": "Tenant Performance Monitor",
+     "carries": [
+      "cellId"
+     ],
+     "provenance": "derived — ADM-013 declares entryState.params cellId and ADM-002 holds cellId, so an edge into it carries them"
+    },
+    {
+     "to": "ADM-014",
+     "trigger": "Auto-Scaling Configuration",
+     "carries": [
+      "cellId"
+     ],
+     "provenance": "derived — ADM-014 declares entryState.params cellId and ADM-002 holds cellId, so an edge into it carries them"
+    },
+    {
+     "to": "ADM-015",
+     "trigger": "API Rate Limit & Quota Management",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-015 declares entryState.params requestId, tenantId and ADM-002 holds tenantId, so an edge into it carries them"
+    },
+    {
+     "to": "ADM-016",
+     "trigger": "White-Label Branding Management",
+     "provenance": "derived — ADM-016 declares entryState.params bannerId, pageId, policyKind, version and ADM-002 holds none of them, so the edge carries nothing and ADM-016 opens cold"
+    },
+    {
+     "to": "ADM-017",
+     "trigger": "Domain & Certificate Management",
+     "provenance": "derived — ADM-017 declares entryState.params bannerId, domainId, pageId, policyKind, version and ADM-002 holds none of them, so the edge carries nothing and ADM-017 opens cold"
+    },
+    {
+     "to": "ADM-018",
+     "trigger": "Localisation & Language Pack",
+     "provenance": "derived — ADM-018 declares entryState.params bannerId, pageId, policyKind, version and ADM-002 holds none of them, so the edge carries nothing and ADM-018 opens cold"
+    },
+    {
+     "to": "ADM-019",
+     "trigger": "Global Configuration & Defaults",
+     "carries": [
+      "planId"
+     ],
+     "provenance": "derived — ADM-019 declares entryState.params planId and ADM-002 holds planId, so an edge into it carries them"
+    },
+    {
+     "to": "ADM-022",
+     "trigger": "Release & Version Management",
+     "provenance": "derived — ADM-022 declares entryState.params releaseId and ADM-002 holds none of them, so the edge carries nothing and ADM-022 opens cold"
+    },
+    {
+     "to": "ADM-023",
+     "trigger": "Staging Promotion & Approval",
+     "provenance": "derived — ADM-023 declares entryState.params releaseId and ADM-002 holds none of them, so the edge carries nothing and ADM-023 opens cold"
+    },
+    {
+     "to": "ADM-026",
+     "trigger": "End-of-Support Notice Management",
+     "provenance": "derived — ADM-026 declares entryState.params version and ADM-002 holds none of them, so the edge carries nothing and ADM-026 opens cold"
+    },
+    {
+     "to": "ADM-027",
+     "trigger": "Database Migration Console",
+     "provenance": "derived — ADM-027 declares entryState.params runId and ADM-002 holds none of them, so the edge carries nothing and ADM-027 opens cold"
+    },
+    {
+     "to": "ADM-029",
+     "trigger": "Deployment Monitor",
+     "carries": [
+      "cellId"
+     ],
+     "provenance": "derived — ADM-029 declares entryState.params cellId, rolloutId and ADM-002 holds cellId, so an edge into it carries them"
+    },
+    {
+     "to": "ADM-030",
+     "trigger": "Infrastructure Sizing & Scaling Policy",
+     "carries": [
+      "cellId"
+     ],
+     "provenance": "derived — ADM-030 declares entryState.params cellId and ADM-002 holds cellId, so an edge into it carries them"
+    },
+    {
+     "to": "ADM-031",
+     "trigger": "Security & Compliance Dashboard",
+     "provenance": "derived — ADM-031 declares entryState.params dashboardId and ADM-002 holds none of them, so the edge carries nothing and ADM-031 opens cold"
+    },
+    {
+     "to": "ADM-032",
+     "trigger": "WAF & Security Policy View",
+     "carries": [
+      "cellId"
+     ],
+     "provenance": "derived — ADM-032 declares entryState.params cellId and ADM-002 holds cellId, so an edge into it carries them"
+    },
+    {
+     "to": "ADM-033",
+     "trigger": "Backup & DR Status",
+     "carries": [
+      "cellId"
+     ],
+     "provenance": "derived — ADM-033 declares entryState.params cellId and ADM-002 holds cellId, so an edge into it carries them"
+    },
+    {
+     "to": "ADM-034",
+     "trigger": "Archival Job Monitor",
+     "carries": [
+      "cellId"
+     ],
+     "provenance": "derived — ADM-034 declares entryState.params cellId and ADM-002 holds cellId, so an edge into it carries them"
+    },
+    {
+     "to": "ADM-037",
+     "trigger": "AI Provider & Credentials",
+     "carries": [
+      "regionId"
+     ],
+     "provenance": "derived — ADM-037 declares entryState.params modelId, providerId, regionId, templateKey and ADM-002 holds regionId, so an edge into it carries them"
+    },
+    {
+     "to": "ADM-138",
+     "trigger": "Promotion Command Center Dashboard",
+     "provenance": "derived — ADM-138 declares entryState.params promotionId and ADM-002 holds none of them, so the edge carries nothing and ADM-138 opens cold"
+    },
+    {
+     "to": "ADM-158",
+     "trigger": "Coupon & Promo Code Command Center",
+     "provenance": "derived — ADM-158 declares entryState.params campaignId and ADM-002 holds none of them, so the edge carries nothing and ADM-158 opens cold"
+    },
+    {
+     "to": "ADM-318",
+     "trigger": "Dead Letters",
+     "provenance": "derived — ADM-318 declares entryState.params deadLetterId and ADM-002 holds none of them, so the edge carries nothing and ADM-318 opens cold"
+    },
+    {
+     "to": "ADM-024",
+     "trigger": "Release Notification Composer",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-025",
+     "trigger": "Tenant Upgrade Scheduler",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-028",
+     "trigger": "Environment Registry",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-035",
+     "trigger": "Support & Escalation Console",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-036",
+     "trigger": "Platform Notification Broadcast",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-038",
+     "trigger": "Communication Service Command Center",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-048",
+     "trigger": "Commercial Pricing Command Center",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-058",
+     "trigger": "Pricing Rule Command Center",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-068",
+     "trigger": "Tax, Fee & Calculation Command Center",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-078",
+     "trigger": "Pricing Governance Command Center",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-088",
+     "trigger": "Dynamic Pricing Strategy Command Center",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-098",
+     "trigger": "AI Pricing Intelligence Command Center",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-108",
+     "trigger": "Revenue Optimization Command Center",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-118",
+     "trigger": "Product Lifecycle Command Center",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-128",
+     "trigger": "Product Governance Command Center",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-148",
+     "trigger": "Promotion Rule Builder",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-168",
+     "trigger": "Advanced Offer Command Center",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-178",
+     "trigger": "Bundle & Combo Command Center",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-188",
+     "trigger": "Dynamic Bundle Operations Command Center",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-198",
+     "trigger": "Targeting & Eligibility Command Center",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-208",
+     "trigger": "Stacking & Conflict Command Center",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-218",
+     "trigger": "Campaign Governance & Budget Command Center",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-228",
+     "trigger": "Promotion Performance Command Center",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-238",
+     "trigger": "Rules & Workflow Command Center",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-248",
+     "trigger": "Workflow Operations Command Center",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-258",
+     "trigger": "Sales Channel Command Center",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-268",
+     "trigger": "Channel Operations Command Center",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-278",
+     "trigger": "Resale Marketplace Command Center",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-288",
+     "trigger": "Resale Operations Command Center",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-298",
+     "trigger": "My Tickets & Resale Marketplace Entry",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ADM-308",
+     "trigger": "Upgrade & Conversion Command Center",
+     "provenance": "structural — ADM-002 is P09's home screen and its exits are its launcher"
     }
    ]
   },
@@ -167,13 +694,6 @@
   "pattern": "listDetail",
   "patternReason": "`listTenants` reads the population and `getEntitlementUsage` reads one of them — list, select, act",
   "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
-  "gaps": [
-   {
-    "operation": "getSsoConfig",
-    "why": "**4 declared operations reach no component on this screen**: getSsoConfig, getTenant, getTenantLicences, listTenantCells. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -182,8 +702,22 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listTenants",
+       "notes": "Sends `?status=` to `listTenants`.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "textField",
+       "label": "Plan id",
+       "operation": "listTenants",
+       "notes": "Sends `?planId=` to `listTenants`.",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every platform",
+       "label": "Every tenant",
        "bindsTo": "Tenant",
        "columns": [
         "Tenant.id",
@@ -201,6 +735,27 @@
        ],
        "operation": "listTenants",
        "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every cell",
+       "bindsTo": "Cell",
+       "columns": [
+        "Cell.id",
+        "Cell.name",
+        "Cell.kind",
+        "Cell.clusterId",
+        "Cell.isReachable",
+        "Cell.lastContactAt",
+        "Cell.licenceExpiresAt",
+        "Cell.participatesInCrossCell",
+        "Cell.regionId",
+        "Cell.regionName",
+        "Cell.countryCode",
+        "Cell.tier"
+       ],
+       "operation": "listTenantCells",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
       }
      ]
     },
@@ -210,7 +765,89 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected platform",
+       "label": "The selected tenant",
+       "bindsTo": "Tenant",
+       "columns": [
+        "Tenant.id",
+        "Tenant.code",
+        "Tenant.name",
+        "Tenant.status",
+        "Tenant.suspensionMode",
+        "Tenant.suspensionReason",
+        "Tenant.suspensionEffectiveAt",
+        "Tenant.suspensionNoticeMessage",
+        "Tenant.terminationScheduledAt",
+        "Tenant.terminationRetentionUntil",
+        "Tenant.terminationReason",
+        "Tenant.terminationRequestedByPrincipalId",
+        "Tenant.planId",
+        "Tenant.planName",
+        "Tenant.cellCount",
+        "Tenant.venueCount"
+       ],
+       "operation": "listTenants",
+       "provenance": "contract subscription.yaml GET /tenants"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The SSO provider config",
+       "bindsTo": "SsoProviderConfig",
+       "columns": [
+        "SsoProviderConfig.id",
+        "SsoProviderConfig.displayName",
+        "SsoProviderConfig.protocol",
+        "SsoProviderConfig.metadataUrl",
+        "SsoProviderConfig.issuer",
+        "SsoProviderConfig.clientId",
+        "SsoProviderConfig.clientSecretRef",
+        "SsoProviderConfig.groupMappings",
+        "SsoProviderConfig.autoProvisionPrincipals",
+        "SsoProviderConfig.isEnforced",
+        "SsoProviderConfig.isActive"
+       ],
+       "operation": "getSsoConfig",
+       "provenance": "contract identity.yaml GET /tenants/sso-config"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The tenant",
+       "bindsTo": "TenantDetail",
+       "columns": [
+        "TenantDetail.id",
+        "TenantDetail.code",
+        "TenantDetail.name",
+        "TenantDetail.status",
+        "TenantDetail.suspensionMode",
+        "TenantDetail.suspensionReason",
+        "TenantDetail.suspensionEffectiveAt",
+        "TenantDetail.suspensionNoticeMessage",
+        "TenantDetail.terminationScheduledAt",
+        "TenantDetail.terminationRetentionUntil",
+        "TenantDetail.terminationReason",
+        "TenantDetail.terminationRequestedByPrincipalId",
+        "TenantDetail.planId",
+        "TenantDetail.planName",
+        "TenantDetail.cellCount",
+        "TenantDetail.venueCount"
+       ],
+       "operation": "getTenant",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The licence position",
+       "bindsTo": "LicencePosition",
+       "columns": [
+        "LicencePosition.planId",
+        "LicencePosition.licensedModules",
+        "LicencePosition.limits"
+       ],
+       "operation": "getTenantLicences",
+       "provenance": "contract subscription.yaml GET /tenants/{tenantId}/licences"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The entitlement usage",
        "bindsTo": "EntitlementUsage",
        "columns": [
         "EntitlementUsage.metrics",
@@ -226,9 +863,9 @@
   "states": {
    "loading": "The platform list.",
    "error": "Could not load. Names which read failed and leaves the platform untouched.",
-   "emptyFirstRun": "No platform yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the platform are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No platform yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on status, planId and the platform are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -277,14 +914,18 @@
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "EntitlementUsage.metrics",
-    "EntitlementUsage.asAt"
+    "Tenant.id",
+    "Tenant.code",
+    "Tenant.name",
+    "Tenant.status",
+    "Tenant.suspensionMode"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-002",
+   "derivedFrom": "wireframes/reference/Dashboards Board.dc.html",
    "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -340,25 +981,27 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-003 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-003 holds none of them, so the edge carries nothing and ADM-002 opens cold"
+    },
+    {
+     "to": "ADM-004",
+     "trigger": "Platform Audit Log",
+     "provenance": "derived — ADM-004 declares entryState.params decisionRecordId and ADM-003 holds none of them, so the edge carries nothing and ADM-004 opens cold"
     },
     {
      "to": "SCN-003",
      "trigger": "Guest scans at the other venue",
      "provenance": "flow F19 step 2→3",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "rightId"
+     ]
     }
    ]
   },
@@ -370,13 +1013,6 @@
   "pattern": "listDetail",
   "patternReason": "`listCellJobs` reads the population and `getCellHealth` reads one of them — list, select, act",
   "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
-  "gaps": [
-   {
-    "operation": "getCell",
-    "why": "**3 declared operations reach no component on this screen**: getCell, getCellCapacity, getCrossRegionEntitlement. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -386,7 +1022,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every cross-tenant health",
+       "label": "Every cell job",
        "bindsTo": "CellJob",
        "columns": [
         "CellJob.id",
@@ -409,7 +1045,90 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected cross-tenant health",
+       "label": "The selected cell job",
+       "bindsTo": "CellJob",
+       "columns": [
+        "CellJob.id",
+        "CellJob.kind",
+        "CellJob.status",
+        "CellJob.progressPercent",
+        "CellJob.message",
+        "CellJob.error",
+        "CellJob.scheduledFor",
+        "CellJob.completedAt"
+       ],
+       "operation": "listCellJobs",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/jobs"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cell",
+       "bindsTo": "CellDetail",
+       "columns": [
+        "CellDetail.id",
+        "CellDetail.name",
+        "CellDetail.kind",
+        "CellDetail.clusterId",
+        "CellDetail.isReachable",
+        "CellDetail.lastContactAt",
+        "CellDetail.licenceExpiresAt",
+        "CellDetail.participatesInCrossCell",
+        "CellDetail.regionId",
+        "CellDetail.regionName",
+        "CellDetail.countryCode",
+        "CellDetail.tier",
+        "CellDetail.status",
+        "CellDetail.cloudProvider",
+        "CellDetail.cloudRegion",
+        "CellDetail.apiEndpoint"
+       ],
+       "operation": "getCell",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cell capacity",
+       "bindsTo": "CellCapacity",
+       "columns": [
+        "CellCapacity.kind",
+        "CellCapacity.tenantCount",
+        "CellCapacity.isConstrained",
+        "CellCapacity.constrainedDimension",
+        "CellCapacity.dimensions",
+        "CellCapacity.forecastBreachAt",
+        "CellCapacity.measuredAt"
+       ],
+       "operation": "getCellCapacity",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/capacity"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cross region entitlement",
+       "bindsTo": "CrossRegionEntitlement",
+       "columns": [
+        "CrossRegionEntitlement.id",
+        "CrossRegionEntitlement.rightId",
+        "CrossRegionEntitlement.ticketId",
+        "CrossRegionEntitlement.guestLinkId",
+        "CrossRegionEntitlement.issuingCellName",
+        "CrossRegionEntitlement.consumingCellName",
+        "CrossRegionEntitlement.mediaCodes",
+        "CrossRegionEntitlement.validFrom",
+        "CrossRegionEntitlement.validTo",
+        "CrossRegionEntitlement.admissionRulesId",
+        "CrossRegionEntitlement.venueId",
+        "CrossRegionEntitlement.entriesAllowed",
+        "CrossRegionEntitlement.entriesConsumed",
+        "CrossRegionEntitlement.status",
+        "CrossRegionEntitlement.lastConsumedAt",
+        "CrossRegionEntitlement.lastReconciledAt"
+       ],
+       "operation": "getCrossRegionEntitlement",
+       "provenance": "contract cross-region.yaml GET /cross-region-entitlements/{rightId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cell health",
        "bindsTo": "CellHealth",
        "columns": [
         "CellHealth.isHealthy",
@@ -431,31 +1150,31 @@
      "components": [
       {
        "kind": "destructiveButton",
-       "label": "Cancel",
+       "label": "Cancel decommission",
        "operation": "cancelDecommission",
        "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
       },
       {
        "kind": "secondaryButton",
-       "label": "Decommission",
+       "label": "Decommission cell",
        "operation": "decommissionCell",
        "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save cell tier",
        "operation": "updateCellTier",
        "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Propagate",
+       "label": "Propagate cross region entitlement",
        "operation": "propagateCrossRegionEntitlement",
        "provenance": "contract cross-region.yaml POST /cross-region-entitlements"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reconcile",
+       "label": "Reconcile redemptions",
        "operation": "reconcileRedemptions",
        "provenance": "contract cross-region.yaml POST /cross-region-entitlements/reconcile"
       }
@@ -467,17 +1186,97 @@
    {
     "id": "confirmCancelDecommission",
     "component": "confirmDialog",
-    "trigger": "Cancel",
-    "body": "**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather than the verb. A cross-tenant health this affects should be identified in the dialog, not just counted.",
+    "trigger": "Cancel decommission",
+    "body": "**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather than the verb. A cross-tenant health this affects should be identified in the dialog, not just counted. **Collects what `cancelDecommission` sends before it is called.** Required: `reason`.",
     "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
+   },
+   {
+    "id": "formDecommissionCell",
+    "component": "modal",
+    "trigger": "Decommission cell",
+    "body": "**Collects what `decommissionCell` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Decommission cell",
+     "operation": "decommissionCell"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
+   },
+   {
+    "id": "formUpdateCellTier",
+    "component": "modal",
+    "trigger": "Save cell tier",
+    "body": "**Collects what `updateCellTier` sends before it is called.** Required: `tier`. Optional: `scheduledFor`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save cell tier",
+     "operation": "updateCellTier"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "tier",
+      "scheduledFor"
+     ]
+    },
+    "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
+   },
+   {
+    "id": "formPropagateCrossRegionEntitlement",
+    "component": "modal",
+    "trigger": "Propagate cross region entitlement",
+    "body": "**Collects what `propagateCrossRegionEntitlement` sends before it is called.** Required: `rightId`, `ticketId`, `issuingCellName`, `validFrom`, `validTo`, `admissionRulesId`, `entriesAllowed`. Optional: `guestLinkId`, `mediaCodes`, `venueId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PropagateRightRequest",
+    "confirm": {
+     "label": "Propagate cross region entitlement",
+     "operation": "propagateCrossRegionEntitlement"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "rightId",
+      "ticketId",
+      "issuingCellName",
+      "validFrom",
+      "validTo",
+      "admissionRulesId",
+      "entriesAllowed",
+      "guestLinkId",
+      "mediaCodes",
+      "venueId"
+     ]
+    },
+    "provenance": "contract cross-region.yaml POST /cross-region-entitlements"
+   },
+   {
+    "id": "formReconcileRedemptions",
+    "component": "modal",
+    "trigger": "Reconcile redemptions",
+    "body": "**Collects what `reconcileRedemptions` sends before it is called.** Required: `consumingCellName`, `consumptions`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reconcile redemptions",
+     "operation": "reconcileRedemptions"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "consumingCellName",
+      "consumptions"
+     ]
+    },
+    "provenance": "contract cross-region.yaml POST /cross-region-entitlements/reconcile"
    }
   ],
   "states": {
    "loading": "The cross-tenant health list.",
    "error": "Could not load. Names which read failed and leaves the cross-tenant health untouched.",
-   "emptyFirstRun": "No cross-tenant health yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the cross-tenant health are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No cross-tenant health yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listCellJobs` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellHealth` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -554,6 +1353,23 @@
     "invalidates": [
      "listCellJobs"
     ]
+   },
+   {
+    "operationId": "getWalletAllocation",
+    "contract": "cross-region",
+    "purpose": "How wallet funds are allocated across regions",
+    "trigger": "onLoad",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)"
+   },
+   {
+    "operationId": "setWalletAllocationPolicy",
+    "contract": "cross-region",
+    "purpose": "Set the cross-region wallet allocation policy",
+    "trigger": "onAction",
+    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
+    "invalidates": [
+     "getWalletAllocation"
+    ]
    }
   ],
   "entryState": {
@@ -569,17 +1385,18 @@
    ],
    "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `cellId`, `rightId`.",
    "preloaded": [
-    "CellHealth.isHealthy",
-    "CellHealth.isSchemaBehind",
-    "CellHealth.databaseStatus",
-    "CellHealth.replicationLagSeconds",
-    "CellHealth.lastBackupAt"
+    "CellJob.id",
+    "CellJob.kind",
+    "CellJob.status",
+    "CellJob.progressPercent",
+    "CellJob.message"
    ]
   },
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-003",
+   "derivedFrom": "wireframes/reference/Dashboards Board.dc.html",
    "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -635,27 +1452,17 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-004 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-004 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-003",
      "trigger": "Cross-Tenant Health Dashboard",
-     "carries": [
-      "cellId",
-      "rightId"
-     ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId and ADM-004 holds none of them, so the edge carries nothing and ADM-003 opens cold"
     },
     {
      "to": "BO-068",
@@ -683,8 +1490,29 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Principal id",
+       "operation": "listAiInteractions",
+       "notes": "Sends `?principalId=` to `listAiInteractions`.",
+       "provenance": "contract ai.yaml GET /interactions"
+      },
+      {
+       "kind": "selectField",
+       "label": "Outcome",
+       "operation": "listAiInteractions",
+       "notes": "Sends `?outcome=` to `listAiInteractions`.",
+       "provenance": "contract ai.yaml GET /interactions"
+      },
+      {
+       "kind": "datePicker",
+       "label": "From",
+       "operation": "listAiInteractions",
+       "notes": "Sends `?from=` to `listAiInteractions`.",
+       "provenance": "contract ai.yaml GET /interactions"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every platform audit log",
+       "label": "Every AI interaction",
        "bindsTo": "AiInteraction",
        "columns": [
         "AiInteraction.id",
@@ -711,7 +1539,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected platform audit log",
+       "label": "The selected AI interaction",
        "bindsTo": "AiInteraction",
        "columns": [
         "AiInteraction.id",
@@ -741,9 +1569,9 @@
   "states": {
    "loading": "The platform audit log list.",
    "error": "Could not load. Names which read failed and leaves the platform audit log untouched.",
-   "emptyFirstRun": "No platform audit log yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the platform audit log are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No platform audit log yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Nothing matches the filter on principalId, outcome, from and the platform audit log are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `AI_AUDIT_VIEW`, which `listAiInteractions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -751,6 +1579,13 @@
     "contract": "ai",
     "purpose": "Every prompt, response and action",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "getAiDecisionTrace",
+    "contract": "ai",
+    "purpose": "The full trace of a decision",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -760,6 +1595,12 @@
     "AiInteraction.principalId",
     "AiInteraction.audience",
     "AiInteraction.subjectId"
+   ],
+   "params": [
+    {
+     "name": "decisionRecordId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {
@@ -819,34 +1660,30 @@
    ],
    "transitions": [
     {
-     "to": "ADM-014",
-     "trigger": "Auto-Scaling Configuration",
-     "provenance": "flow F97 step 2→3"
-    },
-    {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-013 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-013 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-003",
      "trigger": "Cross-Tenant Health Dashboard",
      "carries": [
-      "cellId",
-      "rightId"
+      "cellId"
      ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId and ADM-013 holds cellId, so an edge into it carries them"
+    },
+    {
+     "to": "ADM-014",
+     "trigger": "Auto-Scaling Configuration",
+     "provenance": "flow F97 step 2→3",
+     "carries": [
+      "cellId"
+     ]
     }
    ]
   },
@@ -855,13 +1692,6 @@
   "pattern": "listDetail",
   "patternReason": "`listCellJobs` reads the population and `getCellHealth` reads one of them — list, select, act",
   "purpose": "See tenant performance monitor for this venue.",
-  "gaps": [
-   {
-    "operation": "getCell",
-    "why": "**2 declared operations reach no component on this screen**: getCell, getCellCapacity. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -871,7 +1701,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every tenant performance",
+       "label": "Every cell job",
        "bindsTo": "CellJob",
        "columns": [
         "CellJob.id",
@@ -894,7 +1724,65 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected tenant performance",
+       "label": "The selected cell job",
+       "bindsTo": "CellJob",
+       "columns": [
+        "CellJob.id",
+        "CellJob.kind",
+        "CellJob.status",
+        "CellJob.progressPercent",
+        "CellJob.message",
+        "CellJob.error",
+        "CellJob.scheduledFor",
+        "CellJob.completedAt"
+       ],
+       "operation": "listCellJobs",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/jobs"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cell",
+       "bindsTo": "CellDetail",
+       "columns": [
+        "CellDetail.id",
+        "CellDetail.name",
+        "CellDetail.kind",
+        "CellDetail.clusterId",
+        "CellDetail.isReachable",
+        "CellDetail.lastContactAt",
+        "CellDetail.licenceExpiresAt",
+        "CellDetail.participatesInCrossCell",
+        "CellDetail.regionId",
+        "CellDetail.regionName",
+        "CellDetail.countryCode",
+        "CellDetail.tier",
+        "CellDetail.status",
+        "CellDetail.cloudProvider",
+        "CellDetail.cloudRegion",
+        "CellDetail.apiEndpoint"
+       ],
+       "operation": "getCell",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cell capacity",
+       "bindsTo": "CellCapacity",
+       "columns": [
+        "CellCapacity.kind",
+        "CellCapacity.tenantCount",
+        "CellCapacity.isConstrained",
+        "CellCapacity.constrainedDimension",
+        "CellCapacity.dimensions",
+        "CellCapacity.forecastBreachAt",
+        "CellCapacity.measuredAt"
+       ],
+       "operation": "getCellCapacity",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/capacity"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cell health",
        "bindsTo": "CellHealth",
        "columns": [
         "CellHealth.isHealthy",
@@ -916,19 +1804,19 @@
      "components": [
       {
        "kind": "destructiveButton",
-       "label": "Cancel",
+       "label": "Cancel decommission",
        "operation": "cancelDecommission",
        "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
       },
       {
        "kind": "secondaryButton",
-       "label": "Decommission",
+       "label": "Decommission cell",
        "operation": "decommissionCell",
        "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save cell tier",
        "operation": "updateCellTier",
        "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
       }
@@ -940,17 +1828,52 @@
    {
     "id": "confirmCancelDecommission",
     "component": "confirmDialog",
-    "trigger": "Cancel",
-    "body": "**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather than the verb. A tenant performance this affects should be identified in the dialog, not just counted.",
+    "trigger": "Cancel decommission",
+    "body": "**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather than the verb. A tenant performance this affects should be identified in the dialog, not just counted. **Collects what `cancelDecommission` sends before it is called.** Required: `reason`.",
     "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
+   },
+   {
+    "id": "formDecommissionCell",
+    "component": "modal",
+    "trigger": "Decommission cell",
+    "body": "**Collects what `decommissionCell` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Decommission cell",
+     "operation": "decommissionCell"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
+   },
+   {
+    "id": "formUpdateCellTier",
+    "component": "modal",
+    "trigger": "Save cell tier",
+    "body": "**Collects what `updateCellTier` sends before it is called.** Required: `tier`. Optional: `scheduledFor`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save cell tier",
+     "operation": "updateCellTier"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "tier",
+      "scheduledFor"
+     ]
+    },
+    "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
    }
   ],
   "states": {
    "loading": "The tenant performance list.",
    "error": "Could not load. Names which read failed and leaves the tenant performance untouched.",
-   "emptyFirstRun": "No tenant performance yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the tenant performance are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No tenant performance yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listCellJobs` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellHealth` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -1014,11 +1937,11 @@
    ],
    "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `cellId`.",
    "preloaded": [
-    "CellHealth.isHealthy",
-    "CellHealth.isSchemaBehind",
-    "CellHealth.databaseStatus",
-    "CellHealth.replicationLagSeconds",
-    "CellHealth.lastBackupAt"
+    "CellJob.id",
+    "CellJob.kind",
+    "CellJob.status",
+    "CellJob.progressPercent",
+    "CellJob.message"
    ]
   },
   "wireframe": {
@@ -1079,27 +2002,20 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId and ADM-029 holds none of them, so the edge carries nothing and ADM-001 opens cold"
     },
     {
      "to": "ADM-002",
      "trigger": "Platform Dashboard",
-     "carries": [
-      "tenantId"
-     ],
-     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-029 holds none of them, so the edge carries nothing and ADM-002 opens cold"
     },
     {
      "to": "ADM-003",
      "trigger": "Cross-Tenant Health Dashboard",
      "carries": [
-      "cellId",
-      "rightId"
+      "cellId"
      ],
-     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId and ADM-029 holds cellId, so an edge into it carries them"
     }
    ]
   },
@@ -1108,13 +2024,6 @@
   "pattern": "listDetail",
   "patternReason": "`listCellJobs` reads the population and `getRollout` reads one of them — list, select, act",
   "purpose": "Find deployment monitor for this venue.",
-  "gaps": [
-   {
-    "operation": "listRollouts",
-    "why": "**4 declared operations reach no component on this screen**: listRollouts, getCell, getCellCapacity, getCellHealth. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -1124,7 +2033,7 @@
      "components": [
       {
        "kind": "dataTable",
-       "label": "Every deployment",
+       "label": "Every cell job",
        "bindsTo": "CellJob",
        "columns": [
         "CellJob.id",
@@ -1138,6 +2047,27 @@
        ],
        "operation": "listCellJobs",
        "provenance": "contract subscription.yaml GET /cells/{cellId}/jobs"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every rollout",
+       "bindsTo": "Rollout",
+       "columns": [
+        "Rollout.id",
+        "Rollout.releaseId",
+        "Rollout.environment",
+        "Rollout.status",
+        "Rollout.cellsTotal",
+        "Rollout.cellsComplete",
+        "Rollout.cellsFailed",
+        "Rollout.startedByPrincipalId",
+        "Rollout.approvedByPrincipalId",
+        "Rollout.pausedReason",
+        "Rollout.startedAt",
+        "Rollout.completedAt"
+       ],
+       "operation": "listRollouts",
+       "provenance": "contract platform-ops.yaml GET /rollouts"
       }
      ]
     },
@@ -1147,11 +2077,85 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected deployment",
+       "label": "The selected cell job",
+       "bindsTo": "CellJob",
+       "columns": [
+        "CellJob.id",
+        "CellJob.kind",
+        "CellJob.status",
+        "CellJob.progressPercent",
+        "CellJob.message",
+        "CellJob.error",
+        "CellJob.scheduledFor",
+        "CellJob.completedAt"
+       ],
+       "operation": "listCellJobs",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/jobs"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cell",
+       "bindsTo": "CellDetail",
+       "columns": [
+        "CellDetail.id",
+        "CellDetail.name",
+        "CellDetail.kind",
+        "CellDetail.clusterId",
+        "CellDetail.isReachable",
+        "CellDetail.lastContactAt",
+        "CellDetail.licenceExpiresAt",
+        "CellDetail.participatesInCrossCell",
+        "CellDetail.regionId",
+        "CellDetail.regionName",
+        "CellDetail.countryCode",
+        "CellDetail.tier",
+        "CellDetail.status",
+        "CellDetail.cloudProvider",
+        "CellDetail.cloudRegion",
+        "CellDetail.apiEndpoint"
+       ],
+       "operation": "getCell",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cell capacity",
+       "bindsTo": "CellCapacity",
+       "columns": [
+        "CellCapacity.kind",
+        "CellCapacity.tenantCount",
+        "CellCapacity.isConstrained",
+        "CellCapacity.constrainedDimension",
+        "CellCapacity.dimensions",
+        "CellCapacity.forecastBreachAt",
+        "CellCapacity.measuredAt"
+       ],
+       "operation": "getCellCapacity",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/capacity"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The cell health",
+       "bindsTo": "CellHealth",
+       "columns": [
+        "CellHealth.isHealthy",
+        "CellHealth.isSchemaBehind",
+        "CellHealth.databaseStatus",
+        "CellHealth.replicationLagSeconds",
+        "CellHealth.lastBackupAt",
+        "CellHealth.lastRestoreDrillAt",
+        "CellHealth.checkedAt"
+       ],
+       "operation": "getCellHealth",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/health"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The rollout",
        "bindsTo": "RolloutDetail",
        "columns": [
         "RolloutDetail.id",
-        "RolloutDetail.reinventoryHoldId",
+        "RolloutDetail.releaseId",
         "RolloutDetail.environment",
         "RolloutDetail.status",
         "RolloutDetail.cellsTotal",
@@ -1175,37 +2179,38 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Pause",
+       "label": "Pause rollout",
        "operation": "pauseRollout",
        "provenance": "contract platform-ops.yaml POST /rollouts/{rolloutId}/pause"
       },
       {
        "kind": "secondaryButton",
-       "label": "Rollback",
+       "label": "Rollback rollout",
        "operation": "rollbackRollout",
        "provenance": "contract platform-ops.yaml POST /rollouts/{rolloutId}/rollback"
       },
       {
        "kind": "destructiveButton",
-       "label": "Cancel",
+       "label": "Cancel decommission",
        "operation": "cancelDecommission",
        "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
       },
       {
        "kind": "secondaryButton",
-       "label": "Decommission",
+       "label": "Decommission cell",
        "operation": "decommissionCell",
        "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
       },
       {
        "kind": "secondaryButton",
-       "label": "Start",
+       "label": "Start rollout",
        "operation": "startRollout",
+       "notes": "Requests the stage; it does not move it. `startRollout` answers 202 with `approvalRequestId` and the rollout unchanged until the platform release manager approves (decided 28 September, audit R144).",
        "provenance": "contract platform-ops.yaml POST /rollouts/{rolloutId}/start"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save cell tier",
        "operation": "updateCellTier",
        "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
       }
@@ -1217,17 +2222,106 @@
    {
     "id": "confirmCancelDecommission",
     "component": "confirmDialog",
-    "trigger": "Cancel",
-    "body": "**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather than the verb. A deployment this affects should be identified in the dialog, not just counted.",
+    "trigger": "Cancel decommission",
+    "body": "**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather than the verb. A deployment this affects should be identified in the dialog, not just counted. **Collects what `cancelDecommission` sends before it is called.** Required: `reason`.",
     "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
+   },
+   {
+    "id": "formPauseRollout",
+    "component": "modal",
+    "trigger": "Pause rollout",
+    "body": "**Collects what `pauseRollout` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Pause rollout",
+     "operation": "pauseRollout"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract platform-ops.yaml POST /rollouts/{rolloutId}/pause"
+   },
+   {
+    "id": "formRollbackRollout",
+    "component": "modal",
+    "trigger": "Rollback rollout",
+    "body": "**Collects what `rollbackRollout` sends before it is called.** Required: `reason`, `stepUpToken`. Optional: `cellIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Rollback rollout",
+     "operation": "rollbackRollout"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason",
+      "stepUpToken",
+      "cellIds"
+     ]
+    },
+    "provenance": "contract platform-ops.yaml POST /rollouts/{rolloutId}/rollback"
+   },
+   {
+    "id": "formDecommissionCell",
+    "component": "modal",
+    "trigger": "Decommission cell",
+    "body": "**Collects what `decommissionCell` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Decommission cell",
+     "operation": "decommissionCell"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
+   },
+   {
+    "id": "formStartRollout",
+    "component": "modal",
+    "trigger": "Start rollout",
+    "body": "**Collects what `startRollout` sends before it is called.** Required: `stage`. **Sending it asks for approval, it does not promote** (decided 28 September, audit R144): the answer is 202 with a pending `releasePromotion` request, routed to a holder of `PLATFORM_RELEASE_PROMOTE` other than the requester — nobody approves their own promotion. The rollout moves to the stage when that request is approved. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Start rollout",
+     "operation": "startRollout"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "stage"
+     ]
+    },
+    "provenance": "contract platform-ops.yaml POST /rollouts/{rolloutId}/start"
+   },
+   {
+    "id": "formUpdateCellTier",
+    "component": "modal",
+    "trigger": "Save cell tier",
+    "body": "**Collects what `updateCellTier` sends before it is called.** Required: `tier`. Optional: `scheduledFor`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save cell tier",
+     "operation": "updateCellTier"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "tier",
+      "scheduledFor"
+     ]
+    },
+    "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
    }
   ],
   "states": {
    "loading": "The deployment list.",
    "error": "Could not load. Names which read failed and leaves the deployment untouched.",
-   "emptyFirstRun": "No deployment yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the deployment are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No deployment yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoResults": "Never shown: `listCellJobs` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listCellJobs` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "rolloutPendingApproval": "**Requested, not moved.** `startRollout` answered 202: the rollout shows the stage it has reached, the stage requested and that a `releasePromotion` approval is pending with the platform release manager. The requester sees no approve action for their own request (decided 28 September, audit R144)."
   },
   "apis": [
    {
@@ -1246,19 +2340,19 @@
     "operationId": "getRollout",
     "contract": "platform-ops",
     "purpose": "Per-cell progress",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "pauseRollout",
     "contract": "platform-ops",
     "purpose": "Halt before the next cell",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "rollbackRollout",
     "contract": "platform-ops",
     "purpose": "Revert, where every migration is reversible",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "cancelDecommission",
@@ -1299,7 +2393,7 @@
    {
     "operationId": "startRollout",
     "contract": "platform-ops",
-    "purpose": "Start or continue a rollout",
+    "purpose": "Request the next rollout stage; 202 pending the platform release manager's releasePromotion approval, never the requester's own (audit R144)",
     "trigger": "onAction",
     "invalidates": [
      "listCellJobs"
@@ -1328,11 +2422,11 @@
    ],
    "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `cellId`, `rolloutId`.",
    "preloaded": [
-    "RolloutDetail.id",
-    "RolloutDetail.reinventoryHoldId",
-    "RolloutDetail.environment",
-    "RolloutDetail.status",
-    "RolloutDetail.cellsTotal"
+    "CellJob.id",
+    "CellJob.kind",
+    "CellJob.status",
+    "CellJob.progressPercent",
+    "CellJob.message"
    ]
   },
   "wireframe": {

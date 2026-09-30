@@ -163,11 +163,11 @@
    "operations": 8
   },
   {
-   "contract": "white-label",
+   "contract": "wallet",
    "operations": 8
   },
   {
-   "contract": "wallet",
+   "contract": "white-label",
    "operations": 8
   },
   {

@@ -9,7 +9,7 @@
 | Screens | P01 50 · P02 77 |
 | Capability groups | 56 — appOnly 6 · folded 3 · paired 46 · webOnly 1 |
 | Operations | web 214 · app 217 · shared 211 |
-| Findings | high 34 · medium 203 · low 232 · info 3 |
+| Findings | high 34 · medium 170 · low 232 · info 3 |
 
 ## By dimension
 
@@ -20,7 +20,6 @@
 | operations | 7 | 44 |  |  |
 | frontend manifest | 2 | 1 |  |  |
 | coverage | 1 | 4 | 3 | 2 |
-| design bundles |  | 33 |  |  |
 | entry parameters |  | 27 |  |  |
 | bindings |  | 26 |  |  |
 | states |  | 19 |  |  |
@@ -97,7 +96,7 @@
 | wave | virtual-queue (WEB-040 ↔ GST-023) | ships in wave 2 on the web and wave 3 on the app | one wave for both, or record why one shell waits |
 | wave | waiting-room (WEB-015 ↔ GST-046) | ships in wave 2 on the web and wave 1 on the app | one wave for both, or record why one shell waits |
 
-## Medium — 203
+## Medium — 170
 
 | Dimension | Where | Difference | Resolve by |
 |---|---|---|---|
@@ -146,39 +145,6 @@
 | cross-shell handover | ticket-transfer (WEB-030 ↔ GST-014/GST-045) | WEB-030 hands the guest to GST-014 on the app — "The friend claims it in the app" (flow F55 step 4→5) | a twin exists on the same shell; hand over only where the device matters |
 | design | Claude Design | web 13/14 batches drawn, app 19/19 — the web is designed and the app is generated boxes, and the only app reference (TICVAI_Mobile.dc.html) uses a different design system from the drawn web frames | draw the app batches against the web's house style, or decide which system is the guest's |
 | design | itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059) | designer-drawn frame on the app only |  |
-| design bundles | P01-account-self-service-01 | 5 of 5 screens differ from the YAML (WEB-016, WEB-017, WEB-018, WEB-019, WEB-020) | python3 tools/export-design-batch.py P01-account-self-service-01 |
-| design bundles | P01-booking-selection-01 | 7 of 7 screens differ from the YAML (WEB-005, WEB-006, WEB-007, WEB-008, WEB-009, WEB-047, WEB-048) | python3 tools/export-design-batch.py P01-booking-selection-01 |
-| design bundles | P01-cart-checkout-01 | 5 of 5 screens differ from the YAML (WEB-010, WEB-011, WEB-012, WEB-013, WEB-014) | python3 tools/export-design-batch.py P01-cart-checkout-01 |
-| design bundles | P01-discovery-browse-01 | 5 of 5 screens differ from the YAML (WEB-001, WEB-002, WEB-003, WEB-004, WEB-050) | python3 tools/export-design-batch.py P01-discovery-browse-01 |
-| design bundles | P01-engagement-support-01 | 6 of 6 screens differ from the YAML (WEB-025, WEB-026, WEB-027, WEB-028, WEB-044, WEB-046) | python3 tools/export-design-batch.py P01-engagement-support-01 |
-| design bundles | P01-high-demand-access-01 | 1 of 1 screens differ from the YAML (WEB-015) | python3 tools/export-design-batch.py P01-high-demand-access-01 |
-| design bundles | P01-in-venue-services-01 | 4 of 6 screens differ from the YAML (WEB-036, WEB-038, WEB-040, WEB-041) | python3 tools/export-design-batch.py P01-in-venue-services-01 |
-| design bundles | P01-membership-loyalty-value-01 | 5 of 5 screens differ from the YAML (WEB-021, WEB-022, WEB-023, WEB-024, WEB-043) | python3 tools/export-design-batch.py P01-membership-loyalty-value-01 |
-| design bundles | P01-promotions-01 | 1 of 1 screens differ from the YAML (WEB-032) | python3 tools/export-design-batch.py P01-promotions-01 |
-| design bundles | P01-retail-01 | 2 of 2 screens differ from the YAML (WEB-033, WEB-042) | python3 tools/export-design-batch.py P01-retail-01 |
-| design bundles | P01-support-01 | 2 of 2 screens differ from the YAML (WEB-034, WEB-045) | python3 tools/export-design-batch.py P01-support-01 |
-| design bundles | P01-system-states-01 | 1 of 1 screens differ from the YAML (WEB-029) | python3 tools/export-design-batch.py P01-system-states-01 |
-| design bundles | P01-ticketing-01 | 3 of 3 screens differ from the YAML (WEB-030, WEB-031, WEB-035) | python3 tools/export-design-batch.py P01-ticketing-01 |
-| design bundles | P01-transport-01 | never cut |  |
-| design bundles | P02-account-self-service-01 | 10 of 10 screens differ from the YAML (GST-012, GST-013, GST-018, GST-019, GST-020, GST-039, GST-042, GST-045) | python3 tools/export-design-batch.py P02-account-self-service-01 |
-| design bundles | P02-account-self-service-02 | 4 of 4 screens differ from the YAML (GST-067, GST-069, GST-071, GST-073) | python3 tools/export-design-batch.py P02-account-self-service-02 |
-| design bundles | P02-booking-selection-01 | 10 of 10 screens differ from the YAML (GST-007, GST-008, GST-048, GST-049, GST-050, GST-056, GST-058, GST-072) | python3 tools/export-design-batch.py P02-booking-selection-01 |
-| design bundles | P02-cart-checkout-01 | 3 of 3 screens differ from the YAML (GST-009, GST-010, GST-041) | python3 tools/export-design-batch.py P02-cart-checkout-01 |
-| design bundles | P02-discovery-01 | 1 of 1 screens differ from the YAML (GST-063) | python3 tools/export-design-batch.py P02-discovery-01 |
-| design bundles | P02-discovery-browse-01 | 7 of 7 screens differ from the YAML (GST-001, GST-002, GST-003, GST-004, GST-005, GST-006, GST-057) | python3 tools/export-design-batch.py P02-discovery-browse-01 |
-| design bundles | P02-engagement-support-01 | 10 of 10 screens differ from the YAML (GST-030, GST-031, GST-032, GST-033, GST-035, GST-040, GST-051, GST-052) | python3 tools/export-design-batch.py P02-engagement-support-01 |
-| design bundles | P02-engagement-support-02 | 2 of 2 screens differ from the YAML (GST-059, GST-068) | python3 tools/export-design-batch.py P02-engagement-support-02 |
-| design bundles | P02-high-demand-access-01 | 1 of 1 screens differ from the YAML (GST-046) | python3 tools/export-design-batch.py P02-high-demand-access-01 |
-| design bundles | P02-in-venue-experience-01 | 2 of 2 screens differ from the YAML (GST-061, GST-062) | python3 tools/export-design-batch.py P02-in-venue-experience-01 |
-| design bundles | P02-in-venue-services-01 | 10 of 10 screens differ from the YAML (GST-021, GST-022, GST-023, GST-024, GST-025, GST-027, GST-028, GST-029) | python3 tools/export-design-batch.py P02-in-venue-services-01 |
-| design bundles | P02-marketing-01 | 1 of 1 screens differ from the YAML (GST-065) | python3 tools/export-design-batch.py P02-marketing-01 |
-| design bundles | P02-membership-loyalty-value-01 | 3 of 3 screens differ from the YAML (GST-011, GST-015, GST-036) | python3 tools/export-design-batch.py P02-membership-loyalty-value-01 |
-| design bundles | P02-promotions-01 | 1 of 1 screens differ from the YAML (GST-037) | python3 tools/export-design-batch.py P02-promotions-01 |
-| design bundles | P02-retail-01 | 1 of 1 screens differ from the YAML (GST-026) | python3 tools/export-design-batch.py P02-retail-01 |
-| design bundles | P02-support-01 | 1 of 1 screens differ from the YAML (GST-034) | python3 tools/export-design-batch.py P02-support-01 |
-| design bundles | P02-system-states-01 | 2 of 2 screens differ from the YAML (GST-043, GST-047) | python3 tools/export-design-batch.py P02-system-states-01 |
-| design bundles | P02-ticketing-01 | 4 of 4 screens differ from the YAML (GST-014, GST-016, GST-017, GST-044) | python3 tools/export-design-batch.py P02-ticketing-01 |
-| design bundles | P02-transport-01 | never cut |  |
 | documents | docs/active/mom-digest.md:3908 | "can differ in functionality" — a client minute says web and app may differ — the 12 September rule says they do not; worth confirming with the client | confirm with the client |
 | entry parameters | add-ons (WEB-008 ↔ GST-048/GST-056) | web opens with ['bundleId', 'cartId', 'venueId'], app with ['bundleId', 'cartId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033) | web opens with ['conversationId', 'messageId', 'outletId'], app with ['cartId', 'conversationId', 'messageId', 'orderId', 'outletId'] — one shared link cannot open both | one deep-link shape per capability |

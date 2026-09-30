@@ -1,6 +1,6 @@
 # P12-conversations-01 — P12 · Conversations
 
-**2 screens · 13 operations · 12 schemas · 2 permissions**
+**2 screens · 13 operations · 13 schemas · 2 permissions**
 
 Platform P12 Venue Support · ships as **venue-management** ·
 staff audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 2 permissions apply here:
   `CASE_MANAGE, CASE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **2 of these operations work offline**: addCaseMessage, createCase
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,8 +60,8 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `SUP-004` | Conversation Queue | listDetail | 10 | 0 | — |
-| `SUP-005` | Live Chat Workspace | listDetail | 11 | 1 | — |
+| `SUP-004` | Conversation Queue | listDetail | 10 | 6 | — |
+| `SUP-005` | Live Chat Workspace | listDetail | 11 | 8 | — |
 
 ---
 
@@ -98,17 +97,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "inferred": true,
    "transitions": [
     {
-     "to": "SUP-005",
-     "trigger": "Reads the history and replies",
-     "provenance": "flow F05 step 1→2, F24 step 3→4"
-    },
-    {
      "to": "SUP-001",
      "trigger": "Agent Login",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-004 holds none of them, so the edge carries nothing and SUP-001 opens cold"
     },
     {
      "to": "SUP-002",
@@ -116,7 +107,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "caseId"
      ],
-     "provenance": "derived — SUP-002 declares entryState.params caseId, so an edge into it must carry them"
+     "provenance": "derived — SUP-002 declares entryState.params caseId and SUP-004 holds caseId, so an edge into it carries them"
+    },
+    {
+     "to": "SUP-005",
+     "trigger": "Reads the history and replies",
+     "provenance": "flow F05 step 1→2, F24 step 3→4",
+     "carries": [
+      "caseId",
+      "conversationId"
+     ]
     }
    ]
   },
@@ -125,13 +125,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listCases` reads the population and `getCase` reads one of them — list, select, act",
   "purpose": "Find the right one quickly, and act on it without opening it.",
-  "gaps": [
-   {
-    "operation": "listConversations",
-    "why": "**1 declared operation reach no component on this screen**: listConversations. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -140,8 +133,36 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listCases",
+       "notes": "Sends `?status=` to `listCases`.",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "textField",
+       "label": "Assigned to principal id",
+       "operation": "listCases",
+       "notes": "Sends `?assignedToPrincipalId=` to `listCases`.",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "toggle",
+       "label": "Breached sla",
+       "operation": "listCases",
+       "notes": "Sends `?breachedSla=` to `listCases`.",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "textField",
+       "label": "Priority",
+       "operation": "listCases",
+       "notes": "Sends `?priority=` to `listCases`.",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every conversation queue",
+       "label": "Every case",
        "bindsTo": "Case",
        "columns": [
         "Case.id",
@@ -159,6 +180,27 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "listCases",
        "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "dataTable",
+       "label": "Every conversation",
+       "bindsTo": "Conversation",
+       "columns": [
+        "Conversation.id",
+        "Conversation.telephony",
+        "Conversation.assistSessionId",
+        "Conversation.channel",
+        "Conversation.state",
+        "Conversation.subjectId",
+        "Conversation.venueId",
+        "Conversation.assignedPrincipalId",
+        "Conversation.queueId",
+        "Conversation.queuePosition",
+        "Conversation.estimatedWaitSeconds",
+        "Conversation.handoverReason"
+       ],
+       "operation": "listConversations",
+       "provenance": "contract marketing-crm.yaml GET /conversations"
       }
      ]
     },
@@ -168,7 +210,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected conversation queue",
+       "label": "The selected case",
+       "bindsTo": "Case",
+       "columns": [
+        "Case.id",
+        "Case.caseNumber",
+        "Case.subjectId",
+        "Case.guestName",
+        "Case.subject",
+        "Case.kind",
+        "Case.channel",
+        "Case.recordedAt",
+        "Case.syncedAt",
+        "Case.categoryId",
+        "Case.status",
+        "Case.priority",
+        "Case.assignedToPrincipalId",
+        "Case.venueId",
+        "Case.relatedOrderId",
+        "Case.slaDueAt"
+       ],
+       "operation": "listCases",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The case",
        "bindsTo": "CaseDetail",
        "columns": [
         "CaseDetail.id",
@@ -176,17 +243,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "CaseDetail.subjectId",
         "CaseDetail.guestName",
         "CaseDetail.subject",
+        "CaseDetail.kind",
+        "CaseDetail.channel",
+        "CaseDetail.recordedAt",
+        "CaseDetail.syncedAt",
         "CaseDetail.categoryId",
         "CaseDetail.status",
         "CaseDetail.priority",
         "CaseDetail.assignedToPrincipalId",
         "CaseDetail.venueId",
         "CaseDetail.relatedOrderId",
-        "CaseDetail.slaDueAt",
-        "CaseDetail.isSlaBreached",
-        "CaseDetail.slaPausedSeconds",
-        "CaseDetail.escalationCount",
-        "CaseDetail.resolvedAt"
+        "CaseDetail.slaDueAt"
        ],
        "operation": "getCase",
        "provenance": "contract marketing-crm.yaml GET /cases/{caseId}"
@@ -199,43 +266,43 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Add",
+       "label": "Add case message",
        "operation": "addCaseMessage",
        "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/messages"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create case",
        "operation": "createCase",
        "provenance": "contract marketing-crm.yaml POST /cases"
       },
       {
        "kind": "secondaryButton",
-       "label": "Escalate",
+       "label": "Escalate case",
        "operation": "escalateCase",
        "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/escalate"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reopen",
+       "label": "Reopen case",
        "operation": "reopenCase",
        "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/reopen"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save case",
        "operation": "updateCase",
        "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Claim",
+       "label": "Claim conversation",
        "operation": "claimConversation",
        "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/claim"
       },
       {
        "kind": "secondaryButton",
-       "label": "Transfer",
+       "label": "Transfer conversation",
        "operation": "transferConversation",
        "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/transfer"
       }
@@ -246,9 +313,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "states": {
    "loading": "The conversation queue list.",
    "error": "Could not load. Names which read failed and leaves the conversation queue untouched.",
-   "emptyFirstRun": "No conversation queue yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the conversation queue are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No conversation queue yet. Offers Add case message (`addCaseMessage`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on status, assignedToPrincipalId, breachedSla, priority and the conversation queue are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `CASE_VIEW`, which `listCases` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
@@ -288,7 +355,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "getCase",
     "contract": "marketing-crm",
     "purpose": "Read a case with its thread",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "reopenCase",
@@ -346,11 +413,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom.",
    "preloaded": [
-    "CaseDetail.id",
-    "CaseDetail.caseNumber",
-    "CaseDetail.subjectId",
-    "CaseDetail.guestName",
-    "CaseDetail.subject"
+    "Case.id",
+    "Case.caseNumber",
+    "Case.subjectId",
+    "Case.guestName",
+    "Case.subject"
    ]
   },
   "wireframe": {
@@ -359,6 +426,135 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "board": "wireframes/P12 Venue Support.dc.html#sup-004"
   },
   "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formAddCaseMessage",
+    "component": "modal",
+    "trigger": "Add case message",
+    "body": "**Collects what `addCaseMessage` sends before it is called.** Required: `id`, `body`, `isInternal`, `recordedAt`. Optional: `channel`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Add case message",
+     "operation": "addCaseMessage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "body",
+      "isInternal",
+      "recordedAt",
+      "channel",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/messages"
+   },
+   {
+    "id": "formCreateCase",
+    "component": "modal",
+    "trigger": "Create case",
+    "body": "**Collects what `createCase` sends before it is called.** Required: `id`, `subject`, `description`, `channel`, `recordedAt`. Optional: `subjectId`, `categoryId`, `priority`, `kind`, `venueId`, `relatedOrderId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateCaseRequest",
+    "confirm": {
+     "label": "Create case",
+     "operation": "createCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "subject",
+      "description",
+      "channel",
+      "recordedAt",
+      "subjectId",
+      "categoryId",
+      "priority",
+      "kind",
+      "venueId",
+      "relatedOrderId",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases"
+   },
+   {
+    "id": "formEscalateCase",
+    "component": "modal",
+    "trigger": "Escalate case",
+    "body": "**Collects what `escalateCase` sends before it is called.** Required: `reason`. Optional: `assignToPrincipalId`, `newPriority`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Escalate case",
+     "operation": "escalateCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason",
+      "assignToPrincipalId",
+      "newPriority"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/escalate"
+   },
+   {
+    "id": "formReopenCase",
+    "component": "modal",
+    "trigger": "Reopen case",
+    "body": "**Collects what `reopenCase` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reopen case",
+     "operation": "reopenCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/reopen"
+   },
+   {
+    "id": "formUpdateCase",
+    "component": "modal",
+    "trigger": "Save case",
+    "body": "**Collects what `updateCase` sends before it is called.** Nothing in the body is required. Optional: `status`, `priority`, `assignedToPrincipalId`, `categoryId`, `resolutionNote`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save case",
+     "operation": "updateCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "priority",
+      "assignedToPrincipalId",
+      "categoryId",
+      "resolutionNote"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}"
+   },
+   {
+    "id": "formTransferConversation",
+    "component": "modal",
+    "trigger": "Transfer conversation",
+    "body": "**Collects what `transferConversation` sends before it is called.** Nothing in the body is required. Optional: `toPrincipalId`, `toQueueId`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Transfer conversation",
+     "operation": "transferConversation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "toPrincipalId",
+      "toQueueId",
+      "note"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/transfer"
+   }
+  ],
   "_platform": {
    "code": "P12",
    "audience": "staff",
@@ -412,10 +608,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "SUP-001",
      "trigger": "Agent Login",
-     "carries": [
-      "sessionId"
-     ],
-     "provenance": "derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry them"
+     "provenance": "derived — SUP-001 declares entryState.params challengeId and SUP-005 holds none of them, so the edge carries nothing and SUP-001 opens cold"
     },
     {
      "to": "SUP-002",
@@ -423,7 +616,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "caseId"
      ],
-     "provenance": "derived — SUP-002 declares entryState.params caseId, so an edge into it must carry them"
+     "provenance": "derived — SUP-002 declares entryState.params caseId and SUP-005 holds caseId, so an edge into it carries them"
     }
    ]
   },
@@ -432,13 +625,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "`listCases` reads the population and `getCase` reads one of them — list, select, act",
   "purpose": "Work with live chat workspace for this venue.",
-  "gaps": [
-   {
-    "operation": "getConversation",
-    "why": "**1 declared operation reach no component on this screen**: getConversation. Either the screen is missing what calls them, or the declaration is residue.",
-    "source": "the screen's own declarations"
-   }
-  ],
   "layout": {
    "template": "split",
    "regions": [
@@ -447,8 +633,36 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Status",
+       "operation": "listCases",
+       "notes": "Sends `?status=` to `listCases`.",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "textField",
+       "label": "Assigned to principal id",
+       "operation": "listCases",
+       "notes": "Sends `?assignedToPrincipalId=` to `listCases`.",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "toggle",
+       "label": "Breached sla",
+       "operation": "listCases",
+       "notes": "Sends `?breachedSla=` to `listCases`.",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "textField",
+       "label": "Priority",
+       "operation": "listCases",
+       "notes": "Sends `?priority=` to `listCases`.",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every live chat",
+       "label": "Every case",
        "bindsTo": "Case",
        "columns": [
         "Case.id",
@@ -475,7 +689,57 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected live chat",
+       "label": "The selected case",
+       "bindsTo": "Case",
+       "columns": [
+        "Case.id",
+        "Case.caseNumber",
+        "Case.subjectId",
+        "Case.guestName",
+        "Case.subject",
+        "Case.kind",
+        "Case.channel",
+        "Case.recordedAt",
+        "Case.syncedAt",
+        "Case.categoryId",
+        "Case.status",
+        "Case.priority",
+        "Case.assignedToPrincipalId",
+        "Case.venueId",
+        "Case.relatedOrderId",
+        "Case.slaDueAt"
+       ],
+       "operation": "listCases",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The conversation",
+       "bindsTo": "Conversation",
+       "columns": [
+        "Conversation.id",
+        "Conversation.telephony",
+        "Conversation.assistSessionId",
+        "Conversation.channel",
+        "Conversation.state",
+        "Conversation.subjectId",
+        "Conversation.venueId",
+        "Conversation.assignedPrincipalId",
+        "Conversation.queueId",
+        "Conversation.queuePosition",
+        "Conversation.estimatedWaitSeconds",
+        "Conversation.handoverReason",
+        "Conversation.handoverSummary",
+        "Conversation.sentiment",
+        "Conversation.intent",
+        "Conversation.locale"
+       ],
+       "operation": "getConversation",
+       "provenance": "contract marketing-crm.yaml GET /conversations/{conversationId}"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "The case",
        "bindsTo": "CaseDetail",
        "columns": [
         "CaseDetail.id",
@@ -483,17 +747,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "CaseDetail.subjectId",
         "CaseDetail.guestName",
         "CaseDetail.subject",
+        "CaseDetail.kind",
+        "CaseDetail.channel",
+        "CaseDetail.recordedAt",
+        "CaseDetail.syncedAt",
         "CaseDetail.categoryId",
         "CaseDetail.status",
         "CaseDetail.priority",
         "CaseDetail.assignedToPrincipalId",
         "CaseDetail.venueId",
         "CaseDetail.relatedOrderId",
-        "CaseDetail.slaDueAt",
-        "CaseDetail.isSlaBreached",
-        "CaseDetail.slaPausedSeconds",
-        "CaseDetail.escalationCount",
-        "CaseDetail.resolvedAt"
+        "CaseDetail.slaDueAt"
        ],
        "operation": "getCase",
        "provenance": "contract marketing-crm.yaml GET /cases/{caseId}"
@@ -506,79 +770,51 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Add",
+       "label": "Add case message",
        "operation": "addCaseMessage",
        "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/messages"
       },
       {
        "kind": "secondaryButton",
-       "label": "Save changes",
+       "label": "Save case",
        "operation": "updateCase",
        "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Escalate",
+       "label": "Escalate case",
        "operation": "escalateCase",
        "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/escalate"
       },
       {
        "kind": "secondaryButton",
-       "label": "Create",
+       "label": "Create case",
        "operation": "createCase",
        "provenance": "contract marketing-crm.yaml POST /cases"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reopen",
+       "label": "Reopen case",
        "operation": "reopenCase",
        "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/reopen"
       },
       {
        "kind": "secondaryButton",
-       "label": "Send",
+       "label": "Send conversation message",
        "operation": "sendConversationMessage",
        "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/messages"
       },
       {
        "kind": "destructiveButton",
-       "label": "Close",
+       "label": "Close conversation",
        "operation": "closeConversation",
        "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/close"
       },
       {
        "kind": "secondaryButton",
-       "label": "Transfer",
+       "label": "Transfer conversation",
        "operation": "transferConversation",
        "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/transfer"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "addCaseMessage",
-       "label": "Add case message",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "dataTable",
-       "derived": true,
-       "impliedBy": "listCases",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "addCaseMessage",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -588,24 +824,169 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "id": "confirmCloseConversation",
     "component": "confirmDialog",
-    "trigger": "Close",
-    "body": "**Names what `closeConversation` changes and what it leaves alone**, in the consequence rather than the verb. A live chat this affects should be identified in the dialog, not just counted.",
+    "trigger": "Close conversation",
+    "body": "**Names what `closeConversation` changes and what it leaves alone**, in the consequence rather than the verb. A live chat this affects should be identified in the dialog, not just counted. **Collects what `closeConversation` sends before it is called.** Required: `outcome`. Optional: `caseId`.",
     "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/close"
+   },
+   {
+    "id": "formAddCaseMessage",
+    "component": "modal",
+    "trigger": "Add case message",
+    "body": "**Collects what `addCaseMessage` sends before it is called.** Required: `id`, `body`, `isInternal`, `recordedAt`. Optional: `channel`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Add case message",
+     "operation": "addCaseMessage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "body",
+      "isInternal",
+      "recordedAt",
+      "channel",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/messages"
+   },
+   {
+    "id": "formUpdateCase",
+    "component": "modal",
+    "trigger": "Save case",
+    "body": "**Collects what `updateCase` sends before it is called.** Nothing in the body is required. Optional: `status`, `priority`, `assignedToPrincipalId`, `categoryId`, `resolutionNote`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save case",
+     "operation": "updateCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "status",
+      "priority",
+      "assignedToPrincipalId",
+      "categoryId",
+      "resolutionNote"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}"
+   },
+   {
+    "id": "formEscalateCase",
+    "component": "modal",
+    "trigger": "Escalate case",
+    "body": "**Collects what `escalateCase` sends before it is called.** Required: `reason`. Optional: `assignToPrincipalId`, `newPriority`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Escalate case",
+     "operation": "escalateCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason",
+      "assignToPrincipalId",
+      "newPriority"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/escalate"
+   },
+   {
+    "id": "formCreateCase",
+    "component": "modal",
+    "trigger": "Create case",
+    "body": "**Collects what `createCase` sends before it is called.** Required: `id`, `subject`, `description`, `channel`, `recordedAt`. Optional: `subjectId`, `categoryId`, `priority`, `kind`, `venueId`, `relatedOrderId`, `attachmentRefs`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateCaseRequest",
+    "confirm": {
+     "label": "Create case",
+     "operation": "createCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "subject",
+      "description",
+      "channel",
+      "recordedAt",
+      "subjectId",
+      "categoryId",
+      "priority",
+      "kind",
+      "venueId",
+      "relatedOrderId",
+      "attachmentRefs"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases"
+   },
+   {
+    "id": "formReopenCase",
+    "component": "modal",
+    "trigger": "Reopen case",
+    "body": "**Collects what `reopenCase` sends before it is called.** Required: `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reopen case",
+     "operation": "reopenCase"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "reason"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/reopen"
+   },
+   {
+    "id": "formSendConversationMessage",
+    "component": "modal",
+    "trigger": "Send conversation message",
+    "body": "**Collects what `sendConversationMessage` sends before it is called.** Required: `body`. Optional: `attachments`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Send conversation message",
+     "operation": "sendConversationMessage"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "body",
+      "attachments"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/messages"
+   },
+   {
+    "id": "formTransferConversation",
+    "component": "modal",
+    "trigger": "Transfer conversation",
+    "body": "**Collects what `transferConversation` sends before it is called.** Nothing in the body is required. Optional: `toPrincipalId`, `toQueueId`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Transfer conversation",
+     "operation": "transferConversation"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "toPrincipalId",
+      "toQueueId",
+      "note"
+     ]
+    },
+    "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/transfer"
    }
   ],
   "states": {
    "loading": "The live chat list.",
    "error": "Could not load. Names which read failed and leaves the live chat untouched.",
-   "emptyFirstRun": "No live chat yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the live chat are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyFirstRun": "No live chat yet. Offers Add case message (`addCaseMessage`); distinct from a filter that matched nothing.",
+   "emptyNoResults": "Nothing matches the filter on status, assignedToPrincipalId, breachedSla, priority and the live chat are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Shown when the caller lacks `CASE_VIEW`, which `getCase` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
    {
     "operationId": "addCaseMessage",
     "contract": "marketing-crm",
     "purpose": "from page inventory",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getCase",
@@ -617,13 +998,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "updateCase",
     "contract": "marketing-crm",
     "purpose": "Assign, reprioritise, resolve",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "escalateCase",
     "contract": "marketing-crm",
     "purpose": "Escalate with a reason",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "createCase",
@@ -696,11 +1077,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
    "preloaded": [
-    "CaseDetail.id",
-    "CaseDetail.caseNumber",
-    "CaseDetail.subjectId",
-    "CaseDetail.guestName",
-    "CaseDetail.subject"
+    "Case.id",
+    "Case.caseNumber",
+    "Case.subjectId",
+    "Case.guestName",
+    "Case.subject"
    ]
   },
   "wireframe": {
@@ -893,6 +1274,11 @@ Method, path, parameters, request and response for every operation these screens
     "required": null
    },
    {
+    "name": "membershipId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -935,10 +1321,15 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "Conversation"
+  "responds": "Page"
  },
  "reopenCase": {
   "method": "POST",
@@ -957,7 +1348,7 @@ Method, path, parameters, request and response for every operation these screens
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Case"
  },
  "sendConversationMessage": {
   "method": "POST",
@@ -1027,6 +1418,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
  "Case": {
   "x-ticvai-persistence": "marketing.case",
+  "x-ticvai-retired-columns": [
+   "guest_name",
+   "subject",
+   "is_sla_breached"
+  ],
   "type": "object",
   "required": [
    "id",
@@ -1038,10 +1434,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   ],
   "properties": {
    "id": {
-    "type": "string"
+    "type": "string",
+    "format": "uuid",
+    "description": "Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7."
    },
    "caseNumber": {
-    "type": "string"
+    "type": "string",
+    "readOnly": true,
+    "description": "**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity. Assigned when the case reaches the server, so a retry with the same `id` keeps its number.\n"
    },
    "subjectId": {
     "type": "string",
@@ -1050,15 +1450,60 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "guestName": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from `pii.subject` when the case is read, never stored on the case.** A name copied onto a case row is personal data outside the erasable store (ADR-0023), and it had no source anyway — no request carries it. Returned only to callers holding `GUEST_VIEW_PII`, as `searchGuests` does.\n"
    },
    "subject": {
-    "type": "string"
+    "type": "string",
+    "x-ticvai-column": "title",
+    "description": "**The case's one-line title**, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps `subject` because screens bind it.\n"
+   },
+   "kind": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CaseKind"
+     }
+    ],
+    "nullable": true,
+    "description": "What the guest said it was about, where the guest raised it."
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MessageChannel"
+     }
+    ],
+    "description": "How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`."
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Device time the case was raised — the start of the SLA clock."
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "Server time the case arrived. Equal to `recordedAt` for a case raised online."
    },
    "categoryId": {
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "queueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The `ServiceQueue` the case waits in, set by routing (`CaseRoutingRule.queueId`). Null once routed straight to an agent. (decided 29 September, data model for the agreed operations)"
+   },
+   "membershipId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The identity membership this case concerns (`identity.customer_membership`); member case notes are cases with this set. (decided 29 September, coordinator decision DM4, writers pass)"
    },
    "status": {
     "$ref": "#/components/schemas/CaseStatus"
@@ -1086,7 +1531,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "nullable": true
    },
    "isSlaBreached": {
-    "type": "boolean"
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**Computed when read, never stored.** True once the case has been open longer than its SLA allows — the time from `recordedAt` to `resolvedAt` (or to now, while unresolved), less `slaPausedSeconds`, is past the target that set `slaDueAt`. A stored flag would need a job to flip it at the moment of breach, and no such job is designed; `listCases?breachedSla` filters on the same computation.\n"
    },
    "slaPausedSeconds": {
     "type": "integer",
@@ -1132,6 +1580,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   ]
  },
+ "CaseKind": {
+  "type": "string",
+  "description": "**What the guest says the case is about**, in their words rather than the venue's taxonomy — `raiseMyCase` asks for it and `categoryId` is what staff file it under. Stored on the case, because a lost-property report that forgets it was one cannot be routed to the lost and found desk.\n**`other` only with a note (decided 28 September, audit R222).** A case raised as `other` must carry a non-empty `detail` (`raiseMyCase`), or it is refused with 400; the notes are reviewed quarterly to add the real kinds they reveal.\n",
+  "enum": [
+   "lostProperty",
+   "complaint",
+   "question",
+   "accessibility",
+   "refundRequest",
+   "other"
+  ]
+ },
  "CaseMessage": {
   "x-ticvai-persistence": "marketing.case_message",
   "type": "object",
@@ -1143,6 +1603,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "recordedAt"
   ],
   "properties": {
+   "resolution": {
+    "type": "string",
+    "description": "**What was actually done about it.** Indexed for retrieval: an agent facing a complaint benefits more from how the last one was resolved than from a policy. Without this column `marketing.case` can only embed its subject line.\n"
+   },
    "id": {
     "type": "string"
    },
@@ -1177,7 +1641,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "recordedAt": {
     "type": "string",
-    "format": "date-time"
+    "format": "date-time",
+    "description": "Device time — `addCaseMessage` is offline-capable."
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "Server time the message arrived."
    }
   }
  },
@@ -1290,12 +1761,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "queuePosition": {
     "type": "integer",
     "nullable": true,
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "Place among the unclaimed conversations in `queueId`, from the live agent queue (audit R149). Null once claimed."
    },
    "estimatedWaitSeconds": {
     "type": "integer",
     "nullable": true,
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "From the live agent queue — the conversations ahead divided across that queue's agents online now (audit R149). Null once claimed."
    },
    "handoverReason": {
     "type": "string",
@@ -1387,7 +1862,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "ConversationMessage": {
   "type": "object",
-  "x-ticvai-persistence": "marketing.conversation_message",
+  "x-ticvai-persistence": "marketing.conversation_message + marketing.conversation_message_attachment",
   "required": [
    "id",
    "sender",
@@ -1483,7 +1958,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "subjectId": {
     "type": "string",
@@ -1501,6 +1976,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "uuid"
    },
+   "membershipId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The identity membership this case concerns (`identity.customer_membership`); member case notes are cases with this set. Must belong to `subjectId` when both are given (422). (decided 29 September, coordinator decision DM4, writers pass)"
+   },
    "priority": {
     "allOf": [
      {
@@ -1508,6 +1989,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      }
     ],
     "default": "normal"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/CaseKind"
    },
    "channel": {
     "$ref": "#/components/schemas/MessageChannel"
@@ -1521,13 +2005,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "attachmentRefs": {
     "type": "array",
+    "description": "Stored on the opening `CaseMessage`, not on the case.",
     "items": {
      "type": "string"
     }
    },
    "recordedAt": {
     "type": "string",
-    "format": "date-time"
+    "format": "date-time",
+    "description": "Device time the case was raised. The server stamps `Case.syncedAt` on arrival."
    }
   }
  },

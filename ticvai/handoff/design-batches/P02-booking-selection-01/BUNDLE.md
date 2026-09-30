@@ -147,7 +147,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "performanceId"
      ],
-     "provenance": "decided 29 September 2026 (P29), W8"
+     "provenance": "decided 29 September 2026, W8"
     }
    ]
   },
@@ -261,14 +261,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getPublishedBookingFlow",
        "notes": "The steps of the published flow in their `sortOrder`, this one (date and time) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
-       "provenance": "decided 29 September 2026 (P29), W12; CMS-103 Booking Flows"
+       "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       },
       {
        "kind": "datePicker",
        "label": "Next 7 days",
        "operation": "listPerformances",
        "notes": "**A date strip of the next `BookingFlowSettings.dateStripDays` days** (default 7, 3-31) with a calendar icon that opens the full month for later dates (M17-08).",
-       "provenance": "decided 29 September 2026 (P29), M17-08"
+       "provenance": "decided 29 September 2026, M17-08"
       }
      ]
     },
@@ -351,7 +351,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "white-label",
     "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), W12"
+    "provenance": "decided 29 September 2026, W12"
    }
   ],
   "entryState": {
@@ -379,9 +379,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "prototype": {
     "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-29",
+    "verified": "2026-09-30",
     "match": "partial",
-    "view": "Buy tickets → a dated product → Booking (date and time step)",
+    "view": "Buy tickets → Timed entry → Book now (step 1: date, then entry window)",
     "differences": "Booking in the app runs the website booking engine; per-flow step order."
    }
   },
@@ -543,7 +543,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "productId"
      ],
-     "provenance": "decided 29 September 2026 (P29), W8"
+     "provenance": "decided 29 September 2026, W8"
     }
    ]
   },
@@ -613,14 +613,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        ],
        "operation": "getPublishedBookingFlow",
        "notes": "The steps of the published flow in their `sortOrder`, this one (tickets) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
-       "provenance": "decided 29 September 2026 (P29), W12; CMS-103 Booking Flows"
+       "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
       },
       {
        "kind": "secondaryButton",
        "label": "Show everything",
        "operation": "listProducts",
        "notes": "Clears the Help me choose filter (W4).",
-       "provenance": "decided 29 September 2026 (P29), W4"
+       "provenance": "decided 29 September 2026, W4"
       }
      ]
     },
@@ -682,7 +682,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "white-label",
     "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), W12"
+    "provenance": "decided 29 September 2026, W12"
    }
   ],
   "entryState": {
@@ -714,9 +714,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "prototype": {
     "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-29",
+    "verified": "2026-09-30",
     "match": "partial",
-    "view": "Buy tickets → a product → Booking (tickets step)",
+    "view": "Buy tickets → Dated day pass → Book now → Fri 2 Oct (step 2: tickets; add-ons are step 3)",
     "differences": "Booking in the app runs the website booking engine."
    }
   },
@@ -888,15 +888,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "client-verified",
+   "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-048",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
-    "match": "exact",
-    "view": "Account → All screens → Wave 2 → Upsell / cross-sell"
-   }
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "rev": "Mobile App v4, 29 September 2026",
+    "match": "none",
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-048.html, and #GST-048 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Upsell / cross-sell (exact)."
+   },
+   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
@@ -1130,9 +1131,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "prototype": {
     "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (29 September build)",
-    "verified": "2026-09-29",
+    "verified": "2026-09-30",
     "match": "partial",
-    "view": "Buy tickets → a stadium or theatre event → seat map (← Whole map)",
+    "view": "Union Arena → Buy tickets → Direct seat map → 2D plan → section 104 (← Whole map)",
     "differences": "The app runs the website seat engine (2D and 3D)."
    },
    "derivedFrom": "wireframes/reference/Seat Board 4.dc.html",
@@ -1394,16 +1395,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "client-verified",
+   "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-050",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
-    "match": "partial",
-    "view": "Account → All screens → Wave 3 → Resource booking – cabana; Rev 3 feedback → Cabana map",
-    "differences": "Rev 3 books from a map, with a hold countdown and sold-out cabanas; the YAML is a list with addCartLine and no hold. YAML GST-070 also says cabanas are booked by staff (R073c), which contradicts both this screen and the prototype."
-   }
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "rev": "Mobile App v4, 29 September 2026",
+    "match": "none",
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-050.html, and #GST-050 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 3 → Resource booking – cabana; Rev 3 feedback → Cabana map (partial). What v2 did differently: Rev 3 books from a map, with a hold countdown and sold-out cabanas; the YAML is a list with addCartLine and no hold. YAML GST-070 also says cabanas are booked by staff (R073c), which contradicts both this screen and the prototype."
+   },
+   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
@@ -1499,7 +1500,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "cartId"
      ],
-     "provenance": "decided 29 September 2026 (P29), MOB-4"
+     "provenance": "decided 29 September 2026, MOB-4"
     }
    ]
   },
@@ -1651,15 +1652,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "client-verified",
+   "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-056",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
-    "match": "exact",
-    "view": "Account → All screens → Wave 2 → Bundle package"
-   }
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "rev": "Mobile App v4, 29 September 2026",
+    "match": "none",
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-056.html, and #GST-056 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 2 → Bundle package (exact)."
+   },
+   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
@@ -1856,16 +1858,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "client-verified",
+   "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-058",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
-    "match": "exact",
-    "view": "Account → All screens → Wave 3 → Resource availability (cabana); Rev 3 feedback → Cabana map",
-    "differences": "The Rev 3 cabana map puts availability and booking on one screen."
-   }
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "rev": "Mobile App v4, 29 September 2026",
+    "match": "none",
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-058.html, and #GST-058 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Wave 3 → Resource availability (cabana); Rev 3 feedback → Cabana map (exact). What v2 did differently: The Rev 3 cabana map puts availability and booking on one screen."
+   },
+   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "_platform": {
@@ -2538,15 +2540,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "client-verified",
+   "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-074",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
-    "match": "exact",
-    "view": "Account → All screens → Rev 3 feedback → Cabana map (r3cabmap)"
-   }
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "rev": "Mobile App v4, 29 September 2026",
+    "match": "none",
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-074.html, and #GST-074 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Rev 3 feedback → Cabana map (r3cabmap) (exact)."
+   },
+   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).",
   "overlays": [
@@ -2763,15 +2766,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "wireframe": {
    "status": "notStarted",
-   "provenance": "client-verified",
+   "provenance": "designed",
    "board": "wireframes/P02 Guest App.dc.html#gst-075",
    "prototype": {
-    "file": "sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html",
-    "rev": "rev 3",
-    "verified": "2026-09-28",
-    "match": "exact",
-    "view": "Account → All screens → Rev 3 feedback → Meeting room by the hour (r3room)"
-   }
+    "file": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+    "rev": "Mobile App v4, 29 September 2026",
+    "match": "none",
+    "note": "Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the v4 look (the frame on this screen's board, wireframes/frames/gst-075.html, and #GST-075 in handoff/design-batches/apps/1-guest-app/return/TICVAI Guest App.dc.html). NOT client-verified: awaiting the client's design reviewer. Build the layout from that frame and this definition. Mobile v2 (28 September, superseded by v4) showed it at: Account → All screens → Rev 3 feedback → Meeting room by the hour (r3room) (exact)."
+   },
+   "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
+   "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).",
   "_platform": {
@@ -3672,12 +3676,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "description": "At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); at most 10 per sale on staff and POS (audit R080 (c)). Over the limit is 422 `seatLimitExceeded`.",
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     }
    },
    "resourceHoldId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant and `quantity` is 1. The hold is the line's capacity; no inventory lease is taken."
    },
@@ -3956,12 +3960,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "readOnly": true
    },
    "questionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "questionVersion": {
     "type": "integer",
@@ -4001,14 +4005,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "readOnly": true,
     "description": "Set by `orders.checkoutCart` when the cart becomes an order."
    },
    "orderLineId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "readOnly": true
    },
@@ -4567,12 +4571,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "maxItems": 50,
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     }
    },
    "resourceHoldId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The `resources.ResourceHold` this line buys (decided 29 September, rev 3 REV3-15). While set, `leaseExpiresAt` is the hold's `expiresAt` and `inventoryHoldId` is null."
    },
@@ -5000,8 +5004,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "Client-generated ULID, as a seat hold's."
+    "format": "uuid",
+    "description": "Client-generated UUIDv7, as a seat hold's."
    },
    "mapId": {
     "type": "string",
@@ -5057,7 +5061,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "performanceId": {
     "type": "string",
@@ -5206,7 +5210,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "entitlementId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "toSubjectId": {
     "type": "string",
@@ -5321,7 +5325,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "leaderSubjectId": {
     "type": "string",
@@ -5532,9 +5536,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "readOnly": true,
-    "description": "ULID."
+    "description": "UUIDv7."
    },
    "venueId": {
     "type": "string",
@@ -5591,9 +5595,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "properties": {
       "id": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "format": "uuid",
        "readOnly": true,
-       "description": "ULID. The row's own key."
+       "description": "UUIDv7. The row's own key."
       },
       "title": {
        "$ref": "#/components/schemas/LocalisedText"
@@ -5628,9 +5632,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
         "properties": {
          "id": {
           "type": "string",
-          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+          "format": "uuid",
           "readOnly": true,
-          "description": "ULID. The row's own key."
+          "description": "UUIDv7. The row's own key."
          },
          "title": {
           "$ref": "#/components/schemas/LocalisedText"
@@ -6972,7 +6976,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "properties": {
       "questionId": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+       "format": "uuid"
       },
       "questionVersion": {
        "type": "integer",
@@ -7112,7 +7116,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "mapId": {
     "type": "string",

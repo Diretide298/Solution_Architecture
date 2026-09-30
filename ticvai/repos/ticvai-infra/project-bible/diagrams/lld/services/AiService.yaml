@@ -2,6 +2,7 @@ id: LLD-AiService
 title: AiService — 141 operations, 74 tables
 generatedBy: tools/derive-diagrams.py
 tier: engagement
+deployable: ticvai-ai
 index: diagrams/hld/02-services.yaml
 why: '**Separate at any size, and not because of size.** ADR-0020 makes it a hard boundary: only this
   service writes AI tables, and it is read-only against the transactional core. **That boundary caught
@@ -308,7 +309,7 @@ operationsByContract:
     scope: venue
     permission: AI_USE
     offline: false
-    reads: 25
+    reads: 24
     writes: 7
   - operation: generateVenueLayout
     verb: POST
@@ -1012,7 +1013,7 @@ operationsByContract:
     scope: venue
     permission: AI_USE
     offline: false
-    reads: 9
+    reads: 8
     writes: 4
   - operation: sendAiMessage
     verb: POST
@@ -1020,7 +1021,7 @@ operationsByContract:
     scope: venue
     permission: AI_USE
     offline: false
-    reads: 13
+    reads: 12
     writes: 8
   - operation: setAiByokEnablement
     verb: PUT
@@ -1592,17 +1593,11 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.chunk_embedding
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
   - ai
-  foreignWriters: null
-- table: ai.chunk_ref
-  columns: 2
-  store: postgres
-  parent: null
-  writtenBy: []
   foreignWriters: null
 - table: ai.config_session
   columns: 14
@@ -1755,6 +1750,12 @@ tables:
   parent: null
   writtenBy:
   - ai
+  foreignWriters: null
+- table: ai.inbox
+  columns: 3
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: ai.incident
   columns: 16

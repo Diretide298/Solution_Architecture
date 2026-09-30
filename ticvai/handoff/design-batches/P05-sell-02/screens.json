@@ -16,13 +16,24 @@
    "exitTo": [
     "KSK-001",
     "KSK-002",
-    "KSK-003"
+    "KSK-003",
+    "KSK-012"
    ],
    "inferred": false,
    "entryFrom": [
     "KSK-003"
    ],
-   "notes": "**Reached from KSK-003** — collecting is an alternative to buying, offered at the start. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely."
+   "notes": "**Reached from KSK-003** — collecting is an alternative to buying, offered at the start. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "KSK-012",
+     "trigger": "Booking found",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — KSK-012 declares entryState.params orderId and KSK-011 holds orderId, so an edge into it carries them"
+    }
+   ]
   },
   "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
   "density": "touchLarge",
@@ -41,7 +52,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected collect booking",
+       "label": "The order",
        "bindsTo": "Order",
        "columns": [
         "Order.id",
@@ -63,29 +74,6 @@
        ],
        "operation": "getOrder",
        "provenance": "contract orders.yaml GET /orders/{orderId}"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Lookup",
-       "operation": "lookupShopAndDrop",
-       "provenance": "contract retail.yaml GET /shop-and-drop/lookup"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
       },
       {
        "kind": "searchField",
@@ -96,15 +84,26 @@
        "provenance": "carried from the previous definition"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Lookup shop and drop",
+       "operation": "lookupShopAndDrop",
+       "provenance": "contract retail.yaml GET /shop-and-drop/lookup"
+      }
+     ]
     }
    ]
   },
   "states": {
-   "loading": "The collect booking list.",
+   "loading": "The collect booking, read by `getOrder`.",
    "error": "Could not load. Names which read failed and leaves the collect booking untouched.",
-   "emptyFirstRun": "No collect booking yet. Carries the create action; distinct from a filter that matched nothing.",
-   "emptyNoResults": "The filter narrowed it and the collect booking are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "No collect booking yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Not available"
   },
   "apis": [
@@ -112,7 +111,7 @@
     "operationId": "lookupShopAndDrop",
     "contract": "retail",
     "purpose": "Find a guest's dropped goods",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    },
    {
     "operationId": "getOrder",
@@ -134,6 +133,7 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-011",
+   "derivedFrom": "wireframes/reference/Kiosk Board 2.dc.html",
    "note": "**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -192,13 +192,6 @@
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`transferOrderTickets`) and no read of a population — it is settings, not a list",
   "purpose": "Confirm it is the right booking, then print.",
-  "gaps": [
-   {
-    "operation": "transferOrderTickets",
-    "why": "**`transferOrderTickets` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
-    "source": "contract orders.yaml POST /orders/{orderId}/transfer"
-   }
-  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -208,7 +201,7 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Transfer",
+       "label": "Transfer order tickets",
        "operation": "transferOrderTickets",
        "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       }
@@ -219,17 +212,24 @@
      "slot": "carried",
      "components": [
       {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
+       "kind": "multiSelect",
+       "label": "Ticket ids",
+       "operation": "transferOrderTickets",
+       "notes": "Required.",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "transferOrderTickets",
-       "provenance": "carried from the previous definition"
+       "kind": "textField",
+       "label": "Recipient",
+       "operation": "transferOrderTickets",
+       "notes": "Required.",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      },
+      {
+       "kind": "textField",
+       "label": "Message",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
       }
      ]
     }
@@ -239,7 +239,6 @@
    "loading": "Booking detail",
    "error": "Not found. Offers KSK-013",
    "emptyFirstRun": "No booking for that reference",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Not available"
   },
   "apis": [
@@ -263,6 +262,7 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-012",
+   "derivedFrom": "wireframes/reference/Kiosk Board 2.dc.html",
    "note": "**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -337,7 +337,7 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "End",
+       "label": "End kiosk assist",
        "operation": "endKioskAssist",
        "provenance": "contract marketing-crm.yaml POST /kiosk-assists/{sessionId}/end"
       }
@@ -345,20 +345,13 @@
     },
     {
      "name": "contentBody",
-     "slot": "carried",
      "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      },
       {
        "kind": "secondaryButton",
        "label": "Cancel",
        "notes": "**A screen that can submit must be leaveable without submitting.**",
        "derived": true,
-       "impliedBy": "endKioskAssist",
-       "provenance": "carried from the previous definition"
+       "impliedBy": "endKioskAssist"
       }
      ]
     }
@@ -368,7 +361,6 @@
    "loading": "Alerting staff",
    "error": "**Cannot reach staff.** Shows the counter location and opening hours instead of a spinner",
    "emptyFirstRun": "Not applicable",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "Shows the counter location"
   },
   "apis": [
@@ -392,6 +384,7 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-013",
+   "derivedFrom": "wireframes/reference/Kiosk Board 2.dc.html",
    "note": "**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -462,14 +455,7 @@
    "regions": [
     {
      "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "notes": "Structure from the wireframe board. Components not yet enumerated.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
+     "components": []
     }
    ]
   },
@@ -477,8 +463,6 @@
    "loading": "Not applicable",
    "error": "This is the error state",
    "emptyFirstRun": "Not applicable",
-   "emptyNoResults": "The filter narrowed it and the out service are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "This is the offline state. It does not attempt a cached sale"
   },
   "apis": [],
@@ -486,6 +470,7 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-014",
+   "derivedFrom": "wireframes/reference/Kiosk Board 2.dc.html",
    "note": "**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
@@ -535,10 +520,9 @@
      "to": "KSK-017",
      "trigger": "Shop",
      "carries": [
-      "cartId",
       "outletId"
      ],
-     "provenance": "derived — KSK-017 declares entryState.params cartId, outletId, so an edge into it must carry them"
+     "provenance": "derived — KSK-017 declares entryState.params outletId and KSK-016 holds outletId, so an edge into it carries them"
     }
    ]
   },
@@ -559,7 +543,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected order food",
+       "label": "The guest menu",
        "bindsTo": "GuestMenu",
        "columns": [
         "GuestMenu.outletId",
@@ -572,25 +556,7 @@
        ],
        "operation": "getGuestMenu",
        "provenance": "contract fnb.yaml GET /outlets/{outletId}/guest-menu"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create",
-       "operation": "createGuestFnbOrder",
-       "provenance": "contract fnb.yaml POST /guest-orders"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
+      },
       {
        "kind": "cardList",
        "bindsTo": "Menu",
@@ -606,6 +572,18 @@
        "kind": "primaryButton",
        "label": "Add to order",
        "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create guest F&B order",
+       "operation": "createGuestFnbOrder",
+       "provenance": "contract fnb.yaml POST /guest-orders"
       }
      ]
     }
@@ -645,9 +623,37 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-016",
+   "derivedFrom": "wireframes/reference/Kiosk Board 2.dc.html",
    "note": "**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formCreateGuestFnbOrder",
+    "component": "modal",
+    "trigger": "Create guest F&B order",
+    "body": "**Collects what `createGuestFnbOrder` sends before it is called.** Required: `id`, `lines`, `quotedTotal`, `recordedAt`. Optional: `locationSessionId`, `outletId`, `fulfilment`, `paymentMethod`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateGuestOrderRequest",
+    "confirm": {
+     "label": "Create guest F&B order",
+     "operation": "createGuestFnbOrder"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "lines",
+      "quotedTotal",
+      "recordedAt",
+      "locationSessionId",
+      "outletId",
+      "fulfilment",
+      "paymentMethod"
+     ]
+    },
+    "provenance": "contract fnb.yaml POST /guest-orders"
+   }
+  ],
   "_platform": {
    "code": "P05",
    "audience": "guest",
@@ -698,7 +704,7 @@
      "carries": [
       "outletId"
      ],
-     "provenance": "derived — KSK-016 declares entryState.params outletId, so an edge into it must carry them"
+     "provenance": "derived — KSK-016 declares entryState.params outletId and KSK-017 holds outletId, so an edge into it carries them"
     }
    ]
   },
@@ -718,8 +724,36 @@
      "slot": "collection",
      "components": [
       {
+       "kind": "textField",
+       "label": "Outlet id",
+       "operation": "listMerchandise",
+       "notes": "Sends `?outletId=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "textField",
+       "label": "Category id",
+       "operation": "listMerchandise",
+       "notes": "Sends `?categoryId=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "toggle",
+       "label": "In stock only",
+       "operation": "listMerchandise",
+       "notes": "Sends `?inStockOnly=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search",
+       "operation": "listMerchandise",
+       "notes": "Sends `?search=` to `listMerchandise`.",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
        "kind": "dataTable",
-       "label": "Every shop",
+       "label": "Every merchandise",
        "bindsTo": "MerchandiseItem",
        "columns": [
         "MerchandiseItem.id",
@@ -737,6 +771,22 @@
        ],
        "operation": "listMerchandise",
        "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Size",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Add",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reserve for collection",
+       "notes": "BL-019. **Reserve is not buy** — the guest pays at a till or on the app, and this screen is honest about which",
+       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -746,7 +796,7 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected shop",
+       "label": "The selected merchandise",
        "bindsTo": "MerchandiseItem",
        "columns": [
         "MerchandiseItem.id",
@@ -776,43 +826,22 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Reserve",
+       "label": "Reserve merchandise",
        "operation": "reserveMerchandise",
        "provenance": "contract retail.yaml POST /outlets/{outletId}/reserve"
       },
       {
        "kind": "secondaryButton",
-       "label": "Add",
+       "label": "Add cart line",
        "operation": "addCartLine",
        "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
       },
       {
        "kind": "secondaryButton",
-       "label": "Lookup",
+       "label": "Lookup merchandise",
        "operation": "lookupMerchandise",
+       "notes": "The kiosk is a workstation, so the price check is at its own outlet and sends no `outletId` (a workstation caller's own outlet always wins); an inactive item is not found (decided 28 September, audit R215 (1)).",
        "provenance": "contract retail.yaml GET /merchandise/lookup"
-      }
-     ]
-    },
-    {
-     "name": "contentBody",
-     "slot": "carried",
-     "components": [
-      {
-       "kind": "multiSelect",
-       "label": "Size",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "primaryButton",
-       "label": "Add",
-       "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Reserve for collection",
-       "notes": "BL-019. **Reserve is not buy** — the guest pays at a till or on the app, and this screen is honest about which",
-       "provenance": "carried from the previous definition"
       }
      ]
     }
@@ -854,7 +883,7 @@
     "operationId": "lookupMerchandise",
     "contract": "retail",
     "purpose": "Price and stock check by barcode",
-    "trigger": "onLoad"
+    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -881,9 +910,56 @@
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-017",
+   "derivedFrom": "wireframes/reference/Kiosk Board 2.dc.html",
    "note": "**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "overlays": [
+   {
+    "id": "formReserveMerchandise",
+    "component": "modal",
+    "trigger": "Reserve merchandise",
+    "body": "**Collects what `reserveMerchandise` sends before it is called.** Required: `id`, `lines`, `expiresAt`. Optional: `subjectId`, `collectionNote`. **Expiry** (`expiresAt`) is picked from 15 minutes ahead up to the close of the venue's operating day, and the picker offers nothing outside that window (decided 28 September, audit R215 (2)). Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Reserve merchandise",
+     "operation": "reserveMerchandise"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "lines",
+      "expiresAt",
+      "subjectId",
+      "collectionNote"
+     ]
+    },
+    "provenance": "contract retail.yaml POST /outlets/{outletId}/reserve"
+   },
+   {
+    "id": "formAddCartLine",
+    "component": "modal",
+    "trigger": "Add cart line",
+    "body": "**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "AddCartLineRequest",
+    "confirm": {
+     "label": "Add cart line",
+     "operation": "addCartLine"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "variantId",
+      "quantity",
+      "performanceId",
+      "seatIds",
+      "parentLineId",
+      "attributes"
+     ]
+    },
+    "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
+   }
+  ],
   "_platform": {
    "code": "P05",
    "audience": "guest",

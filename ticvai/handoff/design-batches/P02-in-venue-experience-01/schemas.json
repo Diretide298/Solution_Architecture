@@ -247,6 +247,7 @@
    },
    "orderId": {
     "type": "string",
+    "format": "uuid",
     "nullable": true,
     "description": "The paid online order that created this collection (audit R236)."
    },

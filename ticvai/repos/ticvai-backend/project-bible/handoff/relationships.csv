@@ -453,12 +453,11 @@ ai.case_evidence,via createRiskCase,ai.risk_case,ambient,lineage,,
 ai.case_evidence,via decideRiskAlert,ai.risk_alert,ambient,lineage,,
 ai.case_evidence,via decideRiskAlert,ai.risk_case,ambient,lineage,,
 ai.chunk_embedding,document_id,ai.knowledge_document,reference,declared,,yes
-ai.chunk_embedding,parent_chunk_id,ai.chunk_ref,reference,convention,,
+ai.chunk_embedding,parent_chunk_id,ai.chunk_embedding,reference,declared,,
 ai.chunk_embedding,via ingestKnowledgeDocument,ai.knowledge_document,ambient,lineage,,
 ai.chunk_embedding,via reindexSource,ai.index_entry,ambient,lineage,,
 ai.chunk_embedding,via reindexSource,ai.index_job,ambient,lineage,,
 ai.chunk_embedding,via removeIndexEntry,ai.index_entry,ambient,lineage,,
-ai.chunk_ref,document_id,ai.knowledge_document,reference,declared,,yes
 ai.config_session,conversation_id,ai.conversation,reference,declared,,
 ai.config_session,plan_id,ai.action_plan,reference,declared,,
 ai.config_session,requested_by_principal_id,identity.principal,reference,declared,yes,
@@ -856,7 +855,6 @@ catalogue.event_reschedule,approval_request_id,approvals.request,reference,conve
 catalogue.event_reschedule,new_space_id,catalogue.space,reference,convention,,
 catalogue.event_resource_plan,event_id,catalogue.event,child,convention,,
 catalogue.event_schedule,event_id,catalogue.event,child,convention,,
-catalogue.fee_rule,eligibility_ref_id,ai.chunk_ref,reference,convention,yes,
 catalogue.fee_rule,fee_id,catalogue.fee,child,convention,,
 catalogue.group_package,product_id,catalogue.product,reference,convention,,
 catalogue.import_job,change_request_id,catalogue.change_request,reference,convention,,
@@ -907,7 +905,6 @@ catalogue.price_assignment,event_id,catalogue.event,reference,convention,,
 catalogue.price_assignment,price_list_id,catalogue.price_list,reference,convention,,
 catalogue.price_assignment,product_id,catalogue.product,reference,convention,,
 catalogue.price_assignment,sales_channel_id,catalogue.sales_channel,reference,convention,,
-catalogue.price_assignment,scope_ref_id,ai.chunk_ref,reference,convention,yes,
 catalogue.price_assignment,venue_id,platform.scope,reference,precedent,yes,
 catalogue.price_execution,approval_request_id,approvals.request,reference,convention,yes,
 catalogue.price_execution,dynamic_pricing_strategy_id,catalogue.dynamic_pricing_strategy,reference,convention,,
@@ -1081,6 +1078,7 @@ control.migration_run_tenant,migration_run_id,control.migration_run,child,declar
 control.migration_run_tenant,tenant_id,control.tenant,reference,convention,,
 control.onboarding_application,provisioned_tenant_id,control.tenant,reference,convention,,
 control.onboarding_application,venue_type_template_id,control.venue_type_template,reference,declared,,
+control.outbox_relay,cell_tenant_id,control.cell_tenant,reference,declared,,yes
 control.partner,account_manager_principal_id,identity.principal,reference,convention,yes,
 control.partner,commercial_manager_principal_id,identity.principal,reference,convention,yes,
 control.partner,finance_owner_principal_id,identity.principal,reference,convention,yes,
@@ -1575,6 +1573,7 @@ inventory.transfer,via createStockTransfer,inventory.transfer_line,ambient,linea
 inventory.transfer,via receiveStockTransfer,inventory.transfer_line,ambient,lineage,,
 inventory.transfer_line,item_id,inventory.item,reference,declared,,
 inventory.transfer_line,transfer_id,inventory.transfer,child,declared,,yes
+kernel.inbox,event_id,catalogue.event,reference,convention,yes,
 ledger.account,legal_entity_id,ledger.legal_entity,reference,declared,,yes
 ledger.account_mapping,credit_account_id,ledger.account,child,declared,,yes
 ledger.account_mapping,debit_account_id,ledger.account,child,declared,,yes

@@ -1,6 +1,6 @@
 # WS57 — Sales Channel Management board 1
 
-**10 screens · 10 operations · 15 schemas · 2 permissions**
+**10 screens · 11 operations · 21 schemas · 2 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -50,8 +50,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 2 permissions apply here:
   `PRODUCT_CONFIGURE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,17 +60,17 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-258` | Sales Channel Command Center | commandCentre | 1 | 0 | — |
+| `ADM-258` | Sales Channel Command Center | commandCentre | 3 | 0 | — |
 | `ADM-259` | Channel Creation & Profile Configuration | configEditor | 1 | 0 | — |
 | `ADM-260` | Product & Catalogue Assignment | listDetail | 1 | 2 | — |
 | `ADM-261` | Channel Pricing & Commercial Profile Assignment | listDetail | 1 | 0 | — |
 | `ADM-262` | Inventory, Capacity & Channel Allocation | listDetail | 1 | 0 | — |
-| `ADM-263` | Channel Sales Schedule & Availability Windows | listDetail | 1 | 0 | — |
-| `ADM-264` | Customer & Eligibility Rules by Channel | configEditor | 1 | 0 | — |
-| `ADM-265` | Channel Sales Rules, Limits & Restrictions | configEditor | 1 | 0 | — |
+| `ADM-263` | Channel Sales Schedule & Availability Windows | listDetail | 2 | 1 | — |
+| `ADM-264` | Customer & Eligibility Rules by Channel | configEditor | 2 | 1 | — |
+| `ADM-265` | Channel Sales Rules, Limits & Restrictions | configEditor | 2 | 1 | — |
 | `ADM-266` | Channel Fees, Payment & Fulfillment Configuration | configEditor | 1 | 0 | — |
 | `ADM-267` | Channel Publication, Readiness & AI Validation | configEditor | 1 | 0 | — |
 
 ## Thin screens in this batch
 
-**ADM-261, ADM-262, ADM-263 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-261, ADM-262 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.

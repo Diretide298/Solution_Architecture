@@ -1,6 +1,6 @@
 # WS104 — Subscription Licensing AI Self Service board 7
 
-**10 screens · 8 operations · 28 schemas · 6 permissions**
+**10 screens · 9 operations · 33 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -62,8 +62,8 @@ convincingly. It is never a caption.
 |---|---|---|---|---|---|
 | `BO-595` | AI Setup Command Center | configEditor | 1 | 0 | — |
 | `BO-596` | Guided Setup Plan | listDetail | 1 | 0 | — |
-| `BO-597` | AI Configuration Workspace | listDetail | 1 | 0 | — |
-| `BO-598` | AI Draft Review & Approval | listDetail | 1 | 0 | — |
+| `BO-597` | AI Configuration Workspace | listDetail | 2 | 0 | — |
+| `BO-598` | AI Draft Review & Approval | listDetail | 2 | 0 | — |
 | `BO-599` | Manual Configuration Center | listDetail | 1 | 0 | — |
 | `BO-600` | Venue, Calendar & Operational Setup | listDetail | 1 | 0 | — |
 | `BO-601` | Product, Pricing & Sales Channel Setup | configEditor | 2 | 0 | — |
@@ -495,6 +495,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Draft the configuration",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getActionPlan",
+    "contract": "ai",
+    "purpose": "A plan with its steps",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -503,6 +510,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS159 Subscription Licensing AI Self Service Board 7.dc.html#bo-597"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 86. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "planId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -614,6 +629,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Review and accept a draft",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getActionPlan",
+    "contract": "ai",
+    "purpose": "A plan with its steps",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -622,6 +644,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS159 Subscription Licensing AI Self Service Board 7.dc.html#bo-598"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 87. 0 of 0 labels bound to a contract property; 0 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "planId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1522,6 +1552,19 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": null,
   "responds": "GeneratedConfiguration"
  },
+ "getActionPlan": {
+  "method": "GET",
+  "path": "/action-plans/{planId}",
+  "contract": "ai",
+  "summary": "A plan with its steps",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiActionPlanDetail"
+ },
  "getGoLiveReadiness": {
   "method": "GET",
   "path": "/go-live-readiness",
@@ -1612,6 +1655,11 @@ Method, path, parameters, request and response for every operation these screens
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -1674,6 +1722,282 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "number",
     "default": 1,
     "description": "**Timeouts are an accessibility barrier nobody counts.** A guest who needs three times as long to read a screen should not lose their basket to a 90-second inactivity timer.\n"
+   }
+  }
+ },
+ "AiActionPlan": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.action_plan",
+  "description": "**A plan: plan, validate, simulate, approve, execute, with rollback** (design 2.2 D, 3.8; AIC-086..107). Independent of any conversation (AIC-102). Its steps are `ai.action_step`; the change set is hashed so what was approved is what runs (AIC-181).",
+  "required": [
+   "origin",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "origin": {
+    "type": "string",
+    "enum": [
+     "configurationSession",
+     "generateConfiguration",
+     "assistant",
+     "riskCase",
+     "operationalRequirement",
+     "rollback"
+    ]
+   },
+   "originRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "summary": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "validated",
+     "simulated",
+     "awaitingApproval",
+     "approved",
+     "executing",
+     "paused",
+     "completed",
+     "partiallyCompleted",
+     "failed",
+     "compensated",
+     "cancelled",
+     "rolledBack"
+    ],
+    "readOnly": true
+   },
+   "autonomyLevel": {
+    "$ref": "#/components/schemas/AiAutonomyLevel"
+   },
+   "approvalTier": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 2,
+    "description": "The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). Not an autonomy level."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The `approvals` request, where tier 2 or the matrix caught the plan."
+   },
+   "proposedActionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "ai.proposed_action",
+    "description": "The `ai.proposed_action` the plan is presented as for a decision."
+   },
+   "changeSetHash": {
+    "type": "string",
+    "readOnly": true
+   },
+   "governanceOutcome": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/AiGovernanceOutcome"
+     }
+    ],
+    "readOnly": true
+   },
+   "policyVersionRef": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The governance policy version that decided it."
+   },
+   "simulation": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4)."
+   },
+   "partialCompletionAllowed": {
+    "type": "boolean",
+    "default": false,
+    "description": "Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134)."
+   },
+   "rollbackOfPlanId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "ai.action_plan"
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "identity.principal"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
+   }
+  }
+ },
+ "AiActionPlanDetail": {
+  "type": "object",
+  "x-ticvai-persistence": "none — ai.action_plan with its ai.action_step rows",
+  "description": "A plan with its steps in DAG order.",
+  "required": [
+   "plan",
+   "steps"
+  ],
+  "properties": {
+   "plan": {
+    "$ref": "#/components/schemas/AiActionPlan"
+   },
+   "steps": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiActionStep"
+    }
+   }
+  }
+ },
+ "AiActionStep": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.action_step",
+  "description": "One step of a plan: a registered tool against `targetContract.targetOperation` at a contract version (AIC-095), with payload, provenance, compensation and the idempotency key `plan:{id}:step:{n}`. **Scoped through its plan** (`platform.apply_parent_rls`). Each step records its target object's version; drift pauses the plan (AIC-182).",
+  "required": [
+   "planId",
+   "stepNumber",
+   "toolKey",
+   "targetContract",
+   "targetOperation",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "ai.action_plan"
+   },
+   "stepNumber": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "dependsOn": {
+    "type": "array",
+    "items": {
+     "type": "integer",
+     "minimum": 1
+    },
+    "description": "Step numbers that must succeed first. The plan is a DAG."
+   },
+   "toolKey": {
+    "type": "string"
+   },
+   "targetContract": {
+    "type": "string"
+   },
+   "targetOperation": {
+    "type": "string"
+   },
+   "contractVersion": {
+    "type": "string"
+   },
+   "payload": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "The request body of `targetOperation`, validated against it before the plan is approved."
+   },
+   "provenance": {
+    "$ref": "#/components/schemas/AiProvenance"
+   },
+   "idempotencyKey": {
+    "type": "string",
+    "readOnly": true
+   },
+   "targetObjectRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "targetObjectVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "The version the step was planned against. A different version at execution is drift."
+   },
+   "reversible": {
+    "type": "boolean"
+   },
+   "compensation": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "validated",
+     "running",
+     "succeeded",
+     "failed",
+     "compensated",
+     "skipped",
+     "paused"
+    ],
+    "readOnly": true
+   },
+   "attempts": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 3,
+    "readOnly": true,
+    "description": "Bounded at 3 (AIC-135)."
+   },
+   "lastError": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true
+   },
+   "resultRef": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The owning service's response: success is its answer, not a model's judgement (AIC-097)."
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    }
   }
  },
@@ -1746,6 +2070,73 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "readOnly": true,
     "x-ticvai-derived": "onRead",
     "description": "True while the draft's source differs from the icon in `liveVersion`."
+   }
+  }
+ },
+ "BookingFlow": {
+  "x-ticvai-persistence": "whitelabel.booking_flow",
+  "type": "object",
+  "description": "**A venue's booking flow (decided 29 September, W12: operators pick their flows, see which steps are required, set their own order).** Made from a `BookingFlowType`; lives in the working draft and reaches guests with `publishTenantConfig`, which copies the venue's flows into the version's snapshot. A product or category names its flow (catalogue `bookingFlowId`); otherwise the venue's default for the type serving its kind applies.\n",
+  "required": [
+   "flowTypeKey",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "From the path of `createBookingFlowDefinition`."
+   },
+   "flowTypeKey": {
+    "$ref": "#/components/schemas/BookingFlowTypeKey"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 80,
+    "description": "Staff-facing, e.g. \"Day pass, date first\". Not shown to guests."
+   },
+   "isDefaultForType": {
+    "type": "boolean",
+    "default": false,
+    "description": "At most one per venue and type; setting it takes it from the previous default."
+   },
+   "isEnabled": {
+    "type": "boolean",
+    "default": true,
+    "description": "A disabled flow is kept and not published; products naming it fall back to the default."
+   },
+   "steps": {
+    "type": "array",
+    "maxItems": 30,
+    "description": "Every step of the type, in the venue's order. Filled from the type when left out on create.",
+    "items": {
+     "$ref": "#/components/schemas/BookingFlowStep"
+    }
+   },
+   "settings": {
+    "$ref": "#/components/schemas/BookingFlowLevelSettings"
+   },
+   "isValid": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-derived": "onWrite",
+    "description": "Whether the flow passes `validateBookingFlow`; worked out in the same transaction as each write. `publishTenantConfig` refuses a draft holding an invalid enabled flow."
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The partition key (ADR-0005). Written at `venue` scope."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -1837,6 +2228,22 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "readOnly": true,
     "description": "Always `buildTime` for native apps. The guest web app takes a splash change at the publish, with no build (audit R163)."
+   },
+   "introVideoAssetRef": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The optional intro video (decided 29 September, MOB-5).** A video `MediaAsset` from the media library (CMS-010). Streamed, so a change reaches guests with the publish and needs no app build.\n"
+   },
+   "introVideoMode": {
+    "type": "string",
+    "enum": [
+     "off",
+     "firstLaunch",
+     "everyLaunch"
+    ],
+    "default": "off",
+    "description": "When GST-001 plays it full screen. \"Skip introduction\" is always shown. Anything but `off` needs `introVideoAssetRef`, or 400."
    }
   }
  },
@@ -2334,6 +2741,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "traceId": {
     "type": "string"
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The one-step `ai.action_plan` the draft was written as (AI design 2.3), readable with `getActionPlan`."
    }
   }
  },
@@ -2514,7 +2926,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       },
       "maxItems": {
        "type": "integer",
-       "nullable": true
+       "nullable": true,
+       "description": "How many items the section shows. On the mobile Home, `attractions`, `dining`, `whatsOn` and `shop` show 1 or 2 highlights (decided 29 September, MOB-3)."
+      },
+      "heroStyle": {
+       "type": "string",
+       "nullable": true,
+       "enum": [
+        "carousel",
+        "video",
+        "poster",
+        "split",
+        null
+       ],
+       "description": "For `heroBanner` only (decided 29 September, MOB-3)."
       }
      }
     }
@@ -2635,6 +3060,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  "NavigationConfig": {
   "x-ticvai-persistence": "whitelabel.navigation_item",
   "type": "object",
+  "description": "**The mobile tab set is venue configuration (decided 29 September, MOB-1; 29 September brief decision 6).** Before a tenant saves its own, `bottomNavigation` is Home, Explore, Plan and Tickets (each an `appSection` link), with the Buy tickets button beside them; Map is an optional tab. Plan is left out while `visitPlanner` is off.\n",
   "required": [
    "kind",
    "items"
@@ -2690,6 +3116,27 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
       }
      }
     }
+   },
+   "buyButton": {
+    "type": "object",
+    "nullable": true,
+    "description": "**The persistent Buy tickets button (decided 29 September, MOB-2).** On every screen of the mobile app except the booking and checkout steps; it opens GST-003. Read with `bottomNavigation`.\n",
+    "properties": {
+     "style": {
+      "type": "string",
+      "enum": [
+       "raised",
+       "floating",
+       "flat",
+       "hidden"
+      ],
+      "default": "raised",
+      "description": "`raised` sits in the centre of the tab bar, as the v4 prototype shows; `hidden` turns it off."
+     },
+     "label": {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    }
    }
   }
  },
@@ -2701,6 +3148,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "retail",
    "mixed"
   ]
+ },
+ "SetPriceRequest": {
+  "type": "object",
+  "required": [
+   "variantId",
+   "amount"
+  ],
+  "properties": {
+   "variantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxCodeId": {
+    "type": "string",
+    "format": "uuid"
+   }
+  }
  },
  "TenantConfig": {
   "x-ticvai-persistence": "whitelabel.tenant_config",
@@ -2732,6 +3199,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "bookingFlow": {
     "$ref": "#/components/schemas/BookingFlowConfig"
+   },
+   "bookingFlows": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-derived": "onRead",
+    "description": "Every venue's booking flows in the draft (`whitelabel.booking_flow`), so a publish snapshots them with the rest (decided 29 September, W12).",
+    "items": {
+     "$ref": "#/components/schemas/BookingFlow"
+    }
    },
    "theme": {
     "$ref": "#/components/schemas/Theme"
@@ -2968,6 +3444,30 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     ],
     "default": "solid",
     "description": "Button shape (decided 29 September, rev 3 CFG-3)."
+   },
+   "componentColours": {
+    "type": "object",
+    "description": "**Colours for single interactive elements (decided 17 September, M17-11).** Each is optional and falls back to the theme colours. Every pair passes the same contrast check as the theme (`ContrastProblem`), or `setTheme` refuses it with 400. The guest flow stays the standard one; only the colours change.\n",
+    "properties": {
+     "primaryCta": {
+      "$ref": "#/components/schemas/ThemeComponentColour"
+     },
+     "payButton": {
+      "$ref": "#/components/schemas/ThemeComponentColour"
+     },
+     "addToCart": {
+      "$ref": "#/components/schemas/ThemeComponentColour"
+     },
+     "buyTicketsButton": {
+      "$ref": "#/components/schemas/ThemeComponentColour"
+     },
+     "link": {
+      "$ref": "#/components/schemas/ThemeComponentColour"
+     },
+     "badge": {
+      "$ref": "#/components/schemas/ThemeComponentColour"
+     }
+    }
    }
   }
  },
@@ -3025,6 +3525,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid",
     "readOnly": true,
     "description": "From the path of `setVenueSettings`."
+   },
+   "calendarDayStartHour": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 23,
+    "nullable": true,
+    "default": 6,
+    "description": "**Where the venue's calendar day starts** (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (`calendarView` in `screens/_components.yaml`), so a venue open 06:00 to 02:00 sees its night on the day it belongs to. Display only: it moves no booking, slot or business date. Null inherits the tenant default (proposed 6, client to correct).\n"
    },
    "currencyCode": {
     "type": "string",

@@ -1,6 +1,6 @@
 # WS136 — Marketing CRM Configuration Reference v1.0 board 2
 
-**10 screens · 21 operations · 21 schemas · 6 permissions**
+**10 screens · 23 operations · 26 schemas · 8 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -47,8 +47,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 6 permissions apply here:
-  `AUDIT_VIEW, GUEST_MANAGE, GUEST_VIEW, GUEST_VIEW_PII, MARKETING_MANAGE, MARKETING_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 8 permissions apply here:
+  `AUDIT_VIEW, GUEST_MANAGE, GUEST_VIEW, GUEST_VIEW_PII, MARKETING_MANAGE, MARKETING_VIEW, TENANT_CONFIGURE, TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -67,7 +67,7 @@ convincingly. It is never a caption.
 | `BO-748` | Consent Capture & Versions | listDetail | 2 | 0 | — |
 | `BO-749` | Guest Preference Center | listDetail | 2 | 0 | — |
 | `BO-750` | Data Subject Requests | listDetail | 2 | 0 | — |
-| `BO-751` | Retention & Anonymization | listDetail | 2 | 0 | — |
+| `BO-751` | Retention & Anonymization | listDetail | 4 | 0 | — |
 | `BO-752` | Privacy & AI Governance | listDetail | 2 | 0 | — |
 | `BO-753` | Compliance Audit Dashboard | listDetail | 1 | 0 | — |
 
@@ -1200,6 +1200,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "listDataRetentionExpiry",
      "searchGuests"
     ]
+   },
+   {
+    "operationId": "listDataRetentionSettings",
+    "contract": "tenancy",
+    "purpose": "Retention period per data class",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setDataRetentionSetting",
+    "contract": "tenancy",
+    "purpose": "Set a class's period",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1208,6 +1222,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "workshopBoard": "wireframes/WS71 Marketing CRM Configuration Reference v1.0 Board 2.dc.html#bo-751"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 13. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "dataClass",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1550,6 +1572,35 @@ Method, path, parameters, request and response for every operation these screens
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listDataRetentionSettings": {
+  "method": "GET",
+  "path": "/data-retention-settings",
+  "contract": "tenancy",
+  "summary": "How long the tenant keeps each class of data",
+  "permission": "TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "dataClass",
+    "in": "query",
+    "required": false
+   },
    {
     "name": null,
     "in": null,
@@ -2045,6 +2096,25 @@ Method, path, parameters, request and response for every operation these screens
   "requestBody": "DataRetentionPolicy",
   "responds": "DataRetentionPolicy"
  },
+ "setDataRetentionSetting": {
+  "method": "PUT",
+  "path": "/data-retention-settings/{dataClass}",
+  "contract": "tenancy",
+  "summary": "Set how long the tenant keeps one class of data",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "TenantDataRetentionSetting",
+  "responds": "TenantDataRetentionSetting"
+ },
  "setGuestMatchPolicy": {
   "method": "PUT",
   "path": "/guest-match-policy",
@@ -2310,8 +2380,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "pos",
    "callCentre",
    "import",
-   "agentRecorded"
-  ]
+   "agentRecorded",
+   "cookieBanner",
+   "checkout"
+  ],
+  "description": "`checkout` (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders `checkoutCart` `marketingConsents[]` and recorded by `recordCheckoutConsents`, bound to the order and the verified contact. `cookieBanner` (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by `claimDeviceConsent`. Kept apart from `website`, a form submission, because the audit trail (2.6.56) has to tell the two apart."
  },
  "ConsentState": {
   "x-ticvai-persistence": "none — projection over consent_record",
@@ -2722,7 +2795,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     }
    },
    "retainMonths": {
-    "type": "integer"
+    "type": "integer",
+    "description": "At most the tenant's effective `guestProfile` period (tenancy `setDataRetentionSetting`, decided 29 September); a rule may only shorten it."
    },
    "action": {
     "type": "string",
@@ -2751,6 +2825,211 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "scopePath": {
     "type": "string"
+   }
+  }
+ },
+ "DataSubjectCustomerPrivacyRequestManagementView": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.privacy_request",
+  "description": "One customer privacy request (pack 17.2.4 Case Information). The case layer over the cross-region `platform.dsar_request` fan-out, which it references when it raises one.",
+  "required": [
+   "subjectId",
+   "requestType",
+   "source",
+   "requesterRole",
+   "jurisdiction"
+  ],
+  "properties": {
+   "requestId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The person the request is about."
+   },
+   "requestType": {
+    "type": "string",
+    "maxLength": 60,
+    "description": "A configured request type code (`setPrivacyRequestTypes`), e.g. `access`, `dataExport`, `correction`, `deletion`, `anonymisation`, `restriction`, `objection`, `consentWithdrawal`, `marketingOptOut`."
+   },
+   "source": {
+    "type": "string",
+    "enum": [
+     "customerPortal",
+     "b2c",
+     "mobileApp",
+     "emailManual",
+     "customerService",
+     "pos",
+     "api"
+    ]
+   },
+   "requesterRole": {
+    "type": "string",
+    "enum": [
+     "self",
+     "guardian",
+     "authorisedRepresentative"
+    ]
+   },
+   "requesterSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The guardian or representative, when not `self`; verified like the subject."
+   },
+   "jurisdiction": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$",
+    "description": "Selects the response period configured for this request type."
+   },
+   "submittedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "dueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "`submittedAt` plus the jurisdiction's configured response period; null when none is configured."
+   },
+   "deadlineConfigured": {
+    "type": "boolean",
+    "readOnly": true
+   },
+   "daysRemaining": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Negative once overdue; null without a deadline."
+   },
+   "atRisk": {
+    "type": "boolean",
+    "readOnly": true,
+    "description": "Inside the request type's configured warning window before `dueAt`."
+   },
+   "slaState": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "onTrack",
+     "atRisk",
+     "overdue",
+     "escalated",
+     "noDeadline"
+    ]
+   },
+   "priority": {
+    "type": "string",
+    "enum": [
+     "P1",
+     "P2",
+     "P3",
+     "P4"
+    ],
+    "default": "P3"
+   },
+   "ownerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "verificationMethod": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "accountLogin",
+     "otp",
+     "emailVerification",
+     "mobileVerification",
+     "idReview",
+     "manualVerification"
+    ],
+    "description": "One of the methods the request type allows."
+   },
+   "verificationStatus": {
+    "type": "string",
+    "enum": [
+     "notStarted",
+     "pending",
+     "verified",
+     "failed"
+    ],
+    "default": "notStarted"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "submitted",
+     "inProgress",
+     "completed"
+    ],
+    "default": "submitted",
+    "description": "MoM 20 Aug lifecycle."
+   },
+   "stage": {
+    "type": "string",
+    "maxLength": 60,
+    "nullable": true,
+    "description": "The configured workflow step within `inProgress` (a stage code of the request type)."
+   },
+   "outcome": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "fulfilled",
+     "partiallyFulfilled",
+     "refused",
+     "withdrawnByRequester"
+    ],
+    "description": "Required to complete. `refused` and `partiallyFulfilled` need `outcomeReason`."
+   },
+   "outcomeReason": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "escalated": {
+    "type": "boolean",
+    "default": false
+   },
+   "dsarRequestId": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The cross-region `DsarRequest.requestId`, when fulfilment fanned out."
+   },
+   "caseId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The customer-service case it came in through, if any."
+   },
+   "notes": {
+    "type": "string",
+    "maxLength": 4000,
+    "nullable": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005)."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
@@ -3286,6 +3565,115 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "PrivacyAuditEvidenceComplianceReportingView": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.privacy_audit_event",
+  "description": "One privacy audit event (pack 17.2.9 Audit Fields). Append-only; written by the operation that performed the event, never through an API.",
+  "required": [
+   "eventId",
+   "action",
+   "occurredAt"
+  ],
+  "properties": {
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "action": {
+    "type": "string",
+    "enum": [
+     "consentGranted",
+     "consentWithdrawn",
+     "preferenceChanged",
+     "policyAccepted",
+     "privacyRequestCreated",
+     "identityVerified",
+     "dataExportGenerated",
+     "correctionRequested",
+     "deletionApproved",
+     "anonymisationExecuted",
+     "retentionAction",
+     "legalHold",
+     "administrativeOverride",
+     "configurationChange"
+    ]
+   },
+   "actorType": {
+    "type": "string",
+    "enum": [
+     "customer",
+     "guardian",
+     "staff",
+     "system",
+     "ai"
+    ]
+   },
+   "actorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "actorRole": {
+    "type": "string",
+    "nullable": true,
+    "description": "The role the actor held at the time."
+   },
+   "source": {
+    "$ref": "../shared/common.yaml#/components/schemas/ModuleKey"
+   },
+   "channel": {
+    "type": "string",
+    "nullable": true,
+    "description": "A `ConsentSource` value or the staff surface it came through."
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "before": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": true,
+    "description": "The changed fields before, masked where the field is sensitive."
+   },
+   "after": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": true
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "approvalReference": {
+    "type": "string",
+    "nullable": true,
+    "description": "The approval that authorised it (privacy action approval, hold approval, package approval)."
+   },
+   "relatedRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "relatedCaseId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "evidenceReference": {
+    "type": "string",
+    "nullable": true,
+    "description": "e.g. the consent evidence id, the policy version, the export asset id."
+   }
+  }
+ },
  "PrivacyIncident": {
   "type": "object",
   "x-ticvai-persistence": "marketing.privacy_incident",
@@ -3678,6 +4066,364 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "nullable": true
+   }
+  }
+ },
+ "TenantDataRetentionClass": {
+  "type": "string",
+  "description": "**The data classes a tenant sets a retention period for** (decided 29 September, Chinmay: all data retention is tenant configuration, one setting per class). Defaults are ADR-0047's and the AI system design's (section 8, decision 5); a legal limit is the only thing the platform enforces.\n| Class | Default | Counted from | Legal limit (refused) | |---|---|---|---| | `guestProfile` | 5 years | last activity | none | | `paymentRecord` | 10 years | created | at least 10 years (4.3.4) | | `financialRecord` | 7 years | created | at least 7 years (6.1.78) | | `auditRecord` | 2 years (authorisation and device audit) | created | none | | `approvalRecord` | 7 years (approvals board 6.7) | decided | none | | `complianceInspection` | 7 years | created | none | | `faceTagBiometric` | 7 days | ticket expiry | make-or-break | | `facePassBiometric` | follows `guestProfile` | last activity | make-or-break | | `aiPrompts` | 90 days (prompts and responses) | created | none | | `aiConversations` | 90 days | last activity | none | | `aiDecisionRecords` | follows `auditRecord` (decision records and the approvals of AI actions) | decided | none | | `aiMetadataIndex` | always follows `aiDecisionRecords` (summaries, entities, embeddings) | created | none |\n**ADR-0047's floors and ceilings that are not law are defaults now, not refusals** (the audit floor of one year, the proposed seven-year guest-profile ceiling, the Face Tag thirty-day ceiling). Platform-owned copies — the burst environment copy, a decommissioned cell — are not tenant data classes and are not here.\n",
+  "enum": [
+   "guestProfile",
+   "paymentRecord",
+   "financialRecord",
+   "auditRecord",
+   "approvalRecord",
+   "complianceInspection",
+   "faceTagBiometric",
+   "facePassBiometric",
+   "aiPrompts",
+   "aiConversations",
+   "aiDecisionRecords",
+   "aiMetadataIndex"
+  ]
+ },
+ "TenantDataRetentionSetting": {
+  "type": "object",
+  "x-ticvai-persistence": "tenancy.data_retention_setting",
+  "description": "**One tenant's retention period for one data class** (decided 29 September, Chinmay). One row per tenant and class, written by `setDataRetentionSetting`; a class with no row takes the platform default. The limit and default fields are the platform's catalogue, computed for the response and not stored on the row.\n",
+  "required": [
+   "dataClass"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "dataClass": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/TenantDataRetentionClass"
+     }
+    ],
+    "x-ticvai-unique": "tenant",
+    "description": "One row per class per tenant. On a write it comes from the path; a body value is ignored."
+   },
+   "retainAmount": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "description": "The tenant's period. Null with no `followsDataClass` means the platform default applies. Zero means the data is not kept past the transaction that produced it.\n"
+   },
+   "retainUnit": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "days",
+     "months",
+     "years"
+    ],
+    "description": "Required with `retainAmount`."
+   },
+   "followsDataClass": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/TenantDataRetentionClass"
+     }
+    ],
+    "nullable": true,
+    "description": "Keep this class for as long as another class is kept. Set by default for `aiDecisionRecords` (follows `auditRecord`), `facePassBiometric` (follows `guestProfile`) and `aiMetadataIndex` (follows `aiDecisionRecords`, and cannot be changed).\n"
+   },
+   "onExpiry": {
+    "type": "string",
+    "enum": [
+     "archive",
+     "anonymise",
+     "delete"
+    ],
+    "default": "archive",
+    "description": "ADR-0047's stages. `archive` moves the data to the archive instance, from where it is erased on the class's own schedule; derived stores (the AI index, search) purge at archive, not later.\n"
+   },
+   "anchor": {
+    "type": "string",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "enum": [
+     "createdAt",
+     "lastActivity",
+     "decidedAt",
+     "ticketExpiry"
+    ],
+    "description": "What the period is counted from. Fixed per class by the platform."
+   },
+   "effectiveAmount": {
+    "type": "integer",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The period actually applied, after follows and defaults are resolved."
+   },
+   "effectiveUnit": {
+    "type": "string",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "enum": [
+     "days",
+     "months",
+     "years"
+    ]
+   },
+   "isDefault": {
+    "type": "boolean",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "True when the tenant has not set this class and the platform default applies."
+   },
+   "defaultAmount": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false
+   },
+   "defaultUnit": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "enum": [
+     "days",
+     "months",
+     "years"
+    ]
+   },
+   "legalMinimumAmount": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "A floor the law sets. A shorter period is refused (`422`)."
+   },
+   "legalMaximumAmount": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "A maximum the law sets. A longer period is refused (`422`). Null for every class until the biometric make-or-break is answered."
+   },
+   "legalLimitUnit": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "enum": [
+     "days",
+     "months",
+     "years"
+    ]
+   },
+   "legalBasis": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The law or requirement the limit comes from, e.g. `4.3.4`."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The tenant. Retention is set at tenant scope only."
+   }
+  }
+ },
+ "VersioningEffectiveDatesLegalChangeControlView": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over marketing.form_definition, marketing.waiver_version_control (new), marketing.form_submission and marketing.waiver_signature",
+  "description": "One version of one waiver and its change control (pack 11.1.8).",
+  "required": [
+   "formId",
+   "versionNumber",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "formId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "waiverName": {
+    "type": "string"
+   },
+   "versionNumber": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "published",
+     "superseded",
+     "retired"
+    ],
+    "description": "`FormDefinition.status` (states/form-definition.yaml)."
+   },
+   "lifecycleStatus": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "review",
+     "pendingApproval",
+     "approved",
+     "scheduled",
+     "published",
+     "suspended",
+     "expired",
+     "archived"
+    ]
+   },
+   "createdByUserId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "changeReason": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true
+   },
+   "legalReviewer": {
+    "type": "string",
+    "nullable": true,
+    "description": "`FormDefinition.legalReviewedBy`."
+   },
+   "legalReviewedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "approvedByUserId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "approvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "resignRule": {
+    "type": "string",
+    "enum": [
+     "noResign",
+     "resignAtNextBooking",
+     "resignBeforeNextVisit"
+    ],
+    "description": "Whether people who signed an earlier version must sign this one."
+   },
+   "suspended": {
+    "type": "boolean",
+    "default": false
+   },
+   "suspensionReason": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "signatureCount": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Signatures taken against this exact version."
+   },
+   "comparison": {
+    "type": "object",
+    "nullable": true,
+    "description": "Present when `compareWith` is given.",
+    "properties": {
+     "comparedWithVersion": {
+      "type": "integer",
+      "minimum": 1
+     },
+     "addedText": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "blockKey": {
+         "type": "string"
+        },
+        "language": {
+         "type": "string"
+        },
+        "text": {
+         "type": "string"
+        }
+       }
+      }
+     },
+     "removedText": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "blockKey": {
+         "type": "string"
+        },
+        "language": {
+         "type": "string"
+        },
+        "text": {
+         "type": "string"
+        }
+       }
+      }
+     },
+     "changedQuestions": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "description": "Field keys added, removed or changed."
+     },
+     "changedSignatoryRules": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "description": "Names of the signatory-rule properties that differ."
+     },
+     "changedAssociations": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "description": "Associations added, removed or changed between the two versions' publication."
+     }
+    }
    }
   }
  }

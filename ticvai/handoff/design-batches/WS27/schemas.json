@@ -64,7 +64,7 @@
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "leaderSubjectId": {
     "type": "string",
@@ -179,7 +179,7 @@
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "leaderSubjectId": {
     "type": "string",

@@ -2002,6 +2002,50 @@ def read_work_package(
     return {"workPackage": found, "touches": [_link_row(r)["target"] for r in rows]}
 
 
+# **A board reads in the order the work is finished in, and the same way every time.** It used to come
+# back newest-updated first, so a comment, a push or a status change elsewhere reshuffled it, and a
+# pull of "my next 15" pulled a different 15 on each ask. The order now:
+#   1. what you have already started (so it is finished before anything new is picked up);
+#   2. then the build order the plan gives every task ("Build order: #n" in its description). A
+#      sub-task has none of its own and takes its parent's place, straight after the parent;
+#   3. then tickets with no build order at all, by start date, due date and number.
+# On hold and waiting-for-QA tickets keep their place in that order rather than jumping to the top.
+STARTED = {"in progress", "in development", "developed", "reopened"}
+
+
+def _completion_order(items: list, by_key: dict) -> list:
+    mine = {i["key"]: i for i in items}
+
+    def place(item: dict) -> tuple:
+        # Own build order, or the nearest ancestor's, with how far down the tree this ticket sits so a
+        # parent comes before its sub-tasks. Visit-guarded: the parent chain is another system's data.
+        at, depth, seen = item, 0, {item["key"]}
+        while at.get("buildOrder") is None:
+            parent = str(at.get("parent") or "")
+            nxt = by_key.get(parent) or mine.get(parent)
+            if not parent or not nxt or parent in seen:
+                break
+            seen.add(parent)
+            at, depth = nxt, depth + 1
+        return at.get("buildOrder"), depth
+
+    def key(item: dict) -> tuple:
+        order, depth = place(item)
+        started = (item.get("status") or "").strip().lower() in STARTED
+        number = int(item["key"]) if str(item.get("key", "")).isdigit() else 0
+        return (
+            0 if started else 1,
+            0 if order is not None else 1,
+            order if order is not None else 0,
+            depth,
+            item.get("startDate") or "9999",
+            item.get("dueDate") or "9999",
+            number,
+        )
+
+    return sorted(items, key=key)
+
+
 @app.get("/api/board/mine")
 def my_board(
     project_id: str = Query(default=""),
@@ -2052,10 +2096,15 @@ def my_board(
     except HTTPException:
         tree_read = False
 
+    items = _completion_order(items, by_key)
+    position = {item["key"]: n for n, item in enumerate(items, 1)}
+
     def dressed(item: dict) -> dict:
         module = _module_of(item["key"], by_key) if tree_read else None
         return {
             **item,
+            # Its place in the order above, counted from 1, so the reader can see the board is ordered.
+            "position": position[item["key"]],
             "touches": touching.get(item["key"], []),
             # The top of the tree, which is the epic or module this is from.
             # Null when the ticket is itself top-level, which is a real answer.

@@ -21,71 +21,341 @@
   }
  ],
  "tasks": [
-  {"key": "PLATFORM-KERNEL", "epic": "PLATFORM", "points": 8, "pool": "backend", "depends": ["SETUP-DB", "SETUP-AUTH"],
+  {
+   "key": "PLATFORM-KERNEL",
+   "epic": "PLATFORM",
+   "points": 8,
+   "pool": "backend",
+   "depends": [
+    "SETUP-DB",
+    "SETUP-AUTH"
+   ],
    "subject": "Request kernel: hostname to tenant routing, per-transaction scope, error model and 429",
-   "detail": "In ticvai-backend. Resolve the tenant from the hostname (control-plane routing table, SD-021), open every transaction with the tenant and scope settings the row-level policies read (SD-059), one problem-details error model, and 429 with Retry-After on the hot public operations (SD-043). Done when: two seeded tenants on two hostnames cannot read each other's rows, and a flood test returns 429 instead of 500."},
-  {"key": "PLATFORM-IDEMPOTENCY", "epic": "PLATFORM", "points": 5, "pool": "backend", "depends": ["PLATFORM-KERNEL"],
+   "detail": "In ticvai-backend. Resolve the tenant from the hostname (control-plane routing table, SD-021), open every transaction with the tenant and scope settings the row-level policies read (SD-059), one problem-details error model, and 429 with Retry-After on the hot public operations (SD-043). Done when: two seeded tenants on two hostnames cannot read each other's rows, and a flood test returns 429 instead of 500."
+  },
+  {
+   "key": "PLATFORM-IDEMPOTENCY",
+   "epic": "PLATFORM",
+   "points": 5,
+   "pool": "backend",
+   "depends": [
+    "PLATFORM-KERNEL"
+   ],
    "subject": "Durable idempotency: the Idempotency-Key store and middleware",
-   "detail": "Idempotency records in PostgreSQL with Redis as a cache only (SD-024), so a retried payment or sale after a restart returns the first answer. Done when: replaying a createOrder with the same key after a service restart returns the original response and creates nothing."},
-  {"key": "PLATFORM-OUTBOX", "epic": "PLATFORM", "points": 8, "pool": "backend", "depends": ["PLATFORM-KERNEL"],
-   "subject": "Outbox, relay and inbox on the chosen broker",
-   "detail": "The transactional outbox per tenant database, the relay per cell, the inbox for exactly-once handling, and the broker adapter (the broker is an ADR decision due before 5 October; Azure Service Bus recommended, SD-032, SD-030, SD-031). Done when: an event written in a transaction reaches its consumer once, survives a relay restart, and a poison message lands in the dead-letter queue."},
-  {"key": "PLATFORM-SAGA-PAID", "epic": "PLATFORM", "points": 5, "pool": "backend", "depends": ["PLATFORM-OUTBOX"],
+   "detail": "Idempotency records in PostgreSQL with Redis as a cache only (SD-024), so a retried payment or sale after a restart returns the first answer. Done when: replaying a createOrder with the same key after a service restart returns the original response and creates nothing."
+  },
+  {
+   "key": "PLATFORM-OUTBOX",
+   "epic": "PLATFORM",
+   "points": 8,
+   "pool": "backend",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "SETUP-HOSTS"
+   ],
+   "subject": "Outbox, relay and inbox behind the kernel broker interface, on a local RabbitMQ",
+   "detail": "The transactional outbox per tenant database; one relay per region in the workers host, with a lease and a polling loop per tenant database, and an inbox per tenant database for exactly-once handling (ADR-0058); publishing and consuming only through the kernel interface (IEventPublisher, IEventSubscriber). The broker per ADR-0057 is the client's choice between RabbitMQ and Kafka: build behind the kernel interface on a local RabbitMQ until they answer, with ordering per aggregate by an ordering key and dead letters drained into platform.dead_letter. A relay-lag dashboard and alert per tenant database (SD-030, SD-031, SD-032). Done when: an event written in a transaction reaches its consumer once, survives a relay restart and a redelivery, a poison message lands in platform.dead_letter, and relay lag shows on the dashboard and alerts when unpublished rows are older than 60 seconds."
+  },
+  {
+   "key": "PLATFORM-SAGA-PAID",
+   "epic": "PLATFORM",
+   "points": 5,
+   "pool": "backend",
+   "depends": [
+    "PLATFORM-OUTBOX"
+   ],
    "subject": "Order paid to tickets issued: the saga proven end to end",
-   "detail": "order.paid consumed by the entitlement owner, tickets issued, the ledger posting once from the event, and holds converted with capacity decremented (SD-026, SD-023). Done when: a web purchase in the sandbox ends with a ticket, one ledger posting and sold capacity reduced, and a replayed event changes nothing."},
-  {"key": "PLATFORM-PAYMENTS", "epic": "PLATFORM", "points": 8, "pool": "backend", "depends": ["PLATFORM-OUTBOX", "CLIENT-PAY-SANDBOX"],
+   "detail": "order.paid consumed by the entitlement owner, tickets issued, the ledger posting once from the event, and holds converted with capacity decremented (SD-026, SD-023). Done when: a web purchase in the sandbox ends with a ticket, one ledger posting and sold capacity reduced, and a replayed event changes nothing."
+  },
+  {
+   "key": "PLATFORM-PAYMENTS",
+   "epic": "PLATFORM",
+   "points": 8,
+   "pool": "backend",
+   "depends": [
+    "PLATFORM-OUTBOX"
+   ],
    "subject": "Payment adapter and signed webhook against the provider's test mode",
-   "detail": "The provider adapter, the inbound signed webhook, the provider reference on payments, 3-D Secure redirect states and the card-terminal flow for the POS (SD-034). Done when: an approved, a declined and a 3-D Secure payment each end in the right order state from the webhook alone, with polling only as the fallback."},
-  {"key": "PLATFORM-AUDIT", "epic": "PLATFORM", "points": 3, "pool": "backend", "depends": ["PLATFORM-KERNEL"],
+   "detail": "The provider adapter, the inbound signed webhook, the provider reference on payments, 3-D Secure redirect states and the card-terminal flow for the POS (SD-034). Done when: an approved, a declined and a 3-D Secure payment each end in the right order state from the webhook alone, with polling only as the fallback. Acceptance of the declined, unknown and reconcile paths waits on the client's payment sandbox credentials: see the client's answer in the Decisions Register."
+  },
+  {
+   "key": "PLATFORM-AUDIT",
+   "epic": "PLATFORM",
+   "points": 3,
+   "pool": "backend",
+   "depends": [
+    "PLATFORM-KERNEL"
+   ],
    "subject": "Audit interceptor for every write",
-   "detail": "Who, what, when, tenant and venue for every write, written once by an interceptor rather than per operation (SD-057). Done when: any write in the Block A slice leaves one audit row a support user can read."},
-  {"key": "PLATFORM-FLAGS", "epic": "PLATFORM", "points": 2, "pool": "backend", "depends": ["PLATFORM-KERNEL"],
+   "detail": "Who, what, when, tenant and venue for every write, written once by an interceptor rather than per operation (SD-057). Done when: any write in the Block A slice leaves one audit row a support user can read."
+  },
+  {
+   "key": "PLATFORM-FLAGS",
+   "epic": "PLATFORM",
+   "points": 2,
+   "pool": "backend",
+   "depends": [
+    "PLATFORM-KERNEL"
+   ],
    "subject": "Release flags per tenant",
-   "detail": "Half-built features stay dark per tenant between sprints (SD-051). Done when: a flag switched off for one tenant hides a screen and refuses its operations for that tenant only."},
-  {"key": "PLATFORM-RLS", "epic": "PLATFORM", "points": 3, "pool": "backend", "depends": ["PLATFORM-KERNEL"],
+   "detail": "Half-built features stay dark per tenant between sprints (SD-051). Done when: a flag switched off for one tenant hides a screen and refuses its operations for that tenant only."
+  },
+  {
+   "key": "PLATFORM-RLS",
+   "epic": "PLATFORM",
+   "points": 3,
+   "pool": "backend",
+   "depends": [
+    "PLATFORM-KERNEL"
+   ],
    "subject": "Row-level policies without a per-row subquery on hot tables",
-   "detail": "Scope predicates read session settings instead of joining per row (SD-016). Done when: the order and scan-event queries keep their plan with policies on, measured on the seed data."},
-  {"key": "PLATFORM-OBSERVE", "epic": "PLATFORM", "points": 5, "assignee": "Hrushikant Patkar", "depends": ["SETUP-OBS"],
+   "detail": "Scope predicates read session settings instead of joining per row (SD-016). Done when: the order and scan-event queries keep their plan with policies on, measured on the seed data."
+  },
+  {
+   "key": "PLATFORM-OBSERVE",
+   "epic": "PLATFORM",
+   "points": 5,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "SETUP-OBS"
+   ],
    "subject": "Observability with tenant and venue on every trace, and the first dashboards",
-   "detail": "OpenTelemetry attributes for tenant, venue and workstation; dashboards for the sale path and sync; alerts on error rate and latency (SD-048). Done when: a failed POS sale can be found by venue and till within a minute."},
-  {"key": "PLATFORM-MIGRATE", "epic": "PLATFORM", "points": 5, "assignee": "Hrushikant Patkar", "depends": ["SETUP-DB"],
+   "detail": "OpenTelemetry attributes for tenant, venue and workstation; dashboards for the sale path and sync; alerts on error rate and latency (SD-048). Done when: a failed POS sale can be found by venue and till within a minute."
+  },
+  {
+   "key": "PLATFORM-MIGRATE",
+   "epic": "PLATFORM",
+   "points": 5,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "SETUP-DB"
+   ],
    "subject": "Migration fan-out across tenant databases, and expand-then-contract changes",
-   "detail": "Apply a migration to every tenant database with progress and resume, and the rule that a schema change ships in two steps so old and new code both run (SD-049). Done when: a column rename reaches three seeded tenant databases with no downtime."},
-  {"key": "OFFLINE-JOURNAL", "epic": "OFFLINE", "points": 8, "assignee": "Pradnya Yeram", "depends": ["SETUP-CLIENTS"],
+   "detail": "Apply a migration to every tenant database with progress and resume, and the rule that a schema change ships in two steps so old and new code both run (SD-049). Done when: a column rename reaches three seeded tenant databases with no downtime."
+  },
+  {
+   "key": "SETUP-HOSTS",
+   "epic": "PLATFORM",
+   "points": 3,
+   "pool": "backend",
+   "depends": [
+    "SETUP-CI"
+   ],
+   "subject": "Hosts for the deployables on .NET 10: commerce, access, operations and workers, each composing its modules",
+   "detail": "In ticvai-backend, on .NET 10 LTS (decided 30 September; ADR-0055). Four .NET hosts in one solution: commerce (Identity, Tenancy, Catalogue, Order, Ledger, Wallet), access (Access), operations (F&B, Retail, Inventory, VenueOps, Marketing, WhiteLabel, Reporting, Platform, CrossRegion) and workers (the outbox relay, every module's event consumers, scheduled jobs), each composing its modules through IModule. ticvai-ai stays the Python service. Done when: each host starts locally with its modules registered and a health endpoint, CI builds one image per host, and moving a module to another host is a change of one registration."
+  },
+  {
+   "key": "ARCH-TESTS",
+   "epic": "PLATFORM",
+   "points": 3,
+   "pool": "backend",
+   "depends": [
+    "SETUP-HOSTS"
+   ],
+   "subject": "Architecture tests for 17 modules: no module references another, and no module's SQL names another's schema",
+   "detail": "Extend tests/Ticvai.ArchitectureTests/ModuleBoundaryTests.cs from six modules to 17 (ADR-0055), and add a test that fails when a module's SQL names another module's schema other than through a published read view. Done when: a deliberate cross-module reference and a raw cross-schema query each fail the build in CI."
+  },
+  {
+   "key": "DB-READ-VIEWS",
+   "epic": "PLATFORM",
+   "points": 5,
+   "pool": "backend",
+   "depends": [
+    "MIG-BASELINE"
+   ],
+   "subject": "Published read views for cross-module reads, generated from the lineage",
+   "detail": "A deriver reads handoff/api-data-lineage.json and generates, per owning module, the views other modules may read (894 cross-schema reads on 30 September; ADR-0055), applied by the migrations. Done when: every cross-schema read in the Block A slice goes through a published view, the views regenerate with one command, and a raw cross-schema read is reported by the lineage check."
+  },
+  {
+   "key": "DB-ROLES",
+   "epic": "PLATFORM",
+   "points": 2,
+   "pool": "backend",
+   "depends": [
+    "MIG-BASELINE"
+   ],
+   "subject": "One Postgres role per deployable; the AI role read-only",
+   "detail": "Roles for commerce, access, operations, ticvai-ai and workers (ADR-0055), created in the baseline migrations and granted their modules' schemas plus the published read views; the ticvai-ai role is read-only on the transactional schemas (ADR-0020). Done when: each host connects with its own role from the cell's Key Vault, and a write from the AI role to a transactional table is refused by PostgreSQL."
+  },
+  {
+   "key": "KERNEL-ID",
+   "epic": "PLATFORM",
+   "points": 2,
+   "pool": "backend",
+   "depends": [
+    "SETUP-HOSTS"
+   ],
+   "subject": "One id type: UUIDv7 from Id.New() in the kernel and in offline-core",
+   "detail": "Replace the kernel's ULID generator (Ticvai.Shared.Kernel Primitives/Ulid.cs) with Id.New(), a UUIDv7 Guid (RFC 9562) written big-endian so PostgreSQL's uuid order is time order (ADR-0056), and the same generator in ticvai-frontend packages/offline-core for ids created offline. Done when: ids made by the server and by an offline till sort by creation time in PostgreSQL, a .NET-to-TypeScript round-trip test agrees byte for byte, and no ULID string is generated anywhere."
+  },
+  {
+   "key": "MIG-PARTITIONS",
+   "epic": "PLATFORM",
+   "points": 3,
+   "pool": "backend",
+   "depends": [
+    "MIG-BASELINE",
+    "SETUP-HOSTS"
+   ],
+   "subject": "Monthly partitions: create three months ahead, detach what retention has expired",
+   "detail": "A job in the workers host that keeps monthly range partitions three months ahead on the time-partitioned tables (access.scan_event, platform.outbox, platform.dead_letter, platform.audit_record, ledger.journal_line, marketing.message_dispatch, kernel.inbox; ADR-0056) in every tenant database, and detaches and archives partitions past their retention (ADR-0047). Done when: a new tenant database has partitions three months ahead, a run with the clock moved forward creates the next month, and an expired partition is detached, not deleted row by row."
+  },
+  {
+   "key": "SETUP-QDRANT",
+   "epic": "PLATFORM",
+   "points": 3,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "SETUP-ENV"
+   ],
+   "subject": "Qdrant cluster in dev and staging: 3 nodes, TLS, snapshots, monitoring",
+   "detail": "In ticvai-infra (Terraform): a self-hosted 3-node Qdrant cluster in Azure UAE North for dev and staging (ADR-0049), pinned to 1.16 or later, with TLS, JWT RBAC on and the signing key in the cell's Key Vault, snapshot storage in the UAE, and monitoring and alerts on node health, disk and latency. Check Qdrant Hybrid Cloud on our own AKS as an alternative before building. Done when: the cluster survives the loss of one node, a snapshot of a test collection restores into a fresh cluster, and a request without a valid token is refused."
+  },
+  {
+   "key": "OFFLINE-JOURNAL",
+   "epic": "OFFLINE",
+   "points": 8,
+   "assignee": "Pradnya Yeram",
+   "depends": [
+    "SETUP-CLIENTS"
+   ],
    "subject": "Offline journal in packages/offline-core: record, replay and the conflict policies",
-   "detail": "In ticvai-frontend packages/offline-core: an append-only journal of sales and scans taken offline, replay on reconnect, and the conflict policies the contracts declare (SD-047). Done when: a POS takes ten cash sales with the network off and all ten reach the server once when it returns."},
-  {"key": "OFFLINE-BUNDLE", "epic": "OFFLINE", "points": 8, "pool": "backend", "depends": ["PLATFORM-KERNEL"],
+   "detail": "In ticvai-frontend packages/offline-core: an append-only journal of sales and scans taken offline, replay on reconnect, and the conflict policies the contracts declare (SD-047). Done when: a POS takes ten cash sales with the network off and all ten reach the server once when it returns."
+  },
+  {
+   "key": "OFFLINE-BUNDLE",
+   "epic": "OFFLINE",
+   "points": 8,
+   "pool": "backend",
+   "depends": [
+    "PLATFORM-KERNEL"
+   ],
    "subject": "Signed catalogue and entitlement bundles, and the lease client",
-   "detail": "The signed bundle a till or scanner trades from offline, including entitlements and dynamic access policy for the scanner (SD-052), and the lease each workstation holds (SD-047). Done when: a till with an expired lease stops selling offline and says why."},
-  {"key": "OFFLINE-SYNC", "epic": "OFFLINE", "points": 5, "pool": "backend", "depends": ["OFFLINE-BUNDLE"],
+   "detail": "The signed bundle a till or scanner trades from offline, including entitlements and dynamic access policy for the scanner (SD-052), and the lease each workstation holds (SD-047). Done when: a till with an expired lease stops selling offline and says why."
+  },
+  {
+   "key": "OFFLINE-SYNC",
+   "epic": "OFFLINE",
+   "points": 5,
+   "pool": "backend",
+   "depends": [
+    "OFFLINE-BUNDLE"
+   ],
    "subject": "syncOrders: a result per entry, and a bad entry quarantined instead of blocking the till",
-   "detail": "Per-entry outcomes, a quarantine a supervisor resolves, and the till carrying on with the rest (SD-028). Done when: one malformed sale in a batch of twenty is quarantined and the other nineteen are accepted."},
-  {"key": "POS-KDS-ROUTING", "epic": "OFFLINE", "points": 5, "pool": "backend", "depends": ["PLATFORM-OUTBOX"],
+   "detail": "Per-entry outcomes, a quarantine a supervisor resolves, and the till carrying on with the rest (SD-028). Done when: one malformed sale in a batch of twenty is quarantined and the other nineteen are accepted."
+  },
+  {
+   "key": "POS-KDS-ROUTING",
+   "epic": "OFFLINE",
+   "points": 5,
+   "pool": "backend",
+   "depends": [
+    "PLATFORM-OUTBOX"
+   ],
    "subject": "A POS sale reaches the kitchen: routing online, and the LAN path decision",
-   "detail": "createFnbOrder from the POS creates the kitchen ticket as the guest order does, routed to the right station (SD-046). The offline LAN path to the Kitchen Display is an ADR decision; this task implements the online path and the stub the decision fills. Done when: a POS sale of a burger and a drink shows on the grill and bar stations."},
-  {"key": "AI-ENGINE-GATEWAY", "epic": "AI-ENGINE", "assignee": "Kalpita Mejari", "days": 10,
+   "detail": "createFnbOrder from the POS creates the kitchen ticket as the guest order does, routed to the right station (SD-046). The offline LAN path to the Kitchen Display is an ADR decision; this task implements the online path and the stub the decision fills. Done when: a POS sale of a burger and a drink shows on the grill and bar stations."
+  },
+  {
+   "key": "AI-ENGINE-GATEWAY",
+   "epic": "AI-ENGINE",
+   "assignee": "Kalpita Mejari",
+   "days": 10,
    "subject": "AI gateway, governance decision point and usage metering",
-   "detail": "One gateway every AI call goes through: provider (managed Azure by default; BYOK where TICVAI enables it), policy check (evaluateAiGovernance), usage and spend (getAiUsage), and the decision record for every answer. About 10 engineer-days."},
-  {"key": "AI-ENGINE-BASELINE", "epic": "AI-ENGINE", "assignee": "Second AI engineer", "days": 15,
+   "detail": "One gateway every AI call goes through: provider (managed Azure by default; BYOK where TICVAI enables it), policy check (evaluateAiGovernance), usage and spend (getAiUsage), and the decision record for every answer. About 10 engineer-days.",
+   "depends": [
+    "SETUP-CI",
+    "SETUP-ENV"
+   ]
+  },
+  {
+   "key": "AI-ENGINE-BASELINE",
+   "epic": "AI-ENGINE",
+   "assignee": "Second AI engineer",
+   "days": 15,
    "subject": "The baseline-then-learn layer: estimator interface, maturity stages, venue profile, starting patterns",
-   "detail": "One interface per AI question with three answers behind it (starting pattern, statistical on the tenant's data, trained model); the stage and 'based on' label on every answer; the venue profile entered at onboarding; starting patterns per venue type with the UAE calendar and weather; no other tenant's data. About 15 engineer-days; the rest of the layer continues in Block B."},
-  {"key": "AI-ENGINE-SUGGESTIONS", "epic": "AI-ENGINE", "assignee": "Second AI engineer", "days": 8,
+   "detail": "One interface per AI question with three answers behind it (starting pattern, statistical on the tenant's data, trained model); the stage and 'based on' label on every answer; the venue profile entered at onboarding; starting patterns per venue type with the UAE calendar and weather; no other tenant's data. About 15 engineer-days; the rest of the layer continues in Block B.",
+   "depends": [
+    "AI-ENGINE-GATEWAY"
+   ]
+  },
+  {
+   "key": "AI-ENGINE-SUGGESTIONS",
+   "epic": "AI-ENGINE",
+   "assignee": "Second AI engineer",
+   "days": 8,
    "subject": "Day-one suggestions for the Block A screens: queue balancing, prep plan, upsell",
-   "detail": "requestSuggestion answers from the baseline on day one for the kinds Block A screens call (BO-005, GST-031, WEB-044), with the upsell baseline from the Promotions relationship map. About 8 engineer-days."},
-  {"key": "AI-ENGINE-CONCIERGE", "epic": "AI-ENGINE", "assignee": "Kalpita Mejari", "days": 8,
+   "detail": "requestSuggestion answers from the baseline on day one for the kinds Block A screens call (BO-005, GST-031, WEB-044), with the upsell baseline from the Promotions relationship map. About 8 engineer-days.",
+   "depends": [
+    "AI-ENGINE-BASELINE"
+   ]
+  },
+  {
+   "key": "AI-ENGINE-CONCIERGE",
+   "epic": "AI-ENGINE",
+   "assignee": "Kalpita Mejari",
+   "days": 8,
    "subject": "Guest concierge: retrieval over the venue's knowledge, answers with sources",
-   "detail": "Knowledge ingest and reindex, semantic search, the concierge conversation with the venue's content as its only source, and the answer cache keyed by scope. About 8 engineer-days."},
-  {"key": "AI-ENGINE-GUIDED", "epic": "AI-ENGINE", "assignee": "Kalpita Mejari", "days": 4,
+   "detail": "Knowledge ingest and reindex, semantic search, the concierge conversation with the venue's content as its only source, and the answer cache keyed by scope. About 8 engineer-days.",
+   "depends": [
+    "AI-ENGINE-GATEWAY",
+    "AI-ENGINE-QDRANT"
+   ]
+  },
+  {
+   "key": "AI-ENGINE-QDRANT",
+   "epic": "AI-ENGINE",
+   "assignee": "Second AI engineer",
+   "days": 5,
+   "subject": "Qdrant tenancy: a collection and a scoped token per tenant, the retrieval client, erasure and snapshots",
+   "detail": "Collection-per-tenant provisioning at tenant onboarding, per embedding model behind the alias tenant_<tenantId> (a model change is a shadow collection and an alias swap); per-tenant JWT issuance and rotation, scoped to the tenant's collections; the single retrieval client with no scope parameter that always adds the venue filter; erasure by guest or document payload, checked against the point references in ai.chunk_embedding; offboarding that deletes the collections and revokes the token; per-collection snapshots (ADR-0049). Done when: a token for one tenant cannot read another tenant's collection, a venue-scoped question never returns another venue's chunk, and an erased guest's points are gone and provably so. About 5 engineer-days.",
+   "depends": [
+    "SETUP-QDRANT",
+    "AI-ENGINE-GATEWAY"
+   ]
+  },
+  {
+   "key": "AI-ENGINE-GUIDED",
+   "epic": "AI-ENGINE",
+   "assignee": "Kalpita Mejari",
+   "days": 4,
    "subject": "Help me choose: suggested question sets from the product catalogue",
-   "detail": "proposeGuidedChoice suggests filter questions from product attributes (age and height rules, levels, certifications); the operator edits and publishes, nothing is published automatically. About 4 engineer-days."},
-  {"key": "AI-ENGINE-TRANSLATE", "epic": "AI-ENGINE", "assignee": "Kalpita Mejari", "days": 3,
+   "detail": "proposeGuidedChoice suggests filter questions from product attributes (age and height rules, levels, certifications); the operator edits and publishes, nothing is published automatically. About 4 engineer-days.",
+   "depends": [
+    "AI-ENGINE-GATEWAY"
+   ]
+  },
+  {
+   "key": "AI-ENGINE-TRANSLATE",
+   "epic": "AI-ENGINE",
+   "assignee": "Kalpita Mejari",
+   "days": 3,
    "subject": "Content translation English and Arabic for the CMS",
-   "detail": "proposeTranslations for CMS content, reviewed by the operator before publishing. About 3 engineer-days."},
-  {"key": "AI-ENGINE-PLANNER", "epic": "AI-ENGINE", "assignee": "Kalpita Mejari", "days": 8,
+   "detail": "proposeTranslations for CMS content, reviewed by the operator before publishing. About 3 engineer-days.",
+   "depends": [
+    "AI-ENGINE-GATEWAY"
+   ]
+  },
+  {
+   "key": "AI-ENGINE-PLANNER",
+   "epic": "AI-ENGINE",
+   "assignee": "Kalpita Mejari",
+   "days": 8,
    "subject": "The planner agent on top of the rules planner",
-   "detail": "The agent refines the rules plan by chat, with the plan operations as its tools; when AI is off or fails it falls back to the rules plan, never to an error. About 8 engineer-days."},
-  {"key": "AI-ENGINE-EVAL", "epic": "AI-ENGINE", "assignee": "Second AI engineer", "days": 5,
+   "detail": "The agent refines the rules plan by chat, with the plan operations as its tools; when AI is off or fails it falls back to the rules plan, never to an error. About 8 engineer-days.",
+   "depends": [
+    "AI-ENGINE-GATEWAY"
+   ]
+  },
+  {
+   "key": "AI-ENGINE-EVAL",
+   "epic": "AI-ENGINE",
+   "assignee": "Second AI engineer",
+   "days": 5,
    "subject": "Evaluation harness and the promotion alert",
-   "detail": "Offline evaluation of every AI answer type against a fixture, the backtest runner the learned producers will use, and the promotion-ready alert to the admin (AI-D16). About 5 engineer-days."}
+   "detail": "Offline evaluation of every AI answer type against a fixture, the backtest runner the learned producers will use, and the promotion-ready alert to the admin (AI-D16). About 5 engineer-days.",
+   "depends": [
+    "AI-ENGINE-GATEWAY"
+   ]
+  }
  ]
 }

@@ -1,6 +1,6 @@
 # WS107 — Subscription Licensing AI Self Service board 10
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 15 operations · 20 schemas · 6 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `PLATFORM_BILLING_MANAGE, PLATFORM_BILLING_VIEW, PLATFORM_CELL_MANAGE, PLATFORM_PLAN_MANAGE, PLATFORM_TENANT_MANAGE, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +60,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `ADM-459` | Billing & Commercial Command Center | commandCentre | 0 | 0 | — |
-| `ADM-460` | Billing Calculation & Charge Breakdown | listDetail | 0 | 0 | — |
-| `ADM-461` | Consumption Reconciliation & Billing Approval | listDetail | 0 | 0 | — |
-| `ADM-462` | Invoice & Payment Management | listDetail | 0 | 0 | — |
-| `ADM-463` | Subscription & Commercial Change Management | listDetail | 0 | 0 | — |
-| `ADM-464` | Renewal Management Center | commandCentre | 0 | 0 | — |
-| `ADM-465` | AI Upgrade, Downgrade & Commercial Right-Sizing | listDetail | 0 | 0 | — |
-| `ADM-466` | Commercial Scenario Simulator | commandCentre | 0 | 0 | — |
-| `ADM-467` | Discount, Credit & Commercial Override Management | configEditor | 0 | 0 | — |
-| `ADM-468` | Renewal Approval, Activation & Commercial Handoff | listDetail | 0 | 0 | — |
+| `ADM-459` | Billing & Commercial Command Center | commandCentre | 1 | 0 | — |
+| `ADM-460` | Billing Calculation & Charge Breakdown | listDetail | 1 | 0 | — |
+| `ADM-461` | Consumption Reconciliation & Billing Approval | listDetail | 2 | 0 | — |
+| `ADM-462` | Invoice & Payment Management | listDetail | 4 | 0 | — |
+| `ADM-463` | Subscription & Commercial Change Management | listDetail | 2 | 0 | — |
+| `ADM-464` | Renewal Management Center | commandCentre | 2 | 0 | — |
+| `ADM-465` | AI Upgrade, Downgrade & Commercial Right-Sizing | listDetail | 2 | 0 | — |
+| `ADM-466` | Commercial Scenario Simulator | commandCentre | 1 | 0 | — |
+| `ADM-467` | Discount, Credit & Commercial Override Management | configEditor | 4 | 0 | — |
+| `ADM-468` | Renewal Approval, Activation & Commercial Handoff | listDetail | 1 | 0 | — |
 
 ## Thin screens in this batch
 

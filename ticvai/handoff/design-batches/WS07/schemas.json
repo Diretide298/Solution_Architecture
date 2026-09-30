@@ -1,4 +1,253 @@
 {
+ "AccessAccreditationCredential": {
+  "type": "object",
+  "x-ticvai-persistence": "access.accreditation_credential",
+  "x-ticvai-agreed": "29 September: build pass (group OWN, from group RA's handoff; BL-181); the events accreditation.credentialIssued and accreditation.holderStatusChanged name access as their critical consumer",
+  "description": "**What a gate needs to admit an accredited person, kept by `access`** (29 September, build). Written only by the consumers of `accreditation.credentialIssued` (a row per credential; a replacement sets the replaced row's `admits` false) and `accreditation.holderStatusChanged` (every credential of the holder: `admits` false unless the holder is `active`, validity taken from the event). Read by `validateAccess` and shipped in the offline package. The record of truth stays in `accreditation`; this is a copy shaped for the gate, never edited by a person.",
+  "required": [
+   "id",
+   "holderId",
+   "encodedIdentifier",
+   "admits",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The accreditation credential's id (`credentialId` on the events)."
+   },
+   "holderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "programmeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "kind": {
+    "type": "string",
+    "description": "printedBadge, mobileCredential, qr, nfcCard, rfidCard or wristband, as issued."
+   },
+   "encodedIdentifier": {
+    "type": "string",
+    "x-ticvai-unique": "tenant",
+    "description": "What the gate reads from the credential. Never sent to webhook subscribers."
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "zoneIds": {
+    "type": "array",
+    "description": "The holder's effective zones, from the event (`effectiveZones`).",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "holderStatus": {
+    "type": "string",
+    "enum": [
+     "active",
+     "suspended",
+     "revoked",
+     "expired",
+     "archived"
+    ],
+    "description": "The holder's status as last published; only `active` admits."
+   },
+   "admits": {
+    "type": "boolean",
+    "description": "False once the credential is replaced or the holder is not active."
+   },
+   "sourceChangedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "The `issuedAt` or `changedAt` of the event last applied; an older event arriving late is ignored."
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005), the accreditation programme's scope."
+   }
+  }
+ },
+ "AccessDynamicPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "access.dynamic_policy",
+  "description": "One guest-admission dynamic (attribute-based) policy with its current content - type, context or identity it tests, condition expression, result, priority, zones, validity, status and current version. Not identity.access_policy, which is staff permission (declared 29 September, data-model close-out DM1).\n\n**Which of the two policy engines this is** (stated 29 September, build pass). **This one governs who may pass which gate**: admission of a guest, pass holder, accreditation holder or employee at an access point, decided in validation with results a gate acts on (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor). **identity `AccessPolicy` governs who may do what in the software**: a principal's permissions on operations and screens, decided by identity `evaluateAccess`. An employee's badge opening a staff door is decided here; the same employee approving a refund is decided in identity. Effectiveness is reported per engine: `listDynamicPolicyEffectiveness` here, `listAccessPolicyEffectiveness` in identity.",
+  "required": [
+   "id",
+   "scopePath",
+   "name",
+   "policyType",
+   "conditionExpression",
+   "result",
+   "status",
+   "currentVersion"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The policyId"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "ltree of the owning scope node; where it applies further is access.policy_scope_assignment"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "policyType": {
+    "type": "string",
+    "enum": [
+     "guestAttribute",
+     "accreditation",
+     "occupancy",
+     "employee",
+     "risk",
+     "membership",
+     "timeEvent"
+    ]
+   },
+   "contextType": {
+    "type": "string",
+    "enum": [
+     "date",
+     "day",
+     "time",
+     "season",
+     "event",
+     "performance",
+     "specialEvent",
+     "holiday",
+     "operatingCalendar",
+     "occupancy",
+     "attractionStatus"
+    ],
+    "nullable": true,
+    "description": "Context/time/event policies (setContextTimeEvent)"
+   },
+   "identityType": {
+    "type": "string",
+    "enum": [
+     "guest",
+     "member",
+     "annualPassHolder",
+     "employee",
+     "contractor",
+     "vendor",
+     "performer",
+     "media",
+     "vip",
+     "security",
+     "emergencyServices",
+     "eventStaff"
+    ],
+    "nullable": true,
+    "description": "Identity-based policies (listIdentityMembershipAccreditation)"
+   },
+   "conditionExpression": {
+    "type": "string",
+    "description": "Condition tree over access.access_attribute keys using AND, OR, NOT, IN and BETWEEN"
+   },
+   "result": {
+    "type": "string",
+    "enum": [
+     "allow",
+     "deny",
+     "review",
+     "requireId",
+     "requireBiometric",
+     "requireCompanion",
+     "requireSupervisor"
+    ]
+   },
+   "priority": {
+    "type": "integer",
+    "nullable": true
+   },
+   "allowedZoneIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "deniedZoneIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "monitorThresholdPercent": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Occupancy policies. Percent at which the band becomes Monitor"
+   },
+   "restrictThresholdPercent": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "Occupancy policies. Percent at which the band becomes Restrict"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The grant expires automatically at validTo"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "pendingApproval",
+     "active",
+     "inactive",
+     "expired"
+    ],
+    "default": "draft"
+   },
+   "currentVersion": {
+    "type": "integer",
+    "minimum": 1,
+    "description": "The version in force (access.dynamic_policy_version)"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
  "AccessOfflinePolicy": {
   "type": "object",
   "x-ticvai-persistence": "access.offline_policy",
@@ -204,13 +453,13 @@
    },
    "fraudRuleId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The access fraud rule that raised the alert, if one did"
    },
    "entitlementId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "The credential (the list's credentialId)"
    },
@@ -520,6 +769,180 @@
    "nodeType"
   ]
  },
+ "EdgePackageDataDistributionView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Edge Package & Data Distribution displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "packageId": {
+    "type": "string",
+    "description": "Edge package identifier"
+   },
+   "contents": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "venues",
+      "zones",
+      "gates",
+      "accessRules",
+      "calendars",
+      "mediaProfiles",
+      "verificationProfiles",
+      "entitlementDefinitions",
+      "trustedVerificationMaterial",
+      "revocationInformation",
+      "credentialSecurityParameters",
+      "reasonCodes",
+      "gateResponses",
+      "languages",
+      "operatorPermissions"
+     ]
+    },
+    "description": "Data sets included in this edge package"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version (the pack shows 24.6, 89 | Pag e)"
+   },
+   "devices": {
+    "type": "integer",
+    "description": "Devices (the pack shows 84)"
+   },
+   "signatureValid": {
+    "type": "boolean",
+    "description": "✓ Signature valid"
+   },
+   "packageComplete": {
+    "type": "boolean",
+    "description": "✓ Package complete"
+   },
+   "versionValid": {
+    "type": "boolean",
+    "description": "✓ Version valid"
+   },
+   "deviceAuthorized": {
+    "type": "boolean",
+    "description": "✓ Device authorized"
+   },
+   "sizeBytes": {
+    "type": "integer",
+    "description": "Package size"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Valid from"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Valid to"
+   }
+  },
+  "required": [
+   "packageId"
+  ]
+ },
+ "EdgeSecurityAuditDeploymentView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Edge Security, Audit & Deployment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "policyVersionId": {
+    "type": "string",
+    "description": "Edge policy version identifier"
+   },
+   "deploymentScope": {
+    "type": "string",
+    "enum": [
+     "tenant",
+     "venue",
+     "park",
+     "edgeCluster",
+     "gateGroup",
+     "deviceGroup",
+     "individualDevice"
+    ],
+    "description": "Where this edge policy version deploys"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version label, e.g. V4.8"
+   },
+   "stage": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "validated",
+     "securityTested",
+     "offlineSimulated",
+     "approved",
+     "pilot",
+     "published"
+    ],
+    "description": "Release stage"
+   },
+   "isProduction": {
+    "type": "boolean",
+    "description": "Currently in production"
+   },
+   "scheduledAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Scheduled deployment time"
+   }
+  },
+  "required": [
+   "policyVersionId"
+  ]
+ },
+ "EdgeSecurityAuditDeploymentViewSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none - aggregate computed at read time over the rows the page lists",
+  "description": "The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).",
+  "properties": {
+   "edgeCertificates": {
+    "type": "integer",
+    "description": "Edge certificates"
+   },
+   "edgeCredentials": {
+    "type": "integer",
+    "description": "Edge credentials"
+   },
+   "packageSignatures": {
+    "type": "integer",
+    "description": "Package signatures"
+   },
+   "authorizedDevices": {
+    "type": "integer",
+    "description": "Authorized devices"
+   },
+   "revokedDevices": {
+    "type": "integer",
+    "description": "Revoked devices"
+   },
+   "failedPackageValidation": {
+    "type": "integer",
+    "description": "Failed package validation"
+   },
+   "unauthorizedConnectionAttempts": {
+    "type": "integer",
+    "description": "unauthorized connection attempts"
+   },
+   "configurationChanges": {
+    "type": "integer",
+    "description": "configuration changes"
+   },
+   "offlineOverrideActivity": {
+    "type": "integer",
+    "description": "offline override activity"
+   }
+  }
+ },
  "HardwareDeploymentInput": {
   "type": "object",
   "x-ticvai-persistence": "none — request only (decided 29 September, VM close-out)",
@@ -533,7 +956,7 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "description": "Client-generated deployment id"
    },
    "configurationVersion": {
@@ -588,7 +1011,7 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "configurationVersion": {
     "type": "string"
@@ -711,6 +1134,186 @@
    "venueId"
   ]
  },
+ "OfflineEdgeOperationsCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Offline & Edge Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "venueId": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "rulesCached": {
+    "type": "boolean",
+    "description": "✓ Rules cached"
+   },
+   "verificationMaterialCurrent": {
+    "type": "boolean",
+    "description": "✓ Verification material current"
+   },
+   "revocationDataCurrent": {
+    "type": "boolean",
+    "description": "✓ Revocation data current"
+   },
+   "credentialDefinitionsAvailable": {
+    "type": "boolean",
+    "description": "✓ Credential definitions available"
+   },
+   "deviceStorageHealthy": {
+    "type": "boolean",
+    "description": "✓ Device storage healthy"
+   },
+   "lastSynchronizationSuccessful": {
+    "type": "boolean",
+    "description": "✓ Last synchronization successful"
+   },
+   "venueName": {
+    "type": "string",
+    "description": "Venue name"
+   },
+   "devices": {
+    "type": "integer",
+    "description": "Devices at the venue"
+   },
+   "offlineReady": {
+    "type": "integer",
+    "description": "Devices ready to operate offline"
+   },
+   "readinessPercent": {
+    "type": "number",
+    "description": "Share of devices offline ready"
+   },
+   "packageStatus": {
+    "type": "string",
+    "enum": [
+     "current",
+     "expiring",
+     "expired"
+    ],
+    "description": "Edge package status"
+   },
+   "pendingTransactions": {
+    "type": "integer",
+    "description": "Offline transactions not yet synchronized"
+   },
+   "readinessStatus": {
+    "type": "string",
+    "enum": [
+     "ready",
+     "warning",
+     "notReady"
+    ],
+    "description": "Venue readiness"
+   }
+  },
+  "required": [
+   "venueId"
+  ]
+ },
+ "OfflineEdgeOperationsCommandCenterViewSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none - aggregate computed at read time over the rows the page lists",
+  "description": "The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).",
+  "properties": {
+   "offlineReadyDevices": {
+    "type": "integer",
+    "description": "Offline-Ready Devices"
+   },
+   "currentlyOnline": {
+    "type": "integer",
+    "description": "Currently Online"
+   },
+   "currentlyOffline": {
+    "type": "integer",
+    "description": "Currently Offline"
+   },
+   "devicesInDegradedMode": {
+    "type": "integer",
+    "description": "Devices in Degraded Mode"
+   },
+   "edgeNodesOnline": {
+    "type": "integer",
+    "description": "Edge Nodes Online"
+   },
+   "packagesCurrent": {
+    "type": "integer",
+    "description": "Packages Current"
+   },
+   "packagesExpiring": {
+    "type": "integer",
+    "description": "Packages Expiring"
+   },
+   "pendingOfflineTransactions": {
+    "type": "integer",
+    "description": "Pending Offline Transactions"
+   },
+   "syncConflicts": {
+    "type": "integer",
+    "description": "Sync conflicts"
+   },
+   "offlineSecurityAlerts": {
+    "type": "integer",
+    "description": "Offline Security Alerts"
+   }
+  }
+ },
+ "OfflineEntitlementUsageLedgerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Offline Entitlement & Usage Ledger displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ledgerEntryId": {
+    "type": "string",
+    "description": "Ledger entry identifier"
+   },
+   "credential": {
+    "type": "string",
+    "description": "Credential"
+   },
+   "device": {
+    "type": "string",
+    "description": "Device"
+   },
+   "gate": {
+    "type": "string",
+    "description": "Gate"
+   },
+   "entitlement": {
+    "type": "string",
+    "description": "Entitlement"
+   },
+   "quantity": {
+    "type": "integer",
+    "description": "Quantity"
+   },
+   "timestamp": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Timestamp"
+   },
+   "localSequence": {
+    "type": "integer",
+    "description": "Device-local sequence number"
+   },
+   "operator": {
+    "type": "string",
+    "description": "operator"
+   },
+   "decision": {
+    "type": "string",
+    "description": "decision"
+   },
+   "packageVersion": {
+    "type": "string",
+    "description": "package version"
+   }
+  },
+  "required": [
+   "ledgerEntryId"
+  ]
+ },
  "OfflinePackage": {
   "x-ticvai-persistence": "none — generated artefact in object storage",
   "type": "object",
@@ -742,8 +1345,20 @@
     "type": "string",
     "format": "uuid"
    },
+   "entitlementsVersion": {
+    "type": "integer",
+    "description": "The highest `access.entitlement` change included (SD-052, 29 September). A refresh sends it as `sinceVersion` and receives only what changed after it, so a 60,000-guest venue is not re-sent whole."
+   },
+   "dynamicPolicies": {
+    "type": "array",
+    "description": "The active guest-admission dynamic policies for this access point's zones (SD-052), so an offline gate applies the same rules as an online one.",
+    "items": {
+     "$ref": "#/components/schemas/AccessDynamicPolicy"
+    }
+   },
    "entitlements": {
     "type": "array",
+    "description": "Read from `access.entitlement` (SD-052). With `sinceVersion`, only the rows changed after it, including ones now void or used, so a device removes them.",
     "items": {
      "type": "object",
      "required": [
@@ -757,7 +1372,7 @@
      "properties": {
       "ticketId": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "format": "uuid",
        "description": "The `Entitlement.id`."
       },
       "mediaCodes": {
@@ -817,7 +1432,7 @@
       },
       "ticketId": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "format": "uuid",
        "description": "The `Entitlement.id` in the issuing cell."
       },
       "issuingCellId": {
@@ -890,6 +1505,13 @@
        "type": "boolean"
       }
      }
+    }
+   },
+   "accreditationCredentials": {
+    "type": "array",
+    "description": "Accreditation credentials that admit at this access point, from access.accreditation_credential (29 September, build; BL-181). Only rows that admit are included; a credential dropped from one package to the next no longer admits.",
+    "items": {
+     "$ref": "#/components/schemas/AccessAccreditationCredential"
     }
    }
   }
@@ -1124,6 +1746,71 @@
    },
    "hasMore": {
     "type": "boolean"
+   }
+  }
+ },
+ "ReconnectionSynchronizationConflictResolutionView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Reconnection, Synchronization & Conflict Resolution displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "conflictId": {
+    "type": "string",
+    "description": "Conflict identifier"
+   },
+   "centralRemainingBalanceBeforeOutage": {
+    "type": "integer",
+    "description": "Entitlement uses remaining centrally before the outage (a count, not money)"
+   },
+   "resolutionPolicy": {
+    "type": "string",
+    "enum": [
+     "preserveBothAndFlag",
+     "earliestTransactionWins",
+     "configuredBusinessRule",
+     "supervisorReview",
+     "securityInvestigation"
+    ],
+    "description": "How this conflict is resolved"
+   },
+   "credentialId": {
+    "type": "string",
+    "description": "Credential involved"
+   }
+  },
+  "required": [
+   "conflictId"
+  ]
+ },
+ "ReconnectionSynchronizationConflictResolutionViewSummary": {
+  "type": "object",
+  "x-ticvai-persistence": "none - aggregate computed at read time over the rows the page lists",
+  "description": "The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).",
+  "properties": {
+   "pendingScans": {
+    "type": "integer",
+    "description": "Pending scans"
+   },
+   "entitlementEvents": {
+    "type": "integer",
+    "description": "Entitlement events"
+   },
+   "entries": {
+    "type": "integer",
+    "description": "Entries"
+   },
+   "exits": {
+    "type": "integer",
+    "description": "Exits"
+   },
+   "overrides": {
+    "type": "integer",
+    "description": "Overrides"
+   },
+   "securityEvents": {
+    "type": "integer",
+    "description": "Security events"
    }
   }
  }

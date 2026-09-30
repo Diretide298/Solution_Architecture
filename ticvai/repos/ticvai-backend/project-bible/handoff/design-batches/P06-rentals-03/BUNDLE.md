@@ -1,6 +1,6 @@
 # P06-rentals-03 — P06 · Rentals (3 of 3)
 
-**10 screens · 0 operations · 0 schemas · 0 permissions**
+**10 screens · 6 operations · 10 schemas · 3 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -47,11 +47,11 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `ASSET_MANAGE, RENTAL_OPERATE, RENTAL_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **3 of these operations work offline**: recordRentalInspection, returnRental, setAssetStatus
+  — and the rest do not. A surface that looks the same online and off is lying.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,16 +61,16 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `EMP-091` | Rental Return Command Center | commandCentre | 0 | 0 | — |
-| `EMP-092` | Return Scan & Rental Retrieval | listDetail | 0 | 0 | — |
-| `EMP-093` | Return Summary & Actual Return Time | listDetail | 0 | 0 | — |
-| `EMP-094` | Post-Rental Condition Inspection | listDetail | 0 | 0 | — |
-| `EMP-095` | Before vs After Condition Comparison | listDetail | 0 | 0 | — |
-| `EMP-096` | Damage Assessment & Charge Workflow | listDetail | 0 | 0 | — |
-| `EMP-097` | Partial Return & Missing Equipment | listDetail | 0 | 0 | — |
-| `EMP-098` | Late Fees, Damage Fees & Final Settlement | listDetail | 0 | 0 | — |
-| `EMP-099` | Deposit Release, Capture & Customer Confirmation | listDetail | 0 | 0 | — |
-| `EMP-100` | Return Completion & Equipment Disposition | listDetail | 0 | 0 | — |
+| `EMP-091` | Rental Return Command Center | commandCentre | 1 | 0 | — |
+| `EMP-092` | Return Scan & Rental Retrieval | listDetail | 1 | 0 | — |
+| `EMP-093` | Return Summary & Actual Return Time | listDetail | 1 | 0 | — |
+| `EMP-094` | Post-Rental Condition Inspection | listDetail | 1 | 0 | — |
+| `EMP-095` | Before vs After Condition Comparison | listDetail | 1 | 0 | — |
+| `EMP-096` | Damage Assessment & Charge Workflow | listDetail | 1 | 0 | — |
+| `EMP-097` | Partial Return & Missing Equipment | listDetail | 1 | 0 | — |
+| `EMP-098` | Late Fees, Damage Fees & Final Settlement | listDetail | 1 | 0 | — |
+| `EMP-099` | Deposit Release, Capture & Customer Confirmation | listDetail | 1 | 0 | — |
+| `EMP-100` | Return Completion & Equipment Disposition | listDetail | 2 | 0 | — |
 
 ## Thin screens in this batch
 
@@ -204,7 +204,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "loading": "The rental return list; the counts above it resolve separately.",
    "offline": "TODO — not decided. Rental Management does not say what a staff device does here without a connection, and no minute has decided it."
   },
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "operationId": "listRentalBookings",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Expected back",
+    "trigger": "onLoad"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 92. 0 of 8 labels bound to a contract property; 18 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "entryState": {
    "preloaded": [
@@ -346,7 +354,19 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
-   "regions": [],
+   "regions": [
+    {
+     "components": [
+      {
+       "derived": true,
+       "impliedBy": "getRentalBooking",
+       "kind": "detailPanel",
+       "notes": "One record, read-only."
+      }
+     ],
+     "name": "contentBody"
+    }
+   ],
    "template": "split"
   },
   "states": {
@@ -369,7 +389,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "operationId": "getRentalBooking",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Retrieve by scan",
+    "trigger": "onAction"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 93. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -391,6 +419,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-092"
+  },
+  "entryState": {
+   "params": [
+    {
+     "from": "navigation",
+     "name": "bookingId"
+    }
+   ]
   },
   "_platform": {
    "code": "P06",
@@ -438,7 +474,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
-   "regions": [],
+   "regions": [
+    {
+     "components": [
+      {
+       "derived": true,
+       "impliedBy": "returnRental",
+       "kind": "primaryButton",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "derived": true,
+       "impliedBy": "returnRental",
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**"
+      }
+     ],
+     "name": "contentBody"
+    }
+   ],
    "template": "split"
   },
   "states": {
@@ -461,7 +516,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "invalidates": [
+     "getRentalBooking",
+     "listRentalBookings",
+     "getRentalAvailability",
+     "listOverdueRentals"
+    ],
+    "operationId": "returnRental",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Record the actual return time",
+    "trigger": "onAction"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 94. 0 of 0 labels bound to a contract property; 0 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -483,6 +552,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-093"
+  },
+  "entryState": {
+   "params": [
+    {
+     "from": "navigation",
+     "name": "bookingId"
+    }
+   ]
   },
   "_platform": {
    "code": "P06",
@@ -530,7 +607,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
-   "regions": [],
+   "regions": [
+    {
+     "components": [
+      {
+       "derived": true,
+       "impliedBy": "recordRentalInspection",
+       "kind": "primaryButton",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "derived": true,
+       "impliedBy": "recordRentalInspection",
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**"
+      }
+     ],
+     "name": "contentBody"
+    }
+   ],
    "template": "split"
   },
   "states": {
@@ -553,7 +649,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "invalidates": [
+     "getRentalBooking"
+    ],
+    "operationId": "recordRentalInspection",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Condition on the way back",
+    "trigger": "onAction"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 95. 0 of 0 labels bound to a contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -575,6 +682,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-094"
+  },
+  "entryState": {
+   "params": [
+    {
+     "from": "navigation",
+     "name": "bookingId"
+    }
+   ]
   },
   "_platform": {
    "code": "P06",
@@ -622,7 +737,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
-   "regions": [],
+   "regions": [
+    {
+     "components": [
+      {
+       "derived": true,
+       "impliedBy": "recordRentalInspection",
+       "kind": "primaryButton",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "derived": true,
+       "impliedBy": "recordRentalInspection",
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**"
+      }
+     ],
+     "name": "contentBody"
+    }
+   ],
    "template": "split"
   },
   "states": {
@@ -645,7 +779,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "invalidates": [
+     "getRentalBooking"
+    ],
+    "operationId": "recordRentalInspection",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Before against after",
+    "trigger": "onAction"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 96. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -667,6 +812,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-095"
+  },
+  "entryState": {
+   "params": [
+    {
+     "from": "navigation",
+     "name": "bookingId"
+    }
+   ]
   },
   "_platform": {
    "code": "P06",
@@ -714,7 +867,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
-   "regions": [],
+   "regions": [
+    {
+     "components": [
+      {
+       "derived": true,
+       "impliedBy": "assessRentalDamage",
+       "kind": "primaryButton",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "derived": true,
+       "impliedBy": "assessRentalDamage",
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**"
+      }
+     ],
+     "name": "contentBody"
+    }
+   ],
    "template": "split"
   },
   "states": {
@@ -737,7 +909,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "invalidates": [
+     "getRentalBooking"
+    ],
+    "operationId": "assessRentalDamage",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Price the damage",
+    "trigger": "onAction"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 97. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -759,6 +942,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-096"
+  },
+  "entryState": {
+   "params": [
+    {
+     "from": "navigation",
+     "name": "bookingId"
+    }
+   ]
   },
   "_platform": {
    "code": "P06",
@@ -806,7 +997,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
-   "regions": [],
+   "regions": [
+    {
+     "components": [
+      {
+       "derived": true,
+       "impliedBy": "returnRental",
+       "kind": "primaryButton",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "derived": true,
+       "impliedBy": "returnRental",
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**"
+      }
+     ],
+     "name": "contentBody"
+    }
+   ],
    "template": "split"
   },
   "states": {
@@ -829,7 +1039,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "invalidates": [
+     "getRentalBooking",
+     "listRentalBookings",
+     "getRentalAvailability",
+     "listOverdueRentals"
+    ],
+    "operationId": "returnRental",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Partial return, with what is missing",
+    "trigger": "onAction"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 98. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -851,6 +1075,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-097"
+  },
+  "entryState": {
+   "params": [
+    {
+     "from": "navigation",
+     "name": "bookingId"
+    }
+   ]
   },
   "_platform": {
    "code": "P06",
@@ -898,7 +1130,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
-   "regions": [],
+   "regions": [
+    {
+     "components": [
+      {
+       "derived": true,
+       "impliedBy": "returnRental",
+       "kind": "primaryButton",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "derived": true,
+       "impliedBy": "returnRental",
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**"
+      }
+     ],
+     "name": "contentBody"
+    }
+   ],
    "template": "split"
   },
   "states": {
@@ -921,7 +1172,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "invalidates": [
+     "getRentalBooking",
+     "listRentalBookings",
+     "getRentalAvailability",
+     "listOverdueRentals"
+    ],
+    "operationId": "returnRental",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Late fee, damage and settlement",
+    "trigger": "onAction"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 99. 0 of 0 labels bound to a contract property; 0 of 3 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -943,6 +1208,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-098"
+  },
+  "entryState": {
+   "params": [
+    {
+     "from": "navigation",
+     "name": "bookingId"
+    }
+   ]
   },
   "_platform": {
    "code": "P06",
@@ -990,7 +1263,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
-   "regions": [],
+   "regions": [
+    {
+     "components": [
+      {
+       "derived": true,
+       "impliedBy": "returnRental",
+       "kind": "primaryButton",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "derived": true,
+       "impliedBy": "returnRental",
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**"
+      }
+     ],
+     "name": "contentBody"
+    }
+   ],
    "template": "split"
   },
   "states": {
@@ -1013,7 +1305,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "invalidates": [
+     "getRentalBooking",
+     "listRentalBookings",
+     "getRentalAvailability",
+     "listOverdueRentals"
+    ],
+    "operationId": "returnRental",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Capture or release the deposit",
+    "trigger": "onAction"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 100. 0 of 0 labels bound to a contract property; 0 of 4 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -1035,6 +1341,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-099"
+  },
+  "entryState": {
+   "params": [
+    {
+     "from": "navigation",
+     "name": "bookingId"
+    }
+   ]
   },
   "_platform": {
    "code": "P06",
@@ -1082,7 +1396,26 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
-   "regions": [],
+   "regions": [
+    {
+     "components": [
+      {
+       "derived": true,
+       "impliedBy": "returnRental",
+       "kind": "primaryButton",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "derived": true,
+       "impliedBy": "returnRental",
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**"
+      }
+     ],
+     "name": "contentBody"
+    }
+   ],
    "template": "split"
   },
   "states": {
@@ -1105,7 +1438,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
    }
   ],
-  "apis": [],
+  "apis": [
+   {
+    "contract": "rental",
+    "invalidates": [
+     "getRentalBooking",
+     "listRentalBookings",
+     "getRentalAvailability",
+     "listOverdueRentals"
+    ],
+    "operationId": "returnRental",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Complete, and dispose of the equipment",
+    "trigger": "onAction"
+   },
+   {
+    "contract": "maintenance",
+    "invalidates": [
+     "getAsset",
+     "listAssets"
+    ],
+    "operationId": "setAssetStatus",
+    "provenance": "board reading, 19 September 2026",
+    "purpose": "Back into the pool, or not",
+    "trigger": "onAction"
+   }
+  ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 101. 0 of 0 labels bound to a contract property; 0 of 118 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "navigation": {
    "entryFrom": [
@@ -1127,6 +1485,18 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "status": "notStarted",
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-100"
+  },
+  "entryState": {
+   "params": [
+    {
+     "from": "navigation",
+     "name": "assetId"
+    },
+    {
+     "from": "navigation",
+     "name": "bookingId"
+    }
+   ]
   },
   "_platform": {
    "code": "P06",
@@ -1157,7 +1527,131 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
 Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
 
 ```json
-{}
+{
+ "assessRentalDamage": {
+  "method": "POST",
+  "path": "/rental-bookings/{bookingId}/damage",
+  "contract": "rental",
+  "summary": "Price the damage, and say who approved it",
+  "permission": "RENTAL_OPERATE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalDamageAssessment",
+  "responds": "RentalDamageAssessment"
+ },
+ "getRentalBooking": {
+  "method": "GET",
+  "path": "/rental-bookings/{bookingId}",
+  "contract": "rental",
+  "summary": "One booking, its timeline and its readiness",
+  "permission": "RENTAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "RentalBooking"
+ },
+ "listRentalBookings": {
+  "method": "GET",
+  "path": "/rental-bookings",
+  "contract": "rental",
+  "summary": "Reservations across venues and locations",
+  "permission": "RENTAL_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "locationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RentalBooking"
+ },
+ "recordRentalInspection": {
+  "method": "POST",
+  "path": "/rental-bookings/{bookingId}/inspection",
+  "contract": "rental",
+  "summary": "Condition before or after, with evidence",
+  "permission": "RENTAL_OPERATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalInspection",
+  "responds": "RentalInspection"
+ },
+ "returnRental": {
+  "method": "POST",
+  "path": "/rental-bookings/{bookingId}/return",
+  "contract": "rental",
+  "summary": "Take it back, inspect it, and settle everything at once",
+  "permission": "RENTAL_OPERATE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RentalReturn",
+  "responds": "RentalSettlement"
+ },
+ "setAssetStatus": {
+  "method": "PUT",
+  "path": "/assets/{assetId}/status",
+  "contract": "maintenance",
+  "summary": "Take an asset out of service or return it",
+  "permission": "ASSET_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SetAssetStatusRequest",
+  "responds": "AssetStatusResult"
+ }
+}
 ```
 
 ## `schemas.json`
@@ -1165,5 +1659,619 @@ Method, path, parameters, request and response for every operation these screens
 The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
 
 ```json
-{}
+{
+ "Asset": {
+  "x-ticvai-persistence": "maintenance.asset",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateAssetRequest"
+   },
+   {
+    "type": "object",
+    "x-ticvai-retired-columns": [
+     "is_maintenance_overdue",
+     "document_refs"
+    ],
+    "required": [
+     "id",
+     "status"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "resourceId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "1.2.x. **Where this asset is also bookable.** An AV rig is an asset to maintain and a resource to allocate, and they are the same object seen from two sides.\n**`resources` owns the calendar and this owns the condition.** An asset out of service makes its resource unbookable, which is one link rather than two models of availability.\n"
+     },
+     "deviceId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "BL-160. **Where this asset is also a registered device.** A turnstile is an asset to maintain and a device to operate, and — exactly as with `resourceId` above — they are the same object seen from two sides.\n**Nothing joined them before this.** A turnstile controller reporting `needsAttention` could not raise a work order against itself, and an engineer closing one had no way back to the device whose firmware caused it.\n**Null for most assets and for most devices.** A chiller is not a device and a signature pad is not on the asset register; the link is sparse, and it lives here rather than on `platform.device` because `platform` is the foundation tier and a foreign key pointing from it into `maintenance` would invert the tiers — every cell running a spine would carry a column for a satellite it may not deploy.\n"
+     },
+     "acquisitionCost": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "acquiredOn": {
+      "type": "string",
+      "format": "date",
+      "nullable": true
+     },
+     "depreciation": {
+      "type": "object",
+      "nullable": true,
+      "description": "**Recorded here and posted by `finance`.** Depreciation is an accounting act and the asset register is where the useful life is actually known — an engineer knows a chiller lasts fifteen years and an accountant knows what to do about it.\n",
+      "properties": {
+       "method": {
+        "type": "string",
+        "enum": [
+         "straightLine",
+         "reducingBalance",
+         "unitsOfProduction",
+         "none"
+        ]
+       },
+       "usefulLifeMonths": {
+        "type": "integer"
+       },
+       "residualValue": {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       },
+       "accumulatedDepreciation": {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      }
+     },
+     "retiredOn": {
+      "type": "string",
+      "format": "date",
+      "nullable": true,
+      "description": "**Retirement is not deletion.** A work order from three years ago still names this asset, and an inspection record with no asset is an inspection of nothing.\n"
+     },
+     "disposalProceeds": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "status": {
+      "$ref": "#/components/schemas/AssetStatus"
+     },
+     "statusReason": {
+      "type": "string",
+      "nullable": true
+     },
+     "openWorkOrderCount": {
+      "type": "integer",
+      "readOnly": true,
+      "x-ticvai-derived": "onWrite",
+      "description": "Work orders on this asset whose status is `open`, `assigned`, `inProgress`, `paused` or `awaitingParts` — the same set `AssetDetail.openWorkOrders` returns. **Maintained on write**: `createWorkOrder` and every transition into or out of that set (complete, cancel, close, reject back to open) adjust it in the same transaction as the work-order row.\n"
+     },
+     "nextMaintenanceDueAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "x-ticvai-derived": "onWrite",
+      "description": "The earliest `nextDueAt` among this asset's active maintenance plans; null when none has one. **Maintained on write**: recomputed whenever one of those plans is created, amended, suspended or has its `nextDueAt` moved by a completed work order. `listAssets?maintenanceDue` filters on this column against the clock.\n"
+     },
+     "isMaintenanceOverdue": {
+      "type": "boolean",
+      "readOnly": true,
+      "x-ticvai-persisted": false,
+      "x-ticvai-derived": "onRead",
+      "description": "`nextMaintenanceDueAt` is in the past at the moment of the read. **Computed on read and not stored** — it depends on the clock, so a stored copy is stale the minute after it is written.\n"
+     },
+     "lastInspectionAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "x-ticvai-derived": "onWrite",
+      "description": "`performedAt` of the latest inspection submitted against this asset. **Maintained on write** by `submitInspection`, in the same transaction as the inspection row; an inspection synced late with an earlier `performedAt` does not move it back.\n"
+     },
+     "usageCounter": {
+      "type": "number",
+      "nullable": true,
+      "description": "Cycles, hours or kilometres. Drives usage-based maintenance."
+     }
+    }
+   }
+  ]
+ },
+ "AssetStatus": {
+  "type": "string",
+  "enum": [
+   "inService",
+   "outOfService",
+   "underMaintenance",
+   "awaitingParts",
+   "retired",
+   "disposed"
+  ]
+ },
+ "AssetStatusResult": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "asset",
+   "downstreamEffects"
+  ],
+  "properties": {
+   "asset": {
+    "$ref": "#/components/schemas/Asset"
+   },
+   "downstreamEffects": {
+    "type": "object",
+    "description": "What else changed. Surfaced so the person taking a ride out of service sees the commercial consequence at the moment they do it.\n",
+    "properties": {
+     "productsSuspended": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "accessPointBlocked": {
+      "type": "boolean"
+     },
+     "performancesAffected": {
+      "type": "integer"
+     },
+     "workOrderId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     }
+    }
+   }
+  }
+ },
+ "RentalBooking": {
+  "type": "object",
+  "x-ticvai-persistence": "rental.booking",
+  "description": "Board 5. **The booking outlives the order** — an order completes at payment and the rental is still out.\n",
+  "required": [
+   "id",
+   "productId",
+   "from",
+   "to",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "reference": {
+    "type": "string"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "returnLocationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "customerId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "from": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "to": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "quantity": {
+    "type": "integer"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "confirmed",
+     "awaitingArrival",
+     "checkedOut",
+     "overdue",
+     "partiallyReturned",
+     "completed",
+     "completedWithDamage",
+     "notReturned",
+     "cancelled",
+     "noShow"
+    ]
+   },
+   "checkedOutAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "dueBackAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "returnedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "depositAuthorisationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "accruedLateFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "readiness": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**Computed, not stored** — agreement, requirements, deposit, equipment.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "check": {
+       "type": "string"
+      },
+      "satisfied": {
+       "type": "boolean"
+      },
+      "detail": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "participants": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/RentalParticipant"
+    }
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "RentalDamageAssessment": {
+  "type": "object",
+  "x-ticvai-persistence": "rental.damage_assessment",
+  "description": "Board 8.6. **A dispute is a state, not a deletion.**",
+  "required": [
+   "amount",
+   "description"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "description": {
+    "type": "string"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "inspectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "assessedBy": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "approvedBy": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "customerAcknowledgement": {
+    "type": "string",
+    "enum": [
+     "accepted",
+     "disputed",
+     "notPresented"
+    ],
+    "default": "notPresented"
+   },
+   "workOrderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Raised in `maintenance`, so the repair is tracked where every other repair is."
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "RentalInspection": {
+  "type": "object",
+  "x-ticvai-persistence": "rental.inspection",
+  "description": "Boards 6.5 and 8.4. **Before and after are one record shape with a phase**, which is what makes the comparison view possible.\n",
+  "required": [
+   "phase",
+   "condition"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "phase": {
+    "type": "string",
+    "enum": [
+     "preRental",
+     "postRental"
+    ]
+   },
+   "condition": {
+    "type": "string",
+    "enum": [
+     "good",
+     "minorDamage",
+     "majorDamage",
+     "faulty",
+     "notReturned"
+    ],
+    "description": "**26 August: simplified state attributes.** *\"rental/equipment items can be tracked with simplified state attributes (e.g., available, rented, faulty) rather than requiring granular custom attributes for this category — agreed by Allam.\"* So the condition is a short enum, and anything finer belongs in the note or the photographs.\n"
+   },
+   "checklist": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "item": {
+       "type": "string"
+      },
+      "passed": {
+       "type": "boolean"
+      },
+      "note": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   },
+   "photoAssetIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "inspectedBy": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "inspectedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "RentalParticipant": {
+  "type": "object",
+  "x-ticvai-persistence": "rental.participant",
+  "description": "Board 5.5. **A group rental is one booking with participants**, because the agreement, the deposit and the return are handled together.\n",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "isPrimaryRenter": {
+    "type": "boolean",
+    "default": false
+   },
+   "dateOfBirth": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "idNumber": {
+    "type": "string",
+    "nullable": true
+   },
+   "guardianName": {
+    "type": "string",
+    "nullable": true
+   },
+   "emergencyContact": {
+    "type": "string",
+    "nullable": true
+   },
+   "hasSignedWaiver": {
+    "type": "boolean",
+    "readOnly": true
+   },
+   "customFields": {
+    "type": "object",
+    "additionalProperties": true
+   }
+  }
+ },
+ "RentalReturn": {
+  "type": "object",
+  "description": "Board 8. **Late fee, damage and partial return all land on one deposit.**",
+  "required": [
+   "returnedAt"
+  ],
+  "properties": {
+   "returnedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "returnLocationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "returnedAssetIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "missingAssetIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "inspection": {
+    "$ref": "#/components/schemas/RentalInspection"
+   },
+   "damage": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/RentalDamageAssessment"
+    }
+   },
+   "waiveLateFee": {
+    "type": "boolean",
+    "default": false
+   },
+   "overrideId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
+ "RentalSettlement": {
+  "type": "object",
+  "x-ticvai-persistence": "rental.settlement",
+  "description": "Board 8.8. **One statement, because there is one deposit.** *Capture AED 120, release AED 380.*\n",
+  "properties": {
+   "bookingId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "expectedReturnAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "actualReturnAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "gracePeriodMinutes": {
+    "type": "integer"
+   },
+   "chargeableLateMinutes": {
+    "type": "integer"
+   },
+   "lateFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "damageFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "missingItemFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "totalCharged": {
+    "x-ticvai-column": "gross_charged_amount",
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "depositCaptured": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "depositReleased": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "balanceDue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "**Where the charges exceed the deposit.** A bike written off against a AED 200 hold leaves a real debt, and netting it to zero hides it.\n"
+   },
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "completed",
+     "completedWithDamage",
+     "partiallyReturned",
+     "notReturned"
+    ]
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "SetAssetStatusRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "status",
+   "reason",
+   "recordedAt"
+  ],
+  "properties": {
+   "status": {
+    "$ref": "#/components/schemas/AssetStatus"
+   },
+   "reason": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 1000
+   },
+   "inspectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Required for return to service where the asset demands it."
+   },
+   "raiseWorkOrder": {
+    "type": "boolean",
+    "default": false
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ }
+}
 ```

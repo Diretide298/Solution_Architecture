@@ -58,6 +58,53 @@
    "transactional"
   ]
  },
+ "ConsentRecord": {
+  "x-ticvai-persistence": "marketing.consent_record + marketing.consent_record_channel",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/RecordConsentRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "subjectId"
+    ],
+    "properties": {
+     "id": {
+      "type": "string"
+     },
+     "subjectId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "recordedByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     },
+     "orderId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true,
+      "description": "The order whose checkout carried the opt-in (source `checkout`, M18-15): the UUIDv7 of orders.sales_order. Null for every other source.",
+      "x-ticvai-references": "orders.sales_order"
+     },
+     "verifiedContactRef": {
+      "type": "string",
+      "nullable": true,
+      "maxLength": 128,
+      "description": "The verified contact the checkout opt-in was given against (ADR-0045), as the keyed hash the guest match policy uses; never the raw address. It is how a checkout consent given without an account is attached to the profile when the contact later matches one."
+     },
+     "supersededAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
+   }
+  ]
+ },
  "ConsentState": {
   "x-ticvai-persistence": "none — projection over consent_record",
   "type": "object",
@@ -106,6 +153,50 @@
        "nullable": true
       }
      }
+    }
+   }
+  }
+ },
+ "CreateSegmentRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "name",
+   "criteria"
+  ],
+  "properties": {
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "match": {
+    "type": "string",
+    "enum": [
+     "all",
+     "any"
+    ],
+    "default": "all"
+   },
+   "criteria": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "$ref": "#/components/schemas/SegmentCriterion"
+    }
+   },
+   "excludeSegmentIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
     }
    }
   }
@@ -305,6 +396,90 @@
       "format": "date-time"
      }
     }
+   }
+  }
+ },
+ "CustomerSegmentProfilePricingRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Customer Segment & Profile Pricing Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ruleName": {
+    "type": "string",
+    "description": "Rule Name"
+   },
+   "segment": {
+    "type": "string",
+    "description": "Segment: the value the dimension must equal, e.g. VIP"
+   },
+   "applicableProducts": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Applicable Products: product ids or product category codes"
+   },
+   "priceList": {
+    "type": "string",
+    "description": "Price List: the list whose rate the rule selects"
+   },
+   "rate": {
+    "type": "string",
+    "description": "Rate: code of the rate used when the rule matches, e.g. VIP Adult"
+   },
+   "priority": {
+    "type": "integer",
+    "description": "Priority within the configurable pricing hierarchy (MoM 1 Sep §4.4): the lower number wins"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: draft, active, disabled or expired"
+   },
+   "ruleId": {
+    "type": "string",
+    "description": "Rule ID"
+   },
+   "dimension": {
+    "type": "string",
+    "enum": [
+     "customerType",
+     "customerSegment",
+     "accountType",
+     "crmSegment",
+     "vipStatus",
+     "corporateCustomer",
+     "employeeStaff",
+     "partnerCustomer",
+     "guestRegisteredUser"
+    ],
+    "description": "Supported Dimension (p.25) the rule tests"
+   },
+   "segmentSource": {
+    "type": "string",
+    "enum": [
+     "crm",
+     "membership",
+     "b2bPartner",
+     "corporateAccount",
+     "customerProfile"
+    ],
+    "description": "Customer Segment Source (p.26) the segment is read from"
+   },
+   "fallbackRate": {
+    "type": "string",
+    "description": "Fallback (p.26): rate used when the customer no longer qualifies; the standard rate by default (decided 29 September, readiness close-out)"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
    }
   }
  },
@@ -976,6 +1151,109 @@
    }
   }
  },
+ "IdentityGuestVerification": {
+  "type": "object",
+  "x-ticvai-persistence": "identity.guest_identity_verification",
+  "description": "**One guest identity-document verification** (5.3.21; decided 29 September, build pass): the document it checks, its status, the method and who decided. The document itself is `pii.subject_document`; this row holds no document number.",
+  "required": [
+   "id",
+   "subjectId",
+   "status",
+   "submittedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectDocumentId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The `pii.subject_document` row submitted."
+   },
+   "documentKind": {
+    "type": "string",
+    "enum": [
+     "passport",
+     "emiratesId",
+     "nationalId",
+     "drivingLicence",
+     "residencePermit",
+     "other"
+    ]
+   },
+   "documentNumberLast4": {
+    "type": "string",
+    "maxLength": 4,
+    "nullable": true,
+    "readOnly": true
+   },
+   "reason": {
+    "type": "string",
+    "enum": [
+     "policyRequired",
+     "ageRestrictedPurchase",
+     "residentPricing",
+     "accountRecovery"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "verified",
+     "rejected",
+     "resubmissionRequested"
+    ],
+    "readOnly": true
+   },
+   "method": {
+    "type": "string",
+    "enum": [
+     "manualReview",
+     "documentScanner",
+     "provider"
+    ],
+    "nullable": true,
+    "readOnly": true
+   },
+   "decisionReason": {
+    "type": "string",
+    "maxLength": 300,
+    "nullable": true,
+    "readOnly": true
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "submittedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "documentImageDeletedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the scan (and any selfie) was deleted under the policy's retention."
+   }
+  }
+ },
  "LoyaltyAdjustmentResult": {
   "type": "object",
   "x-ticvai-persistence": "none — composed from the entry posted and the resulting position",
@@ -1324,5 +1602,75 @@
     "type": "boolean"
    }
   }
+ },
+ "RecordConsentRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "purpose",
+   "decision",
+   "noticeVersion",
+   "source",
+   "recordedAt"
+  ],
+  "properties": {
+   "purpose": {
+    "$ref": "#/components/schemas/ConsentPurpose"
+   },
+   "decision": {
+    "$ref": "#/components/schemas/ConsentDecision"
+   },
+   "channels": {
+    "type": "array",
+    "description": "Omit to apply to every channel the purpose covers.",
+    "items": {
+     "$ref": "#/components/schemas/MessageChannel"
+    }
+   },
+   "noticeVersion": {
+    "type": "string"
+   },
+   "source": {
+    "$ref": "#/components/schemas/ConsentSource"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "Segment": {
+  "x-ticvai-persistence": "marketing.segment + marketing.segment_criterion",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateSegmentRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "createdAt"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "lastEvaluatedSize": {
+      "type": "integer",
+      "nullable": true
+     },
+     "lastEvaluatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "createdAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  ]
  }
 }

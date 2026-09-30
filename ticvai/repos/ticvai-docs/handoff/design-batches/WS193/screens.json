@@ -1449,6 +1449,41 @@
     "purpose": "Fraud cases",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listRiskAlerts",
+    "contract": "ai",
+    "purpose": "Risk alerts",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "decideRiskAlert",
+    "contract": "ai",
+    "purpose": "Dismiss, monitor, mark false positive, or escalate",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "createRiskCase",
+    "contract": "ai",
+    "purpose": "Open an investigation",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getRiskCase",
+    "contract": "ai",
+    "purpose": "A case with its evidence and actions",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "closeRiskCase",
+    "contract": "ai",
+    "purpose": "Close a case with an outcome",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1459,6 +1494,16 @@
     "Transaction",
     "Amount",
     "Risk score"
+   ],
+   "params": [
+    {
+     "name": "alertId",
+     "from": "navigation"
+    },
+    {
+     "name": "caseId",
+     "from": "navigation"
+    }
    ]
   },
   "wireframe": {

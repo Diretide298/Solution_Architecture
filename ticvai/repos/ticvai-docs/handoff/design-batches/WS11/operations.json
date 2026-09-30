@@ -1,4 +1,38 @@
 {
+ "getAccessRiskScore": {
+  "method": "GET",
+  "path": "/access-risk-scores",
+  "contract": "access",
+  "summary": "The current access risk score of a person, credential or device, with its signals",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "entitlementId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "deviceId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessRiskScore"
+ },
  "listAccessRiskScoring": {
   "method": "GET",
   "path": "/access-risk-scoring",

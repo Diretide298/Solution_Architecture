@@ -160,7 +160,7 @@ CREATE TABLE IF NOT EXISTS games.operational_config (
 
 -- One game played, what it cost and what it won
 CREATE TABLE IF NOT EXISTS games.play (
-    play_id                           text PRIMARY KEY NOT NULL,
+    play_id                           uuid PRIMARY KEY NOT NULL,
     card_code                         text,
     game_id                           uuid,
     credits_used                      integer NOT NULL,
@@ -287,7 +287,7 @@ CREATE TABLE IF NOT EXISTS games.reader_sync_status (
 
 -- Credits exchanged for prizes. Lines are children
 CREATE TABLE IF NOT EXISTS games.redemption (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     redemption_number                 text,
     card_code                         text NOT NULL,
     venue_id                          uuid,
@@ -300,7 +300,7 @@ CREATE TABLE IF NOT EXISTS games.redemption (
 
 -- One prize taken, drawn against its stock
 CREATE TABLE IF NOT EXISTS games.redemption_line (
-    redemption_id                     text NOT NULL,
+    redemption_id                     uuid NOT NULL,
     prize_id                          uuid,
     name                              text,
     quantity                          integer,

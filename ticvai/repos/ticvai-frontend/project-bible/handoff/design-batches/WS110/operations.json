@@ -44,7 +44,7 @@
   "summary": "Approve, reject, return for more, or escalate",
   "permission": "ACCREDITATION_APPROVE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -74,6 +74,19 @@
   ],
   "requestBody": null,
   "responds": "ApprovalRequest"
+ },
+ "getAccreditationApplication": {
+  "method": "GET",
+  "path": "/accreditation-applications/{applicationId}",
+  "contract": "accreditation",
+  "summary": "One application, with where each requirement stands",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AccreditationApplication"
  },
  "listAccreditationApplications": {
   "method": "GET",
@@ -128,6 +141,74 @@
   "requestBody": null,
   "responds": "AccreditationAuditRecord"
  },
+ "listAccreditationDocuments": {
+  "method": "GET",
+  "path": "/accreditation-documents",
+  "contract": "accreditation",
+  "summary": "Documents supplied, by holder, application, requirement or state",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "applicationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "holderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "requirementCode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "expiringWithinDays",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "resubmitAccreditationApplication": {
+  "method": "POST",
+  "path": "/accreditation-applications/{applicationId}/resubmit",
+  "contract": "accreditation",
+  "summary": "Send an application back after a return for information or a rejection",
+  "permission": "ACCREDITATION_APPLY",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccreditationApplication"
+ },
  "setApprovalMatrix": {
   "method": "PUT",
   "path": "/approval-matrices",
@@ -165,5 +246,24 @@
   ],
   "requestBody": "VisualWorkflowDesignerInput",
   "responds": "VisualWorkflowDesignerView"
+ },
+ "updateAccreditationApplication": {
+  "method": "PUT",
+  "path": "/accreditation-applications/{applicationId}",
+  "contract": "accreditation",
+  "summary": "Save a draft, or amend an application returned for information",
+  "permission": "ACCREDITATION_APPLY",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccreditationApplication",
+  "responds": "AccreditationApplication"
  }
 }

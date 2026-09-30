@@ -55,6 +55,11 @@
     "name": "venueId",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "basis",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,

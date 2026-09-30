@@ -15,7 +15,7 @@ What this checks is the conventions a parser cannot know:
   * every foreign key points at a table some migration actually creates
   * every Postgres enum holds the same values as its contract counterpart
   * money columns are numeric(18,4) and carry currency and scale
-  * ULID columns are char(26)
+  * id columns are uuid (ADR-0056: one id type, UUIDv7 minted by Id.New())
   * no DROP or destructive ALTER outside a rollback block
 
 Run: python3 tools/check-migrations.py
@@ -242,11 +242,12 @@ def check_file(path: Path, known_schemas: set[str]) -> set[str]:
             if "currency_code" not in head and "currency" not in head:
                 warn(name, f"{table} has money columns but no currency column")
 
-        # ULID keys
-        for col in re.findall(r"^\s+(id|\w+_id)\s+(char\(\d+\)|uuid|text)", head, re.M):
+        # One id type (ADR-0056): a key named `id` or `*_id` is uuid. An identifier that is not
+        # ours (`provider_*`, `external_*`, `partner_*`) is whatever its owner says, so it is skipped.
+        for col in re.findall(r"^\s+(id|\w+_id)\s+(char\(\d+\)|varchar(?:\(\d+\))?|uuid|text)", head, re.M):
             cname, ctype = col
-            if ctype.startswith("char(") and ctype != "char(26)":
-                fail(name, f"{table}.{cname} is {ctype} — ULIDs are char(26)")
+            if ctype != "uuid" and not cname.startswith(("provider_", "external_", "partner_")):
+                fail(name, f"{table}.{cname} is {ctype} — ids are uuid (ADR-0056)")
 
     return known
 

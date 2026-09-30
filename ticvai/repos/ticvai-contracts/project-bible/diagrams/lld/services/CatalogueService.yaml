@@ -2,6 +2,7 @@ id: LLD-CatalogueService
 title: CatalogueService — 445 operations, 134 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
+deployable: commerce
 index: diagrams/hld/02-services.yaml
 why: '**What is sold, at what price, in which seat.** Promotions and seating are folded in because both
   are pricing and availability against the same product — a promotion that cannot see a price list and

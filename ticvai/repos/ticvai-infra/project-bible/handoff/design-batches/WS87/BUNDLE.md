@@ -1,6 +1,6 @@
 # WS87 — Game and Ride board 10
 
-**10 screens · 7 operations · 6 schemas · 4 permissions**
+**10 screens · 9 operations · 10 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -63,7 +63,7 @@ convincingly. It is never a caption.
 | `BO-484` | Self-Service Experience Command Center | commandCentre | 1 | 0 | — |
 | `BO-485` | Self-Service Kiosk Profile & Channel Configuration | listDetail | 1 | 0 | — |
 | `BO-486` | Customer Card / Wallet Identification | listDetail | 1 | 0 | — |
-| `BO-487` | Customer Wallet & Balance Summary | listDetail | 1 | 0 | — |
+| `BO-487` | Customer Wallet & Balance Summary | listDetail | 3 | 0 | — |
 | `BO-488` | Self-Service Wallet Top-Up | listDetail | 1 | 0 | — |
 | `BO-489` | Bonus, Free Game & Benefit View | listDetail | 1 | 0 | — |
 | `BO-490` | Game & Ride Eligibility / “What Can I Play?” | listDetail | 1 | 0 | — |
@@ -653,6 +653,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Balance summary",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getWalletExitBalance",
+    "contract": "wallet",
+    "purpose": "Balance due / refundable at exit",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "settleWalletAtExit",
+    "contract": "wallet",
+    "purpose": "Settle the wallet at exit",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -664,6 +678,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "params": [
     {
      "name": "subjectId",
+     "from": "navigation"
+    },
+    {
+     "name": "walletId",
      "from": "navigation"
     }
    ]
@@ -1559,9 +1577,28 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Wallet"
+ },
+ "getWalletExitBalance": {
+  "method": "GET",
+  "path": "/wallets/{walletId}/exit-balance",
+  "contract": "wallet",
+  "summary": "What the holder owes or is owed on leaving",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WalletExitBalance"
  },
  "listGameplayTransactions": {
   "method": "GET",
@@ -1644,6 +1681,25 @@ Method, path, parameters, request and response for every operation these screens
   ],
   "requestBody": "GameKioskConfig",
   "responds": "GameKioskConfig"
+ },
+ "settleWalletAtExit": {
+  "method": "POST",
+  "path": "/wallets/{walletId}/exit-settlement",
+  "contract": "wallet",
+  "summary": "Settle a short balance, or refund a credit, when the holder leaves",
+  "permission": "WALLET_OPERATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WalletExitSettlement"
  },
  "topUpWallet": {
   "method": "POST",
@@ -1908,6 +1964,35 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -1923,6 +2008,69 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string"
    },
    "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Prize": {
+  "x-ticvai-persistence": "games.prize",
+  "type": "object",
+  "required": [
+   "id",
+   "name",
+   "venueId",
+   "pointCost",
+   "onHand"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "merchandiseId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Links to retail. Redemption depletes stock through the inventory ledger — a prize wall running out is a stock problem and should look like one.\n"
+   },
+   "pointCost": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "onHand": {
+    "type": "integer"
+   },
+   "isAvailable": {
+    "type": "boolean"
+   },
+   "tier": {
+    "type": "string",
+    "nullable": true,
+    "description": "Small, medium, large, jackpot. Drives prize-wall layout."
+   },
+   "imageAssetRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "barcode": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true,
+    "description": "The prize's own barcode, read by `lookupPrize` before the linked retail item's barcode or SKU. Unique within the venue (VM close-out, 29 September)."
+   },
+   "isActive": {
     "type": "boolean"
    }
   }
@@ -2029,6 +2177,121 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "type": "string",
     "format": "date-time",
     "nullable": true
+   }
+  }
+ },
+ "WalletExitBalance": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed from wallet.wallet, wallet.credit_lot and held offline transactions",
+  "required": [
+   "walletId",
+   "balance",
+   "amountDue",
+   "refundable"
+  ],
+  "properties": {
+   "walletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "balance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "pendingOfflineAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "amountDue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "refundable": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "nonRefundableCredit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "waiveAllowedUpTo": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "asAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "WalletExitSettlement": {
+  "type": "object",
+  "x-ticvai-persistence": "wallet.exit_settlement",
+  "description": "4.3.4. One settlement of a wallet at exit.",
+  "required": [
+   "id",
+   "walletId",
+   "action",
+   "amount",
+   "settledAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "walletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "action": {
+    "type": "string",
+    "enum": [
+     "collect",
+     "refund",
+     "waive"
+    ]
+   },
+   "method": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "card",
+     "cash",
+     "storedCard",
+     "originalPayment"
+    ]
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "balanceBefore": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "paymentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "refundId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "walletTransactionId": {
+    "type": "string",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "settledByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "settledAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true
    }
   }
  }

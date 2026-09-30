@@ -151,6 +151,11 @@
     "required": null
    },
    {
+    "name": "membershipId",
+    "in": "query",
+    "required": null
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -193,10 +198,15 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "Conversation"
+  "responds": "Page"
  },
  "reopenCase": {
   "method": "POST",
@@ -215,7 +225,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Case"
  },
  "sendConversationMessage": {
   "method": "POST",

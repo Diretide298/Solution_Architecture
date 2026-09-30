@@ -54,10 +54,6 @@
     "type": "string",
     "description": "Loyalty profile"
    },
-   "identityVerificationWhereRequired": {
-    "type": "boolean",
-    "description": "Identity verification where required"
-   },
    "billingInformation": {
     "type": "string",
     "description": "Billing information"
@@ -105,6 +101,10 @@
    "failureHandling": {
     "type": "string",
     "description": "Failure handling"
+   },
+   "identityVerification": {
+    "type": "boolean",
+    "description": "Identity verification where required"
    }
   }
  },
@@ -154,10 +154,6 @@
     "type": "integer",
     "description": "Active entitlements"
    },
-   "processExplicitlyReturnsIt": {
-    "type": "string",
-    "description": "process explicitly returns it"
-   },
    "soldResaleListingStillActive": {
     "type": "integer",
     "description": "Sold resale listing still active"
@@ -173,22 +169,6 @@
    "capacityDiscrepancy": {
     "type": "integer",
     "description": "Capacity discrepancy"
-   },
-   "investigate": {
-    "type": "string",
-    "description": "Investigate"
-   },
-   "reSync": {
-    "type": "string",
-    "description": "Re-sync"
-   },
-   "correctMapping": {
-    "type": "string",
-    "description": "Correct mapping"
-   },
-   "holdTicket": {
-    "type": "string",
-    "description": "Hold ticket"
    }
   }
  },
@@ -201,38 +181,6 @@
    "oldCredentialRevoke": {
     "type": "string",
     "description": "Old Credential → Revoke"
-   },
-   "staticQr": {
-    "type": "string",
-    "description": "Static QR"
-   },
-   "dynamicQr": {
-    "type": "string",
-    "description": "Dynamic QR"
-   },
-   "barcode": {
-    "type": "string",
-    "description": "Barcode"
-   },
-   "nfc": {
-    "type": "string",
-    "description": "NFC"
-   },
-   "rfid": {
-    "type": "string",
-    "description": "RFID"
-   },
-   "mobileWalletPass": {
-    "type": "string",
-    "description": "Mobile Wallet pass"
-   },
-   "digitalTicket": {
-    "type": "string",
-    "description": "Digital ticket"
-   },
-   "wearableCredential": {
-    "type": "string",
-    "description": "Wearable credential"
    },
    "revokedResold": {
     "type": "string",
@@ -258,33 +206,37 @@
     "type": "string",
     "description": "Original ticket relationship"
    },
-   "newSecurityKeysTokenWhereApplicable": {
+   "newSecurityKeys": {
     "type": "integer",
     "description": "New security keys/token where applicable"
    },
-   "newWalletPassWhereApplicable": {
+   "newWalletPass": {
     "type": "integer",
     "description": "New wallet pass where applicable"
    },
-   "ticvaiAccount": {
+   "credentialMedia": {
     "type": "string",
-    "description": "TICVAI account"
+    "enum": [
+     "staticQr",
+     "dynamicQr",
+     "barcode",
+     "nfc",
+     "rfid",
+     "mobileWalletPass",
+     "digitalTicket",
+     "wearableCredential"
+    ],
+    "description": "Credential media handled."
    },
-   "mobileApp": {
+   "deliveryMethod": {
     "type": "string",
-    "description": "Mobile app"
-   },
-   "email": {
-    "type": "string",
-    "description": "Email"
-   },
-   "wallet": {
-    "type": "string",
-    "description": "Wallet"
-   },
-   "otherConfiguredDeliveryMethods": {
-    "type": "string",
-    "description": "Other configured delivery methods"
+    "enum": [
+     "mobileApp",
+     "email",
+     "wallet",
+     "otherConfiguredDeliveryMethods"
+    ],
+    "description": "How the new credential is delivered."
    }
   }
  },
@@ -294,58 +246,6 @@
   "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
   "description": "**What Refunds, Disputes & Resale Exceptions displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "eventCancellation": {
-    "type": "string",
-    "description": "Event cancellation"
-   },
-   "eventPostponement": {
-    "type": "string",
-    "description": "Event postponement"
-   },
-   "buyerRefund": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Buyer refund"
-   },
-   "sellerDispute": {
-    "type": "string",
-    "description": "Seller dispute"
-   },
-   "buyerDispute": {
-    "type": "string",
-    "description": "Buyer dispute"
-   },
-   "paymentChargeback": {
-    "type": "string",
-    "description": "Payment chargeback"
-   },
-   "failedOwnershipTransfer": {
-    "type": "integer",
-    "description": "Failed ownership transfer"
-   },
-   "failedCredentialIssuance": {
-    "type": "integer",
-    "description": "Failed credential issuance"
-   },
-   "ticketAccessIssue": {
-    "type": "string",
-    "description": "Ticket access issue"
-   },
-   "sellerPayoutDispute": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Seller payout dispute"
-   },
-   "incorrectTicket": {
-    "type": "string",
-    "description": "Incorrect ticket"
-   },
-   "venueChange": {
-    "type": "string",
-    "description": "Venue change"
-   },
-   "seatChange": {
-    "type": "string",
-    "description": "Seat change"
-   },
    "caseId": {
     "type": "string",
     "description": "Case ID"
@@ -402,21 +302,34 @@
     "type": "string",
     "description": "Resolution"
    },
-   "holdSettlement": {
+   "issueType": {
     "type": "string",
-    "description": "Hold settlement"
+    "enum": [
+     "eventCancellation",
+     "eventPostponement",
+     "buyerRefund",
+     "sellerDispute",
+     "buyerDispute",
+     "paymentChargeback",
+     "failedOwnershipTransfer",
+     "failedCredentialIssuance",
+     "duplicateTransaction",
+     "ticketAccessIssue",
+     "sellerPayoutDispute",
+     "incorrectTicket",
+     "venueChange",
+     "seatChange"
+    ],
+    "description": "Exception type."
    },
-   "returnOwnership": {
+   "refundRecipient": {
     "type": "string",
-    "description": "Return ownership"
-   },
-   "provideReplacementTicket": {
-    "type": "string",
-    "description": "Provide replacement ticket"
-   },
-   "whoReceivesTheRefund": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Who receives the refund?"
+    "enum": [
+     "resaleBuyer",
+     "originalPurchaser",
+     "split"
+    ],
+    "description": "Who is refunded when the event is cancelled after a resale; set by the resale policy the client names (make-or-break, see the operation)"
    }
   }
  },
@@ -452,7 +365,7 @@
    },
    "averageDiscount": {
     "type": "number",
-    "description": "Average Discount"
+    "description": "Average discount, percent"
    },
    "sellerProceeds": {
     "type": "integer",
@@ -478,10 +391,6 @@
    "refundDisputeRate": {
     "type": "number",
     "description": "Refund/Dispute Rate"
-   },
-   "including": {
-    "type": "string",
-    "description": "including"
    },
    "primaryAvailability": {
     "type": "string",
@@ -511,10 +420,6 @@
     "type": "string",
     "description": "Sell-through"
    },
-   "primaryPriceForWeekendPerformances": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "primary price for weekend performances"
-   },
    "expectedResaleDemand": {
     "type": "string",
     "description": "Expected resale demand"
@@ -534,42 +439,6 @@
    "expectedMarketplaceRevenue": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Expected marketplace revenue"
-   },
-   "policyPermitsIt": {
-    "type": "string",
-    "description": "policy permits it"
-   },
-   "monitoring": {
-    "type": "string",
-    "description": "monitoring"
-   },
-   "exceptionsAuditAnalytics": {
-    "type": "string",
-    "description": "Exceptions → Audit → Analytics"
-   },
-   "modelAEmbeddedWhiteLabel": {
-    "type": "string",
-    "description": "Model A — Embedded White-Label"
-   },
-   "modelBTicvaiHostedWhiteLabel": {
-    "type": "string",
-    "description": "Model B — TICVAI-Hosted White-Label"
-   },
-   "andCommercialPolicies": {
-    "type": "string",
-    "description": "and commercial policies"
-   },
-   "modelCHeadlessApi": {
-    "type": "string",
-    "description": "Model C — Headless/API"
-   },
-   "engine": {
-    "type": "string",
-    "description": "engine"
-   },
-   "customerProposition": {
-    "type": "string",
-    "description": "customer proposition"
    }
   }
  },
@@ -644,10 +513,6 @@
     "type": "string",
     "description": "Approval"
    },
-   "deviceChannelWhereApplicable": {
-    "type": "string",
-    "description": "Device/channel where applicable"
-   },
    "ticketId": {
     "type": "string",
     "description": "Ticket ID"
@@ -660,41 +525,61 @@
     "type": "string",
     "description": "Resale transaction"
    },
-   "seat": {
-    "type": "string",
-    "description": "Seat"
-   },
-   "event": {
-    "type": "string",
-    "description": "Event"
-   },
    "paymentReference": {
     "type": "string",
     "description": "Payment reference"
    },
-   "subjectToRolePermissions": {
+   "deviceChannel": {
     "type": "string",
-    "description": "subject to role permissions"
+    "description": "Device/channel where applicable"
+   }
+  }
+ },
+ "ResaleConfirmationOwnershipTransferTicketDeliveryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Resale Confirmation, Ownership Transfer & Ticket Delivery displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "dynamicQr": {
+    "type": "string",
+    "description": "Dynamic QR"
    },
-   "finance": {
+   "mobileTicket": {
     "type": "string",
-    "description": "Finance"
+    "description": "Mobile Ticket"
    },
-   "compliance": {
+   "appleWallet": {
     "type": "string",
-    "description": "Compliance"
+    "description": "Apple Wallet"
    },
-   "fraudInvestigation": {
+   "googleWallet": {
     "type": "string",
-    "description": "Fraud investigation"
+    "description": "Google Wallet"
    },
-   "customerDispute": {
+   "otherSupportedCredentialMedia": {
     "type": "string",
-    "description": "Customer dispute"
+    "description": "Other supported credential media"
    },
-   "venueOperations": {
+   "rfidNfcAssignment": {
     "type": "string",
-    "description": "Venue operations"
+    "description": "RFID/NFC assignment where applicable"
+   },
+   "ticketId": {
+    "type": "string",
+    "description": "Ticket ID, unchanged through the resale (MoM 1 Sep)"
+   },
+   "currentOwner": {
+    "type": "string",
+    "description": "Current owner"
+   },
+   "previousOwner": {
+    "type": "string",
+    "description": "Previous owner"
+   },
+   "settlementStatus": {
+    "type": "string",
+    "description": "Seller settlement status"
    }
   }
  },
@@ -744,30 +629,6 @@
     "type": "integer",
     "description": "Repeated failed transactions"
    },
-   "accountDeviceAnomaliesWherePermitted": {
-    "type": "string",
-    "description": "Account/device anomalies where permitted"
-   },
-   "withExplainableContributingFactors": {
-    "type": "string",
-    "description": "with explainable contributing factors"
-   },
-   "allow": {
-    "type": "boolean",
-    "description": "Allow"
-   },
-   "requireVerification": {
-    "type": "boolean",
-    "description": "Require verification"
-   },
-   "holdTransaction": {
-    "type": "string",
-    "description": "Hold transaction"
-   },
-   "requireManualReview": {
-    "type": "boolean",
-    "description": "Require manual review"
-   },
    "revokedSellerCredential": {
     "type": "string",
     "description": "Revoked seller credential"
@@ -779,6 +640,20 @@
    "invalidatedTickets": {
     "type": "string",
     "description": "Invalidated tickets"
+   },
+   "accountDeviceAnomalies": {
+    "type": "string",
+    "description": "Account/device anomalies where permitted"
+   },
+   "response": {
+    "type": "string",
+    "enum": [
+     "allow",
+     "requireVerification",
+     "holdTransaction",
+     "requireManualReview"
+    ],
+    "description": "Configured response to the signal."
    }
   }
  },
@@ -921,10 +796,137 @@
      "cancelled"
     ],
     "description": "Vocabulary listed under Exception statuses."
-   },
-   "holdTransaction": {
+   }
+  }
+ },
+ "ResaleSettlement": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.resale_settlement",
+  "description": "**What one seller is owed for one sold listing, and when and how it is paid** (DM5, 29 September: data model for the agreed operations; MoM 1 Sep 4.14, Board 2: settlement to the original seller). The amounts are fixed from the listing's own fee snapshot at sale. `ResaleListing.payoutStatus` is the seller-facing summary of this row.\n**The seller is paid after the buyer is admitted, not after they pay**, so a dispute or a refund lands on a settlement that is still `pending` or `onHold`, never on money already paid out.",
+  "required": [
+   "id",
+   "resaleListingId",
+   "sellerSubjectId",
+   "listingPrice",
+   "sellerFee",
+   "sellerProceeds",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "Hold transaction"
+    "format": "uuid",
+    "readOnly": true
+   },
+   "resaleListingId": {
+    "x-ticvai-references": "orders.resale_listing",
+    "type": "string",
+    "format": "uuid",
+    "description": "Unique; one settlement per sold listing."
+   },
+   "sellerSubjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "listingPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "sellerFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "processingFee": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "tax": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "adjustments": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true
+   },
+   "sellerProceeds": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "payoutMethod": {
+    "type": "string",
+    "nullable": true,
+    "description": "Proposed values, client to correct (DM5).",
+    "enum": [
+     "originalPaymentMethod",
+     "bankTransfer",
+     "wallet"
+    ]
+   },
+   "settlementBatch": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true
+   },
+   "expectedPayoutDate": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "scheduled",
+     "onHold",
+     "paid",
+     "failed",
+     "reversed"
+    ]
+   },
+   "holdReason": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "manualHold",
+     "complianceHold",
+     "refundDisputeHold"
+    ]
+   },
+   "paidAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "failureReason": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    }
   }
  },
@@ -1001,32 +1003,8 @@
     ],
     "description": "Vocabulary listed under Exception statuses."
    },
-   "immediatelyAfterResale": {
-    "type": "string",
-    "description": "Immediately after resale"
-   },
-   "xDaysAfterResale": {
-    "type": "string",
-    "description": "X days after resale"
-   },
-   "afterEventCompletion": {
-    "type": "string",
-    "description": "After event completion"
-   },
-   "xDaysAfterEvent": {
-    "type": "string",
-    "description": "X days after event"
-   },
-   "afterAccessValidation": {
-    "type": "string",
-    "description": "After access validation"
-   },
-   "operatorDefinedSettlementCycle": {
-    "type": "string",
-    "description": "Operator-defined settlement cycle"
-   },
    "minimumPayoutThreshold": {
-    "type": "integer",
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
     "description": "Minimum payout threshold"
    },
    "settlementBatches": {
@@ -1041,17 +1019,26 @@
     "type": "string",
     "description": "Payment account verification"
    },
-   "manualHold": {
+   "settlementTiming": {
     "type": "string",
-    "description": "Manual hold"
+    "enum": [
+     "immediatelyAfterResale",
+     "xDaysAfterResale",
+     "afterEventCompletion",
+     "xDaysAfterEvent",
+     "afterAccessValidation",
+     "operatorDefinedSettlementCycle"
+    ],
+    "description": "When sellers are paid (a venue may pay only after the event has taken place)."
    },
-   "complianceHold": {
+   "holdReason": {
     "type": "string",
-    "description": "Compliance hold"
-   },
-   "refundDisputeHold": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Refund/dispute hold"
+    "enum": [
+     "manualHold",
+     "complianceHold",
+     "refundDisputeHold"
+    ],
+    "description": "Why a payout is on hold."
    }
   }
  },
@@ -1109,38 +1096,6 @@
     "type": "string",
     "description": "Validity"
    },
-   "buyerPaymentCompleted": {
-    "type": "string",
-    "description": "Buyer payment completed"
-   },
-   "listingRemainsValid": {
-    "type": "string",
-    "description": "Listing remains valid"
-   },
-   "sellerStillOwnsTicket": {
-    "type": "string",
-    "description": "Seller still owns ticket"
-   },
-   "ticketHasNotBeenScanned": {
-    "type": "string",
-    "description": "Ticket has not been scanned"
-   },
-   "ticketHasNotBeenRefunded": {
-    "type": "string",
-    "description": "Ticket has not been refunded"
-   },
-   "eventRemainsActive": {
-    "type": "integer",
-    "description": "Event remains active"
-   },
-   "capacityRemainsValid": {
-    "type": "integer",
-    "description": "Capacity remains valid"
-   },
-   "noFraudHoldExists": {
-    "type": "string",
-    "description": "No fraud hold exists"
-   },
    "sellerOwnershipHistoricalTransferred": {
     "type": "string",
     "description": "Seller Ownership: Historical / Transferred"
@@ -1157,10 +1112,6 @@
     "type": "string",
     "description": "Seat assignment"
    },
-   "addOnsWherePermitted": {
-    "type": "string",
-    "description": "Add-ons where permitted"
-   },
    "accessRights": {
     "type": "string",
     "description": "Access rights"
@@ -1168,6 +1119,10 @@
    "associatedBenefits": {
     "type": "string",
     "description": "Associated benefits"
+   },
+   "addOns": {
+    "type": "string",
+    "description": "Add-ons where permitted"
    }
   }
  }

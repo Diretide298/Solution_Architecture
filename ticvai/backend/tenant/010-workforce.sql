@@ -194,7 +194,7 @@ CREATE TABLE IF NOT EXISTS workforce.leave_request (
     half_day                          boolean DEFAULT false,
     reason                            text,
     status                            text CONSTRAINT leave_request_status_chk CHECK (status IN ('requested', 'approved', 'rejected', 'cancelled', 'taken')),
-    approval_request_id               text,
+    approval_request_id               uuid,
     scope_path                        ltree NOT NULL
 );
 
@@ -298,7 +298,7 @@ CREATE TABLE IF NOT EXISTS workforce.shift_swap (
     from_principal_id                 uuid NOT NULL,
     to_principal_id                   uuid NOT NULL,
     status                            text NOT NULL CONSTRAINT shift_swap_status_chk CHECK (status IN ('awaitingPeer', 'awaitingApproval', 'approved', 'rejected', 'withdrawn')),
-    approval_request_id               text,
+    approval_request_id               uuid,
     reason                            text,
     requested_at                      timestamptz
 );
@@ -338,7 +338,7 @@ CREATE TABLE IF NOT EXISTS workforce.staff_conversation_participant (
     staff_conversation_id             uuid NOT NULL,
     principal_id                      uuid NOT NULL,
     joined_at                         timestamptz NOT NULL,
-    last_read_message_id              text,
+    last_read_message_id              uuid,
     muted_until                       timestamptz,
     id                                uuid PRIMARY KEY NOT NULL
 );
@@ -346,7 +346,7 @@ CREATE TABLE IF NOT EXISTS workforce.staff_conversation_participant (
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS workforce.staff_message (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     staff_conversation_id             uuid NOT NULL,
     sender_principal_id               uuid NOT NULL,
     body                              text NOT NULL CONSTRAINT staff_message_body_chk CHECK (char_length(body) <= 2000),

@@ -1,6 +1,6 @@
 # WS142 — Marketing CRM Configuration Reference v1.0 board 8
 
-**10 screens · 16 operations · 18 schemas · 4 permissions**
+**10 screens · 16 operations · 21 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

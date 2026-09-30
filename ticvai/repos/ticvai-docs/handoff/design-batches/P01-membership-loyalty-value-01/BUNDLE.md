@@ -4460,8 +4460,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "entitlementId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "The `Entitlement.id`, a ULID (`pii.subject_biometric.entitlement_id`)."
+    "format": "uuid",
+    "description": "The `Entitlement.id`, a UUIDv7 (`pii.subject_biometric.entitlement_id`)."
    },
    "kind": {
     "$ref": "#/components/schemas/BiometricKind"
@@ -4745,8 +4745,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "entitlementId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "The `access.Entitlement.id` this membership is — a ULID, like every entitlement id."
+    "format": "uuid",
+    "description": "The `access.Entitlement.id` this membership is — a UUIDv7, like every entitlement id."
    },
    "productId": {
     "type": "string",
@@ -5287,7 +5287,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "paymentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "dunningCaseId": {
@@ -5321,7 +5321,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "subjectId": {
     "type": "string",
@@ -6493,12 +6493,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "paymentId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "refundId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "walletTransactionId": {

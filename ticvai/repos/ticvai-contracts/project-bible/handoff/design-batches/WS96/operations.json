@@ -56,6 +56,44 @@
   "requestBody": "MaintenancePlan",
   "responds": "MaintenancePlan"
  },
+ "createStockReservation": {
+  "method": "POST",
+  "path": "/stock-reservations",
+  "contract": "inventory",
+  "summary": "Reserve stock for a work order or another need",
+  "permission": "PROCUREMENT_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "InventoryStockReservation",
+  "responds": "InventoryStockReservation"
+ },
+ "createVendorServiceRequest": {
+  "method": "POST",
+  "path": "/vendor-service-requests",
+  "contract": "maintenance",
+  "summary": "Engage an outside vendor on a work order",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VendorServiceRequest",
+  "responds": "VendorServiceRequest"
+ },
  "createWorkOrder": {
   "method": "POST",
   "path": "/work-orders",
@@ -118,6 +156,21 @@
     "name": "withinDays",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -136,6 +189,19 @@
   "requestBody": null,
   "responds": "WorkOrderDetail"
  },
+ "getWorkOrderPriorityPolicy": {
+  "method": "GET",
+  "path": "/work-order-priority-policy",
+  "contract": "maintenance",
+  "summary": "Read how a fault's priority is scored",
+  "permission": "WORK_ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WorkOrderPriorityPolicy"
+ },
  "listMaintenancePlans": {
   "method": "GET",
   "path": "/maintenance-plans",
@@ -146,6 +212,79 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listStockReservations": {
+  "method": "GET",
+  "path": "/stock-reservations",
+  "contract": "inventory",
+  "summary": "Soft holds on stock",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "sourceType",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "sourceId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listVendorServiceRequests": {
+  "method": "GET",
+  "path": "/vendor-service-requests",
+  "contract": "maintenance",
+  "summary": "Requests sent to outside vendors",
+  "permission": "WORK_ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "workOrderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "supplierId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
    {
     "name": null,
     "in": null,
@@ -192,6 +331,21 @@
    },
    {
     "name": "overdueOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
     "in": "query",
     "required": null
    },
@@ -247,6 +401,25 @@
   "requestBody": null,
   "responds": "WorkOrder"
  },
+ "releaseStockReservation": {
+  "method": "POST",
+  "path": "/stock-reservations/{stockReservationId}/release",
+  "contract": "inventory",
+  "summary": "Give reserved stock back",
+  "permission": "PROCUREMENT_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "InventoryStockReservation"
+ },
  "setAssetStatus": {
   "method": "PUT",
   "path": "/assets/{assetId}/status",
@@ -265,6 +438,25 @@
   ],
   "requestBody": "SetAssetStatusRequest",
   "responds": "AssetStatusResult"
+ },
+ "setWorkOrderPriorityPolicy": {
+  "method": "PUT",
+  "path": "/work-order-priority-policy",
+  "contract": "maintenance",
+  "summary": "Set how a fault's priority is scored",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WorkOrderPriorityPolicy",
+  "responds": "WorkOrderPriorityPolicy"
  },
  "startWorkOrder": {
   "method": "POST",
@@ -304,6 +496,30 @@
   "requestBody": "SubmitInspectionRequest",
   "responds": "InspectionResult"
  },
+ "suggestWorkOrderAssignee": {
+  "method": "GET",
+  "path": "/work-orders/{workOrderId}/assignee-suggestions",
+  "contract": "maintenance",
+  "summary": "Who should take this work order, ranked",
+  "permission": "WORK_ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "updateMaintenancePlan": {
   "method": "PATCH",
   "path": "/maintenance-plans/{planId}",
@@ -322,6 +538,25 @@
   ],
   "requestBody": null,
   "responds": "MaintenancePlan"
+ },
+ "updateVendorServiceRequest": {
+  "method": "PATCH",
+  "path": "/vendor-service-requests/{vendorServiceRequestId}",
+  "contract": "maintenance",
+  "summary": "Move a vendor request along",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "VendorServiceRequest"
  },
  "updateWorkOrder": {
   "method": "PATCH",

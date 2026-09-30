@@ -9,12 +9,12 @@
  * Guarantees, from the 31 Jul 2026 offline architecture decision:
  *   - sequential per device, preserving order
  *   - both recorded and synced timestamps retained
- *   - idempotent on the server via a client-generated ULID
+ *   - idempotent on the server via a client-generated UUIDv7
  *   - automatic mode detection, automatic flush on reconnect
  */
 
 import type { SQLiteDatabase } from './sqlite';
-import { newUlid } from './ulid';
+import { newId } from './id';
 
 export type OutboxStatus = 'pending' | 'inFlight' | 'synced' | 'failed' | 'rejected';
 
@@ -28,7 +28,7 @@ export type ConflictPolicy =
   | 'manual';
 
 export interface OutboxEntry {
-  /** Client-generated ULID. Also the server-side idempotency key. */
+  /** Client-generated UUIDv7. Also the server-side idempotency key. */
   id: string;
   /** Monotonic per device. Preserves ordering across a batch. */
   sequence: number;
@@ -104,7 +104,7 @@ export class Outbox {
    * reconciles later, which is what makes offline selling feel instantaneous.
    */
   async enqueue(request: EnqueueRequest): Promise<OutboxEntry> {
-    const id = newUlid();
+    const id = newId();
     const sequence = await this.nextSequence();
     const recordedAt = new Date().toISOString();
 
@@ -236,7 +236,7 @@ export class Outbox {
 
   /**
    * Recovers entries stranded in `inFlight` by a crash or a kill mid-drain.
-   * Safe to replay because the server deduplicates on the entry's ULID.
+   * Safe to replay because the server deduplicates on the entry's id.
    */
   async recoverInFlight(): Promise<number> {
     const result = await this.db.run(

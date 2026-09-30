@@ -1823,7 +1823,7 @@ paths:
               type: object
               required: [id, amount, tender, recordedAt]
               properties:
-                id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+                id: { type: string, format: uuid }
                 amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
                 tender: { type: string }
                 bonusAmount:
@@ -2228,7 +2228,7 @@ paths:
               properties:
                 id:
                   type: string
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  format: uuid
                 credits:
                   type: integer
                   minimum: 1
@@ -3472,11 +3472,11 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
         paymentId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         refundId:
           type: string
-          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+          format: uuid
           nullable: true
         walletTransactionId:
           type: string
@@ -5211,7 +5211,7 @@ components:
       type: object
       required: [id, faceValue, kind]
       properties:
-        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+        id: { type: string, format: uuid }
         kind:
           type: string
           enum: [physical, digital]

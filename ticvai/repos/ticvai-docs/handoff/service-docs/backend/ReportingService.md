@@ -69,7 +69,7 @@ The self-service builder. A definition names its data source, columns, filters, 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateReportRequest`
 
@@ -178,7 +178,7 @@ Retired rather than deleted where executions or paused schedules reference it â€
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | reportId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Responses**
 
@@ -365,7 +365,7 @@ Definitions are versioned. Historic executions keep the version they ran against
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | reportId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateReportRequest`
 
@@ -476,7 +476,7 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateDashboardRequest`
 
@@ -630,7 +630,7 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | dashboardId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -669,7 +669,7 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | dashboardId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateDashboardRequest`
 
@@ -756,7 +756,7 @@ Scope is applied from the caller's resolved permissions. Parameters narrow; they
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | reportId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `RunReportRequest`
 
@@ -825,7 +825,7 @@ Runs under the caller's resolved permissions. The generated query cannot widen s
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -923,7 +923,7 @@ Turns a one-off question into something schedulable. The generated query becomes
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | conversationId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1003,7 +1003,7 @@ Turns a one-off question into something schedulable. The generated query becomes
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `KpiDefinition`
 
@@ -1069,7 +1069,7 @@ The tiles go with it and come back with it. `reporting.dashboard_tile` carries `
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | dashboardId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Responses**
 
@@ -1139,7 +1139,7 @@ BL-152. **The metric comes from the closed set**, so a rule cannot watch somethi
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `AlertRule`
 
@@ -1206,7 +1206,7 @@ BL-152. **The metric comes from the closed set**, so a rule cannot watch somethi
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `SemanticModel`
 

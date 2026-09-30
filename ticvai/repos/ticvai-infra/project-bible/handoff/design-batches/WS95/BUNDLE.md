@@ -1515,7 +1515,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Price the damage, and say who approved it",
   "permission": "RENTAL_OPERATE",
   "offlineCapable": null,
-  "conflictPolicy": null,
+  "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1581,7 +1581,7 @@ Method, path, parameters, request and response for every operation these screens
   "summary": "Condition before or after, with evidence",
   "permission": "RENTAL_OPERATE",
   "offlineCapable": true,
-  "conflictPolicy": null,
+  "conflictPolicy": "append",
   "scopeLevel": "venue",
   "parameters": [
    {
@@ -1801,7 +1801,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      },
      "workOrderId": {
       "type": "string",
-      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+      "format": "uuid",
       "nullable": true
      }
     }
@@ -2239,7 +2239,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "inspectionId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "Required for return to service where the asset demands it."
    },

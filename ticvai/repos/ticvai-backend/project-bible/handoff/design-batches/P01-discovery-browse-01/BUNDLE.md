@@ -315,7 +315,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "WEB-050",
      "trigger": "Plan your visit (header)",
-     "provenance": "decided 29 September 2026 (P29), MOB-6; web build Plan your visit"
+     "provenance": "decided 29 September 2026, MOB-6; web build Plan your visit"
     },
     {
      "to": "WEB-004",
@@ -816,14 +816,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Help me choose",
        "operation": "getPublishedGuidedChoice",
        "notes": "**The answers filter the list** (W4): sent as `guidedAnswerIds` to `listProducts` (and `searchCatalogue`), so web, app and kiosk filter the same way on the server.",
-       "provenance": "decided 29 September 2026 (P29), W4"
+       "provenance": "decided 29 September 2026, W4"
       },
       {
        "kind": "secondaryButton",
        "label": "Show everything",
        "operation": "listProducts",
        "notes": "Clears the Help me choose filter (W4).",
-       "provenance": "decided 29 September 2026 (P29), W4"
+       "provenance": "decided 29 September 2026, W4"
       },
       {
        "kind": "cardList",
@@ -831,7 +831,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "Product.salesContact",
        "operation": "listProducts",
        "notes": "**View-only products** (W3): Call sales / Email sales from `Product.salesContact` instead of Book.",
-       "provenance": "decided 29 September 2026 (P29), W3"
+       "provenance": "decided 29 September 2026, W3"
       }
      ]
     },
@@ -932,7 +932,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "white-label",
     "purpose": "Help me choose: the questions whose answers filter this list (W4)",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), W4"
+    "provenance": "decided 29 September 2026, W4"
    }
   ],
   "entryState": {
@@ -1362,14 +1362,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "Product.salesContact",
        "operation": "getProduct",
        "notes": "**View-only product** (W3): no Book; the sales contact from `Product.salesContact` (phone, email, note; the venue contact when absent).",
-       "provenance": "decided 29 September 2026 (P29), W3"
+       "provenance": "decided 29 September 2026, W3"
       },
       {
        "kind": "datePicker",
        "label": "Next 7 days",
        "operation": "listPerformances",
        "notes": "**Single-event page** (M18-13): banner or video hero, a brief description, and a date strip of the next `dateStripDays` days (default 7) with a calendar icon for later dates (M17-08).",
-       "provenance": "decided 29 September 2026 (P29), M18-13, M17-08"
+       "provenance": "decided 29 September 2026, M18-13, M17-08"
       }
      ]
     },
@@ -1622,7 +1622,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "note": "Names it and offers a swap; the rest of the plan is kept."
       }
      ],
-     "provenance": "decided 29 September 2026 (P29), MOB-6; web build: Book this plan goes straight into booking"
+     "provenance": "decided 29 September 2026, MOB-6; web build: Book this plan goes straight into booking"
     },
     {
      "to": "WEB-004",
@@ -1630,16 +1630,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "carries": [
       "productId"
      ],
-     "provenance": "decided 29 September 2026 (P29), MOB-6"
+     "provenance": "decided 29 September 2026, MOB-6"
     },
     {
      "to": "WEB-001",
      "trigger": "Back to tickets",
-     "provenance": "decided 29 September 2026 (P29), MOB-6"
+     "provenance": "decided 29 September 2026, MOB-6"
     }
    ]
   },
-  "notes": "**Added 29 September (P29)**: the 29 September web build has *Plan your visit* in the header, opening the planner full screen, and *Book this plan* goes straight into booking. The web twin of the Plan tab (GST-051 questions, GST-053 plan), binding the same planner operations (venue-map `generateVisitPlan`, `getVisitPlan`, `updateVisitPlan`, `listVisitPlanAlternatives`, `bookVisitPlan`). Block A (29 September re-plan, superseding R187 and GAP-C3). Rules-based; the AI planner chat is app-only for now. Hidden when the venue turns module `visitPlanner` off.",
+  "notes": "**Added 29 September**: the 29 September web build has *Plan your visit* in the header, opening the planner full screen, and *Book this plan* goes straight into booking. The web twin of the Plan tab (GST-051 questions, GST-053 plan), binding the same planner operations (venue-map `generateVisitPlan`, `getVisitPlan`, `updateVisitPlan`, `listVisitPlanAlternatives`, `bookVisitPlan`). Block A (29 September re-plan, superseding R187 and GAP-C3). Rules-based; the AI planner chat is app-only for now. Hidden when the venue turns module `visitPlanner` off.",
   "density": "compact",
   "pattern": "multiStepForm",
   "patternReason": "The Visit Planner prototype: six questions, then the plan with Book this plan",
@@ -1655,7 +1655,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "progressIndicator",
        "label": "Plan your visit · n of 6",
        "notes": "Who, heights (skipped with no children), days (up to 3), pace, interests, lunch.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6; Visit Planner prototype"
+       "provenance": "decided 29 September 2026, MOB-6; Visit Planner prototype"
       }
      ]
     },
@@ -1667,46 +1667,46 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "numberField",
        "label": "Adults and children",
        "notes": "Adults 1-8 (12+), children 0-8 (3-11).",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "selectField",
        "label": "How tall are the children?",
        "operation": "listProducts",
        "notes": "Per child; rides over the limit are left out (`ProductEligibilityRule`).",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "multiSelect",
        "label": "Which days are you visiting?",
        "notes": "Up to three.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "selectField",
        "label": "How busy should each day be?",
        "notes": "Packed, Balanced or Relaxed.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "multiSelect",
        "label": "What are you most interested in?",
        "operation": "listProducts",
        "notes": "Interest tags of the venue.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "selectField",
        "label": "What would you like for lunch?",
        "notes": "Cuisines of the outlets.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "primaryButton",
        "label": "Make my plan",
        "operation": "generateVisitPlan",
        "notes": "Runs the rules planner.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       }
      ]
     },
@@ -1720,35 +1720,35 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "bindsTo": "VisitPlanItem",
        "operation": "getVisitPlan",
        "notes": "Day tabs; arrival, timed items and lunch.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "secondaryButton",
        "label": "Swap / + Add something",
        "operation": "listVisitPlanAlternatives",
        "notes": "Candidates that suit everyone in the group.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "secondaryButton",
        "label": "Remove / Undo changes",
        "operation": "updateVisitPlan",
        "notes": "Each change is a new version.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "toggle",
        "label": "Add Fast Track",
        "operation": "updateVisitPlan",
        "notes": "Per guest, with the queuing time saved.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "detailPanel",
        "label": "Estimated total",
        "operation": "getVisitPlan",
        "notes": "Estimate for the group; confirmed in booking.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       }
      ]
     },
@@ -1761,13 +1761,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Book this plan",
        "operation": "bookVisitPlan",
        "notes": "Cart lines from the plan; opens the cart.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       },
       {
        "kind": "secondaryButton",
        "label": "Change answers",
        "notes": "Back to the questions.",
-       "provenance": "decided 29 September 2026 (P29), MOB-6"
+       "provenance": "decided 29 September 2026, MOB-6"
       }
      ]
     }
@@ -1787,42 +1787,42 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "catalogue",
     "purpose": "Interests and height limits of what the planner may include",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "operationId": "generateVisitPlan",
     "contract": "venue-map",
     "purpose": "Build a rules plan from the inputs (party, heights, dates, pace, interests, cuisine)",
     "trigger": "onAction",
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "operationId": "getVisitPlan",
     "contract": "venue-map",
     "purpose": "The plan: days, timed items and add-on suggestions, at its current version",
     "trigger": "onLoad",
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "operationId": "updateVisitPlan",
     "contract": "venue-map",
     "purpose": "Swap, remove, add or undo: each change is a new version, so undo goes back one",
     "trigger": "onAction",
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "operationId": "listVisitPlanAlternatives",
     "contract": "venue-map",
     "purpose": "Swap candidates for one item that suit everyone in the party",
     "trigger": "onAction",
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "operationId": "bookVisitPlan",
     "contract": "venue-map",
     "purpose": "Book this plan: turns the plan (and chosen add-ons) into cart lines and returns the cart",
     "trigger": "onAction",
-    "provenance": "decided 29 September 2026 (P29), MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6"
    }
   ],
   "entryState": {
@@ -3447,8 +3447,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "A ULID, matching `TicketStatus.ticketId` — **stable for the life of the ticket and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement with a new `mediaCode`.\n**This is the ticket id.** Wherever an operation takes a `ticketId` or `ticketIds` — `lookupTicket`, `listScans`, `ScanEvent`, the offline package and `transferOrderTickets` — it is this value. An order line's `entitlementIds` are the ticket ids of that line.\n"
+    "format": "uuid",
+    "description": "A UUIDv7, matching `TicketStatus.ticketId` — **stable for the life of the ticket and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement with a new `mediaCode`.\n**This is the ticket id.** Wherever an operation takes a `ticketId` or `ticketIds` — `lookupTicket`, `listScans`, `ScanEvent`, the offline package and `transferOrderTickets` — it is this value. An order line's `entitlementIds` are the ticket ids of that line.\n"
    },
    "templateId": {
     "type": "string",
@@ -3461,8 +3461,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "The order's id, a ULID as in `/orders/{orderId}` (`orders.sales_order.id`)."
+    "format": "uuid",
+    "description": "The order's id, a UUIDv7 as in `/orders/{orderId}` (`orders.sales_order.id`)."
    },
    "orderLineId": {
     "type": "string",
@@ -3581,7 +3581,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "supersedesEntitlementId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true,
     "description": "For a reissue or a resale. **The chain is traceable** — a ticket appearing from nowhere is indistinguishable from a fraudulent one.\n"
    },
@@ -3797,9 +3797,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "readOnly": true,
-    "description": "ULID."
+    "description": "UUIDv7."
    },
    "venueId": {
     "type": "string",
@@ -3856,9 +3856,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "properties": {
       "id": {
        "type": "string",
-       "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+       "format": "uuid",
        "readOnly": true,
-       "description": "ULID. The row's own key."
+       "description": "UUIDv7. The row's own key."
       },
       "title": {
        "$ref": "#/components/schemas/LocalisedText"
@@ -3893,9 +3893,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
         "properties": {
          "id": {
           "type": "string",
-          "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+          "format": "uuid",
           "readOnly": true,
-          "description": "ULID. The row's own key."
+          "description": "UUIDv7. The row's own key."
          },
          "title": {
           "$ref": "#/components/schemas/LocalisedText"
@@ -6597,8 +6597,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "batchId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-    "description": "ULID minted by the runtime; a retried beacon repeats it."
+    "format": "uuid",
+    "description": "UUIDv7 minted by the runtime; a retried beacon repeats it."
    },
    "sessionRef": {
     "type": "string",

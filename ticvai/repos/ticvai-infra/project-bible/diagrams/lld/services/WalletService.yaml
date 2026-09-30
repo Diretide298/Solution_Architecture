@@ -2,6 +2,7 @@ id: LLD-WalletService
 title: WalletService — 66 operations, 31 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
+deployable: commerce
 index: diagrams/hld/02-services.yaml
 why: '**Eight domains need a wallet and none of them owns it.** A Gold Membership issues F&B credit,
   parking credits and ride credits into the same wallet, so subscription, games and F&B all read it;

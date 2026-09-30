@@ -165,9 +165,9 @@ Each backend page lists what is *not* in the slice, which is what later releases
 | `seating.seat` | `assignSeats` |
 | `wallet.gift_card` | `activateGiftCard`, `blockGiftCard`, `issueGiftCard`, `redeemGiftCard` |
 
-**Read but written by no operation (21 tables).** Most are child rows written inside their parent's operation and missing from the lineage. Four are real contract gaps, logged as L1-L4 in `docs/active/action-register-22-september.md`.
+**Read but written by no operation (20 tables).** Most are child rows written inside their parent's operation and missing from the lineage. Four are real contract gaps, logged as L1-L4 in `docs/active/action-register-22-september.md`.
 
-`access.accreditation_credential`, `ai.capability_maturity`, `ai.chunk_ref`, `ai.eval_suite`, `fnb.sold_out_item`, `identity.platform_staff_grant`, `inventory.serialised_item`, `inventory.stock_batch`, `inventory.stock_level`, `ledger.event_budget`, `marketing.attribution_touch`, `marketing.booking_consent_record`, `marketing.challenge_progress`, `orders.pos_shift_approval`, `orders.pos_shift_incident`, `orders.ticket_template_channel`, `payments.stored_forward`, `platform.device_heartbeat`, `retail.shop_and_drop_line`, `subscription.plan_module`, `venuemap.map_version`
+`access.accreditation_credential`, `ai.capability_maturity`, `ai.eval_suite`, `fnb.sold_out_item`, `identity.platform_staff_grant`, `inventory.serialised_item`, `inventory.stock_batch`, `inventory.stock_level`, `ledger.event_budget`, `marketing.attribution_touch`, `marketing.booking_consent_record`, `marketing.challenge_progress`, `orders.pos_shift_approval`, `orders.pos_shift_incident`, `orders.ticket_template_channel`, `payments.stored_forward`, `platform.device_heartbeat`, `retail.shop_and_drop_line`, `subscription.plan_module`, `venuemap.map_version`
 
 **Setup operations no screen calls (13).** No screen lists them in its apis and no contract marks them consumed, so they are reachable only by API or import. Each needs a screen that binds it, or its contract to say it is API-only.
 

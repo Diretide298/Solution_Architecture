@@ -1,6 +1,6 @@
 # WS21 — B2B, Reseller & OTA Partner Management board 1
 
-**10 screens · 10 operations · 13 schemas · 2 permissions**
+**10 screens · 16 operations · 25 schemas · 3 permissions**
 
 Platform P10 Partner Web · ships as **ticvai-control** ·
 partner audience · web ·
@@ -47,11 +47,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `PLATFORM_CELL_MANAGE, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `PARTNER_MANAGE, PLATFORM_CELL_MANAGE, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **0 of these operations work offline**
-  
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -61,14 +60,14 @@ convincingly. It is never a caption.
 
 | id | name | pattern | ops | overlays | machine |
 |---|---|---|---|---|---|
-| `PTR-022` | Partner Management Command Center | commandCentre | 1 | 0 | — |
+| `PTR-022` | Partner Management Command Center | commandCentre | 2 | 0 | — |
 | `PTR-023` | Partner Profile & Organization Setup | configEditor | 1 | 0 | — |
-| `PTR-024` | Partner Onboarding & Application Workflow | configEditor | 1 | 0 | — |
-| `PTR-025` | Partner Contacts & User Administration | configEditor | 1 | 0 | — |
-| `PTR-026` | Territory, Market & Distribution Rights | configEditor | 1 | 0 | — |
+| `PTR-024` | Partner Onboarding & Application Workflow | configEditor | 2 | 1 | — |
+| `PTR-025` | Partner Contacts & User Administration | configEditor | 3 | 2 | — |
+| `PTR-026` | Territory, Market & Distribution Rights | configEditor | 2 | 1 | — |
 | `PTR-027` | Partner Brand, Venue & Business Scope Assignment | listDetail | 1 | 0 | — |
 | `PTR-028` | Partner Documentation & Compliance Repository | configEditor | 1 | 0 | — |
-| `PTR-029` | Partner Access, Roles & Permission Profile | configEditor | 1 | 0 | — |
+| `PTR-029` | Partner Access, Roles & Permission Profile | configEditor | 2 | 1 | — |
 | `PTR-030` | Partner Approval, Status & Lifecycle Management | configEditor | 1 | 0 | — |
 | `PTR-031` | Partner 360° Profile, Readiness & AI Review | listDetail | 1 | 0 | — |
 
@@ -107,7 +106,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "PTR-001"
    ],
    "exitTo": [
-    "PTR-001",
     "PTR-023",
     "PTR-024",
     "PTR-025",
@@ -121,15 +119,6 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "inferred": false,
    "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
    "transitions": [
-    {
-     "to": "PTR-001",
-     "trigger": "Partner Login / MFA",
-     "carries": [
-      "accountId",
-      "sessionId"
-     ],
-     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
-    },
     {
      "to": "PTR-023",
      "trigger": "Sets up the organisation record",
@@ -175,10 +164,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Authorized administrators can identify every partner, its business relationship, current status and outstanding actions from a single workspace.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each partner record should display) — counts over a population, then the population",
   "purpose": "Provide a centralized management dashboard for all B2B, reseller, OTA and distribution partners across the TICVAI ecosystem.",
-  "purposeNote": "Authorized administrators can identify every partner, its business relationship, current status and outstanding actions from a single workspace.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -220,73 +209,73 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "metricTile",
        "label": "Total Partners",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "PartnerManagementCommandCenterView.totalPartners"
+       "bindsTo": "PartnerManagementCommandCenterSummary.totalPartners"
       },
       {
        "kind": "metricTile",
        "label": "Active Partners",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "PartnerManagementCommandCenterView.activePartners"
+       "bindsTo": "PartnerManagementCommandCenterSummary.activePartners"
       },
       {
        "kind": "metricTile",
        "label": "Pending Onboarding",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "PartnerManagementCommandCenterView.pendingOnboarding"
+       "bindsTo": "PartnerManagementCommandCenterSummary.pendingOnboarding"
       },
       {
        "kind": "metricTile",
        "label": "Pending Approval",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "PartnerManagementCommandCenterView.pendingApproval"
+       "bindsTo": "PartnerManagementCommandCenterSummary.pendingApproval"
       },
       {
        "kind": "metricTile",
        "label": "Suspended Partners",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "PartnerManagementCommandCenterView.suspendedPartners"
+       "bindsTo": "PartnerManagementCommandCenterSummary.suspendedPartners"
       },
       {
        "kind": "metricTile",
        "label": "Expiring Agreements",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "PartnerManagementCommandCenterView.expiringAgreements"
+       "bindsTo": "PartnerManagementCommandCenterSummary.expiringAgreements"
       },
       {
        "kind": "metricTile",
        "label": "Documentation Issues",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "PartnerManagementCommandCenterView.documentationIssues"
+       "bindsTo": "PartnerManagementCommandCenterSummary.documentationIssues"
       },
       {
        "kind": "metricTile",
        "label": "Partners With Credit Holds",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "PartnerManagementCommandCenterView.partnersWithCreditHolds"
+       "bindsTo": "PartnerManagementCommandCenterSummary.partnersWithCreditHolds"
       },
       {
        "kind": "metricTile",
        "label": "Connected OTA/API Partners",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "PartnerManagementCommandCenterView.connectedOtaApiPartners"
+       "bindsTo": "PartnerManagementCommandCenterSummary.connectedOtaApiPartners"
       },
       {
        "kind": "metricTile",
        "label": "Partner Sales YTD",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "PartnerManagementCommandCenterView.partnerSalesYtd"
+       "bindsTo": "PartnerManagementCommandCenterSummary.partnerSalesYtd"
       },
       {
        "kind": "metricTile",
        "label": "Partner Revenue YTD",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "PartnerManagementCommandCenterView.partnerRevenueYtd"
+       "bindsTo": "PartnerManagementCommandCenterSummary.partnerRevenueYtd"
       },
       {
        "kind": "metricTile",
        "label": "High-Risk Partners",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "PartnerManagementCommandCenterView.highRiskPartners"
+       "bindsTo": "PartnerManagementCommandCenterSummary.highRiskPartners"
       }
      ]
     },
@@ -373,6 +362,12 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   },
   "apis": [
    {
+    "operationId": "listPartner2",
+    "contract": "subscription",
+    "purpose": "Partner Operations Command Center",
+    "trigger": "onLoad"
+   },
+   {
     "operationId": "listPartner",
     "contract": "subscription",
     "purpose": "Partner Management Command Center",
@@ -382,7 +377,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-022"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-022",
+   "workshopBoard": "wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-022"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 5. 31 of 38 labels bound to a contract property; 48 of 55 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -446,14 +442,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Each external partner has one governed master organization record that can be referenced by commercial, operational, finance and distribution processes.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
   "purpose": "Create the master business record for each external distribution partner.",
-  "purposeNote": "Each external partner has one governed master organization record that can be referenced by commercial, operational, finance and distribution processes.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: New Partner. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Key Account, New Partner. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
     "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Allow internal tags such as"
    }
   ],
@@ -552,6 +548,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Key Account",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Allow internal tags such as"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "New Partner",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Allow internal tags such as"
       }
@@ -570,18 +571,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setPartnerProfileOrganization",
     "contract": "subscription",
     "purpose": "Partner Profile & Organization Setup",
-    "trigger": "onAction",
-    "invalidates": [
-     "setPartnerProfileOrganization"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-023"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-023",
+   "workshopBoard": "wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-023"
   },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 17 of 53 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 18 of 53 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -643,15 +642,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "New partners cannot become commercially active until the configured onboarding and approval stages have been successfully completed.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
   "purpose": "Manage the complete journey from a new partner application through internal review and activation.",
-  "purposeNote": "New partners cannot become commercially active until the configured onboarding and approval stages have been successfully completed.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Sequential approval, Parallel approval, Request More Information. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 8 §Support"
+    "why": "**The pack names 5 actions on this screen; 1 are served since the writers pass (29 September): Request More Information by `actOnPartnerApplicationReview`.** Still unserved: Product requirements, Sequential approval, Parallel approval, Rejection. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 8 §Operations"
    }
   ],
   "layout": {
@@ -719,6 +718,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Product requirements",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 8 §Operations"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Sequential approval",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 8 §Support"
       },
@@ -729,8 +733,21 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       },
       {
        "kind": "secondaryButton",
+       "label": "Rejection",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 8 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Request More Information",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 8 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Act on partner application review",
+       "operation": "actOnPartnerApplicationReview",
+       "permission": "PARTNER_MANAGE",
+       "notes": "The review actions on PTR-024 (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml POST /partner-applications/{applicationId}/review-actions"
       }
      ]
     }
@@ -748,14 +765,57 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "subscription",
     "purpose": "Partner Onboarding & Application Workflow",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "actOnPartnerApplicationReview",
+    "contract": "subscription",
+    "purpose": "Move a partner application through its departmental review",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPartnerOnboardingApplication"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-024"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-024",
+   "workshopBoard": "wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-024"
   },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 13 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 15 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formActOnPartnerApplicationReview",
+    "component": "modal",
+    "trigger": "Act on partner application review",
+    "body": "**Collects what `actOnPartnerApplicationReview` sends before it is called.** Required: `action`. Optional: `department`, `assigneePrincipalId`, `note`, `documentIds`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PartnerApplicationReviewAction",
+    "confirm": {
+     "label": "Act on partner application review",
+     "operation": "actOnPartnerApplicationReview"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "action",
+      "department",
+      "assigneePrincipalId",
+      "note",
+      "documentIds"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /partner-applications/{applicationId}/review-actions"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "applicationId",
+     "from": "navigation",
+     "optional": true
+    }
+   ]
+  },
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -817,15 +877,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Every external user accessing TICVAI on behalf of a partner is associated with a valid partner account and controlled through appropriate roles and permissions.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture; Configure) and no display directory — it is settings, not a population",
   "purpose": "Manage the individuals authorized to interact with TICVAI on behalf of each partner.",
-  "purposeNote": "Every external user accessing TICVAI on behalf of a partner is associated with a valid partner account and controlled through appropriate roles and permissions.",
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Password policy. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
-    "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support/reference"
+    "why": "**The pack names 9 actions on this screen; 6 are served since the writers pass (29 September): Primary Contact, Commercial, Finance, Operations, Management, Emergency Contact by `setPartnerContact`.** Still unserved: Password policy, SSO where available …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support"
    }
   ],
   "layout": {
@@ -928,8 +988,59 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "components": [
       {
        "kind": "primaryButton",
+       "label": "Primary Contact",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Commercial",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Finance",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Operations",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Management",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Emergency Contact",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Password policy",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support/reference"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "SSO where available",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support/reference"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save partner contact",
+       "operation": "setPartnerContact",
+       "permission": "PARTNER_MANAGE",
+       "notes": "The contact half of PTR-025 (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml PUT /partner-contacts"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create partner user",
+       "operation": "createPartnerUser",
+       "permission": "PARTNER_MANAGE",
+       "notes": "2.7.51.",
+       "provenance": "contract subscription.yaml POST /partners/{partnerId}/users"
       }
      ]
     }
@@ -947,14 +1058,100 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "subscription",
     "purpose": "Partner Contacts & User Administration",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPartnerContact",
+    "contract": "subscription",
+    "purpose": "Create, edit, disable, enable or revoke a partner contact",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPartnerContactUser"
+    ]
+   },
+   {
+    "operationId": "createPartnerUser",
+    "contract": "subscription",
+    "purpose": "Add a user to a partner branch",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPartnerContactUser"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-025"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-025",
+   "workshopBoard": "wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-025"
   },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 18 of 52 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 26 of 52 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetPartnerContact",
+    "component": "modal",
+    "trigger": "Save partner contact",
+    "body": "**Collects what `setPartnerContact` sends before it is called.** Required: `partnerId`. Optional: `contactId`, `action`, `name`, `position`, `department`, `email`, `mobile`, `telephone`, `language`, `timeZone`, `contactType`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PartnerContactInput",
+    "confirm": {
+     "label": "Save partner contact",
+     "operation": "setPartnerContact"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "partnerId",
+      "contactId",
+      "action",
+      "name",
+      "position",
+      "department",
+      "email",
+      "mobile",
+      "telephone",
+      "language",
+      "timeZone",
+      "contactType"
+     ]
+    },
+    "provenance": "contract subscription.yaml PUT /partner-contacts"
+   },
+   {
+    "id": "formCreatePartnerUser",
+    "component": "modal",
+    "trigger": "Create partner user",
+    "body": "**Collects what `createPartnerUser` sends before it is called.** Required: `id`, `partnerId`, `principalId`, `branchScopePath`. Optional: `role`, `salesLocation`, `currency`, `accountExpiresAt`, `allocationQuota`, `creditLimitOverride`, `canManageUsers`. Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "PartnerUser",
+    "confirm": {
+     "label": "Create partner user",
+     "operation": "createPartnerUser"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "id",
+      "partnerId",
+      "principalId",
+      "branchScopePath",
+      "role",
+      "salesLocation",
+      "currency",
+      "accountExpiresAt",
+      "allocationQuota",
+      "creditLimitOverride",
+      "canManageUsers"
+     ]
+    },
+    "provenance": "contract subscription.yaml POST /partners/{partnerId}/users"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "partnerId",
+     "from": "session"
+    }
+   ]
+  },
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1008,10 +1205,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "partner is authorized to use.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Define where and through what business scope a partner is authorized to distribute TICVAI products.",
-  "purposeNote": "partner is authorized to use.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1040,6 +1237,20 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 12 §Configure"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save partner distribution rights",
+       "operation": "setPartnerDistributionRights",
+       "permission": "PARTNER_MANAGE",
+       "notes": "The writer for PTR-026 (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml PUT /partners/{partnerId}/distribution-rights"
+      }
+     ]
     }
    ]
   },
@@ -1055,14 +1266,51 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "subscription",
     "purpose": "Territory, Market & Distribution Rights",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPartnerDistributionRights",
+    "contract": "subscription",
+    "purpose": "Replace a partner's territory, market and distribution rights",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTerritoryMarketDistribution"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-026"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-026",
+   "workshopBoard": "wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-026"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 12. 0 of 0 labels bound to a contract property; 4 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetPartnerDistributionRights",
+    "component": "modal",
+    "trigger": "Save partner distribution rights",
+    "body": "**Collects what `setPartnerDistributionRights` sends before it is called.** Required: `rights`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save partner distribution rights",
+     "operation": "setPartnerDistributionRights"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "rights"
+     ]
+    },
+    "provenance": "contract subscription.yaml PUT /partners/{partnerId}/distribution-rights"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "partnerId",
+     "from": "session"
+    }
+   ]
+  },
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1124,10 +1372,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Every partner is associated only with the TICVAI brands, venues and business entities for which the commercial relationship has been approved.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Determine which TICVAI business entities the partner relationship covers. This is deliberately separate from product assignment, which is governed through the Sales Channel and commercial configuration layers.",
-  "purposeNote": "Every partner is associated only with the TICVAI brands, venues and business entities for which the commercial relationship has been approved.",
   "gaps": [
    {
     "operation": null,
@@ -1180,16 +1428,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "setPartnerBrandVenue",
     "contract": "subscription",
     "purpose": "Partner Brand, Venue & Business Scope Assignment",
-    "trigger": "onAction",
-    "invalidates": [
-     "setPartnerBrandVenue"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-027"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-027",
+   "workshopBoard": "wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-027"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 0 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1253,10 +1499,17 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "restrict commercial activity when mandatory documentation is missing or invalid.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture; Configure whether expiration should) and no display directory — it is settings, not a population",
   "purpose": "Maintain required partner documentation and ensure that commercial accounts remain compliant.",
-  "purposeNote": "restrict commercial activity when mandatory documentation is missing or invalid.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Commercial Registration, Bank Details, Signed Agreement, API Agreement. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 15 §Support configurable documents such as"
+   }
+  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1340,6 +1593,32 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 15 §Configure whether expiration should"
       }
      ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Commercial Registration",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 15 §Support configurable documents such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Bank Details",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 15 §Support configurable documents such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Signed Agreement",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 15 §Support configurable documents such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "API Agreement",
+       "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 15 §Support configurable documents such as"
+      }
+     ]
     }
    ]
   },
@@ -1360,9 +1639,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-028"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-028",
+   "workshopBoard": "wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-028"
   },
-  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 15 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 19 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1424,10 +1704,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "density": "compact",
+  "purposeNote": "Partner organizations can access only the capabilities authorized by TICVAI, regardless of permissions assigned to individual partner users.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure whether the partner may) and no display directory — it is settings, not a population",
   "purpose": "Control what a partner organization is permitted to do, beyond individual-user permissions.",
-  "purposeNote": "Partner organizations can access only the capabilities authorized by TICVAI, regardless of permissions assigned to individual partner users.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1536,6 +1816,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Permissions this screen separates",
        "notes": "**The pack separates these permissions and no action on the screen claims them yet:** ↓, Permanent, Temporary, Seasonal, Event-specific. Each needs attaching to the control it gates, or the screen needs the control.",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 16 §Partner Permission Ceiling"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save partner capability grants",
+       "operation": "setPartnerCapabilityGrants",
+       "permission": "PARTNER_MANAGE",
+       "notes": "The writer for PTR-029's organisation ceiling (decided 29 September, writers pass; DM4).",
+       "provenance": "contract subscription.yaml PUT /partners/{partnerId}/capability-grants"
       }
      ]
     }
@@ -1553,14 +1841,51 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "contract": "subscription",
     "purpose": "Partner Access, Roles & Permission Profile",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setPartnerCapabilityGrants",
+    "contract": "subscription",
+    "purpose": "Replace the capability ceiling of a partner",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPartnerAccessRole"
+    ]
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-029"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-029",
+   "workshopBoard": "wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-029"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 23 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "overlays": [
+   {
+    "id": "formSetPartnerCapabilityGrants",
+    "component": "modal",
+    "trigger": "Save partner capability grants",
+    "body": "**Collects what `setPartnerCapabilityGrants` sends before it is called.** Required: `grants`. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save partner capability grants",
+     "operation": "setPartnerCapabilityGrants"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "grants"
+     ]
+    },
+    "provenance": "contract subscription.yaml PUT /partners/{partnerId}/capability-grants"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "partnerId",
+     "from": "session"
+    }
+   ]
+  },
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1614,10 +1939,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Partner lifecycle changes are governed, effective-dated, auditable and do not unintentionally damage valid existing customer transactions.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
   "purpose": "Govern the complete business lifecycle of a partner after onboarding.",
-  "purposeNote": "Partner lifecycle changes are governed, effective-dated, auditable and do not unintentionally damage valid existing customer transactions.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1698,16 +2023,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "operationId": "approvePartnerStatuLifecycle",
     "contract": "subscription",
     "purpose": "Partner Approval, Status & Lifecycle Management",
-    "trigger": "onAction",
-    "invalidates": [
-     "approvePartnerStatuLifecycle"
-    ]
+    "trigger": "onAction"
    }
   ],
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-030"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-030",
+   "workshopBoard": "wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-030"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 18. 0 of 0 labels bound to a contract property; 15 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1763,10 +2086,10 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "notes": "**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
   },
   "density": "compact",
+  "purposeNote": "Before activation, authorized management can evaluate the partner's complete organizational, compliance, access, commercial and technical readiness from one consolidated view. Board 1 — Final Screen Register Screen Backend Screen Primary Responsibility 8.1.1 Partner Management Command Center Partner portfolio & status Screen Backend Screen Primary Responsibility 8.1.2 Partner Profile & Organization Setup Master partner record 8.1.3 Partner Onboarding & Application Workflow Partner onboarding 8.1.4 Partner Contacts & User Administration Contacts and B2B users",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide one consolidated Partner 360 screen before activation and throughout the relationship. This should become one of the most useful screens for TICVAI commercial management. Board 1 established who the partner is and what they are authorized to access. Board 2 establishes the commercial rules under which that partner can transact with TICVAI.",
-  "purposeNote": "Before activation, authorized management can evaluate the partner's complete organizational, compliance, access, commercial and technical readiness from one consolidated view. Board 1 — Final Screen Register Screen Backend Screen Primary Responsibility 8.1.1 Partner Management Command Center Partner portfolio & status Screen Backend Screen Primary Responsibility 8.1.2 Partner Profile & Organization Setup Master partner record 8.1.3 Partner Onboarding & Application Workflow Partner onboarding 8.1.4 Partner Contacts & User Administration Contacts and B2B users",
   "gaps": [
    {
     "operation": null,
@@ -1822,7 +2145,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
   "wireframe": {
    "status": "notStarted",
    "provenance": "generated",
-   "board": "wireframes/P10 Partner Web.dc.html#ptr-031"
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-031",
+   "workshopBoard": "wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-031"
   },
   "apisNote": "Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page 19. 0 of 0 labels bound to a contract property; 1 of 78 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "_platform": {
@@ -1858,6 +2182,25 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
+ "actOnPartnerApplicationReview": {
+  "method": "POST",
+  "path": "/partner-applications/{applicationId}/review-actions",
+  "contract": "subscription",
+  "summary": "Move a partner application through its departmental review",
+  "permission": "PARTNER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PartnerApplicationReviewAction",
+  "responds": "PartnerApplication"
+ },
  "approvePartnerStatuLifecycle": {
   "method": "PUT",
   "path": "/partner-statu-lifecycle",
@@ -1867,9 +2210,34 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PartnerApprovalStatusLifecycleManagementInput",
   "responds": "PartnerApprovalStatusLifecycleManagementView"
+ },
+ "createPartnerUser": {
+  "method": "POST",
+  "path": "/partners/{partnerId}/users",
+  "contract": "subscription",
+  "summary": "Add a user to a partner branch",
+  "permission": "PARTNER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PartnerUser",
+  "responds": "PartnerUser"
  },
  "listPartner": {
   "method": "GET",
@@ -1902,7 +2270,116 @@ Method, path, parameters, request and response for every operation these screens
     "required": false
    },
    {
+    "name": "risk",
+    "in": "query",
+    "required": false
+   },
+   {
     "name": "integrationType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partnerType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "territory",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "agreementStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "creditStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPartner2": {
+  "method": "GET",
+  "path": "/partner-2",
+  "contract": "subscription",
+  "summary": "Partner Operations Command Center",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "market",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partnerType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "accountManager",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "operationalStatus",
     "in": "query",
     "required": false
    },
@@ -1910,10 +2387,20 @@ Method, path, parameters, request and response for every operation these screens
     "name": "risk",
     "in": "query",
     "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
-  "responds": "PartnerManagementCommandCenterView"
+  "responds": "Page"
  },
  "listPartnerAccessRole": {
   "method": "GET",
@@ -1924,9 +2411,35 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "capability",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "grantType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PartnerAccessRolesPermissionProfileView"
+  "responds": "Page"
  },
  "listPartnerContactUser": {
   "method": "GET",
@@ -1937,9 +2450,45 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "contactType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "hasUserAccount",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PartnerContactsUserAdministrationView"
+  "responds": "Page"
  },
  "listPartnerDocumentationCompliance": {
   "method": "GET",
@@ -1950,9 +2499,40 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "documentType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "verificationStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "expiringWithinDays",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PartnerDocumentationComplianceRepositoryView"
+  "responds": "Page"
  },
  "listPartnerOnboardingApplication": {
   "method": "GET",
@@ -1963,9 +2543,40 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "stage",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "requestedPartnerType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "PartnerOnboardingApplicationWorkflowView"
+  "responds": "Page"
  },
  "listPartnerProfileReadiness": {
   "method": "GET",
@@ -1976,9 +2587,35 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "Partner360ProfileReadinessAiReviewView"
+  "responds": "Page"
  },
  "listTerritoryMarketDistribution": {
   "method": "GET",
@@ -1989,9 +2626,45 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "market",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "distributionMethod",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "exclusivity",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "TerritoryMarketDistributionRightsView"
+  "responds": "Page"
  },
  "setPartnerBrandVenue": {
   "method": "PUT",
@@ -2002,9 +2675,72 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PartnerBrandVenueBusinessScopeAssignmentInput",
   "responds": "PartnerBrandVenueBusinessScopeAssignmentView"
+ },
+ "setPartnerCapabilityGrants": {
+  "method": "PUT",
+  "path": "/partners/{partnerId}/capability-grants",
+  "contract": "subscription",
+  "summary": "Replace the capability ceiling of a partner",
+  "permission": "PARTNER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setPartnerContact": {
+  "method": "PUT",
+  "path": "/partner-contacts",
+  "contract": "subscription",
+  "summary": "Create, edit, disable, enable or revoke a partner contact",
+  "permission": "PARTNER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PartnerContactInput",
+  "responds": "PartnerContact"
+ },
+ "setPartnerDistributionRights": {
+  "method": "PUT",
+  "path": "/partners/{partnerId}/distribution-rights",
+  "contract": "subscription",
+  "summary": "Replace a partner's territory, market and distribution rights",
+  "permission": "PARTNER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "setPartnerProfileOrganization": {
   "method": "PUT",
@@ -2015,7 +2751,13 @@ Method, path, parameters, request and response for every operation these screens
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": "PartnerProfileOrganizationSetupInput",
   "responds": "PartnerProfileOrganizationSetupView"
  }
@@ -2028,582 +2770,1276 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
  "Partner360ProfileReadinessAiReviewView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner and its control.partner_* rows and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Partner 360° Profile, Readiness & AI Review displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "companyInformationAndHierarchy": {
     "type": "string",
-    "description": "Company information and hierarchy"
+    "description": "Organization: legal entity and parent chain, e.g. \"Gulf Travel LLC > Gulf Travel Group\""
    },
    "keyPartnerContacts": {
-    "type": "string",
-    "description": "Key partner contacts"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Contacts: key partner contacts (name and contact type)"
    },
    "activeB2bUsers": {
     "type": "integer",
-    "description": "Active B2B users"
+    "description": "Users: active B2B users"
    },
    "authorizedMarkets": {
-    "type": "string",
-    "description": "Authorized markets"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Territories: authorized markets"
    },
    "brandsAndVenues": {
-    "type": "string",
-    "description": "Brands and venues"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Business Scope: brands and venues"
    },
    "complianceStatus": {
     "type": "string",
-    "description": "Compliance status"
+    "description": "Documentation: compliant, expiring, incomplete or nonCompliant"
    },
    "authorizedCapabilities": {
-    "type": "string",
-    "description": "Authorized capabilities"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Permissions: authorized capabilities"
    },
-   "agreementCreditSummaryFromBoard2": {
+   "commercialSummary": {
     "type": "string",
-    "description": "Agreement/credit summary from Board 2"
+    "description": "Commercial: agreement and credit summary"
    },
-   "connectedChannelsFromArea4": {
+   "connectedChannels": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "b2bPortal",
+      "api",
+      "otaConnection",
+      "agentPortal",
+      "affiliateLink",
+      "voucherDistribution",
+      "bulkTicketExport",
+      "other"
+     ]
+    },
+    "description": "Distribution: connected channels"
+   },
+   "performanceSummary": {
     "type": "string",
-    "description": "Connected channels from Area 4"
+    "description": "Performance: scorecard summary"
    },
-   "summaryFromBoard3": {
+   "partnerId": {
     "type": "string",
-    "description": "Summary from Board 3"
+    "format": "uuid",
+    "description": "Partner"
    },
-   "approvedLimit": {
+   "partnerName": {
+    "type": "string",
+    "description": "Partner Name"
+   },
+   "partnerType": {
+    "type": "string",
+    "description": "Partner Type code"
+   },
+   "accountManager": {
+    "type": "string",
+    "description": "Account Manager"
+   },
+   "country": {
+    "type": "string",
+    "description": "Country, ISO 3166-1 alpha-2"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status: lead, applicant, underReview, approved, configuration, active, restricted, suspended, terminated or archived (pack p.6 and p.18 merged with MoM 31 Aug 4.3 lead -> submitted -> active -> suspended; \"submitted\" is applicant)"
+   },
+   "riskRating": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
+    "description": "Risk"
+   },
+   "salesYtd": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Sales YTD"
+   },
+   "outstandingBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Outstanding Balance"
+   },
+   "readinessScore": {
     "type": "integer",
-    "description": "approved limit"
+    "description": "Readiness Score, 0-100"
    },
-   "returnForChanges": {
-    "type": "string",
-    "description": "Return for Changes"
+   "readinessBreakdown": {
+    "type": "object",
+    "description": "Readiness by section, each 0-100",
+    "properties": {
+     "organization": {
+      "type": "integer"
+     },
+     "contacts": {
+      "type": "integer"
+     },
+     "documentation": {
+      "type": "integer"
+     },
+     "territory": {
+      "type": "integer"
+     },
+     "permissions": {
+      "type": "integer"
+     },
+     "commercialAgreement": {
+      "type": "integer"
+     },
+     "credit": {
+      "type": "integer"
+     },
+     "integration": {
+      "type": "integer"
+     }
+    }
    },
-   "restrict": {
-    "type": "string",
-    "description": "Restrict"
+   "blockers": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Critical blockers to activation"
    },
-   "configuredHumanAuthorization": {
+   "aiRecommendation": {
     "type": "string",
-    "description": "configured human authorization"
+    "enum": [
+     "recommendedForActivation",
+     "activationNotRecommended"
+    ],
+    "description": "Advisory AI Partner Review verdict",
+    "nullable": true
    },
-   "authorization": {
-    "type": "string",
-    "description": "authorization"
-   },
-   "allocationsIntoBoard1": {
-    "type": "string",
-    "description": "allocations into Board 1"
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Advisory AI Partner Review narrative"
    }
   }
  },
  "PartnerAccessRolesPermissionProfileView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_capability_grant (PartnerCapabilityGrant) and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Partner Access, Roles & Permission Profile displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "holdInventory": {
+   "partnerId": {
     "type": "string",
-    "description": "Hold Inventory"
+    "format": "uuid",
+    "description": "Partner"
    },
-   "confirmBooking": {
+   "capability": {
     "type": "string",
-    "description": "Confirm Booking"
+    "enum": [
+     "searchAvailability",
+     "createBooking",
+     "holdInventory",
+     "confirmBooking",
+     "cancelBooking",
+     "modifyBooking",
+     "rescheduleBooking",
+     "downloadTicket",
+     "printTicket",
+     "sendTicket",
+     "accessCustomerDetails",
+     "useCredit",
+     "usePaymentCard",
+     "viewCommission",
+     "viewNetRates",
+     "accessReports",
+     "exportData",
+     "useApi",
+     "createSubAgents",
+     "refund",
+     "manualPriceOverride",
+     "creditAdjustment",
+     "highValueBooking",
+     "customerDataExport"
+    ],
+    "description": "Organization-level capability (pack pp.16-17; refund and rescheduleBooking from MoM 31 Aug 4.3)"
    },
-   "modifyBooking": {
+   "allowed": {
+    "type": "boolean",
+    "description": "Whether the partner may use this capability"
+   },
+   "requiresInternalApproval": {
+    "type": "boolean",
+    "description": "Sensitive function: each use needs additional internal approval"
+   },
+   "grantType": {
     "type": "string",
-    "description": "Modify Booking"
+    "enum": [
+     "permanent",
+     "temporary",
+     "seasonal",
+     "eventSpecific"
+    ],
+    "description": "Effective Dates: how long the grant lasts"
    },
-   "accessCustomerDetails": {
+   "effectiveFrom": {
     "type": "string",
-    "description": "Access Customer Details"
+    "format": "date",
+    "description": "Effective from",
+    "nullable": true
    },
-   "useCredit": {
+   "effectiveTo": {
     "type": "string",
-    "description": "Use Credit"
+    "format": "date",
+    "description": "Effective to",
+    "nullable": true
    },
-   "usePaymentCard": {
+   "eventId": {
     "type": "string",
-    "description": "Use Payment Card"
-   },
-   "accessReports": {
+    "description": "Event the grant is limited to, for an eventSpecific grant",
+    "nullable": true
+   }
+  }
+ },
+ "PartnerAgreementStatus": {
+  "type": "string",
+  "enum": [
+   "pendingApproval",
+   "active",
+   "expiringSoon",
+   "expired",
+   "suspended",
+   "terminated"
+  ]
+ },
+ "PartnerApplication": {
+  "type": "object",
+  "x-ticvai-persistence": "control.partner_application + control.partner_application_review_task",
+  "description": "A partner onboarding application and where it stands in the review. `registerPartner` creates one with the partner record it opens (lifecycle `applicant`); the stage moves through the departmental reviews and the decision itself goes through `approvals` (decided 29 September, data model DM4)\n\n**Written by** registerPartner (creates the application `submitted` with the partner `applicant`) and actOnPartnerApplicationReview (starts the review, completes a departmental task, asks for and receives more information, withdraws); the approval itself is decided in approvals (decided 29 September, writers pass; DM4).",
+  "required": [
+   "id",
+   "companyName",
+   "stage",
+   "status",
+   "submittedAt"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "Access Reports"
+    "format": "uuid",
+    "readOnly": true
    },
-   "useApi": {
+   "partnerId": {
     "type": "string",
-    "description": "Use API"
+    "format": "uuid",
+    "nullable": true,
+    "description": "Partner record created on submission (lifecycle applicant)."
    },
-   "manualPriceOverride": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Manual price override"
-   },
-   "creditAdjustment": {
+   "companyName": {
     "type": "string",
-    "description": "Credit adjustment"
+    "description": "Company legal name as applied."
    },
-   "highValueBooking": {
+   "tradingName": {
     "type": "string",
-    "description": "High-value booking"
+    "nullable": true,
+    "description": "Trading name as applied."
    },
-   "customerDataExport": {
+   "country": {
     "type": "string",
-    "description": "Customer data export"
+    "nullable": true,
+    "description": "Country, ISO 3166-1 alpha-2."
    },
-   "mayRequireAdditionalInternalApproval": {
+   "requestedPartnerType": {
     "type": "string",
-    "description": "may require additional internal approval"
+    "nullable": true,
+    "description": "Requested partner type code (see `Partner.partnerType`)."
    },
-   "permanent": {
-    "type": "string",
-    "description": "Permanent"
+   "markets": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Markets the applicant wants to sell into."
    },
-   "temporary": {
-    "type": "string",
-    "description": "Temporary"
+   "expectedSalesVolume": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Expected sales volume, tickets per year."
    },
-   "seasonal": {
-    "type": "string",
-    "description": "Seasonal"
+   "requestedProducts": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Requested products."
    },
-   "eventSpecific": {
+   "requestedVenues": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Requested venues."
+   },
+   "preferredDistributionMethod": {
     "type": "string",
-    "description": "Event-specific"
+    "enum": [
+     "b2bPortal",
+     "api",
+     "otaConnection",
+     "agentPortal",
+     "affiliateLink",
+     "voucherDistribution",
+     "bulkTicketExport",
+     "other"
+    ],
+    "nullable": true,
+    "description": "Preferred distribution method."
+   },
+   "estimatedAnnualBusiness": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Estimated annual business value."
+   },
+   "contactName": {
+    "type": "string",
+    "nullable": true,
+    "description": "Applicant contact name."
+   },
+   "contactEmail": {
+    "type": "string",
+    "format": "email",
+    "description": "Applicant contact email."
+   },
+   "billingRequirements": {
+    "type": "string",
+    "nullable": true,
+    "description": "Billing requirements as stated by the applicant."
+   },
+   "businessCase": {
+    "type": "string",
+    "nullable": true,
+    "description": "Commercial review: business case."
+   },
+   "territory": {
+    "type": "string",
+    "nullable": true,
+    "description": "Commercial review: territory."
+   },
+   "creditRequest": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Finance review: requested credit limit."
+   },
+   "paymentTerms": {
+    "type": "string",
+    "nullable": true,
+    "description": "Finance review: requested payment terms."
+   },
+   "taxRegistrationNumber": {
+    "type": "string",
+    "nullable": true,
+    "description": "Finance review: tax/VAT registration number."
+   },
+   "productRequirements": {
+    "type": "string",
+    "nullable": true,
+    "description": "Operations review: product requirements."
+   },
+   "fulfillmentRequirements": {
+    "type": "string",
+    "nullable": true,
+    "description": "Operations review: fulfilment requirements."
+   },
+   "apiIntegrationRequirements": {
+    "type": "string",
+    "nullable": true,
+    "description": "Technical review: API/integration requirements."
+   },
+   "stage": {
+    "type": "string",
+    "enum": [
+     "application",
+     "businessVerification",
+     "documentation",
+     "commercialReview",
+     "financeReview",
+     "technicalReview",
+     "approval",
+     "configuration",
+     "activation"
+    ],
+    "default": "application",
+    "description": "Current onboarding stage (pack p.9 Onboarding Workflow)."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "submitted",
+     "inReview",
+     "moreInformationRequested",
+     "approved",
+     "rejected",
+     "withdrawn"
+    ],
+    "default": "submitted",
+    "description": "Application status."
+   },
+   "reviewTasks": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "department",
+      "completed"
+     ],
+     "properties": {
+      "department": {
+       "type": "string",
+       "enum": [
+        "commercial",
+        "finance",
+        "operations",
+        "technical"
+       ]
+      },
+      "assigneePrincipalId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "dueAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "completed": {
+       "type": "boolean"
+      }
+     }
+    },
+    "description": "Internal Review: the task each department receives; the rows of control.partner_application_review_task."
+   },
+   "submittedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Submitted at."
+   },
+   "slaDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When the current stage breaches its SLA."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The approvals request carrying the decision, as on `PartnerAgreement`."
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The partition key (ADR-0005), written at `tenant` scope."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "PartnerApplicationReviewAction": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; applied to control.partner_application and control.partner_application_review_task, and to control.partner on startReview and withdraw (decided 29 September, writers pass; DM4)",
+  "description": "One review action on a partner application (actOnPartnerApplicationReview) (decided 29 September, writers pass; DM4)",
+  "required": [
+   "action"
+  ],
+  "properties": {
+   "action": {
+    "type": "string",
+    "enum": [
+     "startReview",
+     "completeTask",
+     "requestInformation",
+     "supplyInformation",
+     "withdraw"
+    ],
+    "description": "The action (states/partner-application.yaml)"
+   },
+   "department": {
+    "type": "string",
+    "enum": [
+     "commercial",
+     "finance",
+     "operations",
+     "technical"
+    ],
+    "nullable": true,
+    "description": "For completeTask, the department whose review task is done"
+   },
+   "assigneePrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For startReview, who each opened task is assigned to when one person reviews all; empty leaves them to each department's queue"
+   },
+   "note": {
+    "type": "string",
+    "nullable": true,
+    "description": "The reviewer's finding (completeTask), what is missing (requestInformation, required) or the applicant's answer (supplyInformation)"
+   },
+   "documentIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "For supplyInformation, documents uploaded in answer (control.partner_document)"
    }
   }
  },
  "PartnerApprovalStatusLifecycleManagementInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; stored as control.partner_status_history (PartnerStatusHistory), with the resulting status on control.partner (data model DM4)",
   "description": "**What Partner Approval, Status & Lifecycle Management submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "thenPotentially": {
+   "partnerId": {
     "type": "string",
-    "description": "then potentially"
+    "format": "uuid",
+    "description": "Partner"
    },
-   "restrict": {
+   "action": {
     "type": "string",
-    "description": "Restrict"
+    "enum": [
+     "approve",
+     "activate",
+     "restrict",
+     "suspend",
+     "reactivate",
+     "terminate",
+     "archive"
+    ],
+    "description": "Status Actions"
    },
-   "reactivate": {
+   "reasonCategory": {
     "type": "string",
-    "description": "Reactivate"
+    "enum": [
+     "commercial",
+     "compliance",
+     "credit",
+     "fraud",
+     "contractExpiry",
+     "performance",
+     "technical",
+     "managementDecision"
+    ],
+    "description": "Status Reasons"
    },
-   "terminate": {
+   "reasonNote": {
     "type": "string",
-    "description": "Terminate"
+    "description": "Free-text reason",
+    "nullable": true
    },
-   "commercial": {
+   "suspensionScope": {
     "type": "string",
-    "description": "Commercial"
+    "enum": [
+     "full",
+     "selected"
+    ],
+    "description": "Suspension Scope: full suspension or selected restrictions",
+    "nullable": true
    },
-   "compliance": {
-    "type": "string",
-    "description": "Compliance"
+   "restrictions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "stopNewBookings",
+      "stopCreditSales",
+      "stopApi",
+      "stopSpecificVenue",
+      "stopSpecificMarket"
+     ]
+    },
+    "description": "Selected restrictions when suspensionScope is selected, or for restrict"
    },
-   "credit": {
-    "type": "string",
-    "description": "Credit"
+   "restrictedVenueIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Venues for stopSpecificVenue"
    },
-   "fraud": {
-    "type": "string",
-    "description": "Fraud"
+   "restrictedMarkets": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Markets for stopSpecificMarket"
    },
-   "contractExpiry": {
+   "effectiveFrom": {
     "type": "string",
     "format": "date-time",
-    "description": "Contract Expiry"
+    "description": "When the change takes effect; lifecycle changes are effective-dated"
    },
-   "performance": {
-    "type": "string",
-    "description": "Performance"
-   },
-   "technical": {
-    "type": "string",
-    "description": "Technical"
-   },
-   "managementDecision": {
-    "type": "string",
-    "description": "Management Decision"
-   },
-   "orSelectedRestrictions": {
-    "type": "string",
-    "description": "or selected restrictions"
-   },
-   "stopNewBookings": {
-    "type": "string",
-    "description": "Stop New Bookings"
-   },
-   "stopCreditSales": {
-    "type": "string",
-    "description": "Stop Credit Sales"
-   },
-   "stopApi": {
-    "type": "string",
-    "description": "Stop API"
-   },
-   "stopSpecificVenue": {
-    "type": "string",
-    "description": "Stop Specific Venue"
-   },
-   "stopSpecificMarket": {
-    "type": "string",
-    "description": "Stop Specific Market"
-   },
-   "futureBookings": {
-    "type": "string",
-    "description": "Future bookings"
-   },
-   "activeHolds": {
-    "type": "integer",
-    "description": "Active holds"
-   },
-   "outstandingBalance": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Outstanding balance"
-   },
-   "pendingSettlement": {
-    "type": "integer",
-    "description": "Pending settlement"
-   },
-   "activeUsers": {
-    "type": "integer",
-    "description": "Active users"
-   },
-   "activeIntegrations": {
-    "type": "integer",
-    "description": "Active integrations"
-   },
-   "existingCustomers": {
-    "type": "string",
-    "description": "Existing customers"
-   },
-   "existingTickets": {
-    "type": "string",
-    "description": "Existing tickets"
-   },
-   "currentAllocations": {
-    "type": "string",
-    "description": "Current allocations"
-   },
-   "customers": {
-    "type": "string",
-    "description": "customers"
+   "dryRun": {
+    "type": "boolean",
+    "description": "When true, return the impact analysis without changing anything, so the screen can show it before the administrator confirms (decided 29 September, readiness close-out)"
    }
   }
  },
  "PartnerApprovalStatusLifecycleManagementView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner and control.partner_status_history and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Partner Approval, Status & Lifecycle Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "thenPotentially": {
-    "type": "string",
-    "description": "then potentially"
-   },
-   "restrict": {
-    "type": "string",
-    "description": "Restrict"
-   },
-   "reactivate": {
-    "type": "string",
-    "description": "Reactivate"
-   },
-   "terminate": {
-    "type": "string",
-    "description": "Terminate"
-   },
-   "commercial": {
-    "type": "string",
-    "description": "Commercial"
-   },
-   "compliance": {
-    "type": "string",
-    "description": "Compliance"
-   },
-   "credit": {
-    "type": "string",
-    "description": "Credit"
-   },
-   "fraud": {
-    "type": "string",
-    "description": "Fraud"
-   },
-   "contractExpiry": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Contract Expiry"
-   },
-   "performance": {
-    "type": "string",
-    "description": "Performance"
-   },
-   "technical": {
-    "type": "string",
-    "description": "Technical"
-   },
-   "managementDecision": {
-    "type": "string",
-    "description": "Management Decision"
-   },
-   "orSelectedRestrictions": {
-    "type": "string",
-    "description": "or selected restrictions"
-   },
-   "stopNewBookings": {
-    "type": "string",
-    "description": "Stop New Bookings"
-   },
-   "stopCreditSales": {
-    "type": "string",
-    "description": "Stop Credit Sales"
-   },
-   "stopApi": {
-    "type": "string",
-    "description": "Stop API"
-   },
-   "stopSpecificVenue": {
-    "type": "string",
-    "description": "Stop Specific Venue"
-   },
-   "stopSpecificMarket": {
-    "type": "string",
-    "description": "Stop Specific Market"
-   },
    "futureBookings": {
-    "type": "string",
-    "description": "Future bookings"
+    "type": "integer",
+    "description": "Impact: future bookings"
    },
    "activeHolds": {
     "type": "integer",
-    "description": "Active holds"
+    "description": "Impact: active holds"
    },
    "outstandingBalance": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Outstanding balance"
+    "description": "Impact: outstanding balance"
    },
    "pendingSettlement": {
-    "type": "integer",
-    "description": "Pending settlement"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Impact: pending settlement"
    },
    "activeUsers": {
     "type": "integer",
-    "description": "Active users"
+    "description": "Impact: active users"
    },
    "activeIntegrations": {
     "type": "integer",
-    "description": "Active integrations"
+    "description": "Impact: active integrations"
    },
    "existingCustomers": {
-    "type": "string",
-    "description": "Existing customers"
+    "type": "integer",
+    "description": "Impact: existing customers holding tickets"
    },
    "existingTickets": {
-    "type": "string",
-    "description": "Existing tickets"
+    "type": "integer",
+    "description": "Impact: existing tickets; never invalidated by a suspension"
    },
    "currentAllocations": {
-    "type": "string",
-    "description": "Current allocations"
+    "type": "integer",
+    "description": "Impact: current contractual allocations"
    },
-   "customers": {
+   "partnerId": {
     "type": "string",
-    "description": "customers"
+    "format": "uuid",
+    "description": "Partner"
+   },
+   "action": {
+    "type": "string",
+    "enum": [
+     "approve",
+     "activate",
+     "restrict",
+     "suspend",
+     "reactivate",
+     "terminate",
+     "archive"
+    ],
+    "description": "Status Actions"
+   },
+   "reasonCategory": {
+    "type": "string",
+    "enum": [
+     "commercial",
+     "compliance",
+     "credit",
+     "fraud",
+     "contractExpiry",
+     "performance",
+     "technical",
+     "managementDecision"
+    ],
+    "description": "Status Reasons"
+   },
+   "reasonNote": {
+    "type": "string",
+    "description": "Free-text reason",
+    "nullable": true
+   },
+   "suspensionScope": {
+    "type": "string",
+    "enum": [
+     "full",
+     "selected"
+    ],
+    "description": "Suspension Scope: full suspension or selected restrictions",
+    "nullable": true
+   },
+   "restrictions": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "stopNewBookings",
+      "stopCreditSales",
+      "stopApi",
+      "stopSpecificVenue",
+      "stopSpecificMarket"
+     ]
+    },
+    "description": "Selected restrictions when suspensionScope is selected, or for restrict"
+   },
+   "restrictedVenueIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Venues for stopSpecificVenue"
+   },
+   "restrictedMarkets": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Markets for stopSpecificMarket"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "description": "When the change takes effect; lifecycle changes are effective-dated"
+   },
+   "status": {
+    "type": "string",
+    "description": "Resulting account status: lead, applicant, underReview, approved, configuration, active, restricted, suspended, terminated or archived (pack p.6 and p.18 merged with MoM 31 Aug 4.3 lead -> submitted -> active -> suspended; \"submitted\" is applicant)"
+   },
+   "applied": {
+    "type": "boolean",
+    "description": "False when dryRun was set or the change awaits approval"
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "description": "Approval request raised for the change",
+    "nullable": true
+   },
+   "aiImpactSummary": {
+    "type": "string",
+    "description": "Advisory AI summary of the business impact",
+    "nullable": true
    }
   }
  },
  "PartnerBrandVenueBusinessScopeAssignmentInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; stored as control.partner_scope_assignment (PartnerScopeAssignment); brand, venue and attraction land in brandId, venueId and attractionId, assignmentId is its id (data model DM4)",
   "description": "**What Partner Brand, Venue & Business Scope Assignment submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "tenant": {
     "type": "string",
-    "description": "Tenant"
+    "description": "Tenant id"
    },
    "brand": {
     "type": "string",
-    "description": "Brand"
+    "description": "Brand id; blank = every brand of the tenant",
+    "nullable": true
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue id; blank = every venue of the brand",
+    "nullable": true
    },
    "attraction": {
     "type": "string",
-    "description": "Attraction"
+    "description": "Attraction id; blank = every attraction of the venue",
+    "nullable": true
    },
    "businessUnit": {
     "type": "string",
-    "description": "Business Unit"
+    "description": "Business Unit",
+    "nullable": true
    },
    "eventPortfolio": {
     "type": "string",
-    "description": "Event Portfolio"
+    "description": "Event Portfolio",
+    "nullable": true
    },
    "market": {
     "type": "string",
-    "description": "Market"
-   },
-   "dubaiExperiences": {
-    "type": "string",
-    "description": "Dubai Experiences"
-   },
-   "dubaiArena": {
-    "type": "string",
-    "description": "Dubai Arena"
-   },
-   "cityMuseum": {
-    "type": "string",
-    "description": "City Museum"
-   },
-   "abuDhabiWaterpark": {
-    "type": "string",
-    "description": "Abu Dhabi Waterpark"
-   },
-   "allowControlledExceptions": {
-    "type": "boolean",
-    "description": "Allow controlled exceptions"
+    "description": "Market",
+    "nullable": true
    },
    "startDate": {
     "type": "string",
-    "format": "date-time",
+    "format": "date",
     "description": "Start Date"
    },
    "endDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "End Date"
-   },
-   "temporaryAssignment": {
-    "type": "string",
-    "description": "Temporary Assignment"
+    "format": "date",
+    "description": "End Date; a set end date makes the assignment temporary",
+    "nullable": true
    },
    "seasonalScope": {
+    "type": "boolean",
+    "description": "Seasonal Scope: when true the start and end month-day recur every year (decided 29 September, readiness close-out)"
+   },
+   "assignmentId": {
     "type": "string",
-    "description": "Seasonal Scope"
+    "format": "uuid",
+    "description": "Assignment id; omit to create"
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Partner"
+   },
+   "authorized": {
+    "type": "boolean",
+    "description": "Authorized (true) or explicitly not authorized (false), the pack's Not Authorized example"
+   },
+   "scopeExclusions": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Scope Overrides: product or product-category ids excluded inside this scope (e.g. all Dubai Arena events except VIP Hospitality); consumed by the commercial/channel rules"
    }
   }
  },
  "PartnerBrandVenueBusinessScopeAssignmentView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_scope_assignment (PartnerScopeAssignment) and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Partner Brand, Venue & Business Scope Assignment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "tenant": {
     "type": "string",
-    "description": "Tenant"
+    "description": "Tenant id"
    },
    "brand": {
     "type": "string",
-    "description": "Brand"
+    "description": "Brand id; blank = every brand of the tenant",
+    "nullable": true
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue id; blank = every venue of the brand",
+    "nullable": true
    },
    "attraction": {
     "type": "string",
-    "description": "Attraction"
+    "description": "Attraction id; blank = every attraction of the venue",
+    "nullable": true
    },
    "businessUnit": {
     "type": "string",
-    "description": "Business Unit"
+    "description": "Business Unit",
+    "nullable": true
    },
    "eventPortfolio": {
     "type": "string",
-    "description": "Event Portfolio"
+    "description": "Event Portfolio",
+    "nullable": true
    },
    "market": {
     "type": "string",
-    "description": "Market"
-   },
-   "dubaiExperiences": {
-    "type": "string",
-    "description": "Dubai Experiences"
-   },
-   "dubaiArena": {
-    "type": "string",
-    "description": "Dubai Arena"
-   },
-   "cityMuseum": {
-    "type": "string",
-    "description": "City Museum"
-   },
-   "abuDhabiWaterpark": {
-    "type": "string",
-    "description": "Abu Dhabi Waterpark"
-   },
-   "allowControlledExceptions": {
-    "type": "boolean",
-    "description": "Allow controlled exceptions"
+    "description": "Market",
+    "nullable": true
    },
    "startDate": {
     "type": "string",
-    "format": "date-time",
+    "format": "date",
     "description": "Start Date"
    },
    "endDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "End Date"
-   },
-   "temporaryAssignment": {
-    "type": "string",
-    "description": "Temporary Assignment"
+    "format": "date",
+    "description": "End Date; a set end date makes the assignment temporary",
+    "nullable": true
    },
    "seasonalScope": {
+    "type": "boolean",
+    "description": "Seasonal Scope: when true the start and end month-day recur every year (decided 29 September, readiness close-out)"
+   },
+   "assignmentId": {
     "type": "string",
-    "description": "Seasonal Scope"
+    "format": "uuid",
+    "description": "Assignment id; omit to create"
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Partner"
+   },
+   "authorized": {
+    "type": "boolean",
+    "description": "Authorized (true) or explicitly not authorized (false), the pack's Not Authorized example"
+   },
+   "scopeExclusions": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Scope Overrides: product or product-category ids excluded inside this scope (e.g. all Dubai Arena events except VIP Hospitality); consumed by the commercial/channel rules"
+   }
+  }
+ },
+ "PartnerCapabilityGrant": {
+  "type": "object",
+  "x-ticvai-persistence": "control.partner_capability_grant",
+  "description": "The ceiling on one capability for one partner: whether the organisation may use it, whether each use needs internal approval, and for how long. A partner user's own permissions sit inside this ceiling (decided 29 September, data model DM4)\n\n**Written by** setPartnerCapabilityGrants, which replaces the partner's ceiling as a set (decided 29 September, writers pass; DM4).",
+  "required": [
+   "id",
+   "partnerId",
+   "capability",
+   "allowed",
+   "grantType"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The partner (control.partner)."
+   },
+   "capability": {
+    "type": "string",
+    "enum": [
+     "searchAvailability",
+     "createBooking",
+     "holdInventory",
+     "confirmBooking",
+     "cancelBooking",
+     "modifyBooking",
+     "rescheduleBooking",
+     "downloadTicket",
+     "printTicket",
+     "sendTicket",
+     "accessCustomerDetails",
+     "useCredit",
+     "usePaymentCard",
+     "viewCommission",
+     "viewNetRates",
+     "accessReports",
+     "exportData",
+     "useApi",
+     "createSubAgents",
+     "refund",
+     "manualPriceOverride",
+     "creditAdjustment",
+     "highValueBooking",
+     "customerDataExport"
+    ],
+    "description": "Organisation-level capability (pack pp.16-17; refund and rescheduleBooking from MoM 31 Aug 4.3)."
+   },
+   "allowed": {
+    "type": "boolean",
+    "description": "Whether the partner may use this capability."
+   },
+   "requiresInternalApproval": {
+    "type": "boolean",
+    "default": false,
+    "description": "Sensitive function: each use needs additional internal approval."
+   },
+   "grantType": {
+    "type": "string",
+    "enum": [
+     "permanent",
+     "temporary",
+     "seasonal",
+     "eventSpecific"
+    ],
+    "description": "How long the grant lasts."
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "Effective from."
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "Effective to."
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Event (catalogue.event) the grant is limited to, for an eventSpecific grant."
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The partition key (ADR-0005), written at `tenant` scope."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "PartnerContact": {
+  "type": "object",
+  "x-ticvai-persistence": "control.partner_contact",
+  "description": "A person at the partner, with or without a B2B user account. A contact with an account links to its principal (`control.partner_user` carries the branch, quota and credit); one without an account is still somebody finance or operations must be able to reach (decided 29 September, data model DM4)\n\n**Written by** setPartnerContact (create, edit, disable, enable, revoke) and by createPartnerUser, which creates the contact `invited` for a user with an account (decided 29 September, writers pass; DM4).",
+  "required": [
+   "id",
+   "partnerId",
+   "name",
+   "contactType",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The partner (control.partner)."
+   },
+   "name": {
+    "type": "string",
+    "description": "Name."
+   },
+   "position": {
+    "type": "string",
+    "nullable": true,
+    "description": "Position."
+   },
+   "department": {
+    "type": "string",
+    "nullable": true,
+    "description": "Department."
+   },
+   "email": {
+    "type": "string",
+    "format": "email",
+    "nullable": true,
+    "description": "Email."
+   },
+   "mobile": {
+    "type": "string",
+    "nullable": true,
+    "description": "Mobile."
+   },
+   "telephone": {
+    "type": "string",
+    "nullable": true,
+    "description": "Telephone."
+   },
+   "language": {
+    "type": "string",
+    "nullable": true,
+    "description": "Language, BCP 47 tag."
+   },
+   "timeZone": {
+    "type": "string",
+    "nullable": true,
+    "description": "Time zone, IANA name."
+   },
+   "contactType": {
+    "type": "string",
+    "enum": [
+     "primary",
+     "commercial",
+     "reservations",
+     "finance",
+     "technical",
+     "operations",
+     "management",
+     "emergency"
+    ],
+    "description": "Contact type."
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Identity principal of the B2B user account (identity.principal); empty for a contact with no account."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "invited",
+     "active",
+     "disabled",
+     "revoked",
+     "expired"
+    ],
+    "default": "active",
+    "description": "Status; a contact with no user account is active or disabled."
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The partition key (ADR-0005), written at `tenant` scope."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "PartnerContactInput": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; stored as control.partner_contact (PartnerContact) (decided 29 September, writers pass; DM4)",
+  "description": "What setPartnerContact submits. Without `contactId` it creates a contact with no user account; a contact who signs in is created through createPartnerUser (decided 29 September, writers pass; DM4)",
+  "required": [
+   "partnerId"
+  ],
+  "properties": {
+   "contactId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The contact to change; omit to create"
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The partner (control.partner)"
+   },
+   "action": {
+    "type": "string",
+    "enum": [
+     "save",
+     "disable",
+     "enable",
+     "revoke"
+    ],
+    "default": "save",
+    "description": "save creates or edits; disable, enable and revoke change access (states/partner-contact.yaml)"
+   },
+   "name": {
+    "type": "string",
+    "description": "Name; required to create"
+   },
+   "position": {
+    "type": "string",
+    "nullable": true
+   },
+   "department": {
+    "type": "string",
+    "nullable": true
+   },
+   "email": {
+    "type": "string",
+    "format": "email",
+    "nullable": true
+   },
+   "mobile": {
+    "type": "string",
+    "nullable": true
+   },
+   "telephone": {
+    "type": "string",
+    "nullable": true
+   },
+   "language": {
+    "type": "string",
+    "nullable": true,
+    "description": "BCP 47 tag"
+   },
+   "timeZone": {
+    "type": "string",
+    "nullable": true,
+    "description": "IANA name"
+   },
+   "contactType": {
+    "type": "string",
+    "enum": [
+     "primary",
+     "commercial",
+     "reservations",
+     "finance",
+     "technical",
+     "operations",
+     "management",
+     "emergency"
+    ],
+    "description": "Contact type; required to create"
    }
   }
  },
  "PartnerContactsUserAdministrationView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_contact (PartnerContact) with control.partner_user and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Partner Contacts & User Administration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "primaryContact": {
-    "type": "string",
-    "description": "Primary Contact"
-   },
-   "commercial": {
-    "type": "string",
-    "description": "Commercial"
-   },
-   "reservations": {
-    "type": "string",
-    "description": "Reservations"
-   },
-   "finance": {
-    "type": "string",
-    "description": "Finance"
-   },
-   "technical": {
-    "type": "string",
-    "description": "Technical"
-   },
-   "operations": {
-    "type": "string",
-    "description": "Operations"
-   },
-   "management": {
-    "type": "string",
-    "description": "Management"
-   },
-   "emergencyContact": {
-    "type": "string",
-    "description": "Emergency Contact"
-   },
    "name": {
     "type": "string",
     "description": "Name"
@@ -2618,7 +4054,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "email": {
     "type": "string",
-    "description": "Email"
+    "description": "Email",
+    "format": "email"
    },
    "mobile": {
     "type": "string",
@@ -2630,133 +4067,244 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "language": {
     "type": "string",
-    "description": "Language"
+    "description": "Language, BCP 47 tag"
    },
    "timeZone": {
     "type": "string",
-    "format": "date-time",
-    "description": "Time Zone"
+    "description": "Time Zone, IANA name"
    },
    "contactType": {
     "type": "string",
+    "enum": [
+     "primary",
+     "commercial",
+     "reservations",
+     "finance",
+     "technical",
+     "operations",
+     "management",
+     "emergency"
+    ],
     "description": "Contact Type"
    },
    "status": {
     "type": "string",
-    "description": "Status"
+    "description": "Status: invited, active, disabled, revoked or expired (a contact with no user account is active or disabled)"
    },
    "username": {
     "type": "string",
-    "description": "Username"
+    "description": "Username of the B2B user account; empty for a contact with no account",
+    "nullable": true
    },
-   "partner": {
+   "partnerId": {
     "type": "string",
+    "format": "uuid",
     "description": "Partner"
    },
-   "branch": {
+   "branchScopePath": {
     "type": "string",
-    "description": "Branch"
+    "description": "Branch the user sits on, as the PartnerUser scope path",
+    "nullable": true
    },
    "role": {
     "type": "string",
-    "description": "Role"
+    "description": "Partner role, e.g. Partner Administrator, Booking Agent, Supervisor, Finance User, Reporting User, API Administrator; PartnerUser.role (control.partner_user), the grants themselves are RBAC data (decided 29 September, writers pass; DM4)",
+    "nullable": true
    },
    "permissions": {
-    "type": "string",
-    "description": "Permissions"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Effective permissions of the user, within the partner ceiling"
    },
    "salesLocation": {
     "type": "string",
-    "description": "Sales Location"
+    "description": "Sales Location; PartnerUser.salesLocation (control.partner_user), empty for a contact with no account (decided 29 September, writers pass; DM4)",
+    "nullable": true
    },
    "currency": {
     "type": "string",
-    "description": "Currency"
+    "pattern": "^[A-Z]{3}$",
+    "description": "Currency the user sells in; PartnerUser.currency (control.partner_user) (decided 29 September, writers pass; DM4)"
    },
-   "mfa": {
-    "type": "string",
-    "description": "MFA"
+   "mfaEnrolled": {
+    "type": "boolean",
+    "description": "MFA enrolled"
    },
-   "passwordPolicy": {
-    "type": "string",
-    "description": "Password policy"
-   },
-   "ssoWhereAvailable": {
-    "type": "string",
-    "description": "SSO where available"
-   },
-   "loginRestrictions": {
-    "type": "string",
-    "description": "Login restrictions"
-   },
-   "accountExpiry": {
+   "accountExpiresAt": {
     "type": "string",
     "format": "date-time",
-    "description": "Account expiry"
+    "description": "Account expiry; PartnerUser.accountExpiresAt (control.partner_user) (decided 29 September, writers pass; DM4)",
+    "nullable": true
    },
-   "sessionControls": {
+   "contactId": {
     "type": "string",
-    "description": "Session controls"
+    "format": "uuid",
+    "description": "Contact id"
    },
-   "reassignRole": {
+   "principalId": {
     "type": "string",
-    "description": "Reassign Role"
+    "format": "uuid",
+    "description": "Identity principal of the B2B user account; empty for a contact with no account",
+    "nullable": true
+   }
+  }
+ },
+ "PartnerDistributionRight": {
+  "type": "object",
+  "x-ticvai-persistence": "control.partner_distribution_right",
+  "description": "One territory, market and distribution right for a partner: where it may sell, by which methods, how exclusively and whether it may appoint sub-agents. A blank dimension means all; `allowed: false` is an explicit exclusion (decided 29 September, data model DM4)\n\n**Written by** setPartnerDistributionRights, which replaces the partner's rights as a set (decided 29 September, writers pass; DM4).",
+  "required": [
+   "id",
+   "partnerId",
+   "allowed",
+   "exclusivity",
+   "effectiveFrom"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The partner (control.partner)."
+   },
+   "country": {
+    "type": "string",
+    "nullable": true,
+    "description": "Country, ISO 3166-1 alpha-2; blank = all."
+   },
+   "region": {
+    "type": "string",
+    "nullable": true,
+    "description": "Region; blank = all in the country."
+   },
+   "city": {
+    "type": "string",
+    "nullable": true,
+    "description": "City; blank = all in the region."
+   },
+   "market": {
+    "type": "string",
+    "nullable": true,
+    "description": "Market (source market the partner sells into)."
+   },
+   "brandId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Brand (a platform.scope node); blank = all."
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Venue; blank = all venues in scope."
+   },
+   "attractionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Attraction; blank = all."
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Event (catalogue.event); blank = all."
+   },
+   "allowed": {
+    "type": "boolean",
+    "description": "Allowed (true) or explicitly not allowed (false), the pack's Allowed / Not allowed example."
+   },
+   "distributionMethods": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "b2bPortal",
+      "api",
+      "otaConnection",
+      "agentPortal",
+      "affiliateLink",
+      "voucherDistribution",
+      "bulkTicketExport",
+      "other"
+     ]
+    },
+    "description": "Distribution methods this right covers."
+   },
+   "exclusivity": {
+    "type": "string",
+    "enum": [
+     "nonExclusive",
+     "exclusive",
+     "preferred",
+     "restricted"
+    ],
+    "description": "Exclusivity."
+   },
+   "subAgentRule": {
+    "type": "string",
+    "enum": [
+     "allowed",
+     "prohibited",
+     "approvalRequired"
+    ],
+    "description": "Sub-agent rights."
+   },
+   "maximumHierarchyDepth": {
+    "type": "integer",
+    "minimum": 0,
+    "nullable": true,
+    "description": "Maximum hierarchy depth of sub-agents below the partner."
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date",
+    "description": "Effective from."
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "Effective to; empty for open-ended."
+   },
+   "reviewDate": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "Review date."
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "The partition key (ADR-0005), written at `tenant` scope."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
    }
   }
  },
  "PartnerDocumentationComplianceRepositoryView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_document (PartnerDocument) and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Partner Documentation & Compliance Repository displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "tradeLicense": {
-    "type": "string",
-    "description": "Trade License"
-   },
-   "taxVatCertificate": {
-    "type": "string",
-    "description": "Tax/VAT Certificate"
-   },
-   "commercialRegistration": {
-    "type": "string",
-    "description": "Commercial Registration"
-   },
-   "bankDetails": {
-    "type": "string",
-    "description": "Bank Details"
-   },
-   "insurance": {
-    "type": "string",
-    "description": "Insurance"
-   },
-   "signedAgreement": {
-    "type": "string",
-    "description": "Signed Agreement"
-   },
-   "nda": {
-    "type": "string",
-    "description": "NDA"
-   },
-   "apiAgreement": {
-    "type": "string",
-    "description": "API Agreement"
-   },
-   "complianceDocuments": {
-    "type": "string",
-    "description": "Compliance Documents"
-   },
-   "identificationOfAuthorizedSignatory": {
-    "type": "string",
-    "description": "Identification of Authorized Signatory"
-   },
-   "otherRequiredDocuments": {
-    "type": "string",
-    "description": "Other required documents"
-   },
    "documentType": {
     "type": "string",
-    "description": "Document Type"
+    "description": "Document Type code from the configurable list, seeded with tradeLicence, taxVatCertificate, commercialRegistration, bankDetails, insurance, signedAgreement, nda, apiAgreement, complianceDocument, authorizedSignatoryId, other"
    },
    "documentNumber": {
     "type": "string",
@@ -2764,77 +4312,88 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "expiryDate": {
     "type": "string",
-    "format": "date-time",
-    "description": "Expiry Date"
+    "format": "date",
+    "description": "Expiry Date",
+    "nullable": true
    },
    "issuingAuthority": {
     "type": "string",
     "description": "Issuing Authority"
    },
-   "file": {
+   "fileRef": {
     "type": "string",
-    "description": "File"
+    "description": "Stored file reference",
+    "nullable": true
    },
    "verificationStatus": {
     "type": "string",
-    "description": "Verification Status"
+    "description": "Verification Status: missing, uploaded, underReview, verified, rejected, expiring or expired"
    },
    "verifiedBy": {
     "type": "string",
-    "description": "Verified By"
+    "description": "Verified By: staff display name",
+    "nullable": true
    },
    "verificationDate": {
     "type": "string",
     "format": "date-time",
-    "description": "Verification Date"
+    "description": "Verification Date",
+    "nullable": true
    },
    "notes": {
     "type": "string",
     "description": "Notes"
    },
-   "missing": {
+   "documentId": {
     "type": "string",
-    "description": "Missing"
+    "format": "uuid",
+    "description": "Document id"
    },
-   "uploaded": {
+   "partnerId": {
     "type": "string",
-    "description": "Uploaded"
+    "format": "uuid",
+    "description": "Partner"
    },
-   "underReview": {
+   "issueDate": {
     "type": "string",
-    "description": "Under Review"
+    "format": "date",
+    "description": "Issue Date",
+    "nullable": true
    },
-   "verified": {
-    "type": "string",
-    "description": "Verified"
-   },
-   "rejected": {
-    "type": "integer",
-    "description": "Rejected"
-   },
-   "expiring": {
-    "type": "string",
-    "description": "Expiring"
-   },
-   "expired": {
-    "type": "integer",
-    "description": "Expired"
-   },
-   "warnOnly": {
-    "type": "string",
-    "description": "Warn only"
-   },
-   "requireManualReview": {
+   "mandatory": {
     "type": "boolean",
-    "description": "Require manual review"
+    "description": "Whether this document type is mandatory for the partner type"
+   },
+   "daysToExpiry": {
+    "type": "integer",
+    "description": "Days until expiry; negative once expired",
+    "nullable": true
+   },
+   "expiryAction": {
+    "type": "string",
+    "enum": [
+     "warnOnly",
+     "blockNewBookings",
+     "blockCreditTransactions",
+     "suspendPartner",
+     "requireManualReview"
+    ],
+    "description": "Compliance Rules: what expiry or absence of this document does"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Advisory AI findings from the uploaded file (extracted fields, missing or inconsistent information)"
    }
   }
  },
- "PartnerManagementCommandCenterView": {
+ "PartnerManagementCommandCenterSummary": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
-  "description": "**What Partner Management Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Partner Management Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
   "properties": {
    "totalPartners": {
     "type": "integer",
@@ -2858,34 +4417,43 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "expiringAgreements": {
     "type": "integer",
-    "description": "Expiring Agreements"
+    "description": "Expiring Agreements: partners whose active agreement ends within its expiryAlertDays (default 30) (decided 29 September, readiness close-out)"
    },
    "documentationIssues": {
     "type": "integer",
-    "description": "Documentation Issues"
+    "description": "Documentation Issues: partners with a mandatory document missing, rejected, expiring or expired"
    },
    "partnersWithCreditHolds": {
-    "type": "string",
-    "description": "Partners With Credit Holds"
+    "type": "integer",
+    "description": "Partners With Credit Holds: partners whose credit status is onHold or blocked"
    },
    "connectedOtaApiPartners": {
     "type": "integer",
     "description": "Connected OTA/API Partners"
    },
    "partnerSalesYtd": {
-    "type": "string",
-    "description": "Partner Sales YTD"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Partner Sales YTD: gross value of partner orders this calendar year (decided 29 September, readiness close-out)"
    },
    "partnerRevenueYtd": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Partner Revenue YTD"
+    "description": "Partner Revenue YTD: partner sales net of commission this calendar year (decided 29 September, readiness close-out)"
    },
    "highRiskPartners": {
     "type": "integer",
     "description": "High-Risk Partners"
-   },
+   }
+  }
+ },
+ "PartnerManagementCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over control.partner (Partner), control.partner_credit_profile, control.partner_application, control.partner_scope_assignment and control.partner_distribution_right and the existing subscription state, assembled at read time (data model DM4)",
+  "description": "**What Partner Management Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
    "partnerId": {
     "type": "string",
+    "format": "uuid",
     "description": "Partner ID"
    },
    "tradingName": {
@@ -2898,216 +4466,458 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "partnerType": {
     "type": "string",
-    "description": "Partner Type"
+    "description": "Partner type code from the tenant's configurable partner-type list (MoM 31 Aug 4.3: configurable category/type), seeded with the pack's p.7 list: b2bReseller, travelAgent, tourOperator, ota, corporateCustomer, hotelConcierge, destinationManagementCompany, affiliate, wholesaler, distributor, governmentPartner, schoolInstitution, apiPartner, internalGroupCompany"
    },
    "country": {
     "type": "string",
-    "description": "Country"
+    "description": "Country, ISO 3166-1 alpha-2"
    },
    "territory": {
     "type": "string",
-    "description": "Territory"
+    "description": "Territory: summary of the authorised markets (listTerritoryMarketDistribution)"
    },
-   "assignedBrand": {
-    "type": "string",
-    "description": "Assigned Brand"
+   "assignedBrands": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Assigned Brand/Venue: brand names in the partner's business scope (setPartnerBrandVenue)"
    },
-   "assignedVenue": {
-    "type": "string",
-    "description": "Assigned Venue"
+   "assignedVenues": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Assigned Brand/Venue: venue names in the partner's business scope (setPartnerBrandVenue)"
    },
    "commercialOwner": {
     "type": "string",
-    "description": "Commercial Owner"
+    "description": "Commercial Owner: staff display name of the account manager"
    },
    "distributionChannel": {
-    "type": "string",
-    "description": "Distribution Channel"
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "b2bPortal",
+      "api",
+      "otaConnection",
+      "agentPortal",
+      "affiliateLink",
+      "voucherDistribution",
+      "bulkTicketExport",
+      "other"
+     ]
+    },
+    "description": "Distribution Channel: Distribution methods: b2bPortal (the TICVAI B2B portal), api (partner consumes the TICVAI API), otaConnection (TICVAI integrates into the OTA, either direction per MoM 31 Aug 4.3), agentPortal, affiliateLink, voucherDistribution, bulkTicketExport (pre-generated QR tickets as CSV, MoM 5 Aug option 3), other"
    },
    "accountStatus": {
     "type": "string",
-    "description": "Account Status"
+    "description": "Account Status: lead, applicant, underReview, approved, configuration, active, restricted, suspended, terminated or archived (pack p.6 and p.18 merged with MoM 31 Aug 4.3 lead -> submitted -> active -> suspended; \"submitted\" is applicant)"
    },
    "onboardingStatus": {
     "type": "string",
-    "description": "Onboarding Status"
+    "description": "Onboarding Status: the application stage (application, businessVerification, documentation, commercialReview, financeReview, technicalReview, approval, configuration, activation) or complete"
    },
    "agreementStatus": {
-    "type": "string",
-    "description": "Agreement Status"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/PartnerAgreementStatus"
+     }
+    ],
+    "nullable": true,
+    "description": "Agreement Status of the partner's current agreement; empty when none"
    },
    "creditStatus": {
     "type": "string",
-    "description": "Credit Status"
+    "description": "Credit Status: notEnabled, withinLimit, warning (at the warning threshold), highRisk, onHold or blocked (decided 29 September, readiness close-out)"
    },
    "integrationStatus": {
     "type": "string",
-    "description": "Integration Status"
+    "enum": [
+     "none",
+     "testing",
+     "connected",
+     "degraded",
+     "disconnected"
+    ],
+    "x-ticvai-persisted": false,
+    "description": "Integration Status: none, testing, connected, degraded or disconnected (decided 29 September, readiness close-out). **Derived at read time, not a column** (decided 29 September, writers pass; DM4), from the partner's OTA/API channel listings (control.channel_listing) and the health of its API clients (control.api_client, with webhook deliveries in control.webhook_delivery), first match wins: `none` when the partner has no channel listing and no API client; `disconnected` when every listing is `paused` or `delisted` or every production API client is `suspended` or `revoked`; `degraded` when a `live` listing's `lastPushedAt` is older than twice its `pushIntervalMinutes`, or webhook deliveries to the partner failed in the last hour; `connected` when a `live` listing or an `active` production client exists and none of the above holds; otherwise `testing` (only `draft` listings or only sandbox clients). The thresholds are proposed, the venue may correct them."
    },
    "lastActivity": {
     "type": "string",
     "format": "date-time",
     "description": "Last Activity"
    },
-   "suspendedTerminatedArchived": {
+   "riskRating": {
     "type": "string",
-    "description": "Suspended → Terminated → Archived"
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
+    "description": "Risk rating, Low / Medium / High / Critical (pack p.58); drives the Risk filter and the High-Risk Partners KPI"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Partner Attention Required: advisory AI flags such as an agreement expiring against forward bookings (pack p.6)"
    }
   }
  },
  "PartnerOnboardingApplicationWorkflowView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_application + control.partner_application_review_task (PartnerApplication) and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Partner Onboarding & Application Workflow displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "companyInformation": {
+   "companyName": {
     "type": "string",
-    "description": "Company information"
+    "description": "Company legal name as applied"
    },
    "requestedPartnerType": {
     "type": "string",
-    "description": "Requested partner type"
+    "description": "Requested partner type code (see partnerType)"
    },
    "markets": {
-    "type": "string",
-    "description": "Markets"
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Markets the applicant wants to sell into"
    },
    "expectedSalesVolume": {
     "type": "integer",
-    "description": "Expected sales volume"
+    "description": "Expected sales volume, tickets per year"
    },
    "requestedProducts": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Requested products"
    },
    "requestedVenues": {
-    "type": "string",
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
     "description": "Requested venues"
    },
    "preferredDistributionMethod": {
     "type": "string",
-    "description": "Preferred distribution method"
+    "enum": [
+     "b2bPortal",
+     "api",
+     "otaConnection",
+     "agentPortal",
+     "affiliateLink",
+     "voucherDistribution",
+     "bulkTicketExport",
+     "other"
+    ],
+    "description": "Preferred distribution method. Distribution methods: b2bPortal (the TICVAI B2B portal), api (partner consumes the TICVAI API), otaConnection (TICVAI integrates into the OTA, either direction per MoM 31 Aug 4.3), agentPortal, affiliateLink, voucherDistribution, bulkTicketExport (pre-generated QR tickets as CSV, MoM 5 Aug option 3), other"
    },
    "estimatedAnnualBusiness": {
-    "type": "string",
-    "description": "Estimated annual business"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Estimated annual business value"
    },
-   "contactInformation": {
+   "contactName": {
     "type": "string",
-    "description": "Contact information"
+    "description": "Applicant contact name"
    },
    "billingRequirements": {
     "type": "string",
-    "description": "Billing requirements"
-   },
-   "eachDepartmentReceivesRelevantTasks": {
-    "type": "string",
-    "description": "Each department receives relevant tasks"
+    "description": "Billing requirements as stated by the applicant"
    },
    "businessCase": {
     "type": "string",
-    "description": "Business case"
+    "description": "Commercial review: business case"
    },
    "territory": {
     "type": "string",
-    "description": "Territory"
-   },
-   "expectedVolume": {
-    "type": "integer",
-    "description": "Expected volume"
+    "description": "Commercial review: territory"
    },
    "creditRequest": {
-    "type": "string",
-    "description": "Credit request"
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Finance review: requested credit limit"
    },
    "paymentTerms": {
     "type": "string",
-    "description": "Payment terms"
+    "description": "Finance review: requested payment terms"
    },
-   "taxInformation": {
+   "taxRegistrationNumber": {
     "type": "string",
-    "description": "Tax information"
+    "description": "Finance review: tax/VAT registration number"
    },
    "productRequirements": {
     "type": "string",
-    "description": "Product requirements"
+    "description": "Operations review: product requirements"
    },
    "fulfillmentRequirements": {
     "type": "string",
-    "description": "Fulfillment requirements"
+    "description": "Operations review: fulfilment requirements"
    },
    "apiIntegrationRequirements": {
     "type": "string",
-    "description": "API/integration requirements"
+    "description": "Technical review: API/integration requirements"
    },
-   "sequentialApproval": {
+   "applicationId": {
     "type": "string",
-    "description": "Sequential approval"
+    "format": "uuid",
+    "description": "Application id"
    },
-   "parallelApproval": {
+   "partnerId": {
     "type": "string",
-    "description": "Parallel approval"
+    "format": "uuid",
+    "description": "Partner record created on submission (lifecycle applicant)",
+    "nullable": true
    },
-   "mandatoryStage": {
+   "contactEmail": {
     "type": "string",
-    "description": "Mandatory stage"
+    "description": "Applicant contact email",
+    "format": "email"
    },
-   "optionalStage": {
+   "stage": {
     "type": "string",
-    "description": "Optional stage"
+    "enum": [
+     "application",
+     "businessVerification",
+     "documentation",
+     "commercialReview",
+     "financeReview",
+     "technicalReview",
+     "approval",
+     "configuration",
+     "activation"
+    ],
+    "description": "Current onboarding stage (pack p.9 Onboarding Workflow)"
    },
-   "sla": {
+   "status": {
     "type": "string",
-    "description": "SLA"
+    "description": "Application status: submitted, inReview, moreInformationRequested, approved, rejected or withdrawn"
    },
-   "escalation": {
+   "submittedAt": {
     "type": "string",
-    "description": "Escalation"
+    "format": "date-time",
+    "description": "Submitted at"
    },
-   "reassignment": {
+   "slaDueAt": {
     "type": "string",
-    "description": "Reassignment"
+    "format": "date-time",
+    "description": "When the current stage breaches its SLA",
+    "nullable": true
    },
-   "rejection": {
-    "type": "string",
-    "description": "Rejection"
+   "reviewTasks": {
+    "type": "array",
+    "description": "Internal Review: the task each department receives",
+    "items": {
+     "type": "object",
+     "properties": {
+      "department": {
+       "type": "string",
+       "enum": [
+        "commercial",
+        "finance",
+        "operations",
+        "technical"
+       ]
+      },
+      "assignee": {
+       "type": "string"
+      },
+      "dueAt": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "completed": {
+       "type": "boolean"
+      }
+     }
+    }
    },
-   "requestMoreInformation": {
+   "aiSummary": {
     "type": "string",
-    "description": "Request More Information"
+    "description": "Advisory AI summary of the application (pack p.10)",
+    "nullable": true
+   }
+  }
+ },
+ "PartnerOperationsCommandCenterSummary": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
+  "description": "**The headline figures on Partner Operations Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
+  "properties": {
+   "partnerSalesToday": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Partner Sales Today"
+   },
+   "partnerSalesMtd": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Partner Sales MTD"
+   },
+   "activePartnerOrders": {
+    "type": "integer",
+    "description": "Active Partner Orders"
+   },
+   "activeReservations": {
+    "type": "integer",
+    "description": "Active Reservations"
+   },
+   "activeHolds": {
+    "type": "integer",
+    "description": "Active Holds"
+   },
+   "ticketsSold": {
+    "type": "integer",
+    "description": "Tickets Sold"
+   },
+   "cancellations": {
+    "type": "integer",
+    "description": "Cancellations"
+   },
+   "refunds": {
+    "type": "integer",
+    "description": "Refunds"
+   },
+   "outstandingReceivables": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Outstanding Receivables"
+   },
+   "commissionPayable": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Commission Payable"
+   },
+   "pendingSettlements": {
+    "type": "integer",
+    "description": "Pending Settlements"
+   },
+   "operationalExceptions": {
+    "type": "integer",
+    "description": "Operational Exceptions"
+   },
+   "partnersRequiringAttention": {
+    "type": "integer",
+    "description": "Partners Requiring Attention"
+   },
+   "activityFeed": {
+    "type": "array",
+    "description": "Activity Feed: recent partner events, newest first",
+    "items": {
+     "type": "object",
+     "properties": {
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "partnerId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
+   }
+  }
+ },
+ "PartnerOperationsCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Partner Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "partner": {
+    "type": "string",
+    "description": "Partner trading name"
+   },
+   "partnerType": {
+    "type": "string",
+    "description": "Partner Type code"
+   },
+   "accountManager": {
+    "type": "string",
+    "description": "Account Manager"
+   },
+   "orders": {
+    "type": "integer",
+    "description": "Orders"
+   },
+   "tickets": {
+    "type": "integer",
+    "description": "Tickets"
+   },
+   "grossSales": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Gross Sales"
+   },
+   "netSales": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Net Sales"
+   },
+   "commission": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Commission"
+   },
+   "outstandingBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Outstanding Balance"
+   },
+   "creditUtilization": {
+    "type": "number",
+    "description": "Credit Utilization, percent"
+   },
+   "allocationUtilization": {
+    "type": "number",
+    "description": "Allocation Utilization, percent"
+   },
+   "cancellationRate": {
+    "type": "number",
+    "description": "Cancellation Rate, percent"
+   },
+   "operationalStatus": {
+    "type": "string",
+    "description": "Operational Status: normal, attention, restricted, suspended"
+   },
+   "risk": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
+    "description": "Risk"
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Partner"
+   },
+   "aiInsights": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Advisory AI attention flags for this partner"
    }
   }
  },
  "PartnerProfileOrganizationSetupInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is control.developer_account at 3%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; stored as control.partner (Partner); accountManager and the other owners land in the *PrincipalId columns (data model DM4)",
   "description": "**What Partner Profile & Organization Setup submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
-   "typesType": {
-    "type": "string",
-    "enum": [
-     "b2bReseller",
-     "travelAgent",
-     "tourOperator",
-     "ota",
-     "corporateCustomer",
-     "hotelConcierge",
-     "destinationManagementCompany",
-     "affiliate",
-     "wholesaler",
-     "distributor",
-     "governmentPartner",
-     "schoolInstitution",
-     "apiPartner",
-     "internalGroupCompany"
-    ],
-    "description": "Vocabulary listed under Partner Types."
-   },
    "partnerId": {
     "type": "string",
-    "description": "Partner ID"
+    "format": "uuid",
+    "description": "Partner ID; omit to create a new partner"
    },
    "legalEntityName": {
     "type": "string",
@@ -3119,7 +4929,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "partnerType": {
     "type": "string",
-    "description": "Partner Type"
+    "description": "Partner type code from the tenant's configurable partner-type list (MoM 31 Aug 4.3: configurable category/type), seeded with the pack's p.7 list: b2bReseller, travelAgent, tourOperator, ota, corporateCustomer, hotelConcierge, destinationManagementCompany, affiliate, wholesaler, distributor, governmentPartner, schoolInstitution, apiPartner, internalGroupCompany"
    },
    "registrationNumber": {
     "type": "string",
@@ -3131,7 +4941,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "country": {
     "type": "string",
-    "description": "Country"
+    "description": "Country, ISO 3166-1 alpha-2"
    },
    "city": {
     "type": "string",
@@ -3147,7 +4957,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "website": {
     "type": "string",
-    "description": "Website"
+    "description": "Website",
+    "format": "uri"
    },
    "mainTelephone": {
     "type": "string",
@@ -3155,100 +4966,81 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "generalEmail": {
     "type": "string",
-    "description": "General Email"
+    "description": "General Email",
+    "format": "email"
    },
    "preferredLanguage": {
     "type": "string",
-    "description": "Preferred Language"
+    "description": "Preferred Language, BCP 47 tag"
    },
    "defaultCurrency": {
     "type": "string",
-    "description": "Default Currency"
+    "pattern": "^[A-Z]{3}$",
+    "description": "Default Currency, ISO 4217"
    },
    "timeZone": {
     "type": "string",
-    "format": "date-time",
-    "description": "Time Zone"
+    "description": "Time Zone, IANA name"
    },
    "accountManager": {
     "type": "string",
-    "description": "Account Manager"
+    "format": "uuid",
+    "description": "Account Manager: staff principal id"
    },
    "commercialManager": {
     "type": "string",
-    "description": "Commercial Manager"
+    "format": "uuid",
+    "description": "Commercial Manager: staff principal id"
    },
    "financeOwner": {
     "type": "string",
-    "description": "Finance Owner"
+    "format": "uuid",
+    "description": "Finance Owner: staff principal id"
    },
    "operationalOwner": {
     "type": "string",
-    "description": "Operational Owner"
+    "format": "uuid",
+    "description": "Operational Owner: staff principal id"
    },
    "technicalOwner": {
     "type": "string",
-    "description": "Technical Owner"
+    "format": "uuid",
+    "description": "Technical Owner: staff principal id"
    },
-   "strategic": {
+   "parentPartnerId": {
     "type": "string",
-    "description": "Strategic"
+    "format": "uuid",
+    "description": "Parent partner in the hierarchy; empty for a top-level partner",
+    "nullable": true
    },
-   "keyAccount": {
-    "type": "string",
-    "description": "Key Account"
-   },
-   "standard": {
-    "type": "string",
-    "description": "Standard"
-   },
-   "newPartner": {
-    "type": "integer",
-    "description": "New Partner"
-   },
-   "highVolume": {
-    "type": "integer",
-    "description": "High Volume"
-   },
-   "vip": {
-    "type": "string",
-    "description": "VIP"
-   },
-   "restricted": {
-    "type": "string",
-    "description": "Restricted"
+   "classificationTags": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "strategic",
+      "keyAccount",
+      "standard",
+      "newPartner",
+      "highVolume",
+      "vip",
+      "restricted"
+     ]
+    },
+    "description": "Account Classification: internal tags"
    }
   }
  },
  "PartnerProfileOrganizationSetupView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner (Partner) and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Partner Profile & Organization Setup displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
-   "typesType": {
-    "type": "string",
-    "enum": [
-     "b2bReseller",
-     "travelAgent",
-     "tourOperator",
-     "ota",
-     "corporateCustomer",
-     "hotelConcierge",
-     "destinationManagementCompany",
-     "affiliate",
-     "wholesaler",
-     "distributor",
-     "governmentPartner",
-     "schoolInstitution",
-     "apiPartner",
-     "internalGroupCompany"
-    ],
-    "description": "Vocabulary listed under Partner Types."
-   },
    "partnerId": {
     "type": "string",
-    "description": "Partner ID"
+    "format": "uuid",
+    "description": "Partner ID; server-assigned"
    },
    "legalEntityName": {
     "type": "string",
@@ -3260,7 +5052,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "partnerType": {
     "type": "string",
-    "description": "Partner Type"
+    "description": "Partner type code from the tenant's configurable partner-type list (MoM 31 Aug 4.3: configurable category/type), seeded with the pack's p.7 list: b2bReseller, travelAgent, tourOperator, ota, corporateCustomer, hotelConcierge, destinationManagementCompany, affiliate, wholesaler, distributor, governmentPartner, schoolInstitution, apiPartner, internalGroupCompany"
    },
    "registrationNumber": {
     "type": "string",
@@ -3272,7 +5064,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "country": {
     "type": "string",
-    "description": "Country"
+    "description": "Country, ISO 3166-1 alpha-2"
    },
    "city": {
     "type": "string",
@@ -3288,7 +5080,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "website": {
     "type": "string",
-    "description": "Website"
+    "description": "Website",
+    "format": "uri"
    },
    "mainTelephone": {
     "type": "string",
@@ -3296,196 +5089,281 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    },
    "generalEmail": {
     "type": "string",
-    "description": "General Email"
+    "description": "General Email",
+    "format": "email"
    },
    "preferredLanguage": {
     "type": "string",
-    "description": "Preferred Language"
+    "description": "Preferred Language, BCP 47 tag"
    },
    "defaultCurrency": {
     "type": "string",
-    "description": "Default Currency"
+    "pattern": "^[A-Z]{3}$",
+    "description": "Default Currency, ISO 4217"
    },
    "timeZone": {
     "type": "string",
-    "format": "date-time",
-    "description": "Time Zone"
+    "description": "Time Zone, IANA name"
    },
    "accountManager": {
     "type": "string",
-    "description": "Account Manager"
+    "format": "uuid",
+    "description": "Account Manager: staff principal id"
    },
    "commercialManager": {
     "type": "string",
-    "description": "Commercial Manager"
+    "format": "uuid",
+    "description": "Commercial Manager: staff principal id"
    },
    "financeOwner": {
     "type": "string",
-    "description": "Finance Owner"
+    "format": "uuid",
+    "description": "Finance Owner: staff principal id"
    },
    "operationalOwner": {
     "type": "string",
-    "description": "Operational Owner"
+    "format": "uuid",
+    "description": "Operational Owner: staff principal id"
    },
    "technicalOwner": {
     "type": "string",
-    "description": "Technical Owner"
+    "format": "uuid",
+    "description": "Technical Owner: staff principal id"
    },
-   "strategic": {
+   "parentPartnerId": {
     "type": "string",
-    "description": "Strategic"
+    "format": "uuid",
+    "description": "Parent partner in the hierarchy (Global Partner -> UAE Entity); empty for a top-level partner",
+    "nullable": true
    },
-   "keyAccount": {
+   "classificationTags": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "strategic",
+      "keyAccount",
+      "standard",
+      "newPartner",
+      "highVolume",
+      "vip",
+      "restricted"
+     ]
+    },
+    "description": "Account Classification: internal tags"
+   },
+   "possibleDuplicates": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "Advisory: partner ids the AI duplicate check matched on company details; a human decides"
+   }
+  }
+ },
+ "PartnerUser": {
+  "type": "object",
+  "x-ticvai-persistence": "control.partner_user",
+  "description": "2.7.51, BL-075. **A partner was a flat account** — `registerPartner` created one and nothing created a user beneath it.\nThe requirement asks for Master Agency, Branch, Department and User with permissions, quotas and credit cascading down. **That is a scope tree, and `tenancy` already has one** — so this is a principal on a partner branch rather than a new hierarchy.\n**Quota and credit resolve the way configuration does: nearest ancestor wins.** A branch with no credit limit inherits the agency's, which is the behaviour a partner expects and would otherwise have to be enforced by hand.\n",
+  "required": [
+   "id",
+   "partnerId",
+   "principalId",
+   "branchScopePath"
+  ],
+  "properties": {
+   "id": {
     "type": "string",
-    "description": "Key Account"
+    "format": "uuid"
    },
-   "standard": {
+   "partnerId": {
+    "x-ticvai-references": "control.partner",
     "type": "string",
-    "description": "Standard"
+    "format": "uuid",
+    "description": "The partner (control.partner) the user belongs to. **Resolves to control.partner**, not to control.partner_agreement as the naming convention guessed before the partner master existed (decided 29 September, writers pass; DM4)"
    },
-   "newPartner": {
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "role": {
+    "type": "string",
+    "nullable": true,
+    "description": "The partner role shown for the user: Partner Administrator, Booking Agent, Supervisor, Finance User, Reporting User or API Administrator (pack p.12). The permissions the role grants stay RBAC data in identity; this is the label listPartnerContactUser shows (decided 29 September, writers pass; DM4)"
+   },
+   "salesLocation": {
+    "type": "string",
+    "nullable": true,
+    "description": "The sales location (branch office or desk) the user sells from, shown on listPartnerContactUser (decided 29 September, writers pass; DM4)"
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "description": "Currency the user sells in, ISO 4217; empty means the agreement's settlementCurrency (decided 29 September, writers pass; DM4)"
+   },
+   "accountExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When the user's account expires; empty for no expiry. An expired account cannot sign in and shows as `expired` on listPartnerContactUser (decided 29 September, writers pass; DM4)"
+   },
+   "branchScopePath": {
+    "type": "string",
+    "description": "The branch this user sits on. **An ltree, like every other scope path**, so a report at agency level rolls up its branches without anybody writing a join.\n"
+   },
+   "allocationQuota": {
     "type": "integer",
-    "description": "New Partner"
+    "nullable": true,
+    "description": "Units this branch may sell. **Null inherits the parent's**, and a quota set at branch level below the agency's is a deliberate restriction rather than an error.\n"
    },
-   "highVolume": {
-    "type": "integer",
-    "description": "High Volume"
+   "creditLimitOverride": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
-   "vip": {
-    "type": "string",
-    "description": "VIP"
-   },
-   "restricted": {
-    "type": "string",
-    "description": "Restricted"
+   "canManageUsers": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Partner-managed access control** — 2.7.51 asks for it, and a venue administering every travel agent's staff list is a venue doing the agency's HR.\n"
    }
   }
  },
  "TerritoryMarketDistributionRightsView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "x-ticvai-persistence": "none — projection over control.partner_distribution_right (PartnerDistributionRight) and the existing subscription state, assembled at read time (data model DM4)",
   "description": "**What Territory, Market & Distribution Rights displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
   "properties": {
    "country": {
     "type": "string",
-    "description": "Country"
+    "description": "Country, ISO 3166-1 alpha-2; blank = all",
+    "nullable": true
    },
    "region": {
     "type": "string",
-    "description": "Region"
+    "description": "Region; blank = all in the country",
+    "nullable": true
    },
    "city": {
     "type": "string",
-    "description": "City"
+    "description": "City; blank = all in the region",
+    "nullable": true
    },
    "market": {
     "type": "string",
-    "description": "Market"
+    "description": "Market (source market the partner sells into)",
+    "nullable": true
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue id; blank = all venues in scope",
+    "nullable": true
    },
    "attraction": {
     "type": "string",
-    "description": "Attraction"
+    "description": "Attraction id",
+    "nullable": true
    },
    "event": {
     "type": "string",
-    "description": "Event"
+    "description": "Event id",
+    "nullable": true
    },
    "brand": {
     "type": "string",
-    "description": "Brand"
-   },
-   "b2bPortal": {
-    "type": "string",
-    "description": "B2B Portal"
-   },
-   "api": {
-    "type": "string",
-    "description": "API"
-   },
-   "otaConnection": {
-    "type": "string",
-    "description": "OTA Connection"
-   },
-   "agentPortal": {
-    "type": "string",
-    "description": "Agent Portal"
-   },
-   "affiliateLink": {
-    "type": "string",
-    "description": "Affiliate Link"
-   },
-   "voucherDistribution": {
-    "type": "string",
-    "description": "Voucher Distribution"
-   },
-   "otherAuthorizedChannel": {
-    "type": "string",
-    "description": "Other authorized channel"
-   },
-   "uae": {
-    "type": "string",
-    "description": "UAE"
-   },
-   "dubai": {
-    "type": "string",
-    "description": "Dubai"
-   },
-   "saudiMarket": {
-    "type": "string",
-    "description": "Saudi market"
-   },
-   "directConsumerResale": {
-    "type": "string",
-    "description": "Direct consumer resale"
-   },
-   "subDistribution": {
-    "type": "string",
-    "description": "Sub-distribution"
-   },
-   "nonExclusive": {
-    "type": "string",
-    "description": "Non-exclusive"
-   },
-   "exclusive": {
-    "type": "string",
-    "description": "Exclusive"
-   },
-   "preferred": {
-    "type": "string",
-    "description": "Preferred"
-   },
-   "restricted": {
-    "type": "string",
-    "description": "Restricted"
-   },
-   "subAgentsAllowed": {
-    "type": "boolean",
-    "description": "Sub-agents allowed"
-   },
-   "subAgentsProhibited": {
-    "type": "string",
-    "description": "Sub-agents prohibited"
-   },
-   "approvalRequired": {
-    "type": "boolean",
-    "description": "Approval required"
+    "description": "Brand id",
+    "nullable": true
    },
    "maximumHierarchyDepth": {
-    "type": "string",
-    "description": "Maximum hierarchy depth"
+    "type": "integer",
+    "description": "Maximum hierarchy depth of sub-agents below the partner",
+    "nullable": true
    },
    "effectiveFrom": {
     "type": "string",
+    "format": "date",
     "description": "Effective From"
    },
    "effectiveTo": {
     "type": "string",
-    "description": "Effective To"
+    "format": "date",
+    "description": "Effective To; empty for open-ended",
+    "nullable": true
+   },
+   "rightId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Distribution right id"
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Partner"
+   },
+   "allowed": {
+    "type": "boolean",
+    "description": "Allowed (true) or explicitly not allowed (false), the pack's Allowed / Not allowed example"
+   },
+   "distributionMethods": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "enum": [
+      "b2bPortal",
+      "api",
+      "otaConnection",
+      "agentPortal",
+      "affiliateLink",
+      "voucherDistribution",
+      "bulkTicketExport",
+      "other"
+     ]
+    },
+    "description": "Distribution Rights: Distribution methods: b2bPortal (the TICVAI B2B portal), api (partner consumes the TICVAI API), otaConnection (TICVAI integrates into the OTA, either direction per MoM 31 Aug 4.3), agentPortal, affiliateLink, voucherDistribution, bulkTicketExport (pre-generated QR tickets as CSV, MoM 5 Aug option 3), other"
+   },
+   "exclusivity": {
+    "type": "string",
+    "enum": [
+     "nonExclusive",
+     "exclusive",
+     "preferred",
+     "restricted"
+    ],
+    "description": "Exclusivity"
+   },
+   "subAgentRule": {
+    "type": "string",
+    "enum": [
+     "allowed",
+     "prohibited",
+     "approvalRequired"
+    ],
+    "description": "Sub-Agent Rights"
+   },
+   "reviewDate": {
+    "type": "string",
+    "format": "date",
+    "description": "Review Date",
+    "nullable": true
+   },
+   "validationIssues": {
+    "type": "array",
+    "description": "Conflict Detection: e.g. two partners exclusive for the same market and period",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string",
+       "enum": [
+        "overlappingExclusiveRight",
+        "outsideBusinessScope"
+       ]
+      },
+      "message": {
+       "type": "string"
+      }
+     }
+    }
    }
   }
  }

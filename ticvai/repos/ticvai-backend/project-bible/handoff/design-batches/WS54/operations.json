@@ -8,7 +8,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "BundleBogoAdvancedOfferAnalyticsView"
  },
@@ -21,9 +27,108 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "CampaignPromotionPerformanceExplorerView"
+ },
+ "listChannelCustomerSegment": {
+  "method": "GET",
+  "path": "/channel-customer-segment",
+  "contract": "catalogue",
+  "summary": "Channel, Customer Segment & Location Dynamic Rules",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "dimension",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "strategyId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerSegment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "locationLevel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listCommercialCampaigns": {
+  "method": "GET",
+  "path": "/commercial-campaigns",
+  "contract": "promotions",
+  "summary": "List commercial campaigns",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "activeAt",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "ownerPrincipalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "q",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
  },
  "listCustomerSegmentChannel": {
   "method": "GET",
@@ -34,7 +139,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "CustomerSegmentChannelPartnerAnalyticsView"
  },
@@ -47,7 +158,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "DiscountMarginProfitabilityAnalyticsView"
  },
@@ -60,7 +177,43 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "metric",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dimension",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "comparisonPeriod",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "grouping",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "format",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "ExecutivePromotionIntelligenceReportingStudioView"
  },
@@ -73,7 +226,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "IncrementalityAttributionCannibalizationAnalysisView"
  },
@@ -86,9 +245,148 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "AiOptimizationNextBestActionCenterView"
+ },
+ "listPromotionCampaign": {
+  "method": "GET",
+  "path": "/promotion-campaign",
+  "contract": "promotions",
+  "summary": "Promotion & Campaign Directory",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "promotionType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "campaign",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productCategory",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "attraction",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "fnb",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "retail",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "membership",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerSegment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "owner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "approvalState",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "promotionValue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "budgetStatus",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "PromotionCampaignDirectoryView"
+ },
+ "listPromotionHealthPerformance": {
+  "method": "GET",
+  "path": "/promotion-health-performance",
+  "contract": "promotions",
+  "summary": "Promotion Health & Performance Monitor",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PromotionHealthPerformanceMonitorView"
  },
  "listPromotionPerformance": {
   "method": "GET",
@@ -99,7 +397,78 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "dateRange",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "businessEntity",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "attraction",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "campaign",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "promotion",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "bundle",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerSegment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "market",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "currency",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "PromotionPerformanceCommandCenterView"
  },
@@ -113,6 +482,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
    {
     "name": "channel",
     "in": "query",
@@ -166,7 +540,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "UpsellCrossSellAttachRateAnalyticsView"
  }

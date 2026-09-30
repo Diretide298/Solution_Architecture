@@ -53,7 +53,10 @@
     {
      "to": "BO-667",
      "trigger": "Event & Venue Accreditation Assignment",
-     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "carries": [
+      "programmeId"
+     ]
     },
     {
      "to": "BO-668",
@@ -518,6 +521,13 @@
     "invalidates": [
      "listAccreditationProgrammes"
     ]
+   },
+   {
+    "operationId": "cloneAccreditationProgramme",
+    "contract": "accreditation",
+    "purpose": "Assign a programme to a new event by cloning it",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -526,6 +536,14 @@
    "workshopBoard": "wireframes/WS06 ACCREDITATION Board 6.dc.html#bo-667"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 49. 0 of 0 labels bound to a contract property; 0 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "programmeId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1146,6 +1164,19 @@
        "derived": true,
        "impliedBy": "listAccreditationHolders",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "renewAccreditation",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "renewAccreditation"
       }
      ]
     }
@@ -1165,6 +1196,13 @@
     "purpose": "Expiring soon",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "renewAccreditation",
+    "contract": "accreditation",
+    "purpose": "Renew a holder approaching expiry",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1173,6 +1211,14 @@
    "workshopBoard": "wireframes/WS06 ACCREDITATION Board 6.dc.html#bo-672"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 52. 0 of 0 labels bound to a contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "holderId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1287,6 +1333,20 @@
     "invalidates": [
      "listAccreditationHolders"
     ]
+   },
+   {
+    "operationId": "listAccreditationHolders",
+    "contract": "accreditation",
+    "purpose": "Holders inside the renewal window (expiringWithinDays)",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "renewAccreditation",
+    "contract": "accreditation",
+    "purpose": "Renew without recreating the holder",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1295,6 +1355,14 @@
    "workshopBoard": "wireframes/WS06 ACCREDITATION Board 6.dc.html#bo-673"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 53. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "holderId",
+     "from": "navigation"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

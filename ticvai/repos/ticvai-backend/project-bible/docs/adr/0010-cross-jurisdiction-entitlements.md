@@ -28,7 +28,7 @@ selling a portfolio pass cannot sell a pass that stops at a border their guests 
 perceive.
 
 It is legally workable. Cross-border transfer is permitted under PDPL Article 22 with
-adequacy, or Article 23 with contractual safeguards or explicit consent (ADR-0009). The
+adequacy, or Article 23 with contractual safeguards or explicit consent (ADR-0009, whose vector-store section is amended by ADR-0049; residency unchanged). The
 constraint is that every transfer needs a documented mechanism — not that transfer is
 prohibited.
 

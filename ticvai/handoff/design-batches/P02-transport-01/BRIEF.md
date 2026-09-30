@@ -1,6 +1,6 @@
 # P02-transport-01 — P02 · Transport
 
-**4 screens · 13 operations · 25 schemas · 0 permissions**
+**4 screens · 13 operations · 24 schemas · 0 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·

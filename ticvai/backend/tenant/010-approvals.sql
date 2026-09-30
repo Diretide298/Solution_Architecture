@@ -20,8 +20,8 @@ CREATE TABLE IF NOT EXISTS approvals.accreditation_badge (
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS approvals.approved_action_execution (
-    id                                text PRIMARY KEY NOT NULL,
-    approval_request_id               text NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
+    approval_request_id               uuid NOT NULL,
     source_module                     text NOT NULL,
     action_type                       text NOT NULL,
     subject_ref                       text,
@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS approvals.decision (
     used_mfa                          boolean,
     signature_ref                     text,
     decided_at                        timestamptz NOT NULL,
-    request_id                        text NOT NULL
+    request_id                        uuid NOT NULL
 );
 
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
@@ -206,7 +206,7 @@ CREATE TABLE IF NOT EXISTS approvals.delegation (
 -- operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS approvals.escalation (
     id                                uuid PRIMARY KEY NOT NULL,
-    request_id                        text NOT NULL
+    request_id                        uuid NOT NULL
 );
 
 -- Holds 11 columns. No description has been written for this table — the name is the only thing
@@ -229,7 +229,7 @@ CREATE TABLE IF NOT EXISTS approvals.evidence_package (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS approvals.external_dispatch (
     id                                uuid PRIMARY KEY NOT NULL,
-    request_id                        text NOT NULL,
+    request_id                        uuid NOT NULL,
     provider_id                       uuid NOT NULL,
     level                             integer NOT NULL,
     status                            text NOT NULL CONSTRAINT external_dispatch_status_chk CHECK (status IN ('pending', 'sent', 'failed', 'decided', 'timedOut', 'cancelled')),
@@ -280,7 +280,7 @@ CREATE TABLE IF NOT EXISTS approvals.matrix (
 -- operations read it and 24 write it; 50 tables reference it; written by 3 contracts — approvals,
 -- subscription, workforce.
 CREATE TABLE IF NOT EXISTS approvals.request (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     kind                              text NOT NULL CONSTRAINT request_kind_chk CHECK (kind IN ('refund', 'priceOverride', 'discountOverride', 'complimentaryTicket', 'membershipCancellation', 'accessPermissionChange', 'configurationChange', 'aiRecommendation', 'releasePromotion', 'requisition', 'stockWriteOff', 'journalEntry', 'periodClose', 'periodReopen', 'purchaseOrderCancel', 'purchaseOrderShortClose', 'tenantMigration', 'productChange', 'pricingChange')),
     reroute_on_no_approver            boolean DEFAULT true,
     out_of_office_delegate_id         uuid,
@@ -497,7 +497,7 @@ CREATE TABLE IF NOT EXISTS approvals.workflow_step_execution (
     service                           text CONSTRAINT workflow_step_execution_service_chk CHECK (char_length(service) <= 100),
     action                            text CONSTRAINT workflow_step_execution_action_chk CHECK (char_length(action) <= 200),
     assigned_to_principal_id          uuid,
-    approval_request_id               text,
+    approval_request_id               uuid,
     input_payload                     jsonb,
     output_payload                    jsonb,
     decision                          text CONSTRAINT workflow_step_execution_decision_chk CHECK (char_length(decision) <= 100),
@@ -544,7 +544,7 @@ CREATE TABLE IF NOT EXISTS approvals.workflow_version (
     test_results                      text CONSTRAINT workflow_version_test_results_chk CHECK (char_length(test_results) <= 2000),
     business_owner_principal_id       uuid,
     technical_owner_principal_id      uuid,
-    approval_request_id               text,
+    approval_request_id               uuid,
     rollout_scope                     text CONSTRAINT workflow_version_rollout_scope_chk CHECK (rollout_scope IN ('allScopes', 'selectedTenant', 'selectedVenue', 'selectedBrand', 'controlledRollout')),
     scope_ids                         text[],
     created_by                        uuid,

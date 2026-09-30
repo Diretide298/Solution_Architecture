@@ -1,6 +1,6 @@
 # P08-people-access-rights-02 — P08 · People & Access Rights (2 of 2)
 
-**2 screens · 5 operations · 6 schemas · 5 permissions**
+**2 screens · 5 operations · 7 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -99,7 +99,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-084",
      "trigger": "Approval Inbox",
-     "provenance": "derived — BO-084 declares entryState.params requestId and BO-088 holds none of them, so the edge carries nothing and BO-084 opens cold"
+     "provenance": "derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-088 holds none of them, so the edge carries nothing and BO-084 opens cold"
     },
     {
      "to": "BO-085",
@@ -299,7 +299,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     {
      "to": "BO-084",
      "trigger": "Approval Inbox",
-     "provenance": "derived — BO-084 declares entryState.params requestId and BO-106 holds none of them, so the edge carries nothing and BO-084 opens cold"
+     "provenance": "derived — BO-084 declares entryState.params approvalRequestId, requestId and BO-106 holds none of them, so the edge carries nothing and BO-084 opens cold"
     },
     {
      "to": "BO-085",
@@ -310,6 +310,11 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
      "to": "BO-087",
      "trigger": "Approval Delegations",
      "provenance": "derived — BO-087 declares entryState.params delegationId and BO-106 holds none of them, so the edge carries nothing and BO-087 opens cold"
+    },
+    {
+     "to": "BO-054",
+     "trigger": "Role Assignment",
+     "provenance": "derived — BO-054 declares entryState.params campaignId and BO-106 holds none of them, so the edge carries nothing and BO-054 opens cold"
     }
    ]
   },
@@ -555,6 +560,16 @@ Method, path, parameters, request and response for every operation these screens
     "name": "compareTo",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "interval",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
    }
   ],
   "requestBody": null,
@@ -774,6 +789,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "code": {
     "type": "string"
    },
+   "bucketStart": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise."
+   },
+   "groupKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked."
+   },
    "name": {
     "type": "string"
    },
@@ -864,6 +890,56 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    }
   }
  },
+ "Role": {
+  "x-ticvai-persistence": "identity.role",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "x-ticvai-unique": "tenant",
+    "description": "**Unique within the tenant** (decided 28 September, audit R108). A seeded role's code is reserved in every tenant. Unique per tenant, not per venue, because a grant names a role anywhere in the tree; `createRole` refuses a duplicate with `409 duplicate-code`.\n"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string"
+   },
+   "permissions": {
+    "type": "array",
+    "description": "**A role that grants no permissions is not a role.** `Role` carried a code, a name and two counts until 18 August, and `identity.role_permission` derived from it with exactly one column — `role_id`. **A join table that joins to nothing**, found by Hrushikant in review and missed by the schema audit that ran the same day.\n**The audit asked whether every table had columns, a relationship and an owner, and this table had all three.** What it did not ask is whether a table with one column can do the job its name claims.\n",
+    "items": {
+     "$ref": "../shared/permissions.yaml#/components/schemas/Permission"
+    }
+   },
+   "inheritsFromRoleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Role composition, one level deep and no deeper.** A supervisor role that is a cashier plus three permissions is how venues actually describe them.\n**Cycles are refused and depth is capped at one**, because a permission set nobody can read off the screen is a permission set nobody audits.\n"
+   },
+   "isSystem": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Seeded roles ship and are editable; deleting one is refused.** A venue that removes `cashier` and rebuilds it has two roles with one name in the audit log.\n**The seeded system roles are Cashier, Supervisor, Venue Manager, Finance and Tenant Admin** (proposed in `docs/active/seed-data-proposal.md` section 2, client to correct; audit R229).\n"
+   },
+   "principalCount": {
+    "type": "integer"
+   },
+   "grantCount": {
+    "type": "integer"
+   }
+  }
+ },
  "VenueSettings": {
   "type": "object",
   "x-ticvai-persistence": "platform.venue_settings",
@@ -880,6 +956,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
     "format": "uuid",
     "readOnly": true,
     "description": "From the path of `setVenueSettings`."
+   },
+   "calendarDayStartHour": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 23,
+    "nullable": true,
+    "default": 6,
+    "description": "**Where the venue's calendar day starts** (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (`calendarView` in `screens/_components.yaml`), so a venue open 06:00 to 02:00 sees its night on the day it belongs to. Display only: it moves no booking, slot or business date. Null inherits the tenant default (proposed 6, client to correct).\n"
    },
    "currencyCode": {
     "type": "string",

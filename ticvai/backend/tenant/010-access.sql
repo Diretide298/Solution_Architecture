@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS access.access_change (
     old_access_id                     uuid NOT NULL,
     new_access_id                     uuid,
     type                              text NOT NULL CONSTRAINT access_change_type_chk CHECK (char_length(type) <= 30),
-    order_id                          text,
+    order_id                          uuid,
     upgrade_id                        uuid,
     reason                            text CONSTRAINT access_change_reason_chk CHECK (char_length(reason) <= 500),
     changed_by_principal_id           uuid,
@@ -266,9 +266,9 @@ CREATE TABLE IF NOT EXISTS access.biometric_audit_event (
     occurred_at                       timestamptz NOT NULL,
     is_simulation                     boolean NOT NULL DEFAULT false,
     scenario                          text CONSTRAINT biometric_audit_event_scenario_chk CHECK (scenario IN ('validFacePass', 'faceMismatch', 'noBiometricProfile', 'lowConfidenceMatch', 'livenessFailure', 'duplicateProfile', 'reEnrollmentAttempt', 'childAssignedAdult', 'faceTagExpired', 'faceTagDeleted', 'offlineBiometric', 'cameraUnavailable', 'alternativeVerificationFallback')),
-    biometric_profile_id              text,
+    biometric_profile_id              uuid,
     subject_id                        uuid,
-    entitlement_id                    text,
+    entitlement_id                    uuid,
     credential_type                   text CONSTRAINT biometric_audit_event_credential_type_chk CHECK (char_length(credential_type) <= 100),
     face_profile_reference            text CONSTRAINT biometric_audit_event_face_profile_reference_chk CHECK (char_length(face_profile_reference) <= 200),
     access_point_id                   uuid,
@@ -283,7 +283,7 @@ CREATE TABLE IF NOT EXISTS access.biometric_audit_event (
 -- Holds 36 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS access.biometric_profile (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     profile_kind                      text NOT NULL CONSTRAINT biometric_profile_profile_kind_chk CHECK (profile_kind IN ('verification', 'facePassEnrolment', 'faceTagEnrolment', 'faceMatch')),
     venue_id                          uuid NOT NULL,
     scope_path                        ltree NOT NULL,
@@ -358,7 +358,7 @@ CREATE TABLE IF NOT EXISTS access.branding_profile (
     field_overrides                   jsonb,
     translation_status                text DEFAULT 'notStarted' CONSTRAINT branding_profile_translation_status_chk CHECK (translation_status IN ('notStarted', 'inProgress', 'inReview', 'approved')),
     reviewer_principal_id             uuid,
-    approval_request_id               text,
+    approval_request_id               uuid,
     version                           integer DEFAULT 1,
     scope_path                        ltree NOT NULL,
     created_at                        timestamptz,
@@ -368,7 +368,7 @@ CREATE TABLE IF NOT EXISTS access.branding_profile (
 -- Holds 12 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS access.companion_rule (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     venue_id                          uuid NOT NULL,
     scope_path                        ltree NOT NULL,
     name                              text NOT NULL CONSTRAINT companion_rule_name_chk CHECK (char_length(name) <= 200),
@@ -426,7 +426,7 @@ CREATE TABLE IF NOT EXISTS access.configuration_version (
 -- Holds 13 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS access.consumption_rule (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     name                              text NOT NULL CONSTRAINT consumption_rule_name_chk CHECK (char_length(name) <= 200),
     credential_type                   text,
     entitlement_type                  text NOT NULL CONSTRAINT consumption_rule_entitlement_type_chk CHECK (entitlement_type IN ('parkAdmission', 'attractionAdmission', 'ride', 'fastPass', 'meal', 'voucher', 'photo', 'locker', 'event', 'experience', 'reEntry', 'membershipBenefit', 'custom')),
@@ -444,9 +444,9 @@ CREATE TABLE IF NOT EXISTS access.consumption_rule (
 -- Holds 24 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS access.credential_binding (
-    id                                text PRIMARY KEY NOT NULL,
-    entitlement_id                    text NOT NULL,
-    media_type_id                     text NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
+    entitlement_id                    uuid NOT NULL,
+    media_type_id                     uuid NOT NULL,
     credential_reference              text NOT NULL CONSTRAINT credential_binding_credential_reference_chk CHECK (char_length(credential_reference) <= 200),
     token_reference                   text CONSTRAINT credential_binding_token_reference_chk CHECK (char_length(token_reference) <= 500),
     provider                          text CONSTRAINT credential_binding_provider_chk CHECK (char_length(provider) <= 100),
@@ -473,9 +473,9 @@ CREATE TABLE IF NOT EXISTS access.credential_binding (
 -- Holds 18 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS access.credential_delivery (
-    id                                text PRIMARY KEY NOT NULL,
-    entitlement_id                    text NOT NULL,
-    credential_binding_id             text,
+    id                                uuid PRIMARY KEY NOT NULL,
+    entitlement_id                    uuid NOT NULL,
+    credential_binding_id             uuid,
     channel                           text NOT NULL CONSTRAINT credential_delivery_channel_chk CHECK (channel IN ('email', 'smsLink', 'whatsapp', 'b2cAccount', 'mobileApp', 'download', 'appleWallet', 'googleWallet', 'pos', 'boxOffice', 'kiosk', 'groupPortal', 'api', 'physicalCollection')),
     recipient_role                    text NOT NULL DEFAULT 'ticketHolder' CONSTRAINT credential_delivery_recipient_role_chk CHECK (recipient_role IN ('purchaser', 'ticketHolder', 'participant', 'guardian', 'groupLeader', 'authorizedRecipient')),
     destination                       text CONSTRAINT credential_delivery_destination_chk CHECK (char_length(destination) <= 320),
@@ -497,9 +497,9 @@ CREATE TABLE IF NOT EXISTS access.credential_delivery (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS access.credential_event (
     id                                uuid PRIMARY KEY NOT NULL,
-    entitlement_id                    text NOT NULL,
-    credential_binding_id             text,
-    media_type_id                     text,
+    entitlement_id                    uuid NOT NULL,
+    credential_binding_id             uuid,
+    media_type_id                     uuid,
     action                            text NOT NULL CONSTRAINT credential_event_action_chk CHECK (action IN ('credentialRequested', 'generated', 'bound', 'delivered', 'activated', 'refreshed', 'updated', 'presented', 'transferred', 'suspended', 'reactivated', 'replaced', 'swapped', 'revoked', 'expired', 'rebound', 'regenerated', 'deleted')),
     before                            jsonb,
     after                             jsonb,
@@ -509,11 +509,11 @@ CREATE TABLE IF NOT EXISTS access.credential_event (
     reason                            text CONSTRAINT credential_event_reason_chk CHECK (char_length(reason) <= 500),
     result_reason_code                text CONSTRAINT credential_event_result_reason_code_chk CHECK (char_length(result_reason_code) <= 50),
     swap_reason                       text CONSTRAINT credential_event_swap_reason_chk CHECK (swap_reason IN ('lost', 'damaged', 'deviceChange', 'upgrade', 'guestRequest', 'operationalReplacement', 'fraudSecurity', 'accessibility')),
-    from_media_type_id                text,
+    from_media_type_id                uuid,
     from_media_reference              text CONSTRAINT credential_event_from_media_reference_chk CHECK (char_length(from_media_reference) <= 200),
-    to_media_type_id                  text,
+    to_media_type_id                  uuid,
     to_media_reference                text CONSTRAINT credential_event_to_media_reference_chk CHECK (char_length(to_media_reference) <= 200),
-    approval_request_id               text,
+    approval_request_id               uuid,
     provider_reference                text CONSTRAINT credential_event_provider_reference_chk CHECK (char_length(provider_reference) <= 200),
     related_transaction_id            text CONSTRAINT credential_event_related_transaction_id_chk CHECK (char_length(related_transaction_id) <= 100),
     anomaly_flags                     text[],
@@ -540,14 +540,14 @@ CREATE TABLE IF NOT EXISTS access.credential_event_propagation_rule (
 -- Holds 21 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS access.credential_exception (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     failure_type                      text NOT NULL CONSTRAINT credential_exception_failure_type_chk CHECK (failure_type IN ('generationFailed', 'bindingFailed', 'activationFailed', 'deliveryFailed', 'walletFailure', 'rfidEncodingFailure', 'duplicateCredential', 'invalidToken', 'providerFailure', 'synchronizationFailure', 'missingTemplate', 'missingRequiredData', 'expiredCredential', 'mappingFailure', 'unknownCredential')),
     severity                          text NOT NULL CONSTRAINT credential_exception_severity_chk CHECK (severity IN ('low', 'medium', 'high', 'critical')),
-    entitlement_id                    text,
-    credential_binding_id             text,
+    entitlement_id                    uuid,
+    credential_binding_id             uuid,
     credential_issuance_id            uuid,
-    credential_delivery_id            text,
-    media_type_id                     text,
+    credential_delivery_id            uuid,
+    media_type_id                     uuid,
     failure                           text CONSTRAINT credential_exception_failure_chk CHECK (char_length(failure) <= 1000),
     operational_impact                text CONSTRAINT credential_exception_operational_impact_chk CHECK (char_length(operational_impact) <= 500),
     status                            text NOT NULL DEFAULT 'open' CONSTRAINT credential_exception_status_chk CHECK (status IN ('open', 'inProgress', 'escalated', 'resolved')),
@@ -568,9 +568,9 @@ CREATE TABLE IF NOT EXISTS access.credential_exception (
 CREATE TABLE IF NOT EXISTS access.credential_issuance (
     id                                uuid PRIMARY KEY NOT NULL,
     trigger                           text NOT NULL CONSTRAINT credential_issuance_trigger_chk CHECK (trigger IN ('orderConfirmation', 'ticketIssuance', 'membershipActivation', 'customerRequest', 'staffAction', 'rfidCollection', 'walletRequest', 'faceEnrollment', 'api', 'bulkOperation', 'scheduledProcess')),
-    entitlement_id                    text NOT NULL,
-    credential_binding_id             text,
-    media_type_id                     text NOT NULL,
+    entitlement_id                    uuid NOT NULL,
+    credential_binding_id             uuid,
+    media_type_id                     uuid NOT NULL,
     media_template_id                 uuid,
     media_template_version_id         uuid,
     provider                          text CONSTRAINT credential_issuance_provider_chk CHECK (char_length(provider) <= 100),
@@ -605,7 +605,7 @@ CREATE TABLE IF NOT EXISTS access.credential_issuance_retry_policy (
 -- Holds 32 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS access.credential_policy (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     kind                              text NOT NULL CONSTRAINT credential_policy_kind_chk CHECK (kind IN ('activationDisplay', 'transfer', 'virtualTicketIdentity', 'deviceBinding')),
     name                              text CONSTRAINT credential_policy_name_chk CHECK (char_length(name) <= 200),
     venue_id                          uuid,
@@ -667,7 +667,7 @@ CREATE TABLE IF NOT EXISTS access.credential_sharing_case (
     id                                uuid PRIMARY KEY NOT NULL,
     venue_id                          uuid,
     scope_path                        ltree NOT NULL,
-    entitlement_id                    text NOT NULL,
+    entitlement_id                    uuid NOT NULL,
     primary_device_id                 uuid,
     additional_device_ids             text[],
     maximum_active_devices            integer,
@@ -681,8 +681,8 @@ CREATE TABLE IF NOT EXISTS access.credential_sharing_case (
 CREATE TABLE IF NOT EXISTS access.device_binding (
     id                                uuid PRIMARY KEY NOT NULL,
     subject_id                        uuid,
-    entitlement_id                    text NOT NULL,
-    credential_binding_id             text,
+    entitlement_id                    uuid NOT NULL,
+    credential_binding_id             uuid,
     device_id                         text NOT NULL CONSTRAINT device_binding_device_id_chk CHECK (char_length(device_id) <= 200),
     device_reference                  text CONSTRAINT device_binding_device_reference_chk CHECK (char_length(device_reference) <= 200),
     app_installation_id               text CONSTRAINT device_binding_app_installation_id_chk CHECK (char_length(app_installation_id) <= 200),
@@ -833,10 +833,10 @@ CREATE TABLE IF NOT EXISTS access.edge_package (
 -- validateAccess read the template and suspendEntitlement suspended it, which would have suspended
 -- it for every guest who held one. Han
 CREATE TABLE IF NOT EXISTS access.entitlement (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     template_id                       uuid NOT NULL,
     product_id                        uuid NOT NULL,
-    order_id                          text NOT NULL,
+    order_id                          uuid NOT NULL,
     order_line_id                     uuid,
     subject_id                        uuid,
     venue_id                          uuid,
@@ -857,7 +857,7 @@ CREATE TABLE IF NOT EXISTS access.entitlement (
     holder_name                       text,
     shared_with_subject_ids           text[],
     issued_via                        text CONSTRAINT entitlement_issued_via_chk CHECK (issued_via IN ('sale', 'invitation', 'reissue', 'transfer', 'resale', 'membership', 'groupBooking')),
-    supersedes_entitlement_id         text,
+    supersedes_entitlement_id         uuid,
     wallet_value_id                   uuid
 );
 
@@ -874,7 +874,7 @@ CREATE TABLE IF NOT EXISTS access.entry_rule_point (
 -- Holds 16 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS access.external_credential_integration (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     integration_type                  text NOT NULL CONSTRAINT external_credential_integration_integration_type_chk CHECK (integration_type IN ('hotelRoomCard', 'hotelPms', 'digitalWallet', 'otherExternal', 'partnerCredential')),
     name                              text NOT NULL CONSTRAINT external_credential_integration_name_chk CHECK (char_length(name) <= 200),
     external_system                   text NOT NULL CONSTRAINT external_credential_integration_external_system_chk CHECK (char_length(external_system) <= 200),
@@ -899,7 +899,7 @@ CREATE TABLE IF NOT EXISTS access.face_reenrolment_attempt (
     venue_id                          uuid NOT NULL,
     scope_path                        ltree NOT NULL,
     subject_id                        uuid NOT NULL,
-    entitlement_id                    text,
+    entitlement_id                    uuid,
     existing_profile_reference        text NOT NULL CONSTRAINT face_reenrolment_attempt_existing_profile_reference_chk CHECK (char_length(existing_profile_reference) <= 200),
     new_capture_reference             text NOT NULL CONSTRAINT face_reenrolment_attempt_new_capture_reference_chk CHECK (char_length(new_capture_reference) <= 200),
     match_result                      text NOT NULL CONSTRAINT face_reenrolment_attempt_match_result_chk CHECK (match_result IN ('withinPolicy', 'significantDifference')),
@@ -931,7 +931,7 @@ CREATE TABLE IF NOT EXISTS access.fast_pass_profile (
 -- Holds 19 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS access.fraud_rule (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     scope_path                        ltree NOT NULL,
     rule_kind                         text NOT NULL CONSTRAINT fraud_rule_rule_kind_chk CHECK (rule_kind IN ('signal', 'relationship')),
     signal                            text CONSTRAINT fraud_rule_signal_chk CHECK (signal IN ('excessiveQrActivations', 'multipleActiveSessions', 'credentialCopied', 'excessiveRefreshAttempts', 'invalidSignature', 'expiredCredential', 'revokedCredential', 'screenshotReplayAttempt', 'abnormalTransferFrequency', 'repeatedFailedValidation', 'newDevice', 'multipleDevices', 'deviceBindingMismatch', 'rootedCompromisedDevice', 'abnormalDeviceChanges', 'impossibleDeviceMovement', 'suspiciousScannerDeviceActivity', 'duplicateEntry', 'simultaneousUse', 'antiPassbackViolations', 'unusualReEntry', 'unusualCrossover', 'excessiveAttractionUse', 'repeatedWrongGateAttempts', 'abnormalFastPassConsumption', 'faceMismatch', 'unusualFaceChange', 'multipleIdentitiesLinked', 'suspiciousCompanionChanges', 'podNannyRelationshipAnomalies', 'excessiveRefunds')),
@@ -1044,7 +1044,7 @@ CREATE TABLE IF NOT EXISTS access.group_admission_rule (
 -- Holds 14 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS access.hardware_deployment (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     configuration_version             text NOT NULL,
     target_scope                      text NOT NULL CONSTRAINT hardware_deployment_target_scope_chk CHECK (target_scope IN ('pilot', 'selectedGates', 'deviceGroup', 'venue')),
     venue_id                          text,
@@ -1141,7 +1141,7 @@ CREATE TABLE IF NOT EXISTS access.media_binding_rule (
     allowed_media_type_ids            text[],
     mandatory_media_type_ids          text[],
     optional_media_type_ids           text[],
-    primary_media_type_id             text,
+    primary_media_type_id             uuid,
     secondary_media_type_ids          text[],
     backup_media_type_ids             text[],
     temporary_media_type_ids          text[],
@@ -1169,7 +1169,7 @@ CREATE TABLE IF NOT EXISTS access.media_binding_rule (
 -- saying what it is
 CREATE TABLE IF NOT EXISTS access.media_compatibility_test (
     id                                uuid PRIMARY KEY NOT NULL,
-    media_type_id                     text NOT NULL,
+    media_type_id                     uuid NOT NULL,
     venue_id                          uuid NOT NULL,
     park_id                           text,
     access_point_id                   uuid,
@@ -1177,7 +1177,7 @@ CREATE TABLE IF NOT EXISTS access.media_compatibility_test (
     stage                             text NOT NULL CONSTRAINT media_compatibility_test_stage_chk CHECK (stage IN ('draft', 'compatibilityTest', 'validate', 'approval', 'published')),
     compatibility_warnings            text[],
     exception_reason                  text CONSTRAINT media_compatibility_test_exception_reason_chk CHECK (char_length(exception_reason) <= 500),
-    approval_request_id               text,
+    approval_request_id               uuid,
     published_at                      timestamptz,
     scope_path                        ltree NOT NULL,
     created_at                        timestamptz,
@@ -1187,9 +1187,9 @@ CREATE TABLE IF NOT EXISTS access.media_compatibility_test (
 -- Holds 28 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS access.media_encoding_profile (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     name                              text NOT NULL CONSTRAINT media_encoding_profile_name_chk CHECK (char_length(name) <= 200),
-    media_type_id                     text,
+    media_type_id                     uuid,
     encoding_format                   text CONSTRAINT media_encoding_profile_encoding_format_chk CHECK (char_length(encoding_format) <= 100),
     offline_payload_profile           text CONSTRAINT media_encoding_profile_offline_payload_profile_chk CHECK (char_length(offline_payload_profile) <= 200),
     checksum_signature_reference      text CONSTRAINT media_encoding_profile_checksum_signature_reference_chk CHECK (char_length(checksum_signature_reference) <= 200),
@@ -1279,7 +1279,7 @@ CREATE TABLE IF NOT EXISTS access.media_template_version (
     channels                          text[],
     validation_checks                 text[],
     preview_targets                   text[],
-    approval_request_id               text,
+    approval_request_id               uuid,
     status                            text NOT NULL CONSTRAINT media_template_version_status_chk CHECK (status IN ('pendingApproval', 'scheduled', 'published', 'superseded', 'rejected')),
     published_at                      timestamptz,
     created_at                        timestamptz NOT NULL,
@@ -1290,7 +1290,7 @@ CREATE TABLE IF NOT EXISTS access.media_template_version (
 -- Holds 39 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
 CREATE TABLE IF NOT EXISTS access.media_type (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid PRIMARY KEY NOT NULL,
     name                              text NOT NULL CONSTRAINT media_type_name_chk CHECK (char_length(name) <= 200),
     media_type                        text NOT NULL CONSTRAINT media_type_media_type_chk CHECK (media_type IN ('linearBarcode', 'twoDimensionalBarcode', 'qr', 'rfidContact', 'rfidProximity', 'rfidIso15693', 'rfidOtherStandard', 'appCredential', 'mobileWallet', 'paperTicket', 'wristband', 'plasticCard', 'hotelCard', 'facePass', 'faceTag', 'partnerQr', 'externalBarcode', 'thirdPartyCredential')),
     category                          text CONSTRAINT media_type_category_chk CHECK (category IN ('digital', 'physical', 'biometric', 'future')),
@@ -1376,7 +1376,7 @@ CREATE TABLE IF NOT EXISTS access.operating_calendar_entry (
 CREATE TABLE IF NOT EXISTS access.parking_entitlement (
     id                                uuid PRIMARY KEY,
     facility_id                       uuid NOT NULL,
-    order_id                          text NOT NULL,
+    order_id                          uuid NOT NULL,
     subject_id                        uuid,
     plate_number                      text,
     plate_country                     text,
@@ -1495,18 +1495,18 @@ CREATE TABLE IF NOT EXISTS access.risk_scoring_config (
 
 -- Every presentation of a credential, admitted or not. The highest-volume table in the platform
 CREATE TABLE IF NOT EXISTS access.scan_event (
-    id                                text PRIMARY KEY NOT NULL,
+    id                                uuid NOT NULL,
     access_point_id                   uuid NOT NULL,
     venue_id                          uuid NOT NULL,
     scope_path                        ltree NOT NULL,
-    ticket_id                         text,
+    ticket_id                         uuid,
     media_code                        text,
     outcome                           text NOT NULL CONSTRAINT scan_event_outcome_chk CHECK (outcome IN ('admitted', 'denied', 'overridden')),
     deny_reason                       text CONSTRAINT scan_event_deny_reason_chk CHECK (deny_reason IN ('notFound', 'notYetValid', 'expired', 'alreadyUsed', 'reentryLimitReached', 'exitRequiredBeforeReentry', 'wrongAccessPoint', 'wrongPerformance', 'outsideAdmissionWindow', 'entitlementSuspended', 'blacklisted', 'capacityReached', 'waiverRequired', 'accompanimentRequired', 'mediaDeactivated', 'unpaid', 'delegatedRightExhausted', 'delegatedRightRevoked', 'journeyNotCovered')),
     direction                         text NOT NULL CONSTRAINT scan_event_direction_chk CHECK (direction IN ('entry', 'exit', 'reentry', 'crossover')),
     operator_principal_id             uuid,
     device_id                         uuid,
-    overrides_scan_id                 text,
+    overrides_scan_id                 uuid,
     override_reason                   text,
     dynamic_policy_id                 uuid,
     dynamic_policy_version            integer,
@@ -1516,8 +1516,9 @@ CREATE TABLE IF NOT EXISTS access.scan_event (
     package_version                   text,
     recorded_at                       timestamptz NOT NULL,
     synced_at                         timestamptz,
-    overridden_by_principal_id        uuid
-);
+    overridden_by_principal_id        uuid,
+    CONSTRAINT scan_event_pkey PRIMARY KEY (id, recorded_at)
+) PARTITION BY RANGE (recorded_at);
 
 -- Holds 20 columns. No description has been written for this table — the name is the only thing
 -- saying what it is
@@ -1529,8 +1530,8 @@ CREATE TABLE IF NOT EXISTS access.security_alert (
     alert_type                        text CONSTRAINT security_alert_alert_type_chk CHECK (char_length(alert_type) <= 60),
     severity                          text NOT NULL CONSTRAINT security_alert_severity_chk CHECK (severity IN ('low', 'medium', 'high', 'critical')),
     description                       text CONSTRAINT security_alert_description_chk CHECK (char_length(description) <= 500),
-    fraud_rule_id                     text,
-    entitlement_id                    text,
+    fraud_rule_id                     uuid,
+    entitlement_id                    uuid,
     subject_id                        uuid,
     zone_id                           uuid,
     access_point_id                   uuid,
@@ -1550,7 +1551,7 @@ CREATE TABLE IF NOT EXISTS access.security_investigation (
     id                                uuid PRIMARY KEY NOT NULL,
     venue_id                          uuid,
     scope_path                        ltree NOT NULL,
-    subject_entitlement_id            text,
+    subject_entitlement_id            uuid,
     evidence_sources                  text[],
     status                            text NOT NULL DEFAULT 'open' CONSTRAINT security_investigation_status_chk CHECK (status IN ('open', 'investigating', 'actionTaken', 'resolved', 'closed')),
     risk_score                        integer,

@@ -56,7 +56,7 @@ components:
       name: Idempotency-Key
       in: header
       required: true
-      description: 'Client-generated ULID. Servers deduplicate on this value. Required on every mutating
+      description: 'Client-generated UUIDv7. Servers deduplicate on this value. Required on every mutating
         request because offline clients replay their outbox on reconnect.
 
 
@@ -66,7 +66,7 @@ components:
         completed gets the stored original response (status and body), and nothing is written a
         second time (backend-patterns: `IIdempotencyStore`).
 
-        - **A body ULID `id` is the same key.** An edge-created entity''s client ULID "doubles as the
+        - **A body UUIDv7 `id` is the same key.** An edge-created entity''s client UUIDv7 "doubles as the
         idempotency key" (naming-and-style §4), so where a create body carries a client `id`, it
         must equal this header. A request whose header and body `id` differ is a `400` with problem
         type `validation`.
@@ -84,7 +84,7 @@ components:
         '
       schema:
         type: string
-        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        format: uuid
     IfMatch:
       name: If-Match
       in: header
@@ -150,6 +150,21 @@ components:
         type: integer
         minimum: 0
   schemas:
+    Id:
+      type: string
+      format: uuid
+      x-ticvai-persistence-column: uuid
+      description: '**Every id is a uuid, and every new one is a UUIDv7** (ADR-0056, 30 September): time-ordered,
+        so a key in an index stays in insertion order, and minted by the service with the kernel''s `Id.New()`.
+        A client that creates a record offline (a sale, a scan, a case raised on a device) generates the id
+        itself **in the same format** with a UUIDv7 function, and that id doubles as the `Idempotency-Key`.
+        Ids are opaque: a client never reads a time or anything else out of one. Human codes a person reads
+        or types (order numbers, ticket, card, booking and voucher codes) are not ids and stay text; so do
+        provider, external and partner ids, which are not ours.
+
+        Inline `type: string, format: uuid` means the same thing; this component is for a contract that
+        wants one name for it.'
+      example: 01a0f18a-ca80-7c4e-9a3f-5b2d8e1f6a04
     StoredValueKind:
       type: string
       description: '**Six things in this package hold a balance and behave the same way** — a wallet,

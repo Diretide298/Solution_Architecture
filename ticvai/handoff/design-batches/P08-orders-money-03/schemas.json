@@ -223,7 +223,7 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "fiscalPeriodId": {
     "type": "string",
@@ -678,7 +678,7 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "entryNumber": {
     "type": "string",
@@ -731,12 +731,12 @@
    },
    "reversalOfEntryId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "reversedByEntryId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "reversalReason": {
@@ -771,6 +771,7 @@
   }
  },
  "JournalLine": {
+  "x-ticvai-append-only": "postedAt",
   "type": "object",
   "required": [
    "accountId",
@@ -801,6 +802,12 @@
    "description": {
     "type": "string",
     "maxLength": 500
+   },
+   "postedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "**Copied from the journal entry when it posts** (ADR-0056), so the line table can be partitioned by month on its own column. Never differs from its entry's."
    }
   }
  },
@@ -937,7 +944,7 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderNumber": {
     "type": "string"
@@ -1111,11 +1118,11 @@
   "properties": {
    "id": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    "format": "uuid"
    },
    "orderLineId": {
     "type": "string"
@@ -1166,7 +1173,7 @@
    },
    "journalEntryId": {
     "type": "string",
-    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "format": "uuid",
     "nullable": true
    },
    "occurredAt": {
@@ -1251,7 +1258,7 @@
     "type": "array",
     "items": {
      "type": "string",
-     "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+     "format": "uuid"
     }
    }
   }

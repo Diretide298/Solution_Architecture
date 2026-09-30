@@ -3470,21 +3470,21 @@
     "contract": "maintenance",
     "purpose": "Technicians ranked by skill, shift and load (M17-13)",
     "trigger": "onAction",
-    "provenance": "decided 17 September, M17-13 (P29)"
+    "provenance": "decided 17 September, M17-13 (the 29 September pass)"
    },
    {
     "operationId": "listVendorServiceRequests",
     "contract": "maintenance",
     "purpose": "Outside vendors on this work order (M17-13)",
     "trigger": "onAction",
-    "provenance": "decided 17 September, M17-13 (P29)"
+    "provenance": "decided 17 September, M17-13 (the 29 September pass)"
    },
    {
     "operationId": "createVendorServiceRequest",
     "contract": "maintenance",
     "purpose": "Engage an outside vendor (M17-13)",
     "trigger": "onAction",
-    "provenance": "decided 17 September, M17-13 (P29)",
+    "provenance": "decided 17 September, M17-13 (the 29 September pass)",
     "invalidates": [
      "listVendorServiceRequests"
     ]
@@ -3494,7 +3494,7 @@
     "contract": "maintenance",
     "purpose": "Move a vendor request along (M17-13)",
     "trigger": "onAction",
-    "provenance": "decided 17 September, M17-13 (P29)",
+    "provenance": "decided 17 September, M17-13 (the 29 September pass)",
     "invalidates": [
      "listVendorServiceRequests"
     ]

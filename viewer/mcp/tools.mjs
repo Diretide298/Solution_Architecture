@@ -372,7 +372,8 @@ function boardReadme(pulled, project, when) {
     groups.get(name).push(t);
   }
   let out = `# My board - ${project?.name ?? 'OpenProject'}\n\nPulled ${when}. Open work assigned to you, `
-    + 'grouped by milestone. Each ticket has a folder under work/ with its description and '
+    + 'grouped by milestone, in the order the work is finished in: what you have started, then the '
+    + "plan's build order. Each ticket has a folder under work/ with its description and "
     + 'everything it is linked to.\n';
   for (const [name, tickets] of groups) {
     out += `\n## ${name}\n\n| Ticket | Status | Due | Linked | Folder |\n|---|---|---|---|---|\n`;
@@ -867,7 +868,10 @@ export const TOOLS = [
       // page of JSON to answer "what am I doing today". What is kept is what
       // somebody reads down a list: which ticket, what it is, what it is part
       // of, where it has got to, when it is due.
+      // In the order the server gives, which is the order the work is finished in: what you have
+      // started, then the plan's build order (see /api/board/mine). Never re-sorted here.
       const rows = items.map((t) => ({
+        order: t.buildOrder ?? '',
         ticket: t.key,
         task: t.subject,
         module: t.module ? `${t.module.key} — ${t.module.subject}` : '—',
@@ -900,7 +904,8 @@ export const TOOLS = [
         // Which OpenProject project this board is read from, so "nothing
         // assigned" is never mistaken for "nothing assigned anywhere".
         ...(board.openproject ? { openprojectProject: board.openproject } : {}),
-        columns: ['ticket', 'task', 'module', 'status', 'due'],
+        columns: ['order', 'ticket', 'task', 'module', 'status', 'due'],
+        orderedBy: "what you have started first, then the plan's build order; the same every time",
         rows,
         // Said when it is false, so a column of dashes is read as "could not
         // ask" rather than as "these belong to nothing".

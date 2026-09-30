@@ -166,13 +166,13 @@ A guest who cannot carry a purchase around a venue collects it on the way out. T
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | outletId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes |  |
 | subjectId | string (uuid) |  |  |
 | lines | array of object | yes | (min items 1) |
 | lines[].merchandiseId | string (uuid) | yes |  |
@@ -230,7 +230,7 @@ Links a sellable catalogue variant to an inventory item. That link is what makes
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateMerchandiseRequest`
 
@@ -350,7 +350,7 @@ Two callers. **The back office** lists and manages the range. **The guest shop s
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | merchandiseId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -430,13 +430,13 @@ Goods returned damaged or opened are written off rather than restocked, and that
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateRetailReturnRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes |  |
 | saleId | string | yes |  |
 | lines | array of object | yes | (min items 1) |
 | lines[].lineId | string | yes |  |
@@ -655,7 +655,7 @@ By receipt number, order number or the barcode printed on the receipt. A guest a
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | outletId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ReturnPolicy`
 
@@ -739,18 +739,18 @@ Creates an order in the Order & Payment context and a `saleDepletion` movement i
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CreateRetailSaleRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| id | string (uuid) | yes |  |
 | outletId | string (uuid) | yes |  |
 | shiftId | string |  |  |
 | subjectId | string (uuid) |  |  |
 | lines | array of CreateRetailSaleLine | yes | (min items 1) |
-| lines[].id | string | yes | (pattern ^[0-9A-HJKMNP-TV-Z]{26}$) |
+| lines[].id | string (uuid) | yes |  |
 | lines[].merchandiseId | string (uuid) | yes |  |
 | lines[].quantity | integer | yes | (min 1) |
 | lines[].serialNumbers | array of string |  | Required where the item is serialised. |
@@ -844,7 +844,7 @@ Also the receipt lookup a returns desk starts from. Returns whether each line is
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| saleId | path | yes | string |  |
+| saleId | path | yes | string (uuid) |  |
 
 **Response**: `RetailSale`
 
@@ -1003,8 +1003,8 @@ Also the receipt lookup a returns desk starts from. Returns whether each line is
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| saleId | path | yes | string |  |
-| Idempotency-Key | header | yes | string | Client-generated ULID. |
+| saleId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**
 
@@ -1081,7 +1081,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | text | yes |  |
 | return_number | text | no |  |
 | sale_id | text | yes |  |
-| refund_id | text | no | The refund raised in the Order & Payment context. |
+| refund_id | uuid | no | The refund raised in the Order & Payment context. |
 | reason | text | no |  |
 | refund_amount | numeric(18,4) | yes |  |
 | refund_tender | text | no |  |
@@ -1128,9 +1128,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | text | yes |  |
 | receipt_number | text | yes | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| order_id | text | yes | The order in the Order & Payment context. |
+| order_id | uuid | yes | The order in the Order & Payment context. |
 | outlet_id | uuid | yes |  |
-| shift_id | text | no |  |
+| shift_id | uuid | no |  |
 | subject_id | uuid | no |  |
 | net_amount | numeric(18,4) | no |  |
 | discount_amount | numeric(18,4) | no |  |
@@ -1165,8 +1165,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | text | yes |  |
 | drop_reference | text | yes | Short and readable. |
 | sale_id | text | no | The till sale. |
-| order_id | text | no | The paid online order that created this collection (audit R236). |
-| entitlement_id | text | no | The ticket that claims these goods. |
+| order_id | uuid | no | The paid online order that created this collection (audit R236). |
+| entitlement_id | uuid | no | The ticket that claims these goods. |
 | subject_id | uuid | no |  |
 | collection_point_id | uuid | yes |  |
 | collection_point_name | text | no |  |

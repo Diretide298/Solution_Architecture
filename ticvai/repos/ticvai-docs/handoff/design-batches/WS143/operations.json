@@ -54,6 +54,11 @@
     "required": false
    },
    {
+    "name": "productId",
+    "in": "query",
+    "required": false
+   },
+   {
     "name": "agentPrincipalId",
     "in": "query",
     "required": false

@@ -2,6 +2,7 @@ id: LLD-FnbService
 title: FnbService — 120 operations, 49 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
+deployable: operations
 index: diagrams/hld/02-services.yaml
 why: '**120 operations and 49 tables — the largest single domain after marketing.** Its own service
   because a kitchen pass has a latency profile nothing else shares: a bump must land in under a second
