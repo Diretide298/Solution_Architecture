@@ -182,11 +182,11 @@
    "operations": 11
   },
   {
-   "contract": "venue-map",
+   "contract": "wallet",
    "operations": 8
   },
   {
-   "contract": "wallet",
+   "contract": "venue-map",
    "operations": 8
   },
   {
@@ -210,7 +210,7 @@
    "operations": 5
   },
   {
-   "contract": "promotions",
+   "contract": "payments",
    "operations": 4
   },
   {
@@ -218,11 +218,11 @@
    "operations": 4
   },
   {
-   "contract": "retail",
+   "contract": "promotions",
    "operations": 4
   },
   {
-   "contract": "payments",
+   "contract": "retail",
    "operations": 4
   },
   {
@@ -687,7 +687,7 @@
    "module": "Engagement & Support",
    "wave": 1,
    "route": "/general/plan-your-adventure-start",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {

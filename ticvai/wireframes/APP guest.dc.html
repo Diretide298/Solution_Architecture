@@ -208,7 +208,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
         </div>
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; getProductEligibilityRule · getProduct · listPerformances · getAvailability +1</div>
-          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · videoBuffering · videoUnavailable · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; eventId&larr;WEB-002, productId&larr;WEB-001</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-002">WEB-002</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#web-003">WEB-003</a> <br><a href="#web-005">WEB-005</a>  &mdash; <i>Chooses ticket types and quantities</i> <span class="car">productId</span><br><a href="#web-006">WEB-006</a>  &mdash; <i>Book (a dated product: date first, then time</i> <span class="car">productId</span><br><a href="#web-007">WEB-007</a>  &mdash; <i>Book (a fixture with one on-sale performance</i> <span class="car">performanceId</span><br><a href="#web-047">WEB-047</a>  &mdash; <i>Book (a cabana, lounger or other spot placed</i> <span class="car">productId</span><br><a href="#web-048">WEB-048</a>  &mdash; <i>Book (a space sold by the hour, e.g. a meeti</i> <span class="car">productId</span></div>
           
@@ -237,8 +237,8 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listProducts · generateVisitPlan · getVisitPlan · updateVisitPlan +2</div>
-          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>OPERATIONS</b> &middot; listProducts · generateVisitPlan · getVisitPlan · updateVisitPlan +3</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · preferenceNotAtVenue · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, planId&larr;deepLink, itemId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#web-010">WEB-010</a>  &mdash; <i>Book this plan</i> <span class="car">cartId</span><br><a href="#web-001">WEB-001</a>  &mdash; <i>Back to tickets</i><br><a href="#web-004">WEB-004</a>  &mdash; <i>Opens an item on the plan</i> <span class="car">productId</span></div>
           
@@ -1261,7 +1261,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
         </div>
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; getProductEligibilityRule · getProduct · getAvailability · getWaitTimes +3</div>
-          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · videoBuffering · videoUnavailable · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; productId&larr;deepLink, eventId&larr;deepLink, mapId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-007">GST-007</a>  &mdash; <i>Book (a dated product: date, then time, then</i> <span class="car">eventId</span><br><a href="#gst-008">GST-008</a>  &mdash; <i>Book (an undated product: tickets straight a</i> <span class="car">productId</span><br><a href="#gst-049">GST-049</a>  &mdash; <i>Book (a fixture with one on-sale performance</i> <span class="car">performanceId</span><br><a href="#gst-074">GST-074</a>  &mdash; <i>Book (a cabana, lounger or other spot on the</i> <span class="car">productId</span><br><a href="#gst-075">GST-075</a>  &mdash; <i>Book (a space sold by the hour)</i> <span class="car">productId</span><br><a href="#gst-056">GST-056</a>  &mdash; <i>Buy meal combo (a bundle that includes admis</i> <span class="car">bundleId</span><br><a href="#gst-038">GST-038</a>  &mdash; <i>Show on the map (At the Venue, Map view)</i></div>
           
@@ -4430,8 +4430,8 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getWaitTimes · listProducts · generateVisitPlan</div>
-          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>OPERATIONS</b> &middot; getWaitTimes · listProducts · generateVisitPlan · getTenantAppStatus</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · preferenceNotAtVenue · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
           <div><b>GOES TO</b> &middot; entry point · <a href="#gst-053">GST-053</a>  &mdash; <i>Make my plan</i> <span class="car">planId</span><br><a href="#gst-052">GST-052</a>  &mdash; <i>Take a ready-made plan</i><br><a href="#gst-001">GST-001</a>  &mdash; <i>Home tab</i></div>
           
@@ -4594,7 +4594,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
         </div>
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; getCart · listProducts · getWaitTimes · getVisitPlan +3</div>
-          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · preferenceNotAtVenue · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; planId&larr;GST-051, venueId&larr;session, itemId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#gst-041">GST-041</a>  &mdash; <i>Book this plan</i> <span class="car">cartId</span><br><a href="#gst-054">GST-054</a>  &mdash; <i>Refine with the AI planner</i> <span class="car">planId</span><br><a href="#gst-051">GST-051</a>  &mdash; <i>Change answers</i><br><a href="#gst-048">GST-048</a>  &mdash; <i>More add-ons</i> <span class="car">cartId</span><br><a href="#gst-059">GST-059</a>  &mdash; <i>On the day: follow the plan</i> <span class="car">planId</span><br><a href="#gst-001">GST-001</a>  &mdash; <i>Home tab</i></div>
           

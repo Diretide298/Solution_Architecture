@@ -13,7 +13,7 @@
 | **Tables** | 137 |
 | **Screens** | 195 |
 | **Flows** | 11 |
-| **Documents** | 55 |
+| **Documents** | 56 |
 | **Open conflicts** | 1 |
 
 ## Reached outside the contract
@@ -600,6 +600,7 @@
 | [Audit — the 3 September dump, its checks, and what trickles down](..\docs\active\dump-audit-3-september.md) |  | 2 |
 | [Full-layer audit — 20 August](..\docs\active\full-layer-audit-20aug.md) |  | 3 |
 | [TICVAI — Hierarchy, Data Segregation and Services](..\docs\active\hierarchy-segregation-services.md) |  | 1 |
+| [Infrastructure answers: Qdrant, PostgreSQL extensions, the broker, the network and the cost sheet](..\docs\active\infra-answers-30-september.md) |  | 1 |
 | [Optimisation assessment — RAG, caching, backend, frontend](..\docs\active\optimisation-assessment.md) |  | 4 |
 | [Optimisation adoption plan](..\docs\active\optimisation-plan.md) |  | 3 |
 | [Phase 0 — identity pass, all clusters](..\docs\active\phase0-identity-pass-all-clusters.md) |  | 2 |

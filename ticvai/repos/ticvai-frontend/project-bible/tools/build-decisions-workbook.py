@@ -69,6 +69,12 @@ NEW_QUESTIONS = [
      "captures, in each region you operate? (Asked before; restated with what we built.)", "a",
      "Face Tag deleted once the ticket is fully used; Face Pass retention set by each venue. The legal limit "
      "you confirm becomes a floor no venue setting can go below.", "Your data protection counsel"),
+    ("Guest data", "Biometrics for children",
+     "Adults may have face data stored with their consent. For guests under 18, should face capture (Face Pass, "
+     "Face Tag) be excluded entirely, or allowed with a consent form signed by a parent or guardian? (Raised in "
+     "the 30 September meeting.)", "a",
+     "Face capture is not offered to guests under 18 until you decide; with guardian consent, the guardian's "
+     "signed consent is recorded against the child's ticket before capture.", "Your data protection counsel"),
     ("Forecasting", "Weather data",
      "Do you approve a commercial weather data service as an input to attendance forecasting, and its monthly "
      "cost?", "d",
@@ -125,7 +131,7 @@ NEW_QUESTIONS = [
      "card number. Until you name the terminal, testing uses the provider's simulator.",
      "Your finance / payments owner"),
     ("Hardware", "NFC and RFID media",
-     "Which NFC readers (your list says \"China\") and which wristband and card chip type (for example MIFARE "
+     "Which NFC readers (your list says \"China\", still open) and RFID readers (Kaptur, still open), and which wristband and card chip type (for example MIFARE "
      "DESFire) will be used at gates and for cashless payments, and which device encodes the wristbands?",
      "A device only you buy",
      "Wristbands and cards are read by their unique id and a secured application on the chip; nothing of value is "
@@ -187,6 +193,17 @@ NEW_QUESTIONS = [
      "Pricing rules, passes, lockers and queues are built into the platform; an outside service is connected through an "
      "adapter once you confirm it.",
      "Your commercial / operations team"),
+    # 30 September meeting (MoM 4.8): in-park 3D navigation built natively - ADR-0069.
+    ("Venue data", "3D venue model for in-park navigation",
+     "In-park 3D navigation is built into the guest app, as agreed on 30 September, and needs two files for each "
+     "venue: a 3D model of the venue (a GLB file) and a pathway and location file (the walkable paths, and where "
+     "each ride, outlet, shop and facility is, linked to its catalogue item), with two or more surveyed GPS points "
+     "so the model lines up with the guest's position. Will you supply these for each venue, or commission a 3D "
+     "vendor to produce them, and by when? We will send the file specification.",
+     "Your venue's own asset, or a cost you approve",
+     "In-park navigation runs on the 2D park map, with the same routes and live GPS, until a venue's model is "
+     "supplied; the 3D view switches on per venue when its files pass the platform's checks.",
+     "Your operations / venue team"),
 ]
 
 # The questions sent before (readiness report of 29 September), written out in full. The default is read from

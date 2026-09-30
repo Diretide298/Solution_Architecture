@@ -69,11 +69,14 @@ and usually enough to predict what an ADR says.
 | [0057](0057-events-travel-on-rabbitmq-or-kafka.md) | Events travel on RabbitMQ or Kafka, behind one kernel interface | **Proposed** — waiting on the client's choice between RabbitMQ and Kafka | **SD-032** — completes 0033 |
 | [0058](0058-one-relay-per-region-and-an-inbox-per-tenant-database.md) | One relay per region, and an inbox per tenant database | Accepted 30 September | SD-031, SD-030 — amends 0033 |
 | [0059](0059-ai-phasing-against-the-six-month-plan.md) | AI phasing against the six-month plan | Accepted 30 September | SD-062, CF-57, CF-14 |
+| [0069](0069-in-park-3d-navigation-is-built-natively.md) | **In-park 3D navigation is built natively**, from a venue GLB model, a pathway and location file, and GPS | Accepted 30 September (client meeting, MoM 4.8) | — builds on the venue-map contract (19.2.55–19.2.60) |
 
 > **0026 to 0037 were added on 30 September** (SD-053): they had been on disk since August and
 > missing from this table. **0049–0051 and 0055–0059 were added the same day**, from the system-design
 > review. Numbers 0052–0054 and 0060–0068 are held by review drafts that are not decided yet; they join
 > this table when they are.
+> **0069 was added the same day** from the client meeting of 30 September; it takes the next number
+> after the drafts so none of them has to be renumbered.
 
 ## Still needed
 

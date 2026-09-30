@@ -89,9 +89,20 @@ variable "maintenance_hour" {
   default = 2
 }
 
-variable "redis_capacity" {
-  type    = number
-  default = 1
+variable "redis_sku" {
+  type        = string
+  default     = "Balanced_B10"
+  description = "Azure Managed Redis SKU. Balanced_B10 (12 GB) for production; Balanced_B1 for pre-production."
+}
+variable "redis_high_availability" {
+  type        = bool
+  default     = true
+  description = "Two nodes, zone-redundant. false only for pre-production. Changing it recreates the cache."
+}
+variable "redis_private_dns_zone_id" {
+  type        = string
+  default     = null
+  description = "privatelink.redis.azure.net zone for the Redis private endpoint."
 }
 variable "system_node_size" {
   type    = string
@@ -109,10 +120,85 @@ variable "workload_max_nodes" {
   type    = number
   default = 20
 }
+variable "ai_node_size" {
+  type    = string
+  default = "Standard_D8s_v5"
+}
+variable "ai_min_nodes" {
+  type    = number
+  default = 2
+}
+variable "ai_max_nodes" {
+  type    = number
+  default = 4
+}
+variable "qdrant_node_size" {
+  type    = string
+  default = "Standard_E4s_v5"
+}
+variable "qdrant_nodes" {
+  type        = number
+  default     = 3
+  description = "One per zone, replication factor 2 (ADR-0049)."
+}
+variable "broker_self_hosted" {
+  type        = bool
+  default     = true
+  description = "false once the client picks a managed broker (CloudAMQP, Event Hubs); ADR-0057."
+}
+variable "broker_node_size" {
+  type    = string
+  default = "Standard_D2s_v5"
+}
+variable "broker_nodes" {
+  type    = number
+  default = 3
+}
+variable "zones" {
+  type    = list(string)
+  default = ["1", "2", "3"]
+}
 
-variable "database_subnet_id"  { type = string }
-variable "compute_subnet_id"   { type = string }
+variable "create_network" {
+  type        = bool
+  default     = true
+  description = "Dedicated and isolated cells: build the VNet, subnets, NAT Gateway and edge NSGs (network.tf)."
+}
+variable "vnet_address_space" {
+  type    = string
+  default = "10.20.0.0/16"
+}
+variable "address_plan" {
+  type        = map(string)
+  description = "Subnets created in the VNet. Mirrors SUBNETS in ticvai/tools/build-hld-lld.py; change both together."
+  default = {
+    "snet-ingress"           = "10.20.0.0/24"
+    "snet-aks-system"        = "10.20.4.0/22"
+    "snet-aks-workload"      = "10.20.8.0/21"
+    "snet-aks-ai"            = "10.20.16.0/22"
+    "snet-aks-data"          = "10.20.20.0/23"
+    "snet-postgres"          = "10.20.24.0/24"
+    "snet-private-endpoints" = "10.20.25.0/24"
+    "AzureBastionSubnet"     = "10.20.26.0/26"
+    "GatewaySubnet"          = "10.20.27.0/27"
+  }
+}
+variable "existing_subnet_ids" {
+  type        = map(string)
+  default     = {}
+  description = "When create_network is false: keys system, workload, ai, data, private_endpoints."
+}
+variable "database_subnet_id" {
+  type        = string
+  default     = null
+  description = "Delegated PostgreSQL subnet when the module does not own the network (shared tier)."
+}
 variable "private_dns_zone_id" { type = string }
+variable "pod_cidr" {
+  type        = string
+  default     = "10.244.0.0/16"
+  description = "CNI Overlay pod range, outside the VNet. Must not overlap a venue LAN on the VPN; 100.64.0.0/16 if in doubt."
+}
 variable "service_cidr" {
   type    = string
   default = "10.100.0.0/16"

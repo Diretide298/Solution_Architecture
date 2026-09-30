@@ -42,7 +42,7 @@
 | [GST-043](#gst-043-arabic-rtl-experience) | Arabic / RTL Experience | System States | 1 | 0 |
 | [GST-046](#gst-046-branded-queue-waiting-room) | Branded Queue / Waiting Room | High-Demand Access | 1 | 3 |
 | [GST-047](#gst-047-maintenance-upgrade-page) | Maintenance / Upgrade Page | System States | 1 | 1 |
-| [GST-051](#gst-051-plan) | Plan | Engagement & Support | 1 | 3 |
+| [GST-051](#gst-051-plan) | Plan | Engagement & Support | 1 | 4 |
 | [GST-052](#gst-052-suggested-itineraries) | Suggested Itineraries | Engagement & Support | 1 | 3 |
 | [GST-053](#gst-053-your-plan) | Your Plan | Engagement & Support | 1 | 7 |
 | [GST-054](#gst-054-ai-planner) | AI Planner | Engagement & Support | 1 | 6 |
@@ -355,7 +355,9 @@
 
 | State | Behaviour |
 |---|---|
-| loading | The attraction list. |
+| loading | The video is not part of loading (client meeting 30 September, MoM 4.8): the attraction renders as it arrives and no loader or loading screen is ever drawn over the video. |
+| videoBuffering | Poster frame, not a loader (client meeting 30 September, MoM 4.8): from the info button until the first frames arrive the ride's poster (primary image, else the video's first frame) fills the video area and playback starts in place as soon as it can; no spinner, overlay or blocking screen. The details beside it stay usable throughout. |
+| videoUnavailable | The video cannot play (no video, a failed stream, data saver on). The poster stays and the details are unaffected; no error screen and no loader. |
 | error | Could not load. Names which read failed and leaves the attraction untouched. |
 | emptyFirstRun | No attraction yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | emptyNoResults | Nothing matches the filter on from, to and the attraction are still there. Names the active filter and offers to clear it. |
@@ -1067,7 +1069,8 @@
 |---|---|---|---|---|
 | `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
-| `generateVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#generatevisitplan) | onAction | Build a rules plan from the inputs (party, heights, dates, pace, interests, cuisine) | `None` |
+| `generateVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#generatevisitplan) | onAction | Build a rules plan from the inputs (party, heights, dates, park per day, pace, interests, shops, cuisine); each day from its own park's points only | `None` |
+| `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | The tenant's active venues, for the park-per-day choice in a multi-venue tenant | `None` |
 
 **States**
 
@@ -1077,6 +1080,7 @@
 | error | Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing. |
 | emptyFirstRun | No plan yet: the first question is shown. Nothing is saved until *Make my plan*. |
 | emptyNoResults | Nothing suits the whole party on that day (for example every ride is over a child's height): says so and offers to change the answers. |
+| preferenceNotAtVenue | A preference no chosen park can meet (client meeting 30 September, MoM 4.7): a cuisine or shop tag with no matching point at any park of the plan is marked on its chip (*Not at the parks you chose*) before *Make my plan*; the plan is still made without it, never with a restaurant or shop from a park the party is not visiting. Where another park of the tenant has it, the chip says which, and choosing that park for a day brings it in. |
 | emptyNoAccess | A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 
@@ -1176,6 +1180,7 @@
 | error | Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing. |
 | emptyFirstRun | No plan yet: offers the questions (GST-051) or a ready-made plan (GST-052). |
 | emptyNoResults | Nothing suits the whole party on that day (for example every ride is over a child's height): says so and offers to change the answers. |
+| preferenceNotAtVenue | A day whose park cannot meet a preference (client meeting 30 September, MoM 4.7): the day is shown in full with the *Not at this park* banner naming the cuisine or shop and where it is instead; nothing from another park is placed. *Change answers* (GST-051) lets the guest move that day to the park that has it. An empty swap sheet says the day's park has no other option of that kind, not that none exists anywhere. |
 | emptyNoAccess | A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 

@@ -13,7 +13,7 @@
  },
  "severity": {
   "high": 34,
-  "medium": 170,
+  "medium": 169,
   "low": 232,
   "info": 3
  },
@@ -317,13 +317,6 @@
    "dimension": "bindings",
    "where": "home (WEB-001 ↔ GST-001)",
    "detail": "web shows ['HomepageLayout', 'Product'] only, app shows ['GuestProfileDetail', 'Money'] only",
-   "fix": "bind both twins to the same schemas"
-  },
-  {
-   "severity": "medium",
-   "dimension": "bindings",
-   "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
-   "detail": "web shows — only, app shows ['VisitPlan'] only",
    "fix": "bind both twins to the same schemas"
   },
   {
@@ -974,7 +967,7 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "help-and-cases (WEB-025 ↔ GST-068)",
-   "detail": "the web calls getTenantAppStatus here; the app calls getTenantAppStatus on GST-001/GST-029/GST-038/GST-040/GST-047",
+   "detail": "the web calls getTenantAppStatus here; the app calls getTenantAppStatus on GST-001/GST-029/GST-038/GST-040/GST-047/GST-051",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -1842,7 +1835,7 @@
    "severity": "low",
    "dimension": "components",
    "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
-   "detail": "web only —, app only ['assistantPanel', 'banner', 'cardList', 'dataTable', 'destructiveButton'] (15 vs 36 components)",
+   "detail": "web only —, app only ['assistantPanel', 'cardList', 'dataTable', 'destructiveButton'] (18 vs 39 components)",
    "fix": ""
   },
   {
@@ -2661,7 +2654,7 @@
    "severity": "low",
    "dimension": "state wording",
    "where": "detail (WEB-004 ↔ GST-004/GST-006)",
-   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
+   "detail": "7 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading, videoBuffering, videoUnavailable",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {
@@ -2710,7 +2703,7 @@
    "severity": "low",
    "dimension": "state wording",
    "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
-   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
+   "detail": "6 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading, preferenceNotAtVenue",
    "fix": "one copy per state — the 12 September offline sync is the model"
   },
   {

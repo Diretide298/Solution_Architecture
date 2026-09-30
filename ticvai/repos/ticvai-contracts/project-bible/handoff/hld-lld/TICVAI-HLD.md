@@ -30,7 +30,7 @@ Internet is down (ADR-0013), and syncs when it is back.
 |---|---|---|
 | PostgreSQL 16 | A control database, one database per tenant, read replicas, a reporting replica and the AI log database | ADR-0038, ADR-0056 (UUIDv7 ids, monthly partitions) |
 | Qdrant | The AI knowledge index: one collection per tenant, each with its own collection-scoped key; venue scope is a filter the retrieval client always adds | ADR-0049 (approved 30 September on condition of UAE hosting) |
-| Redis | Sessions, idempotency keys, caches | ADR-0032 |
+| Azure Managed Redis | Sessions, idempotency keys, caches (not Azure Cache for Redis, which is retiring) | ADR-0032 |
 | Event broker | Events between deployables; RabbitMQ or Kafka, the client's choice | ADR-0057, ADR-0058 |
 | Blob storage | Media, exports, Qdrant snapshots, database dumps | ADR-0047 |
 
@@ -49,7 +49,7 @@ Internet is down (ADR-0013), and syncs when it is back.
 | Front Door + WAF | commerce | Real-time API call (HTTPS) |
 | Front Door + WAF | operations | Real-time API call (HTTPS) |
 | commerce | PostgreSQL 16 | Real-time direct call (database, cache) |
-| commerce | Redis | Real-time direct call (database, cache) |
+| commerce | Azure Managed Redis | Real-time direct call (database, cache) |
 | operations | PostgreSQL 16 | Real-time direct call (database, cache) |
 | operations | Reporting replica | Real-time direct call (database, cache) |
 | access | PostgreSQL 16 | Real-time direct call (database, cache) |

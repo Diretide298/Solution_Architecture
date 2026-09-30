@@ -28250,8 +28250,16 @@ screens:
         bindsTo: VenuePoint.cuisineTags
         operation: setVenuePoint
         notes: For restaurants and kiosks; matched against the guest's cuisine choice on the Plan tab
-          (MOB-6).
+          (MOB-6), for this venue's days only (client meeting 30 September, MoM 4.7).
         provenance: agreed name venue-map VenuePoint.cuisineTags (the 29 September pass brief)
+      - kind: multiSelect
+        label: Retail
+        bindsTo: VenuePoint.retailTags
+        operation: setVenuePoint
+        notes: 'For shops and kiosks that sell goods (souvenirs, toys, apparel ...); matched against the
+          guest''s shop choice on the Plan tab for this venue''s days only (client meeting 30 September,
+          MoM 4.7: retail and kiosk shops join F&B as venue-linked planner options).'
+        provenance: decided 30 September 2026, client meeting MoM 4.7 (Allam)
   states:
     loading: The map editor publish, read by `getVenueMap`.
     error: Could not load. Names which read failed and leaves the map editor publish untouched.
@@ -28336,8 +28344,8 @@ screens:
       `name`, `position`. Optional: `nameLocalised`, `outletId`, `productId`, `accessPointId`, `isStepFree`,
       `openingHours`, `iconRef`, `isActive`, `isNavigable`, `isDestination`, `pointId`; and the item details
       decided 29 September (MOB-4, MOB-6): `description`, `media`, `featuredOffer` (a product or a bundle,
-      on any kind of point), `typicalDurationMinutes`, `interestTags`, `cuisineTags`. Dismissing sends
-      nothing; the screen behind is unchanged.'
+      on any kind of point), `typicalDurationMinutes`, `interestTags`, `cuisineTags`; and `retailTags`
+      (30 September, MoM 4.7). Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: SetVenuePointRequest
     confirm:
       label: Save venue point
@@ -28367,6 +28375,7 @@ screens:
       - typicalDurationMinutes
       - interestTags
       - cuisineTags
+      - retailTags
     provenance: contract venue-map.yaml POST /venue-maps/{mapId}/points
   - id: formPublishVenueMap
     component: modal

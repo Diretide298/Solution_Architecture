@@ -65,7 +65,7 @@ convincingly. It is never a caption.
 | `WEB-002` | Event & Attraction Listing | listDetail | 6 | 0 | — |
 | `WEB-003` | Search Results | listDetail | 2 | 0 | — |
 | `WEB-004` | Attraction Details | listDetail | 5 | 0 | — |
-| `WEB-050` | Plan Your Visit | multiStepForm | 6 | 0 | — |
+| `WEB-050` | Plan Your Visit | multiStepForm | 7 | 0 | — |
 
 ---
 
@@ -1282,7 +1282,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
-  "notes": "**Renamed 31 August** from *Event / Attraction Detail*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added getAvailability, getWaitTimes. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.\n\n**Rev 3 (decided 29 September).** Ticket tags from `Product.displayTags` when `BookingFlowConfig.ticketTags` is on (23SEP-3); Read more opens on the product's own video or photo (`Product.media`, 23SEP-4). An info-only product shows its `notBookableLabel` and no Book button (REV3-14). **Book** opens the ticket counters as a side panel here (23SEP-5); a dated product goes to the date and time first (WEB-006, REV3-2); a fixture with a single on-sale performance opens straight on the seat map with the fixture as a strip at its top (WEB-007, 23SEP-16, REV3-4); a product placed on a venue map opens the map booking (WEB-047, REV3-15); a product sold by the hour opens the space booking (WEB-048, REV3-13). The event banner lists dates only when `BookingFlowConfig.eventBannerDates` is on (default off, 23SEP-19). Help me choose sits on the booking step (WEB-005), where the prototype draws it, not here (REV3-11).\n\n**29 September.** W3: view-only products show Call sales / Email sales instead of Book. M18-13: in single-event mode, a banner or video hero and only the next seven days, with a calendar for later dates (M17-08).",
+  "notes": "**Renamed 31 August** from *Event / Attraction Detail*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added getAvailability, getWaitTimes. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.\n\n**Rev 3 (decided 29 September).** Ticket tags from `Product.displayTags` when `BookingFlowConfig.ticketTags` is on (23SEP-3); Read more opens on the product's own video or photo (`Product.media`, 23SEP-4). An info-only product shows its `notBookableLabel` and no Book button (REV3-14). **Book** opens the ticket counters as a side panel here (23SEP-5); a dated product goes to the date and time first (WEB-006, REV3-2); a fixture with a single on-sale performance opens straight on the seat map with the fixture as a strip at its top (WEB-007, 23SEP-16, REV3-4); a product placed on a venue map opens the map booking (WEB-047, REV3-15); a product sold by the hour opens the space booking (WEB-048, REV3-13). The event banner lists dates only when `BookingFlowConfig.eventBannerDates` is on (default off, 23SEP-19). Help me choose sits on the booking step (WEB-005), where the prototype draws it, not here (REV3-11).\n\n**29 September.** W3: view-only products show Call sales / Email sales instead of Book. M18-13: in single-event mode, a banner or video hero and only the next seven days, with a calendar for later dates (M17-08).\n\n**Video plays directly (client meeting 30 September, MoM 4.8, Qossai; the same page as the app's GST-004, so the same behaviour).** The ride or attraction video starts in place with no loader in front of it; its poster frame shows while it buffers, and a video that cannot play leaves the poster and the details, never an error screen.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listPerformances` reads the population and `getProduct` reads one of them — list, select, act",
@@ -1352,9 +1352,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "detailPanel",
        "label": "Photo and video",
        "bindsTo": "Product.media",
-       "notes": "Read more opens on the primary video or photo (`Product.media`, `isPrimary`).",
+       "notes": "**The video plays directly, with no loader in front of it** (client meeting 30 September, MoM 4.8): the info button reveals the details and starts the primary video in place; the poster frame (the primary image, or the video's first frame) shows while it buffers, never a spinner or loading screen. Read more opens on the primary video or photo (`Product.media`, `isPrimary`).",
        "operation": "getProduct",
-       "provenance": "decided 29 September, rev 3 23SEP-4"
+       "provenance": "decided 29 September, rev 3 23SEP-4; decided 30 September 2026, client meeting MoM 4.8 (Qossai)"
       },
       {
        "kind": "secondaryButton",
@@ -1480,7 +1480,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "states": {
-   "loading": "The attraction list.",
+   "loading": "**The video is not part of loading** (client meeting 30 September, MoM 4.8): the attraction renders as it arrives and no loader or loading screen is ever drawn over the video.",
+   "videoBuffering": "**Poster frame, not a loader** (client meeting 30 September, MoM 4.8): until the first frames arrive the poster (primary image, else the video's first frame) fills the video area and playback starts in place as soon as it can; no spinner, overlay or blocking screen. The details beside it stay usable throughout.",
+   "videoUnavailable": "The video cannot play (no video, a failed stream, data saver on). The poster stays and the details are unaffected; no error screen and no loader.",
    "error": "Could not load. Names which read failed and leaves the attraction untouched.",
    "emptyFirstRun": "No attraction yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on from, to and the attraction are still there. Names the active filter and offers to clear it.",
@@ -1639,7 +1641,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
-  "notes": "**Added 29 September**: the 29 September web build has *Plan your visit* in the header, opening the planner full screen, and *Book this plan* goes straight into booking. The web twin of the Plan tab (GST-051 questions, GST-053 plan), binding the same planner operations (venue-map `generateVisitPlan`, `getVisitPlan`, `updateVisitPlan`, `listVisitPlanAlternatives`, `bookVisitPlan`). Block A (29 September re-plan, superseding R187 and GAP-C3). Rules-based; the AI planner chat is app-only for now. Hidden when the venue turns module `visitPlanner` off.",
+  "notes": "**Added 29 September**: the 29 September web build has *Plan your visit* in the header, opening the planner full screen, and *Book this plan* goes straight into booking. The web twin of the Plan tab (GST-051 questions, GST-053 plan), binding the same planner operations (venue-map `generateVisitPlan`, `getVisitPlan`, `updateVisitPlan`, `listVisitPlanAlternatives`, `bookVisitPlan`). Block A (29 September re-plan, superseding R187 and GAP-C3). Rules-based; the AI planner chat is app-only for now. Hidden when the venue turns module `visitPlanner` off.\n\n**Multi-venue intelligence (client meeting 30 September, MoM 4.7, Allam).** As on the app: each day is at one park and uses only that park's rides, dining and retail (shops and kiosks, added beside F&B); a preference the park cannot meet is said, never filled from another park.",
   "density": "compact",
   "pattern": "multiStepForm",
   "patternReason": "The Visit Planner prototype: six questions, then the plan with Book this plan",
@@ -1684,6 +1686,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       },
       {
        "kind": "selectField",
+       "label": "Which park each day?",
+       "bindsTo": "TenantAppStatus.venues",
+       "operation": "getTenantAppStatus",
+       "notes": "**Only in a multi-venue tenant**; hidden otherwise. One choice per chosen day, defaulting to the venue picked in the header; sent as `VisitPlanRequest.dayVenues`. Each day is then planned from that park's own rides, dining and shops only (client meeting 30 September, MoM 4.7).",
+       "provenance": "decided 30 September 2026, client meeting MoM 4.7 (Allam)"
+      },
+      {
+       "kind": "selectField",
        "label": "How busy should each day be?",
        "notes": "Packed, Balanced or Relaxed.",
        "provenance": "decided 29 September 2026, MOB-6"
@@ -1696,10 +1706,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "decided 29 September 2026, MOB-6"
       },
       {
+       "kind": "multiSelect",
+       "label": "Any shops you'd like to visit?",
+       "notes": "Shown when Shopping is chosen (client meeting 30 September, MoM 4.7: retail and kiosk shops join F&B in the planner). The `retailTags` of the chosen parks' shops and retail kiosks; sent as `VisitPlanRequest.retailTags`.",
+       "provenance": "decided 30 September 2026, client meeting MoM 4.7 (Allam)"
+      },
+      {
        "kind": "selectField",
        "label": "What would you like for lunch?",
-       "notes": "Cuisines of the outlets.",
-       "provenance": "decided 29 September 2026, MOB-6"
+       "notes": "Cuisines of the chosen parks' dining points only (restaurants, cafes, food kiosks; client meeting 30 September, MoM 4.7). In a multi-venue plan each cuisine names the park(s) that serve it, and lunch is planned only at a restaurant of that day's park.",
+       "provenance": "decided 29 September 2026, MOB-6; decided 30 September 2026, client meeting MoM 4.7 (Allam)"
       },
       {
        "kind": "primaryButton",
@@ -1719,14 +1735,22 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Your plan",
        "bindsTo": "VisitPlanItem",
        "operation": "getVisitPlan",
-       "notes": "Day tabs; arrival, timed items and lunch.",
-       "provenance": "decided 29 September 2026, MOB-6"
+       "notes": "Day tabs, each naming its park (`VisitPlan.days[].venueId`); arrival, timed items, lunch and shop or kiosk stops, every one at that day's park (`VisitPlanItem.venueId`; client meeting 30 September, MoM 4.7).",
+       "provenance": "decided 29 September 2026, MOB-6; decided 30 September 2026, client meeting MoM 4.7 (Allam)"
+      },
+      {
+       "kind": "banner",
+       "label": "Not at this park",
+       "bindsTo": "VisitPlan.unmatchedPreferences",
+       "operation": "getVisitPlan",
+       "notes": "Per day, a cuisine or shop the day's park cannot offer, and the park that can (from `availableAtVenueIds`), e.g. *No Indian restaurant at Summit Peaks. Indian food is at Aqua Park (day 2).* Hidden when every preference is met (client meeting 30 September, MoM 4.7).",
+       "provenance": "decided 30 September 2026, client meeting MoM 4.7 (Allam)"
       },
       {
        "kind": "secondaryButton",
        "label": "Swap / + Add something",
        "operation": "listVisitPlanAlternatives",
-       "notes": "Candidates that suit everyone in the group.",
+       "notes": "Candidates that suit everyone in the group, from the day's park only (client meeting 30 September, MoM 4.7).",
        "provenance": "decided 29 September 2026, MOB-6"
       },
       {
@@ -1778,6 +1802,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "error": "Could not build or load the plan. Names what failed; the answers are kept.",
    "emptyFirstRun": "No plan yet: the first question is shown.",
    "emptyNoResults": "Nothing suits the whole group on that day: says which answer ruled everything out and offers to change it.",
+   "preferenceNotAtVenue": "**A preference a day's park cannot meet** (client meeting 30 September, MoM 4.7): before *Make my plan* the chip is marked *Not at the parks you chose* (naming a park of the tenant that has it); after it, the day shows the *Not at this park* banner and nothing from another park is placed. *Change answers* lets the guest move that day to the park that has it.",
    "emptyNoAccess": "A guest holds no permission. Anyone can build a plan; signing in is asked only to save it, and booking follows the cart's own sign-in gate.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
@@ -1792,9 +1817,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "operationId": "generateVisitPlan",
     "contract": "venue-map",
-    "purpose": "Build a rules plan from the inputs (party, heights, dates, pace, interests, cuisine)",
+    "purpose": "Build a rules plan from the inputs (party, heights, dates, park per day, pace, interests, shops, cuisine); each day from its own park's points only",
     "trigger": "onAction",
-    "provenance": "decided 29 September 2026, MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6; decided 30 September 2026, client meeting MoM 4.7 (Allam)"
    },
    {
     "operationId": "getVisitPlan",
@@ -1823,6 +1848,13 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "purpose": "Book this plan: turns the plan (and chosen add-ons) into cart lines and returns the cart",
     "trigger": "onAction",
     "provenance": "decided 29 September 2026, MOB-6"
+   },
+   {
+    "operationId": "getTenantAppStatus",
+    "contract": "white-label",
+    "purpose": "The tenant's active venues, for the park-per-day choice in a multi-venue tenant",
+    "trigger": "onLoad",
+    "provenance": "decided 30 September 2026, client meeting MoM 4.7 (Allam)"
    }
   ],
   "entryState": {
@@ -6030,8 +6062,57 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
         "ageRule",
         "closedOnDate",
         "notInInterests",
-        "noTime"
+        "noTime",
+        "notAtVenue"
+       ],
+       "description": "`notAtVenue` (30 September, MoM 4.7): a must-include point that is at none of the plan's venues, so no day could hold it.\n"
+      }
+     }
+    }
+   },
+   "unmatchedPreferences": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**A preference a day's venue cannot meet is said, never faked** (30 September client meeting, MoM 4.7, Allam's requirement). One entry per day and preference that no point of that day's venue matches: a cuisine (`cuisineTags`), a shop (`retailTags`) or an interest (`interestTags`). `availableAtVenueIds` names the tenant's other active venues whose published map does match, so GST-053 and WEB-050 can say *Indian food is at the other park (day 2)* instead of quietly placing a restaurant the party cannot reach. Empty when every preference is met on every day. Worked out on read for the version read (a swap can meet or lose a preference), never stored.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "date",
+      "venueId",
+      "preference",
+      "tag"
+     ],
+     "properties": {
+      "date": {
+       "type": "string",
+       "format": "date"
+      },
+      "venueId": {
+       "type": "string",
+       "format": "uuid",
+       "description": "The day's venue, which has no match."
+      },
+      "preference": {
+       "type": "string",
+       "enum": [
+        "cuisine",
+        "retail",
+        "interest"
        ]
+      },
+      "tag": {
+       "type": "string",
+       "maxLength": 30
+      },
+      "availableAtVenueIds": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "uuid"
+       },
+       "description": "Other active venues of the tenant where the tag is matched. Empty when none is."
       }
      }
     }
@@ -6044,12 +6125,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "type": "object",
      "required": [
       "date",
+      "venueId",
       "items"
      ],
      "properties": {
       "date": {
        "type": "string",
        "format": "date"
+      },
+      "venueId": {
+       "type": "string",
+       "format": "uuid",
+       "description": "**The venue this day is planned at** (30 September, MoM 4.7): `VisitPlanRequest.dayVenues` for the date, else `venueId`. Every item of the day is at this venue.\n"
       },
       "opensAt": {
        "type": "string",
@@ -6086,6 +6173,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "description": "One candidate for a swap (29 September, MOB-6).",
   "required": [
    "kind",
+   "venueId",
    "startsAt",
    "reason"
   ],
@@ -6099,6 +6187,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "shop",
      "rest"
     ]
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The item's day venue; an alternative is never from another venue (30 September, MoM 4.7)."
    },
    "pointId": {
     "type": "string",
@@ -6256,7 +6349,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "shop",
      "rest",
      "travel"
-    ]
+    ],
+    "description": "`meal` is a stop at a dining point (restaurant, cafe or food kiosk); `shop` is a retail stop at a shop or a retail kiosk (30 September client meeting, MoM 4.7: retail is placed from the day venue's own points, as dining is).\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**The venue of this stop** (30 September client meeting, MoM 4.7): always the day's venue, and the venue whose map `pointId` is on. Carried on the item so the screens, `bookVisitPlan` and the AI planner agent read it rather than infer it. **Worked out on read, not stored**: from the plan's `inputs` (`dayVenues` for the item's date, else `venueId`). A stored `venue_id` would move the item rows from the plan's own row-level policy to a venue policy and hide a second park's items from the guest who owns the plan.\n"
    },
    "pointId": {
     "type": "string",
@@ -6345,7 +6447,30 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "venueId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "description": "The venue the guest picked in the app (GST-001 / WEB-001), which scopes the plan. Every date is planned at this venue unless `dayVenues` puts it somewhere else.\n"
+   },
+   "dayVenues": {
+    "type": "array",
+    "maxItems": 7,
+    "description": "**Which venue on which date, in a multi-venue tenant** (30 September client meeting, MoM 4.7, Allam's requirement). One entry per date that is not at `venueId`; each date of `dates` at most once. Each venue must be an active venue of the caller's tenant (the options `getTenantAppStatus.venues` lists), else 422 `venue-not-in-tenant`. **Each day is then planned from that venue's own published map only**: its rides, its dining and its retail points, never another venue's.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "date",
+      "venueId"
+     ],
+     "properties": {
+      "date": {
+       "type": "string",
+       "format": "date"
+      },
+      "venueId": {
+       "type": "string",
+       "format": "uuid"
+      }
+     }
+    }
    },
    "dates": {
     "type": "array",
@@ -6398,13 +6523,24 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "cuisineTags": {
     "type": "array",
     "maxItems": 8,
+    "description": "Matched per day against the `cuisineTags` of that day's venue's dining points only (30 September, MoM 4.7). A cuisine no dining point of the day's venue serves is not forced into the day; it is reported in `VisitPlan.unmatchedPreferences`.\n",
     "items": {
      "type": "string"
+    }
+   },
+   "retailTags": {
+    "type": "array",
+    "maxItems": 8,
+    "description": "**Shops the party would like to visit** (30 September client meeting, MoM 4.7: retail and kiosk shops join F&B as venue-linked planner options), e.g. `souvenirs`, `toys`, `apparel`, `essentials`. Matched per day against `VenuePoint.retailTags` of that day's venue's shops and retail kiosks; an unmatched tag is reported, as a cuisine is.\n",
+    "items": {
+     "type": "string",
+     "maxLength": 30
     }
    },
    "mustIncludePointIds": {
     "type": "array",
     "maxItems": 10,
+    "description": "Placed on a day whose venue has the point. A point at none of the plan's venues is listed in `VisitPlan.excluded` with `notAtVenue`, never placed on another venue's day.\n",
     "items": {
      "type": "string",
      "format": "uuid"

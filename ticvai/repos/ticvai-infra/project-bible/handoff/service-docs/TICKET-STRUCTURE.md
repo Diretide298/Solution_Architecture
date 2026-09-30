@@ -130,5 +130,11 @@ order numbers next to new tickets numbered today, and links the plan dropped sta
 - Change the plan only through its inputs (`docs/active/team.json`, `docs/active/block-a-extra-tasks.json`, the
   screens and contracts) and run `tools/refresh.sh`. Never edit `tasks.csv` or ticket order by hand.
 - `TICKET-LINKS.md` shows the result; its last section must only list setup and onboarding.
+- **Work that has a ticket keeps its key** (30 September). `build-service-docs.py` reconciles every key against
+  `pms-map.json` before writing: a screen keeps its pushed key whichever prefix it moves to (`VM-`, `APP-SETUP-`,
+  `APP-<platform>-`), a backend task keeps the pushed number whose operations it shares most (so a split cannot
+  re-number a ticket onto the other half), a migration keeps its schema's pushed key across `MIG-` and `VM-MIG-`,
+  and only genuinely new work gets a new key. A ticket op-retire closed is never reused. `check-key-stability`
+  (in the refresh checks) fails if a new key's work is already on a pushed ticket that left the plan.
 - Push only through the steps in section 5, dry run first, database backup first
   (`OPENPROJECT-PUSH.md` has the server commands).

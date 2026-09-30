@@ -3081,8 +3081,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Cuisine",
        "bindsTo": "VenuePoint.cuisineTags",
        "operation": "setVenuePoint",
-       "notes": "For restaurants and kiosks; matched against the guest's cuisine choice on the Plan tab (MOB-6).",
+       "notes": "For restaurants and kiosks; matched against the guest's cuisine choice on the Plan tab (MOB-6), for this venue's days only (client meeting 30 September, MoM 4.7).",
        "provenance": "agreed name venue-map VenuePoint.cuisineTags (the 29 September pass brief)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Retail",
+       "bindsTo": "VenuePoint.retailTags",
+       "operation": "setVenuePoint",
+       "notes": "For shops and kiosks that sell goods (souvenirs, toys, apparel ...); matched against the guest's shop choice on the Plan tab for this venue's days only (client meeting 30 September, MoM 4.7: retail and kiosk shops join F&B as venue-linked planner options).",
+       "provenance": "decided 30 September 2026, client meeting MoM 4.7 (Allam)"
       }
      ]
     }
@@ -3188,7 +3196,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "id": "formSetVenuePoint",
     "component": "modal",
     "trigger": "Save venue point",
-    "body": "**Collects what `setVenuePoint` sends before it is called.** Required: `id`, `mapId`, `kind`, `name`, `position`. Optional: `nameLocalised`, `outletId`, `productId`, `accessPointId`, `isStepFree`, `openingHours`, `iconRef`, `isActive`, `isNavigable`, `isDestination`, `pointId`; and the item details decided 29 September (MOB-4, MOB-6): `description`, `media`, `featuredOffer` (a product or a bundle, on any kind of point), `typicalDurationMinutes`, `interestTags`, `cuisineTags`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setVenuePoint` sends before it is called.** Required: `id`, `mapId`, `kind`, `name`, `position`. Optional: `nameLocalised`, `outletId`, `productId`, `accessPointId`, `isStepFree`, `openingHours`, `iconRef`, `isActive`, `isNavigable`, `isDestination`, `pointId`; and the item details decided 29 September (MOB-4, MOB-6): `description`, `media`, `featuredOffer` (a product or a bundle, on any kind of point), `typicalDurationMinutes`, `interestTags`, `cuisineTags`; and `retailTags` (30 September, MoM 4.7). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "SetVenuePointRequest",
     "confirm": {
      "label": "Save venue point",
@@ -3218,7 +3226,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       "featuredOffer",
       "typicalDurationMinutes",
       "interestTags",
-      "cuisineTags"
+      "cuisineTags",
+      "retailTags"
      ]
     },
     "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/points"
@@ -9513,7 +9522,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "cuisineTags": {
     "type": "array",
     "maxItems": 8,
-    "description": "**For dining points** (restaurant, cafe, kiosk; 29 September, MOB-6). The planner places meals at points whose cuisine the party chose, at meal times. Free text codes such as `arabic`, `indian`, `italian`, `fastFood`, `vegetarian`, `halal` — cuisines are too many to close, and a wrong enum is worse than an unmatched tag.\n",
+    "description": "**For dining points** (restaurant, cafe, kiosk; 29 September, MOB-6). The planner places meals at points whose cuisine the party chose, at meal times. Free text codes such as `arabic`, `indian`, `italian`, `fastFood`, `vegetarian`, `halal` — cuisines are too many to close, and a wrong enum is worse than an unmatched tag. **Read per venue**: the planner matches a guest's cuisine only against the points of the venue that day is at (30 September, MoM 4.7).\n",
+    "items": {
+     "type": "string",
+     "maxLength": 30
+    }
+   },
+   "retailTags": {
+    "type": "array",
+    "maxItems": 8,
+    "description": "**For retail points** (shop, and a kiosk that sells goods rather than food; 30 September client meeting, MoM 4.7: retail and kiosk shops join F&B as venue-linked planner options). The planner places a shop stop at points whose tags the party chose, on the day of this point's venue only. Free text codes such as `souvenirs`, `toys`, `apparel`, `photo`, `essentials`, for the same reason as `cuisineTags`. A kiosk may carry both lists.\n",
     "items": {
      "type": "string",
      "maxLength": 30

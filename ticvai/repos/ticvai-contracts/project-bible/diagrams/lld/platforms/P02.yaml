@@ -59,7 +59,7 @@ servicesCalled:
 - service: AccessService
   operationCalls: 20
 - service: WhiteLabelService
-  operationCalls: 17
+  operationCalls: 18
 - service: AiService
   operationCalls: 16
 - service: WalletService
@@ -258,6 +258,8 @@ screens:
   - error
   - loading
   - offline
+  - videoBuffering
+  - videoUnavailable
   offlineState: true
   entryParams:
   - productId<-deepLink
@@ -1639,6 +1641,7 @@ screens:
   density: comfortable
   operations:
   - generateVisitPlan
+  - getTenantAppStatus
   - getWaitTimes
   - listProducts
   states:
@@ -1648,6 +1651,7 @@ screens:
   - error
   - loading
   - offline
+  - preferenceNotAtVenue
   offlineState: true
   entryParams:
   - venueId<-session
@@ -1707,6 +1711,7 @@ screens:
   - error
   - loading
   - offline
+  - preferenceNotAtVenue
   offlineState: true
   entryParams:
   - planId<-GST-051

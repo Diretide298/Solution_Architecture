@@ -46,7 +46,7 @@ schemas:
   tables: 23
   stores:
   - postgres
-  largestTable: games.game
+  largestTable: games.entitlement
 - schema: rental
   tables: 24
   stores:
@@ -3405,7 +3405,7 @@ tables:
   - venue-map
   foreignWriters: null
 - table: venuemap.point
-  columns: 20
+  columns: 21
   store: postgres
   parent: null
   writtenBy:

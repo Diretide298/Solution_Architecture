@@ -15,7 +15,11 @@ specs-and-cost workbook with and without high availability). The content comes f
 deployables and their modules (handoff/service-decomposition.json, ADR-0055), the Terraform cell defaults
 (repos/ticvai-infra/terraform/modules/cell), and the decisions of 30 September (ADR-0049 Qdrant one
 collection per tenant, UAE hosting only; ADR-0056; ADR-0057 broker is the client's choice; ADR-0058).
-Prices are estimates for Azure UAE North and say so; the workbook keeps them in editable cells.
+Prices are estimates for Azure UAE North and say so; the workbook keeps them in editable cells. Unit prices
+were checked against the Azure Retail Prices API (uaenorth, pay as you go, 730 hours) on 30 September 2026, and
+the infrastructure answers of that day were folded in: Azure Managed Redis instead of the retiring Azure Cache
+for Redis, CNI Overlay with a subnet per pool, egress through the NAT Gateway, NSGs at the edges only, a Gateway
+API ingress, a GatewaySubnet (docs/active/infra-answers-30-september.md).
 """
 import io
 import json
@@ -29,6 +33,9 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "handoff" / "hld-lld"
 DESIGN = ROOT / "handoff" / "design-batches" / "HLD-LLD"
 DATE = "30 September 2026"
+PRICE_SOURCE = ("Azure Retail Prices API (prices.azure.com), region uaenorth, pay as you go, 730 hours a month, "
+                "pulled 30 September 2026; vendor prices (CloudAMQP, Confluent) from the vendors' pages the same "
+                "day. Working: docs/active/infra-answers-30-september.md, section 4b.")
 
 
 def write(path, text):
@@ -71,7 +78,7 @@ HLD_NODES = {
     "blob":      ("Blob storage", "media, exports, backups", 70, 510, 150, 70),
     "pg":        ("PostgreSQL 16", "control DB + one DB per tenant", 270, 110, 180, 70),
     "rpt":       ("Reporting replica", "lag-tolerant, no writes", 270, 210, 180, 70),
-    "redis":     ("Redis", "sessions, idempotency, cache", 270, 310, 180, 70),
+    "redis":     ("Azure Managed Redis", "sessions, idempotency, cache", 270, 310, 180, 70),
     "broker":    ("Event broker", "RabbitMQ or Kafka (client)", 270, 410, 180, 70),
     "workers":   ("workers", "outbox relay, consumers, jobs", 270, 510, 180, 70),
     "commerce":  ("commerce", "sale path", 540, 110, 160, 70),
@@ -136,21 +143,21 @@ HLD_LINKS = [
 LLD_NODES = {
     "users":   ("Users", ["B2C guests", "B2B partners", "Venue operators"], 30, 330, 150, 110, "#FFFFFF"),
     "fd":      ("Azure Front Door Premium", ["WAF: OWASP + bot rules", "TLS 1.2+, custom domains", "Private Link to origin"], 220, 320, 190, 130, "#FFFFFF"),
-    "ilb":     ("Ingress (internal LB)", ["NGINX ingress on AKS", "Private Link service"], 470, 330, 170, 110, "#EEF4FF"),
-    "sys":     ("AKS system pool", ["D4s v5, 2-4 nodes", "zones 1-3"], 690, 150, 190, 80, "#EEF4FF"),
+    "ilb":     ("Ingress (internal LB)", ["Gateway API ingress", "(AKS App Routing)", "Private Link service"], 470, 330, 170, 110, "#EEF4FF"),
+    "sys":     ("AKS system pool", ["D4s v5, 2-4 nodes, zones 1-3", "+ ingress gateway pods"], 690, 150, 190, 80, "#EEF4FF"),
     "wl":      ("AKS workload pool", ["D8s v5, 3-20 nodes", "commerce, access,", "operations, workers"], 690, 250, 190, 110, "#EEF4FF"),
     "aip":     ("AKS AI pool", ["D8s v5, 2-4 nodes", "ticvai-ai, embeddings,", "reranker (CPU)"], 690, 380, 190, 110, "#EEF4FF"),
     "data":    ("AKS data pool", ["E4s v5 x3, zones 1-3", "Qdrant 3-node cluster", "broker 3-node cluster"], 690, 510, 190, 110, "#EEF4FF"),
     "pg":      ("PostgreSQL Flexible Server 16", ["GP D4ds v5, zone-redundant HA", "control DB + DB per tenant", "PITR 35 days, UAE only"], 950, 150, 220, 110, "#FFFFFF"),
     "ro":      ("Read replicas x2", ["GP D4ds v5", "gate checks never read here"], 950, 280, 220, 70, "#FFFFFF"),
     "rpt":     ("Reporting + AI log DB", ["reporting replica (D2ds v5)", "AI log DB (D4ds v5, 1 TB)"], 950, 370, 220, 80, "#FFFFFF"),
-    "pe":      ("Private endpoints", ["Redis Premium (13 GB)", "Key Vault (HSM keys)", "Blob storage (ZRS)", "Container Registry"], 950, 470, 220, 120, "#FFFFFF"),
+    "pe":      ("Private endpoints", ["Azure Managed Redis B10 (12 GB)", "Key Vault", "Blob storage (ZRS)", "Container Registry"], 950, 470, 220, 120, "#FFFFFF"),
     "bastion": ("Azure Bastion", ["admin access only", "no public SSH / RDP"], 470, 560, 170, 80, "#FFFFFF"),
-    "nat":     ("NAT Gateway", ["one static egress IP", "for provider allow-lists"], 470, 700, 170, 80, "#FFFFFF"),
+    "nat":     ("NAT Gateway", ["one static egress IP;", "AKS outbound type"], 470, 700, 170, 80, "#FFFFFF"),
     "extp":    ("External providers", ["Payments, e-invoicing", "messaging, Azure OpenAI"], 220, 700, 190, 80, "#FFFFFF"),
     "ops":     ("Operations", ["Azure Monitor + Log Analytics", "Azure Backup, Defender", "Entra ID, subscription"], 30, 560, 180, 100, "#FFFFFF"),
     "venue":   ("Venue site", ["POS, kiosks, KDS", "venue edge node (offline)", "turnstiles, handhelds on LAN"], 1250, 300, 190, 110, "#FFFFFF"),
-    "vpn":     ("Site-to-site VPN", ["dedicated tier only;", "others: Internet + mTLS"], 1250, 450, 190, 80, "#FFFFFF"),
+    "vpn":     ("Site-to-site VPN", ["dedicated tier, GatewaySubnet;", "others: Internet + mTLS"], 1250, 450, 190, 80, "#FFFFFF"),
 }
 # Frames a line may start or end on without being a box: (label, x, y, w, h)
 LLD_FRAMES = {"aks": ("AKS cluster", 670, 130, 230, 510)}
@@ -168,22 +175,37 @@ LLD_LINKS = [
     ("vpn", "ilb", "sync", [(1225, 490), (1225, 676), (650, 676), (650, 420)]),
 ]
 SUBNETS = [
-    # (name, cidr, holds, rule)
+    # (name, cidr, holds, rule). Mirrors address_plan in repos/ticvai-infra/terraform/modules/cell/variables.tf
+    # (network.tf builds it); change both together. NSGs sit at the edges only; east-west rules between the
+    # AKS pools are Cilium network policies, because ingress pods and CoreDNS on the system pool must reach
+    # every node and an NSG between node subnets would break the cluster.
     ("snet-ingress", "10.20.0.0/24", "Internal load balancer and Private Link service for Front Door",
-     "Inbound only from Front Door's Private Link; no public IP"),
-    ("snet-aks-system", "10.20.4.0/22", "AKS system node pool", "No inbound from outside the VNet"),
+     "NSG: no Internet inbound; Private Link service network policies disabled"),
+    ("snet-agc", "10.20.2.0/24", "Reserved: Application Gateway for Containers, only if chosen over App Routing",
+     "Not created; delegated subnet if used"),
+    ("snet-aks-system", "10.20.4.0/22", "AKS system pool, and the ingress gateway pods (they tolerate its taint)",
+     "No NSG; egress through the NAT Gateway"),
     ("snet-aks-workload", "10.20.8.0/21", "Workload pool: commerce, access, operations, workers",
-     "Inbound from snet-ingress only; outbound through the NAT Gateway"),
+     "No NSG; Cilium policy: inbound from the ingress gateway; egress through the NAT Gateway"),
     ("snet-aks-ai", "10.20.16.0/22", "AI pool: ticvai-ai, embeddings, reranker",
-     "Inbound from snet-ingress and snet-aks-workload; read-only role on transactional schemas (ADR-0020)"),
-    ("snet-aks-data", "10.20.20.0/23", "Data pool: Qdrant cluster, broker cluster",
-     "Inbound from the workload and AI pools only; Qdrant needs each tenant's collection-scoped JWT"),
+     "No NSG; Cilium policy: inbound from the ingress gateway and the workload pool; read-only role on "
+     "transactional schemas (ADR-0020)"),
+    ("snet-aks-data", "10.20.20.0/23", "Data pool: Qdrant cluster, broker cluster (tainted)",
+     "No NSG; Cilium policy: inbound from the workload and AI pools only; Qdrant needs each tenant's "
+     "collection-scoped JWT"),
     ("snet-postgres", "10.20.24.0/24", "PostgreSQL Flexible Server (delegated subnet), replicas, AI log DB",
-     "Inbound 5432 from the AKS subnets only (through pgbouncer); public access disabled"),
-    ("snet-private-endpoints", "10.20.25.0/24", "Redis, Key Vault, Blob storage, Container Registry",
-     "Private endpoints with private DNS zones; public access disabled on every resource"),
+     "NSG: 5432 (6432 for built-in PgBouncer) from the AKS subnets; all traffic inside the subnet (HA "
+     "replication); outbound 443 to the Storage tag (WAL archive); public access disabled"),
+    ("snet-private-endpoints", "10.20.25.0/24", "Azure Managed Redis, Key Vault, Blob storage, Container Registry "
+     "(and a managed broker if chosen)",
+     "NSG: inbound from the AKS subnets only; private DNS zones; public access disabled on every resource"),
     ("AzureBastionSubnet", "10.20.26.0/26", "Azure Bastion", "The only administrative path in"),
+    ("GatewaySubnet", "10.20.27.0/27", "VPN gateway for dedicated-tier venues' site-to-site VPN",
+     "Created empty; the gateway is added when a venue needs it. No NSG (Azure does not support one here)"),
+    ("snet-jump", "10.20.28.0/27", "Reserved: a jump VM, only if the AKS API is private and Bastion stays Basic",
+     "Not created"),
 ]
+POD_CIDR = "10.244.0.0/16"  # CNI Overlay pod range, outside the VNet (Terraform default, variables.tf)
 AKS_SERVICE_CIDR = "10.100.0.0/16"  # Terraform default (modules/cell/variables.tf)
 
 
@@ -380,7 +402,10 @@ PROD_HA = [
      "E4s v5 (4 vCPU, 32 GB) x3, zones 1-3, replication factor 2", 3, 225, None),
     ("Vector store", "Managed Disks", "Qdrant storage", "Premium SSD P15 256 GB per node", 3, 38, None),
     ("Event broker", "Virtual Machines (AKS nodes)", "Broker cluster: RabbitMQ or Kafka (client's choice, ADR-0057)",
-     "D2s v5 (2 vCPU, 8 GB) x3, zones 1-3; re-price if a managed service is chosen", 3, 88, None),
+     "D2s v5 (2 vCPU, 8 GB) x3, zones 1-3, self-run (RabbitMQ Cluster Operator). If CloudAMQP is chosen, "
+     "$396-696 replaces this line and the disks", 3, 88, None),
+    ("Event broker", "Managed Disks", "Broker storage: quorum queues or Kafka logs",
+     "Premium SSD P10 128 GB per node", 3, 21.5, None),
     ("Database", "Azure Database for PostgreSQL", "Primary with zone-redundant standby: control DB + DB per tenant",
      "Flexible Server 16, General Purpose D4ds v5 (4 vCore, 16 GB) x2 (primary + standby)", 2, 320, None),
     ("Database", "Azure Database for PostgreSQL", "Storage, primary and standby",
@@ -391,22 +416,33 @@ PROD_HA = [
      "General Purpose D2ds v5 (2 vCore, 8 GB) + 256 GB", 1, 196, None),
     ("Database", "Azure Database for PostgreSQL", "AI log database (decision records, prompts)",
      "General Purpose D4ds v5 + 1 TB", 1, 460, None),
-    ("Cache", "Azure Cache for Redis", "Sessions, idempotency keys, caches, AI features",
-     "Premium P2 (13 GB), zone-redundant, private endpoint", 1, 1000, None),
+    ("Cache", "Azure Managed Redis", "Sessions, idempotency keys, caches, AI features",
+     "Balanced B10 (12 GB), high availability, zone-redundant, private endpoint. $0.45045/h per instance; "
+     "budgeted as two instance meters until the HA price is confirmed. Replaces Azure Cache for Redis "
+     "(retiring; no new caches for new customers from 1 October 2026)", 1, 658, None),
     ("Storage", "Storage account (Blob, ZRS)", "Media, exports, Qdrant snapshots, database dumps",
      "Hot tier, zone-redundant, 2 TB, UAE North only", 1, 60, None),
     ("Storage", "Container Registry", "Images for the five deployables", "Standard", 1, 20, None),
-    ("Security", "Key Vault", "Secrets, per-tenant keys, Qdrant JWT signing keys", "Premium (HSM-backed keys)", 1, 10, None),
+    ("Security", "Key Vault", "Secrets (the Qdrant API key is a secret held by the token issuer), per-tenant keys",
+     "Premium (HSM-backed per-tenant keys). Scales with tenants: +$1.32 per tenant per month for an HSM key "
+     "(about $264 at 200 tenants)", 1, 10, None),
     ("Network", "Azure Front Door", "Single entry for web, apps and APIs, with WAF",
-     "Premium: WAF managed rules and bot protection, Private Link origin; base + estimated traffic", 1, 450, 2),
+     "Premium: WAF managed rules and bot protection, Private Link origin. Base $330 + 2 TB edge-to-client in "
+     "zone 7 at $0.11/GB ($225) + about 50 million requests ($84, an assumption) + edge-to-origin", 1, 650, 2),
     ("Network", "NAT Gateway", "One static egress IP for payment and e-invoicing allow-lists",
      "730 hours, 1 TB processed", 1, 80, None),
-    ("Network", "Azure Bastion", "Administrative access only", "Basic, 730 hours", 1, 139, None),
+    ("Network", "Azure Bastion", "Administrative access only",
+     "Basic, 730 hours. Standard ($212) if the AKS API is private and kubectl goes through Bastion", 1, 139, None),
     ("Network", "Private Link", "Private endpoints and private DNS zones", "About 6 endpoints", 1, 50, None),
-    ("Network", "Bandwidth", "Outbound data transfer", "About 2 TB a month", 1, 180, 2),
+    ("Network", "Bandwidth", "Egress through the NAT Gateway to providers",
+     "First 100 GB free, then $0.181/GB. Azure origin to Front Door is free; the web traffic is in the Front "
+     "Door line", 1, 20, 2),
     ("Operations", "Azure Monitor / Log Analytics", "Logs, metrics, alerts, dashboards", "About 60 GB ingested a month", 1, 200, None),
     ("Operations", "Azure Backup", "Snapshots of Qdrant and broker disks", "Daily, 30 days, UAE North", 1, 40, None),
-    ("Operations", "Microsoft Defender for Cloud", "Servers, containers and databases", "Estimated", 1, 150, None),
+    ("Operations", "Microsoft Defender for Cloud", "Containers, databases and storage",
+     "Defender for Containers: 70 vCores x $0.00941/h ($481); Defender for PostgreSQL: 5 servers x $15 ($75); "
+     "Defender for Storage: about $10 per account, 2 accounts. Defender for Servers P1 instead of Containers: "
+     "about $165 in all. Pick the plan, then re-price", 1, 575, None),
     ("AI (usage)", "Azure OpenAI", "Language model calls (re-billed per token, AI-D02)",
      "Usage-based; not a fixed hosting cost", 1, 0, None),
 ]
@@ -421,24 +457,30 @@ PROD_NO_HA = [
      "E4s v5 (4 vCPU, 32 GB), single node", 1, 225, None),
     ("Vector store", "Managed Disks", "Qdrant storage", "Premium SSD P15 256 GB", 1, 38, None),
     ("Event broker", "Virtual Machines (AKS nodes)", "Broker: RabbitMQ or Kafka (client's choice, ADR-0057)",
-     "D2s v5 (2 vCPU, 8 GB), single node", 1, 88, None),
+     "D2s v5 (2 vCPU, 8 GB), single node, self-run", 1, 88, None),
+    ("Event broker", "Managed Disks", "Broker storage", "Premium SSD P10 128 GB", 1, 21.5, None),
     ("Database", "Azure Database for PostgreSQL", "Primary: control DB + DB per tenant",
      "Flexible Server 16, General Purpose D4ds v5 (4 vCore, 16 GB), no standby", 1, 320, None),
     ("Database", "Azure Database for PostgreSQL", "Storage", "256 GB Premium SSD; PITR backup 35 days", 1, 36, None),
     ("Database", "Azure Database for PostgreSQL", "Read replica (also serves reporting)",
      "General Purpose D4ds v5 + 256 GB", 1, 356, None),
     ("Database", "Azure Database for PostgreSQL", "AI log database", "General Purpose D2ds v5 + 512 GB", 1, 230, None),
-    ("Cache", "Azure Cache for Redis", "Sessions, idempotency keys, caches, AI features", "Standard C4 (13 GB)", 1, 400, None),
+    ("Cache", "Azure Managed Redis", "Sessions, idempotency keys, caches, AI features",
+     "Balanced B10 (12 GB), one node, no high availability; $0.45045/h", 1, 329, None),
     ("Storage", "Storage account (Blob, LRS)", "Media, exports, Qdrant snapshots, database dumps", "Hot tier, 2 TB, UAE North only", 1, 45, None),
     ("Storage", "Container Registry", "Images for the five deployables", "Standard", 1, 20, None),
-    ("Security", "Key Vault", "Secrets, per-tenant keys, Qdrant JWT signing keys", "Standard", 1, 5, None),
+    ("Security", "Key Vault", "Secrets (the Qdrant API key is a secret held by the token issuer), per-tenant keys",
+     "Standard", 1, 5, None),
     ("Network", "Azure Front Door", "Single entry for web, apps and APIs, with WAF",
-     "Premium: WAF managed rules and bot protection; base + estimated traffic", 1, 450, 2),
+     "Premium: WAF managed rules and bot protection. Base $330 + 2 TB edge-to-client in zone 7 ($225) + about "
+     "50 million requests ($84, an assumption) + edge-to-origin", 1, 650, 2),
     ("Network", "NAT Gateway", "One static egress IP for payment and e-invoicing allow-lists", "730 hours, 1 TB processed", 1, 80, None),
     ("Network", "Azure Bastion", "Administrative access only", "Basic, 730 hours", 1, 139, None),
-    ("Network", "Bandwidth", "Outbound data transfer", "About 2 TB a month", 1, 180, 2),
+    ("Network", "Bandwidth", "Egress through the NAT Gateway to providers",
+     "First 100 GB free, then $0.181/GB; the web traffic is in the Front Door line", 1, 20, 2),
     ("Operations", "Azure Monitor / Log Analytics", "Logs, metrics, alerts", "About 40 GB ingested a month", 1, 140, None),
-    ("Operations", "Microsoft Defender for Cloud", "Servers, containers and databases", "Estimated", 1, 100, None),
+    ("Operations", "Microsoft Defender for Cloud", "Containers, databases and storage",
+     "Defender for Containers: 38 vCores ($261); PostgreSQL: 3 servers ($45); Storage (about $10)", 1, 316, None),
     ("AI (usage)", "Azure OpenAI", "Language model calls (re-billed per token, AI-D02)", "Usage-based", 1, 0, None),
 ]
 PREPROD = [
@@ -447,18 +489,20 @@ PREPROD = [
      "D8s v5 (8 vCPU, 32 GB) x2 + D4s v5 x1, Linux", 1, 875, None),
     ("Vector store", "Virtual Machines (AKS nodes)", "Qdrant, single node", "E2s v5 (2 vCPU, 16 GB) + P10 128 GB", 1, 132, None),
     ("Event broker", "Virtual Machines (AKS nodes)", "Broker, single node", "D2s v5 (2 vCPU, 8 GB)", 1, 88, None),
+    ("Event broker", "Managed Disks", "Broker storage", "Premium SSD P10 128 GB", 1, 21.5, None),
     ("Database", "Azure Database for PostgreSQL", "Control DB + test tenant DBs + AI log DB",
      "Flexible Server 16, General Purpose D2ds v5 + 256 GB, no standby, no replicas", 1, 196, None),
-    ("Cache", "Azure Cache for Redis", "Test cache", "Standard C1 (1 GB)", 1, 125, None),
+    ("Cache", "Azure Managed Redis", "Test cache", "Balanced B1 (1 GB), one node (B0, about $53, if enough)", 1, 133, None),
     ("Storage", "Storage account (Blob, LRS)", "Test media and snapshots", "Hot tier, 500 GB", 1, 15, None),
     ("Security", "Key Vault", "Test secrets", "Standard", 1, 5, None),
     ("Network", "Front Door, NAT, Bastion, Registry", "Shared with production", "Separate routes and WAF policy", 1, 0, None),
     ("Operations", "Azure Monitor / Log Analytics", "Logs and metrics", "About 20 GB ingested a month", 1, 70, None),
 ]
 NOTES_PROD = [
-    "Prices are estimates for Azure region UAE North, pay as you go, 730 hours a month, 30 September 2026. "
-    "Confirm each line in the Azure pricing calculator for UAE North before quoting; reserved instances "
-    "(1 or 3 years) lower compute by roughly 30-55%.",
+    "Prices: " + PRICE_SOURCE + " Confirm each line in the Azure pricing calculator for UAE North before "
+    "quoting; reserved instances (1 or 3 years) lower compute by roughly 30-55%.",
+    "Redis is Azure Managed Redis. Azure Cache for Redis retires on 30 September 2028 and new customers cannot "
+    "create it from 1 October 2026, so the platform does not start on it.",
     "Every store is hosted in the UAE, backups and disaster recovery included. Qdrant was approved on that "
     "condition (30 September).",
     "One production cell serves many tenants: each tenant has its own PostgreSQL database and its own Qdrant "
@@ -469,8 +513,12 @@ NOTES_PROD = [
     "the e-invoicing provider, Apple and Google developer accounts, and venue hardware.",
     "The venue edge node (one per venue, runs the gates and POS offline) is venue hardware, not Azure: "
     "recommended 8 cores, 32 GB RAM, 1 TB SSD, two units per venue for failover.",
-    "The event broker is RabbitMQ or Kafka, the client's choice. It is priced self-hosted on AKS; a managed "
-    "service is re-priced when chosen.",
+    "The event broker is RabbitMQ or Kafka, the client's choice. It is priced self-run on AKS (VMs and disks). "
+    "Managed options in UAE North (ADR-0057): CloudAMQP 3-node $297-597 + $99 PrivateLink; Event Hubs "
+    "Standard with the Kafka endpoint $60-130 (10 topics per namespace); Event Hubs Premium 1 PU about $1,072; "
+    "Confluent Cloud Enterprise about $1,280-1,640.",
+    "Front Door is a global service; it stores nothing and decrypts at the edge nearest the user. Its WAF logs "
+    "go to the UAE North Log Analytics workspace.",
 ]
 NOTES_NO_HA = [
     "Single zone throughout: a zone outage stops the cloud services until they are restored. Venue gates and "
@@ -505,14 +553,15 @@ def cost_block(ws, r, env, rows, notes, scaled_col=True):
     first = r + 1
     for i, (grp, typ, desc, spec, qty, unit, sq) in enumerate(rows):
         rr = first + i
-        vals = [env if i == 0 else None, grp, typ, desc, "UAE North", spec, qty, unit]
+        region = "Global" if typ == "Azure Front Door" else "UAE North"
+        vals = [env if i == 0 else None, grp, typ, desc, region, spec, qty, unit]
         for c, v in enumerate(vals, 1):
             cell = ws.cell(rr, c, v)
             cell.alignment = WRAP
             cell.border = BORDER
         ws.cell(rr, 9, f"=G{rr}*H{rr}").number_format = "#,##0"
         ws.cell(rr, 9).border = BORDER
-        ws.cell(rr, 8).number_format = "#,##0"
+        ws.cell(rr, 8).number_format = "#,##0.##"
         if scaled_col:
             ws.cell(rr, 10, f"={sq}*H{rr}" if sq else f"=I{rr}").number_format = "#,##0"
             ws.cell(rr, 10).border = BORDER
@@ -556,6 +605,7 @@ def cost_sheet(wb, title, prod_rows, prod_notes):
     ws["B4"], ws["C4"] = "Margin", MARGIN
     ws["C4"].number_format = "0%"
     ws["D3"] = "Edit the rate, the margin and any unit price; every total is a formula."
+    ws["D4"] = "Prices: " + PRICE_SOURCE
     r = cost_block(ws, 6, "Production", prod_rows, NOTES_PROD + prod_notes)
     cost_block(ws, r, "Pre-production", PREPROD, NOTES_PREPROD)
     widths = [16, 16, 26, 38, 11, 46, 6, 14, 16, 18]
@@ -571,7 +621,7 @@ def build_workbook(path):
     cost_sheet(wb, "Infra without HA", PROD_NO_HA, NOTES_NO_HA)
     cost_sheet(wb, "Infra with High Availability", PROD_HA, [
         "Zones 1-3 in UAE North: PostgreSQL zone-redundant standby, Qdrant and broker three-node clusters, AKS "
-        "node pools across zones, Redis Premium zone-redundant."])
+        "node pools across zones, Azure Managed Redis with high availability (zone-redundant)."])
     ws = wb.create_sheet("Deployables")
     ws.append(["Deployable", "What it is", "Modules", "Runs on"])
     runs = {"commerce": "Workload pool", "access": "Workload pool (and the venue edge node)",
@@ -582,7 +632,7 @@ def build_workbook(path):
     ws.append(["Data stores", "", "", ""])
     for row in [("PostgreSQL 16", "Control DB and one database per tenant; read replicas; reporting replica; AI log DB", "", "Flexible Server"),
                 ("Qdrant", "Vectors; one collection per tenant, collection-scoped JWT (ADR-0049)", "", "Data pool"),
-                ("Redis", "Sessions, idempotency, caches", "", "Azure Cache for Redis"),
+                ("Redis", "Sessions, idempotency, caches", "", "Azure Managed Redis"),
                 ("Event broker", "RabbitMQ or Kafka, the client's choice (ADR-0057); outbox relay per region (ADR-0058)", "", "Data pool"),
                 ("Blob storage", "Media, exports, snapshots, dumps", "", "Storage account")]:
         ws.append(list(row))
@@ -598,6 +648,8 @@ def build_workbook(path):
     ws.append(["Subnet", "Address range", "Holds", "Rule"])
     for sn in SUBNETS:
         ws.append(list(sn))
+    ws.append(["AKS pod range (CNI Overlay)", POD_CIDR, "Pod addresses, outside the VNet (Terraform default)",
+               "Must not overlap a peered VNet, the client's ranges or a venue LAN on the VPN; 100.64.0.0/16 if in doubt"])
     ws.append(["AKS service range", AKS_SERVICE_CIDR, "Kubernetes services (Terraform default)", "Internal only"])
     for i, w in enumerate([24, 16, 60, 70], 1):
         ws.column_dimensions[get_column_letter(i)].width = w
@@ -646,7 +698,7 @@ Internet is down (ADR-0013), and syncs when it is back.
 |---|---|---|
 | PostgreSQL 16 | A control database, one database per tenant, read replicas, a reporting replica and the AI log database | ADR-0038, ADR-0056 (UUIDv7 ids, monthly partitions) |
 | Qdrant | The AI knowledge index: one collection per tenant, each with its own collection-scoped key; venue scope is a filter the retrieval client always adds | ADR-0049 (approved 30 September on condition of UAE hosting) |
-| Redis | Sessions, idempotency keys, caches | ADR-0032 |
+| Azure Managed Redis | Sessions, idempotency keys, caches (not Azure Cache for Redis, which is retiring) | ADR-0032 |
 | Event broker | Events between deployables; RabbitMQ or Kafka, the client's choice | ADR-0057, ADR-0058 |
 | Blob storage | Media, exports, Qdrant snapshots, database dumps | ADR-0047 |
 
@@ -695,13 +747,14 @@ def lld_md():
 | Tier | What runs there | Size (production, with HA) |
 |---|---|---|
 | Edge | Azure Front Door Premium with WAF (OWASP and bot rules), TLS 1.2+, Private Link to the origin | One profile |
-| Ingress | NGINX ingress behind an internal load balancer, published to Front Door by Private Link | In the system pool |
-| AKS system pool | Kubernetes system services | D4s v5, 2-4 nodes, zones 1-3 |
+| Ingress | A Gateway API ingress: the AKS App Routing add-on's Gateway API implementation behind an internal load balancer, published to Front Door by Private Link. Not NGINX (ingress-nginx is out of maintenance; the add-on's NGINX is supported only through November 2026). Application Gateway for Containers is the alternative, with `snet-agc` reserved | In the system pool; the gateway pods tolerate its `CriticalAddonsOnly` taint |
+| AKS cluster | Azure CNI Overlay (pods from `{POD_CIDR}`, outside the VNet), Cilium network policy and data plane, egress through the NAT Gateway (`userAssignedNATGateway`), a subnet per pool | Standard tier |
+| AKS system pool | Kubernetes system services, the ingress gateway | D4s v5, 2-4 nodes, zones 1-3 |
 | AKS workload pool | commerce, access, operations, workers | D8s v5, 3-20 nodes, autoscaled |
 | AKS AI pool | ticvai-ai, the embedding model and the reranker (CPU) | D8s v5, 2-4 nodes |
-| AKS data pool | Qdrant (3 nodes), the event broker (3 nodes) | E4s v5 x3 and D2s v5 x3, zones 1-3 |
+| AKS data pool | Qdrant (3 nodes, open source, official Helm chart), the event broker (3 nodes, while self-run); tainted | E4s v5 x3 and D2s v5 x3, zones 1-3 |
 | Database | PostgreSQL Flexible Server 16: primary with zone-redundant standby, 2 read replicas, a reporting replica, the AI log database | General Purpose D4ds v5; 256 GB each; AI log 1 TB |
-| Private endpoints | Redis Premium (13 GB), Key Vault (HSM keys), Blob storage (ZRS), Container Registry | Public access disabled |
+| Private endpoints | Azure Managed Redis Balanced B10 (12 GB), zone-redundant; Key Vault (HSM per-tenant keys); Blob storage (ZRS); Container Registry | Public access disabled |
 
 ## Network
 
@@ -710,20 +763,34 @@ VNet `10.20.0.0/16` (proposed; confirm against the client's address plan before 
 | Subnet | Range | Holds | Rule |
 |---|---|---|---|
 {sn}
+| AKS pods (CNI Overlay) | `{POD_CIDR}` | Pod range, outside the VNet (Terraform default) | Must not overlap a peered VNet, the client's ranges or a venue LAN on the VPN; `100.64.0.0/16` if in doubt |
 | AKS services | `{AKS_SERVICE_CIDR}` | Kubernetes service range (Terraform default) | Internal only |
+
+The Terraform cell module builds this plan (`network.tf`, `address_plan` in `variables.tf`); the two reserved
+ranges (`snet-agc`, `snet-jump`) are not created until they are needed.
 
 - **Inbound:** only through Front Door (web, apps, APIs, venue devices) and Bastion (administrators). No
   resource has a public database, cache or storage endpoint.
 - **Outbound:** through the NAT Gateway's one static IP, which payment and e-invoicing providers can allow-list.
+  AKS uses it as its outbound type (`userAssignedNATGateway`), and the NAT Gateway is attached to every node
+  subnet.
+- **NSGs at the edges, Cilium inside.** NSGs guard the ingress, PostgreSQL and private-endpoint subnets. The
+  rules between AKS pools (workload to data, AI to Qdrant) are Cilium network policies: the ingress gateway
+  and CoreDNS run on the system pool and must reach every node, which subnet-to-subnet NSGs would block.
 - **Venues:** devices reach the cloud over the Internet with TLS and device certificates; a dedicated-tier
-  tenant may add a site-to-site VPN. Turnstiles and handhelds only talk to the venue edge node.
+  tenant may add a site-to-site VPN, whose gateway goes in `GatewaySubnet`. Turnstiles and handhelds only talk
+  to the venue edge node.
+- **Front Door is global.** It stores nothing, but decrypts at the edge location nearest the user (normally in
+  the UAE for UAE users, not guaranteed): data in transit only. Its WAF logs stay in the UAE North workspace.
 
 ## Security
 
 - **Identity:** Entra ID for administrators; the platform's own identity for staff, guests and partners.
   Workloads use managed identities to reach Key Vault, storage and the registry.
 - **Tenant isolation:** each tenant's database (with row-level security for venue scope) and each tenant's
-  Qdrant collection, readable only with that tenant's collection-scoped JWT, signed with a key in Key Vault.
+  Qdrant collection, readable only with that tenant's collection-scoped JWT, signed (HS256) with the Qdrant
+  API key, which the token issuer holds as a Key Vault secret. Rotating that key reissues every tenant's token
+  at once, so it is a planned event (ADR-0049).
 - **Least privilege between deployables:** one PostgreSQL role per deployable; the AI role is read-only on the
   transactional schemas (ADR-0020, ADR-0055).
 - **Secrets:** Key Vault only; nothing in images or config maps.
@@ -733,9 +800,9 @@ VNet `10.20.0.0/16` (proposed; confirm against the client's address plan before 
 | Store | High availability | Backup |
 |---|---|---|
 | PostgreSQL | Zone-redundant standby, automatic failover | Point-in-time restore 35 days; a nightly dump per tenant to Blob (UAE) |
-| Qdrant | Three nodes across zones, replication factor 2 | Snapshot per collection to Blob (UAE) |
+| Qdrant | Three nodes across zones, replication factor 2 | Snapshot per collection to local disk, copied to Blob (UAE) by a CronJob (Blob is not a native snapshot target); disk snapshots as a second line |
 | Broker | Three nodes across zones | The outbox is the record; nothing is lost if the broker is rebuilt |
-| Redis | Premium, zone-redundant | Not backed up: it only holds what can be rebuilt |
+| Redis | Azure Managed Redis, high availability, zone-redundant | Not backed up: it only holds what can be rebuilt |
 | AKS | Nodes across zones, at least 2 replicas per deployable | Rebuilt from the registry and Terraform |
 
 The venue edge node keeps gates and POS running through any cloud outage and syncs afterwards.
@@ -750,10 +817,18 @@ The venue edge node keeps gates and POS running through any cloud outage and syn
 
 ## Open points
 
-- The broker is the client's choice (RabbitMQ or Kafka); if a managed service is chosen it replaces the data
-  pool's broker nodes.
-- Whether Qdrant runs as Qdrant Hybrid Cloud on our own AKS or plain self-hosted (ADR-0049 action).
-- Prices in the workbook are estimates; confirm them in the Azure pricing calculator for UAE North.
+- The broker is the client's choice (RabbitMQ or Kafka; ADR-0057 has the UAE North options and prices). A
+  managed broker (CloudAMQP, Event Hubs) removes the broker from `snet-aks-data` and adds a private endpoint in
+  `snet-private-endpoints`.
+- Whether the AKS API server is private. If it is, Bastion Basic cannot tunnel `kubectl`: Bastion Standard
+  ($212 a month) or a jump VM in `snet-jump`.
+- One PostgreSQL HA mode for production: the Terraform uses same-zone HA on the shared tier and zone-redundant
+  on dedicated and isolated tiers; this document promises zone-redundant.
+- The ingress: confirm that the App Routing add-on's Gateway API implementation is generally available in UAE
+  North before SETUP; otherwise Application Gateway for Containers in `snet-agc`.
+- Prices in the workbook were checked against the Azure Retail Prices API on 30 September; confirm them in the
+  Azure pricing calculator for UAE North before quoting. The Azure Managed Redis HA price (one or two instance
+  meters) is unconfirmed.
 """
 
 

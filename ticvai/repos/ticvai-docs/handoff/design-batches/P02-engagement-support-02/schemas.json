@@ -432,8 +432,57 @@
         "ageRule",
         "closedOnDate",
         "notInInterests",
-        "noTime"
+        "noTime",
+        "notAtVenue"
+       ],
+       "description": "`notAtVenue` (30 September, MoM 4.7): a must-include point that is at none of the plan's venues, so no day could hold it.\n"
+      }
+     }
+    }
+   },
+   "unmatchedPreferences": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**A preference a day's venue cannot meet is said, never faked** (30 September client meeting, MoM 4.7, Allam's requirement). One entry per day and preference that no point of that day's venue matches: a cuisine (`cuisineTags`), a shop (`retailTags`) or an interest (`interestTags`). `availableAtVenueIds` names the tenant's other active venues whose published map does match, so GST-053 and WEB-050 can say *Indian food is at the other park (day 2)* instead of quietly placing a restaurant the party cannot reach. Empty when every preference is met on every day. Worked out on read for the version read (a swap can meet or lose a preference), never stored.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "date",
+      "venueId",
+      "preference",
+      "tag"
+     ],
+     "properties": {
+      "date": {
+       "type": "string",
+       "format": "date"
+      },
+      "venueId": {
+       "type": "string",
+       "format": "uuid",
+       "description": "The day's venue, which has no match."
+      },
+      "preference": {
+       "type": "string",
+       "enum": [
+        "cuisine",
+        "retail",
+        "interest"
        ]
+      },
+      "tag": {
+       "type": "string",
+       "maxLength": 30
+      },
+      "availableAtVenueIds": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "uuid"
+       },
+       "description": "Other active venues of the tenant where the tag is matched. Empty when none is."
       }
      }
     }
@@ -446,12 +495,18 @@
      "type": "object",
      "required": [
       "date",
+      "venueId",
       "items"
      ],
      "properties": {
       "date": {
        "type": "string",
        "format": "date"
+      },
+      "venueId": {
+       "type": "string",
+       "format": "uuid",
+       "description": "**The venue this day is planned at** (30 September, MoM 4.7): `VisitPlanRequest.dayVenues` for the date, else `venueId`. Every item of the day is at this venue.\n"
       },
       "opensAt": {
        "type": "string",
@@ -488,6 +543,7 @@
   "description": "One candidate for a swap (29 September, MOB-6).",
   "required": [
    "kind",
+   "venueId",
    "startsAt",
    "reason"
   ],
@@ -501,6 +557,11 @@
      "shop",
      "rest"
     ]
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The item's day venue; an alternative is never from another venue (30 September, MoM 4.7)."
    },
    "pointId": {
     "type": "string",
@@ -595,7 +656,16 @@
      "shop",
      "rest",
      "travel"
-    ]
+    ],
+    "description": "`meal` is a stop at a dining point (restaurant, cafe or food kiosk); `shop` is a retail stop at a shop or a retail kiosk (30 September client meeting, MoM 4.7: retail is placed from the day venue's own points, as dining is).\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**The venue of this stop** (30 September client meeting, MoM 4.7): always the day's venue, and the venue whose map `pointId` is on. Carried on the item so the screens, `bookVisitPlan` and the AI planner agent read it rather than infer it. **Worked out on read, not stored**: from the plan's `inputs` (`dayVenues` for the item's date, else `venueId`). A stored `venue_id` would move the item rows from the plan's own row-level policy to a venue policy and hide a second park's items from the guest who owns the plan.\n"
    },
    "pointId": {
     "type": "string",
@@ -684,7 +754,30 @@
   "properties": {
    "venueId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "description": "The venue the guest picked in the app (GST-001 / WEB-001), which scopes the plan. Every date is planned at this venue unless `dayVenues` puts it somewhere else.\n"
+   },
+   "dayVenues": {
+    "type": "array",
+    "maxItems": 7,
+    "description": "**Which venue on which date, in a multi-venue tenant** (30 September client meeting, MoM 4.7, Allam's requirement). One entry per date that is not at `venueId`; each date of `dates` at most once. Each venue must be an active venue of the caller's tenant (the options `getTenantAppStatus.venues` lists), else 422 `venue-not-in-tenant`. **Each day is then planned from that venue's own published map only**: its rides, its dining and its retail points, never another venue's.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "date",
+      "venueId"
+     ],
+     "properties": {
+      "date": {
+       "type": "string",
+       "format": "date"
+      },
+      "venueId": {
+       "type": "string",
+       "format": "uuid"
+      }
+     }
+    }
    },
    "dates": {
     "type": "array",
@@ -737,13 +830,24 @@
    "cuisineTags": {
     "type": "array",
     "maxItems": 8,
+    "description": "Matched per day against the `cuisineTags` of that day's venue's dining points only (30 September, MoM 4.7). A cuisine no dining point of the day's venue serves is not forced into the day; it is reported in `VisitPlan.unmatchedPreferences`.\n",
     "items": {
      "type": "string"
+    }
+   },
+   "retailTags": {
+    "type": "array",
+    "maxItems": 8,
+    "description": "**Shops the party would like to visit** (30 September client meeting, MoM 4.7: retail and kiosk shops join F&B as venue-linked planner options), e.g. `souvenirs`, `toys`, `apparel`, `essentials`. Matched per day against `VenuePoint.retailTags` of that day's venue's shops and retail kiosks; an unmatched tag is reported, as a cuisine is.\n",
+    "items": {
+     "type": "string",
+     "maxLength": 30
     }
    },
    "mustIncludePointIds": {
     "type": "array",
     "maxItems": 10,
+    "description": "Placed on a day whose venue has the point. A point at none of the plan's venues is listed in `VisitPlan.excluded` with `notAtVenue`, never placed on another venue's day.\n",
     "items": {
      "type": "string",
      "format": "uuid"

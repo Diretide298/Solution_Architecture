@@ -55,7 +55,7 @@ servicesCalled:
 - service: FnbService
   operationCalls: 21
 - service: WhiteLabelService
-  operationCalls: 19
+  operationCalls: 20
 - service: AiService
   operationCalls: 11
 - service: AccessService
@@ -216,6 +216,8 @@ screens:
   - error
   - loading
   - offline
+  - videoBuffering
+  - videoUnavailable
   offlineState: true
   entryParams:
   - eventId<-WEB-002
@@ -1687,6 +1689,7 @@ screens:
   operations:
   - bookVisitPlan
   - generateVisitPlan
+  - getTenantAppStatus
   - getVisitPlan
   - listProducts
   - listVisitPlanAlternatives
@@ -1698,6 +1701,7 @@ screens:
   - error
   - loading
   - offline
+  - preferenceNotAtVenue
   offlineState: true
   entryParams:
   - venueId<-session

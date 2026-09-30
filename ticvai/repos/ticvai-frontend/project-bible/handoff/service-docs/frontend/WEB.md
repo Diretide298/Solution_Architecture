@@ -45,7 +45,7 @@
 | [WEB-029](#web-029-error-sold-out-maintenance) | Error / Sold Out / Maintenance | System States | 1 | 1 |
 | [WEB-030](#web-030-ticket-transfer) | Ticket Transfer | Ticketing | 1 | 4 |
 | [WEB-035](#web-035-multi-currency-pricing) | Multi-Currency & Pricing | Ticketing | 1 | 2 |
-| [WEB-050](#web-050-plan-your-visit) | Plan Your Visit | Discovery & Browse | 1 | 6 |
+| [WEB-050](#web-050-plan-your-visit) | Plan Your Visit | Discovery & Browse | 1 | 7 |
 | [WEB-007](#web-007-interactive-seat-selection) | Interactive Seat Selection | Booking & Selection | 2 | 6 |
 | [WEB-008](#web-008-add-ons-upsell) | Add-ons & Upsell | Booking & Selection | 2 | 6 |
 | [WEB-015](#web-015-branded-queue-waiting-room) | Branded Queue / Waiting Room | High-Demand Access | 2 | 3 |
@@ -276,7 +276,9 @@
 
 | State | Behaviour |
 |---|---|
-| loading | The attraction list. |
+| loading | The video is not part of loading (client meeting 30 September, MoM 4.8): the attraction renders as it arrives and no loader or loading screen is ever drawn over the video. |
+| videoBuffering | Poster frame, not a loader (client meeting 30 September, MoM 4.8): until the first frames arrive the poster (primary image, else the video's first frame) fills the video area and playback starts in place as soon as it can; no spinner, overlay or blocking screen. The details beside it stay usable throughout. |
+| videoUnavailable | The video cannot play (no video, a failed stream, data saver on). The poster stays and the details are unaffected; no error screen and no loader. |
 | error | Could not load. Names which read failed and leaves the attraction untouched. |
 | emptyFirstRun | No attraction yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | emptyNoResults | Nothing matches the filter on from, to and the attraction are still there. Names the active filter and offers to clear it. |
@@ -1159,11 +1161,12 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | Interests and height limits of what the planner may include | `PRODUCT_VIEW` |
-| `generateVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#generatevisitplan) | onAction | Build a rules plan from the inputs (party, heights, dates, pace, interests, cuisine) | `None` |
+| `generateVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#generatevisitplan) | onAction | Build a rules plan from the inputs (party, heights, dates, park per day, pace, interests, shops, cuisine); each day from its own park's points only | `None` |
 | `getVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#getvisitplan) | onLoad | The plan: days, timed items and add-on suggestions, at its current version | `None` |
 | `updateVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#updatevisitplan) | onAction | Swap, remove, add or undo: each change is a new version, so undo goes back one | `None` |
 | `listVisitPlanAlternatives` | [VenueOpsService](../backend/VenueOpsService.md#listvisitplanalternatives) | onAction | Swap candidates for one item that suit everyone in the party | `None` |
 | `bookVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#bookvisitplan) | onAction | Book this plan: turns the plan (and chosen add-ons) into cart lines and returns the cart | `None` |
+| `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | The tenant's active venues, for the park-per-day choice in a multi-venue tenant | `None` |
 
 **States**
 
@@ -1173,6 +1176,7 @@
 | error | Could not build or load the plan. Names what failed; the answers are kept. |
 | emptyFirstRun | No plan yet: the first question is shown. |
 | emptyNoResults | Nothing suits the whole group on that day: says which answer ruled everything out and offers to change it. |
+| preferenceNotAtVenue | A preference a day's park cannot meet (client meeting 30 September, MoM 4.7): before *Make my plan* the chip is marked *Not at the parks you chose* (naming a park of the tenant that has it); after it, the day shows the *Not at this park* banner and nothing from another park is placed. *Change answers* lets the guest move that day to the park that has it. |
 | emptyNoAccess | A guest holds no permission. Anyone can build a plan; signing in is asked only to save it, and booking follows the cart's own sign-in gate. |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 

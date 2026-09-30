@@ -130,7 +130,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Wired to the venue map 18 August (CF-123).** The whole map arrives in one call and the client filters locally — which is also what makes it work with no signal in the middle of a park. **Routing happens on the device.** The platform guarantees the graph — connected, versioned, with step-free marked — and the client walks it, because a phone with the graph cached routes with no signal and a server round-trip per step does not. **The version is how a stale route is caught**: a guest holding a route across a path that closed this morning gets told, rather than walking into a barrier. **Drawn 26 August** — `Seat Board 4.dc.html` frame `seat-4b`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**\n\n**Mobile v4 (decided 29 September, MOB-1).** The **Map** view of GST-038 At the Venue: **one implementation with GST-038, the ids kept** (as GAP-D3).",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Wired to the venue map 18 August (CF-123).** The whole map arrives in one call and the client filters locally — which is also what makes it work with no signal in the middle of a park. **Routing happens on the device.** The platform guarantees the graph — connected, versioned, with step-free marked — and the client walks it, because a phone with the graph cached routes with no signal and a server round-trip per step does not. **The version is how a stale route is caught**: a guest holding a route across a path that closed this morning gets told, rather than walking into a barrier. **Drawn 26 August** — `Seat Board 4.dc.html` frame `seat-4b`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**\n\n**Mobile v4 (decided 29 September, MOB-1).** The **Map** view of GST-038 At the Venue: **one implementation with GST-038, the ids kept** (as GAP-D3).\n\n**3D navigation (client meeting 30 September, MoM 4.8): ADR-0069.** Where the venue map has a GLB model, this view renders it natively (react-three-fiber) and the walking-navigation mode follows the guest in 3D; the route still comes from `getVenueMapGraph`, snapped from live GPS, with no external mapping service. No model, a weak phone or failed rendering: the 2D map, same route.",
   "density": "comfortable",
   "boardFrames": [
    "Seat Board 4.dc.html#seat-4b"
@@ -2235,7 +2235,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     "appTabs"
    ]
   },
-  "notes": "**Mobile v4 (decided 29 September, MOB-1).** Retitled **At the Venue**, the in-venue mode and the optional Map tab: views Map, Waits, Food, Shows, Shop and Services, plus a *Happening now* panel (live orders and queues). **GST-021 Interactive Map and GST-022 Attraction Wait Times are its Map and Waits views: one implementation, three ids** (as GAP-D3). Food opens GST-024, Shop GST-026, Services GST-029, a queue GST-023. This answers CF-92: it is a real screen. (Was: *Not minuted and not in the matrix* — the only unsourced screen of the eight audited on 17 August.)",
+  "notes": "**Mobile v4 (decided 29 September, MOB-1).** Retitled **At the Venue**, the in-venue mode and the optional Map tab: views Map, Waits, Food, Shows, Shop and Services, plus a *Happening now* panel (live orders and queues). **GST-021 Interactive Map and GST-022 Attraction Wait Times are its Map and Waits views: one implementation, three ids** (as GAP-D3). Food opens GST-024, Shop GST-026, Services GST-029, a queue GST-023. This answers CF-92: it is a real screen. (Was: *Not minuted and not in the matrix* — the only unsourced screen of the eight audited on 17 August.) **The Map view's in-park 3D navigation is ADR-0069** (client meeting 30 September, MoM 4.8): venue GLB model, pathway and location file, live GPS, built natively; 2D until a venue supplies a model.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getTenantAppStatus` reads one of them — list, select, act",
@@ -7500,7 +7500,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "cuisineTags": {
     "type": "array",
     "maxItems": 8,
-    "description": "**For dining points** (restaurant, cafe, kiosk; 29 September, MOB-6). The planner places meals at points whose cuisine the party chose, at meal times. Free text codes such as `arabic`, `indian`, `italian`, `fastFood`, `vegetarian`, `halal` — cuisines are too many to close, and a wrong enum is worse than an unmatched tag.\n",
+    "description": "**For dining points** (restaurant, cafe, kiosk; 29 September, MOB-6). The planner places meals at points whose cuisine the party chose, at meal times. Free text codes such as `arabic`, `indian`, `italian`, `fastFood`, `vegetarian`, `halal` — cuisines are too many to close, and a wrong enum is worse than an unmatched tag. **Read per venue**: the planner matches a guest's cuisine only against the points of the venue that day is at (30 September, MoM 4.7).\n",
+    "items": {
+     "type": "string",
+     "maxLength": 30
+    }
+   },
+   "retailTags": {
+    "type": "array",
+    "maxItems": 8,
+    "description": "**For retail points** (shop, and a kiosk that sells goods rather than food; 30 September client meeting, MoM 4.7: retail and kiosk shops join F&B as venue-linked planner options). The planner places a shop stop at points whose tags the party chose, on the day of this point's venue only. Free text codes such as `souvenirs`, `toys`, `apparel`, `photo`, `essentials`, for the same reason as `cuisineTags`. A kiosk may carry both lists.\n",
     "items": {
      "type": "string",
      "maxLength": 30

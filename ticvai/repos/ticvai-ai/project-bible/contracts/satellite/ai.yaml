@@ -43,11 +43,11 @@ info:
     a local model are interchangeable at the operation level (8.4.21–8.4.25), and failover between them
     is a platform concern rather than a caller''s (8.4.26).
 
-    **Tenant isolation is the tenant''s own database** (design 5.8, ADR-0049, which supersedes ADR-0021
-    in part). Vectors live in pgvector inside each tenant''s database, one embedding table per embedding
-    model; row-level security carries venue scope, and the single retrieval client still takes no scope
-    parameter, as defence in depth. Qdrant with a shard per tenant is the documented scale-out, used only
-    past the section 6 trigger.
+    **Tenant isolation is enforced by the store** (ADR-0049, which amends ADR-0021). Vectors live in
+    Qdrant from day one, one collection per tenant per embedding model behind the alias `tenant_<id>`,
+    readable only with that tenant''s collection-scoped JWT. The tenant database keeps the point references
+    (`ai.chunk_embedding`), not the vectors; there is no pgvector. Venue scope is a payload filter the
+    single retrieval client always adds, and the client still takes no scope parameter.
 
     The rule this replaces said isolation must never be filter-level. **That was right about shared placement
     for the wrong stated reason, and reasoning from it produced a cross-tenant defect on 17 August (CF-97)**
@@ -529,6 +529,18 @@ paths:
         planner agent does, through its registered tools, as the guest), so the change is a version the
         guest can undo and AI writes only `ai.suggestion` (ADR-0020). When AI is off or fails, the
         answer is the rules plan unchanged, with `basis` `heuristic`, never an error.
+
+
+        **Grounded in each day''s venue** (30 September client meeting, MoM 4.7, Allam''s
+        requirement). The agent proposes only points and performances that the plan operations
+        return for that day (`getVisitPlan` and `listVisitPlanAlternatives`, which read the
+        published map of the day''s venue, `VisitPlan.days[].venueId`): rides, dining and retail
+        (shops and kiosks) of that venue, never one named from general knowledge or from another
+        venue of the tenant. A wish the day''s venue cannot meet (*"Indian food on day 1"* at a
+        park with no Indian restaurant) is answered as such, naming the venue where it exists
+        from `VisitPlan.unmatchedPreferences`; moving a day to that venue is the guest''s change
+        of answers, not a change the agent makes. `updateVisitPlan` refuses a point from another
+        venue (422 `point-not-at-day-venue`) as the backstop.
 
         '
       tags:
@@ -10796,7 +10808,11 @@ components:
         on GST-054 through these five `venue-map` operations, **always called as the guest whose plan it is** (permission
         null, the guest session''s own plan), so every change is a plan version the guest can undo. `bookVisitPlan`
         needs the guest to press Book in the app; the agent may prepare it and never checks out. AI writes nothing
-        outside `ai.*` (ADR-0020): the plan tables are written by the venue-map service these tools call.'
+        outside `ai.*` (ADR-0020): the plan tables are written by the venue-map service these tools call.
+        **Grounding** (30 September client meeting, MoM 4.7): the agent''s candidates are only what these
+        tools return for a day, i.e. the rides, dining and retail points (shops and kiosks) on the published
+        map of that day''s venue; it never proposes a point from another venue or from general knowledge, and
+        says so when a preference is not met there (`VisitPlan.unmatchedPreferences`).'
       required:
       - toolKey
       - targetContract
@@ -15727,6 +15743,8 @@ components:
         - `itinerary` (added 29 September, MOB-6, guest-allowed): refines a `venue-map` visit plan the
         guest owns. `subjectRef` is the plan id; `value` is `{planId, baseVersion, changes, rationale}`,
         applied with `updateVisitPlan` as the guest. Minimum: none; the rules plan is the baseline.
+        Every change names a point or performance of that day''s venue only, rides, dining and retail
+        alike (30 September client meeting, MoM 4.7).
 
         '
       enum:

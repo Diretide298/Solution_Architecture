@@ -2997,8 +2997,16 @@
        "label": "Cuisine",
        "bindsTo": "VenuePoint.cuisineTags",
        "operation": "setVenuePoint",
-       "notes": "For restaurants and kiosks; matched against the guest's cuisine choice on the Plan tab (MOB-6).",
+       "notes": "For restaurants and kiosks; matched against the guest's cuisine choice on the Plan tab (MOB-6), for this venue's days only (client meeting 30 September, MoM 4.7).",
        "provenance": "agreed name venue-map VenuePoint.cuisineTags (the 29 September pass brief)"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Retail",
+       "bindsTo": "VenuePoint.retailTags",
+       "operation": "setVenuePoint",
+       "notes": "For shops and kiosks that sell goods (souvenirs, toys, apparel ...); matched against the guest's shop choice on the Plan tab for this venue's days only (client meeting 30 September, MoM 4.7: retail and kiosk shops join F&B as venue-linked planner options).",
+       "provenance": "decided 30 September 2026, client meeting MoM 4.7 (Allam)"
       }
      ]
     }
@@ -3104,7 +3112,7 @@
     "id": "formSetVenuePoint",
     "component": "modal",
     "trigger": "Save venue point",
-    "body": "**Collects what `setVenuePoint` sends before it is called.** Required: `id`, `mapId`, `kind`, `name`, `position`. Optional: `nameLocalised`, `outletId`, `productId`, `accessPointId`, `isStepFree`, `openingHours`, `iconRef`, `isActive`, `isNavigable`, `isDestination`, `pointId`; and the item details decided 29 September (MOB-4, MOB-6): `description`, `media`, `featuredOffer` (a product or a bundle, on any kind of point), `typicalDurationMinutes`, `interestTags`, `cuisineTags`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setVenuePoint` sends before it is called.** Required: `id`, `mapId`, `kind`, `name`, `position`. Optional: `nameLocalised`, `outletId`, `productId`, `accessPointId`, `isStepFree`, `openingHours`, `iconRef`, `isActive`, `isNavigable`, `isDestination`, `pointId`; and the item details decided 29 September (MOB-4, MOB-6): `description`, `media`, `featuredOffer` (a product or a bundle, on any kind of point), `typicalDurationMinutes`, `interestTags`, `cuisineTags`; and `retailTags` (30 September, MoM 4.7). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "SetVenuePointRequest",
     "confirm": {
      "label": "Save venue point",
@@ -3134,7 +3142,8 @@
       "featuredOffer",
       "typicalDurationMinutes",
       "interestTags",
-      "cuisineTags"
+      "cuisineTags",
+      "retailTags"
      ]
     },
     "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/points"

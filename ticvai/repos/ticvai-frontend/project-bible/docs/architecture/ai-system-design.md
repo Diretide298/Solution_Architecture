@@ -216,6 +216,8 @@ That is 89 new operations. The P09 blocks bind as follows: configuration assista
 
 The visit plan itself lives in `venue-map` (`venuemap.visit_plan`, `venuemap.visit_plan_item`), because a plan is laid out on the map and is the guest's own, like a cart. **The planner agent never writes it directly**: it proposes changes through `requestSuggestion` kind `itinerary` or calls the plan operations as the guest, so AI still writes only `ai.*`, pgvector and `cache:*` (ADR-0020).
 
+**The planner agent is grounded in each day's venue** (client meeting 30 September, MoM 4.7, Allam's requirement). In a multi-venue tenant each plan day is at one venue (`VisitPlanRequest.dayVenues`, `VisitPlan.days[].venueId`, `VisitPlanItem.venueId`), and the agent's candidates are only what its plan tools return for that day: the rides, dining and **retail (shops and kiosks, added alongside F&B the same day)** on that venue's published map. It never proposes a point from general knowledge or from another venue, and a wish the day's venue cannot meet is answered from `VisitPlan.unmatchedPreferences` (naming the venue that has it) rather than filled. `updateVisitPlan` refuses a point from another venue (422 `point-not-at-day-venue`) as the deterministic backstop, so grounding does not depend on the prompt alone.
+
 **Three new permissions, no more.** `PLATFORM_AI_MANAGE`, from the platform token, for the platform layer of the model catalogue, tool registry and prompt registry. `RISK_REVIEW` and `RISK_INVESTIGATE` for fraud analysts, who are not "AI users" and must not need `AI_USE` to work a case. Everything else uses the four `AI_*` permissions: read with `AI_USE`, configure with `AI_CONFIGURE`, publish or approve with `AI_APPROVE`, audit with `AI_AUDIT_VIEW`. Platform staff reach tenant AI data only through an open platform-staff grant (AIC-265).
 
 ### 2.4 Storage choices
@@ -225,7 +227,7 @@ The visit plan itself lives in `venue-map` (`venuemap.visit_plan`, `venuemap.vis
 | Configuration and current state (policy, providers, capabilities, governance versions, plans, blueprints, cases, alerts, forecast headers, entity risk) | **Tenant database, `ai` schema**, primary | Small, hot, needs RLS and transactions (ADR-0020 §3) |
 | **Vectors**, dense and sparse | **pgvector in the tenant database**; reads on the replica | The database is the tenant boundary; RLS carries venue scope (5.8) |
 | Append-only logs (`ai.activity`, messages, decision records, recommendation decisions and events, risk assessments, forecast points) | **AI log database**: one Postgres database per tenant on a regional AI log server, monthly partitions | ADR-0020 §3 moves history off the primary; a replica cannot be written, so it needs its own server (AIC-248) |
-| Features, velocity counters, caches, snapshots | **Azure Cache for Redis**, keys prefixed `{tenant}:{scope}` | Sub-millisecond reads |
+| Features, velocity counters, caches, snapshots | **Azure Managed Redis** (not Azure Cache for Redis, which is retiring; ADR-0032 amendment), keys prefixed `{tenant}:{scope}` | Sub-millisecond reads |
 | Offline features, training snapshots, model files | **Blob**, a container per tenant; released models immutable | Reproducible training |
 | Case evidence | Postgres `jsonb` plus immutable Blob | AIP-155 |
 | Relationship graph | Postgres edge table, bounded 1..3-hop queries | A graph database is a fifth store for no gain at this size |
@@ -748,6 +750,7 @@ Chinmay answered every question in this section on 29 September, following the r
 | 12 | Which AI ships in six months (30 September, AI-D17) | **Every AI function inside the six months, baseline first, then it learns per tenant.** Rules and starting patterns answer on day one; the tenant's own data takes over as it accumulates | Every suggestion carries its maturity stage (`Suggestion.maturity`); the minimums per kind are where own data takes over, not a refusal |
 | 13 | Model fitness scoring (30 September, AI-D18, our proposal) | **A task-fitness band per model and agent task; warn, never block** | `AiModel.taskFitness`; `setAiProvider` returns `fitnessWarnings` (underpowered, overpowered, unscored); ADM-037 shows them |
 | 14 | Second AI engineer (30 September, AI-D19) | **From 5 October; no third** | As decision 11: trained model producers slip first |
+| 15 | Billing for a client-chosen provider or model (30 September client meeting, MoM 4.1, AI-D20) | **Deferred, not decided: to the dedicated AI workshop** (Allam). Position stated on the call, for the workshop to confirm: the agents behave the same whichever model a client selects (minor performance variation only); we propose a recommended model per function; any extra cost of a provider or model the client chooses (for example ChatGPT) is borne by the client | None yet. Decision 2 (managed Azure OpenAI, re-billed per token) stays the default until the workshop; the per-function recommendation fits decision 13's fitness bands, and BYOK (5.9) is the existing route for a client's own provider |
 
 **The trade-offs in section 5 were reviewed at the same time.** All were accepted, with these additions:
 

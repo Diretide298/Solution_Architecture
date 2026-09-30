@@ -122,5 +122,5 @@
 | `WEB-047` | Map Booking — Cabanas & Spots | Booking & Selection | 3 | 8 | yes |
 | `WEB-048` | Book a Space by the Hour | Booking & Selection | 3 | 4 | yes |
 | `WEB-049` | Transport — Route & Schedule | Transport | 3 | 13 | yes |
-| `WEB-050` | Plan Your Visit | Discovery & Browse | 1 | 6 | yes |
+| `WEB-050` | Plan Your Visit | Discovery & Browse | 1 | 7 | yes |
 

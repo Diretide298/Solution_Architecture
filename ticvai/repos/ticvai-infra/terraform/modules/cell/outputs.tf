@@ -15,7 +15,21 @@ output "reporting_fqdn" {
 }
 
 output "redis_hostname" {
-  value = azurerm_redis_cache.cell.hostname
+  value = azurerm_managed_redis.cell.hostname
+}
+
+output "redis_port" {
+  value = azurerm_managed_redis.cell.default_database[0].port
+}
+
+output "vnet_id" {
+  description = "Link the private DNS zones to this VNet."
+  value       = try(azurerm_virtual_network.cell[0].id, null)
+}
+
+output "nat_egress_ip" {
+  description = "The one static egress IP payment and e-invoicing providers allow-list."
+  value       = try(azurerm_public_ip.nat[0].ip_address, null)
 }
 
 output "key_vault_uri" {
@@ -39,6 +53,6 @@ output "control_plane_registration" {
     cell_name      = local.cell_name
     location       = var.location
     primary_fqdn   = azurerm_postgresql_flexible_server.primary.fqdn
-    redis_hostname = azurerm_redis_cache.cell.hostname
+    redis_hostname = azurerm_managed_redis.cell.hostname
   }
 }

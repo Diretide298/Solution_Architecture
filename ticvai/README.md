@@ -2,7 +2,7 @@
 
 Generated 17 August 2026
 
-**2660 operations · 1093 tables · 2445 screens · 206 state models · 77 events · 97 flows · 56 ADRs**
+**2660 operations · 1093 tables · 2445 screens · 206 state models · 77 events · 97 flows · 57 ADRs**
 
 **Conflicts: 92 raised, 0 blocking.** See `conflict-status.md`.
 
@@ -34,7 +34,7 @@ provenance and what each one rules out — including the six that were wrong fir
 | `states/` · `events/` | 206 state models · 77 events, cross-checked |
 | `flows/` | 23 user journeys with 137 unhappy paths |
 | `handoff/` | 144 registers738 indexes and workbooks — the derived layer |
-| `docs/` | Architecture, 56 ADRs, the conflict register |
+| `docs/` | Architecture, 57 ADRs, the conflict register |
 | `tools/` | **22 checkers and 11 audits**, run as one gated pass by `tools/run-checks.py`, plus the derivers |
 | `wireframes/` | 218 boards from Claude Code, linked to every definition |
 | `sources/` | The matrix, the minutes, the client design references |

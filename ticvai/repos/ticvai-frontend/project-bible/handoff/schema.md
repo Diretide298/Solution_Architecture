@@ -49,7 +49,7 @@ prices, guests and entitlement definitions are shared; transactions are not.
 
 | Object | Purpose |
 |---|---|
-| Extensions | `ltree` `pgcrypto` `pg_stat_statements` `vector` |
+| Extensions | `ltree` `btree_gist` `pgcrypto`; `pg_stat_statements` is on the Azure allow-list (Terraform) only. **No `vector`:** vectors live in Qdrant, one collection per tenant (ADR-0049) |
 | Schemas | 8, with per-module roles and default privileges |
 | `platform.org_unit` | 7-level tree, GiST index on `path` |
 | `platform.region_settings` | Country, currency, **scale**, timezone, fiscal year, placement |

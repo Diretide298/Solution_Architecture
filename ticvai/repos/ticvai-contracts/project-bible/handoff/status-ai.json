@@ -48,7 +48,7 @@
   "tables": 137,
   "screens": 195,
   "flows": 11,
-  "documents": 55,
+  "documents": 56,
   "openConflicts": 1
  },
  "metrics": {
@@ -402,6 +402,11 @@
   {
    "file": "docs\\active\\hierarchy-segregation-services.md",
    "title": "TICVAI \u2014 Hierarchy, Data Segregation and Services",
+   "status": ""
+  },
+  {
+   "file": "docs\\active\\infra-answers-30-september.md",
+   "title": "Infrastructure answers: Qdrant, PostgreSQL extensions, the broker, the network and the cost sheet",
    "status": ""
   },
   {

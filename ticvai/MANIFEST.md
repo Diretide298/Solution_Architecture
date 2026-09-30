@@ -4,7 +4,7 @@
 
 ```
 2660 operations · 33 contracts · 1093 tables · 3033 relationships
-206 state models · 77 events · 97 flows · 56 ADRs
+206 state models · 77 events · 97 flows · 57 ADRs
 2445 screens · 16 platforms · 13 frontends · 5 apps · 218 boards
 ```
 

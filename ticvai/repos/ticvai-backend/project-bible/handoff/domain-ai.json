@@ -4912,6 +4912,12 @@
    "mentions": 1
   },
   {
+   "file": "docs\\active\\infra-answers-30-september.md",
+   "title": "Infrastructure answers: Qdrant, PostgreSQL extensions, the broker, the network and the cost sheet",
+   "status": "",
+   "mentions": 1
+  },
+  {
    "file": "docs\\active\\optimisation-assessment.md",
    "title": "Optimisation assessment \u2014 RAG, caching, backend, frontend",
    "status": "",
@@ -5313,7 +5319,7 @@
   "tables": 137,
   "screens": 195,
   "flows": 11,
-  "documents": 55,
+  "documents": 56,
   "openConflicts": 1
  }
 }

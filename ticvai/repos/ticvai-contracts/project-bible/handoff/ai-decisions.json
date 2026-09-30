@@ -97,6 +97,11 @@
    "id": "AI-D19",
    "q": "7 AI staffing",
    "a": "A second AI engineer from 5 October; no third (Chinmay, 30 September). The trained model producers slip first; everything with a baseline ships in the six months"
+  },
+  {
+   "id": "AI-D20",
+   "q": "AI model billing when a client picks its own provider or model",
+   "a": "DEFERRED, not decided: to the dedicated AI workshop (client meeting 30 September, MoM 4.1; Allam). Position stated on the call, for the workshop to confirm: the AI agents behave the same whichever model a client selects, with only minor performance variation; we propose a recommended model per function; any extra cost of a provider or model the client chooses (for example ChatGPT) is borne by the client. Until the workshop, AI-D02 (managed Azure OpenAI, re-billed per token) stands as the default"
   }
  ],
  "recorded_in": "docs/architecture/ai-system-design.md section 8",

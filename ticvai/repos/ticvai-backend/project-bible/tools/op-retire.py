@@ -60,6 +60,33 @@ OTHER = {
     **{k: ("defer", "", "its operations moved to BO-735 Guest Directory, which is wave 3, outside the Venue "
                         "Management waves (audit R254)")
        for k in ("VM-MARKETING-CONSENT-1", "VM-MARKETING-GUEST-1", "VM-MARKETING-LOYALTY-1")},
+    # 29-30 September: the phased build order and the Venue Management team rule (setup screens the Block A apps
+    # use go first) moved work between the Block A and Venue Management keys. The work is the same; the ticket
+    # under the new key carries it, and the one under the old key is closed.
+    **{f"VM-BO-{n}": ("merge", f"APP-SETUP-BO-{n}", "a Block A app uses this screen, so it is built in Block A's "
+                                                     "setup screens first (decided 30 September)")
+       for n in ("005", "008", "009", "029", "045", "065", "075", "110", "117", "136")},
+    **{f"APP-SETUP-BO-{n}": ("merge", f"VM-BO-{n}", "no Block A app uses this screen, so it is built with the "
+                                                     "Venue Management waves (decided 30 September)")
+       for n in ("013", "062", "086")},
+    **{f"VM-{k}": ("merge", f"SVC-{k}", "a Block A screen calls these operations, so they are built in Block A "
+                                        "(phased build order, decided 30 September)")
+       for k in ("AI-GENERATE-1", "CATALOGUE-PROMOTIONS-1", "FNB-FNB-4", "LEDGER-ACCOUNTS-1", "LEDGER-TAX-1",
+                 "LEDGER-TAX-2", "PLATFORM-PUBLICAPI-2", "REPORTING-CATALOGUE-1")},
+    **{f"VM-MIG-{k}": ("merge", f"MIG-{k}", "one migration per schema, made once in Block A") for k in ("SEATING", "SYNC")},
+    **{k: ("merge", "VM-CATALOGUE-UPSELL-1", "only the Venue Management back office calls the upsell rules, so they "
+                                              "are built with the Venue Management waves (decided 30 September)")
+       for k in ("SVC-CATALOGUE-UPSELL", "SVC-CATALOGUE-UPSELL-1")},
+    "APP-SETUP-BO-857": ("defer", "", "BO-857 Resource Creation & Profile is wave 3, outside Block A and the Venue "
+                         "Management waves 1-2"),
+    "APP-SETUP-PTR-006": ("defer", "", "the partner portal (P10) screens are not in Block A or the Venue Management "
+                          "waves 1-2; they come back when the partner portal is planned"),
+    **{k: ("defer", "", "setReaderScannerPeripheral is still a draft operation, outside the first-release slice")
+       for k in ("SVC-ACCESS-DRAFTED", "SVC-ACCESS-DRAFTED-1")},
+    **{k: ("defer", "", "pauseCampaign, testSendCampaign and unscheduleCampaign are outside the first-release slice; "
+                        "listCampaigns, stopCampaign and updateCampaign are built on VM-MARKETING-CAMPAIGN-1 and "
+                        "SVC-MARKETING-CAMPAIGN-1")
+       for k in ("VM-MARKETING-CAMPAIGN-2", "VM-MARKETING-CAMPAIGN-3")},
 }
 
 

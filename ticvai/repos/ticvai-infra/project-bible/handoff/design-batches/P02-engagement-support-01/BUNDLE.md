@@ -68,7 +68,7 @@ convincingly. It is never a caption.
 | `GST-033` | AI Concierge – Contextual Help | configEditor | 1 | 0 | — |
 | `GST-035` | Feedback & Ratings | configEditor | 2 | 1 | — |
 | `GST-040` | Help & Support | commandCentre | 6 | 2 | — |
-| `GST-051` | Plan | multiStepForm | 3 | 0 | — |
+| `GST-051` | Plan | multiStepForm | 4 | 0 | — |
 | `GST-052` | Suggested Itineraries | listDetail | 3 | 0 | — |
 | `GST-053` | Your Plan | listDetail | 7 | 0 | — |
 | `GST-054` | AI Planner | listDetail | 6 | 0 | yes |
@@ -1594,7 +1594,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
-  "notes": "Minuted 10 Aug §4.9. Benchmarked against Skidata. Tied to a ticket purchase and saved as a personal visit profile. **Out of the first release** (decided 28 September, audit R187): the itinerary planner is deferred and this screen is `wave: 4` with a `deferred` block. Kept, not deleted, for the release that builds it.\n\n**Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan below.\n\n**Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.\n\n**Mobile v4 role (MOB-6): the Plan tab root, \"Plan\".** Inputs: party size, heights (or ages), dates, pace (packed, balanced or relaxed), interests and cuisine. The rules planner (`generateVisitPlan`) runs with no AI. The tab is hidden when the venue turns module `visitPlanner` off.",
+  "notes": "Minuted 10 Aug §4.9. Benchmarked against Skidata. Tied to a ticket purchase and saved as a personal visit profile. **Out of the first release** (decided 28 September, audit R187): the itinerary planner is deferred and this screen is `wave: 4` with a `deferred` block. Kept, not deleted, for the release that builds it.\n\n**Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan below.\n\n**Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.\n\n**Mobile v4 role (MOB-6): the Plan tab root, \"Plan\".** Inputs: party size, heights (or ages), dates, pace (packed, balanced or relaxed), interests and cuisine. The rules planner (`generateVisitPlan`) runs with no AI. The tab is hidden when the venue turns module `visitPlanner` off.\n\n**Multi-venue intelligence (client meeting 30 September, MoM 4.7, Allam; agreed by Chinmay).** In a multi-venue tenant each chosen day is at one park, and the planner uses **only the rides, dining and retail that exist at that park**: a cuisine or shop preference is checked against that park's own points, never assumed of every park (only one park has the Indian restaurant, so *Indian* places lunch there on that park's day and nowhere else). Retail and kiosk shops are now planner options alongside F&B (the gap a Softlabs teammate flagged). Contract: venue-map `generateVisitPlan` `dayVenues`, `retailTags`, `VisitPlan.unmatchedPreferences`.",
   "density": "comfortable",
   "pattern": "multiStepForm",
   "patternReason": "The v4 prototype asks six questions one at a time (who, heights, days, pace, likes, food) and ends on *Make my plan*",
@@ -1645,6 +1645,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
       },
       {
        "kind": "selectField",
+       "label": "Which park each day?",
+       "bindsTo": "TenantAppStatus.venues",
+       "operation": "getTenantAppStatus",
+       "notes": "**Only in a multi-venue tenant** (more than one entry in `getTenantAppStatus.venues`); hidden otherwise. One choice per chosen day, defaulting to the venue picked on Home; sent as `VisitPlanRequest.dayVenues`. **Each day is then planned from that park's own rides, dining and shops only** (client meeting 30 September, MoM 4.7).",
+       "provenance": "decided 30 September 2026, client meeting MoM 4.7 (Allam)"
+      },
+      {
+       "kind": "selectField",
        "label": "How busy should each day be?",
        "notes": "Packed, Balanced or Relaxed.",
        "provenance": "decided 29 September 2026, MOB-6"
@@ -1657,10 +1665,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "provenance": "decided 29 September 2026, MOB-6"
       },
       {
+       "kind": "multiSelect",
+       "label": "Any shops you'd like to visit?",
+       "notes": "**Shown when Shopping is chosen above** (client meeting 30 September, MoM 4.7: retail and kiosk shops join F&B in the planner). Options are the `retailTags` of the shops and retail kiosks of the chosen parks (souvenirs, toys, apparel ...); sent as `VisitPlanRequest.retailTags`. A shop stop is planned only at a shop or kiosk of that day's park.",
+       "provenance": "decided 30 September 2026, client meeting MoM 4.7 (Allam)"
+      },
+      {
        "kind": "selectField",
        "label": "What would you like for lunch?",
-       "notes": "Cuisines from the outlets (`VenuePoint.cuisineTags`); lunch is planned at a restaurant that serves it.",
-       "provenance": "decided 29 September 2026, MOB-6"
+       "notes": "**Cuisines from the dining points of the chosen parks only** (`VenuePoint.cuisineTags` of restaurants, cafes and food kiosks; client meeting 30 September, MoM 4.7). Lunch is planned at a restaurant **of that day's park** that serves it, never another park's. In a multi-venue plan each cuisine names the park(s) that serve it (*Indian · Summit Peaks only*), so the guest sees before planning that it will not be on every day.",
+       "provenance": "decided 29 September 2026, MOB-6; decided 30 September 2026, client meeting MoM 4.7 (Allam)"
       }
      ]
     },
@@ -1690,6 +1704,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "error": "Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing.",
    "emptyFirstRun": "No plan yet: the first question is shown. Nothing is saved until *Make my plan*.",
    "emptyNoResults": "Nothing suits the whole party on that day (for example every ride is over a child's height): says so and offers to change the answers.",
+   "preferenceNotAtVenue": "**A preference no chosen park can meet** (client meeting 30 September, MoM 4.7): a cuisine or shop tag with no matching point at any park of the plan is marked on its chip (*Not at the parks you chose*) before *Make my plan*; the plan is still made without it, never with a restaurant or shop from a park the party is not visiting. Where another park of the tenant has it, the chip says which, and choosing that park for a day brings it in.",
    "emptyNoAccess": "A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
@@ -1709,9 +1724,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    {
     "operationId": "generateVisitPlan",
     "contract": "venue-map",
-    "purpose": "Build a rules plan from the inputs (party, heights, dates, pace, interests, cuisine)",
+    "purpose": "Build a rules plan from the inputs (party, heights, dates, park per day, pace, interests, shops, cuisine); each day from its own park's points only",
     "trigger": "onAction",
-    "provenance": "decided 29 September 2026, MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6; decided 30 September 2026, client meeting MoM 4.7 (Allam)"
+   },
+   {
+    "operationId": "getTenantAppStatus",
+    "contract": "white-label",
+    "purpose": "The tenant's active venues, for the park-per-day choice in a multi-venue tenant",
+    "trigger": "onLoad",
+    "provenance": "decided 30 September 2026, client meeting MoM 4.7 (Allam)"
    }
   ],
   "entryState": {
@@ -2021,7 +2043,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
-  "notes": "Minuted 10 Aug §4.9. **Group sharing agreed** — an in-app QR a friend scans to join the itinerary (Chinmay raised, Qossai confirmed). **Out of the first release** (decided 28 September, audit R187): the itinerary planner is deferred and this screen is `wave: 4` with a `deferred` block. Kept, not deleted, for the release that builds it.\n\n**Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan below.\n\n**Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.\n\n**Mobile v4 role (MOB-6): \"Your Plan\".** Per-day itinerary with swap, remove, add and undo (`updateVisitPlan` is versioned), add-ons such as Fast Track, and **Book this plan** → GST-041.",
+  "notes": "Minuted 10 Aug §4.9. **Group sharing agreed** — an in-app QR a friend scans to join the itinerary (Chinmay raised, Qossai confirmed). **Out of the first release** (decided 28 September, audit R187): the itinerary planner is deferred and this screen is `wave: 4` with a `deferred` block. Kept, not deleted, for the release that builds it.\n\n**Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan below.\n\n**Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.\n\n**Mobile v4 role (MOB-6): \"Your Plan\".** Per-day itinerary with swap, remove, add and undo (`updateVisitPlan` is versioned), add-ons such as Fast Track, and **Book this plan** → GST-041.\n\n**Multi-venue intelligence (client meeting 30 September, MoM 4.7, Allam).** Each day tab is one park, and every item on it (rides, dining, and now retail: shops and kiosks) is at that park; a preference the park cannot meet shows as *Not at this park* rather than being filled from another park.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getCart` reads one of them — list, select, act",
@@ -2038,7 +2060,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "Day tabs",
        "bindsTo": "VisitPlan",
        "operation": "getVisitPlan",
-       "notes": "Day 1 · Fri 2 Oct · Summit Peaks … one tab per chosen day.",
+       "notes": "Day 1 · Fri 2 Oct · Summit Peaks … one tab per chosen day; the park is the day's `VisitPlan.days[].venueId` (client meeting 30 September, MoM 4.7).",
        "provenance": "decided 29 September 2026, MOB-6"
       },
       {
@@ -2046,14 +2068,14 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "label": "The day",
        "bindsTo": "VisitPlanItem",
        "operation": "getVisitPlan",
-       "notes": "Arrive, then each timed item (ride, show, lunch at a restaurant serving the chosen cuisine) with its place and zone; Fast Track marked on the rides it covers.",
-       "provenance": "decided 29 September 2026, MOB-6"
+       "notes": "Arrive, then each timed item (ride, show, lunch at a restaurant serving the chosen cuisine, a shop or kiosk stop) with its place and zone; Fast Track marked on the rides it covers. **Every item is at the day's park** (`VisitPlanItem.venueId`; client meeting 30 September, MoM 4.7): retail stops (`kind` `shop`: shops and retail kiosks) sit beside meals, both from that park's own points.",
+       "provenance": "decided 29 September 2026, MOB-6; decided 30 September 2026, client meeting MoM 4.7 (Allam)"
       },
       {
        "kind": "secondaryButton",
        "label": "Swap",
        "operation": "listVisitPlanAlternatives",
-       "notes": "Opens the swap sheet of candidates that suit everyone (`listVisitPlanAlternatives`); choosing one saves a new version.",
+       "notes": "Opens the swap sheet of candidates that suit everyone (`listVisitPlanAlternatives`); choosing one saves a new version. Candidates come only from the day's park (client meeting 30 September, MoM 4.7); a meal swaps to that park's dining, a shop to its shops and kiosks.",
        "provenance": "decided 29 September 2026, MOB-6"
       },
       {
@@ -2081,8 +2103,16 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "banner",
        "label": "Left out for your group",
        "operation": "getVisitPlan",
-       "notes": "Items left out because of a child's height, with the limit (e.g. *Freefall Tower (needs 1.40 m)*).",
+       "notes": "Items left out because of a child's height, with the limit (e.g. *Freefall Tower (needs 1.40 m)*), and a must-see at none of the chosen parks (`notAtVenue`).",
        "provenance": "decided 29 September 2026, MOB-6"
+      },
+      {
+       "kind": "banner",
+       "label": "Not at this park",
+       "bindsTo": "VisitPlan.unmatchedPreferences",
+       "operation": "getVisitPlan",
+       "notes": "**Per day, what the day's park could not offer** (client meeting 30 September, MoM 4.7): e.g. *No Indian restaurant at Summit Peaks. Indian food is at Aqua Park (day 2).* Names the other park from `availableAtVenueIds`, or says no park has it. Lunch that day is at the park's best other restaurant, marked as such. Hidden when every preference is met.",
+       "provenance": "decided 30 September 2026, client meeting MoM 4.7 (Allam)"
       }
      ]
     },
@@ -2145,6 +2175,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "error": "Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing.",
    "emptyFirstRun": "No plan yet: offers the questions (GST-051) or a ready-made plan (GST-052).",
    "emptyNoResults": "Nothing suits the whole party on that day (for example every ride is over a child's height): says so and offers to change the answers.",
+   "preferenceNotAtVenue": "**A day whose park cannot meet a preference** (client meeting 30 September, MoM 4.7): the day is shown in full with the *Not at this park* banner naming the cuisine or shop and where it is instead; nothing from another park is placed. *Change answers* (GST-051) lets the guest move that day to the park that has it. An empty swap sheet says the day's park has no other option of that kind, not that none exists anywhere.",
    "emptyNoAccess": "A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
@@ -2310,7 +2341,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
-  "notes": "Minuted 10 Aug §4.9. **The AI half is Wave 2** — the manual planner must work without it (CF-41). **Guest concierge confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.** Still degrades to the manual planner rather than to an error. ** wired 24 August.** The board drew four bespoke AI endpoints for itinerary planning; **one operation with a kind answers all of them** (ADR-0028), and recording the outcome is what lets a model replace the heuristic later. **`recordSuggestionOutcome` removed from the guest surface.** `check-screens` refused it and was right: **a guest does not record an outcome — the platform observes what they did.** A guest app that self-reports whether it took the advice is a training label the guest could forge, and the observation belongs server-side where the plan and the visit can be compared. **Out of the first release** (decided 28 September, audit R187): the itinerary planner is deferred and this screen is `wave: 4` with a `deferred` block. Kept, not deleted, for the release that builds it. **Itinerary suggestion removed 28 September** (decided 28 September, audit R209): the planner is deferred (R187) and `requestSuggestion` refuses a guest anything but prepPlan, upsell and waitTime, so this screen no longer asks for a day plan.\n\n**Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan below.\n\n**Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.\n\n**Mobile v4 role (MOB-6): \"AI Planner\".** The agent refines the rules plan by chat; its tools are the plan operations, and `requestSuggestion` gains the guest-allowed kind `itinerary` (what R209 said to add if the planner ships). AI writes only `ai.*` stores; the plan change itself is `updateVisitPlan`. **The rules plan never fails over to an error**: with AI off, not licensed or failing, the guest keeps the rules plan and the Plan tab works in full.",
+  "notes": "Minuted 10 Aug §4.9. **The AI half is Wave 2** — the manual planner must work without it (CF-41). **Guest concierge confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.** Still degrades to the manual planner rather than to an error. ** wired 24 August.** The board drew four bespoke AI endpoints for itinerary planning; **one operation with a kind answers all of them** (ADR-0028), and recording the outcome is what lets a model replace the heuristic later. **`recordSuggestionOutcome` removed from the guest surface.** `check-screens` refused it and was right: **a guest does not record an outcome — the platform observes what they did.** A guest app that self-reports whether it took the advice is a training label the guest could forge, and the observation belongs server-side where the plan and the visit can be compared. **Out of the first release** (decided 28 September, audit R187): the itinerary planner is deferred and this screen is `wave: 4` with a `deferred` block. Kept, not deleted, for the release that builds it. **Itinerary suggestion removed 28 September** (decided 28 September, audit R209): the planner is deferred (R187) and `requestSuggestion` refuses a guest anything but prepPlan, upsell and waitTime, so this screen no longer asks for a day plan.\n\n**Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan below.\n\n**Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.\n\n**Mobile v4 role (MOB-6): \"AI Planner\".** The agent refines the rules plan by chat; its tools are the plan operations, and `requestSuggestion` gains the guest-allowed kind `itinerary` (what R209 said to add if the planner ships). AI writes only `ai.*` stores; the plan change itself is `updateVisitPlan`. **The rules plan never fails over to an error**: with AI off, not licensed or failing, the guest keeps the rules plan and the Plan tab works in full.\n\n**Grounding (client meeting 30 September, MoM 4.7, Allam).** The agent's candidates are only the rides, dining and retail (shops and kiosks) of each day's own park, as the plan operations return them; `updateVisitPlan` refuses a point from another park (`point-not-at-day-venue`) as the backstop.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getWaitTimes` reads one of them — list, select, act",
@@ -2334,7 +2365,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "assistantPanel",
        "label": "Ask the planner",
        "operation": "sendAiMessage",
-       "notes": "e.g. *More shows, fewer coasters on day 2*. The agent calls `requestSuggestion` kind `itinerary` and applies the result with `updateVisitPlan`; Undo on GST-053 reverts it.",
+       "notes": "e.g. *More shows, fewer coasters on day 2*. The agent calls `requestSuggestion` kind `itinerary` and applies the result with `updateVisitPlan`; Undo on GST-053 reverts it. **Grounded in each day's park** (client meeting 30 September, MoM 4.7): it proposes only rides, dining and shops (kiosks included) that the plan operations return for that day's venue; asked for something the park lacks (*Indian food on day 1*), it says the park has none and names the park that does, and never places another park's restaurant or shop.",
        "provenance": "decided 29 September 2026, MOB-6"
       }
      ]
@@ -6464,7 +6495,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
  },
  "SuggestionKind": {
   "type": "string",
-  "description": "What is being suggested. **A closed set, and the reason it is closed is the swap.** Every entry here is a question a venue asks that a model could answer better than a rule — and each one starts as a heuristic and becomes a model when there is data.\n**Six of these were drawn as their own endpoints on the client F&B boards** — `suggestPrice`, `simulateScenario`, `simulateSlaPolicy`, `suggestRequisition`, `suggestReplenishment`, `publishDemandPlan`. **Building six endpoints means six places to change when a model changes**, and the model will change more often than the venue's question does.\n**What each kind is based on, and when the venue's own data takes over. Proposed, client to correct (decided 28 September, audit R213; re-read 29 September, AI functions review).** The figure after each rule is **the point where own data takes over from the baseline, not a refusal**: below it the kind answers from the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, the weather) with `maturity.stage` `starting`, and between it and about three months it blends the two (`learning`). The day-one baseline per kind: `replenishment`, `requisition`, `prepPlan`, `staffing`, `demandForecast` and `scenario` from the baseline forecast (typical attendance from the venue AI settings x the venue-type month curve x the calendar x weather, bookings on hand as a floor); `menuEngineering` ranked by margin with popularity marked learning; `slaTarget` a standard default; `waitTime` people ahead / configured capacity; `upsell` the relationship map and business priority; `segmentation` known guest attributes; `anomaly` the venue's configured thresholds and actual against the forecast's low end; `sendTime` the channel's typical hour; `wasteRisk` shelf life and par against the forecast; `queueBalancing` configured capacity per queue. Only a missing setting refuses (422 `AiMissingSettingProblem`).\n- `price`: unit cost plus the category's target margin, held inside the price band. Minimum: a current cost, no history.\n- `replenishment`: par level minus on-hand plus expected use over the supplier lead time. Minimum: 14 days of stock movements.\n- `requisition`: the next service's prep-plan ingredient needs minus kitchen stock. Minimum: 14 days of sales.\n- `demandForecast`: the average of the same weekday over the last 8 weeks, adjusted by admissions already booked. Minimum: 8 weeks of sales.\n- `prepPlan`: forecast covers for the service times each item's share of the last 4 same weekdays. Minimum: 4 weeks of sales.\n- `menuEngineering`: each item placed by popularity against margin, over 90 days. Minimum: 90 days of sales.\n- `staffing`: forecast demand divided by the role's standard covers per staff hour. Minimum: 8 weeks of sales (the forecast it rests on).\n- `slaTarget`: the 80th percentile of actual times over the last 30 days. Minimum: 30 days of timed events.\n- `waitTime`: people ahead divided by the throughput of the last 30 minutes. Minimum: 30 minutes of throughput today.\n- `upsell`: the item most often bought with the basket's items over 90 days. Minimum: 90 days of orders.\n- `segmentation`: recency, frequency and spend scores over 12 months. Minimum: 90 days of orders.\n- `anomaly`: a value outside three standard deviations of the same weekday over 8 weeks. Minimum: 8 weeks of the measure.\n- `scenario`: the demand forecast re-run with the stated changes. Minimum: as `demandForecast`.\n- `sendTime` (added 29 September): per recipient, the hour inside `context.sendWindow` in which they have most often opened or clicked over the last 90 days (marketing-crm attribution touches), and where `context.channel` is `best`, the consented channel with the highest engagement. A recipient with fewer than three touches gets their segment's modal hour, and one with none the window's start. Asked with `subjectRef` a segment id or `context.subjectIds` (at most 10,000). `value` is `{recommendations: [{subjectId, sendAt, channel, basisTouches}]}`. Minimum: 90 days of message touches at the scope.\n- `wasteRisk` (added 29 September): per item at an outlet or store location, planned production and stock on hand minus forecast demand over the item's shelf life, plus batches expiring inside the horizon (`inventory.listExpiringBatches`). `value` is `{items: [{itemRef, quantityAtRisk, valueAtCost, expiresAt, recommendedAction (reducePrep, promote, transfer, useInRecipe), transferTo}]}`. Minimum: 14 days of recorded waste and of sales.\n- `queueBalancing` (added 29 September): per queue or attraction at `subjectRef` (a venue) over `horizon`, the forecast wait (the `queue` forecast definition) against throughput capacity, a recommended virtual-queue return-slot allocation by queue type, and guest redirection from over-used to under-used attractions. `value` is `{queues: [{queueId, forecastWaitMinutes, capacityPerHour, returnSlotsPerInterval, redirectTo}]}`. Minimum: 14 days of queue readings.\n- `itinerary` (added 29 September, MOB-6, guest-allowed): refines a `venue-map` visit plan the guest owns. `subjectRef` is the plan id; `value` is `{planId, baseVersion, changes, rationale}`, applied with `updateVisitPlan` as the guest. Minimum: none; the rules plan is the baseline.\n",
+  "description": "What is being suggested. **A closed set, and the reason it is closed is the swap.** Every entry here is a question a venue asks that a model could answer better than a rule — and each one starts as a heuristic and becomes a model when there is data.\n**Six of these were drawn as their own endpoints on the client F&B boards** — `suggestPrice`, `simulateScenario`, `simulateSlaPolicy`, `suggestRequisition`, `suggestReplenishment`, `publishDemandPlan`. **Building six endpoints means six places to change when a model changes**, and the model will change more often than the venue's question does.\n**What each kind is based on, and when the venue's own data takes over. Proposed, client to correct (decided 28 September, audit R213; re-read 29 September, AI functions review).** The figure after each rule is **the point where own data takes over from the baseline, not a refusal**: below it the kind answers from the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, the weather) with `maturity.stage` `starting`, and between it and about three months it blends the two (`learning`). The day-one baseline per kind: `replenishment`, `requisition`, `prepPlan`, `staffing`, `demandForecast` and `scenario` from the baseline forecast (typical attendance from the venue AI settings x the venue-type month curve x the calendar x weather, bookings on hand as a floor); `menuEngineering` ranked by margin with popularity marked learning; `slaTarget` a standard default; `waitTime` people ahead / configured capacity; `upsell` the relationship map and business priority; `segmentation` known guest attributes; `anomaly` the venue's configured thresholds and actual against the forecast's low end; `sendTime` the channel's typical hour; `wasteRisk` shelf life and par against the forecast; `queueBalancing` configured capacity per queue. Only a missing setting refuses (422 `AiMissingSettingProblem`).\n- `price`: unit cost plus the category's target margin, held inside the price band. Minimum: a current cost, no history.\n- `replenishment`: par level minus on-hand plus expected use over the supplier lead time. Minimum: 14 days of stock movements.\n- `requisition`: the next service's prep-plan ingredient needs minus kitchen stock. Minimum: 14 days of sales.\n- `demandForecast`: the average of the same weekday over the last 8 weeks, adjusted by admissions already booked. Minimum: 8 weeks of sales.\n- `prepPlan`: forecast covers for the service times each item's share of the last 4 same weekdays. Minimum: 4 weeks of sales.\n- `menuEngineering`: each item placed by popularity against margin, over 90 days. Minimum: 90 days of sales.\n- `staffing`: forecast demand divided by the role's standard covers per staff hour. Minimum: 8 weeks of sales (the forecast it rests on).\n- `slaTarget`: the 80th percentile of actual times over the last 30 days. Minimum: 30 days of timed events.\n- `waitTime`: people ahead divided by the throughput of the last 30 minutes. Minimum: 30 minutes of throughput today.\n- `upsell`: the item most often bought with the basket's items over 90 days. Minimum: 90 days of orders.\n- `segmentation`: recency, frequency and spend scores over 12 months. Minimum: 90 days of orders.\n- `anomaly`: a value outside three standard deviations of the same weekday over 8 weeks. Minimum: 8 weeks of the measure.\n- `scenario`: the demand forecast re-run with the stated changes. Minimum: as `demandForecast`.\n- `sendTime` (added 29 September): per recipient, the hour inside `context.sendWindow` in which they have most often opened or clicked over the last 90 days (marketing-crm attribution touches), and where `context.channel` is `best`, the consented channel with the highest engagement. A recipient with fewer than three touches gets their segment's modal hour, and one with none the window's start. Asked with `subjectRef` a segment id or `context.subjectIds` (at most 10,000). `value` is `{recommendations: [{subjectId, sendAt, channel, basisTouches}]}`. Minimum: 90 days of message touches at the scope.\n- `wasteRisk` (added 29 September): per item at an outlet or store location, planned production and stock on hand minus forecast demand over the item's shelf life, plus batches expiring inside the horizon (`inventory.listExpiringBatches`). `value` is `{items: [{itemRef, quantityAtRisk, valueAtCost, expiresAt, recommendedAction (reducePrep, promote, transfer, useInRecipe), transferTo}]}`. Minimum: 14 days of recorded waste and of sales.\n- `queueBalancing` (added 29 September): per queue or attraction at `subjectRef` (a venue) over `horizon`, the forecast wait (the `queue` forecast definition) against throughput capacity, a recommended virtual-queue return-slot allocation by queue type, and guest redirection from over-used to under-used attractions. `value` is `{queues: [{queueId, forecastWaitMinutes, capacityPerHour, returnSlotsPerInterval, redirectTo}]}`. Minimum: 14 days of queue readings.\n- `itinerary` (added 29 September, MOB-6, guest-allowed): refines a `venue-map` visit plan the guest owns. `subjectRef` is the plan id; `value` is `{planId, baseVersion, changes, rationale}`, applied with `updateVisitPlan` as the guest. Minimum: none; the rules plan is the baseline. Every change names a point or performance of that day's venue only, rides, dining and retail alike (30 September client meeting, MoM 4.7).\n",
   "enum": [
    "price",
    "replenishment",
@@ -6808,8 +6839,57 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
         "ageRule",
         "closedOnDate",
         "notInInterests",
-        "noTime"
+        "noTime",
+        "notAtVenue"
+       ],
+       "description": "`notAtVenue` (30 September, MoM 4.7): a must-include point that is at none of the plan's venues, so no day could hold it.\n"
+      }
+     }
+    }
+   },
+   "unmatchedPreferences": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**A preference a day's venue cannot meet is said, never faked** (30 September client meeting, MoM 4.7, Allam's requirement). One entry per day and preference that no point of that day's venue matches: a cuisine (`cuisineTags`), a shop (`retailTags`) or an interest (`interestTags`). `availableAtVenueIds` names the tenant's other active venues whose published map does match, so GST-053 and WEB-050 can say *Indian food is at the other park (day 2)* instead of quietly placing a restaurant the party cannot reach. Empty when every preference is met on every day. Worked out on read for the version read (a swap can meet or lose a preference), never stored.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "date",
+      "venueId",
+      "preference",
+      "tag"
+     ],
+     "properties": {
+      "date": {
+       "type": "string",
+       "format": "date"
+      },
+      "venueId": {
+       "type": "string",
+       "format": "uuid",
+       "description": "The day's venue, which has no match."
+      },
+      "preference": {
+       "type": "string",
+       "enum": [
+        "cuisine",
+        "retail",
+        "interest"
        ]
+      },
+      "tag": {
+       "type": "string",
+       "maxLength": 30
+      },
+      "availableAtVenueIds": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "uuid"
+       },
+       "description": "Other active venues of the tenant where the tag is matched. Empty when none is."
       }
      }
     }
@@ -6822,12 +6902,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "type": "object",
      "required": [
       "date",
+      "venueId",
       "items"
      ],
      "properties": {
       "date": {
        "type": "string",
        "format": "date"
+      },
+      "venueId": {
+       "type": "string",
+       "format": "uuid",
+       "description": "**The venue this day is planned at** (30 September, MoM 4.7): `VisitPlanRequest.dayVenues` for the date, else `venueId`. Every item of the day is at this venue.\n"
       },
       "opensAt": {
        "type": "string",
@@ -6864,6 +6950,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "description": "One candidate for a swap (29 September, MOB-6).",
   "required": [
    "kind",
+   "venueId",
    "startsAt",
    "reason"
   ],
@@ -6877,6 +6964,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "shop",
      "rest"
     ]
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The item's day venue; an alternative is never from another venue (30 September, MoM 4.7)."
    },
    "pointId": {
     "type": "string",
@@ -7034,7 +7126,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
      "shop",
      "rest",
      "travel"
-    ]
+    ],
+    "description": "`meal` is a stop at a dining point (restaurant, cafe or food kiosk); `shop` is a retail stop at a shop or a retail kiosk (30 September client meeting, MoM 4.7: retail is placed from the day venue's own points, as dining is).\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**The venue of this stop** (30 September client meeting, MoM 4.7): always the day's venue, and the venue whose map `pointId` is on. Carried on the item so the screens, `bookVisitPlan` and the AI planner agent read it rather than infer it. **Worked out on read, not stored**: from the plan's `inputs` (`dayVenues` for the item's date, else `venueId`). A stored `venue_id` would move the item rows from the plan's own row-level policy to a venue policy and hide a second park's items from the guest who owns the plan.\n"
    },
    "pointId": {
     "type": "string",
@@ -7123,7 +7224,30 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
   "properties": {
    "venueId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "description": "The venue the guest picked in the app (GST-001 / WEB-001), which scopes the plan. Every date is planned at this venue unless `dayVenues` puts it somewhere else.\n"
+   },
+   "dayVenues": {
+    "type": "array",
+    "maxItems": 7,
+    "description": "**Which venue on which date, in a multi-venue tenant** (30 September client meeting, MoM 4.7, Allam's requirement). One entry per date that is not at `venueId`; each date of `dates` at most once. Each venue must be an active venue of the caller's tenant (the options `getTenantAppStatus.venues` lists), else 422 `venue-not-in-tenant`. **Each day is then planned from that venue's own published map only**: its rides, its dining and its retail points, never another venue's.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "date",
+      "venueId"
+     ],
+     "properties": {
+      "date": {
+       "type": "string",
+       "format": "date"
+      },
+      "venueId": {
+       "type": "string",
+       "format": "uuid"
+      }
+     }
+    }
    },
    "dates": {
     "type": "array",
@@ -7176,13 +7300,24 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "cuisineTags": {
     "type": "array",
     "maxItems": 8,
+    "description": "Matched per day against the `cuisineTags` of that day's venue's dining points only (30 September, MoM 4.7). A cuisine no dining point of the day's venue serves is not forced into the day; it is reported in `VisitPlan.unmatchedPreferences`.\n",
     "items": {
      "type": "string"
+    }
+   },
+   "retailTags": {
+    "type": "array",
+    "maxItems": 8,
+    "description": "**Shops the party would like to visit** (30 September client meeting, MoM 4.7: retail and kiosk shops join F&B as venue-linked planner options), e.g. `souvenirs`, `toys`, `apparel`, `essentials`. Matched per day against `VenuePoint.retailTags` of that day's venue's shops and retail kiosks; an unmatched tag is reported, as a cuisine is.\n",
+    "items": {
+     "type": "string",
+     "maxLength": 30
     }
    },
    "mustIncludePointIds": {
     "type": "array",
     "maxItems": 10,
+    "description": "Placed on a day whose venue has the point. A point at none of the plan's venues is listed in `VisitPlan.excluded` with `notAtVenue`, never placed on another venue's day.\n",
     "items": {
      "type": "string",
      "format": "uuid"

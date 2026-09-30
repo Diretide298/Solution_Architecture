@@ -9,7 +9,7 @@
 | Screens | P01 50 · P02 77 |
 | Capability groups | 56 — appOnly 6 · folded 3 · paired 46 · webOnly 1 |
 | Operations | web 214 · app 217 · shared 211 |
-| Findings | high 34 · medium 170 · low 232 · info 3 |
+| Findings | high 34 · medium 169 · low 232 · info 3 |
 
 ## By dimension
 
@@ -21,7 +21,7 @@
 | frontend manifest | 2 | 1 |  |  |
 | coverage | 1 | 4 | 3 | 2 |
 | entry parameters |  | 27 |  |  |
-| bindings |  | 26 |  |  |
+| bindings |  | 25 |  |  |
 | states |  | 19 |  |  |
 | flows |  | 13 |  |  |
 | unbound operations |  | 9 | 24 |  |
@@ -96,7 +96,7 @@
 | wave | virtual-queue (WEB-040 ↔ GST-023) | ships in wave 2 on the web and wave 3 on the app | one wave for both, or record why one shell waits |
 | wave | waiting-room (WEB-015 ↔ GST-046) | ships in wave 2 on the web and wave 1 on the app | one wave for both, or record why one shell waits |
 
-## Medium — 170
+## Medium — 169
 
 | Dimension | Where | Difference | Resolve by |
 |---|---|---|---|
@@ -109,7 +109,6 @@
 | bindings | help-and-cases (WEB-025 ↔ GST-068) | web shows ['TenantAppStatus'] only, app shows ['AiConversation'] only | bind both twins to the same schemas |
 | bindings | help-content-and-accessibility (WEB-045 ↔ GST-040/GST-057) | web shows — only, app shows ['Case'] only | bind both twins to the same schemas |
 | bindings | home (WEB-001 ↔ GST-001) | web shows ['HomepageLayout', 'Product'] only, app shows ['GuestProfileDetail', 'Money'] only | bind both twins to the same schemas |
-| bindings | itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059) | web shows — only, app shows ['VisitPlan'] only | bind both twins to the same schemas |
 | bindings | memberships (WEB-022/WEB-023 ↔ GST-015) | web shows — only, app shows ['DelegatedAccess'] only | bind both twins to the same schemas |
 | bindings | newsletter (WEB-027 ↔ GST-065) | web shows ['GuestDevice', 'Wishlist'] only, app shows ['ConsentPurposeConfig'] only | bind both twins to the same schemas |
 | bindings | offers (WEB-032 ↔ GST-037) | web shows — only, app shows ['CouponCode'] only | bind both twins to the same schemas |
@@ -202,7 +201,7 @@
 | operations | detail (WEB-004 ↔ GST-004/GST-006) | the app calls getBundle, getPerformance, getVenueMap here; the web calls getBundle on WEB-008; getPerformance on WEB-006/WEB-010; getVenueMap on WEB-039/WEB-047 | same operations on the same capability, so a guest finds it in the same place |
 | operations | feedback (WEB-026 ↔ GST-035) | the app calls raiseMyCase here; the web calls raiseMyCase on WEB-034 | same operations on the same capability, so a guest finds it in the same place |
 | operations | fnb-order (WEB-036 ↔ GST-024) | the web calls addCartLine, createTableReservation, joinRestaurantWaitlist, leaveRestaurantWaitlist here; the app calls addCartLine on GST-007/GST-008/GST-009/GST-026/GST-027/GST-032/GST-048/GST-050/GST-056/GST-070/GST-074/GST-075/GST-077/GST-078; createTableReservation on GST-070; joinRestaurantWaitlist on GST-070; leaveRestaurantWaitlist on GST-070 | same operations on the same capability, so a guest finds it in the same place |
-| operations | help-and-cases (WEB-025 ↔ GST-068) | the web calls getTenantAppStatus here; the app calls getTenantAppStatus on GST-001/GST-029/GST-038/GST-040/GST-047 | same operations on the same capability, so a guest finds it in the same place |
+| operations | help-and-cases (WEB-025 ↔ GST-068) | the web calls getTenantAppStatus here; the app calls getTenantAppStatus on GST-001/GST-029/GST-038/GST-040/GST-047/GST-051 | same operations on the same capability, so a guest finds it in the same place |
 | operations | help-and-cases (WEB-025 ↔ GST-068) | the app calls listAiConversations here; the web calls listAiConversations on WEB-044 | same operations on the same capability, so a guest finds it in the same place |
 | operations | help-content-and-accessibility (WEB-045 ↔ GST-040/GST-057) | the app calls listMyCases, raiseMyCase, replyToMyCase here; the web calls listMyCases on WEB-034; raiseMyCase on WEB-034; replyToMyCase on WEB-034 | same operations on the same capability, so a guest finds it in the same place |
 | operations | home (WEB-001 ↔ GST-001) | the app calls getGuestProfile, listProductCategories, searchCatalogue here; the web calls getGuestProfile on WEB-011/WEB-020; listProductCategories on WEB-002/WEB-005; searchCatalogue on WEB-002/WEB-003 | same operations on the same capability, so a guest finds it in the same place |
@@ -331,7 +330,7 @@
 | components | help-content-and-accessibility (WEB-045 ↔ GST-040/GST-057) | web only —, app only ['metricTile', 'primaryButton', 'secondaryButton', 'textField'] (6 vs 12 components) |  |
 | components | home (WEB-001 ↔ GST-001) | web only ['iconButton', 'textField'], app only — (14 vs 16 components) |  |
 | components | in-venue-notifications (WEB-046 ↔ GST-030) | web only ['detailPanel'], app only — (8 vs 7 components) |  |
-| components | itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059) | web only —, app only ['assistantPanel', 'banner', 'cardList', 'dataTable', 'destructiveButton'] (15 vs 36 components) |  |
+| components | itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059) | web only —, app only ['assistantPanel', 'cardList', 'dataTable', 'destructiveButton'] (18 vs 39 components) |  |
 | components | loyalty (WEB-043 ↔ GST-036) | web only ['cardList', 'primaryButton', 'secondaryButton'], app only — (7 vs 3 components) |  |
 | components | memberships (WEB-022/WEB-023 ↔ GST-015) | web only ['textField', 'toggle'], app only — (16 vs 11 components) |  |
 | components | menu-item (WEB-037 ↔ GST-061) | web only ['cardList'], app only ['banner', 'selectField'] (5 vs 5 components) |  |
@@ -448,14 +447,14 @@
 | state wording | checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009) | 4 state(s) worded differently: emptyFirstRun, emptyNoAccess, error, loading | one copy per state — the 12 September offline sync is the model |
 | state wording | confirmation (WEB-013 ↔ GST-010) | 1 state(s) worded differently: emptyNoAccess | one copy per state — the 12 September offline sync is the model |
 | state wording | date-and-session (WEB-006 ↔ GST-007) | 5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading | one copy per state — the 12 September offline sync is the model |
-| state wording | detail (WEB-004 ↔ GST-004/GST-006) | 5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading | one copy per state — the 12 September offline sync is the model |
+| state wording | detail (WEB-004 ↔ GST-004/GST-006) | 7 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading, videoBuffering, videoUnavailable | one copy per state — the 12 September offline sync is the model |
 | state wording | feedback (WEB-026 ↔ GST-035) | 3 state(s) worded differently: emptyFirstRun, error, loading | one copy per state — the 12 September offline sync is the model |
 | state wording | fnb-order (WEB-036 ↔ GST-024) | 5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading | one copy per state — the 12 September offline sync is the model |
 | state wording | help-and-cases (WEB-025 ↔ GST-068) | 4 state(s) worded differently: emptyFirstRun, emptyNoAccess, error, loading | one copy per state — the 12 September offline sync is the model |
 | state wording | help-content-and-accessibility (WEB-045 ↔ GST-040/GST-057) | 5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading | one copy per state — the 12 September offline sync is the model |
 | state wording | home (WEB-001 ↔ GST-001) | 5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading | one copy per state — the 12 September offline sync is the model |
 | state wording | in-venue-notifications (WEB-046 ↔ GST-030) | 3 state(s) worded differently: emptyFirstRun, error, loading | one copy per state — the 12 September offline sync is the model |
-| state wording | itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059) | 5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading | one copy per state — the 12 September offline sync is the model |
+| state wording | itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059) | 6 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading, preferenceNotAtVenue | one copy per state — the 12 September offline sync is the model |
 | state wording | loyalty (WEB-043 ↔ GST-036) | 5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading | one copy per state — the 12 September offline sync is the model |
 | state wording | memberships (WEB-022/WEB-023 ↔ GST-015) | 5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading | one copy per state — the 12 September offline sync is the model |
 | state wording | menu-item (WEB-037 ↔ GST-061) | 5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading | one copy per state — the 12 September offline sync is the model |

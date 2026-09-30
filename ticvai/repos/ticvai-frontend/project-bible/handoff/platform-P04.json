@@ -71,11 +71,11 @@
    "operations": 13
   },
   {
-   "contract": "retail",
+   "contract": "tenancy",
    "operations": 10
   },
   {
-   "contract": "tenancy",
+   "contract": "retail",
    "operations": 10
   },
   {
@@ -91,11 +91,11 @@
    "operations": 6
   },
   {
-   "contract": "promotions",
+   "contract": "finance",
    "operations": 5
   },
   {
-   "contract": "finance",
+   "contract": "promotions",
    "operations": 5
   },
   {
@@ -103,15 +103,15 @@
    "operations": 4
   },
   {
+   "contract": "queue",
+   "operations": 3
+  },
+  {
    "contract": "approvals",
    "operations": 3
   },
   {
    "contract": "access",
-   "operations": 3
-  },
-  {
-   "contract": "queue",
    "operations": 3
   },
   {
@@ -123,15 +123,15 @@
    "operations": 2
   },
   {
+   "contract": "inventory",
+   "operations": 1
+  },
+  {
    "contract": "assets",
    "operations": 1
   },
   {
    "contract": "wallet",
-   "operations": 1
-  },
-  {
-   "contract": "inventory",
    "operations": 1
   }
  ],

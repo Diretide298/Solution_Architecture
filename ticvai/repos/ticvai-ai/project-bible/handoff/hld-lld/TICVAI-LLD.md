@@ -19,13 +19,14 @@
 | Tier | What runs there | Size (production, with HA) |
 |---|---|---|
 | Edge | Azure Front Door Premium with WAF (OWASP and bot rules), TLS 1.2+, Private Link to the origin | One profile |
-| Ingress | NGINX ingress behind an internal load balancer, published to Front Door by Private Link | In the system pool |
-| AKS system pool | Kubernetes system services | D4s v5, 2-4 nodes, zones 1-3 |
+| Ingress | A Gateway API ingress: the AKS App Routing add-on's Gateway API implementation behind an internal load balancer, published to Front Door by Private Link. Not NGINX (ingress-nginx is out of maintenance; the add-on's NGINX is supported only through November 2026). Application Gateway for Containers is the alternative, with `snet-agc` reserved | In the system pool; the gateway pods tolerate its `CriticalAddonsOnly` taint |
+| AKS cluster | Azure CNI Overlay (pods from `10.244.0.0/16`, outside the VNet), Cilium network policy and data plane, egress through the NAT Gateway (`userAssignedNATGateway`), a subnet per pool | Standard tier |
+| AKS system pool | Kubernetes system services, the ingress gateway | D4s v5, 2-4 nodes, zones 1-3 |
 | AKS workload pool | commerce, access, operations, workers | D8s v5, 3-20 nodes, autoscaled |
 | AKS AI pool | ticvai-ai, the embedding model and the reranker (CPU) | D8s v5, 2-4 nodes |
-| AKS data pool | Qdrant (3 nodes), the event broker (3 nodes) | E4s v5 x3 and D2s v5 x3, zones 1-3 |
+| AKS data pool | Qdrant (3 nodes, open source, official Helm chart), the event broker (3 nodes, while self-run); tainted | E4s v5 x3 and D2s v5 x3, zones 1-3 |
 | Database | PostgreSQL Flexible Server 16: primary with zone-redundant standby, 2 read replicas, a reporting replica, the AI log database | General Purpose D4ds v5; 256 GB each; AI log 1 TB |
-| Private endpoints | Redis Premium (13 GB), Key Vault (HSM keys), Blob storage (ZRS), Container Registry | Public access disabled |
+| Private endpoints | Azure Managed Redis Balanced B10 (12 GB), zone-redundant; Key Vault (HSM per-tenant keys); Blob storage (ZRS); Container Registry | Public access disabled |
 
 ## Network
 
@@ -33,28 +34,45 @@ VNet `10.20.0.0/16` (proposed; confirm against the client's address plan before 
 
 | Subnet | Range | Holds | Rule |
 |---|---|---|---|
-| `snet-ingress` | 10.20.0.0/24 | Internal load balancer and Private Link service for Front Door | Inbound only from Front Door's Private Link; no public IP |
-| `snet-aks-system` | 10.20.4.0/22 | AKS system node pool | No inbound from outside the VNet |
-| `snet-aks-workload` | 10.20.8.0/21 | Workload pool: commerce, access, operations, workers | Inbound from snet-ingress only; outbound through the NAT Gateway |
-| `snet-aks-ai` | 10.20.16.0/22 | AI pool: ticvai-ai, embeddings, reranker | Inbound from snet-ingress and snet-aks-workload; read-only role on transactional schemas (ADR-0020) |
-| `snet-aks-data` | 10.20.20.0/23 | Data pool: Qdrant cluster, broker cluster | Inbound from the workload and AI pools only; Qdrant needs each tenant's collection-scoped JWT |
-| `snet-postgres` | 10.20.24.0/24 | PostgreSQL Flexible Server (delegated subnet), replicas, AI log DB | Inbound 5432 from the AKS subnets only (through pgbouncer); public access disabled |
-| `snet-private-endpoints` | 10.20.25.0/24 | Redis, Key Vault, Blob storage, Container Registry | Private endpoints with private DNS zones; public access disabled on every resource |
+| `snet-ingress` | 10.20.0.0/24 | Internal load balancer and Private Link service for Front Door | NSG: no Internet inbound; Private Link service network policies disabled |
+| `snet-agc` | 10.20.2.0/24 | Reserved: Application Gateway for Containers, only if chosen over App Routing | Not created; delegated subnet if used |
+| `snet-aks-system` | 10.20.4.0/22 | AKS system pool, and the ingress gateway pods (they tolerate its taint) | No NSG; egress through the NAT Gateway |
+| `snet-aks-workload` | 10.20.8.0/21 | Workload pool: commerce, access, operations, workers | No NSG; Cilium policy: inbound from the ingress gateway; egress through the NAT Gateway |
+| `snet-aks-ai` | 10.20.16.0/22 | AI pool: ticvai-ai, embeddings, reranker | No NSG; Cilium policy: inbound from the ingress gateway and the workload pool; read-only role on transactional schemas (ADR-0020) |
+| `snet-aks-data` | 10.20.20.0/23 | Data pool: Qdrant cluster, broker cluster (tainted) | No NSG; Cilium policy: inbound from the workload and AI pools only; Qdrant needs each tenant's collection-scoped JWT |
+| `snet-postgres` | 10.20.24.0/24 | PostgreSQL Flexible Server (delegated subnet), replicas, AI log DB | NSG: 5432 (6432 for built-in PgBouncer) from the AKS subnets; all traffic inside the subnet (HA replication); outbound 443 to the Storage tag (WAL archive); public access disabled |
+| `snet-private-endpoints` | 10.20.25.0/24 | Azure Managed Redis, Key Vault, Blob storage, Container Registry (and a managed broker if chosen) | NSG: inbound from the AKS subnets only; private DNS zones; public access disabled on every resource |
 | `AzureBastionSubnet` | 10.20.26.0/26 | Azure Bastion | The only administrative path in |
+| `GatewaySubnet` | 10.20.27.0/27 | VPN gateway for dedicated-tier venues' site-to-site VPN | Created empty; the gateway is added when a venue needs it. No NSG (Azure does not support one here) |
+| `snet-jump` | 10.20.28.0/27 | Reserved: a jump VM, only if the AKS API is private and Bastion stays Basic | Not created |
+| AKS pods (CNI Overlay) | `10.244.0.0/16` | Pod range, outside the VNet (Terraform default) | Must not overlap a peered VNet, the client's ranges or a venue LAN on the VPN; `100.64.0.0/16` if in doubt |
 | AKS services | `10.100.0.0/16` | Kubernetes service range (Terraform default) | Internal only |
+
+The Terraform cell module builds this plan (`network.tf`, `address_plan` in `variables.tf`); the two reserved
+ranges (`snet-agc`, `snet-jump`) are not created until they are needed.
 
 - **Inbound:** only through Front Door (web, apps, APIs, venue devices) and Bastion (administrators). No
   resource has a public database, cache or storage endpoint.
 - **Outbound:** through the NAT Gateway's one static IP, which payment and e-invoicing providers can allow-list.
+  AKS uses it as its outbound type (`userAssignedNATGateway`), and the NAT Gateway is attached to every node
+  subnet.
+- **NSGs at the edges, Cilium inside.** NSGs guard the ingress, PostgreSQL and private-endpoint subnets. The
+  rules between AKS pools (workload to data, AI to Qdrant) are Cilium network policies: the ingress gateway
+  and CoreDNS run on the system pool and must reach every node, which subnet-to-subnet NSGs would block.
 - **Venues:** devices reach the cloud over the Internet with TLS and device certificates; a dedicated-tier
-  tenant may add a site-to-site VPN. Turnstiles and handhelds only talk to the venue edge node.
+  tenant may add a site-to-site VPN, whose gateway goes in `GatewaySubnet`. Turnstiles and handhelds only talk
+  to the venue edge node.
+- **Front Door is global.** It stores nothing, but decrypts at the edge location nearest the user (normally in
+  the UAE for UAE users, not guaranteed): data in transit only. Its WAF logs stay in the UAE North workspace.
 
 ## Security
 
 - **Identity:** Entra ID for administrators; the platform's own identity for staff, guests and partners.
   Workloads use managed identities to reach Key Vault, storage and the registry.
 - **Tenant isolation:** each tenant's database (with row-level security for venue scope) and each tenant's
-  Qdrant collection, readable only with that tenant's collection-scoped JWT, signed with a key in Key Vault.
+  Qdrant collection, readable only with that tenant's collection-scoped JWT, signed (HS256) with the Qdrant
+  API key, which the token issuer holds as a Key Vault secret. Rotating that key reissues every tenant's token
+  at once, so it is a planned event (ADR-0049).
 - **Least privilege between deployables:** one PostgreSQL role per deployable; the AI role is read-only on the
   transactional schemas (ADR-0020, ADR-0055).
 - **Secrets:** Key Vault only; nothing in images or config maps.
@@ -64,9 +82,9 @@ VNet `10.20.0.0/16` (proposed; confirm against the client's address plan before 
 | Store | High availability | Backup |
 |---|---|---|
 | PostgreSQL | Zone-redundant standby, automatic failover | Point-in-time restore 35 days; a nightly dump per tenant to Blob (UAE) |
-| Qdrant | Three nodes across zones, replication factor 2 | Snapshot per collection to Blob (UAE) |
+| Qdrant | Three nodes across zones, replication factor 2 | Snapshot per collection to local disk, copied to Blob (UAE) by a CronJob (Blob is not a native snapshot target); disk snapshots as a second line |
 | Broker | Three nodes across zones | The outbox is the record; nothing is lost if the broker is rebuilt |
-| Redis | Premium, zone-redundant | Not backed up: it only holds what can be rebuilt |
+| Redis | Azure Managed Redis, high availability, zone-redundant | Not backed up: it only holds what can be rebuilt |
 | AKS | Nodes across zones, at least 2 replicas per deployable | Rebuilt from the registry and Terraform |
 
 The venue edge node keeps gates and POS running through any cloud outage and syncs afterwards.
@@ -81,7 +99,15 @@ The venue edge node keeps gates and POS running through any cloud outage and syn
 
 ## Open points
 
-- The broker is the client's choice (RabbitMQ or Kafka); if a managed service is chosen it replaces the data
-  pool's broker nodes.
-- Whether Qdrant runs as Qdrant Hybrid Cloud on our own AKS or plain self-hosted (ADR-0049 action).
-- Prices in the workbook are estimates; confirm them in the Azure pricing calculator for UAE North.
+- The broker is the client's choice (RabbitMQ or Kafka; ADR-0057 has the UAE North options and prices). A
+  managed broker (CloudAMQP, Event Hubs) removes the broker from `snet-aks-data` and adds a private endpoint in
+  `snet-private-endpoints`.
+- Whether the AKS API server is private. If it is, Bastion Basic cannot tunnel `kubectl`: Bastion Standard
+  ($212 a month) or a jump VM in `snet-jump`.
+- One PostgreSQL HA mode for production: the Terraform uses same-zone HA on the shared tier and zone-redundant
+  on dedicated and isolated tiers; this document promises zone-redundant.
+- The ingress: confirm that the App Routing add-on's Gateway API implementation is generally available in UAE
+  North before SETUP; otherwise Application Gateway for Containers in `snet-agc`.
+- Prices in the workbook were checked against the Azure Retail Prices API on 30 September; confirm them in the
+  Azure pricing calculator for UAE North before quoting. The Azure Managed Redis HA price (one or two instance
+  meters) is unconfirmed.

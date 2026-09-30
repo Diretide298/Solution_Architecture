@@ -158,7 +158,7 @@ adopting either. A thin adapter over the official client is also enough for 69 e
 
 1. [x] Chinmay: broker is RabbitMQ or Kafka, not Service Bus; the question goes to the client (30 September).
 2. [ ] Client: choose RabbitMQ or Kafka for the cloud event broker (asked in the Decisions Register, "For you to answer").
-3. [ ] Dinesh: check a managed RabbitMQ in Azure UAE North (and, if the client leans to Kafka, Event Hubs' Kafka endpoint or Confluent Cloud there), with prices.
+3. [x] ~~Dinesh~~: check a managed RabbitMQ in Azure UAE North (and, if the client leans to Kafka, Event Hubs' Kafka endpoint or Confluent Cloud there), with prices. **Done 30 September**: see the amendment below.
 4. [x] Package: name the broker question in ADR-0033; add RabbitMQ to the four `deploy/*.yml` as the local and venue-local broker, with the cloud broker left as the client's choice. (1 pt)
 
 **Sprint 1, weeks 1–2**
@@ -170,3 +170,44 @@ adopting either. A thin adapter over the official client is also enough for 69 e
 **After the client answers**
 
 8. [ ] If Kafka: the Kafka adapter behind the same interface, with the same contract tests, and the consumer-side retry and dead-letter topic. (3 pts)
+
+---
+
+## Amendment — the options in UAE North, with prices, 30 September 2026
+
+**Status unchanged: Proposed; the choice is still the client's. Our recommendation is unchanged: RabbitMQ.**
+Source: `docs/active/infra-answers-30-september.md` section 3. Azure prices from the Azure Retail Prices API
+(`uaenorth`, pay as you go, 730 hours), vendor list prices from the vendors' pages, both read 30 September 2026.
+
+**Azure has no first-party RabbitMQ** (no RabbitMQ product in the Azure price list). Service Bus speaks AMQP
+1.0, not RabbitMQ's AMQP 0-9-1, and stays ruled out (Option C).
+
+### If the client picks RabbitMQ
+
+| Option | UAE North | Small production price (USD / month) | Notes |
+|---|---|---|---|
+| **CloudAMQP, dedicated (recommended)** | Yes (in their Azure region list since 21 October 2019) | 3-node **Big Bunny $297** or **Happy Hare $597**, plus **$99** for VPC peering or PrivateLink: **about $400–700** | Managed by 84codes; their control plane is outside the UAE. **Get it in writing that backups, definitions and logs stay in UAE North before signing** |
+| RabbitMQ Cluster Operator on our AKS (fallback) | Yes (our cluster) | 3 × D2s v5 ($258) + 3 × P10 disks ($65): **about $320**, plus our time | Cluster Operator and Messaging Topology Operator are MPL 2.0 and use the official image. **Not the Bitnami chart**: its images moved behind a paid subscription on 29 September 2025. This is what the cost workbook prices today |
+| Azure Service Bus | Yes | Standard $10 + operations; Premium 1 MU about $715 | Not RabbitMQ; ruled out |
+
+### If the client picks Kafka
+
+| Option | UAE North | Small production price (USD / month) | Notes |
+|---|---|---|---|
+| **Event Hubs Standard + Kafka endpoint** | Yes | 2 TUs ≈ $58 + ingress events (a few dollars); a "Standard Kafka Endpoint" meter ($0.09/h, ≈ $66) may be billed on top (unconfirmed): **budget $60–130** | Private Link available. **At most 10 event hubs (topics) per namespace** and 7 days' retention |
+| Event Hubs Premium | Yes | 1 PU ≈ **$1,072** | 100 event hubs per PU, 90 days' retention, resource isolation |
+| Confluent Cloud on Azure | Yes (`uaenorth`; UAE Central not listed) | Standard ≈ $550 but public endpoints only; **Enterprise (private networking) ≈ $1,280–1,640** + $0.02–0.05/GB throughput + $0.08/GB-month storage | A second vendor contract. Public endpoints conflict with the LLD's "no public endpoints", so in practice Enterprise |
+
+**Kafka on Event Hubs Standard: design topics per deployable, not per event.** With 69 events plus dead-letter
+topics, the 10-topic limit forces a few coarse topics (for example one per deployable) or a second namespace.
+Otherwise Premium. Confluent only if the client already has a Confluent contract.
+
+### What it changes
+
+- **Recommendation to the client, restated with prices:** RabbitMQ on **CloudAMQP, 3-node, with PrivateLink,
+  in UAE North, about $400–700 a month.** It meets "managed, if one exists there", costs about the same as
+  running it ourselves once our time is counted, and nobody on the team has run RabbitMQ.
+- **Infrastructure:** a managed broker removes the `broker` node pool from `snet-aks-data`
+  (`broker_self_hosted = false` in the Terraform cell module) and adds a private endpoint in
+  `snet-private-endpoints`. The cost workbook prices the self-run cluster (VMs and P10 disks) until the client
+  answers.

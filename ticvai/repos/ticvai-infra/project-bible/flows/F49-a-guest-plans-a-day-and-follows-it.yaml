@@ -31,7 +31,9 @@ steps:
   operations:
   - generateVisitPlan
   outcome: '**The rules planner, no AI.** A plan per day that leaves out rides over a child''s height
-    and plans lunch where the chosen cuisine is served.'
+    and plans lunch where the chosen cuisine is served. **Each day uses only its own park''s rides,
+    dining and retail (shops and kiosks)** in a multi-venue tenant (client meeting 30 September, MoM
+    4.7): a cuisine or shop the day''s park lacks is reported, never taken from another park.'
 - step: 2
   screen: GST-053
   action: They swap, remove and add items, undo a change and add Fast Track.
@@ -86,6 +88,14 @@ branches:
     the park is closed).
   behaviour: '**Refused with a reason**, naming the answer that ruled everything out, and the answers
     are kept so changing one costs nothing.'
+  severity: recoverable
+  resolvedBy: guest
+- at: 1
+  condition: A cuisine or shop the guest chose exists at none of the day's park's points (only one park
+    has the Indian restaurant).
+  behaviour: '**Said, not faked** (client meeting 30 September, MoM 4.7): the day is planned from that
+    park''s own points, `unmatchedPreferences` names the park that has it, and the guest may move the day
+    there by changing answers.'
   severity: recoverable
   resolvedBy: guest
 - at: 3

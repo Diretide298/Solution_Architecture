@@ -473,6 +473,135 @@ def slug(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
 
 
+# ---- key stability ------------------------------------------------------------------------------
+# **Once a key has an OpenProject ticket, the same work keeps that key** (30 September). The keys below
+# are formed from where work sits in the plan -- `APP-SETUP-` or `VM-` for a screen, the n-th chunk of
+# four operations for a backend task -- so a plan change that moved work re-keyed it, and the push
+# treated the new key as new work: 25 duplicates when screens moved between Block A setup and Venue
+# Management and operations between SVC- and VM-, and SVC-WALLET-RETAIL-1 matched to the wrong half
+# when a split re-numbered its parts. So the plan is formed exactly as before and then reconciled
+# against pms-map.json before anything is written. Only the key changes: phase, track, tier, build
+# order and dependencies were already computed from the key the plan formed, and stay.
+#
+# The identity of the work, by kind:
+#   screen  the screen id. APP-<platform>-, APP-SETUP- and VM- are the same screen.
+#   ops     the operations, within one service group (SVC-X-G-n and VM-X-G-n are one family);
+#           pms-map records each pushed operation as a KEY#operation sub-task.
+#   tables  the tables, within one schema (MIG-S and VM-MIG-S); sub-tasks are KEY#schema.table.
+
+SCREEN_KEY = re.compile(r"(?:APP-[A-Z]+|VM)-([A-Z]+-\d{3,}[A-Z]?)")
+TABLES_KEY = re.compile(r"(?:VM-)?MIG-([A-Z0-9_]+)")
+OPS_KEY = re.compile(r"(?:SVC|VM)-(.+)-(\d+)")
+
+
+def key_identity(key: str):
+    """(kind, family) for a key whose work has an identity, else None. Screens first: VM-BO-005 would
+    also read as an operations key."""
+    m = SCREEN_KEY.fullmatch(key)
+    if m:
+        return "screen", m.group(1)
+    m = TABLES_KEY.fullmatch(key)
+    if m and m.group(1) not in ("BASELINE",):
+        return "tables", m.group(1).lower()
+    m = OPS_KEY.fullmatch(key)
+    if m:
+        return "ops", m.group(1)
+    return None
+
+
+def pushed_items(mp: dict) -> dict[str, set]:
+    """Every pushed task key -> the work its sub-tasks record (operations, tables or the screen id)."""
+    items = {k: set() for k in mp if "#" not in k and not k.startswith(("_", "VERSION"))}
+    for k in mp:
+        if "#" in k:
+            head, _, part = k.partition("#")
+            if head in items and part not in ("build", "wire", "test"):
+                items[head].add(part)
+    for k in items:
+        ident = key_identity(k)
+        if ident and ident[0] == "screen":
+            items[k] = {ident[1]}
+    return items
+
+
+def reconcile_keys(plan: dict[str, set], fixed: set, mp: dict, closed: frozenset = frozenset()):
+    """Map every planned key to the key it is written under. `plan` is natural key -> its work (see above);
+    `fixed` the planned keys with no such identity (epics, features, setup), which never move. `closed`
+    are pushed keys closed by tools/op-retire.py: never given to other work, and a planned key that is
+    closed gives way to an open ticket carrying the same work.
+
+    A pushed key goes to the planned task whose work overlaps it most (ties: its own key first, then the
+    open ticket, then the lower key), so a split keeps each ticket on the half it was made for. A task
+    that matches nothing keeps its key if nobody has pushed it; one whose key was pushed for other work is
+    genuinely new and takes the next number nobody has pushed. Returns ({natural: final}, [notes])."""
+    pitems = pushed_items(mp)
+    fam = defaultdict(list)
+    for k in pitems:
+        ident = key_identity(k)
+        if ident:
+            fam[ident].append(k)
+    naturals = set(plan) | set(fixed)
+    pairs = []
+    for t, work in plan.items():
+        ident = key_identity(t)
+        for k in fam.get(ident, ()):
+            if k in fixed or (k in closed and k != t):
+                continue
+            if k != t and k in naturals and ident[0] == "screen":
+                continue
+            ov = 1 if ident[0] == "screen" else len(work & pitems[k])
+            if ov == 0:
+                if k != t and k in naturals:
+                    continue          # another planned task's key, and none of this work is on it
+                if pitems[k] and ident[0] == "ops":
+                    continue          # pushed for other operations: not this work
+            pairs.append((-ov, k in closed, k != t, k, t))
+    final, taken = {k: k for k in fixed}, set(fixed)
+    for _, _, _, k, t in sorted(pairs):
+        if t not in final and k not in taken:
+            final[t] = k
+            taken.add(k)
+    notes = []
+    for t in sorted(plan):
+        if t not in final and t not in pitems and t not in taken:
+            final[t] = t
+            taken.add(t)
+    # Every other key is settled now, so a new number only has to avoid the pushed keys and the settled
+    # ones; a key its own task gave up (a split's renamed half) is free.
+    for t in sorted(plan):
+        if t in final:
+            continue
+        ident = key_identity(t)
+        if ident and ident[0] == "ops":
+            stem = t[:t.rfind("-")]
+            n = 1
+            while f"{stem}-{n}" in pitems or f"{stem}-{n}" in taken:
+                n += 1
+            final[t] = f"{stem}-{n}"
+            notes.append(f"{t}: pushed for other work, so this work is new and takes {final[t]}")
+        else:
+            final[t] = t
+            notes.append(f"{t}: keeps its key, which was pushed for other work")
+        taken.add(final[t])
+    for t, k in sorted(final.items()):
+        if k != t and k in mp:
+            notes.append(f"{t} -> {k}: the same work is already ticket #{mp.get(k)}")
+    assert len(set(final.values())) == len(final), "key reconciliation gave two tasks one key"
+    return final, notes
+
+
+def closed_keys() -> frozenset:
+    """Pushed keys tools/op-retire.py closes as merged into another ticket (Rejected in OpenProject)."""
+    try:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("op_retire", ROOT / "tools" / "op-retire.py")
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+    except Exception:
+        return frozenset()
+    return frozenset(k for k, (kind, _, _) in mod.OTHER.items() if kind == "merge")
+
+
 def main() -> int:
     sl = json.loads((HANDOFF / "delivery-slice.json").read_text(encoding="utf-8"))
     lineage = json.loads((HANDOFF / "api-data-lineage.json").read_text(encoding="utf-8"))
@@ -1179,6 +1308,7 @@ def main() -> int:
     # same way as the slice's, and the tables those reach beyond the slice get migrations of their own.
     vm = team.get("venueManagement") or {}
     vm_rows = []
+    vm_mig, vm_op_task = {}, {}
     if vm:
         # One person or several; the first leads the epic, screens go to whoever is least loaded.
         vm_team = vm["who"] if isinstance(vm["who"], list) else [vm["who"]]
@@ -1498,6 +1628,47 @@ def main() -> int:
         place(t_)
     tasks[:] = out_
 
+    # **Key stability** (30 September): the work on a pushed ticket keeps that ticket's key (see
+    # reconcile_keys). Applied last, so the plan above -- phase, track, tier, order, links -- is formed from
+    # the keys exactly as before and only the names change. With today's plan it renames nothing.
+    work = defaultdict(set)
+    for o, k in list(op_task.items()) + list(vm_op_task.items()):
+        work[k].add(o)
+    for t, k in list(table_mig.items()) + list(vm_mig.items()):
+        if k != "MIG-BASELINE":
+            work[k].add(t)
+    for t_ in tasks:
+        ident = key_identity(t_["key"])
+        if t_["type"] == "Task" and ident and ident[0] == "screen":
+            work[t_["key"]] = {ident[1]}
+    kmap_path = OUT / "pms-map.json"
+    kmap = json.loads(kmap_path.read_text(encoding="utf-8")) if kmap_path.exists() else {}
+    stable, notes = reconcile_keys({k: v for k, v in work.items() if k in by_key and key_identity(k)},
+                                   {t_["key"] for t_ in tasks if t_["key"] not in work or not key_identity(t_["key"])},
+                                   kmap, closed_keys())
+    renamed = {k: v for k, v in stable.items() if k != v}
+    if renamed:
+        def rk(k):
+            return renamed.get(k, k)
+
+        for t_ in tasks:
+            t_["key"], t_["parent"] = rk(t_["key"]), rk(t_["parent"])
+            t_["dependsOn"] = " ".join(sorted(rk(d) for d in t_["dependsOn"].split()))
+        by_key = {t_["key"]: t_ for t_ in tasks}
+        step = {rk(k): v for k, v in step.items()}
+        op_task = {o: rk(k) for o, k in op_task.items()}
+        for rows_, col in ((migrations, 1), (tables_rows, 0), (vm_rows, 1)):
+            for r_ in rows_:
+                r_[col] = rk(r_[col])
+        mig_md = OUT / "backend" / "MIGRATIONS.md"
+        text = mig_md.read_text(encoding="utf-8")
+        for k, v in renamed.items():
+            text = re.sub(rf"(?<![\w-]){re.escape(k)}(?![\w-])", v, text)
+        mig_md.write_text(text, encoding="utf-8")
+    for n_ in notes:
+        print(f"key stability: {n_}")
+    print(f"key stability: {len(renamed)} planned keys written under the key their work was pushed as")
+
     COLS = ["sequence", "queue", "key", "parent", "type", "track", "subject", "phase", "wave", "step", "points",
             "assignee", "area", "platform", "service", "dependsOn", "description",
             # the build phase (0 plumbing, 1 foundation, 2 commerce, 3 operations, 4 engagement, 5 reporting)
@@ -1637,7 +1808,7 @@ def main() -> int:
                    for nm, u in sorted(uses.items(), key=lambda x: (comp[x[0]]["contract"], x[0]))]
 
     be = [t for t in tasks if t["type"] == "Task" and (t["area"] in ("backend", "devops")
-                                                       or (t["area"] == "VM" and not t["key"].startswith("VM-BO-")))]
+                                                       or (t["area"] == "VM" and t["track"] != "Frontend"))]
     plan_rows = [[step[t["key"]], t["wave"], t["key"], t["parent"], t["subject"], t["points"], t["assignee"],
                   t["service"], t["dependsOn"], t["description"]]
                  for t in sorted(be, key=lambda t: t["sequence"])]

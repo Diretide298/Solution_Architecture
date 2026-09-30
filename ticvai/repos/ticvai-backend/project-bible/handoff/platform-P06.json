@@ -80,19 +80,19 @@
    "operations": 15
   },
   {
-   "contract": "shift",
-   "operations": 13
-  },
-  {
    "contract": "rental",
    "operations": 13
   },
   {
-   "contract": "marketing-crm",
-   "operations": 12
+   "contract": "shift",
+   "operations": 13
   },
   {
    "contract": "identity",
+   "operations": 12
+  },
+  {
+   "contract": "marketing-crm",
    "operations": 12
   },
   {
@@ -116,11 +116,11 @@
    "operations": 2
   },
   {
-   "contract": "retail",
+   "contract": "tenancy",
    "operations": 2
   },
   {
-   "contract": "tenancy",
+   "contract": "retail",
    "operations": 2
   },
   {

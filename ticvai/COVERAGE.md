@@ -24,7 +24,7 @@ Every number below is counted from the files in this package, not from memory.
 | State models | **206** | Every one carries transitions — **all modelled** |
 | Domain events | 77 | Publisher, consumers, idempotency keys |
 | User flows | **97** | 284 branches. Every contract and platform touched |
-| ADRs | 56 | |
+| ADRs | 57 | |
 | **Requirements covered by a contract** | **2,778 of 2,990 (93%)** | The remaining 212 are workshop-blocked |
 | **Requirements with an artefact** | **1,848 of 2,072 (89%)** | 12 of 15 classes closed |
 | Configuration levels decided | 321 of 321 | |

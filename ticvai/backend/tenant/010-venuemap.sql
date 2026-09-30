@@ -105,7 +105,8 @@ CREATE TABLE IF NOT EXISTS venuemap.point (
     featured_offer                    jsonb,
     typical_duration_minutes          integer,
     interest_tags                     text[],
-    cuisine_tags                      text[]
+    cuisine_tags                      text[],
+    retail_tags                       text[]
 );
 
 -- Holds 13 columns. No description has been written for this table — the name is the only thing

@@ -20,7 +20,7 @@
 
 PROJECT_ID = 153
 path = ARGV[0] or abort("usage: rails runner op-bulk-links.rb op-links.json")
-pairs = JSON.parse(File.read(path))
+pairs = JSON.parse(File.read(path)).uniq
 apply = ENV["APPLY"] == "1"
 limit = ENV["LIMIT"]&.to_i
 
@@ -47,7 +47,12 @@ todo.each do |from_id, to_id|
   t = Time.now
   r = Relation.new(from_id: from_id, to_id: to_id)
   r.relation_type = Relation::TYPE_FOLLOWS
-  r.save!(validate: false)
+  begin
+    r.save!(validate: false)
+  rescue ActiveRecord::RecordNotUnique
+    # already there (a repeat in the file, or made meanwhile): nothing to add
+    next
+  end
   made += 1
   if limit || (made % 25).zero?
     puts "  #{made}/#{todo.size}: ##{from_id} follows ##{to_id} in #{(Time.now - t).round(1)}s " \

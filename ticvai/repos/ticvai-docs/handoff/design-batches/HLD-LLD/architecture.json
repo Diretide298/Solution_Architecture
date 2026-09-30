@@ -125,7 +125,7 @@
    },
    {
     "id": "redis",
-    "label": "Redis",
+    "label": "Azure Managed Redis",
     "sub": "sessions, idempotency, cache",
     "x": 270,
     "y": 310,
@@ -686,7 +686,8 @@
     "id": "ilb",
     "label": "Ingress (internal LB)",
     "lines": [
-     "NGINX ingress on AKS",
+     "Gateway API ingress",
+     "(AKS App Routing)",
      "Private Link service"
     ],
     "x": 470,
@@ -698,8 +699,8 @@
     "id": "sys",
     "label": "AKS system pool",
     "lines": [
-     "D4s v5, 2-4 nodes",
-     "zones 1-3"
+     "D4s v5, 2-4 nodes, zones 1-3",
+     "+ ingress gateway pods"
     ],
     "x": 690,
     "y": 150,
@@ -786,8 +787,8 @@
     "id": "pe",
     "label": "Private endpoints",
     "lines": [
-     "Redis Premium (13 GB)",
-     "Key Vault (HSM keys)",
+     "Azure Managed Redis B10 (12 GB)",
+     "Key Vault",
      "Blob storage (ZRS)",
      "Container Registry"
     ],
@@ -812,8 +813,8 @@
     "id": "nat",
     "label": "NAT Gateway",
     "lines": [
-     "one static egress IP",
-     "for provider allow-lists"
+     "one static egress IP;",
+     "AKS outbound type"
     ],
     "x": 470,
     "y": 700,
@@ -862,7 +863,7 @@
     "id": "vpn",
     "label": "Site-to-site VPN",
     "lines": [
-     "dedicated tier only;",
+     "dedicated tier, GatewaySubnet;",
      "others: Internet + mTLS"
     ],
     "x": 1250,
@@ -1053,49 +1054,67 @@
     "name": "snet-ingress",
     "cidr": "10.20.0.0/24",
     "holds": "Internal load balancer and Private Link service for Front Door",
-    "rule": "Inbound only from Front Door's Private Link; no public IP"
+    "rule": "NSG: no Internet inbound; Private Link service network policies disabled"
+   },
+   {
+    "name": "snet-agc",
+    "cidr": "10.20.2.0/24",
+    "holds": "Reserved: Application Gateway for Containers, only if chosen over App Routing",
+    "rule": "Not created; delegated subnet if used"
    },
    {
     "name": "snet-aks-system",
     "cidr": "10.20.4.0/22",
-    "holds": "AKS system node pool",
-    "rule": "No inbound from outside the VNet"
+    "holds": "AKS system pool, and the ingress gateway pods (they tolerate its taint)",
+    "rule": "No NSG; egress through the NAT Gateway"
    },
    {
     "name": "snet-aks-workload",
     "cidr": "10.20.8.0/21",
     "holds": "Workload pool: commerce, access, operations, workers",
-    "rule": "Inbound from snet-ingress only; outbound through the NAT Gateway"
+    "rule": "No NSG; Cilium policy: inbound from the ingress gateway; egress through the NAT Gateway"
    },
    {
     "name": "snet-aks-ai",
     "cidr": "10.20.16.0/22",
     "holds": "AI pool: ticvai-ai, embeddings, reranker",
-    "rule": "Inbound from snet-ingress and snet-aks-workload; read-only role on transactional schemas (ADR-0020)"
+    "rule": "No NSG; Cilium policy: inbound from the ingress gateway and the workload pool; read-only role on transactional schemas (ADR-0020)"
    },
    {
     "name": "snet-aks-data",
     "cidr": "10.20.20.0/23",
-    "holds": "Data pool: Qdrant cluster, broker cluster",
-    "rule": "Inbound from the workload and AI pools only; Qdrant needs each tenant's collection-scoped JWT"
+    "holds": "Data pool: Qdrant cluster, broker cluster (tainted)",
+    "rule": "No NSG; Cilium policy: inbound from the workload and AI pools only; Qdrant needs each tenant's collection-scoped JWT"
    },
    {
     "name": "snet-postgres",
     "cidr": "10.20.24.0/24",
     "holds": "PostgreSQL Flexible Server (delegated subnet), replicas, AI log DB",
-    "rule": "Inbound 5432 from the AKS subnets only (through pgbouncer); public access disabled"
+    "rule": "NSG: 5432 (6432 for built-in PgBouncer) from the AKS subnets; all traffic inside the subnet (HA replication); outbound 443 to the Storage tag (WAL archive); public access disabled"
    },
    {
     "name": "snet-private-endpoints",
     "cidr": "10.20.25.0/24",
-    "holds": "Redis, Key Vault, Blob storage, Container Registry",
-    "rule": "Private endpoints with private DNS zones; public access disabled on every resource"
+    "holds": "Azure Managed Redis, Key Vault, Blob storage, Container Registry (and a managed broker if chosen)",
+    "rule": "NSG: inbound from the AKS subnets only; private DNS zones; public access disabled on every resource"
    },
    {
     "name": "AzureBastionSubnet",
     "cidr": "10.20.26.0/26",
     "holds": "Azure Bastion",
     "rule": "The only administrative path in"
+   },
+   {
+    "name": "GatewaySubnet",
+    "cidr": "10.20.27.0/27",
+    "holds": "VPN gateway for dedicated-tier venues' site-to-site VPN",
+    "rule": "Created empty; the gateway is added when a venue needs it. No NSG (Azure does not support one here)"
+   },
+   {
+    "name": "snet-jump",
+    "cidr": "10.20.28.0/27",
+    "holds": "Reserved: a jump VM, only if the AKS API is private and Bastion stays Basic",
+    "rule": "Not created"
    }
   ]
  },

@@ -36,6 +36,16 @@ def main() -> int:
     missing = sorted({k for e in edges for k in e if k not in mp})
     if missing:
         print("no OpenProject id for:", ", ".join(missing[:20]))
+        if "--skip-unmapped" not in sys.argv:
+            return 1
+        edges = [e for e in edges if e[0] in mp and e[1] in mp]
+        print(f"--skip-unmapped: their links are left out; run again once they are made")
+    by_id = {}
+    for k in {k for e in edges for k in e}:
+        by_id.setdefault(mp[k], []).append(k)
+    shared = {i: ks for i, ks in by_id.items() if len(ks) > 1}
+    if shared:
+        print("one OpenProject ticket for several plan tasks (repair the map first):", shared)
         return 1
 
     # a cycle would make OpenProject's scheduling loop; the per-link check is skipped on the server, so check here

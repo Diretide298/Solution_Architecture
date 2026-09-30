@@ -42,6 +42,8 @@ CHECKS = [
     "audit-unwired-tables", "audit-duplicate-tables", "audit-array-relationships",
     "audit-links", "audit-workbooks", "audit-pack-citations", "audit-contracts",
     "audit-screen-estate", "audit-uncontrolled-values", "index-sources", "check-contract-compat",
+    # 30 September: a plan change must not make a second OpenProject ticket for work that has one.
+    "check-key-stability",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.

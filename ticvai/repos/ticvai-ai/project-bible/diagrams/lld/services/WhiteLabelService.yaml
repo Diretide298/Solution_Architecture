@@ -1003,6 +1003,7 @@ screens:
 - P01:WEB-028 Contact & Venue Information
 - P01:WEB-029 Error / Sold Out / Maintenance
 - P01:WEB-045 Help Centre & Accessibility
+- P01:WEB-050 Plan Your Visit
 - P02:GST-001 Home
 - P02:GST-003 Buy Tickets
 - P02:GST-007 Select Date & Time
@@ -1013,6 +1014,7 @@ screens:
 - P02:GST-040 Help & Support
 - P02:GST-041 Checkout Entry
 - P02:GST-047 Maintenance / Upgrade Page
+- P02:GST-051 Plan
 - P02:GST-057 Accessibility Information
 - P05:KSK-002 Language Select
 - P08:BO-007 Product Directory

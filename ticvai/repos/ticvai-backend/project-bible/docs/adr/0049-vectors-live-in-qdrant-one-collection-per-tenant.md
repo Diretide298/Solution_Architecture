@@ -172,10 +172,75 @@ decision to run Qdrant from the start. D buys nothing B does not, at a cost per 
 1. [x] Chinmay: Qdrant from day one, a collection per tenant with a collection-scoped token (30 September).
 2. [ ] Package: lineage store `qdrant` confirmed on the AI operations; `ai.chunk_embedding` holds the point reference (point id, collection, model, source, guest), not the vector; ADR-0021, ADR-0020 and ADR-0009 amendments (done 30 September). Re-derive, mirrors, check.
 3. [x] Security approval for Qdrant: given 30 September, on condition of UAE hosting only (no client question needed).
-4. [ ] Dinesh: check Qdrant Hybrid Cloud on our own AKS in UAE North as an alternative to plain self-hosting.
+4. [x] ~~Dinesh~~: check Qdrant Hybrid Cloud on our own AKS in UAE North as an alternative to plain self-hosting. **Closed 30 September: self-hosted chosen**; Hybrid Cloud needs an Enterprise contract and sends collection metadata to `cloud.qdrant.io` (amendment below).
 
 **Sprint 1–2**
 
-5. [ ] **SETUP-QDRANT** (DevOps): the 3-node cluster in dev and staging via Terraform, TLS, snapshot storage in the UAE, monitoring. (3 pts)
+5. [ ] **SETUP-QDRANT** (DevOps): the 3-node cluster in dev and staging via Terraform (the `qdrant` node pool) and the official Helm chart, pinned to 1.16 or later; TLS on the service; the snapshot CronJob that copies snapshots to Blob in the UAE; a check that a collection-scoped token works through the alias; monitoring. (3 pts)
 6. [ ] **AI-ENGINE-QDRANT** (AI engineers): collection-per-tenant provisioning at onboarding with the alias, per-tenant JWT issuance and rotation, the retrieval client with the mandatory venue filter, erasure and offboarding paths, snapshots. (about 5 days)
 7. [ ] C4 retrieval: embedding and reranker in the cell, hybrid retrieval on Qdrant (design section 7).
+
+---
+
+## Amendment — hosting, the token key and backups, 30 September 2026
+
+**Status unchanged: Accepted.** Source: `docs/active/infra-answers-30-september.md` section 1 (Qdrant
+documentation and pricing pages, read 30 September 2026).
+
+### Decision: self-host open-source Qdrant on our AKS in UAE North
+
+- **Open-source Qdrant (Apache 2.0), the official Helm chart, on the cell's own AKS in UAE North**: 3 nodes,
+  one per zone, replication factor 2, on the tainted data pool (`qdrant` node pool, E4s v5, Premium SSD P15
+  256 GB each). No licence fee; the VMs and disks are already in the cost workbook.
+- **Pin Qdrant 1.16 or later.** This ADR's reasoning assumes payload-filter RBAC is gone (deprecated in 1.15,
+  removed in 1.16).
+- **TLS on the Qdrant service** (or a mesh). An API key over plain HTTP is not acceptable.
+- The plain Helm chart gives no zero-downtime upgrades, automatic shard rebalancing or cluster backup. Those
+  are ours: SETUP-QDRANT and the runbook own them.
+
+### Collection-scoped JWT: how it is signed, and what rotation means
+
+- **JWT RBAC is in open-source Qdrant since v1.9**: set `service.api_key` and `service.jwt_rbac: true`.
+- **The token is HS256, signed with the admin API key itself.** The token issuer holds `service.api_key` and
+  mints each tenant's token with `{"access":[{"collection":"t_<id>_bge-m3-v1","access":"r"}]}` and an `exp`.
+- **Key Vault holds the API key as a *secret*, not an HSM key**: Key Vault keys cannot do HMAC signing. Only
+  the issuer reads it; `ticvai-ai` never does (as the Decision above already says). The HSM tier of Key Vault
+  is justified by the per-tenant keys, not by Qdrant.
+- **Rotating the API key breaks every tenant's token at once**; Qdrant does not migrate tokens. Rotation is
+  therefore a **planned procedure**, not a schedule that runs by itself:
+  1. Announce a window; put AI retrieval in its degraded mode (no RAG answers, the rest of the platform
+     unaffected).
+  2. Write the new key to Key Vault as a new secret version.
+  3. Roll the Qdrant pods one at a time onto the new `service.api_key`.
+  4. The issuer reissues every tenant's token with the new key; the retrieval clients reload them.
+  5. Verify one read per tenant; disable the old secret version.
+  An urgent rotation after a leak follows the same steps without the announcement. Per-tenant tokens still
+  expire and are reissued on their own schedule (`exp`), which needs no rotation of the key.
+- **Aliases: test on day one.** The documentation does not say whether a token scoped to the collection works
+  through the alias `tenant_<id>`. The `access` claim is a list, so the token can name both the collection and
+  the alias if it has to.
+
+### Backups: snapshots do not go straight to Blob
+
+- Qdrant's snapshot storage supports only `local` and `s3`; **Azure Blob is not a native target.**
+- **Route:** take each collection's snapshot to local disk, then a **Kubernetes CronJob copies it to the UAE
+  North storage account** with azcopy under workload identity, and prunes the local copy. An S3-compatible
+  gateway in front of Blob is the alternative if the CronJob proves fragile.
+- Azure Disk snapshots of the Qdrant disks are a second line, not a replacement: Qdrant's own snapshot is the
+  consistent one.
+
+### Rejected
+
+- **Qdrant Hybrid Cloud (on our AKS, operated by Qdrant's operator).** The data stays in our cluster, but the
+  cloud agent keeps an outbound connection to `cloud.qdrant.io` and sends metrics, cluster metadata and
+  collection information. Our collection names carry tenant ids, so tenant ids would leave the UAE. It is
+  also Enterprise-only, with the price on request, and whether it exposes `jwt_rbac` is not stated.
+- **Qdrant Managed Cloud.** Whether Azure UAE North is offered could not be confirmed (no public region list),
+  and there are no list prices. Ruled out until Qdrant shows a UAE North region in writing.
+- **Qdrant Private Cloud** (Enterprise operator, no connection to Qdrant) fixes Hybrid's metadata problem, at a
+  price on request. It stays the fallback if running Qdrant proves too much for the team.
+
+### Sizing check
+
+About 0.2 GB per tenant (20,000 chunks, dense and sparse vectors, HNSW index). At 200 tenants and replication
+factor 2 that is under 100 GB of working set across three 32 GB nodes; the 256 GB disks are comfortable.

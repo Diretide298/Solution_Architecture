@@ -4,7 +4,7 @@ A multi-tenant platform for ticketing, access control, point of sale and venue o
 **This package is the design of it** — the contracts, the data model, the screens, the
 journeys through them, and the reasoning behind every decision that was not obvious.
 
-**2660 operations · 33 contracts · 1093 tables · 2445 screens · 206 state models · 97 flows · 56 ADRs**
+**2660 operations · 33 contracts · 1093 tables · 2445 screens · 206 state models · 97 flows · 57 ADRs**
 
 **Design 96% · Build 33%.**
 

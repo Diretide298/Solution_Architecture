@@ -186,6 +186,8 @@ Proposes and stops. `venue-map.acceptVenueLabelProposals` is the human half.
 
 **`itinerary` (added 29 September, MOB-6; supersedes the deferral in audits R187 and R209).** The AI planner agent refines a guest's visit plan: `subjectRef` is the `venue-map` plan id, `context` carries the guest's request in words (*"less walking after lunch"*), and `value` is `{planId, baseVersion, changes: [VisitPlanUpdate changes], rationale}`. **It proposes; it does not write the plan.** The app applies the changes with `updateVisitPlan` as the guest (or the planner agent does, through its registered tools, as the guest), so the change is a version the guest can undo and AI writes only `ai.suggestion` (ADR-0020). When AI is off or fails, the answer is the rules plan unchanged, with `basis` `heuristic`, never an error.
 
+**Grounded in each day's venue** (30 September client meeting, MoM 4.7, Allam's requirement). The agent proposes only points and performances that the plan operations return for that day (`getVisitPlan` and `listVisitPlanAlternatives`, which read the published map of the day's venue, `VisitPlan.days[].venueId`): rides, dining and retail (shops and kiosks) of that venue, never one named from general knowledge or from another venue of the tenant. A wish the day's venue cannot meet (*"Indian food on day 1"* at a park with no Indian restaurant) is answered as such, naming the venue where it exists from `VisitPlan.unmatchedPreferences`; moving a day to that venue is the guest's change of answers, not a change the agent makes. `updateVisitPlan` refuses a point from another venue (422 `point-not-at-day-venue`) as the backstop.
+
 |  |  |
 |---|---|
 | Permission | `AI_USE` |

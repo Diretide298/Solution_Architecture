@@ -3310,7 +3310,7 @@ Also the endpoint the guest app calls to discover a maintenance window, which is
 | Read routing | replica |
 | Reads | `whitelabel.config_version`, `whitelabel.tenant_config` |
 | Writes | - |
-| Called by | CMS-001, CMS-014, CMS-102, GST-001, GST-029, GST-038, GST-040, GST-047, KSK-002, WEB-001, WEB-025, WEB-028, WEB-029, WEB-045 |
+| Called by | CMS-001, CMS-014, CMS-102, GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, WEB-001, WEB-025, WEB-028, WEB-029, WEB-045, WEB-050 |
 
 **Response**: `TenantAppStatus`
 

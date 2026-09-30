@@ -205,7 +205,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         </div>
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; getProductEligibilityRule · getProduct · listPerformances · getAvailability +1</div>
-          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · videoBuffering · videoUnavailable · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; eventId&larr;WEB-002, productId&larr;WEB-001</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-002">WEB-002</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#web-003">WEB-003</a> <br><a href="#web-005">WEB-005</a>  &mdash; <i>Chooses ticket types and quantities</i> <span class="car">productId</span><br><a href="#web-006">WEB-006</a>  &mdash; <i>Book (a dated product: date first, then time</i> <span class="car">productId</span><br><a href="#web-007">WEB-007</a>  &mdash; <i>Book (a fixture with one on-sale performance</i> <span class="car">performanceId</span><br><a href="#web-047">WEB-047</a>  &mdash; <i>Book (a cabana, lounger or other spot placed</i> <span class="car">productId</span><br><a href="#web-048">WEB-048</a>  &mdash; <i>Book (a space sold by the hour, e.g. a meeti</i> <span class="car">productId</span></div>
           
@@ -234,8 +234,8 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listProducts · generateVisitPlan · getVisitPlan · updateVisitPlan +2</div>
-          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>OPERATIONS</b> &middot; listProducts · generateVisitPlan · getVisitPlan · updateVisitPlan +3</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · preferenceNotAtVenue · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, planId&larr;deepLink, itemId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#web-010">WEB-010</a>  &mdash; <i>Book this plan</i> <span class="car">cartId</span><br><a href="#web-001">WEB-001</a>  &mdash; <i>Back to tickets</i><br><a href="#web-004">WEB-004</a>  &mdash; <i>Opens an item on the plan</i> <span class="car">productId</span></div>
           

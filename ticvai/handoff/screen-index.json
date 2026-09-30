@@ -589,7 +589,9 @@
   ],
   "machine": null,
   "states": {
-   "loading": "The attraction list.",
+   "loading": "**The video is not part of loading** (client meeting 30 September, MoM 4.8): the attraction renders as it arrives and no loader or loading screen is ever drawn over the video.",
+   "videoBuffering": "**Poster frame, not a loader** (client meeting 30 September, MoM 4.8): until the first frames arrive the poster (primary image, else the video's first frame) fills the video area and playback starts in place as soon as it can; no spinner, overlay or blocking screen. The details beside it stay usable throughout.",
+   "videoUnavailable": "The video cannot play (no video, a failed stream, data saver on). The poster stays and the details are unaffected; no error screen and no loader.",
    "error": "Could not load. Names which read failed and leaves the attraction untouched.",
    "emptyFirstRun": "No attraction yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on from, to and the attraction are still there. Names the active filter and offers to clear it.",
@@ -6562,11 +6564,13 @@
    "getVisitPlan",
    "updateVisitPlan",
    "listVisitPlanAlternatives",
-   "bookVisitPlan"
+   "bookVisitPlan",
+   "getTenantAppStatus"
   ],
   "services": [
    "CatalogueService",
-   "VenueOpsService"
+   "VenueOpsService",
+   "WhiteLabelService"
   ],
   "stores": [
    "postgres",
@@ -6590,7 +6594,9 @@
    "venuemap.point",
    "venuemap.visit_plan",
    "venuemap.visit_plan_item",
-   "whitelabel.guided_choice_answer"
+   "whitelabel.config_version",
+   "whitelabel.guided_choice_answer",
+   "whitelabel.tenant_config"
   ],
   "writes": [
    "cache:idempotency",
@@ -6650,6 +6656,7 @@
    "error": "Could not build or load the plan. Names what failed; the answers are kept.",
    "emptyFirstRun": "No plan yet: the first question is shown.",
    "emptyNoResults": "Nothing suits the whole group on that day: says which answer ruled everything out and offers to change it.",
+   "preferenceNotAtVenue": "**A preference a day's park cannot meet** (client meeting 30 September, MoM 4.7): before *Make my plan* the chip is marked *Not at the parks you chose* (naming a park of the tenant that has it); after it, the day shows the *Not at this park* banner and nothing from another park is placed. *Change answers* lets the guest move that day to the park that has it.",
    "emptyNoAccess": "A guest holds no permission. Anyone can build a plan; signing in is asked only to save it, and booking follows the cart's own sign-in gate.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
@@ -7607,7 +7614,9 @@
   ],
   "machine": null,
   "states": {
-   "loading": "The attraction list.",
+   "loading": "**The video is not part of loading** (client meeting 30 September, MoM 4.8): the attraction renders as it arrives and no loader or loading screen is ever drawn over the video.",
+   "videoBuffering": "**Poster frame, not a loader** (client meeting 30 September, MoM 4.8): from the info button until the first frames arrive the ride's poster (primary image, else the video's first frame) fills the video area and playback starts in place as soon as it can; no spinner, overlay or blocking screen. The details beside it stay usable throughout.",
+   "videoUnavailable": "The video cannot play (no video, a failed stream, data saver on). The poster stays and the details are unaffected; no error screen and no loader.",
    "error": "Could not load. Names which read failed and leaves the attraction untouched.",
    "emptyFirstRun": "No attraction yet. **Offers no create action** \u2014 this screen declares no operation that makes one \u2014 and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on from, to and the attraction are still there. Names the active filter and offers to clear it.",
@@ -12699,11 +12708,13 @@
   "operations": [
    "getWaitTimes",
    "listProducts",
-   "generateVisitPlan"
+   "generateVisitPlan",
+   "getTenantAppStatus"
   ],
   "services": [
    "CatalogueService",
-   "VenueOpsService"
+   "VenueOpsService",
+   "WhiteLabelService"
   ],
   "stores": [
    "postgres",
@@ -12725,7 +12736,9 @@
    "venuemap.point",
    "venuemap.visit_plan",
    "venuemap.visit_plan_item",
-   "whitelabel.guided_choice_answer"
+   "whitelabel.config_version",
+   "whitelabel.guided_choice_answer",
+   "whitelabel.tenant_config"
   ],
   "writes": [
    "cache:idempotency",
@@ -12781,6 +12794,7 @@
    "error": "Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing.",
    "emptyFirstRun": "No plan yet: the first question is shown. Nothing is saved until *Make my plan*.",
    "emptyNoResults": "Nothing suits the whole party on that day (for example every ride is over a child's height): says so and offers to change the answers.",
+   "preferenceNotAtVenue": "**A preference no chosen park can meet** (client meeting 30 September, MoM 4.7): a cuisine or shop tag with no matching point at any park of the plan is marked on its chip (*Not at the parks you chose*) before *Make my plan*; the plan is still made without it, never with a restaurant or shop from a park the party is not visiting. Where another park of the tenant has it, the chip says which, and choosing that park for a day brings it in.",
    "emptyNoAccess": "A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
@@ -13009,6 +13023,7 @@
    "error": "Could not load the plan. Names what failed; the inputs are kept so trying again costs nothing.",
    "emptyFirstRun": "No plan yet: offers the questions (GST-051) or a ready-made plan (GST-052).",
    "emptyNoResults": "Nothing suits the whole party on that day (for example every ride is over a child's height): says so and offers to change the answers.",
+   "preferenceNotAtVenue": "**A day whose park cannot meet a preference** (client meeting 30 September, MoM 4.7): the day is shown in full with the *Not at this park* banner naming the cuisine or shop and where it is instead; nothing from another park is placed. *Change answers* (GST-051) lets the guest move that day to the park that has it. An empty swap sheet says the day's park has no other option of that kind, not that none exists anywhere.",
    "emptyNoAccess": "A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
@@ -51544,7 +51559,7 @@
     "id": "formSetVenuePoint",
     "component": "modal",
     "trigger": "Save venue point",
-    "body": "**Collects what `setVenuePoint` sends before it is called.** Required: `id`, `mapId`, `kind`, `name`, `position`. Optional: `nameLocalised`, `outletId`, `productId`, `accessPointId`, `isStepFree`, `openingHours`, `iconRef`, `isActive`, `isNavigable`, `isDestination`, `pointId`; and the item details decided 29 September (MOB-4, MOB-6): `description`, `media`, `featuredOffer` (a product or a bundle, on any kind of point), `typicalDurationMinutes`, `interestTags`, `cuisineTags`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setVenuePoint` sends before it is called.** Required: `id`, `mapId`, `kind`, `name`, `position`. Optional: `nameLocalised`, `outletId`, `productId`, `accessPointId`, `isStepFree`, `openingHours`, `iconRef`, `isActive`, `isNavigable`, `isDestination`, `pointId`; and the item details decided 29 September (MOB-4, MOB-6): `description`, `media`, `featuredOffer` (a product or a bundle, on any kind of point), `typicalDurationMinutes`, `interestTags`, `cuisineTags`; and `retailTags` (30 September, MoM 4.7). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "SetVenuePointRequest",
     "confirm": {
      "label": "Save venue point",
@@ -51574,7 +51589,8 @@
       "featuredOffer",
       "typicalDurationMinutes",
       "interestTags",
-      "cuisineTags"
+      "cuisineTags",
+      "retailTags"
      ]
     },
     "provenance": "contract venue-map.yaml POST /venue-maps/{mapId}/points"

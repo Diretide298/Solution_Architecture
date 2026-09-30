@@ -65,4 +65,4 @@ convincingly. It is never a caption.
 | `WEB-002` | Event & Attraction Listing | listDetail | 6 | 0 | — |
 | `WEB-003` | Search Results | listDetail | 2 | 0 | — |
 | `WEB-004` | Attraction Details | listDetail | 5 | 0 | — |
-| `WEB-050` | Plan Your Visit | multiStepForm | 6 | 0 | — |
+| `WEB-050` | Plan Your Visit | multiStepForm | 7 | 0 | — |

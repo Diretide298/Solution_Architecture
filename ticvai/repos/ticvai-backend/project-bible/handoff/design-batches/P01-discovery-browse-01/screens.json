@@ -1206,7 +1206,7 @@
     }
    ]
   },
-  "notes": "**Renamed 31 August** from *Event / Attraction Detail*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added getAvailability, getWaitTimes. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.\n\n**Rev 3 (decided 29 September).** Ticket tags from `Product.displayTags` when `BookingFlowConfig.ticketTags` is on (23SEP-3); Read more opens on the product's own video or photo (`Product.media`, 23SEP-4). An info-only product shows its `notBookableLabel` and no Book button (REV3-14). **Book** opens the ticket counters as a side panel here (23SEP-5); a dated product goes to the date and time first (WEB-006, REV3-2); a fixture with a single on-sale performance opens straight on the seat map with the fixture as a strip at its top (WEB-007, 23SEP-16, REV3-4); a product placed on a venue map opens the map booking (WEB-047, REV3-15); a product sold by the hour opens the space booking (WEB-048, REV3-13). The event banner lists dates only when `BookingFlowConfig.eventBannerDates` is on (default off, 23SEP-19). Help me choose sits on the booking step (WEB-005), where the prototype draws it, not here (REV3-11).\n\n**29 September.** W3: view-only products show Call sales / Email sales instead of Book. M18-13: in single-event mode, a banner or video hero and only the next seven days, with a calendar for later dates (M17-08).",
+  "notes": "**Renamed 31 August** from *Event / Attraction Detail*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added getAvailability, getWaitTimes. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.\n\n**Rev 3 (decided 29 September).** Ticket tags from `Product.displayTags` when `BookingFlowConfig.ticketTags` is on (23SEP-3); Read more opens on the product's own video or photo (`Product.media`, 23SEP-4). An info-only product shows its `notBookableLabel` and no Book button (REV3-14). **Book** opens the ticket counters as a side panel here (23SEP-5); a dated product goes to the date and time first (WEB-006, REV3-2); a fixture with a single on-sale performance opens straight on the seat map with the fixture as a strip at its top (WEB-007, 23SEP-16, REV3-4); a product placed on a venue map opens the map booking (WEB-047, REV3-15); a product sold by the hour opens the space booking (WEB-048, REV3-13). The event banner lists dates only when `BookingFlowConfig.eventBannerDates` is on (default off, 23SEP-19). Help me choose sits on the booking step (WEB-005), where the prototype draws it, not here (REV3-11).\n\n**29 September.** W3: view-only products show Call sales / Email sales instead of Book. M18-13: in single-event mode, a banner or video hero and only the next seven days, with a calendar for later dates (M17-08).\n\n**Video plays directly (client meeting 30 September, MoM 4.8, Qossai; the same page as the app's GST-004, so the same behaviour).** The ride or attraction video starts in place with no loader in front of it; its poster frame shows while it buffers, and a video that cannot play leaves the poster and the details, never an error screen.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listPerformances` reads the population and `getProduct` reads one of them — list, select, act",
@@ -1276,9 +1276,9 @@
        "kind": "detailPanel",
        "label": "Photo and video",
        "bindsTo": "Product.media",
-       "notes": "Read more opens on the primary video or photo (`Product.media`, `isPrimary`).",
+       "notes": "**The video plays directly, with no loader in front of it** (client meeting 30 September, MoM 4.8): the info button reveals the details and starts the primary video in place; the poster frame (the primary image, or the video's first frame) shows while it buffers, never a spinner or loading screen. Read more opens on the primary video or photo (`Product.media`, `isPrimary`).",
        "operation": "getProduct",
-       "provenance": "decided 29 September, rev 3 23SEP-4"
+       "provenance": "decided 29 September, rev 3 23SEP-4; decided 30 September 2026, client meeting MoM 4.8 (Qossai)"
       },
       {
        "kind": "secondaryButton",
@@ -1404,7 +1404,9 @@
    ]
   },
   "states": {
-   "loading": "The attraction list.",
+   "loading": "**The video is not part of loading** (client meeting 30 September, MoM 4.8): the attraction renders as it arrives and no loader or loading screen is ever drawn over the video.",
+   "videoBuffering": "**Poster frame, not a loader** (client meeting 30 September, MoM 4.8): until the first frames arrive the poster (primary image, else the video's first frame) fills the video area and playback starts in place as soon as it can; no spinner, overlay or blocking screen. The details beside it stay usable throughout.",
+   "videoUnavailable": "The video cannot play (no video, a failed stream, data saver on). The poster stays and the details are unaffected; no error screen and no loader.",
    "error": "Could not load. Names which read failed and leaves the attraction untouched.",
    "emptyFirstRun": "No attraction yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on from, to and the attraction are still there. Names the active filter and offers to clear it.",
@@ -1563,7 +1565,7 @@
     }
    ]
   },
-  "notes": "**Added 29 September**: the 29 September web build has *Plan your visit* in the header, opening the planner full screen, and *Book this plan* goes straight into booking. The web twin of the Plan tab (GST-051 questions, GST-053 plan), binding the same planner operations (venue-map `generateVisitPlan`, `getVisitPlan`, `updateVisitPlan`, `listVisitPlanAlternatives`, `bookVisitPlan`). Block A (29 September re-plan, superseding R187 and GAP-C3). Rules-based; the AI planner chat is app-only for now. Hidden when the venue turns module `visitPlanner` off.",
+  "notes": "**Added 29 September**: the 29 September web build has *Plan your visit* in the header, opening the planner full screen, and *Book this plan* goes straight into booking. The web twin of the Plan tab (GST-051 questions, GST-053 plan), binding the same planner operations (venue-map `generateVisitPlan`, `getVisitPlan`, `updateVisitPlan`, `listVisitPlanAlternatives`, `bookVisitPlan`). Block A (29 September re-plan, superseding R187 and GAP-C3). Rules-based; the AI planner chat is app-only for now. Hidden when the venue turns module `visitPlanner` off.\n\n**Multi-venue intelligence (client meeting 30 September, MoM 4.7, Allam).** As on the app: each day is at one park and uses only that park's rides, dining and retail (shops and kiosks, added beside F&B); a preference the park cannot meet is said, never filled from another park.",
   "density": "compact",
   "pattern": "multiStepForm",
   "patternReason": "The Visit Planner prototype: six questions, then the plan with Book this plan",
@@ -1608,6 +1610,14 @@
       },
       {
        "kind": "selectField",
+       "label": "Which park each day?",
+       "bindsTo": "TenantAppStatus.venues",
+       "operation": "getTenantAppStatus",
+       "notes": "**Only in a multi-venue tenant**; hidden otherwise. One choice per chosen day, defaulting to the venue picked in the header; sent as `VisitPlanRequest.dayVenues`. Each day is then planned from that park's own rides, dining and shops only (client meeting 30 September, MoM 4.7).",
+       "provenance": "decided 30 September 2026, client meeting MoM 4.7 (Allam)"
+      },
+      {
+       "kind": "selectField",
        "label": "How busy should each day be?",
        "notes": "Packed, Balanced or Relaxed.",
        "provenance": "decided 29 September 2026, MOB-6"
@@ -1620,10 +1630,16 @@
        "provenance": "decided 29 September 2026, MOB-6"
       },
       {
+       "kind": "multiSelect",
+       "label": "Any shops you'd like to visit?",
+       "notes": "Shown when Shopping is chosen (client meeting 30 September, MoM 4.7: retail and kiosk shops join F&B in the planner). The `retailTags` of the chosen parks' shops and retail kiosks; sent as `VisitPlanRequest.retailTags`.",
+       "provenance": "decided 30 September 2026, client meeting MoM 4.7 (Allam)"
+      },
+      {
        "kind": "selectField",
        "label": "What would you like for lunch?",
-       "notes": "Cuisines of the outlets.",
-       "provenance": "decided 29 September 2026, MOB-6"
+       "notes": "Cuisines of the chosen parks' dining points only (restaurants, cafes, food kiosks; client meeting 30 September, MoM 4.7). In a multi-venue plan each cuisine names the park(s) that serve it, and lunch is planned only at a restaurant of that day's park.",
+       "provenance": "decided 29 September 2026, MOB-6; decided 30 September 2026, client meeting MoM 4.7 (Allam)"
       },
       {
        "kind": "primaryButton",
@@ -1643,14 +1659,22 @@
        "label": "Your plan",
        "bindsTo": "VisitPlanItem",
        "operation": "getVisitPlan",
-       "notes": "Day tabs; arrival, timed items and lunch.",
-       "provenance": "decided 29 September 2026, MOB-6"
+       "notes": "Day tabs, each naming its park (`VisitPlan.days[].venueId`); arrival, timed items, lunch and shop or kiosk stops, every one at that day's park (`VisitPlanItem.venueId`; client meeting 30 September, MoM 4.7).",
+       "provenance": "decided 29 September 2026, MOB-6; decided 30 September 2026, client meeting MoM 4.7 (Allam)"
+      },
+      {
+       "kind": "banner",
+       "label": "Not at this park",
+       "bindsTo": "VisitPlan.unmatchedPreferences",
+       "operation": "getVisitPlan",
+       "notes": "Per day, a cuisine or shop the day's park cannot offer, and the park that can (from `availableAtVenueIds`), e.g. *No Indian restaurant at Summit Peaks. Indian food is at Aqua Park (day 2).* Hidden when every preference is met (client meeting 30 September, MoM 4.7).",
+       "provenance": "decided 30 September 2026, client meeting MoM 4.7 (Allam)"
       },
       {
        "kind": "secondaryButton",
        "label": "Swap / + Add something",
        "operation": "listVisitPlanAlternatives",
-       "notes": "Candidates that suit everyone in the group.",
+       "notes": "Candidates that suit everyone in the group, from the day's park only (client meeting 30 September, MoM 4.7).",
        "provenance": "decided 29 September 2026, MOB-6"
       },
       {
@@ -1702,6 +1726,7 @@
    "error": "Could not build or load the plan. Names what failed; the answers are kept.",
    "emptyFirstRun": "No plan yet: the first question is shown.",
    "emptyNoResults": "Nothing suits the whole group on that day: says which answer ruled everything out and offers to change it.",
+   "preferenceNotAtVenue": "**A preference a day's park cannot meet** (client meeting 30 September, MoM 4.7): before *Make my plan* the chip is marked *Not at the parks you chose* (naming a park of the tenant that has it); after it, the day shows the *Not at this park* banner and nothing from another park is placed. *Change answers* lets the guest move that day to the park that has it.",
    "emptyNoAccess": "A guest holds no permission. Anyone can build a plan; signing in is asked only to save it, and booking follows the cart's own sign-in gate.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
@@ -1716,9 +1741,9 @@
    {
     "operationId": "generateVisitPlan",
     "contract": "venue-map",
-    "purpose": "Build a rules plan from the inputs (party, heights, dates, pace, interests, cuisine)",
+    "purpose": "Build a rules plan from the inputs (party, heights, dates, park per day, pace, interests, shops, cuisine); each day from its own park's points only",
     "trigger": "onAction",
-    "provenance": "decided 29 September 2026, MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6; decided 30 September 2026, client meeting MoM 4.7 (Allam)"
    },
    {
     "operationId": "getVisitPlan",
@@ -1747,6 +1772,13 @@
     "purpose": "Book this plan: turns the plan (and chosen add-ons) into cart lines and returns the cart",
     "trigger": "onAction",
     "provenance": "decided 29 September 2026, MOB-6"
+   },
+   {
+    "operationId": "getTenantAppStatus",
+    "contract": "white-label",
+    "purpose": "The tenant's active venues, for the park-per-day choice in a multi-venue tenant",
+    "trigger": "onLoad",
+    "provenance": "decided 30 September 2026, client meeting MoM 4.7 (Allam)"
    }
   ],
   "entryState": {

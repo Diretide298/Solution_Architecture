@@ -170,11 +170,11 @@
    "operations": 20
   },
   {
-   "contract": "tenancy",
+   "contract": "finance",
    "operations": 15
   },
   {
-   "contract": "finance",
+   "contract": "tenancy",
    "operations": 15
   },
   {
@@ -186,11 +186,11 @@
    "operations": 11
   },
   {
-   "contract": "reporting",
+   "contract": "cross-region",
    "operations": 5
   },
   {
-   "contract": "cross-region",
+   "contract": "reporting",
    "operations": 5
   },
   {

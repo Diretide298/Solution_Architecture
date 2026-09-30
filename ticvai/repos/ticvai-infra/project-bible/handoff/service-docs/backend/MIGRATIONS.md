@@ -40,7 +40,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | 29 | `V0030__payments.sql` | MIG-PAYMENTS | tenant | payments | 11 | 132 | marketing, orders, pii | Pranay Shinde | 8 |
 | 30 | `V0031__queue.sql` | MIG-QUEUE | tenant | queue | 5 | 81 | access, catalogue, maintenance, pii, platform | Hrushikant Patkar | 3 |
 | 31 | `V0032__retail.sql` | MIG-RETAIL | tenant | retail | 10 | 110 | access, catalogue, fnb, identity, inventory, orders, pii, platform | Pranay Shinde | 5 |
-| 32 | `V0033__venuemap.sql` | MIG-VENUEMAP | tenant | venuemap | 8 | 105 | access, assets, catalogue, marketing, orders, platform, promotions, resources | Hrushikant Patkar | 5 |
+| 32 | `V0033__venuemap.sql` | MIG-VENUEMAP | tenant | venuemap | 8 | 106 | access, assets, catalogue, marketing, orders, platform, promotions, resources | Hrushikant Patkar | 5 |
 | 33 | `V0034__cross_schema_foreign_keys.sql` | MIG-FOREIGN-KEYS | tenant | (cross-schema) | 0 | 0 |  | Hrushikant Patkar | 3 |
 
 ## Tables
@@ -296,7 +296,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-CATALOGUE | `catalogue.variant` | 9 | none |  | 8 | 3 | used by the first release |
 | MIG-CATALOGUE | `catalogue.waitlist_entry` | 11 | none |  | 2 | 2 | used by the first release |
 | MIG-LEDGER | `ledger.account` | 15 | none |  | 3 | 2 | used by the first release |
-| MIG-LEDGER | `ledger.cost_center` | 6 | venue_id |  | 0 | 0 | referenced by marketing.invitation |
+| MIG-LEDGER | `ledger.cost_center` | 6 | venue_id |  | 0 | 0 | referenced by ledger.event_budget |
 | MIG-LEDGER | `ledger.credit_memo` | 21 | scope_path |  | 5 | 1 | used by the first release |
 | MIG-LEDGER | `ledger.credit_memo_line` | 10 | none |  | 3 | 1 | used by the first release |
 | MIG-LEDGER | `ledger.einvoice_transmission` | 17 | scope_path |  | 3 | 1 | used by the first release |
@@ -318,7 +318,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-INVENTORY | `inventory.goods_receipt_line` | 11 | none |  | 2 | 2 | used by the first release |
 | MIG-INVENTORY | `inventory.item` | 26 | venue_id |  | 5 | 3 | used by the first release |
 | MIG-INVENTORY | `inventory.kit_component` | 6 | scope_path |  | 3 | 1 | used by the first release |
-| MIG-INVENTORY | `inventory.location` | 7 | venue_id |  | 0 | 0 | referenced by platform.outlet |
+| MIG-INVENTORY | `inventory.location` | 7 | venue_id |  | 0 | 0 | referenced by inventory.stock_batch |
 | MIG-INVENTORY | `inventory.movement` | 17 | none |  | 2 | 3 | used by the first release |
 | MIG-INVENTORY | `inventory.purchase_order` | 29 | scope_path |  | 0 | 0 | referenced by inventory.goods_receipt |
 | MIG-INVENTORY | `inventory.requisition` | 20 | venue_id |  | 0 | 0 | referenced by inventory.purchase_order |
@@ -512,7 +512,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-VENUEMAP | `venuemap.map_version` | 7 | none |  | 2 | 0 | used by the first release |
 | MIG-VENUEMAP | `venuemap.path` | 10 | none |  | 6 | 1 | used by the first release |
 | MIG-VENUEMAP | `venuemap.placed_resource` | 11 | none |  | 4 | 1 | used by the first release |
-| MIG-VENUEMAP | `venuemap.point` | 20 | none |  | 9 | 2 | used by the first release |
+| MIG-VENUEMAP | `venuemap.point` | 21 | none |  | 9 | 2 | used by the first release |
 | MIG-VENUEMAP | `venuemap.visit_plan` | 13 | scope_path |  | 6 | 3 | used by the first release |
 | MIG-VENUEMAP | `venuemap.visit_plan_item` | 18 | none |  | 6 | 2 | used by the first release |
 

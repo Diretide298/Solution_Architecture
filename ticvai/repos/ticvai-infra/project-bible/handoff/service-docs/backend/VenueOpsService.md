@@ -4337,6 +4337,7 @@ A venue may have several — **a park map and a floor plan per building are diff
 | points[].typicalDurationMinutes | integer |  | How long a visit to this point usually takes, ride time and queue excluded (29 September, MOB-6). (min 1; max 600; nullable) |
 | points[].interestTags | array of enum (thrill, family, kids, water, animals, shows, culture, shopping, …) |  | What a guest who says they like this would like here (29 September, MOB-6): the planner matches the guest's interests against these. (max items 12) |
 | points[].cuisineTags | array of string |  | For dining points (restaurant, cafe, kiosk; 29 September, MOB-6). (max items 8) |
+| points[].retailTags | array of string |  | For retail points (shop, and a kiosk that sells goods rather than food; 30 September client meeting, MoM 4.7: retail and kiosk shops join F&B as venue-linked planner options). (max items 8) |
 | paths | array of VenuePath |  |  |
 | paths[].id | string (uuid) | yes | (read-only) |
 | paths[].mapId | string (uuid) | yes | From the path of the operation that writes the path. (read-only) |
@@ -4790,6 +4791,7 @@ Unlinked points are fine and expected — a toilet is a toilet.
 | typicalDurationMinutes | integer |  | How long a visit to this point usually takes, ride time and queue excluded (29 September, MOB-6). (min 1; max 600; nullable) |
 | interestTags | array of enum (thrill, family, kids, water, animals, shows, culture, shopping, …) |  | What a guest who says they like this would like here (29 September, MOB-6): the planner matches the guest's interests against these. (max items 12) |
 | cuisineTags | array of string |  | For dining points (restaurant, cafe, kiosk; 29 September, MOB-6). (max items 8) |
+| retailTags | array of string |  | For retail points (shop, and a kiosk that sells goods rather than food; 30 September client meeting, MoM 4.7: retail and kiosk shops join F&B as venue-linked planner options). (max items 8) |
 | pointId | string (uuid) |  | The point to amend. (nullable) |
 
 **Response**: `VenuePoint`
@@ -4826,6 +4828,7 @@ Unlinked points are fine and expected — a toilet is a toilet.
 | typicalDurationMinutes | integer |  | How long a visit to this point usually takes, ride time and queue excluded (29 September, MOB-6). (min 1; max 600; nullable) |
 | interestTags | array of enum (thrill, family, kids, water, animals, shows, culture, shopping, …) |  | What a guest who says they like this would like here (29 September, MOB-6): the planner matches the guest's interests against these. (max items 12) |
 | cuisineTags | array of string |  | For dining points (restaurant, cafe, kiosk; 29 September, MOB-6). (max items 8) |
+| retailTags | array of string |  | For retail points (shop, and a kiosk that sells goods rather than food; 30 September client meeting, MoM 4.7: retail and kiosk shops join F&B as venue-linked planner options). (max items 8) |
 
 **Responses**
 
@@ -4841,7 +4844,7 @@ Unlinked points are fine and expected — a toilet is a toilet.
 
 **`POST /visit-plans/{planId}/booking`**: Book this plan — turn it into cart lines
 
-**"Book this plan"** (29 September, MOB-6). For each item that is bought (an admission per day, a timed attraction, a show performance, a meal combo, an accepted Fast Track add-on) the server adds a line to the guest's cart **by the orders service's `addCartLine`, with its rules unchanged**: the 15-minute lease, the capacity refusal, the seat limit, the info-only refusal. Free items (a walk-up ride, a toilet, a photo spot) add nothing. Quantities come from the party: one admission per person by their age band's variant.
+**"Book this plan"** (29 September, MOB-6). For each item that is bought (an admission per day, a timed attraction, a show performance, a meal combo, an accepted Fast Track add-on) the server adds a line to the guest's cart **by the orders service's `addCartLine`, with its rules unchanged**: the 15-minute lease, the capacity refusal, the seat limit, the info-only refusal. Free items (a walk-up ride, a toilet, a photo spot) add nothing. Quantities come from the party: one admission per person by their age band's variant, per day, **for that day's venue** (`VisitPlan.days[].venueId`; 30 September, MoM 4.7), so a two-park plan books each park's own admission.
 **The cart handoff.** With `cartId`, lines are added to that cart; without it a cart is created for the venue and the guest channel (`orders.createCart`), exactly as the Buy tickets button would. The response is the cart id, the lines added and each item that could not be added with the `addCartLine` refusal it met (`soldOutForSession`, `productInfoOnly`, ...). **A partly booked plan is still a success**: the guest goes to GST-041 with what was added and the plan marks the rest, rather than losing the whole plan to one sold-out show. Nothing is paid here; checkout is `orders.checkoutCart`.
 The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets shows what was bought. `baseVersion` must be current (409 as `updateVisitPlan`).
 
@@ -4903,7 +4906,8 @@ The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets show
 **`POST /visit-plans`**: Build a visit plan from the party, the dates and what they like
 
 **The Plan tab's first answer, and it needs no AI** (29 September, MOB-6). The guest gives party size, each person's height or age, the dates, the pace (packed or relaxed), interests and cuisines; the planner returns one itinerary per day with timed items and add-ons such as Fast Track.
-**Rules, in order.** (1) Candidates: the venue's published map points that are destinations and have a `typicalDurationMinutes`, and the dated performances on each day. (2) Eligibility: a ride whose product's `catalogue.ProductEligibilityRule` excludes anyone in the party by height or age is dropped, and the reason is kept on the plan (`excluded`). (3) Scoring: interest tags matched, then the venue's featured order. (4) Layout: from opening time, the next item is the best-scoring one reachable by walking time over the published graph (`venuemap.path`), with the typical wait for that hour and its duration; a meal is placed at a cuisine-matched dining point around 12:30 and 19:00; `relaxed` leaves a 30-minute gap after every two items and stops by 18:00, `packed` fills to closing. (5) Add-ons: where the expected wait on a planned ride exceeds 30 minutes and the venue sells a Fast Track for it, the add-on is suggested on that item, never added.
+**Each day is planned from its own venue, never from the tenant as a whole** (30 September client meeting, MoM 4.7, Allam's requirement). In a multi-venue tenant the guest may put each date at a different venue (`dayVenues`; a date not listed is at `venueId`). Every candidate for a day comes from **that day's venue's own published map**: its rides and attractions, its dining points (restaurant, cafe, food kiosk) and its retail points (shop, retail kiosk), and the performances dated at that venue. A preference is matched against the amenities of that venue only: when one park has the only Indian restaurant, a party that asked for `indian` gets it on that park's day and nowhere else, and a day at a park without one says so (`unmatchedPreferences`) rather than placing a restaurant the guest cannot walk to.
+**Rules, in order, per day.** (1) Candidates: the day venue's published map points that are destinations and have a `typicalDurationMinutes`, and the performances dated that day at that venue. **Retail is a candidate as F&B is** (30 September, MoM 4.7; until then only dining points were venue-linked): a `shop`, or a `kiosk` carrying `retailTags`, is placed as a `shop` stop. (2) Eligibility: a ride whose product's `catalogue.ProductEligibilityRule` excludes anyone in the party by height or age is dropped, and the reason is kept on the plan (`excluded`); a `mustIncludePointIds` point that is at none of the plan's venues is kept there with `notAtVenue`. (3) Scoring: interest tags matched, then the venue's featured order. (4) Layout: from opening time, the next item is the best-scoring one reachable by walking time over the published graph (`venuemap.path`), with the typical wait for that hour and its duration; a meal is placed at a dining point of the day's venue whose `cuisineTags` match, around 12:30 and 19:00, and where no dining point of that venue matches, at its best other dining point, with the unmatched cuisine recorded; a retail stop is placed when the party chose `shopping` or a `retailTags` value, at a retail point of the day's venue that matches, late in the day or on the way to the exit; `relaxed` leaves a 30-minute gap after every two items and stops by 18:00, `packed` fills to closing. (5) Add-ons: where the expected wait on a planned ride exceeds 30 minutes and the venue sells a Fast Track for it, the add-on is suggested on that item, never added.
 **The same inputs give the same plan**, so the guest can trust that a regenerate changes only what they changed. `presetKey` (or the older `preset`) gives the ready-made day plans of GST-052 (the same rules with preset interests and pace). **The AI planner agent refines a plan; it does not make the first one** (ai `requestSuggestion` kind `itinerary`): when AI is off or fails, this answer is the plan.
 **Owned by the guest session**, as a cart is: a signed-in guest's plan is theirs, an anonymous one is bound to the device session and claimed on sign-in. Nothing is held or sold here; `bookVisitPlan` turns the plan into cart lines.
 
@@ -4930,15 +4934,19 @@ The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets show
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| venueId | string (uuid) | yes |  |
+| venueId | string (uuid) | yes | The venue the guest picked in the app (GST-001 / WEB-001), which scopes the plan. |
+| dayVenues | array of object |  | Which venue on which date, in a multi-venue tenant (30 September client meeting, MoM 4.7, Allam's requirement). (max items 7) |
+| dayVenues[].date | string (date) | yes |  |
+| dayVenues[].venueId | string (uuid) | yes |  |
 | dates | array of string (date) | yes | (min items 1; max items 7) |
 | party | array of object | yes | One entry per person. (min items 1; max items 20) |
 | party[].heightCm | integer |  | (min 40; max 230; nullable) |
 | party[].ageYears | integer |  | (min 0; max 120; nullable) |
 | pace | enum (packed, relaxed) |  | (default relaxed) |
 | interestTags | array of string |  | The same closed list as VenuePoint.interestTags. (max items 12) |
-| cuisineTags | array of string |  | (max items 8) |
-| mustIncludePointIds | array of string (uuid) |  | (max items 10) |
+| cuisineTags | array of string |  | Matched per day against the cuisineTags of that day's venue's dining points only (30 September, MoM 4.7). (max items 8) |
+| retailTags | array of string |  | Shops the party would like to visit (30 September client meeting, MoM 4.7: retail and kiosk shops join F&B as venue-linked planner options), e.g. (max items 8) |
+| mustIncludePointIds | array of string (uuid) |  | Placed on a day whose venue has the point. (max items 10) |
 | preset | enum (highlights, family, thrillSeeker, waterDay, relaxed, showsAndDining) |  | A ready-made day plan (GST-052 Suggested Itineraries): the preset fixes the interests and the pace, and the party still decides eligibility. (nullable) |
 | presetKey | string |  | The ready-made plan the guest took on GST-052 (30 September, second wave of the 29 September pass, MOB-6): one of the built-in preset keys above, or a key of a ready-made plan the venue defines. (max length 64; pattern ^[a-z][a-zA-Z0-9]*$; nullable) |
 | startTime | string |  | When the party arrives. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; nullable) |
@@ -4957,15 +4965,19 @@ The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets show
 | version | integer | yes | The current version. (min 1; read-only) |
 | source | enum (rules, preset, aiAgent) |  | What produced the current version: the rules planner, a preset, or the AI planner agent acting for the guest. (read-only) |
 | inputs | VisitPlanRequest |  | What generateVisitPlan takes (29 September, MOB-6): the Plan tab's form on GST-051 and WEB-050. |
-| inputs.venueId | string (uuid) | yes |  |
+| inputs.venueId | string (uuid) | yes | The venue the guest picked in the app (GST-001 / WEB-001), which scopes the plan. |
+| inputs.dayVenues | array of object |  | Which venue on which date, in a multi-venue tenant (30 September client meeting, MoM 4.7, Allam's requirement). (max items 7) |
+| inputs.dayVenues[].date | string (date) | yes |  |
+| inputs.dayVenues[].venueId | string (uuid) | yes |  |
 | inputs.dates | array of string (date) | yes | (min items 1; max items 7) |
 | inputs.party | array of object | yes | One entry per person. (min items 1; max items 20) |
 | inputs.party[].heightCm | integer |  | (min 40; max 230; nullable) |
 | inputs.party[].ageYears | integer |  | (min 0; max 120; nullable) |
 | inputs.pace | enum (packed, relaxed) |  | (default relaxed) |
 | inputs.interestTags | array of string |  | The same closed list as VenuePoint.interestTags. (max items 12) |
-| inputs.cuisineTags | array of string |  | (max items 8) |
-| inputs.mustIncludePointIds | array of string (uuid) |  | (max items 10) |
+| inputs.cuisineTags | array of string |  | Matched per day against the cuisineTags of that day's venue's dining points only (30 September, MoM 4.7). (max items 8) |
+| inputs.retailTags | array of string |  | Shops the party would like to visit (30 September client meeting, MoM 4.7: retail and kiosk shops join F&B as venue-linked planner options), e.g. (max items 8) |
+| inputs.mustIncludePointIds | array of string (uuid) |  | Placed on a day whose venue has the point. (max items 10) |
 | inputs.preset | enum (highlights, family, thrillSeeker, waterDay, relaxed, showsAndDining) |  | A ready-made day plan (GST-052 Suggested Itineraries): the preset fixes the interests and the pace, and the party still decides eligibility. (nullable) |
 | inputs.presetKey | string |  | The ready-made plan the guest took on GST-052 (30 September, second wave of the 29 September pass, MOB-6): one of the built-in preset keys above, or a key of a ready-made plan the venue defines. (max length 64; pattern ^[a-z][a-zA-Z0-9]*$; nullable) |
 | inputs.startTime | string |  | When the party arrives. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; nullable) |
@@ -4975,9 +4987,16 @@ The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets show
 | excluded | array of object |  | What was left out and why, e.g. (read-only) |
 | excluded[].pointId | string (uuid) |  |  |
 | excluded[].productId | string (uuid) |  | (nullable) |
-| excluded[].reason | enum (heightRule, ageRule, closedOnDate, notInInterests, noTime) |  |  |
+| excluded[].reason | enum (heightRule, ageRule, closedOnDate, notInInterests, noTime, notAtVenue) |  | notAtVenue (30 September, MoM 4.7): a must-include point that is at none of the plan's venues, so no day could hold it. |
+| unmatchedPreferences | array of object |  | A preference a day's venue cannot meet is said, never faked (30 September client meeting, MoM 4.7, Allam's requirement). (read-only) |
+| unmatchedPreferences[].date | string (date) | yes |  |
+| unmatchedPreferences[].venueId | string (uuid) | yes | The day's venue, which has no match. |
+| unmatchedPreferences[].preference | enum (cuisine, retail, interest) | yes |  |
+| unmatchedPreferences[].tag | string | yes | (max length 30) |
+| unmatchedPreferences[].availableAtVenueIds | array of string (uuid) |  | Other active venues of the tenant where the tag is matched. |
 | days | array of object | yes | One per date, in order. (read-only) |
 | days[].date | string (date) | yes |  |
+| days[].venueId | string (uuid) | yes | The venue this day is planned at (30 September, MoM 4.7): VisitPlanRequest.dayVenues for the date, else venueId. |
 | days[].opensAt | string |  | (nullable) |
 | days[].closesAt | string |  | (nullable) |
 | days[].items | array of VisitPlanItem | yes |  |
@@ -4986,7 +5005,8 @@ The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets show
 | days[].items[].planVersion | integer | yes | (min 1; read-only) |
 | days[].items[].date | string (date) | yes |  |
 | days[].items[].sequence | integer | yes | (min 1) |
-| days[].items[].kind | enum (attraction, show, meal, shop, rest, travel) | yes |  |
+| days[].items[].kind | enum (attraction, show, meal, shop, rest, travel) | yes | meal is a stop at a dining point (restaurant, cafe or food kiosk); shop is a retail stop at a shop or a retail kiosk (30 September client meeting, MoM 4.7: retail is placed from the day venue's own p… |
+| days[].items[].venueId | string (uuid) |  | The venue of this stop (30 September client meeting, MoM 4.7): always the day's venue, and the venue whose map pointId is on. (read-only) |
 | days[].items[].pointId | string (uuid) |  | (nullable) |
 | days[].items[].productId | string (uuid) |  | What is bought for this stop, where it is bought. (nullable) |
 | days[].items[].bundleId | string (uuid) |  | A meal combo or package, from the point's featuredOffer. (nullable) |
@@ -5008,7 +5028,7 @@ The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets show
 |---|---|---|
 | 201 |  | The plan, version 1, one day per date asked for. |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-| 422 |  | The venue has no published map, or none of its points carries a planning duration (venue-not-plannable), so there is nothing to lay out; or a date is outside the venue's opening calendar (venue-close… |
+| 422 |  | A venue of the plan (venueId or a dayVenues venue) has no published map, or none of its points carries a planning duration (venue-not-plannable), so there is nothing to lay out; or a date is outside… |
 
 ### getVisitPlan
 
@@ -5050,15 +5070,19 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 | version | integer | yes | The current version. (min 1; read-only) |
 | source | enum (rules, preset, aiAgent) |  | What produced the current version: the rules planner, a preset, or the AI planner agent acting for the guest. (read-only) |
 | inputs | VisitPlanRequest |  | What generateVisitPlan takes (29 September, MOB-6): the Plan tab's form on GST-051 and WEB-050. |
-| inputs.venueId | string (uuid) | yes |  |
+| inputs.venueId | string (uuid) | yes | The venue the guest picked in the app (GST-001 / WEB-001), which scopes the plan. |
+| inputs.dayVenues | array of object |  | Which venue on which date, in a multi-venue tenant (30 September client meeting, MoM 4.7, Allam's requirement). (max items 7) |
+| inputs.dayVenues[].date | string (date) | yes |  |
+| inputs.dayVenues[].venueId | string (uuid) | yes |  |
 | inputs.dates | array of string (date) | yes | (min items 1; max items 7) |
 | inputs.party | array of object | yes | One entry per person. (min items 1; max items 20) |
 | inputs.party[].heightCm | integer |  | (min 40; max 230; nullable) |
 | inputs.party[].ageYears | integer |  | (min 0; max 120; nullable) |
 | inputs.pace | enum (packed, relaxed) |  | (default relaxed) |
 | inputs.interestTags | array of string |  | The same closed list as VenuePoint.interestTags. (max items 12) |
-| inputs.cuisineTags | array of string |  | (max items 8) |
-| inputs.mustIncludePointIds | array of string (uuid) |  | (max items 10) |
+| inputs.cuisineTags | array of string |  | Matched per day against the cuisineTags of that day's venue's dining points only (30 September, MoM 4.7). (max items 8) |
+| inputs.retailTags | array of string |  | Shops the party would like to visit (30 September client meeting, MoM 4.7: retail and kiosk shops join F&B as venue-linked planner options), e.g. (max items 8) |
+| inputs.mustIncludePointIds | array of string (uuid) |  | Placed on a day whose venue has the point. (max items 10) |
 | inputs.preset | enum (highlights, family, thrillSeeker, waterDay, relaxed, showsAndDining) |  | A ready-made day plan (GST-052 Suggested Itineraries): the preset fixes the interests and the pace, and the party still decides eligibility. (nullable) |
 | inputs.presetKey | string |  | The ready-made plan the guest took on GST-052 (30 September, second wave of the 29 September pass, MOB-6): one of the built-in preset keys above, or a key of a ready-made plan the venue defines. (max length 64; pattern ^[a-z][a-zA-Z0-9]*$; nullable) |
 | inputs.startTime | string |  | When the party arrives. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; nullable) |
@@ -5068,9 +5092,16 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 | excluded | array of object |  | What was left out and why, e.g. (read-only) |
 | excluded[].pointId | string (uuid) |  |  |
 | excluded[].productId | string (uuid) |  | (nullable) |
-| excluded[].reason | enum (heightRule, ageRule, closedOnDate, notInInterests, noTime) |  |  |
+| excluded[].reason | enum (heightRule, ageRule, closedOnDate, notInInterests, noTime, notAtVenue) |  | notAtVenue (30 September, MoM 4.7): a must-include point that is at none of the plan's venues, so no day could hold it. |
+| unmatchedPreferences | array of object |  | A preference a day's venue cannot meet is said, never faked (30 September client meeting, MoM 4.7, Allam's requirement). (read-only) |
+| unmatchedPreferences[].date | string (date) | yes |  |
+| unmatchedPreferences[].venueId | string (uuid) | yes | The day's venue, which has no match. |
+| unmatchedPreferences[].preference | enum (cuisine, retail, interest) | yes |  |
+| unmatchedPreferences[].tag | string | yes | (max length 30) |
+| unmatchedPreferences[].availableAtVenueIds | array of string (uuid) |  | Other active venues of the tenant where the tag is matched. |
 | days | array of object | yes | One per date, in order. (read-only) |
 | days[].date | string (date) | yes |  |
+| days[].venueId | string (uuid) | yes | The venue this day is planned at (30 September, MoM 4.7): VisitPlanRequest.dayVenues for the date, else venueId. |
 | days[].opensAt | string |  | (nullable) |
 | days[].closesAt | string |  | (nullable) |
 | days[].items | array of VisitPlanItem | yes |  |
@@ -5079,7 +5110,8 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 | days[].items[].planVersion | integer | yes | (min 1; read-only) |
 | days[].items[].date | string (date) | yes |  |
 | days[].items[].sequence | integer | yes | (min 1) |
-| days[].items[].kind | enum (attraction, show, meal, shop, rest, travel) | yes |  |
+| days[].items[].kind | enum (attraction, show, meal, shop, rest, travel) | yes | meal is a stop at a dining point (restaurant, cafe or food kiosk); shop is a retail stop at a shop or a retail kiosk (30 September client meeting, MoM 4.7: retail is placed from the day venue's own p… |
+| days[].items[].venueId | string (uuid) |  | The venue of this stop (30 September client meeting, MoM 4.7): always the day's venue, and the venue whose map pointId is on. (read-only) |
 | days[].items[].pointId | string (uuid) |  | (nullable) |
 | days[].items[].productId | string (uuid) |  | What is bought for this stop, where it is bought. (nullable) |
 | days[].items[].bundleId | string (uuid) |  | A meal combo or package, from the point's featuredOffer. (nullable) |
@@ -5107,6 +5139,7 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 **`GET /visit-plans/{planId}/items/{itemId}/alternatives`**: What could take this item's place
 
 **The swap sheet** (29 September, MOB-6): points and performances the whole party is eligible for that fit the item's slot, best first by interest match, then by the time lost to walking and the expected wait. Each carries why it was offered, so the sheet can say *"Same thrill level, 4 minutes closer"*. Computed on read, never stored; choosing one is an `updateVisitPlan` `swap`.
+**Only from the item's day venue** (30 September client meeting, MoM 4.7): alternatives are points on that venue's published map and performances dated there, never another venue of the tenant, so a swap cannot move a meal or a shop to a park the party is not in that day. `kind=shop` returns the venue's retail points, shops and retail kiosks alike; `kind=meal` its dining points, food kiosks included.
 
 |  |  |
 |---|---|
@@ -5138,6 +5171,7 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 |---|---|---|---|
 | items | array of VisitPlanAlternative | yes |  |
 | items[].kind | enum (attraction, show, meal, shop, rest) | yes |  |
+| items[].venueId | string (uuid) | yes | The item's day venue; an alternative is never from another venue (30 September, MoM 4.7). |
 | items[].pointId | string (uuid) |  | (nullable) |
 | items[].productId | string (uuid) |  | (nullable) |
 | items[].performanceId | string (uuid) |  | (nullable) |
@@ -5165,6 +5199,7 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 **Every change is a new version, so undo is a change too** (29 September, MOB-6). The body names the version it was made against (`baseVersion`) and a list of changes: `swap` an item for an alternative from `listVisitPlanAlternatives`, `remove`, `add` a point or a performance, `move` an item to another time, or `revertTo` an earlier version. The server re-lays the affected day with the same rules as `generateVisitPlan`, so the times after a change still add up, and returns the new current version.
 **A stale `baseVersion` is refused 409 `plan-version-conflict`** rather than merged: the AI planner agent and the guest can both change a plan, and a change made against a plan the guest no longer sees is a change they did not choose.
 **The AI planner agent calls this as the guest** (ai `setAiTool`, toolKey `venue-map.updateVisitPlan`): the agent's proposal becomes a version the guest can undo. AI never writes the plan tables itself (ADR-0020).
+**A day keeps to its venue** (30 September client meeting, MoM 4.7). An `add` or `swap` may only name a point on the published map of that day's venue, or a performance dated at that venue; anything else is refused 422 `point-not-at-day-venue`, whoever sends it. This is the backstop for the AI planner agent: a restaurant or shop it names from another park never reaches the plan. Moving a day to another venue is a new plan from changed answers (`generateVisitPlan` with `dayVenues`), not a change here.
 
 |  |  |
 |---|---|
@@ -5213,15 +5248,19 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 | version | integer | yes | The current version. (min 1; read-only) |
 | source | enum (rules, preset, aiAgent) |  | What produced the current version: the rules planner, a preset, or the AI planner agent acting for the guest. (read-only) |
 | inputs | VisitPlanRequest |  | What generateVisitPlan takes (29 September, MOB-6): the Plan tab's form on GST-051 and WEB-050. |
-| inputs.venueId | string (uuid) | yes |  |
+| inputs.venueId | string (uuid) | yes | The venue the guest picked in the app (GST-001 / WEB-001), which scopes the plan. |
+| inputs.dayVenues | array of object |  | Which venue on which date, in a multi-venue tenant (30 September client meeting, MoM 4.7, Allam's requirement). (max items 7) |
+| inputs.dayVenues[].date | string (date) | yes |  |
+| inputs.dayVenues[].venueId | string (uuid) | yes |  |
 | inputs.dates | array of string (date) | yes | (min items 1; max items 7) |
 | inputs.party | array of object | yes | One entry per person. (min items 1; max items 20) |
 | inputs.party[].heightCm | integer |  | (min 40; max 230; nullable) |
 | inputs.party[].ageYears | integer |  | (min 0; max 120; nullable) |
 | inputs.pace | enum (packed, relaxed) |  | (default relaxed) |
 | inputs.interestTags | array of string |  | The same closed list as VenuePoint.interestTags. (max items 12) |
-| inputs.cuisineTags | array of string |  | (max items 8) |
-| inputs.mustIncludePointIds | array of string (uuid) |  | (max items 10) |
+| inputs.cuisineTags | array of string |  | Matched per day against the cuisineTags of that day's venue's dining points only (30 September, MoM 4.7). (max items 8) |
+| inputs.retailTags | array of string |  | Shops the party would like to visit (30 September client meeting, MoM 4.7: retail and kiosk shops join F&B as venue-linked planner options), e.g. (max items 8) |
+| inputs.mustIncludePointIds | array of string (uuid) |  | Placed on a day whose venue has the point. (max items 10) |
 | inputs.preset | enum (highlights, family, thrillSeeker, waterDay, relaxed, showsAndDining) |  | A ready-made day plan (GST-052 Suggested Itineraries): the preset fixes the interests and the pace, and the party still decides eligibility. (nullable) |
 | inputs.presetKey | string |  | The ready-made plan the guest took on GST-052 (30 September, second wave of the 29 September pass, MOB-6): one of the built-in preset keys above, or a key of a ready-made plan the venue defines. (max length 64; pattern ^[a-z][a-zA-Z0-9]*$; nullable) |
 | inputs.startTime | string |  | When the party arrives. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; nullable) |
@@ -5231,9 +5270,16 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 | excluded | array of object |  | What was left out and why, e.g. (read-only) |
 | excluded[].pointId | string (uuid) |  |  |
 | excluded[].productId | string (uuid) |  | (nullable) |
-| excluded[].reason | enum (heightRule, ageRule, closedOnDate, notInInterests, noTime) |  |  |
+| excluded[].reason | enum (heightRule, ageRule, closedOnDate, notInInterests, noTime, notAtVenue) |  | notAtVenue (30 September, MoM 4.7): a must-include point that is at none of the plan's venues, so no day could hold it. |
+| unmatchedPreferences | array of object |  | A preference a day's venue cannot meet is said, never faked (30 September client meeting, MoM 4.7, Allam's requirement). (read-only) |
+| unmatchedPreferences[].date | string (date) | yes |  |
+| unmatchedPreferences[].venueId | string (uuid) | yes | The day's venue, which has no match. |
+| unmatchedPreferences[].preference | enum (cuisine, retail, interest) | yes |  |
+| unmatchedPreferences[].tag | string | yes | (max length 30) |
+| unmatchedPreferences[].availableAtVenueIds | array of string (uuid) |  | Other active venues of the tenant where the tag is matched. |
 | days | array of object | yes | One per date, in order. (read-only) |
 | days[].date | string (date) | yes |  |
+| days[].venueId | string (uuid) | yes | The venue this day is planned at (30 September, MoM 4.7): VisitPlanRequest.dayVenues for the date, else venueId. |
 | days[].opensAt | string |  | (nullable) |
 | days[].closesAt | string |  | (nullable) |
 | days[].items | array of VisitPlanItem | yes |  |
@@ -5242,7 +5288,8 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 | days[].items[].planVersion | integer | yes | (min 1; read-only) |
 | days[].items[].date | string (date) | yes |  |
 | days[].items[].sequence | integer | yes | (min 1) |
-| days[].items[].kind | enum (attraction, show, meal, shop, rest, travel) | yes |  |
+| days[].items[].kind | enum (attraction, show, meal, shop, rest, travel) | yes | meal is a stop at a dining point (restaurant, cafe or food kiosk); shop is a retail stop at a shop or a retail kiosk (30 September client meeting, MoM 4.7: retail is placed from the day venue's own p… |
+| days[].items[].venueId | string (uuid) |  | The venue of this stop (30 September client meeting, MoM 4.7): always the day's venue, and the venue whose map pointId is on. (read-only) |
 | days[].items[].pointId | string (uuid) |  | (nullable) |
 | days[].items[].productId | string (uuid) |  | What is bought for this stop, where it is bought. (nullable) |
 | days[].items[].bundleId | string (uuid) |  | A meal combo or package, from the point's featuredOffer. (nullable) |
@@ -5265,7 +5312,7 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 | 200 |  | The new current version |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | baseVersion is not the current version (plan-version-conflict), or the plan is already booked (plan-booked; a booked plan is read-only, generate a new one). |
-| 422 |  | A change names an item not on the plan, a revertTo version that does not exist, or a point the party is not eligible for (item-not-eligible, with the rule that excludes). |
+| 422 |  | A change names an item not on the plan, a revertTo version that does not exist, or a point the party is not eligible for (item-not-eligible, with the rule that excludes); or an add or swap names a po… |
 
 
 ## Group: waitTime
@@ -6031,6 +6078,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | typical_duration_minutes | integer | no | How long a visit to this point usually takes, ride time and queue excluded (29 September, MOB-6). |
 | interest_tags | text[] | no | What a guest who says they like this would like here (29 September, MOB-6): the planner matches the guest's interests against these. |
 | cuisine_tags | text[] | no | For dining points (restaurant, cafe, kiosk; 29 September, MOB-6). |
+| retail_tags | text[] | no | For retail points (shop, and a kiosk that sells goods rather than food; 30 September client meeting, MoM 4.7: retail and kiosk shops join F&B as venue-linked planner options). |
 
 ### `venuemap.visit_plan`
 
@@ -6059,7 +6107,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | plan_version | integer | yes |  |
 | date | date | yes |  |
 | sequence | integer | yes |  |
-| kind | text | yes |  |
+| kind | text | yes | meal is a stop at a dining point (restaurant, cafe or food kiosk); shop is a retail stop at a shop or a retail kiosk (30 September client meeting, MoM 4.7: retail is placed from the day venue's own p… |
 | point_id | uuid | no |  |
 | product_id | uuid | no | What is bought for this stop, where it is bought. |
 | bundle_id | uuid | no | A meal combo or package, from the point's featuredOffer. |

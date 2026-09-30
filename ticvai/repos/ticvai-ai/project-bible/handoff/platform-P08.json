@@ -177,11 +177,11 @@
    "operations": 53
   },
   {
-   "contract": "workforce",
+   "contract": "accreditation",
    "operations": 42
   },
   {
-   "contract": "accreditation",
+   "contract": "workforce",
    "operations": 42
   },
   {
@@ -233,11 +233,11 @@
    "operations": 18
   },
   {
-   "contract": "venue-map",
+   "contract": "queue",
    "operations": 13
   },
   {
-   "contract": "queue",
+   "contract": "venue-map",
    "operations": 13
   },
   {
@@ -253,11 +253,11 @@
    "operations": 11
   },
   {
-   "contract": "payments",
+   "contract": "assets",
    "operations": 5
   },
   {
-   "contract": "assets",
+   "contract": "payments",
    "operations": 5
   },
   {

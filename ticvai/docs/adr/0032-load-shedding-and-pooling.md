@@ -163,3 +163,13 @@ costs a connection, and the queue is where an outage hides until it is total.
 **Global rate limit per tenant.** Deferred rather than rejected — **it protects other tenants from
 one, which is a real property of the shared cell** — but it needs a fairness model nobody has
 specified, and a wrong one throttles the tenant having the good day.
+
+---
+
+## Amendment — the Redis product, 30 September 2026
+
+**Azure Managed Redis, not Azure Cache for Redis.** Azure Cache for Redis (Basic, Standard and Premium) retires
+on 30 September 2028, and new customers cannot create it from 1 October 2026. The cell's cache is Azure Managed
+Redis Balanced B10 (12 GB) with high availability, zone-redundant, behind a private endpoint (Terraform cell
+module; LLD). Nothing in this ADR's pooling, shedding or breaker rules changes. Source:
+`docs/active/infra-answers-30-september.md` section 4b.

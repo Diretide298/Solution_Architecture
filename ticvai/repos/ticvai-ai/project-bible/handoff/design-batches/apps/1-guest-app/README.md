@@ -97,6 +97,11 @@ Open the file and match it. Do not describe it in words.
 
 The manifest counts every P02 batch as drawn, because it counts frames on disk. It cannot see that the frames are one build old. The batches below are exported and current anyway.
 
+**Two changes from the client meeting of 30 September, over the v4 captures.** The v4 views stay the layout; these add to them, on the web twins too (WEB-050, WEB-004).
+
+- **Planner, multi-venue (MoM 4.7, Allam): GST-051, GST-053, GST-054, WEB-050.** In a multi-venue tenant each day is one park (a *Which park each day?* choice after the dates), and a day holds only that park's rides, dining and **retail: shops and kiosks now sit beside meals** as plan stops. A cuisine or shop the park lacks is never filled from another park: the chip says *Not at the parks you chose* before planning, and the day shows a *Not at this park* banner naming the park that has it. Draw the `preferenceNotAtVenue` state.
+- **Ride detail video (MoM 4.8, Qossai): GST-004, WEB-004.** The info button reveals the details and plays the video in place. **No loader or loading screen in front of the video**: the poster frame shows while it buffers (`videoBuffering`), and a video that cannot play leaves the poster (`videoUnavailable`). Remove any spinner the v4 capture draws over the video.
+
 ### Batches, in the order to run them
 
 Block A first: batches with a new or changed screen, then the rest of Block A. Then the rest, cheapest first (the manifest order: fully specified before thin).

@@ -127,7 +127,7 @@
 | `GST-048` | Upsell / Cross-Sell | Booking & Selection | 2 | 3 | yes |
 | `GST-049` | Interactive Seat Selection | Booking & Selection | 2 | 5 | yes |
 | `GST-050` | Resource Booking – Cabana | Booking & Selection | 3 | 3 | yes |
-| `GST-051` | Plan | Engagement & Support | 1 | 3 | yes |
+| `GST-051` | Plan | Engagement & Support | 1 | 4 | yes |
 | `GST-052` | Suggested Itineraries | Engagement & Support | 1 | 3 | yes |
 | `GST-053` | Your Plan | Engagement & Support | 1 | 7 | yes |
 | `GST-054` | AI Planner | Engagement & Support | 1 | 6 | yes |

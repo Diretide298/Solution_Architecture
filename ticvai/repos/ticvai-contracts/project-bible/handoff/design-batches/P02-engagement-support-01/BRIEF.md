@@ -68,7 +68,7 @@ convincingly. It is never a caption.
 | `GST-033` | AI Concierge – Contextual Help | configEditor | 1 | 0 | — |
 | `GST-035` | Feedback & Ratings | configEditor | 2 | 1 | — |
 | `GST-040` | Help & Support | commandCentre | 6 | 2 | — |
-| `GST-051` | Plan | multiStepForm | 3 | 0 | — |
+| `GST-051` | Plan | multiStepForm | 4 | 0 | — |
 | `GST-052` | Suggested Itineraries | listDetail | 3 | 0 | — |
 | `GST-053` | Your Plan | listDetail | 7 | 0 | — |
 | `GST-054` | AI Planner | listDetail | 6 | 0 | yes |

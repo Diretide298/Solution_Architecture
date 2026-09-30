@@ -1699,7 +1699,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Cross-surface parity, 31 August**: added listPerformances. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.\n\n**Rev 3 (decided 29 September).** Ticket tags (23SEP-3) and the product's own photo or video (23SEP-4); an info-only product shows its label and no Book (REV3-14). Book goes to the date and time (GST-007) for a dated product (REV3-2), straight to the seat map for a single-performance fixture (23SEP-16, REV3-4), to the map booking for a spot on a venue map (GST-074, REV3-15), or to the space booking (GST-075, REV3-13). Help me choose sits on the booking step (GST-008), not here (REV3-11). The event banner lists dates only when `eventBannerDates` is on (23SEP-19).\n\n**Mobile v4 (decided 29 September, MOB-4).** GST-004 and GST-006 become one **Item Detail** screen for rides, shows, restaurants and shops: **one implementation, both ids kept** (as GAP-D3). Gallery, the 2D/3D map pin (`getVenueMap`) and a product card from `VenuePoint.featuredOffer` (product or bundle). *Buy meal combo* adds the required admission because the bundle carries it. **W3:** an info-only product shows Call sales / Email sales instead of Book.",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Cross-surface parity, 31 August**: added listPerformances. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.\n\n**Rev 3 (decided 29 September).** Ticket tags (23SEP-3) and the product's own photo or video (23SEP-4); an info-only product shows its label and no Book (REV3-14). Book goes to the date and time (GST-007) for a dated product (REV3-2), straight to the seat map for a single-performance fixture (23SEP-16, REV3-4), to the map booking for a spot on a venue map (GST-074, REV3-15), or to the space booking (GST-075, REV3-13). Help me choose sits on the booking step (GST-008), not here (REV3-11). The event banner lists dates only when `eventBannerDates` is on (23SEP-19).\n\n**Mobile v4 (decided 29 September, MOB-4).** GST-004 and GST-006 become one **Item Detail** screen for rides, shows, restaurants and shops: **one implementation, both ids kept** (as GAP-D3). Gallery, the 2D/3D map pin (`getVenueMap`) and a product card from `VenuePoint.featuredOffer` (product or bundle). *Buy meal combo* adds the required admission because the bundle carries it. **W3:** an info-only product shows Call sales / Email sales instead of Book.\n\n**Video plays directly (client meeting 30 September, MoM 4.8, Qossai; agreed by Chinmay).** On a ride or attraction the info button reveals the details and plays the video straight away; the loader that stood in front of it is removed. While the video buffers its poster frame shows; a video that cannot play leaves the poster and the details, never an error screen.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listPerformances` reads the population and `getProduct` reads one of them — list, select, act",
@@ -1763,9 +1763,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
        "kind": "detailPanel",
        "label": "Photo and video",
        "bindsTo": "Product.media",
-       "notes": "Read more opens on the primary video or photo.",
+       "notes": "**The video plays directly, with no loader in front of it** (client meeting 30 September, MoM 4.8, Qossai; agreed by Chinmay). The info button reveals the ride details and starts the primary video in place, as the header video does elsewhere; while it buffers the poster frame (the primary image, or the video's first frame) shows, never a spinner or loading screen. Read more opens on the primary video or photo.",
        "operation": "getProduct",
-       "provenance": "decided 29 September, rev 3 23SEP-4"
+       "provenance": "decided 29 September, rev 3 23SEP-4; decided 30 September 2026, client meeting MoM 4.8 (Qossai)"
       },
       {
        "kind": "detailPanel",
@@ -1776,7 +1776,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
         "VenuePoint.media"
        ],
        "operation": "getVenueMap",
-       "notes": "Photos and clips from `VenuePoint.media` (else `Product.media`), with the point's description.",
+       "notes": "Photos and clips from `VenuePoint.media` (else `Product.media`), with the point's description. A clip plays in place from its poster frame, with no loader (client meeting 30 September, MoM 4.8).",
        "provenance": "decided 29 September 2026, MOB-4"
       },
       {
@@ -1899,7 +1899,9 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    ]
   },
   "states": {
-   "loading": "The attraction list.",
+   "loading": "**The video is not part of loading** (client meeting 30 September, MoM 4.8): the attraction renders as it arrives and no loader or loading screen is ever drawn over the video.",
+   "videoBuffering": "**Poster frame, not a loader** (client meeting 30 September, MoM 4.8): from the info button until the first frames arrive the ride's poster (primary image, else the video's first frame) fills the video area and playback starts in place as soon as it can; no spinner, overlay or blocking screen. The details beside it stay usable throughout.",
+   "videoUnavailable": "The video cannot play (no video, a failed stream, data saver on). The poster stays and the details are unaffected; no error screen and no loader.",
    "error": "Could not load. Names which read failed and leaves the attraction untouched.",
    "emptyFirstRun": "No attraction yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on from, to and the attraction are still there. Names the active filter and offers to clear it.",
@@ -7726,7 +7728,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
    "cuisineTags": {
     "type": "array",
     "maxItems": 8,
-    "description": "**For dining points** (restaurant, cafe, kiosk; 29 September, MOB-6). The planner places meals at points whose cuisine the party chose, at meal times. Free text codes such as `arabic`, `indian`, `italian`, `fastFood`, `vegetarian`, `halal` — cuisines are too many to close, and a wrong enum is worse than an unmatched tag.\n",
+    "description": "**For dining points** (restaurant, cafe, kiosk; 29 September, MOB-6). The planner places meals at points whose cuisine the party chose, at meal times. Free text codes such as `arabic`, `indian`, `italian`, `fastFood`, `vegetarian`, `halal` — cuisines are too many to close, and a wrong enum is worse than an unmatched tag. **Read per venue**: the planner matches a guest's cuisine only against the points of the venue that day is at (30 September, MoM 4.7).\n",
+    "items": {
+     "type": "string",
+     "maxLength": 30
+    }
+   },
+   "retailTags": {
+    "type": "array",
+    "maxItems": 8,
+    "description": "**For retail points** (shop, and a kiosk that sells goods rather than food; 30 September client meeting, MoM 4.7: retail and kiosk shops join F&B as venue-linked planner options). The planner places a shop stop at points whose tags the party chose, on the day of this point's venue only. Free text codes such as `souvenirs`, `toys`, `apparel`, `photo`, `essentials`, for the same reason as `cuisineTags`. A kiosk may carry both lists.\n",
     "items": {
      "type": "string",
      "maxLength": 30

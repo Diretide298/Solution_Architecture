@@ -2471,8 +2471,8 @@
   {
    "file": "APP guest.dc.html",
    "provenance": "clientPack",
-   "bytes": 731536,
-   "sha256": "bde2836a290d874f",
+   "bytes": 731684,
+   "sha256": "fad1fdb703fbd1ae",
    "frames": 144,
    "screensFramed": 144,
    "screens": [
@@ -4335,8 +4335,8 @@
   {
    "file": "APP venue-management.dc.html",
    "provenance": "clientPack",
-   "bytes": 4162405,
-   "sha256": "53e30b50d60a6cfc",
+   "bytes": 4162419,
+   "sha256": "b4a6b970a69354ea",
    "frames": 1387,
    "screensFramed": 1387,
    "screens": [
@@ -7478,8 +7478,8 @@
   {
    "file": "P01 Guest Web.dc.html",
    "provenance": "generated",
-   "bytes": 139423,
-   "sha256": "fd2d132f2fbd13dc",
+   "bytes": 139474,
+   "sha256": "bc98cd5f4aaa27d5",
    "frames": 50,
    "screensFramed": 50,
    "screens": [
@@ -7596,8 +7596,8 @@
   {
    "file": "P02 Guest App.dc.html",
    "provenance": "generated",
-   "bytes": 553135,
-   "sha256": "b4df4676c15950be",
+   "bytes": 553232,
+   "sha256": "188e2477033812b9",
    "frames": 77,
    "screensFramed": 77,
    "screens": [
@@ -8148,8 +8148,8 @@
   {
    "file": "P08 Venue Management.dc.html",
    "provenance": "generated",
-   "bytes": 3560513,
-   "sha256": "a1d15352faa213f8",
+   "bytes": 3560527,
+   "sha256": "2d5b0b6ea6fe2c8d",
    "frames": 1186,
    "screensFramed": 1186,
    "screens": [
