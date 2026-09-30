@@ -116,7 +116,7 @@ layer for abuse.
 **Sprint 1**
 
 1. [x] Chinmay: accepted 1 October 2026.
-2. [ ] Package: `429` with `Retry-After` on every operation (SD-043); a limits section on the subscription plan. Re-derive, mirrors, check. (2 pts)
+2. [x] Package: `429` with `Retry-After` on every operation (SD-043); a limits section on the subscription plan. Re-derive, mirrors, check. (2 pts) — **Authored 1 October**: every operation declares `429` (the shared `TooManyRequests`, now with the `RateLimit-*` headers; `tools/applied/adr-1-october.py` added it to 2,623); `Plan.requestLimits` (`PlanRequestLimits`, `RequestBudget`) in subscription. The four that declare their own `429` (three AI token ceilings, `verifyMfaChallenge`) now carry `Retry-After` too. Re-derive, mirrors and check at the next refresh.
 3. [ ] Kernel: `429` and `Retry-After` are already in the kernel ticket (review 7.3).
 
 **Sprint 2**

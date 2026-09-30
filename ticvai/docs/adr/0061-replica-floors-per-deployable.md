@@ -113,7 +113,7 @@ replicas at the price of cold starts where staff notice them.
 **Sprint 1**
 
 1. [x] Chinmay: accepted 1 October 2026.
-2. [ ] Package: the floors above in `sizing.json`'s `deployables` block (`commerce` 3; `ticvai-ai` split into its three process groups), and its note no longer calls this ADR a proposed draft; re-derive, mirrors, check. (1 pt)
+2. [ ] Package: the floors above in `sizing.json`'s `deployables` block (`commerce` 3; `ticvai-ai` split into its three process groups), and its note no longer calls this ADR a proposed draft; re-derive, mirrors, check. (1 pt) — **Authored 1 October** in `tools/derive-sizing.py` (`DEPLOYABLE_FLOORS`, `AI_PROCESS_GROUP_FLOORS`): 12 at the floor in the small and medium cells, 13 in the large (real-time 3). `sizing.json` takes it at the next refresh.
 3. [ ] Put the floors in the deploy configs and the Terraform `cell` module. (1 pt)
 
 **Sprint 2**

@@ -114,6 +114,8 @@ paths:
               schema:
                 type: object
                 additionalProperties: true
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /releases:
     get:
       operationId: listReleases
@@ -158,6 +160,8 @@ paths:
                         $ref: '#/components/schemas/Release'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createRelease
       x-ticvai-consumed-by:
@@ -208,6 +212,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /releases/{releaseId}:
     parameters:
     - name: releaseId
@@ -240,6 +246,8 @@ paths:
                 $ref: '#/components/schemas/ReleaseDetail'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /releases/{releaseId}/reject:
     parameters:
     - name: releaseId
@@ -290,6 +298,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /releases/{releaseId}/withdraw:
     parameters:
     - name: releaseId
@@ -340,6 +350,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /releases/{releaseId}/promote:
     parameters:
     - name: releaseId
@@ -418,6 +430,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/PromotionBlockedProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /releases/{releaseId}/readiness:
     parameters:
     - name: releaseId
@@ -452,6 +466,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReleaseReadiness'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rollouts:
     get:
       operationId: listRollouts
@@ -492,6 +508,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Rollout'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rollouts/{rolloutId}:
     parameters:
     - name: rolloutId
@@ -528,6 +546,8 @@ paths:
                 $ref: '#/components/schemas/RolloutDetail'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rollouts/{rolloutId}/start:
     parameters:
     - name: rolloutId
@@ -620,6 +640,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rollouts/{rolloutId}/pause:
     parameters:
     - name: rolloutId
@@ -670,6 +692,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RolloutDetail'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rollouts/{rolloutId}/rollback:
     parameters:
     - name: rolloutId
@@ -742,6 +766,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/IrreversibleProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /migrations:
     get:
       operationId: listMigrations
@@ -789,6 +815,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Migration'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /migrations/plan:
     post:
       operationId: planMigration
@@ -848,6 +876,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /migrations/apply:
     post:
       operationId: applyMigration
@@ -925,6 +955,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /migrations/runs/{runId}:
     parameters:
     - name: runId
@@ -956,6 +988,8 @@ paths:
                 $ref: '#/components/schemas/MigrationRun'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /migrations/runs/{runId}/rollback:
     parameters:
     - name: runId
@@ -1015,6 +1049,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/IrreversibleProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /migrations/version-skew:
     get:
       operationId: getVersionSkew
@@ -1042,6 +1078,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VersionSkewReport'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /environments:
     get:
       operationId: listEnvironments
@@ -1066,6 +1104,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Environment'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: registerEnvironment
       x-ticvai-consumed-by:
@@ -1097,6 +1137,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Environment'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /upgrade-schedules:
     get:
       operationId: listUpgradeSchedules
@@ -1126,6 +1168,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/UpgradeSchedule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: scheduleTenantUpgrade
       x-ticvai-consumed-by:
@@ -1163,6 +1207,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /support-notices:
     get:
       operationId: listSupportNotices
@@ -1190,6 +1236,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SupportNotice'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: publishSupportNotice
       x-ticvai-consumed-by:
@@ -1228,6 +1276,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SupportNotice'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dead-letters:
     get:
       operationId: listDeadLetters
@@ -1263,6 +1313,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DeadLetter'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dead-letters/{deadLetterId}/replay:
     post:
       operationId: replayDeadLetter
@@ -1297,6 +1349,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeadLetter'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /waf-policies:
     get:
       operationId: listWafRules
@@ -1324,6 +1378,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WafRule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setWafPolicy
       x-ticvai-consumed-by:
@@ -1360,6 +1416,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WafRule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /backup-runs:
     get:
       operationId: listBackupRuns
@@ -1387,6 +1445,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BackupRun'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /archival-jobs:
     get:
       operationId: listArchivalJobs
@@ -1414,6 +1474,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ArchivalJob'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /scaling-policies:
     get:
       operationId: getScalingPolicy
@@ -1440,6 +1502,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ScalingPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setScalingPolicy
       x-ticvai-consumed-by:
@@ -1476,6 +1540,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ScalingPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 components:
   schemas:
     OutboxRelay:

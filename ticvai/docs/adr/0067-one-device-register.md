@@ -103,7 +103,7 @@ is truly its own: where a device is placed. C would make the gate module own the
 **Before B1 scanner tickets are cut (by 13 November)**
 
 1. [x] Chinmay: accepted 1 October 2026. ADR-0015 marked amended.
-2. [ ] Package: merge the columns into `platform.device`; create `access.device_placement`; rename and rewire the Access operations (`placeAccessDevice`); drop `device.enrolmentChanged`. New operations need a vocabulary permission. Re-derive, mirrors, check. (3 pts, the finding's estimate)
+2. [ ] Package: merge the columns into `platform.device`; create `access.device_placement`; rename and rewire the Access operations (`placeAccessDevice`); drop `device.enrolmentChanged`. New operations need a vocabulary permission. Re-derive, mirrors, check. (3 pts, the finding's estimate) — **Authored 1 October**: `platform.device` carries hardware type (shared `DeviceHardwareType`), model, serial, every version and component health; `access.access_device` became `access.device_placement` (declared rename); `registerAccessDevice` and `updateAccessDevice` became `placeAccessDevice` and `updateAccessDevicePlacement` (`DEVICE_CONFIGURE`); BO-194 and BO-196 rewired. **`device.enrolmentChanged` lost its access consumer but not its webhook subscribers (16.9.56)**, so it was not dropped: a person decides. Re-derive, mirrors and check at the next refresh.
 
 **B1**
 

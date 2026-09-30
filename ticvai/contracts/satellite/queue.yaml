@@ -76,7 +76,9 @@ info:
       buy sensors, and direct integration with a named vendor is bespoke work.
     - **Q1 Virtual Queue and Q2 Virtual Waiting Room are different systems.** This contract is
       Q1 — ride queues. Q2 throttles traffic at on-sale, is infrastructure rather than
-      product, and lives elsewhere.
+      product, and lives elsewhere: **catalogue `enterWaitingRoom` and `getWaitingRoomPosition`**,
+      Redis positions and a signed admission token checked at the cart (ADR-0066, accepted
+      1 October, amending ADR-0012). No waiting-room screen calls `joinQueue`.
     - **Fast Pass is not a queue feature.** It is an entitlement with a consumption counter,
       owned by Product & Entitlement, spanning access control, F&B and queue. This contract
       redeems against it; it does not define it.
@@ -157,6 +159,8 @@ paths:
                         type: array
                         items: { $ref: '#/components/schemas/Queue' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: createQueue
@@ -194,6 +198,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Queue' }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /queues/{queueId}:
     parameters:
@@ -227,6 +233,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/QueueDetail' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     patch:
       operationId: updateQueue
@@ -281,6 +289,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Queue' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /queues/{queueId}/status:
     parameters:
@@ -341,6 +351,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/QueueStatusResult' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   # ---------------------------------------------------------------- entries
   /waiting-guests:
@@ -394,6 +406,8 @@ paths:
                         type: array
                         items: { $ref: '#/components/schemas/WaitingGuest' }
         '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: joinQueue
@@ -406,6 +420,10 @@ paths:
       summary: Join a virtual queue
       description: >
         Guest-facing. Returns a position, a party number and a return window.
+
+        **Ride queues (Q1) only** (ADR-0066, 1 October). It writes a `queue.entry` row per guest,
+        which is exactly the load an on-sale waiting room exists to keep away; the on-sale room is
+        catalogue `enterWaitingRoom`. The waiting-room parts of WEB-015 and GST-046 move there.
 
         **One active entry per guest per queue**, and a configurable cap across queues — a
         guest holding positions in every queue at once defeats the purpose of a virtual queue
@@ -479,6 +497,9 @@ paths:
         Position, parties ahead, estimated call time. Polled by the guest app, so it is
         cacheable for a few seconds — a thousand guests refreshing a countdown is its own
         load problem.
+
+        **Ride queues (Q1) only** (ADR-0066): the on-sale waiting room's position is catalogue
+        `getWaitingRoomPosition`.
       tags: [entry]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
       x-ticvai-scope-level: venue
@@ -495,6 +516,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/WaitingGuest' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     delete:
       operationId: leaveQueue
@@ -525,6 +548,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /waiting-guests/{entryId}/redeem:
     parameters:
@@ -575,6 +600,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/QueueRedemptionResult' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /waiting-guests/{entryId}/override:
     parameters:
@@ -616,6 +643,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/QueueRedemptionResult' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /queues/{queueId}/call-next:
     parameters:
@@ -674,6 +703,8 @@ paths:
                     type: array
                     items: { type: string, format: uuid }
                   remainingInQueue: { type: integer }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /queues/{queueId}/entries:
     parameters:
@@ -720,6 +751,8 @@ paths:
                       items:
                         type: array
                         items: { $ref: '#/components/schemas/WaitingGuest' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   # ---------------------------------------------------------------- wait times
   /queues/wait-times:
@@ -790,6 +823,8 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/WaitTime' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /queues/{queueId}/wait-time:
     parameters:
@@ -853,6 +888,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/WaitTime' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   # ---------------------------------------------------------------- feeds
   /queue-feeds:
@@ -881,6 +918,8 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/QueueFeed' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     put:
       operationId: configureQueueFeed
@@ -941,6 +980,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /queue-feeds/readings:
     post:
@@ -999,6 +1040,8 @@ paths:
                   duplicates: { type: integer }
                   discardedOutOfOrder: { type: integer }
         '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /queue-feeds/{feedId}/test:
     parameters:
@@ -1039,6 +1082,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/FeedTestResult' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /queue-feeds/{feedId}/health:
     parameters:
@@ -1073,6 +1118,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/QueueFeedHealth' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   # ---------------------------------------------------------------- signage
   /signage/queue-board:
@@ -1109,6 +1156,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/SignageBoard' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /signage/queue-calls:
     get:
@@ -1152,6 +1201,8 @@ paths:
                         calledAt: { type: string, format: date-time }
                         expiresAt: { type: string, format: date-time }
                   asOf: { type: string, format: date-time }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
 components:
   schemas:

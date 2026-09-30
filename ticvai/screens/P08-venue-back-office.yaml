@@ -44383,11 +44383,12 @@ screens:
       components:
       - kind: primaryButton
         label: Save access device
-        operation: updateAccessDevice
+        operation: updateAccessDevicePlacement
         permission: DEVICE_CONFIGURE
-        notes: 'Changes where a registered device sits and what it is: name, hardware model, area, access
-          point, lane, group label, network references, capabilities and `isActive`.'
-        provenance: contract access.yaml PUT /access-devices/{deviceId}
+        notes: 'Changes where a placed device sits: area, access point, lane, role, label, group label, controller
+          reference, proximity threshold and `isActive` (ADR-0067). What the device is (model, serial, versions) is
+          the register''s, tenancy `platform.device`.'
+        provenance: contract access.yaml PUT /device-placements/{placementId}
   states:
     loading: The device gate list.
     error: Could not load. Names which read failed and leaves the device gate untouched.
@@ -44418,9 +44419,9 @@ screens:
     contract: access
     purpose: The gates and turnstiles whose mode is set
     trigger: onLoad
-  - operationId: updateAccessDevice
+  - operationId: updateAccessDevicePlacement
     contract: access
-    purpose: Replace a registered device's registration
+    purpose: Replace a device's placement
     trigger: onAction
     invalidates:
     - listDeviceGate
@@ -44439,6 +44440,9 @@ screens:
     - name: deviceId
       from: navigation
       optional: true
+    - name: placementId
+      from: navigation
+      optional: true
   wireframe:
     status: notStarted
     provenance: generated
@@ -44452,37 +44456,33 @@ screens:
   - id: formUpdateAccessDevice
     component: modal
     trigger: Save access device
-    body: '**Collects what `updateAccessDevice` sends before it is called.** Required: `id`, `venueId`,
-      `hardwareType`, `provisioningStage`, `isActive`, `scopePath`. Optional: `hardwareModelId`, `name`,
-      `serialNumber`, `accessAreaId`, `accessPointId`, `gateLaneId`, `deviceGroupId`, `ipNetworkReference`,
-      `controllerReference`, `installationDate`, `lifecycleStatus`, `capabilities` and 10 more. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    bindsTo: AccessAccessDevice
+    body: '**Collects what `updateAccessDevicePlacement` sends before it is called.** Required: `id`, `venueId`,
+      `deviceId`, `role`, `isActive`, `scopePath`. Optional: `accessAreaId`, `accessPointId`, `gateLaneId`,
+      `name`, `deviceGroupId`, `controllerReference`, `proximityThresholdMeters`, `installationDate`. The
+      device itself (serial, hardware model, versions) is registered in `platform.device` first, with tenancy
+      `registerDevice` (ADR-0067). Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: AccessDevicePlacement
     confirm:
       label: Save access device
-      operation: updateAccessDevice
+      operation: updateAccessDevicePlacement
     dismiss:
       label: Cancel
       discards:
       - id
       - venueId
-      - hardwareType
-      - provisioningStage
+      - deviceId
+      - role
       - isActive
       - scopePath
-      - hardwareModelId
-      - name
-      - serialNumber
       - accessAreaId
       - accessPointId
       - gateLaneId
+      - name
       - deviceGroupId
-      - ipNetworkReference
       - controllerReference
+      - proximityThresholdMeters
       - installationDate
-      - lifecycleStatus
-      - capabilities
-    provenance: contract access.yaml PUT /access-devices/{deviceId}
+    provenance: contract access.yaml PUT /device-placements/{placementId}
 - id: BO-195
   name: Device Type & Hardware Library
   module: Access & Venue
@@ -44697,21 +44697,30 @@ screens:
     - name: actionBar
       slot: rowActions
       components:
+      - kind: secondaryButton
+        label: Register device
+        operation: registerDevice
+        permission: DEVICE_CONFIGURE
+        notes: '**Step one: the device into the one register** (ADR-0067, 1 October): kind, hardware type, hardware
+          model, serial and network reference, in tenancy `platform.device`. An access-control device binds to no
+          workstation; it is placed next.'
+        provenance: ADR-0067, accepted 1 October (register in the platform, then place in Access)
       - kind: primaryButton
         label: Register access device
-        operation: registerAccessDevice
+        operation: placeAccessDevice
         permission: DEVICE_CONFIGURE
-        notes: '**The write behind Physical Device Registration & Provisioning** (BO-196): registers one
-          deployed device (a turnstile, reader, handheld, podium unit or beacon) against a hardware model
-          and places it in the topology.'
-        provenance: contract access.yaml POST /access-devices
+        notes: '**Register in the platform, then place in Access** (ADR-0067, 1 October): tenancy `registerDevice`
+          records the device (a turnstile, reader, handheld, podium unit or beacon) in the one register, and
+          `placeAccessDevice` puts it in the topology.'
+        provenance: contract access.yaml POST /device-placements
       - kind: secondaryButton
         label: Save access device
-        operation: updateAccessDevice
+        operation: updateAccessDevicePlacement
         permission: DEVICE_CONFIGURE
-        notes: 'Changes where a registered device sits and what it is: name, hardware model, area, access
-          point, lane, group label, network references, capabilities and `isActive`.'
-        provenance: contract access.yaml PUT /access-devices/{deviceId}
+        notes: 'Changes where a placed device sits: area, access point, lane, role, label, group label, controller
+          reference, proximity threshold and `isActive` (ADR-0067). What the device is (model, serial, versions) is
+          the register''s, tenancy `platform.device`.'
+        provenance: contract access.yaml PUT /device-placements/{placementId}
   states:
     loading: The physical device registration configuration as saved.
     error: Could not load. Names which read failed and leaves the physical device registration untouched.
@@ -44724,15 +44733,20 @@ screens:
     contract: access
     purpose: Physical Device Registration & Provisioning
     trigger: onLoad
-  - operationId: registerAccessDevice
+  - operationId: registerDevice
+    contract: tenancy
+    purpose: Register the device in the one device register before it is placed
+    trigger: onAction
+    provenance: ADR-0067, accepted 1 October (register in the platform, then place in Access)
+  - operationId: placeAccessDevice
     contract: access
-    purpose: Register a physical access-control device
+    purpose: Place a registered device in the gate topology
     trigger: onAction
     invalidates:
     - listPhysicalDeviceRegistration
-  - operationId: updateAccessDevice
+  - operationId: updateAccessDevicePlacement
     contract: access
-    purpose: Replace a registered device's registration
+    purpose: Replace a device's placement
     trigger: onAction
     invalidates:
     - listPhysicalDeviceRegistration
@@ -44746,78 +44760,96 @@ screens:
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
   overlays:
+  - id: formRegisterDevice
+    component: modal
+    trigger: Register device
+    body: '**Collects what `registerDevice` sends before it is called** (tenancy, the one device register,
+      ADR-0067). Required: `kind`, `driver`. Optional: `hardwareType`, `hardwareModelId`, `serialNumber`,
+      `model`, `identifier`, `ipNetworkReference`. An access-control device binds to no workstation. Dismissing
+      sends nothing; the screen behind is unchanged.'
+    bindsTo: RegisteredDevice
+    confirm:
+      label: Register device
+      operation: registerDevice
+    dismiss:
+      label: Cancel
+      discards:
+      - kind
+      - driver
+      - hardwareType
+      - hardwareModelId
+      - serialNumber
+      - model
+      - identifier
+      - ipNetworkReference
+    provenance: ADR-0067, accepted 1 October
   - id: formRegisterAccessDevice
     component: modal
     trigger: Register access device
-    body: '**Collects what `registerAccessDevice` sends before it is called.** Required: `id`, `venueId`,
-      `hardwareType`, `provisioningStage`, `isActive`, `scopePath`. Optional: `hardwareModelId`, `name`,
-      `serialNumber`, `accessAreaId`, `accessPointId`, `gateLaneId`, `deviceGroupId`, `ipNetworkReference`,
-      `controllerReference`, `installationDate`, `lifecycleStatus`, `capabilities` and 10 more. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    bindsTo: AccessAccessDevice
+    body: '**Collects what `placeAccessDevice` sends before it is called.** Required: `id`, `venueId`,
+      `deviceId`, `role`, `isActive`, `scopePath`. Optional: `accessAreaId`, `accessPointId`, `gateLaneId`,
+      `name`, `deviceGroupId`, `controllerReference`, `proximityThresholdMeters`, `installationDate`. The
+      device itself (serial, hardware model, versions) is registered in `platform.device` first, with tenancy
+      `registerDevice` (ADR-0067). Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: AccessDevicePlacement
     confirm:
       label: Register access device
-      operation: registerAccessDevice
+      operation: placeAccessDevice
     dismiss:
       label: Cancel
       discards:
       - id
       - venueId
-      - hardwareType
-      - provisioningStage
+      - deviceId
+      - role
       - isActive
       - scopePath
-      - hardwareModelId
-      - name
-      - serialNumber
       - accessAreaId
       - accessPointId
       - gateLaneId
+      - name
       - deviceGroupId
-      - ipNetworkReference
       - controllerReference
+      - proximityThresholdMeters
       - installationDate
-      - lifecycleStatus
-      - capabilities
-    provenance: contract access.yaml POST /access-devices
+    provenance: contract access.yaml POST /device-placements
   - id: formUpdateAccessDevice
     component: modal
     trigger: Save access device
-    body: '**Collects what `updateAccessDevice` sends before it is called.** Required: `id`, `venueId`,
-      `hardwareType`, `provisioningStage`, `isActive`, `scopePath`. Optional: `hardwareModelId`, `name`,
-      `serialNumber`, `accessAreaId`, `accessPointId`, `gateLaneId`, `deviceGroupId`, `ipNetworkReference`,
-      `controllerReference`, `installationDate`, `lifecycleStatus`, `capabilities` and 10 more. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    bindsTo: AccessAccessDevice
+    body: '**Collects what `updateAccessDevicePlacement` sends before it is called.** Required: `id`, `venueId`,
+      `deviceId`, `role`, `isActive`, `scopePath`. Optional: `accessAreaId`, `accessPointId`, `gateLaneId`,
+      `name`, `deviceGroupId`, `controllerReference`, `proximityThresholdMeters`, `installationDate`. The
+      device itself (serial, hardware model, versions) is registered in `platform.device` first, with tenancy
+      `registerDevice` (ADR-0067). Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: AccessDevicePlacement
     confirm:
       label: Save access device
-      operation: updateAccessDevice
+      operation: updateAccessDevicePlacement
     dismiss:
       label: Cancel
       discards:
       - id
       - venueId
-      - hardwareType
-      - provisioningStage
+      - deviceId
+      - role
       - isActive
       - scopePath
-      - hardwareModelId
-      - name
-      - serialNumber
       - accessAreaId
       - accessPointId
       - gateLaneId
+      - name
       - deviceGroupId
-      - ipNetworkReference
       - controllerReference
+      - proximityThresholdMeters
       - installationDate
-      - lifecycleStatus
-      - capabilities
-    provenance: contract access.yaml PUT /access-devices/{deviceId}
+    provenance: contract access.yaml PUT /device-placements/{placementId}
   entryState:
     params:
     - name: deviceId
       from: session
+    - name: placementId
+      from: navigation
+      optional: true
 - id: BO-197
   name: Turnstile & Lane Behavior Configuration
   module: Access & Venue
@@ -139363,19 +139395,19 @@ screens:
       components:
       - kind: dataTable
         derived: true
-        impliedBy: listAccessPolicies
+        impliedBy: listAuthorisationPolicies
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
       - kind: primaryButton
         derived: true
-        impliedBy: createAccessPolicy
+        impliedBy: createAuthorisationPolicy
         label: Create access policy
         notes: The act the screen exists for.
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
-        impliedBy: createAccessPolicy
+        impliedBy: createAuthorisationPolicy
   states:
     loading: The roles permissions masking list.
     error: Could not load. Names which read failed and leaves the roles permissions masking untouched.
@@ -139386,53 +139418,53 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: listAccessPolicies
+  - operationId: listAuthorisationPolicies
     contract: identity
     purpose: Who may see and change what
     trigger: onLoad
     provenance: board reading, 19 September 2026
-  - operationId: createAccessPolicy
+  - operationId: createAuthorisationPolicy
     contract: identity
     purpose: Write a policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-  - operationId: simulateAccessPolicy
+  - operationId: simulateAuthorisationPolicy
     contract: identity
     purpose: What this policy would decide, before it decides anything
     trigger: onAction
     provenance: wiring gap, 19 September 2026 — the screen showed the noun and could not act on it
-  - operationId: updateAccessPolicy
+  - operationId: updateAuthorisationPolicy
     contract: identity
     purpose: Change a data-access policy, as a new version
     trigger: onAction
     provenance: decided 29 September, VM close-out (venue management and configuration)
     invalidates:
-    - listAccessPolicies
-  - operationId: setAccessPolicyState
+    - listAuthorisationPolicies
+  - operationId: setAuthorisationPolicyState
     contract: identity
     purpose: Submit, approve, activate or retire a policy
     trigger: onAction
     provenance: decided 29 September, VM close-out (venue management and configuration)
     invalidates:
-    - listAccessPolicies
+    - listAuthorisationPolicies
   - operationId: createEmergencyAccessOverride
     contract: identity
     purpose: Bypass the policy, loudly, with a reason and an expiry
     trigger: onAction
     provenance: decided 29 September, VM close-out (venue management and configuration)
     invalidates:
-    - listAccessPolicies
-  - operationId: listAccessPolicyHistory
+    - listAuthorisationPolicies
+  - operationId: listAuthorisationPolicyHistory
     contract: identity
     purpose: Versions of a policy, to compare and pick one to restore
     trigger: onAction
     provenance: build, 29 September 2026
-  - operationId: restoreAccessPolicyVersion
+  - operationId: restoreAuthorisationPolicyVersion
     contract: identity
     purpose: Restore an approved version as a new version
     trigger: onAction
     provenance: build, 29 September 2026
-  - operationId: listAccessPolicyEffectiveness
+  - operationId: listAuthorisationPolicyEffectiveness
     contract: identity
     purpose: How each permission policy has behaved over a period
     trigger: onAction
@@ -153821,7 +153853,7 @@ screens:
     purpose: Where production access stands for these clients
     trigger: onLoad
     provenance: decided 29 September 2026, 17 September minutes M17-05/M17-06 (applied 30 September)
-  - operationId: listAccessPolicies
+  - operationId: listAuthorisationPolicies
     contract: identity
     purpose: API access and permissions
     trigger: onLoad

@@ -120,6 +120,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProductCategoryNode'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setProductCategories
       x-ticvai-consumed-by:
@@ -201,6 +203,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/import/{jobId}/commit:
     parameters:
     - name: jobId
@@ -251,6 +255,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/me/memberships:
     get:
       operationId: getMyMemberships
@@ -296,6 +302,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GuestMembership'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/import:
     post:
       operationId: importProductCatalogue
@@ -381,6 +389,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/import/{jobId}:
     parameters:
     - name: jobId
@@ -418,6 +428,8 @@ paths:
                 $ref: '#/components/schemas/CatalogueImportJob'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guest/memberships:
     get:
       operationId: listGuestMemberships
@@ -472,6 +484,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/GuestMembership'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/{productId}/versions:
     parameters:
     - name: productId
@@ -512,6 +526,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProductVersion'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/{productId}/versions/{version}/restore:
     parameters:
     - name: productId
@@ -576,6 +592,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Product'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/{productId}/change-impact:
     parameters:
     - name: productId
@@ -633,6 +651,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductChangeImpact'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/bulk-price:
     post:
       operationId: bulkChangePrices
@@ -742,6 +762,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BulkPriceResult'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /entitlements/{entitlementId}/reinstate:
     parameters:
     - name: entitlementId
@@ -804,6 +826,8 @@ paths:
             application/json:
               schema:
                 $ref: ../spine/access.yaml#/components/schemas/Entitlement
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /entitlements/{entitlementId}/freeze:
     parameters:
     - name: entitlementId
@@ -898,6 +922,8 @@ paths:
             application/json:
               schema:
                 $ref: ../spine/access.yaml#/components/schemas/Entitlement
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/{productId}/clone:
     parameters:
     - name: productId
@@ -958,6 +984,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Product'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /search:
     get:
       operationId: searchCatalogue
@@ -1095,6 +1123,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /donation-campaigns:
     get:
       operationId: listDonationCampaigns
@@ -1123,6 +1153,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DonationCampaign'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createDonationCampaign
       x-ticvai-consumed-by:
@@ -1162,6 +1194,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DonationCampaign'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /donation-campaigns/{campaignId}:
     parameters:
     - name: campaignId
@@ -1205,6 +1239,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DonationCampaign'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /waitlist-entries:
     get:
       operationId: listWaitlistEntries
@@ -1239,6 +1275,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WaitlistEntry'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: joinWaitlist
       x-ticvai-consumed-by:
@@ -1293,6 +1331,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /waitlist-entries/{entryId}:
     parameters:
     - name: entryId
@@ -1323,6 +1363,8 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Left
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /waitlist-entries/{entryId}/offer:
     parameters:
     - name: entryId
@@ -1368,6 +1410,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WaitlistEntry'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products:
     get:
       operationId: listProducts
@@ -1533,6 +1577,8 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createProduct
       x-ticvai-consumed-by:
@@ -1600,6 +1646,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/{productId}/eligibility-rule:
     get:
       operationId: getProductEligibilityRule
@@ -1635,6 +1683,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-guest-callable: true
       parameters:
       - name: productId
@@ -1695,6 +1745,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /eligibility-checks:
     post:
       operationId: checkBookingEligibility
@@ -1733,6 +1785,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EligibilityCheckResult'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/{productId}/group-package:
     get:
       operationId: getGroupPackageDefinition
@@ -1760,6 +1814,8 @@ paths:
                 $ref: '#/components/schemas/GroupPackageDefinition'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-guest-callable: true
       parameters:
       - name: productId
@@ -1815,6 +1871,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /group-packages:
     get:
       operationId: listGroupPackages
@@ -1858,6 +1916,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/GroupPackageDefinition'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/{productId}:
     parameters:
     - name: productId
@@ -1909,6 +1969,8 @@ paths:
                 $ref: '#/components/schemas/Product'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateProduct
       x-ticvai-consumed-by:
@@ -1977,6 +2039,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/{productId}/attributes:
     parameters:
     - name: productId
@@ -2076,6 +2140,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/{productId}/variants:
     parameters:
     - name: productId
@@ -2137,6 +2203,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/ProductVariant'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/{productId}/variants/{variantId}:
     parameters:
     - name: productId
@@ -2223,6 +2291,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /price-lists:
     get:
       operationId: listPriceLists
@@ -2263,6 +2333,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/PriceList'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createPriceList
       x-ticvai-consumed-by:
@@ -2311,6 +2383,8 @@ paths:
                 $ref: '#/components/schemas/PriceList'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /price-lists/{priceListId}/prices:
     parameters:
     - name: priceListId
@@ -2354,6 +2428,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Price'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPrices
       x-ticvai-consumed-by:
@@ -2416,6 +2492,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /events:
     get:
       operationId: listEvents
@@ -2453,6 +2531,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Event'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createEvent
       x-ticvai-consumed-by:
@@ -2489,6 +2569,8 @@ paths:
                 $ref: '#/components/schemas/Event'
         '409':
           $ref: ../shared/common.yaml#/components/responses/DuplicateCode
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /events/{eventId}/performances:
     parameters:
     - name: eventId
@@ -2578,6 +2660,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Performance'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createPerformances
       x-ticvai-consumed-by:
@@ -2637,6 +2721,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Performance'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-capacities:
     get:
       operationId: listChannelCapacities
@@ -2679,6 +2765,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/ChannelCapacity'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createChannelCapacity
       x-ticvai-consumed-by:
@@ -2716,6 +2804,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChannelCapacity'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-capacities/{channelCapacityId}/channel-allocations:
     parameters:
     - name: channelCapacityId
@@ -2761,6 +2851,8 @@ paths:
                 $ref: '#/components/schemas/ChannelAllocationSet'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setChannelAllocations
       x-ticvai-consumed-by:
@@ -2832,6 +2924,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-capacities/{channelCapacityId}/channel-allocations/release:
     parameters:
     - name: channelCapacityId
@@ -2888,6 +2982,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChannelAllocationSet'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /catalogue/bundles:
     get:
       operationId: listCatalogueBundles
@@ -2930,6 +3026,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BundleSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: publishBundle
       x-ticvai-consumed-by:
@@ -3002,6 +3100,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /catalogue/bundles/latest:
     get:
       operationId: getLatestBundle
@@ -3052,6 +3152,8 @@ paths:
           description: Unchanged
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /catalogue/bundles/{version}/applied:
     parameters:
     - name: version
@@ -3107,6 +3209,8 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Recorded
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /inventory-holds:
     get:
       operationId: listInventoryHolds
@@ -3159,6 +3263,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/InventoryHold'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: acquireInventoryHold
       x-ticvai-consumed-by:
@@ -3216,8 +3322,16 @@ paths:
         '
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      x-ticvai-note: >-
+        **Behind the on-sale waiting room when it is on** (ADR-0066, accepted 1 October). A `cart` hold for a
+        performance whose waiting room is active needs the admission token the order service forwards from
+        `addCartLine` (`X-Admission-Token`); missing, expired, forged or for another performance, it is refused
+        `403 admission-required` before any row is locked. The check is a signature check in middleware with no
+        database read. A `workstation` hold (a till, a kiosk, an edge node selling at the venue) is not behind the
+        room.
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/AdmissionToken
       requestBody:
         required: true
         content:
@@ -3237,7 +3351,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/InventoryHold'
         '403':
-          $ref: ../shared/common.yaml#/components/responses/Forbidden
+          description: 'Not permitted at the requested scope (`forbidden`), or a `cart` hold for a performance whose
+            waiting room is on without a valid admission token (`admission-required`, ADR-0066).'
+          x-ticvai-problem-types:
+          - forbidden
+          - admission-required
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           description: 'No units remain, or the envelope is seated — seated inventory cannot be leased
             because a seat map is not a count.
@@ -3247,6 +3369,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /inventory-holds/{inventoryHoldId}:
     parameters:
     - name: inventoryHoldId
@@ -3328,6 +3452,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /inventory-holds/{inventoryHoldId}/renew:
     parameters:
     - name: inventoryHoldId
@@ -3409,6 +3535,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /inventory-holds/{inventoryHoldId}/force-release:
     parameters:
     - name: inventoryHoldId
@@ -3472,6 +3600,8 @@ paths:
                 $ref: '#/components/schemas/InventoryHold'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /inventory-holds/{inventoryHoldId}/convert:
     parameters:
     - name: inventoryHoldId
@@ -3563,6 +3693,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /availability:
     get:
       operationId: getAvailability
@@ -3647,6 +3779,8 @@ paths:
                 $ref: '#/components/schemas/PerformanceAvailabilityPage'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/{productId}/lifecycle:
     parameters:
     - name: productId
@@ -3753,6 +3887,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/{productId}/alternative-codes:
     parameters:
     - name: productId
@@ -3796,6 +3932,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AlternativeCode'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setAlternativeCodes
       x-ticvai-consumed-by:
@@ -3862,6 +4000,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/resolve:
     get:
       operationId: resolveProductByCode
@@ -3909,6 +4049,8 @@ paths:
                 $ref: '#/components/schemas/ProductVariant'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /price-lists/{priceListId}:
     parameters:
     - name: priceListId
@@ -3943,6 +4085,8 @@ paths:
                 $ref: '#/components/schemas/PriceList'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updatePriceList
       x-ticvai-consumed-by:
@@ -3998,6 +4142,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PriceList'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /price-lists/{priceListId}/copy:
     parameters:
     - name: priceListId
@@ -4074,6 +4220,8 @@ paths:
                     $ref: '#/components/schemas/PriceList'
                   copiedPriceCount:
                     type: integer
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /events/{eventId}:
     parameters:
     - name: eventId
@@ -4108,6 +4256,8 @@ paths:
                 $ref: '#/components/schemas/Event'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateEvent
       x-ticvai-consumed-by:
@@ -4153,6 +4303,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Event'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /performances/{performanceId}:
     parameters:
     - name: performanceId
@@ -4199,6 +4351,8 @@ paths:
                 $ref: '#/components/schemas/Performance'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updatePerformance
       x-ticvai-consumed-by:
@@ -4274,6 +4428,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /performances/{performanceId}/cancel:
     parameters:
     - name: performanceId
@@ -4378,6 +4534,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-capacities/{channelCapacityId}:
     parameters:
     - name: channelCapacityId
@@ -4446,6 +4604,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /entitlement-templates:
     get:
       operationId: listEntitlementTemplates
@@ -4477,6 +4637,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/EntitlementTemplate'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createEntitlementTemplate
       x-ticvai-consumed-by:
@@ -4510,6 +4672,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EntitlementTemplate'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /entitlements/{entitlementId}/suspend:
     parameters:
     - name: entitlementId
@@ -4579,6 +4743,8 @@ paths:
                     description: Cross-cell rights revoked alongside (ADR-0010).
                     items:
                       type: string
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-lifecycle:
     get:
       operationId: listProductLifecycle
@@ -4705,6 +4871,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ProductLifecycleCommandCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /lifecycle-statu-workflow:
     put:
       operationId: setLifecycleStatuWorkflow
@@ -4752,6 +4920,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LifecycleStatusWorkflowConfigurationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /bulk-product-catalogue:
     post:
       operationId: createBulkProductCatalogue
@@ -4801,6 +4971,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BulkProductCreationCatalogueImportView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-import-export:
     get:
       operationId: listProductImportExport
@@ -4881,6 +5053,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ProductImportExportEnvironmentTransferView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-context-ownership:
     put:
       operationId: setProductContextOwnership
@@ -4926,6 +5100,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductContextOwnershipAssignmentView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-availability:
     put:
       operationId: publishChannelAvailability
@@ -4975,6 +5151,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChannelPublicationAvailabilityView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /activation-scheduler:
     put:
       operationId: publishActivationScheduler
@@ -5023,6 +5201,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PublicationActivationSchedulerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: listScheduledLifecycleActions
       x-ticvai-consumed-by:
@@ -5118,6 +5298,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-duplication-template:
     get:
       operationId: listProductDuplicationTemplate
@@ -5199,6 +5381,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ProductDuplicationTemplateLibraryView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /catalogue-review:
     put:
       operationId: setCatalogueReview
@@ -5248,6 +5432,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiCatalogueBuilderConfigurationReviewView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-governance:
     get:
       operationId: listProductGovernance
@@ -5384,6 +5570,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ProductGovernanceCommandCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /workflow:
     put:
       operationId: approveWorkflow
@@ -5433,6 +5621,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalWorkflowDesignerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /review-decision:
     put:
       operationId: approveReviewDecision
@@ -5481,6 +5671,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalReviewDecisionWorkspaceView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rollback-recovery:
     get:
       operationId: listRollbackRecovery
@@ -5561,6 +5753,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/RollbackRecoveryManagementView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /change-impact-analysi:
     get:
       operationId: listChangeImpactAnalysis
@@ -5655,6 +5849,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ChangeImpactAnalysisView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /change-propagation-dependency:
     get:
       operationId: listChangePropagationDependency
@@ -5742,6 +5938,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ChangePropagationDependencyControlView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-retirement-suspension:
     get:
       operationId: listProductRetirementSuspension
@@ -5821,6 +6019,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ProductRetirementSuspensionArchiveView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-trail-change:
     get:
       operationId: listProductTrailChange
@@ -5977,6 +6177,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ProductAuditTrailChangeHistoryView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /governance-risk-monitoring:
     get:
       operationId: listGovernanceRiskMonitoring
@@ -6077,6 +6279,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/GovernanceRiskAiMonitoringControlCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /sale-channel:
     get:
       operationId: listSaleChannel
@@ -6184,6 +6388,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/SalesChannelCommandCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-profile:
     post:
       operationId: createChannelProfile
@@ -6232,6 +6438,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChannelCreationProfileConfigurationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-catalogue:
     put:
       operationId: setProductCatalogue
@@ -6279,6 +6487,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductCatalogueAssignmentView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-pricing-commercial:
     put:
       operationId: setChannelPricingCommercial
@@ -6325,6 +6535,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChannelPricingCommercialProfileAssignmentView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /inventory-capacity-channel:
     get:
       operationId: listInventoryCapacityChannel
@@ -6408,6 +6620,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/InventoryCapacityChannelAllocationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-sale-schedule:
     get:
       operationId: listChannelSaleSchedule
@@ -6488,6 +6702,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ChannelSalesScheduleAvailabilityWindowsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /customer-eligibility-rule:
     get:
       operationId: listCustomerEligibilityRule
@@ -6564,6 +6780,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/CustomerEligibilityRulesByChannelView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-sale-rule:
     get:
       operationId: listChannelSaleRule
@@ -6633,6 +6851,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ChannelSalesRulesLimitsRestrictionsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-fee-payment:
     put:
       operationId: setChannelFeePayment
@@ -6679,6 +6899,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChannelFeesPaymentFulfillmentConfigurationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-readiness-validation:
     put:
       operationId: publishChannelReadinessValidation
@@ -6727,6 +6949,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChannelPublicationReadinessAiValidationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel:
     get:
       operationId: listChannel
@@ -6816,6 +7040,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ChannelOperationsCommandCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-connection-integration:
     get:
       operationId: listChannelConnectionIntegration
@@ -6902,6 +7128,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ChannelConnectionIntegrationManagerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-price-availability:
     get:
       operationId: listProductPriceAvailability
@@ -6989,6 +7217,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ProductPriceAvailabilitySynchronizationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /real-time-channel:
     get:
       operationId: listRealTimeChannel
@@ -7066,6 +7296,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/RealTimeChannelAvailabilityInventoryMonitorView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-allocation-rebalancing:
     get:
       operationId: listChannelAllocationRebalancing
@@ -7132,6 +7364,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ChannelAllocationRebalancingOperationsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-exception-incident:
     get:
       operationId: listChannelExceptionIncident
@@ -7234,6 +7468,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ChannelExceptionsIncidentsRecoveryView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-performance-commercial:
     get:
       operationId: listChannelPerformanceCommercial
@@ -7351,6 +7587,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ChannelPerformanceCommercialAnalyticsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-log-transaction:
     get:
       operationId: listChannelLogTransaction
@@ -7487,6 +7725,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ChannelAuditLogsTransactionTraceabilityView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-governance-sla:
     get:
       operationId: listChannelGovernanceSla
@@ -7569,6 +7809,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ChannelGovernanceSlaPartnerControlView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-2:
     get:
       operationId: listChannel2
@@ -7646,6 +7888,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/AiChannelOptimizationIntelligenceCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /commercial-pricing:
     get:
       operationId: listCommercialPricing
@@ -7779,6 +8023,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/CommercialPricingCommandCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /price-list-master:
     put:
       operationId: setPriceListMaster
@@ -7825,6 +8071,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PriceListMasterConfigurationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /price-category-rate:
     get:
       operationId: listPriceCategoryRate
@@ -7899,6 +8147,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/PriceCategoryRateTypeLibraryView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rate-structure:
     put:
       operationId: setRateStructure
@@ -7946,6 +8196,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RateStructureBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-service-price:
     put:
       operationId: setProductServicePrice
@@ -7992,6 +8244,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductServicePriceAssignmentView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /package-bundle-add:
     get:
       operationId: listPackageBundleAdd
@@ -8076,6 +8330,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/PackageBundleAddOnPricingView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /market-venue-currency:
     get:
       operationId: listMarketVenueCurrency
@@ -8165,6 +8421,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/MarketVenueCurrencyPricingStructureView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /price-hierarchy-inheritance:
     put:
       operationId: setPriceHierarchyInheritance
@@ -8212,6 +8470,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PriceHierarchyInheritanceConfigurationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /price-list-template:
     get:
       operationId: listPriceListTemplate
@@ -8281,6 +8541,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/PriceListTemplatesCloneReuseView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /commercial-pricing-structure:
     get:
       operationId: listCommercialPricingStructure
@@ -8357,6 +8619,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/CommercialPricingStructureValidationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /pricing-rule:
     get:
       operationId: listPricingRule
@@ -8456,6 +8720,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/PricingRuleCommandCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /customer-segment-profile:
     get:
       operationId: listCustomerSegmentProfile
@@ -8554,6 +8820,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/CustomerSegmentProfilePricingRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /membership-loyalty-pricing:
     get:
       operationId: listMembershipLoyaltyPricing
@@ -8632,6 +8900,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/MembershipLoyaltyPricingRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /residency-nationality-market:
     get:
       operationId: listResidencyNationalityMarket
@@ -8709,6 +8979,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ResidencyNationalityMarketPricingRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-based-pricing:
     get:
       operationId: listChannelBasedPricing
@@ -8783,6 +9055,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ChannelBasedPricingRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /location-venue-event:
     get:
       operationId: listLocationVenueEvent
@@ -8860,6 +9134,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/LocationVenueEventPricingRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /quantity-group-volume:
     get:
       operationId: listQuantityGroupVolume
@@ -8943,6 +9219,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/QuantityGroupVolumePricingRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /effective-date-season:
     get:
       operationId: listEffectiveDateSeason
@@ -9037,6 +9315,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/EffectiveDateSeasonDayBasedPricingRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /timeslot-performance-time:
     get:
       operationId: listTimeslotPerformanceTime
@@ -9111,6 +9391,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/TimeslotPerformanceTimeOfDayPricingRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /pricing-rule-priority:
     get:
       operationId: listPricingRulePriority
@@ -9246,6 +9528,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/PricingRulePriorityConflictResolutionTestingView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tax-fee-calculation:
     get:
       operationId: listTaxFeeCalculation
@@ -9338,6 +9622,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/TaxFeeCalculationCommandCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tax-profile-jurisdiction:
     put:
       operationId: setTaxProfileJurisdiction
@@ -9387,6 +9673,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TaxProfileJurisdictionConfigurationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tax-rule-treatment:
     put:
       operationId: setTaxRuleTreatment
@@ -9434,6 +9722,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TaxRuleTreatmentBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fee-surcharge:
     get:
       operationId: listFeeSurcharge
@@ -9518,6 +9808,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/FeeSurchargeLibraryView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fee-applicability-charging:
     put:
       operationId: setFeeApplicabilityCharging
@@ -9566,6 +9858,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FeeApplicabilityChargingRuleBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fee-waiver-tax:
     get:
       operationId: listFeeWaiverTax
@@ -9656,6 +9950,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/FeeWaiverTaxExemptionExceptionRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /price-calculation-sequence:
     get:
       operationId: listPriceCalculationSequence
@@ -9716,6 +10012,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/PriceCalculationSequenceFormulaEngineView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /currency-precision-rounding:
     get:
       operationId: listCurrencyPrecisionRounding
@@ -9755,6 +10053,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CurrencyPrecisionRoundingMonetaryRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /price-breakdown-calculation:
     put:
       operationId: simulatePriceBreakdownCalculation
@@ -9801,6 +10101,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PriceBreakdownCalculationSimulationExplainabilityView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /calculation-validation-reconciliation:
     get:
       operationId: listCalculationValidationReconciliation
@@ -9887,6 +10189,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/CalculationValidationReconciliationServiceInterfaceView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /pricing-governance:
     get:
       operationId: listPricingGovernance
@@ -10046,6 +10350,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/PricingGovernanceCommandCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /pricing-change-request:
     put:
       operationId: setPricingChangeRequest
@@ -10095,6 +10401,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PricingChangeRequestWorkspaceView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /bulk-pricing-update:
     get:
       operationId: listBulkPricingUpdate
@@ -10183,6 +10491,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/BulkPricingUpdateImportMassMaintenanceView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /pricing-version-baseline:
     get:
       operationId: listPricingVersionBaseline
@@ -10265,6 +10575,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/PricingVersionBaselineManagementView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /pricing-change-impact:
     get:
       operationId: listPricingChangeImpact
@@ -10329,6 +10641,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/PricingChangeImpactAnalysisView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /pricing-workflow-authority:
     put:
       operationId: approvePricingWorkflowAuthority
@@ -10380,6 +10694,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PricingApprovalWorkflowAuthorityMatrixView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /pricing-effective-date:
     put:
       operationId: publishPricingEffectiveDate
@@ -10429,6 +10745,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PricingPublicationEffectiveDateSchedulerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /pricing-distribution-synchronization:
     get:
       operationId: listPricingDistributionSynchronization
@@ -10519,6 +10837,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/PricingDistributionSynchronizationPublicationMonitorView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /pricing-rollback-emergency:
     get:
       operationId: listPricingRollbackEmergency
@@ -10610,6 +10930,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/PricingRollbackEmergencyControlCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: requestPricingRollback
       x-ticvai-consumed-by:
@@ -10674,6 +10996,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /pricing-compliance:
     get:
       operationId: listPricingCompliance
@@ -10816,6 +11140,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/PricingHistoryAuditComplianceExplorerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dynamic-pricing-strategy:
     get:
       operationId: listDynamicPricingStrategy
@@ -10927,6 +11253,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/DynamicPricingStrategyCommandCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dynamic-pricing-strategy-2:
     put:
       operationId: setDynamicPricingStrategy
@@ -10975,6 +11303,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DynamicPricingStrategyBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /demand-occupancy-availability:
     put:
       operationId: setDemandOccupancyAvailability
@@ -11024,6 +11354,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DemandOccupancyAvailabilityRuleBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /booking-velocity-time:
     put:
       operationId: setBookingVelocityTime
@@ -11073,6 +11405,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BookingVelocityTimeToEventRuleBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /seasonal-calendar-day:
     get:
       operationId: listSeasonalCalendarDay
@@ -11166,6 +11500,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/SeasonalCalendarDayTimeslotDynamicRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-customer-segment:
     get:
       operationId: listChannelCustomerSegment
@@ -11266,6 +11602,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ChannelCustomerSegmentLocationDynamicRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dynamic-price-band:
     get:
       operationId: listDynamicPriceBand
@@ -11330,6 +11668,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/DynamicPriceBandsLaddersAdjustmentMatrixView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dynamic-pricing-guardrail:
     get:
       operationId: listDynamicPricingGuardrail
@@ -11396,6 +11736,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/DynamicPricingGuardrailsCommercialProtectionView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dynamic-pricing-automation:
     get:
       operationId: listDynamicPricingAutomation
@@ -11470,6 +11812,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/DynamicPricingAutomationPolicyControlView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rule-priority-conflict:
     get:
       operationId: listRulePriorityConflict
@@ -11559,6 +11903,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/RulePriorityConflictResolutionDynamicPricingTestConsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setRulePriorityConflict
       x-ticvai-consumed-by:
@@ -11626,6 +11972,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /pricing:
     get:
       operationId: listPricing
@@ -11715,6 +12063,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/AiPricingIntelligenceCommandCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /internal-demand-booking:
     get:
       operationId: listInternalDemandBooking
@@ -11840,6 +12190,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/InternalDemandBookingSignalHubView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /weather-demand-impact:
     get:
       operationId: listWeatherDemandImpact
@@ -11921,6 +12273,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/WeatherIntelligenceDemandImpactConfigurationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /nearby-event-exhibition:
     get:
       operationId: listNearbyEventExhibition
@@ -12018,6 +12372,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/NearbyEventExhibitionLocalDemandIntelligenceView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /competitor-pricing-market:
     get:
       operationId: listCompetitorPricingMarket
@@ -12103,6 +12459,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/CompetitorPricingMarketPositionIntelligenceView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /market-tourism-holiday:
     get:
       operationId: listMarketTourismHoliday
@@ -12203,6 +12561,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/MarketTourismHolidayContextualSignalHubView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /demand-booking-curve:
     get:
       operationId: listDemandBookingCurve
@@ -12336,6 +12696,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/AiDemandForecastingBookingCurveStudioView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /price-elasticity-revenue:
     get:
       operationId: listPriceElasticityRevenue
@@ -12439,6 +12801,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/PriceElasticityRevenueResponseIntelligenceView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /pricing-recommendation-explainability:
     get:
       operationId: listPricingRecommendationExplainability
@@ -12561,6 +12925,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/AiPricingRecommendationExplainabilityCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /signal-data-quality:
     get:
       operationId: listSignalDataQuality
@@ -12650,6 +13016,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/AiSignalRegistryDataQualityModelGovernanceView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /revenue:
     get:
       operationId: listRevenue
@@ -12748,6 +13116,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/RevenueOptimizationCommandCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /pricing-2:
     put:
       operationId: setPricing
@@ -12805,6 +13175,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PricingSimulationStudioView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /scenario-modeling-what:
     get:
       operationId: listScenarioModelingWhat
@@ -12886,6 +13258,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ScenarioModelingWhatIfAnalysisView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /pricing-experiment:
     put:
       operationId: setPricingExperiment
@@ -12939,6 +13313,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ABPricingExperimentStudioView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /revenue-demand-impact:
     get:
       operationId: listRevenueDemandImpact
@@ -13012,6 +13388,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/RevenueDemandImpactForecastingView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recommendation-review-decision:
     get:
       operationId: listRecommendationReviewDecision
@@ -13105,6 +13483,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/AiRecommendationReviewDecisionQueueView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /automation-policy-autonomou:
     get:
       operationId: listAutomationPolicyAutonomous
@@ -13188,6 +13568,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/AutomationPolicyAutonomousPricingOrchestratorView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /live-dynamic-price:
     post:
       operationId: createLiveDynamicPrice
@@ -13241,6 +13623,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LiveDynamicPriceExecutionDeploymentMonitorView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dynamic-pricing-performance:
     get:
       operationId: listDynamicPricingPerformance
@@ -13356,6 +13740,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/DynamicPricingPerformanceOptimizationAnalyticsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /learning-model-performance:
     get:
       operationId: listLearningModelPerformance
@@ -13461,6 +13847,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/AiLearningModelPerformanceOptimizationFeedbackView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /event-types:
     get:
       operationId: listEventTypes
@@ -13492,6 +13880,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/EventType'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setEventType
       x-ticvai-consumed-by:
@@ -13522,6 +13912,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EventType'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /events/{eventId}/clone:
     parameters:
     - name: eventId
@@ -13588,6 +13980,8 @@ paths:
                   eventId:
                     type: string
                     format: uuid
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /events/{eventId}/schedule:
     parameters:
     - name: eventId
@@ -13631,6 +14025,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EventSchedule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /events/{eventId}/reschedule:
     parameters:
     - name: eventId
@@ -13679,6 +14075,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EventReschedule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /spaces:
     get:
       operationId: listSpaces
@@ -13707,6 +14105,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Space'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setSpace
       x-ticvai-consumed-by:
@@ -13737,6 +14137,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Space'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /events/{eventId}/capacity-profile:
     parameters:
     - name: eventId
@@ -13788,6 +14190,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EventCapacityProfile'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /events/{eventId}/registration:
     parameters:
     - name: eventId
@@ -13836,6 +14240,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EventRegistration'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /events/{eventId}/resource-plan:
     parameters:
     - name: eventId
@@ -13874,6 +14280,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EventResourcePlan'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setEventResourcePlan
       x-ticvai-consumed-by:
@@ -13907,6 +14315,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EventResourcePlan'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /events/{eventId}/lifecycle:
     parameters:
     - name: eventId
@@ -13975,6 +14385,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /performance-templates:
     get:
       operationId: listPerformanceTemplates
@@ -14012,6 +14424,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PerformanceTemplate'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPerformanceTemplate
       x-ticvai-consumed-by:
@@ -14049,6 +14463,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PerformanceTemplate'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /prepaid-minute-packages:
     put:
       operationId: setPrepaidMinutePackage
@@ -14088,6 +14504,222 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PrepaidMinutePackage'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /performances/{performanceId}/waiting-room:
+    parameters:
+    - name: performanceId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getWaitingRoomStatus
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '1 October: ADR-0066 (the on-sale waiting room sits at the edge, apart from the ride queue)'
+      summary: A performance's waiting room, its setting and how it is moving
+      description: '**The operator''s view of the on-sale waiting room** (ADR-0066, accepted 1 October). The setting
+        (`WaitingRoomSetting`, `catalogue.waiting_room_setting`) and the live figures the release controller works
+        from: how many are waiting, how many were admitted in the last minute, the release rate in force and whether
+        it was cut by `commerce` health (latency and the `429` rate, ADR-0064). The live figures come from the Redis
+        counters, never from a table: the room exists so that waiting costs no database write.
+
+
+        **Separate from the ride queue** (ADR-0012, amended by ADR-0066). `queue.joinQueue` is Q1, ride queues only;
+        this is Q2, infrastructure in front of the sale.
+
+        '
+      tags:
+      - event
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: The setting and the live figures
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WaitingRoomStatus'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+    put:
+      operationId: setWaitingRoomSetting
+      x-ticvai-audience:
+      - staff
+      x-ticvai-agreed: '1 October: ADR-0066 (activation follows the on-sale window, or an operator switches it on)'
+      summary: Switch a performance's waiting room on or off, and set how fast it releases
+      description: '**Activation follows the on-sale window, or an operator switches it on** (ADR-0066). `mode`
+        `onSaleWindow` puts the room in front of the performance while its product is on sale (`Product.onSaleFrom`
+        to `onSaleTo`, the window ADR-0035''s burst environments already use); `on` puts it there now, until
+        `activeUntil` if one is given; `off` takes it away, and every admission token already issued for the
+        performance stays valid until it expires. `maxReleasePerSecond` is the ceiling: with `automaticRelease` the
+        controller admits fewer when `commerce` is slow or refusing (ADR-0064), never more.
+
+
+        **PUT semantics: one row per performance, replaced whole**, created on the first PUT. `id`, `scopePath`,
+        `updatedAt` and `updatedByPrincipalId` are the server''s. A room switched on for a performance that is
+        `cancelled` or `completed` is refused `409`.
+
+
+        **The room is ours, in-house** (ADR-0012''s Wave 1 commitment); `provider: vendor` records that a vendor''s
+        room (such as Queue-it) stands in front instead, whose token the cart checks the same way. Buying one is
+        the client''s decision, not this operation''s.
+
+        '
+      tags:
+      - event
+      x-ticvai-permission: PERFORMANCE_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WaitingRoomSetting'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The setting, as saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WaitingRoomSetting'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: '`performance-not-sellable`: the performance is `cancelled` or `completed`, so there is no sale
+            to put a room in front of.'
+          x-ticvai-problem-types:
+          - performance-not-sellable
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /performances/{performanceId}/waiting-room/entries:
+    parameters:
+    - name: performanceId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: enterWaitingRoom
+      x-ticvai-audience:
+      - anonymous
+      - guest
+      x-ticvai-agreed: '1 October: ADR-0066 (arrival gets a position from a Redis counter; no database write)'
+      summary: Join the on-sale waiting room for a performance
+      description: '**Arrival costs a Redis increment and nothing else** (ADR-0066, accepted 1 October). The guest gets
+        a position from the performance''s counter in Azure Managed Redis (ADR-0032''s product amendment) and an
+        entry id to poll with. **No database write, no session, no personal data**: the guest may not be signed in
+        yet, and the waiting page is static and branded, served from Front Door''s cache.
+
+
+        When the performance''s room is off, the answer is `state: notRequired` and the guest goes straight to the
+        sale. A second call with the same `Idempotency-Key` returns the same entry, so a refresh does not send the
+        guest to the back.
+
+
+        **Not `queue.joinQueue`.** That is the ride queue (Q1) and writes `queue.entry` per guest; the waiting parts
+        of WEB-015 and GST-046 move here (ADR-0066).
+
+        '
+      tags:
+      - event
+      security: []
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-latency-budget-ms: 50
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '201':
+          description: In the room, with a position; or `notRequired` when the room is off
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WaitingRoomEntry'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /performances/{performanceId}/waiting-room/entries/{waitingEntryId}:
+    parameters:
+    - name: performanceId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: waitingEntryId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getWaitingRoomPosition
+      x-ticvai-audience:
+      - anonymous
+      - guest
+      x-ticvai-agreed: '1 October: ADR-0066 (the waiting page polls a cached position endpoint)'
+      summary: Where a waiting guest is, and the admission token once admitted
+      description: '**Polled by the waiting page, answered from the edge''s cache** for a few seconds at a time
+        (`pollAfterSeconds` says when to ask again). Reads the Redis counters only.
+
+
+        **Admitted, it carries the admission token** (`WaitingRoomAdmission`): short-lived and signed, naming the
+        tenant, the performance, its expiry and a unique id; the signing key is a Key Vault secret. The client sends
+        it as `X-Admission-Token` on `orders.addCartLine`, which forwards it to `acquireInventoryHold`; both refuse
+        a missing or invalid token `403 admission-required` for a performance whose room is on. The admitted
+        answer is never cached at the edge.
+
+        '
+      tags:
+      - event
+      security: []
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-latency-budget-ms: 50
+      responses:
+        '200':
+          description: The position, or the admission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WaitingRoomEntry'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /performances/{performanceId}/media:
     parameters:
     - name: performanceId
@@ -14148,6 +14780,8 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Assigned
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /membership-programmes:
     get:
@@ -14175,6 +14809,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CatalogueMembershipProgramme'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setMembershipProgramme
       x-ticvai-consumed-by:
@@ -14205,6 +14841,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CatalogueMembershipProgramme'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /membership-benefits:
     get:
       operationId: listMembershipBenefits
@@ -14231,6 +14869,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CatalogueMembershipBenefit'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setMembershipBenefit
       x-ticvai-consumed-by:
@@ -14261,6 +14901,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CatalogueMembershipBenefit'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /entitlement-templates/{templateId}/benefits:
     get:
       operationId: getPlanBenefits
@@ -14294,6 +14936,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CataloguePlanBenefit'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPlanBenefits
       x-ticvai-consumed-by:
@@ -14339,6 +14983,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CataloguePlanBenefit'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /pricing/dynamic-rules:
     get:
       operationId: listDynamicPriceRules
@@ -14370,6 +15016,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PricingDynamicPriceRule'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /pricing/dynamic-rules/{ruleId}:
     get:
       operationId: getDynamicPriceRule
@@ -14402,6 +15050,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DynamicPriceRuleDetail'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setDynamicPriceRule
       x-ticvai-consumed-by:
@@ -14443,6 +15093,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DynamicPriceRuleDetail'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /events/{eventId}/resource-cost:
     parameters:
     - name: eventId
@@ -14497,6 +15149,8 @@ paths:
                 $ref: '#/components/schemas/EventResourceCostEstimate'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /pricing-rule/{ruleId}/test:
     parameters:
     - name: ruleId
@@ -14555,6 +15209,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /pricing-change-request/{changeId}/submit:
     parameters:
     - name: changeId
@@ -14621,6 +15277,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /pricing-change-request/{changeId}/decision:
     parameters:
     - name: changeId
@@ -14700,6 +15358,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recommendation-review-decision/{recommendationId}/decision:
     parameters:
     - name: recommendationId
@@ -14779,6 +15439,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/{productId}/links:
     parameters:
     - name: productId
@@ -14849,6 +15511,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /configuration-templates:
     put:
       operationId: setConfigurationTemplate
@@ -14907,6 +15571,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /pricing-rollback-emergency/{actionId}/cancel:
     parameters:
     - name: actionId
@@ -14971,6 +15637,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /ai-findings/{findingId}/decision:
     parameters:
     - name: findingId
@@ -15064,6 +15732,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-connections:
     put:
       operationId: setChannelConnectionConfiguration
@@ -15116,6 +15786,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-connections/{connectionId}/test:
     parameters:
     - name: connectionId
@@ -15194,6 +15866,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-syncs:
     put:
       operationId: setChannelSyncSetting
@@ -15238,6 +15912,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChannelSync'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-sales-rules/{ruleId}:
     parameters:
     - name: ruleId
@@ -15312,6 +15988,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-incidents/{incidentId}:
     parameters:
     - name: incidentId
@@ -15394,6 +16072,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-incidents/{incidentId}/retry:
     parameters:
     - name: incidentId
@@ -15445,6 +16125,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /price-categories:
     put:
       operationId: setPriceCategoryRateType
@@ -15503,6 +16185,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /package-pricing:
     put:
       operationId: setPackagePricingDefinition
@@ -15566,6 +16250,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /pricing-markets:
     put:
       operationId: setMarketPricingConfiguration
@@ -15617,6 +16303,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fees:
     put:
       operationId: setFeeDefinition
@@ -15678,6 +16366,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /calculation-profiles:
     put:
       operationId: setPriceCalculationPolicy
@@ -15740,6 +16430,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rounding-profiles:
     put:
       operationId: setCurrencyRoundingRule
@@ -15791,6 +16483,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dynamic-pricing-controls:
     put:
       operationId: setDynamicPricingGuardrailPolicy
@@ -15853,6 +16547,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dynamic-pricing-strategies/{strategyId}/price-ladder:
     parameters:
     - name: strategyId
@@ -15924,6 +16620,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dynamic-pricing-strategies/{strategyId}/lifecycle:
     parameters:
     - name: strategyId
@@ -16006,6 +16704,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /demand-signals/{signalId}:
     parameters:
     - name: signalId
@@ -16081,6 +16781,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /signal-registry:
     put:
       operationId: setSignalRegistryPolicy
@@ -16135,6 +16837,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
 components:
   schemas:
@@ -20334,6 +21038,190 @@ components:
         has no workstation, so a cart hold carries `cartId` and no `holderWorkstationId`.
 
         '
+    WaitingRoomSetting:
+      type: object
+      x-ticvai-persistence: catalogue.waiting_room_setting
+      description: '**Whether a performance''s sale sits behind the on-sale waiting room, and how fast the room
+        releases** (ADR-0066, accepted 1 October). One row per performance, written by `setWaitingRoomSetting`.
+        The room itself (positions, releases, tokens) lives in Redis and at the edge, never in a table.'
+      required:
+      - performanceId
+      - venueId
+      - mode
+      - scopePath
+      properties:
+        id:
+          $ref: ../shared/common.yaml#/components/schemas/Id
+          readOnly: true
+        performanceId:
+          type: string
+          format: uuid
+          x-ticvai-references: catalogue.performance
+        venueId:
+          type: string
+          format: uuid
+          readOnly: true
+        mode:
+          type: string
+          enum:
+          - 'off'
+          - onSaleWindow
+          - 'on'
+          default: 'off'
+          description: '`onSaleWindow`: in front of the sale while the product is on sale (`onSaleFrom` to `onSaleTo`).
+            `on`: in front now, until `activeUntil` if set. `off`: no room; tokens already issued stay valid until
+            they expire.'
+        activeUntil:
+          type: string
+          format: date-time
+          nullable: true
+          description: 'With `mode` `on`, when the room switches itself off. Null keeps it on until an operator
+            switches it off.'
+        maxReleasePerSecond:
+          type: integer
+          minimum: 1
+          maximum: 5000
+          default: 50
+          description: The most guests the release controller admits per second. The controller may admit fewer.
+        automaticRelease:
+          type: boolean
+          default: true
+          description: The controller sets the rate from `commerce` health (latency and the `429` rate, ADR-0064),
+            up to `maxReleasePerSecond`. False holds the rate at the ceiling.
+        admissionTtlSeconds:
+          type: integer
+          minimum: 60
+          maximum: 3600
+          default: 900
+          description: How long an admission token is good for once issued. 900 matches the cart's 15-minute hold.
+        provider:
+          type: string
+          enum:
+          - inHouse
+          - vendor
+          default: inHouse
+          description: '`vendor` when a vendor''s room (such as Queue-it) stands in front instead (ADR-0066''s fallback;
+            buying one is the client''s decision). The cart checks either token the same way.'
+        scopePath:
+          type: string
+          readOnly: true
+          description: ltree of the owning scope node (ADR-0005)
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedByPrincipalId:
+          type: string
+          format: uuid
+          readOnly: true
+          x-ticvai-references: identity.principal
+    WaitingRoomStatus:
+      type: object
+      x-ticvai-persistence: none — composed at read time from catalogue.waiting_room_setting and the room's Redis counters
+      description: What `getWaitingRoomStatus` returns (ADR-0066).
+      required:
+      - setting
+      - waiting
+      - active
+      properties:
+        setting:
+          $ref: '#/components/schemas/WaitingRoomSetting'
+        active:
+          type: boolean
+          description: Whether the room is in front of the sale right now.
+        waiting:
+          type: integer
+          minimum: 0
+          description: Guests holding a position and not yet admitted.
+        admittedLastMinute:
+          type: integer
+          minimum: 0
+        releasePerSecond:
+          type: integer
+          minimum: 0
+          description: The rate the controller is admitting at now, at or below `maxReleasePerSecond`.
+        releaseLimitedBy:
+          type: string
+          nullable: true
+          enum:
+          - ceiling
+          - commerceLatency
+          - commerceRateLimited
+          description: Why the rate is what it is; null when the room is not active.
+    WaitingRoomEntry:
+      type: object
+      x-ticvai-persistence: none — transient, held in the room's Redis counters and never in a table
+      description: One guest's place in a performance's waiting room (ADR-0066). No personal data.
+      required:
+      - waitingEntryId
+      - performanceId
+      - state
+      properties:
+        waitingEntryId:
+          type: string
+          format: uuid
+          description: A UUIDv7 minted on arrival; what the waiting page polls with.
+        performanceId:
+          type: string
+          format: uuid
+        state:
+          type: string
+          enum:
+          - notRequired
+          - waiting
+          - admitted
+          - expired
+          - closed
+          description: '`notRequired`: the room is off, go to the sale. `waiting`: keep polling. `admitted`: `admission`
+            is set. `expired`: the admission was not used in time; enter again. `closed`: the room was switched off or
+            the performance stopped selling.'
+        position:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: Place in the room; null unless `waiting`.
+        aheadOfYou:
+          type: integer
+          minimum: 0
+          nullable: true
+        estimatedWaitSeconds:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: At the current release rate. An estimate, and the page says so.
+        pollAfterSeconds:
+          type: integer
+          minimum: 1
+          default: 5
+        admission:
+          allOf:
+          - $ref: '#/components/schemas/WaitingRoomAdmission'
+          nullable: true
+          description: Set when `state` is `admitted`.
+    WaitingRoomAdmission:
+      type: object
+      x-ticvai-persistence: none — transient, a signed token that is checked and never stored
+      description: '**The admission token** (ADR-0066). Signed with a Key Vault secret; carries the tenant, the
+        performance, the expiry and a unique id, so it cannot be moved to another performance or replayed after it
+        expires. Sent as `X-Admission-Token` (shared parameter `AdmissionToken`).'
+      required:
+      - token
+      - performanceId
+      - expiresAt
+      properties:
+        token:
+          type: string
+          description: The signed token, opaque to the client.
+        admissionId:
+          type: string
+          format: uuid
+          description: The token's unique id.
+        performanceId:
+          type: string
+          format: uuid
+        expiresAt:
+          type: string
+          format: date-time
     InventoryHold:
       x-ticvai-persistence: catalogue.inventory_hold
       type: object

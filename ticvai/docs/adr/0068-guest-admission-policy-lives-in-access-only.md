@@ -104,7 +104,7 @@ rule format proven equal on both sides.
 **Before the `getOfflinePackage` ticket (POS-013) is cut**
 
 1. [x] Chinmay: accepted 1 October 2026.
-2. [ ] Package: package contents (active policy version, entitlements); `scan_event.policy_version`; rename Identity's policy tables and operations; JSON rule schema replacing `condition_expression`. Renames need the vocabulary and naming checks, and a declared rename in the schema history. Re-derive, mirrors, check. (5 pts, the finding's estimate)
+2. [ ] Package: package contents (active policy version, entitlements); `scan_event.policy_version`; rename Identity's policy tables and operations; JSON rule schema replacing `condition_expression`. Renames need the vocabulary and naming checks, and a declared rename in the schema history. Re-derive, mirrors, check. (5 pts, the finding's estimate) — **Authored 1 October**: `identity.authorisation_policy` and `identity.authorisation_policy_version` (declared renames), eleven `*AuthorisationPolicy*` operations on `/authorisation-*`, four schemas; `OfflinePackage.policySetVersion` and `ScanEvent.policySetVersion` beside the existing `dynamicPolicyId`/`dynamicPolicyVersion`; `conditionRule` (`AdmissionRule`, `AdmissionCondition`) replaces `conditionExpression` on the policy and its builder shapes. Re-derive, mirrors and check at the next refresh.
 
 **B1, with the scanner**
 

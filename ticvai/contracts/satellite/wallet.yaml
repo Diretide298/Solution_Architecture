@@ -100,6 +100,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WalletType'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createWalletType
       x-ticvai-consumed-by:
@@ -132,6 +134,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletType'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-types/{walletTypeId}:
     parameters:
     - name: walletTypeId
@@ -185,6 +189,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credit-types:
     get:
       operationId: listCreditTypes
@@ -220,6 +226,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CreditType'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createCreditType
       x-ticvai-consumed-by:
@@ -253,6 +261,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CreditType'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credit-types/{creditTypeId}:
     parameters:
     - name: creditTypeId
@@ -304,6 +314,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CreditType'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credit-types/{creditTypeId}/eligibility:
     parameters:
     - name: creditTypeId
@@ -355,6 +367,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CreditEligibility'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credit-consumption-policy:
     get:
       operationId: getCreditConsumptionPolicy
@@ -376,6 +390,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CreditConsumptionPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setCreditConsumptionPolicy
       x-ticvai-consumed-by:
@@ -425,6 +441,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CreditConsumptionPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credit-lots:
     get:
       operationId: listCreditLots
@@ -469,6 +487,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CreditLot'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credit-lots/expire:
     post:
       operationId: expireCreditLots
@@ -540,6 +560,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CreditExpiryResult'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credit-consumption/simulate:
     post:
       operationId: simulateCreditConsumption
@@ -595,6 +617,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CreditAllocation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-funding-rules:
     get:
       operationId: getWalletFundingRules
@@ -615,6 +639,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletFundingRules'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setWalletFundingRules
       x-ticvai-consumed-by:
@@ -670,6 +696,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletFundingRules'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-funding/reversals:
     post:
       operationId: reverseWalletFunding
@@ -739,6 +767,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /shared-wallets:
     get:
       operationId: listSharedWallets
@@ -774,6 +804,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SharedWallet'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createSharedWallet
       x-ticvai-consumed-by:
@@ -806,6 +838,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SharedWallet'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /shared-wallets/{sharedWalletId}/members:
     parameters:
     - name: sharedWalletId
@@ -876,6 +910,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SharedWalletMember'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /voucher-types:
     get:
       operationId: listVoucherTypes
@@ -905,6 +941,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/VoucherType'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createVoucherType
       x-ticvai-consumed-by:
@@ -938,6 +976,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VoucherType'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /gift-card-products:
     put:
       operationId: setGiftCardProduct
@@ -982,6 +1022,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GiftCardProduct'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-channel-rules:
     put:
       operationId: setWalletChannelRules
@@ -1034,6 +1076,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletChannelRules'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-credentials:
     post:
       operationId: linkWalletCredential
@@ -1082,6 +1126,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-transfer-rules:
     put:
       operationId: setWalletTransferRules
@@ -1126,6 +1172,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletTransferRules'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-refund-policy:
     put:
       operationId: setWalletRefundPolicy
@@ -1171,6 +1219,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletRefundPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-restrictions:
     post:
       operationId: setWalletRestriction
@@ -1211,6 +1261,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletRestriction'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-disputes:
     get:
       operationId: listWalletDisputes
@@ -1243,6 +1295,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WalletDispute'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: raiseWalletDispute
       x-ticvai-consumed-by:
@@ -1278,6 +1332,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletDispute'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-risk-rules:
     put:
       operationId: setWalletRiskRules
@@ -1328,6 +1384,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletRiskRules'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-accounting:
     put:
       operationId: setWalletAccountingMapping
@@ -1374,6 +1432,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletAccountingMapping'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-liability:
     get:
       operationId: getWalletLiability
@@ -1429,6 +1489,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WalletLiabilityRow'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-reconciliation:
     get:
       operationId: getWalletReconciliation
@@ -1473,6 +1535,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletReconciliation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-configuration/publish:
     post:
       operationId: publishWalletConfiguration
@@ -1531,6 +1595,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletConfigurationVersion'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallets/{walletId}/transfer:
     parameters:
       - name: walletId
@@ -1623,6 +1689,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/WalletTransferProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallets/{walletId}/suspend:
     parameters:
       - name: walletId
@@ -1660,6 +1728,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/WalletStateProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallets/{walletId}/reinstate:
     parameters:
       - name: walletId
@@ -1695,6 +1765,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/WalletStateProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallets/{walletId}/close:
     parameters:
       - name: walletId
@@ -1743,6 +1815,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/WalletStateProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallets/{subjectId}:
     parameters:
       - name: subjectId
@@ -1782,6 +1856,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Wallet' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallets/{subjectId}/top-ups:
     parameters:
       - name: subjectId
@@ -1847,6 +1923,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallets/{subjectId}/transactions:
     parameters:
       - name: subjectId
@@ -1902,6 +1980,8 @@ paths:
                         type: array
                         items: { $ref: '#/components/schemas/WalletTransaction' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallets/{subjectId}/adjust:
     parameters:
       - name: subjectId
@@ -1959,6 +2039,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Wallet' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /gift-cards:
     post:
       operationId: issueGiftCard
@@ -1999,6 +2081,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /gift-cards/{cardCode}:
     parameters:
       - name: cardCode
@@ -2029,6 +2113,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/GiftCard' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /gift-cards/{cardCode}/block:
     parameters:
       - name: cardCode
@@ -2068,6 +2154,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/GiftCard' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /gift-cards/{giftCardId}/activate:
     parameters:
       - name: giftCardId
@@ -2110,6 +2198,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/GiftCardProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /gift-cards/{giftCardId}/redeem:
     parameters:
       - name: giftCardId
@@ -2170,6 +2260,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/GiftCardProblem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /game-cards/{cardCode}/load:
     parameters:
     - name: cardCode
@@ -2264,6 +2356,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/GameCardLoadProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /game-cards/{cardCode}/adjust:
     parameters:
     - name: cardCode
@@ -2316,6 +2410,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Wallet'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallets/{walletId}/balance:
     get:
       operationId: getWalletBalance
@@ -2347,6 +2443,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletBalance'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallets/{walletId}/holds:
     get:
       operationId: listWalletHolds
@@ -2378,6 +2476,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WalletHold'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: holdWalletFunds
       security:
@@ -2454,6 +2554,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-holds/{walletHoldId}/capture:
     post:
       operationId: captureWalletHold
@@ -2516,6 +2618,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-holds/{walletHoldId}/release:
     post:
       operationId: releaseWalletHold
@@ -2569,6 +2673,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-authentication-policy:
     put:
       operationId: setWalletAuthenticationPolicy
@@ -2628,6 +2734,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-configuration/versions:
     get:
       operationId: listWalletConfigurationVersions
@@ -2667,6 +2775,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/WalletConfigurationVersion'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-configuration/versions/{version}/diff:
     parameters:
     - name: version
@@ -2713,6 +2823,8 @@ paths:
                 $ref: '#/components/schemas/WalletConfigurationDiff'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-configuration/versions/{version}/restore:
     parameters:
     - name: version
@@ -2777,6 +2889,8 @@ paths:
                 $ref: '#/components/schemas/WalletConfigurationVersion'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-risk-rules/{ruleCode}/status:
     parameters:
     - name: ruleCode
@@ -2855,6 +2969,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-reconciliation-sources:
     put:
       operationId: setWalletReconciliationSources
@@ -2909,6 +3025,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-integration-mappings:
     put:
       operationId: setWalletIntegrationMapping
@@ -2965,6 +3083,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-disputes/{disputeId}/resolve:
     parameters:
     - name: disputeId
@@ -3062,6 +3182,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-disputes/{disputeId}/withdraw:
     parameters:
     - name: disputeId
@@ -3131,6 +3253,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallets/{walletId}/auto-reload:
     parameters:
       - name: walletId
@@ -3163,6 +3287,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/WalletAutoReloadSetting' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setWalletAutoReloadSetting
       x-ticvai-consumed-by:
@@ -3221,6 +3347,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallets/{walletId}/exit-balance:
     parameters:
       - name: walletId
@@ -3258,6 +3386,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/WalletExitBalance' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallets/{walletId}/exit-settlement:
     parameters:
       - name: walletId
@@ -3338,6 +3468,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
 components:
   securitySchemes:

@@ -128,6 +128,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Case'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: raiseMyCase
       x-ticvai-consumed-by:
@@ -226,6 +228,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /my/cases/{caseId}/messages:
     parameters:
     - name: caseId
@@ -286,6 +290,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CaseDetail'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guest-match-policy:
     get:
       operationId: getGuestMatchPolicy
@@ -310,6 +316,8 @@ paths:
                 $ref: '#/components/schemas/GuestMatchPolicy'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setGuestMatchPolicy
       x-ticvai-consumed-by:
@@ -361,6 +369,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guest-checkout/profile-match:
     post:
       operationId: checkGuestCheckoutMatch
@@ -407,6 +417,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -457,6 +469,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -529,6 +543,8 @@ paths:
                       type: array
                       items:
                         type: string
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/merge:
     post:
       operationId: mergeGuests
@@ -603,6 +619,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/MergeRefusedProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{subjectId}/notes:
     parameters:
     - name: subjectId
@@ -682,6 +700,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GuestNote'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{subjectId}/preferences:
     parameters:
     - name: subjectId
@@ -739,6 +759,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GuestPreferences'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /invitation-campaigns:
     post:
       operationId: createInvitationCampaign
@@ -779,6 +801,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvitationCampaign'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /invitations/{token}/respond:
     parameters:
     - name: token
@@ -844,6 +868,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/InvitationResponseProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /privacy-incidents:
     post:
       operationId: recordPrivacyIncident
@@ -885,6 +911,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PrivacyIncident'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /forms:
     get:
       operationId: listForms
@@ -930,6 +958,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/FormDefinition'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createForm
       x-ticvai-consumed-by:
@@ -971,6 +1001,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FormDefinition'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /forms/{formId}:
     parameters:
     - name: formId
@@ -1015,6 +1047,8 @@ paths:
                 $ref: '#/components/schemas/FormDefinition'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /form-submissions:
     post:
       operationId: submitForm
@@ -1057,6 +1091,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FormSubmission'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{subjectId}/waiver-status:
     parameters:
     - name: subjectId
@@ -1115,6 +1151,8 @@ paths:
                   expiringWithinDays:
                     type: integer
                     nullable: true
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guest-documents:
     post:
       operationId: uploadGuestDocument
@@ -1160,6 +1198,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GuestDocument'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /challenges:
     post:
       operationId: createChallenge
@@ -1201,6 +1241,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Challenge'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/me/challenges:
     get:
       operationId: getMyChallenges
@@ -1247,6 +1289,8 @@ paths:
                       allOf:
                       - $ref: '#/components/schemas/ChallengeProgress'
                       nullable: true
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /seo-metadata:
     get:
       operationId: getSeoMetadata
@@ -1299,6 +1343,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SeoMetadata'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setSeoMetadata
       x-ticvai-consumed-by:
@@ -1338,6 +1384,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SeoMetadata'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /seo-redirects:
     post:
       operationId: createUrlRedirect
@@ -1374,6 +1422,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UrlRedirect'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /lost-items:
     get:
       operationId: listLostItems
@@ -1415,6 +1465,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/LostItem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: recordLostItem
       x-ticvai-consumed-by:
@@ -1453,6 +1505,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LostItem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /lost-items/{itemId}/matches:
     parameters:
     - name: itemId
@@ -1489,6 +1543,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/LostItemMatch'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /referrals:
     post:
       operationId: createReferral
@@ -1529,6 +1585,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Referral'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /conversations/{conversationId}/disposition:
     parameters:
     - name: conversationId
@@ -1572,6 +1630,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CallDisposition'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /lost-items/{itemId}/match:
     parameters:
     - name: itemId
@@ -1641,6 +1701,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/StateTransitionProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /attribution/touches:
     post:
       operationId: recordTouchPoint
@@ -1682,6 +1744,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TouchPoint'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /journeys:
     get:
       operationId: listJourneys
@@ -1719,6 +1783,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Journey'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createJourney
       x-ticvai-consumed-by:
@@ -1769,6 +1835,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /journeys/{journeyId}/activate:
     parameters:
     - name: journeyId
@@ -1822,6 +1890,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Journey'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /journeys/{journeyId}/performance:
     parameters:
     - name: journeyId
@@ -1855,6 +1925,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JourneyPerformance'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /message-triggers:
     get:
       operationId: listMessageTriggers
@@ -1887,6 +1959,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/MessageTrigger'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: setMessageTrigger
       x-ticvai-consumed-by:
@@ -1940,6 +2014,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /message-dispatches/{dispatchId}/retry:
     parameters:
     - name: dispatchId
@@ -2000,6 +2076,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MessageDispatch'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/identify:
     post:
       operationId: identifyGuest
@@ -2073,6 +2151,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/GuestAmbiguityProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/me/profile:
     get:
       operationId: getMyProfile
@@ -2107,6 +2187,8 @@ paths:
                     $ref: '#/components/schemas/GuestProfile'
                   preferences:
                     $ref: '#/components/schemas/GuestPreferences'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateMyProfile
       x-ticvai-consumed-by:
@@ -2192,6 +2274,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GuestProfile'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /loyalty/accruals:
     post:
       operationId: accrueLoyaltyPoints
@@ -2257,6 +2341,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LoyaltyPosition'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /loyalty/redemptions:
     post:
       operationId: redeemLoyaltyPoints
@@ -2331,6 +2417,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/LoyaltyRefusedProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /conversations:
     get:
       operationId: listConversations
@@ -2389,6 +2477,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Conversation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /conversations/{conversationId}:
     parameters:
     - name: conversationId
@@ -2426,6 +2516,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Conversation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /conversations/{conversationId}/messages:
     parameters:
     - name: conversationId
@@ -2499,6 +2591,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConversationMessage'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /conversations/{conversationId}/handover:
     parameters:
     - name: conversationId
@@ -2592,6 +2686,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/HandoverRefusedProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /conversations/{conversationId}/claim:
     parameters:
     - name: conversationId
@@ -2636,6 +2732,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /conversations/{conversationId}/transfer:
     parameters:
     - name: conversationId
@@ -2690,6 +2788,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Conversation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /conversations/{conversationId}/close:
     parameters:
     - name: conversationId
@@ -2748,6 +2848,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Conversation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /agent-availability:
     put:
       operationId: setAgentAvailability
@@ -2808,6 +2910,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AgentAvailability'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /kiosk-assists:
     post:
       operationId: startKioskAssist
@@ -2868,6 +2972,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KioskAssistSession'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /kiosk-assists/{sessionId}/end:
     parameters:
     - name: sessionId
@@ -2908,6 +3014,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KioskAssistSession'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /loyalty/position:
     get:
       operationId: getLoyaltyPosition
@@ -2987,6 +3095,8 @@ paths:
                       so the interface can warn before it happens.
 
                       '
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /loyalty/leaderboard:
     get:
       operationId: listLeaderboard
@@ -3050,6 +3160,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/LeaderboardEntry'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /loyalty/leaderboard-nickname:
     put:
       operationId: setLeaderboardNickname
@@ -3101,6 +3213,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LoyaltyPosition'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests:
     get:
       operationId: searchGuests
@@ -3165,6 +3279,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{subjectId}:
     parameters:
     - name: subjectId
@@ -3209,6 +3325,8 @@ paths:
                 $ref: '#/components/schemas/GuestProfileDetail'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateGuestProfile
       x-ticvai-consumed-by:
@@ -3257,6 +3375,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GuestProfileDetail'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{subjectId}/merge:
     parameters:
     - name: subjectId
@@ -3324,6 +3444,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/MergeRefusedProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{subjectId}/consents:
     parameters:
     - name: subjectId
@@ -3363,6 +3485,8 @@ paths:
                 $ref: '#/components/schemas/ConsentState'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: recordConsent
       x-ticvai-consumed-by:
@@ -3429,6 +3553,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /consent-records/checkout:
     post:
       operationId: recordCheckoutConsents
@@ -3522,6 +3648,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ConsentRecord'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{subjectId}/consents/history:
     parameters:
     - name: subjectId
@@ -3571,6 +3699,8 @@ paths:
                         $ref: '#/components/schemas/ConsentRecord'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /consent-purposes:
     get:
       operationId: listConsentPurposes
@@ -3608,6 +3738,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/ConsentPurposeConfig'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setConsentPurposes
       x-ticvai-consumed-by:
@@ -3660,6 +3792,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ConsentPurposeConfig'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /consent/suppression-list:
     get:
       operationId: getSuppressionList
@@ -3694,6 +3828,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Suppression'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: addSuppression
       x-ticvai-consumed-by:
@@ -3743,6 +3879,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Suppression'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{subjectId}/wishlist:
     parameters:
     - name: subjectId
@@ -3798,6 +3936,8 @@ paths:
                 $ref: '#/components/schemas/Wishlist'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: addToWishlist
       x-ticvai-consumed-by:
@@ -3872,6 +4012,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{subjectId}/wishlist/{itemId}:
     parameters:
     - name: subjectId
@@ -3924,6 +4066,8 @@ paths:
           description: Removed
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{subjectId}/devices:
     parameters:
     - name: subjectId
@@ -3983,6 +4127,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/GuestDevice'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: registerGuestDevice
       x-ticvai-consumed-by:
@@ -4057,6 +4203,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GuestDevice'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{subjectId}/devices/{deviceId}:
     parameters:
     - name: subjectId
@@ -4113,6 +4261,8 @@ paths:
           description: Revoked
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /segments:
     get:
       operationId: listSegments
@@ -4156,6 +4306,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Segment'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createSegment
       x-ticvai-consumed-by:
@@ -4204,6 +4356,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /segments/{segmentId}/preview:
     parameters:
     - name: segmentId
@@ -4244,6 +4398,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SegmentPreview'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /segments/{segmentId}/members:
     parameters:
     - name: segmentId
@@ -4282,6 +4438,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/GuestProfile'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /campaigns:
     get:
       operationId: listCampaigns
@@ -4322,6 +4480,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Campaign'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createCampaign
       x-ticvai-consumed-by:
@@ -4363,6 +4523,8 @@ paths:
                 $ref: '#/components/schemas/Campaign'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /campaigns/{campaignId}:
     parameters:
     - name: campaignId
@@ -4395,6 +4557,8 @@ paths:
                 $ref: '#/components/schemas/CampaignDetail'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateCampaign
       x-ticvai-consumed-by:
@@ -4461,6 +4625,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/CampaignStateProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /campaigns/{campaignId}/test-send:
     parameters:
     - name: campaignId
@@ -4525,6 +4691,8 @@ paths:
                     type: integer
                     description: How many test messages were queued — one per recipient. **Queued, not sent**;
                       a test is never counted in `CampaignPerformance`.
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /campaigns/{campaignId}/launch:
     parameters:
     - name: campaignId
@@ -4603,6 +4771,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/CampaignStateProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /campaigns/{campaignId}/pause:
     parameters:
     - name: campaignId
@@ -4660,6 +4830,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/CampaignStateProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /campaigns/{campaignId}/unschedule:
     parameters:
     - name: campaignId
@@ -4704,6 +4876,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/CampaignStateProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /campaigns/{campaignId}/stop:
     parameters:
     - name: campaignId
@@ -4763,6 +4937,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/CampaignStateProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /campaigns/{campaignId}/performance:
     parameters:
     - name: campaignId
@@ -4803,6 +4979,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CampaignPerformance'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /message-templates:
     get:
       operationId: listMessageTemplates
@@ -4842,6 +5020,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/MessageTemplate'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createMessageTemplate
       x-ticvai-consumed-by:
@@ -4888,6 +5068,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /messages:
     post:
       operationId: sendTransactionalMessage
@@ -4968,6 +5150,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /messages/{messageId}:
     parameters:
     - name: messageId
@@ -5001,6 +5185,8 @@ paths:
                 $ref: '#/components/schemas/MessageDispatch'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /cases:
     get:
       operationId: listCases
@@ -5071,6 +5257,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Case'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createCase
       x-ticvai-consumed-by:
@@ -5123,6 +5311,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Case'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /cases/{caseId}:
     parameters:
     - name: caseId
@@ -5162,6 +5352,8 @@ paths:
                 $ref: '#/components/schemas/CaseDetail'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateCase
       x-ticvai-consumed-by:
@@ -5222,6 +5414,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /cases/{caseId}/messages:
     parameters:
     - name: caseId
@@ -5297,6 +5491,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CaseMessage'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /cases/{caseId}/reopen:
     parameters:
     - name: caseId
@@ -5362,6 +5558,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/StateTransitionProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /cases/{caseId}/escalate:
     parameters:
     - name: caseId
@@ -5421,6 +5619,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Case'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /loyalty/programmes:
     get:
       operationId: listLoyaltyProgrammes
@@ -5456,6 +5656,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/LoyaltyProgramme'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createLoyaltyProgramme
       x-ticvai-consumed-by:
@@ -5496,6 +5698,8 @@ paths:
                 $ref: '#/components/schemas/LoyaltyProgramme'
         '409':
           $ref: ../shared/common.yaml#/components/responses/DuplicateCode
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{subjectId}/loyalty:
     parameters:
     - name: subjectId
@@ -5547,6 +5751,8 @@ paths:
                 $ref: '#/components/schemas/LoyaltyPosition'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{subjectId}/loyalty/adjust:
     parameters:
     - name: subjectId
@@ -5603,6 +5809,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/LoyaltyRefusedProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /reviews:
     get:
       operationId: listReviews
@@ -5650,6 +5858,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Review'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: submitReview
       x-ticvai-consumed-by:
@@ -5689,6 +5899,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Review'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /reviews/{reviewId}/respond:
     parameters:
     - name: reviewId
@@ -5738,6 +5950,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Review'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /marketing-subscriptions:
     get:
       operationId: getMarketingSubscription
@@ -5770,6 +5984,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MarketingSubscription'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setMarketingSubscription
       x-ticvai-consumed-by:
@@ -5811,6 +6027,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MarketingSubscription'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /communication-service:
     get:
       operationId: listCommunicationService
@@ -5868,6 +6086,8 @@ paths:
                 $ref: '#/components/schemas/CommunicationServiceCommandCenterView'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-provider:
     put:
       operationId: setChannelProvider
@@ -5925,6 +6145,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /sender-identity-domain:
     put:
       operationId: setSenderIdentityDomain
@@ -5982,6 +6204,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /system-transactional-template:
     get:
       operationId: listSystemTransactionalTemplate
@@ -6082,6 +6306,8 @@ paths:
                           $ref: '#/components/schemas/SystemTransactionalTemplateRegistryView'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /business-event-notification:
     get:
       operationId: listBusinessEventNotification
@@ -6157,6 +6383,8 @@ paths:
                           $ref: '#/components/schemas/BusinessEventNotificationTriggerMappingView'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setBusinessEventMapping
       x-ticvai-audience:
@@ -6208,6 +6436,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /routing-priority-throttling:
     get:
       operationId: listRoutingPriorityThrottling
@@ -6280,6 +6510,8 @@ paths:
                           $ref: '#/components/schemas/RoutingPriorityThrottlingFallbackRulesView'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setCommunicationRoutingRule
       x-ticvai-audience:
@@ -6330,6 +6562,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /consent-preference-communication:
     get:
       operationId: listConsentPreferenceCommunication
@@ -6418,6 +6652,8 @@ paths:
                           $ref: '#/components/schemas/ConsentPreferenceCommunicationPolicyEnforcementView'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /delivery-queue-failure:
     get:
       operationId: listDeliveryQueueFailure
@@ -6575,6 +6811,8 @@ paths:
                               minimum: 0
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /provider-health-usage:
     get:
       operationId: listProviderHealthUsage
@@ -6696,6 +6934,8 @@ paths:
                 $ref: '#/components/schemas/ProviderHealthUsageCostMonitoringView'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /delivery-communication-platform:
     get:
       operationId: listDeliveryCommunicationPlatform
@@ -6758,6 +6998,8 @@ paths:
                 $ref: '#/components/schemas/AiDeliveryOptimizationCommunicationPlatformDiagnostiView'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /privacy-consent:
     get:
       operationId: listPrivacyConsent
@@ -6859,6 +7101,8 @@ paths:
                 $ref: '#/components/schemas/PrivacyConsentConfigurationCommandCenterView'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /data-processing-purpose:
     get:
       operationId: listDataProcessingPurpose
@@ -6932,6 +7176,8 @@ paths:
                         $ref: '#/components/schemas/DataProcessingPurposeLawfulBasisRegistryView'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setDataProcessingPurpose
       x-ticvai-audience:
@@ -6973,6 +7219,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
           $ref: ../shared/common.yaml#/components/responses/Conflict
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /communication-preference-marketing:
     put:
       operationId: setCommunicationPreferenceMarketing
@@ -7028,6 +7276,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /cookie-tracking-digital:
     get:
       operationId: listCookieTrackingDigital
@@ -7128,6 +7378,8 @@ paths:
                         $ref: '#/components/schemas/CookieTrackingDigitalTechnologyRegistryView'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setTrackingTechnology
       x-ticvai-consumed-by:
@@ -7174,6 +7426,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /cookie-banner-preference:
     get:
       operationId: listCookieBannerPreference
@@ -7247,6 +7501,8 @@ paths:
                         $ref: '#/components/schemas/CookieBannerPreferenceCenterDesignerView'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setCookieBannerDesign
       x-ticvai-consumed-by:
@@ -7296,6 +7552,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /consent-capture-point:
     put:
       operationId: setConsentCapturePoint
@@ -7351,6 +7609,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /privacy-notice-policy:
     get:
       operationId: listPrivacyNoticePolicy
@@ -7429,6 +7689,8 @@ paths:
                         $ref: '#/components/schemas/PrivacyNoticePolicyTermsVersionManagementView'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPrivacyNoticePolicyGovernance
       x-ticvai-consumed-by:
@@ -7506,6 +7768,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /minor-guardian-age:
     put:
       operationId: setMinorGuardianAge
@@ -7560,6 +7824,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /privacy-testing:
     put:
       operationId: approvePrivacyTesting
@@ -7614,6 +7880,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           $ref: ../shared/common.yaml#/components/responses/Conflict
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /privacy:
     get:
       operationId: listPrivacy
@@ -7705,6 +7973,8 @@ paths:
                 $ref: '#/components/schemas/PrivacyOperationsCommandCenterView'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPrivacyRequestTypes
       x-ticvai-audience:
@@ -7752,6 +8022,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /customer-privacy-consent:
     get:
       operationId: listCustomerPrivacyConsent
@@ -7797,6 +8069,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /consent-evidence-withdrawal:
     get:
       operationId: listConsentEvidenceWithdrawal
@@ -7908,6 +8182,8 @@ paths:
                         $ref: '#/components/schemas/ConsentEvidenceHistoryWithdrawalManagementView'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /data-subject-customer:
     get:
       operationId: listDataSubjectCustomer
@@ -8016,6 +8292,8 @@ paths:
                         $ref: '#/components/schemas/DataSubjectCustomerPrivacyRequestManagementView'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPrivacyRequest
       x-ticvai-audience:
@@ -8072,6 +8350,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /data-discovery-access:
     put:
       operationId: setDataDiscoveryAccess
@@ -8128,6 +8408,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /deletion-anonymization-restriction:
     get:
       operationId: listDeletionAnonymizationRestriction
@@ -8215,6 +8497,8 @@ paths:
                         $ref: '#/components/schemas/DeletionAnonymizationRestrictionOperationsView'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPrivacyAction
       x-ticvai-audience:
@@ -8271,6 +8555,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /data-retention-expiry:
     get:
       operationId: listDataRetentionExpiry
@@ -8329,6 +8615,8 @@ paths:
                 $ref: '#/components/schemas/DataRetentionExpiryLegalHoldOperationsView'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setLegalHold
       x-ticvai-audience:
@@ -8377,6 +8665,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /privacy-compliance-exception:
     get:
       operationId: listPrivacyComplianceExceptions
@@ -8482,6 +8772,8 @@ paths:
                         $ref: '#/components/schemas/PrivacyComplianceExceptionInvestigationWorkspaceView'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPrivacyComplianceException
       x-ticvai-consumed-by:
@@ -8533,6 +8825,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /privacy-evidence-compliance:
     get:
       operationId: listPrivacyEvidenceCompliance
@@ -8649,6 +8943,8 @@ paths:
                         $ref: '#/components/schemas/PrivacyAuditEvidenceComplianceReportingView'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /privacy-compliance:
     get:
       operationId: listPrivacyCompliance
@@ -8755,6 +9051,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /customer-service:
     get:
       operationId: listCustomerService
@@ -8805,6 +9103,8 @@ paths:
                 $ref: '#/components/schemas/CustomerServiceCommandCenterView'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /customer-service-profile:
     get:
       operationId: listCustomerServiceProfile
@@ -8851,6 +9151,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /unified-interaction-communication:
     get:
       operationId: listUnifiedInteractionCommunication
@@ -8964,6 +9266,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /case-classification-intelligent:
     post:
       operationId: createCaseClassificationIntelligent
@@ -9008,6 +9312,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /case-investigation-resolution:
     put:
       operationId: setCaseInvestigationResolution
@@ -9062,6 +9368,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: getCaseInvestigationResolution
       x-ticvai-audience:
@@ -9098,6 +9406,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /order-booking-ticket:
     put:
       operationId: setOrderBookingTicket
@@ -9161,6 +9471,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /refund-compensation-service:
     put:
       operationId: setRefundCompensationService
@@ -9221,6 +9533,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /escalation-collaboration-internal:
     get:
       operationId: listEscalationCollaborationInternal
@@ -9321,6 +9635,8 @@ paths:
                         $ref: '#/components/schemas/EscalationCollaborationInternalResolutionView'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setCaseInternalRequest
       x-ticvai-audience:
@@ -9365,6 +9681,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           $ref: ../shared/common.yaml#/components/responses/Conflict
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /case-resolution-closure:
     get:
       operationId: listCaseResolutionClosure
@@ -9471,6 +9789,8 @@ paths:
                         $ref: '#/components/schemas/CaseResolutionClosureCustomerFeedbackView'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setCaseResolution
       x-ticvai-audience:
@@ -9514,6 +9834,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           $ref: ../shared/common.yaml#/components/responses/Conflict
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /customer-service-copilot:
     put:
       operationId: setCustomerServiceCopilot
@@ -9573,6 +9895,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /contact:
     get:
       operationId: listContact
@@ -9635,6 +9959,8 @@ paths:
                 $ref: '#/components/schemas/ContactCenterOperationsCommandCenterView'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /intelligent-routing-skill:
     get:
       operationId: listIntelligentRoutingSkills
@@ -9682,6 +10008,8 @@ paths:
                         $ref: '#/components/schemas/IntelligentRoutingSkillsAssignmentEngineView'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setIntelligentRoutingSkill
       x-ticvai-consumed-by:
@@ -9730,6 +10058,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
           $ref: ../shared/common.yaml#/components/responses/Conflict
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /sla-policy-service:
     get:
       operationId: listSlaPolicyService
@@ -9812,6 +10142,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /agent-workload-availability:
     get:
       operationId: listAgentWorkloadAvailability
@@ -9916,6 +10248,8 @@ paths:
                             minimum: 0
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setAgentServiceProfile
       x-ticvai-audience:
@@ -9958,6 +10292,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /escalation-critical-case:
     get:
       operationId: listEscalationCriticalCase
@@ -10114,6 +10450,8 @@ paths:
                               format: uuid
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /quality-agent-evaluation:
     get:
       operationId: listQualityAgentEvaluation
@@ -10208,6 +10546,8 @@ paths:
                         $ref: '#/components/schemas/QualityManagementAgentEvaluationView'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setQualityEvaluation
       x-ticvai-audience:
@@ -10253,6 +10593,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           $ref: ../shared/common.yaml#/components/responses/Conflict
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /customer-satisfaction-feedback:
     get:
       operationId: listCustomerSatisfactionFeedback
@@ -10379,6 +10721,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /service-root-cause:
     get:
       operationId: listServiceRootCause
@@ -10472,6 +10816,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /contact-automation:
     get:
       operationId: listContactAutomation
@@ -10522,6 +10868,8 @@ paths:
                 $ref: '#/components/schemas/AiContactCenterIntelligenceAutomationStudioView'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setContactAutomation
       x-ticvai-audience:
@@ -10567,6 +10915,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
           $ref: ../shared/common.yaml#/components/responses/Conflict
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /waiver-consent:
     get:
       operationId: listWaiverConsent
@@ -10769,6 +11119,8 @@ paths:
                         $ref: '#/components/schemas/WaiverConsentCommandCenterView'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /waiver-template-master:
     get:
       operationId: listWaiverTemplateMaster
@@ -10849,6 +11201,8 @@ paths:
                         $ref: '#/components/schemas/WaiverTemplateLibraryMasterSetupView'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setWaiverTemplateMaster
       x-ticvai-audience:
@@ -10900,6 +11254,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /digital-waiver-form:
     put:
       operationId: setDigitalWaiverForm
@@ -10964,6 +11320,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: getDigitalWaiverForm
       x-ticvai-audience:
@@ -11005,6 +11363,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dynamic-field-question:
     get:
       operationId: listDynamicFieldQuestion
@@ -11072,6 +11432,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setDynamicFieldQuestion
       x-ticvai-audience:
@@ -11126,6 +11488,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /signatory-signature-guardian:
     put:
       operationId: setSignatorySignatureGuardian
@@ -11191,6 +11555,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: getSignatorySignatureGuardian
       x-ticvai-audience:
@@ -11232,6 +11598,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-event-experience:
     get:
       operationId: listProductEventExperience
@@ -11335,6 +11703,8 @@ paths:
                         $ref: '#/components/schemas/ProductEventExperienceAssociationView'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setWaiverAssociation
       x-ticvai-audience:
@@ -11388,6 +11758,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /waiver-trigger-eligibility:
     get:
       operationId: listWaiverTriggerEligibility
@@ -11467,6 +11839,8 @@ paths:
                         $ref: '#/components/schemas/WaiverTriggerEligibilityCompletionRulesView'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setWaiverTriggerRule
       x-ticvai-audience:
@@ -11515,6 +11889,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /versioning-effective-date:
     get:
       operationId: listVersioningEffectiveDate
@@ -11589,6 +11965,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /localization-branding-customer:
     put:
       operationId: setLocalizationBrandingCustomer
@@ -11655,6 +12033,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: getLocalizationBrandingCustomer
       x-ticvai-audience:
@@ -11695,6 +12075,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /waiver-testing:
     put:
       operationId: approveWaiverTesting
@@ -11760,6 +12142,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: getWaiverTesting
       x-ticvai-audience:
@@ -11860,6 +12244,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /waiver:
     get:
       operationId: listWaiver
@@ -11990,6 +12376,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /participant-waiver-statu:
     get:
       operationId: listParticipantWaiverStatus
@@ -12106,6 +12494,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: actOnWaiverRequirements
       x-ticvai-audience:
@@ -12268,6 +12658,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /digital-signing-collection:
     get:
       operationId: listDigitalSigningCollection
@@ -12365,6 +12757,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /minor-guardian-group:
     get:
       operationId: listMinorGuardianGroup
@@ -12486,6 +12880,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /waiver-verification-validation:
     get:
       operationId: listWaiverVerificationQueue
@@ -12567,6 +12963,8 @@ paths:
                         $ref: '#/components/schemas/WaiverVerificationValidationWorkspaceView'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setWaiverVerificationValidation
       x-ticvai-consumed-by:
@@ -12626,6 +13024,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /missing-expired-invalid:
     get:
       operationId: listMissingExpiredInvalid
@@ -12763,6 +13163,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /site-waiver-exception:
     get:
       operationId: listSiteWaiverException
@@ -12856,6 +13258,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setWaiverException
       x-ticvai-audience:
@@ -12909,6 +13313,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /compliance-evidence-waiver:
     get:
       operationId: listComplianceEvidenceWaiver
@@ -13026,6 +13432,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /waiver-compliance-operational:
     get:
       operationId: listWaiverComplianceOperational
@@ -13150,6 +13558,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /waiver-compliance-risk:
     get:
       operationId: listWaiverComplianceRisk
@@ -13214,6 +13624,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guest-attribute-model:
     get:
       operationId: getGuestAttributeModel
@@ -13244,6 +13656,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GuestAttributeModel'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setGuestAttributeModel
       x-ticvai-consumed-by:
@@ -13281,6 +13695,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GuestAttributeModel'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{guestId}/timeline:
     parameters:
     - name: guestId
@@ -13338,6 +13754,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GuestTimelineEvent'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{guestId}/relationships:
     parameters:
     - name: guestId
@@ -13370,6 +13788,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GuestRelationship'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setGuestRelationships
       x-ticvai-consumed-by:
@@ -13423,6 +13843,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GuestRelationship'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{guestId}/intelligence:
     parameters:
     - name: guestId
@@ -13463,6 +13885,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GuestIntelligence'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /identity-resolution-rules:
     get:
       operationId: getIdentityResolutionRules
@@ -13485,6 +13909,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IdentityResolutionRules'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setIdentityResolutionRules
       x-ticvai-consumed-by:
@@ -13529,6 +13955,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IdentityResolutionRules'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /duplicate-candidates:
     get:
       operationId: listDuplicateCandidates
@@ -13577,6 +14005,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/DuplicateCandidate'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /duplicate-candidates/{candidateId}/decide:
     parameters:
     - name: candidateId
@@ -13644,6 +14074,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DuplicateCandidate'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /retention-policies:
     put:
       operationId: setDataRetentionPolicy
@@ -13702,6 +14134,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /retention-runs:
     post:
       operationId: runDataRetention
@@ -13752,6 +14186,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RetentionRunResult'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /audience-lists:
     get:
       operationId: listAudienceLists
@@ -13784,6 +14220,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AudienceList'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: importAudienceList
       x-ticvai-consumed-by:
@@ -13824,6 +14262,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AudienceList'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /audience-activations:
     get:
       operationId: listAudienceActivations
@@ -13856,6 +14296,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AudienceActivation'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: activateAudience
       x-ticvai-consumed-by:
@@ -13903,6 +14345,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /audience-overlap:
     get:
       operationId: getAudienceOverlap
@@ -13943,6 +14387,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AudienceOverlap'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /loyalty/programmes/{programmeId}/rules:
     get:
@@ -13986,6 +14432,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setLoyaltyRules
       x-ticvai-consumed-by:
@@ -14035,6 +14483,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /loyalty/campaigns:
     get:
       operationId: listLoyaltyCampaigns
@@ -14080,6 +14530,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/MarketingLoyaltyCampaign'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setLoyaltyCampaign
       x-ticvai-consumed-by:
@@ -14112,6 +14564,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MarketingLoyaltyCampaign'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /loyalty/points:
     get:
       operationId: listLoyaltyPointEntries
@@ -14175,6 +14629,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/MarketingLoyaltyPoints'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /loyalty/rewards:
     get:
       operationId: listRewards
@@ -14211,6 +14667,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/MarketingReward'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setReward
       x-ticvai-consumed-by:
@@ -14243,6 +14701,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MarketingReward'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /loyalty/reward-assignments:
     get:
       operationId: listRewardAssignments
@@ -14286,6 +14746,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/MarketingRewardAssignment'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: issueReward
       summary: Issue a reward to a guest
@@ -14325,6 +14787,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /badges:
     get:
       operationId: listBadges
@@ -14356,6 +14820,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/MarketingBadge'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setBadge
       x-ticvai-consumed-by:
@@ -14388,6 +14854,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MarketingBadge'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /customers/{customerId}/badges:
     get:
       operationId: listCustomerBadges
@@ -14430,6 +14898,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/MarketingCustomerBadge'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: awardBadge
       x-ticvai-consumed-by:
@@ -14479,6 +14949,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guest-extra-fields:
     get:
       operationId: listGuestExtraFields
@@ -14515,6 +14987,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/GuestExtraFieldDefinition'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setGuestExtraFields
       x-ticvai-consumed-by:
@@ -14554,6 +15028,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GuestExtraFieldDefinition'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{guestId}/extra-values:
     get:
       operationId: getGuestExtraValues
@@ -14587,6 +15063,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MarketingGuestExtraValue'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setGuestExtraValues
       summary: Record a guest's answers
@@ -14630,6 +15108,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MarketingGuestExtraValue'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /sla-policies:
     get:
       operationId: listSlaPolicies
@@ -14665,6 +15145,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/MarketingSlaPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setSlaPolicy
       x-ticvai-consumed-by:
@@ -14701,6 +15183,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MarketingSlaPolicy'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /waiver-signatures:
     get:
       operationId: listWaiverSignatures
@@ -14735,6 +15219,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/MarketingWaiverSignature'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /consent-questions:
     get:
       operationId: listConsentQuestions
@@ -14789,6 +15275,8 @@ paths:
                         $ref: '#/components/schemas/ConsentQuestion'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createConsentQuestion
       x-ticvai-consumed-by:
@@ -14833,6 +15321,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /consent-questions/{questionId}:
     parameters:
     - name: questionId
@@ -14884,6 +15374,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /consent-answers:
     get:
       operationId: listConsentAnswers
@@ -14939,6 +15431,8 @@ paths:
                         $ref: '#/components/schemas/BookingConsentRecord'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: recordConsentAnswers
       x-ticvai-consumed-by:
@@ -15012,6 +15506,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ConsentAnswerProblem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /me/notifications:
     get:
       operationId: listMyNotifications
@@ -15072,6 +15568,8 @@ paths:
                     unreadCount:
                       type: integer
                       minimum: 0
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /me/notifications/read:
     post:
       operationId: markMyNotificationsRead
@@ -15127,6 +15625,8 @@ paths:
                   unreadCount:
                     type: integer
                     minimum: 0
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /case-categories:
     get:
       operationId: listCaseCategories
@@ -15193,6 +15693,8 @@ paths:
                         $ref: '#/components/schemas/CaseCategory'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setCaseCategoryDefinition
       x-ticvai-consumed-by:
@@ -15255,6 +15757,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /service-queues:
     get:
       operationId: listServiceQueues
@@ -15306,6 +15810,8 @@ paths:
                         $ref: '#/components/schemas/ServiceQueue'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setServiceQueueDefinition
       x-ticvai-consumed-by:
@@ -15361,6 +15867,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /consent/device:
     post:
       operationId: recordDeviceConsent
@@ -15453,6 +15961,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: listDeviceConsents
       x-ticvai-consumed-by:
@@ -15547,6 +16057,8 @@ paths:
                         $ref: '#/components/schemas/DeviceConsent'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /consent/device/history:
     get:
       operationId: getDeviceConsentHistory
@@ -15610,6 +16122,8 @@ paths:
                         $ref: '#/components/schemas/DeviceConsent'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{subjectId}/consents/claim-device:
     parameters:
     - name: subjectId
@@ -15687,6 +16201,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /storefront/cookie-consent:
     get:
       operationId: getCookieConsentRuntime
@@ -15768,6 +16284,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /storefront/cookie-consent/technologies:
     get:
       operationId: listPublishedTrackingTechnologies
@@ -15821,6 +16339,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/PublishedTrackingTechnology'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /cookie-tracking-digital/scans:
     post:
       operationId: recordCookieScan
@@ -15875,6 +16395,8 @@ paths:
                 $ref: '#/components/schemas/CookieScanRun'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: listCookieScans
       x-ticvai-consumed-by:
@@ -15919,6 +16441,8 @@ paths:
                         $ref: '#/components/schemas/CookieScanRun'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /cookie-scan-policy:
     get:
       operationId: listCookieScanPolicies
@@ -15958,6 +16482,8 @@ paths:
                         $ref: '#/components/schemas/CookieScanPolicy'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setCookieScanPolicy
       x-ticvai-consumed-by:
@@ -16007,6 +16533,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
 components:
   schemas:

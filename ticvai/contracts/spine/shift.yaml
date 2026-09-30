@@ -165,6 +165,8 @@ paths:
                         type: array
                         items: { $ref: '#/components/schemas/Shift' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: openShift
@@ -217,6 +219,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /denominations:
     get:
@@ -258,6 +262,8 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/Denomination' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     put:
       operationId: setDenominations
@@ -326,6 +332,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /deposit-boxes:
     get:
@@ -367,6 +375,8 @@ paths:
                       items:
                         type: array
                         items: { $ref: '#/components/schemas/DepositBox' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: allocateDepositBox
@@ -404,6 +414,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/DepositBox' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /deposit-boxes/{boxId}/adjust-float:
     parameters:
@@ -478,6 +490,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /deposit-boxes/{boxId}/withdraw:
     parameters:
@@ -557,6 +571,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /deposit-boxes/close:
     post:
@@ -630,6 +646,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /shifts/current:
     get:
@@ -668,6 +686,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /shifts/{shiftId}:
     parameters:
@@ -704,6 +724,8 @@ paths:
               schema: { $ref: '#/components/schemas/Shift' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /shifts/{shiftId}/approve-open:
     parameters:
@@ -757,6 +779,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /shifts/{shiftId}/reopen:
     parameters:
@@ -842,6 +866,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /shifts/{shiftId}/suspend:
     parameters:
@@ -902,6 +928,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /shifts/{shiftId}/resume:
     parameters:
@@ -964,6 +992,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /shifts/{shiftId}/close:
     parameters:
@@ -1045,6 +1075,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /shifts/{shiftId}/accept-variance:
     parameters:
@@ -1121,6 +1153,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /shifts/{shiftId}/approve-close:
     parameters:
@@ -1176,6 +1210,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /shifts/{shiftId}/no-sale:
     parameters:
@@ -1240,6 +1276,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /shifts/{shiftId}/cash-movements:
     parameters:
@@ -1287,6 +1325,8 @@ paths:
                         type: array
                         items: { $ref: '#/components/schemas/CashMovement' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
     post:
       operationId: createCashMovement
@@ -1343,6 +1383,8 @@ paths:
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
 components:
   schemas:

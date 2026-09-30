@@ -99,7 +99,7 @@ wrong number is worse than "not available yet".
 **Before tickets are cut**
 
 1. [x] Chinmay: accepted 1 October 2026 (AI-D13 and AI-D15 already taken on 29 September).
-2. [ ] Package: `askReportingQuestion` description changes from SQL to semantic spec; Block A screen tickets hide the free-text box behind a flag. (1 pt)
+2. [x] Package: `askReportingQuestion` description changes from SQL to semantic spec; Block A screen tickets hide the free-text box behind a flag. (1 pt) — **Authored 1 October**: the description says semantic spec, not text-to-SQL, and that Block A ships the bound screens with the free-text box behind a flag until S7; `explainMetricChange` says the decomposition is plain arithmetic. The screen tickets' flag is the planner's. Re-derive, mirrors and check at the next refresh.
 
 **S7 (8–26 February, ADR-0059)**
 

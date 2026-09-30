@@ -49345,7 +49345,7 @@ screens:
       components:
       - kind: dataTable
         derived: true
-        impliedBy: listAccessPolicies
+        impliedBy: listAuthorisationPolicies
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
   states:
@@ -49358,7 +49358,7 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: listAccessPolicies
+  - operationId: listAuthorisationPolicies
     contract: identity
     purpose: Integration access control
     trigger: onLoad

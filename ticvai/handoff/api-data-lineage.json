@@ -33004,7 +33004,7 @@
   "verb": "GET",
   "path": "/device-gate",
   "reads": [
-   "access.access_device",
+   "access.device_placement",
    "access.access_point",
    "access.hardware_deployment"
   ],
@@ -33023,7 +33023,7 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "per-device type, versions, health, heartbeat from access.access_device; mode stays from access.access_point"
+  "lineageNote": "per-device type, versions, health, heartbeat from access.device_placement; mode stays from access.access_point"
  },
  "listDeviceTypeHardware": {
   "contract": "access",
@@ -34648,7 +34648,7 @@
   "verb": "GET",
   "path": "/hardware-compatibility-health",
   "reads": [
-   "access.access_device",
+   "access.device_placement",
    "access.hardware_deployment",
    "access.hardware_model"
   ],
@@ -34667,7 +34667,7 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "capabilities and lifecycleStatus from access.access_device (with hardware_model); rolloutScope stays from access.hardware_deployment"
+  "lineageNote": "capabilities and lifecycleStatus from access.device_placement (with hardware_model); rolloutScope stays from access.hardware_deployment"
  },
  "listHotelWalletExternal": {
   "contract": "access",
@@ -35847,7 +35847,7 @@
   "verb": "GET",
   "path": "/offline-edge",
   "reads": [
-   "access.access_device",
+   "access.device_placement",
    "access.access_point",
    "access.admission_rules",
    "access.blacklist",
@@ -35872,7 +35872,7 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "device counts/readiness from access.access_device, edge nodes from access.edge_node, packageStatus from access.edge_package validity window"
+  "lineageNote": "device counts/readiness from access.device_placement, edge nodes from access.edge_node, packageStatus from access.edge_package validity window"
  },
  "listOfflineEntitlementUsage": {
   "contract": "access",
@@ -36765,7 +36765,7 @@
   "path": "/physical-device-registration",
   "reads": [
    "access.access_area",
-   "access.access_device",
+   "access.device_placement",
    "access.access_point",
    "access.gate_lane",
    "access.hardware_model"
@@ -36785,7 +36785,7 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "device rows from access.access_device; model/manufacturer via hardware_model, park/zone via access_area, gate/lane via gate_lane"
+  "lineageNote": "device rows from access.device_placement; model/manufacturer via hardware_model, park/zone via access_area, gate/lane via gate_lane"
  },
  "listPodiumConsole": {
   "contract": "access",
@@ -40820,7 +40820,7 @@
   "path": "/topology-validation",
   "reads": [
    "access.access_area",
-   "access.access_device",
+   "access.device_placement",
    "access.access_point",
    "access.admission_rules",
    "access.configuration_version",
@@ -41101,12 +41101,12 @@
   "verb": "PUT",
   "path": "/ble-beacon-geofence",
   "reads": [
-   "access.access_device",
+   "access.device_placement",
    "access.access_point",
    "cache:idempotency"
   ],
   "writes": [
-   "access.access_device",
+   "access.device_placement",
    "access.access_point",
    "access.configuration_change",
    "cache:idempotency"
@@ -41125,7 +41125,7 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "beacon is an access.access_device row (hardwareType beacon, proximityThresholdMeters); the geofence itself stays on access.access_point.geofence; health and lastDetected are device-reported, not written"
+  "lineageNote": "beacon is an access.device_placement row (hardwareType beacon, proximityThresholdMeters); the geofence itself stays on access.access_point.geofence; health and lastDetected are device-reported, not written"
  },
  "setBookingVelocityTime": {
   "contract": "catalogue",
@@ -43451,7 +43451,7 @@
   "verb": "PUT",
   "path": "/reader-scanner-peripheral",
   "reads": [
-   "access.access_device",
+   "access.device_placement",
    "access.access_point",
    "access.access_point_configuration",
    "access.hardware_model",
@@ -45302,15 +45302,15 @@
   ],
   "lineageNote": "concluding promotes a strategy and emits promotions.recommendationStrategyPublished (per the event file); the derived entry wrote nothing"
  },
- "createAccessPolicy": {
+ "createAuthorisationPolicy": {
   "contract": "identity",
   "verb": "POST",
-  "path": "/access-policies",
+  "path": "/authorisation-policies",
   "reads": [
-   "identity.access_policy"
+   "identity.authorisation_policy"
   ],
   "writes": [
-   "identity.access_policy"
+   "identity.authorisation_policy"
   ],
   "routing": null,
   "scope": "tenant",
@@ -46366,12 +46366,12 @@
   ],
   "lineageNote": "near-duplicate/related by assets.media_fingerprint (perceptual hash, embedding of one model_version), exact duplicate by asset_version.checksum, differing fields from media_asset and tags"
  },
- "getAccessPolicy": {
+ "getAuthorisationPolicy": {
   "contract": "identity",
   "verb": "GET",
-  "path": "/access-policies/{policyId}",
+  "path": "/authorisation-policies/{policyId}",
   "reads": [
-   "identity.access_policy"
+   "identity.authorisation_policy"
   ],
   "writes": [],
   "routing": "replica",
@@ -46389,12 +46389,12 @@
    "redis"
   ]
  },
- "getAccessPolicyBundle": {
+ "getAuthorisationPolicyBundle": {
   "contract": "identity",
   "verb": "GET",
-  "path": "/access-policies/bundle",
+  "path": "/authorisation-policies/bundle",
   "reads": [
-   "identity.access_policy"
+   "identity.authorisation_policy"
   ],
   "writes": [],
   "routing": "replica",
@@ -47994,12 +47994,12 @@
    "redis"
   ]
  },
- "listAccessPolicies": {
+ "listAuthorisationPolicies": {
   "contract": "identity",
   "verb": "GET",
-  "path": "/access-policies",
+  "path": "/authorisation-policies",
   "reads": [
-   "identity.access_policy"
+   "identity.authorisation_policy"
   ],
   "writes": [],
   "routing": "replica",
@@ -48017,13 +48017,13 @@
    "redis"
   ]
  },
- "listAccessPolicyHistory": {
+ "listAuthorisationPolicyHistory": {
   "contract": "identity",
   "verb": "GET",
-  "path": "/access-policies/{policyId}/history",
+  "path": "/authorisation-policies/{policyId}/history",
   "reads": [
-   "identity.access_policy",
-   "identity.access_policy_version"
+   "identity.authorisation_policy",
+   "identity.authorisation_policy_version"
   ],
   "writes": [],
   "routing": "replica",
@@ -48041,12 +48041,12 @@
    "redis"
   ]
  },
- "listAccessPolicyTemplates": {
+ "listAuthorisationPolicyTemplates": {
   "contract": "identity",
   "verb": "GET",
-  "path": "/access-policy-templates",
+  "path": "/authorisation-policy-templates",
   "reads": [
-   "identity.access_policy"
+   "identity.authorisation_policy"
   ],
   "writes": [],
   "routing": "replica",
@@ -50253,12 +50253,12 @@
    "redis"
   ]
  },
- "setAccessPolicyState": {
+ "setAuthorisationPolicyState": {
   "contract": "identity",
   "verb": "POST",
-  "path": "/access-policies/{policyId}/state",
+  "path": "/authorisation-policies/{policyId}/state",
   "reads": [
-   "identity.access_policy"
+   "identity.authorisation_policy"
   ],
   "writes": [],
   "routing": null,
@@ -52668,15 +52668,15 @@
    "postgres"
   ]
  },
- "simulateAccessPolicy": {
+ "simulateAuthorisationPolicy": {
   "contract": "identity",
   "verb": "POST",
-  "path": "/access-policies/simulate",
+  "path": "/authorisation-policies/simulate",
   "reads": [
    "identity.access_decision"
   ],
   "writes": [
-   "identity.access_policy"
+   "identity.authorisation_policy"
   ],
   "routing": null,
   "scope": "venue",
@@ -53085,15 +53085,15 @@
   ],
   "lineageNote": "Tests tap/balance/display/IO on a configured reader: reads reader, its deployment and profile, and the test card balance; result returned, not stored (description names no record); IdempotencyKey parameter"
  },
- "updateAccessPolicy": {
+ "updateAuthorisationPolicy": {
   "contract": "identity",
   "verb": "PUT",
-  "path": "/access-policies/{policyId}",
+  "path": "/authorisation-policies/{policyId}",
   "reads": [
-   "identity.access_policy"
+   "identity.authorisation_policy"
   ],
   "writes": [
-   "identity.access_policy"
+   "identity.authorisation_policy"
   ],
   "routing": null,
   "scope": "tenant",
@@ -63086,19 +63086,19 @@
   ],
   "lineageNote": "added 29 September: writers pass"
  },
- "registerAccessDevice": {
+ "placeAccessDevice": {
   "contract": "access",
   "verb": "POST",
-  "path": "/access-devices",
+  "path": "/device-placements",
   "reads": [
    "access.access_area",
-   "access.access_device",
+   "access.device_placement",
    "access.access_point",
    "access.hardware_model",
    "cache:idempotency"
   ],
   "writes": [
-   "access.access_device",
+   "access.device_placement",
    "access.configuration_change",
    "cache:idempotency"
   ],
@@ -64974,17 +64974,17 @@
   ],
   "lineageNote": "W-WE (new, writers pass): activate/pause/resume/retire per states/dynamic-pricing-strategy.yaml"
  },
- "updateAccessDevice": {
+ "updateAccessDevicePlacement": {
   "contract": "access",
   "verb": "PUT",
-  "path": "/access-devices/{deviceId}",
+  "path": "/device-placements/{placementId}",
   "reads": [
-   "access.access_device",
+   "access.device_placement",
    "access.hardware_model",
    "cache:idempotency"
   ],
   "writes": [
-   "access.access_device",
+   "access.device_placement",
    "access.configuration_change",
    "cache:idempotency"
   ],
@@ -67438,14 +67438,14 @@
   ],
   "lineageNote": "tax_invoice_template is written for the series counter (next_number); the PDF goes to object storage and its id onto the invoice; outbox raises the e-invoicing send"
  },
- "listAccessPolicyEffectiveness": {
+ "listAuthorisationPolicyEffectiveness": {
   "contract": "identity",
   "verb": "GET",
-  "path": "/access-policy-effectiveness",
+  "path": "/authorisation-policy-effectiveness",
   "reads": [
    "identity.access_decision",
    "identity.access_override",
-   "identity.access_policy"
+   "identity.authorisation_policy"
   ],
   "writes": [],
   "routing": "replica",
@@ -68480,7 +68480,7 @@
   "path": "/permission-findings",
   "reads": [
    "identity.access_decision",
-   "identity.access_policy",
+   "identity.authorisation_policy",
    "identity.delegated_access",
    "identity.principal",
    "identity.role",
@@ -69574,19 +69574,19 @@
   ],
   "lineageNote": "ai.decision_record, forecast_point, signal_observation, risk_assessment, rec_decision, rec_event, control_test and eval_run live in the AI log database (design 2.4); table names unchanged."
  },
- "restoreAccessPolicyVersion": {
+ "restoreAuthorisationPolicyVersion": {
   "contract": "identity",
   "verb": "POST",
-  "path": "/access-policies/{policyId}/restore",
+  "path": "/authorisation-policies/{policyId}/restore",
   "reads": [
    "cache:idempotency",
-   "identity.access_policy",
-   "identity.access_policy_version"
+   "identity.authorisation_policy",
+   "identity.authorisation_policy_version"
   ],
   "writes": [
    "cache:idempotency",
-   "identity.access_policy",
-   "identity.access_policy_version"
+   "identity.authorisation_policy",
+   "identity.authorisation_policy_version"
   ],
   "routing": null,
   "scope": "tenant",
@@ -69602,7 +69602,7 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "Target version must have approvedBy; writes a new pendingApproval version with the old content; approval routed as setAccessPolicyState"
+  "lineageNote": "Target version must have approvedBy; writes a new pendingApproval version with the old content; approval routed as setAuthorisationPolicyState"
  },
  "resubmitAccreditationApplication": {
   "contract": "accreditation",

@@ -100,7 +100,7 @@ checkout hop is bounded by a budget and fails open.
 **Before tickets are cut**
 
 1. [x] Chinmay: accepted 1 October 2026 (AI-D07 to AI-D09 already taken on 29 September).
-2. [ ] Package: mark the four operations as channel adapters in their descriptions; Block A tickets implement the rules producer in Promotions. (1 pt)
+2. [x] Package: mark the four operations as channel adapters in their descriptions; Block A tickets implement the rules producer in Promotions. (1 pt) — **Authored 1 October**: `getRecommendations`, `getUpsellSuggestions`, `listFnbRecommendations` and `listRetailRecommendations` say they are channel adapters, and their 29 September deprecation is withdrawn, since they stay as the channel surfaces. The Block A ticket text is the planner's. Re-derive, mirrors and check at the next refresh.
 
 **Block B (S5)**
 

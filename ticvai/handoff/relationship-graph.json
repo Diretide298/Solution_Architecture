@@ -481,18 +481,18 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "identity.access_policy_version",
+   "frm": "identity.authorisation_policy_version",
    "col": "previous_id",
-   "to": "identity.access_policy",
+   "to": "identity.authorisation_policy",
    "how": "declared",
    "cross": "",
    "required": "",
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "identity.access_policy_version",
+   "frm": "identity.authorisation_policy_version",
    "col": "current_id",
-   "to": "identity.access_policy",
+   "to": "identity.authorisation_policy",
    "how": "declared",
    "cross": "",
    "required": "",
@@ -9715,9 +9715,9 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "identity.access_policy_version",
+   "frm": "identity.authorisation_policy_version",
    "col": "policy_id",
-   "to": "identity.access_policy",
+   "to": "identity.authorisation_policy",
    "how": "convention",
    "cross": "",
    "required": "",
@@ -14206,7 +14206,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "access.access_device",
+   "frm": "access.device_placement",
    "col": "venue_id",
    "to": "platform.scope",
    "how": "precedent",
@@ -14215,7 +14215,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "access.access_device",
+   "frm": "access.device_placement",
    "col": "hardware_model_id",
    "to": "access.hardware_model",
    "how": "convention",
@@ -14224,7 +14224,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "access.access_device",
+   "frm": "access.device_placement",
    "col": "access_area_id",
    "to": "access.access_area",
    "how": "convention",
@@ -14233,7 +14233,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "access.access_device",
+   "frm": "access.device_placement",
    "col": "access_point_id",
    "to": "access.access_point",
    "how": "convention",
@@ -14242,7 +14242,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "access.access_device",
+   "frm": "access.device_placement",
    "col": "gate_lane_id",
    "to": "access.gate_lane",
    "how": "convention",
@@ -14251,7 +14251,7 @@
    "edgeKind": "foreignKey"
   },
   {
-   "frm": "access.access_device",
+   "frm": "access.device_placement",
    "col": "device_group_id",
    "to": "access.group_admission_rule",
    "how": "convention",
@@ -15441,7 +15441,7 @@
   {
    "frm": "access.podium_shift",
    "col": "access_device_id",
-   "to": "access.access_device",
+   "to": "access.device_placement",
    "how": "convention",
    "cross": "",
    "required": "",
@@ -23485,7 +23485,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "access.access_device",
+   "frm": "access.device_placement",
    "col": "via setBleBeaconGeofence",
    "to": "access.access_point",
    "how": "lineage",
@@ -23494,7 +23494,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "access.access_device",
+   "frm": "access.device_placement",
    "col": "via setBleBeaconGeofence",
    "to": "access.configuration_change",
    "how": "lineage",
@@ -25501,8 +25501,8 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "access.access_device",
-   "col": "via registerAccessDevice",
+   "frm": "access.device_placement",
+   "col": "via placeAccessDevice",
    "to": "access.configuration_change",
    "how": "lineage",
    "cross": "",
@@ -26023,8 +26023,8 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "access.access_device",
-   "col": "via updateAccessDevice",
+   "frm": "access.device_placement",
+   "col": "via updateAccessDevicePlacement",
    "to": "access.configuration_change",
    "how": "lineage",
    "cross": "",
@@ -26797,9 +26797,9 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "identity.access_policy",
-   "col": "via restoreAccessPolicyVersion",
-   "to": "identity.access_policy_version",
+   "frm": "identity.authorisation_policy",
+   "col": "via restoreAuthorisationPolicyVersion",
+   "to": "identity.authorisation_policy_version",
    "how": "lineage",
    "cross": "",
    "required": "",
@@ -29095,7 +29095,7 @@
    "simulatePolicyConflictImpact",
    "verifyIdentity",
    "simulateGuestJourney",
-   "registerAccessDevice",
+   "placeAccessDevice",
    "setAccessPointGroup",
    "setPodium"
   ],
@@ -29321,7 +29321,7 @@
    "deleteOperatingCalendarEntry",
    "deletePodium",
    "deleteReasonCode",
-   "registerAccessDevice",
+   "placeAccessDevice",
    "rollbackConfigurationVersion",
    "setAccessPointGroup",
    "setCredentialEventPropagationRule",
@@ -29340,7 +29340,7 @@
    "setRiskScoringConfig",
    "setTicketStatusTransition",
    "setVerificationMethodPolicy",
-   "updateAccessDevice",
+   "updateAccessDevicePlacement",
    "setGateOfflinePolicy"
   ],
   "orders.pos_shift_approval": [
@@ -34501,7 +34501,7 @@
    "bindCredentialDevice",
    "releaseCredentialDevice"
   ],
-  "access.access_device": [
+  "access.device_placement": [
    "listDeviceGate",
    "listHardwareCompatibilityHealth",
    "listOfflineEdge",
@@ -34509,8 +34509,8 @@
    "publishTopologyValidation",
    "setBleBeaconGeofence",
    "setReaderScannerPeripheral",
-   "registerAccessDevice",
-   "updateAccessDevice"
+   "placeAccessDevice",
+   "updateAccessDevicePlacement"
   ],
   "access.hardware_deployment": [
    "listDeviceGate",
@@ -34525,9 +34525,9 @@
    "listHardwareCompatibilityHealth",
    "listPhysicalDeviceRegistration",
    "setReaderScannerPeripheral",
-   "registerAccessDevice",
+   "placeAccessDevice",
    "setHardwareModel",
-   "updateAccessDevice"
+   "updateAccessDevicePlacement"
   ],
   "marketing.waiver_field_rule": [
    "listDynamicFieldQuestion",
@@ -34675,7 +34675,7 @@
    "listVenueParkAccess",
    "publishTopologyValidation",
    "setAccessAreaZone",
-   "registerAccessDevice"
+   "placeAccessDevice"
   ],
   "access.media_encoding_profile": [
    "listMediaIssuanceEncoding",
@@ -35188,19 +35188,19 @@
    "getRecommendationPerformance",
    "listRecommendationExperiments"
   ],
-  "identity.access_policy": [
-   "createAccessPolicy",
-   "getAccessPolicy",
-   "getAccessPolicyBundle",
-   "listAccessPolicies",
-   "listAccessPolicyHistory",
-   "listAccessPolicyTemplates",
-   "setAccessPolicyState",
-   "simulateAccessPolicy",
-   "updateAccessPolicy",
-   "listAccessPolicyEffectiveness",
+  "identity.authorisation_policy": [
+   "createAuthorisationPolicy",
+   "getAuthorisationPolicy",
+   "getAuthorisationPolicyBundle",
+   "listAuthorisationPolicies",
+   "listAuthorisationPolicyHistory",
+   "listAuthorisationPolicyTemplates",
+   "setAuthorisationPolicyState",
+   "simulateAuthorisationPolicy",
+   "updateAuthorisationPolicy",
+   "listAuthorisationPolicyEffectiveness",
    "listPermissionFindings",
-   "restoreAccessPolicyVersion"
+   "restoreAuthorisationPolicyVersion"
   ],
   "accreditation.identity_conflict": [
    "createAccreditationApplication",
@@ -35279,7 +35279,7 @@
   ],
   "identity.access_override": [
    "createEmergencyAccessOverride",
-   "listAccessPolicyEffectiveness"
+   "listAuthorisationPolicyEffectiveness"
   ],
   "games.entitlement": [
    "createGameEntitlement",
@@ -35440,9 +35440,9 @@
   "identity.access_decision": [
    "evaluateAccess",
    "listAccessDecisions",
-   "simulateAccessPolicy",
+   "simulateAuthorisationPolicy",
    "createAccessReviewCampaign",
-   "listAccessPolicyEffectiveness",
+   "listAuthorisationPolicyEffectiveness",
    "listPermissionFindings",
    "suggestRoleAssignment"
   ],
@@ -35748,9 +35748,9 @@
   "wallet.credential": [
    "linkWalletCredential"
   ],
-  "identity.access_policy_version": [
-   "listAccessPolicyHistory",
-   "restoreAccessPolicyVersion"
+  "identity.authorisation_policy_version": [
+   "listAuthorisationPolicyHistory",
+   "restoreAuthorisationPolicyVersion"
   ],
   "reporting.anomaly": [
    "listAnalyticsAnomalies"
@@ -47325,7 +47325,7 @@
    "BO-054",
    "BO-1066"
   ],
-  "identity.access_policy": [
+  "identity.authorisation_policy": [
    "BO-054",
    "BO-1066",
    "BO-1177",
@@ -47996,7 +47996,7 @@
    "BO-207",
    "BO-213"
   ],
-  "access.access_device": [
+  "access.device_placement": [
    "BO-153",
    "BO-168",
    "BO-194",
@@ -50357,7 +50357,7 @@
   "identity.access_override": [
    "BO-1066"
   ],
-  "identity.access_policy_version": [
+  "identity.authorisation_policy_version": [
    "BO-1066"
   ],
   "control.production_access_request": [

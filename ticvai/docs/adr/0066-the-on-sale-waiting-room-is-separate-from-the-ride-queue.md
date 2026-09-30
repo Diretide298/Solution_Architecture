@@ -113,7 +113,7 @@ fallback for a very large sale before B is proven.
 **Before tickets are cut (Block A)**
 
 1. [x] Chinmay: accepted 1 October 2026. ADR-0012 marked amended.
-2. [ ] Package: re-point the waiting-room parts of WEB-015 and GST-046 away from `joinQueue` to new waiting-room operations, or defer those parts of the screens; admission-token requirement on `addCartLine` and `acquireInventoryHold`. New operations need a vocabulary permission. Re-derive, mirrors, check. (5 pts, the finding's estimate)
+2. [ ] Package: re-point the waiting-room parts of WEB-015 and GST-046 away from `joinQueue` to new waiting-room operations, or defer those parts of the screens; admission-token requirement on `addCartLine` and `acquireInventoryHold`. New operations need a vocabulary permission. Re-derive, mirrors, check. (5 pts, the finding's estimate) — **Contracts authored 1 October**: catalogue `enterWaitingRoom`, `getWaitingRoomPosition` (public), `getWaitingRoomStatus` (`PRODUCT_VIEW`) and `setWaitingRoomSetting` (`PERFORMANCE_CONFIGURE`), the table `catalogue.waiting_room_setting`, the shared `X-Admission-Token` parameter and `403 admission-required` on `addCartLine` and `acquireInventoryHold`; `joinQueue` says Q1 only. **Still open:** re-pointing the waiting-room parts of WEB-015 (P01) and GST-046 (P02), which belong to the guest import.
 
 **B1 (or Block A, if an on-sale is booked in Block A)**
 

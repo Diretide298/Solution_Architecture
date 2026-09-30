@@ -222,6 +222,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Entitlement'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/me/entitlements:
     get:
       operationId: listMyEntitlements
@@ -298,6 +300,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Entitlement'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /entitlements/{entitlementId}:
     parameters:
     - name: entitlementId
@@ -352,6 +356,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /entitlements/{entitlementId}/credential:
     parameters:
     - name: entitlementId
@@ -465,6 +471,8 @@ paths:
                         format: date-time
                         description: The seed stops verifying after this. The app fetches a fresh one
                           whenever it is online before then.
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /entitlements/{entitlementId}/history:
     parameters:
     - name: entitlementId
@@ -538,6 +546,8 @@ paths:
                     byPrincipalName:
                       type: string
                       nullable: true
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /face-tag/enrolments:
     post:
       operationId: enrolFaceTag
@@ -680,6 +690,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /identity-verifications:
     post:
       operationId: verifyIdentity
@@ -777,6 +789,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /face-pass/enrolments:
     post:
       operationId: enrolFacePass
@@ -950,6 +964,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccessFaceReenrolmentAttempt'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /face-pass/enrolments/{enrolmentId}:
     parameters:
     - name: enrolmentId
@@ -999,6 +1015,8 @@ paths:
                 $ref: '#/components/schemas/FacePassEnrolment'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: revokeFacePass
       x-ticvai-consumed-by:
@@ -1035,6 +1053,8 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Destroyed
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /parking-facilities:
     get:
       operationId: listParkingFacilities
@@ -1103,6 +1123,8 @@ paths:
                         $ref: '#/components/schemas/ParkingFacility'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setParkingFacility
       x-ticvai-consumed-by:
@@ -1171,6 +1193,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /internal/orders/{orderId}/entitlements:
     parameters:
     - name: orderId
@@ -1263,6 +1287,8 @@ paths:
                   $ref: '#/components/schemas/Entitlement'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /parking-entitlements:
     post:
       operationId: createParkingEntitlement
@@ -1322,6 +1348,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /parking-entitlements/{entitlementId}:
     parameters:
     - name: entitlementId
@@ -1381,6 +1409,8 @@ paths:
                 $ref: '#/components/schemas/ParkingEntitlement'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access/override:
     post:
       operationId: overrideAccess
@@ -1464,6 +1494,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access/lookup:
     get:
       operationId: lookupTicket
@@ -1521,6 +1553,8 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access/scans:
     post:
       operationId: syncScans
@@ -1598,6 +1632,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: listScans
       x-ticvai-consumed-by:
@@ -1674,6 +1710,8 @@ paths:
                         $ref: '#/components/schemas/ScanEvent'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access/offline-package:
     get:
       operationId: getOfflinePackage
@@ -1695,7 +1733,9 @@ paths:
         - "P08 BO-060 Attendance & Footfall"
         - "P08 BO-207 Edge Package & Data Distribution"
       x-ticvai-note: >-
-        **Entitlements and dynamic policy travel in the package** (system-design review SD-052, 29 September).
+        **The active admission policy version travels in the package** (ADR-0068, accepted 1 October): the
+        dynamic policies at their active versions with their closed-format `conditionRule`, and `policySetVersion`,
+        which each offline scan records. **Entitlements and dynamic policy travel in the package** (system-design review SD-052, 29 September).
         Built from `access.entitlement` and `access.dynamic_policy`. **A package may not miss a ticket sold seconds
         earlier**: the caller passes the consistency token of the last `entitlement.issued` it heard of, and a
         replica behind it is not used (the read goes to the primary). Delta by `sinceVersion`.
@@ -1765,6 +1805,8 @@ paths:
           description: Unchanged since the supplied ETag
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access-points/{accessPointId}/mode:
     parameters:
     - name: accessPointId
@@ -1865,6 +1907,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccessGateModeChange'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access-points:
     get:
       operationId: listAccessPoints
@@ -1911,6 +1955,8 @@ paths:
                         $ref: '#/components/schemas/AccessPoint'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createAccessPoint
       x-ticvai-consumed-by:
@@ -1948,6 +1994,8 @@ paths:
                 $ref: '#/components/schemas/AccessPoint'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access-points/{accessPointId}:
     parameters:
     - name: accessPointId
@@ -1981,6 +2029,8 @@ paths:
                 $ref: '#/components/schemas/AccessPoint'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateAccessPoint
       x-ticvai-consumed-by:
@@ -2038,6 +2088,8 @@ paths:
                 $ref: '#/components/schemas/AccessPoint'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /admission-rules:
     get:
       operationId: listAdmissionRules
@@ -2080,6 +2132,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AdmissionRules'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createAdmissionRules
       x-ticvai-consumed-by:
@@ -2118,6 +2172,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AdmissionRules'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /admission-rules/{profileId}:
     parameters:
     - name: profileId
@@ -2191,6 +2247,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /blacklist:
     get:
       operationId: listBlacklist
@@ -2224,6 +2282,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/BlacklistEntry'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: addBlacklistEntry
       x-ticvai-consumed-by:
@@ -2279,6 +2339,8 @@ paths:
                 $ref: '#/components/schemas/BlacklistEntry'
         '409':
           $ref: ../shared/common.yaml#/components/responses/DuplicateCode
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /blacklist/{mediaCode}:
     parameters:
     - name: mediaCode
@@ -2309,6 +2371,8 @@ paths:
           description: Removed
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access/group-validate:
     post:
       operationId: validateGroupAccess
@@ -2405,6 +2469,8 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access-points/{accessPointId}/geofence:
     parameters:
     - name: accessPointId
@@ -2462,6 +2528,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /virtual-ticket:
     get:
       operationId: listVirtualTicket
@@ -2602,6 +2670,8 @@ paths:
                         $ref: '#/components/schemas/VirtualTicketCommandCenterView'
                     summary:
                       $ref: '#/components/schemas/VirtualTicketCommandCenterViewSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /virtual-ticket-identity:
     put:
       operationId: setVirtualTicketIdentity
@@ -2660,6 +2730,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VirtualTicketIdentityMasterRecordConfigurationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /virtual-ticket-statu:
     get:
       operationId: listVirtualTicketStatus
@@ -2707,6 +2779,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/VirtualTicketStatusLifecycleModelView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's allowed Virtual Ticket status transitions, defined by hand
   /media-type-credential:
     get:
@@ -2755,6 +2829,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MediaTypeCredentialTechnologyRegistryView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: the credential technologies a tenant registers, defined by hand
   /multi-media-binding:
     get:
@@ -2802,6 +2878,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MultiMediaBindingAssociationRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's media binding rules, defined by hand
   /credential-identity-token:
     get:
@@ -2853,6 +2931,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/CredentialIdentityTokenReferenceMappingView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - name: virtualTicketId
         in: query
@@ -2920,6 +3000,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/EntitlementCrossMediaSynchronizationRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: one synchronisation rule per ticket event, defined by hand
   /media-activation-priority:
     get:
@@ -2966,6 +3048,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MediaActivationPriorityFallbackRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: one activation and fallback rule per media type, defined by hand
   /media-replacement-revocation:
     get:
@@ -3018,6 +3102,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MediaReplacementRevocationRebindingRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: one replacement policy per replacement reason, defined by hand
     put:
       operationId: setMediaReplacementRevocation
@@ -3070,6 +3156,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /virtual-ticket-architecture:
     get:
       operationId: listVirtualTicketArchitecture
@@ -3124,6 +3212,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/VirtualTicketArchitectureTestingGovernanceAuditView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - name: changeType
         in: query
@@ -3188,6 +3278,8 @@ paths:
                         $ref: '#/components/schemas/MediaDesignStudioCommandCenterView'
                     summary:
                       $ref: '#/components/schemas/MediaDesignStudioCommandCenterViewSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - name: mediaType
         in: query
@@ -3274,6 +3366,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DigitalQrBarcodeTicketDesignerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /pdf-printable-pos:
     put:
       operationId: setPdfPrintablePos
@@ -3332,6 +3426,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PdfPrintablePosTicketDesignerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /apple-wallet-pass:
     put:
       operationId: setAppleWalletPass
@@ -3391,6 +3487,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AppleWalletPassDesignerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /google-wallet-pass:
     put:
       operationId: setGoogleWalletPass
@@ -3448,6 +3546,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GoogleWalletPassDesignerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rfid-nfc-card:
     put:
       operationId: setRfidNfcCard
@@ -3504,6 +3604,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RfidNfcCardWristbandMediaDesignerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /digital-card-membership:
     put:
       operationId: setDigitalCardMembership
@@ -3558,6 +3660,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DigitalCardMembershipWearableDesignerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dynamic-field-data:
     put:
       operationId: setDynamicFieldData
@@ -3615,6 +3719,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DynamicFieldsDataMappingContentBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /branding-localization-template:
     get:
       operationId: listBrandingLocalizationTemplate
@@ -3660,6 +3766,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BrandingLocalizationTemplateInheritanceView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: branding profiles per inheritance level, defined by hand
     put:
       operationId: setBrandingLocalizationTemplate
@@ -3713,6 +3821,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /multi-media-preview:
     put:
       operationId: approveMultiMediaPreview
@@ -3773,6 +3883,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MultiMediaPreviewTestingApprovalPublicationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credential:
     get:
       operationId: listCredential
@@ -3900,6 +4012,8 @@ paths:
                         $ref: '#/components/schemas/CredentialOperationsCommandCenterView'
                     summary:
                       $ref: '#/components/schemas/CredentialOperationsCommandCenterViewSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /virtual-ticket-credential:
     put:
       operationId: setVirtualTicketCredential
@@ -3960,6 +4074,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VirtualTicketCredential360WorkspaceView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credential-generation-issuance:
     get:
       operationId: listCredentialGenerationIssuance
@@ -4014,6 +4130,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/CredentialGenerationIssuanceMonitorView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - name: status
         in: query
@@ -4094,6 +4212,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/CredentialDeliveryDistributionOperationsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - name: channel
         in: query
@@ -4161,6 +4281,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MediaBindingActivationAssignmentOperationsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credential-replacement-reissue:
     get:
       operationId: listCredentialReplacementReissue
@@ -4212,6 +4334,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CredentialReplacementReissueRevocationRecoveryView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: one replacement policy per reason, defined by hand
   /failed-generation-delivery:
     get:
@@ -4267,6 +4391,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/FailedGenerationDeliveryCredentialExceptionManagemenView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - name: severity
         in: query
@@ -4335,6 +4461,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/CredentialUsageCrossMediaTraceabilityView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - name: virtualTicket
         in: query
@@ -4403,6 +4531,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/CredentialSecurityAuditOperationalEvidenceView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - name: virtualTicket
         in: query
@@ -4532,6 +4662,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TicketMediaAnalyticsAiOperationsIntelligenceView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access:
     get:
       operationId: listAccess
@@ -4577,6 +4709,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccessControlCommandCenterView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /venue-park-access:
     get:
       operationId: listVenueParkAccess
@@ -4623,6 +4757,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/VenueParkAccessStructureView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a tenant's venues, parks and sites, defined by hand
   /access-area-zone:
     put:
@@ -4677,6 +4813,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccessAreaZoneBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /attraction-access:
     put:
       operationId: setAttractionAccess
@@ -4730,6 +4868,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AttractionAccessConfigurationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /gate-lane:
     put:
       operationId: setGateLane
@@ -4787,6 +4927,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GateLaneConfigurationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access-graphical-map:
     put:
       operationId: setAccessGraphicalMap
@@ -4844,6 +4986,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccessControlGraphicalMapDesignerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access-location-grouping:
     get:
       operationId: listAccessLocationGrouping
@@ -4888,6 +5032,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AccessLocationGroupingView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's access-point groups, defined by hand
   /operating-calendar-special:
     get:
@@ -4932,6 +5078,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/OperatingCalendarSpecialAccessDaysView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's calendar entries, defined by hand
   /topology-validation:
     put:
@@ -4995,6 +5143,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TopologyValidationPublicationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access-rule:
     get:
       operationId: listAccessRule
@@ -5051,6 +5201,8 @@ paths:
                         $ref: '#/components/schemas/AccessRuleCommandCenterView'
                     summary:
                       $ref: '#/components/schemas/AccessRuleCommandCenterViewSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - name: venue
         in: query
@@ -5166,6 +5318,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VisualAccessRuleBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /entry-exit-rule:
     get:
       operationId: listEntryExitRule
@@ -5211,6 +5365,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/EntryExitReEntryRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's entry/exit rules, defined by hand
   /anti-passback-journey:
     get:
@@ -5254,6 +5410,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AntiPassbackJourneySequenceView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's anti-passback rules, defined by hand
   /access-validity-time:
     get:
@@ -5298,6 +5456,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AccessValidityTimeRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's validity rules, defined by hand
   /entitlement-consumption:
     get:
@@ -5345,6 +5505,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/EntitlementConsumptionEngineView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's consumption rules, defined by hand
     put:
       operationId: setEntitlementConsumption
@@ -5403,6 +5565,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /multi-park-crossover:
     get:
       operationId: listMultiParkCrossover
@@ -5448,6 +5612,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MultiParkCrossoverRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's crossover rules, defined by hand
   /guest-companion-eligibility:
     get:
@@ -5495,6 +5661,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GuestCompanionEligibilityRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's eligibility rules, defined by hand
     put:
       operationId: setGuestCompanionEligibility
@@ -5546,6 +5714,8 @@ paths:
                 $ref: '#/components/schemas/GuestCompanionEligibilityRulesView'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /group-admission-quantity:
     get:
       operationId: listGroupAdmissionQuantity
@@ -5594,6 +5764,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GroupAdmissionQuantityValidationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's group admission rules, defined by hand
   /rule-conflict-check:
     put:
@@ -5654,6 +5826,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RuleSimulationConflictCheckPublicationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /digital-credential-security:
     get:
       operationId: listDigitalCredentialSecurity
@@ -5706,6 +5880,8 @@ paths:
                         $ref: '#/components/schemas/DigitalCredentialSecurityCommandCenterView'
                     summary:
                       $ref: '#/components/schemas/DigitalCredentialSecurityCommandCenterViewSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -5766,6 +5942,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DynamicQrSecurityProfileBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credential-activation-display:
     get:
       operationId: listCredentialActivationDisplay
@@ -5810,6 +5988,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CredentialActivationDisplayRulesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's activation/display rules, defined by hand
     put:
       operationId: setCredentialActivationDisplay
@@ -5869,6 +6049,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /device-binding-session:
     get:
       operationId: listDeviceBindingSession
@@ -5924,6 +6106,8 @@ paths:
                         $ref: '#/components/schemas/DeviceBindingSessionSecurityView'
                     summary:
                       $ref: '#/components/schemas/DeviceBindingSessionSecurityViewSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -5986,6 +6170,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BleBeaconGeofenceConfigurationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credential-transfer-rebinding:
     get:
       operationId: listCredentialTransferRebinding
@@ -6036,6 +6222,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CredentialTransferRebindingView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's transfer policies, defined by hand
   /credential-revocation-lifecycle:
     get:
@@ -6082,6 +6270,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CredentialRevocationLifecycleEventsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: one row per lifecycle event, fixed list
   /offline-cryptographic-validation:
     get:
@@ -6127,6 +6317,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OfflineCryptographicValidationProfileView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /embedded-entitlement-payload:
     put:
       operationId: setEmbeddedEntitlementPayload
@@ -6183,6 +6375,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EmbeddedEntitlementPayloadDesignerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credential-security:
     get:
       operationId: listCredentialSecurity
@@ -6236,6 +6430,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/CredentialSecuritySimulationAuditPublicationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -6288,6 +6484,8 @@ paths:
                         $ref: '#/components/schemas/MediaCredentialCommandCenterView'
                     summary:
                       $ref: '#/components/schemas/MediaCredentialCommandCenterViewSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - name: tenantId
         in: query
@@ -6380,6 +6578,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MediaTypeTechnologyLibraryView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's media type profiles, defined by hand
     put:
       operationId: setMediaTypeTechnology
@@ -6439,6 +6639,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /virtual-credential-media:
     get:
       operationId: listVirtualCredentialMedia
@@ -6491,6 +6693,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/VirtualCredentialMediaAssociationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -6545,6 +6749,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/VerificationMethodSelectionLockingView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: verification method policies per product, defined by hand
   /media-issuance-encoding:
     get:
@@ -6591,6 +6797,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MediaIssuanceEncodingProfileView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: encoding profiles a venue defines per medium
     put:
       operationId: setMediaIssuanceEncoding
@@ -6648,6 +6856,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /media-swap-replacement:
     get:
       operationId: listMediaSwapReplacement
@@ -6700,6 +6910,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/MediaSwapReplacementView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -6758,6 +6970,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RfidNfcConfigurationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /external-partner-credential:
     get:
       operationId: listExternalPartnerCredential
@@ -6807,6 +7021,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ExternalPartnerCredentialMappingView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's partner credential mappings, defined by hand
   /hotel-wallet-external:
     get:
@@ -6853,6 +7069,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/HotelWalletExternalMediaIntegrationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's external media integrations, set up by hand
     put:
       operationId: setHotelWalletExternal
@@ -6911,6 +7129,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /media-compatibility-testing:
     put:
       operationId: publishMediaCompatibilityTesting
@@ -6969,6 +7189,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MediaCompatibilityTestingPublicationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /biometric-access:
     get:
       operationId: listBiometricAccess
@@ -7018,6 +7240,8 @@ paths:
                         $ref: '#/components/schemas/BiometricAccessCommandCenterView'
                     summary:
                       $ref: '#/components/schemas/BiometricAccessCommandCenterViewSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -7079,6 +7303,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BiometricVerificationProfileBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /face-pass-enrollment:
     put:
       operationId: setFacePassEnrollment
@@ -7134,6 +7360,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FacePassEnrollmentConfigurationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /biometric-consent-guardian:
     get:
       operationId: listBiometricConsentGuardian
@@ -7190,6 +7418,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/BiometricConsentGuardianManagementView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - name: countryJurisdiction
         in: query
@@ -7274,6 +7504,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/FaceTagTemporaryEnrollmentView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's Face Tag profiles, defined by hand
     put:
       operationId: setFaceTagTemporaryEnrollment
@@ -7339,6 +7571,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /face-matching-verification:
     get:
       operationId: listFaceMatchingVerification
@@ -7383,6 +7617,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/FaceMatchingVerificationThresholdsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's match threshold profiles, defined by hand
     put:
       operationId: setFaceMatchingVerification
@@ -7441,6 +7677,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /face-change-enrollment:
     get:
       operationId: listFaceChangeEnrollment
@@ -7494,6 +7732,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/FaceChangeReEnrollmentIdentityProtectionView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -7541,6 +7781,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BiometricValidationAtGateView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's biometric gate outcome rules, defined by hand
   /biometric-lifecycle-retention:
     get:
@@ -7591,6 +7833,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BiometricLifecycleRetentionDeletionView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: retention rules per biometric data category, defined by hand
     put:
       operationId: setBiometricLifecycleRetention
@@ -7663,6 +7907,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
       x-ticvai-step-up-reason: Sets how long biometric data is kept; a wrong value is a data protection breach.
   /biometric:
@@ -7772,6 +8018,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/BiometricSimulationAuditPublicationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /device-gate:
     get:
       operationId: listDeviceGate
@@ -7822,6 +8070,8 @@ paths:
                         $ref: '#/components/schemas/DeviceGateCommandCenterView'
                     summary:
                       $ref: '#/components/schemas/DeviceGateCommandCenterViewSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -7869,6 +8119,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/DeviceTypeHardwareLibraryView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: hardware models a venue registers by hand
   /physical-device-registration:
     get:
@@ -7922,6 +8174,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/PhysicalDeviceRegistrationProvisioningView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -7983,6 +8237,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TurnstileLaneBehaviorConfigurationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /validation-outcome-guest:
     put:
       operationId: setValidationOutcomeGuest
@@ -8039,6 +8295,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ValidationOutcomeGuestFeedbackDesignerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /reader-scanner-peripheral:
     put:
       operationId: setReaderScannerPeripheral
@@ -8092,6 +8350,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReaderScannerPeripheralConfigurationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /handheld-mobile-access:
     put:
       operationId: setHandheldMobileAccess
@@ -8149,6 +8409,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HandheldMobileAccessDeviceConfigurationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /gate-mode-free:
     get:
       operationId: listGateModeFree
@@ -8197,6 +8459,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GateModesFreeSpinEmergencyControlsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's special gate mode policies, defined by hand
   /device-software-content:
     put:
@@ -8257,6 +8521,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeviceSoftwareContentRemoteConfigurationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /hardware-compatibility-health:
     get:
       operationId: listHardwareCompatibilityHealth
@@ -8310,6 +8576,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/HardwareCompatibilityHealthTestingDeploymentView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -8362,6 +8630,8 @@ paths:
                         $ref: '#/components/schemas/OfflineEdgeOperationsCommandCenterView'
                     summary:
                       $ref: '#/components/schemas/OfflineEdgeOperationsCommandCenterViewSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -8420,6 +8690,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EdgeNodeLocalProcessingConfigurationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /edge-package-data:
     get:
       operationId: listEdgePackageData
@@ -8467,6 +8739,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/EdgePackageDataDistributionView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -8513,6 +8787,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OfflineCredentialRevocationCacheView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /offline-entitlement-usage:
     get:
       operationId: listOfflineEntitlementUsage
@@ -8562,6 +8838,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/OfflineEntitlementUsageLedgerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -8607,6 +8885,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConnectivityFailureDegradedModePolicyView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /reconnection-synchronization-conflict:
     get:
       operationId: listReconnectionSynchronizationConflict
@@ -8655,6 +8935,8 @@ paths:
                         $ref: '#/components/schemas/ReconnectionSynchronizationConflictResolutionView'
                     summary:
                       $ref: '#/components/schemas/ReconnectionSynchronizationConflictResolutionViewSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -8706,6 +8988,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OfflineSimulationResilienceTestingView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /edge-security-deployment:
     get:
       operationId: listEdgeSecurityDeployment
@@ -8759,6 +9043,8 @@ paths:
                         $ref: '#/components/schemas/EdgeSecurityAuditDeploymentView'
                     summary:
                       $ref: '#/components/schemas/EdgeSecurityAuditDeploymentViewSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -8811,6 +9097,8 @@ paths:
                         $ref: '#/components/schemas/GuestJourneyCommandCenterView'
                     summary:
                       $ref: '#/components/schemas/GuestJourneyCommandCenterViewSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -8867,6 +9155,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GroupB2bAdmissionProfileBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /group-leader-fast:
     get:
       operationId: listGroupLeaderFast
@@ -8918,6 +9208,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/GroupLeaderFastB2bValidationView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -8972,6 +9264,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/GroupAttendancePartialEntryManagerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -9021,6 +9315,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/FamilyChildPodCompanionJourneyView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's companion relationship rules, defined by hand
   /entry-temporary-exit:
     get:
@@ -9068,6 +9364,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ReEntryTemporaryExitJourneyView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's re-entry journey rules, defined by hand
   /multi-park-crossover-2:
     get:
@@ -9117,6 +9415,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/MultiParkCrossoverJourneyOrchestratorView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -9165,6 +9465,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/FastPassAttractionAccessJourneyView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's Fast Pass access profiles, defined by hand
   /special-event-free:
     get:
@@ -9212,6 +9514,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SpecialEventFreeViewAlternativeAdmissionView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: special admission days a venue sets up by hand
   /live-access:
     get:
@@ -9265,6 +9569,8 @@ paths:
                         $ref: '#/components/schemas/LiveAccessOperationsCommandCenterView'
                     summary:
                       $ref: '#/components/schemas/LiveAccessOperationsCommandCenterViewSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -9318,6 +9624,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PodiumOperationsConsoleView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's podiums, defined by hand
   /ticket-credential-investigation:
     get:
@@ -9449,6 +9757,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/TicketCredentialInvestigationConsoleView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /validation-exception-reason:
     get:
       operationId: listValidationExceptionReason
@@ -9493,6 +9803,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ValidationExceptionReasonCodeManagerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's access reason codes, defined by hand
   /manual-override-supervisor:
     put:
@@ -9552,6 +9864,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ManualOverrideSupervisorApprovalView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
       x-ticvai-step-up-reason: Opens a gate by hand, against the admission rules, for a person standing at
         it.
@@ -9610,6 +9924,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/CredentialDisableBlacklistWhitelistOperationsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -9668,6 +9984,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/LiveGateModeLaneControlView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -9723,6 +10041,8 @@ paths:
                         $ref: '#/components/schemas/QueueThroughputLaneOptimizationView'
                     summary:
                       $ref: '#/components/schemas/QueueThroughputLaneOptimizationViewSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -9785,6 +10105,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OperationalIncidentExceptionWorkspaceView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /shift-handover-summary:
     get:
       operationId: listShiftHandoverSummary
@@ -9837,6 +10159,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/OperationsAuditShiftHandoverControlSummaryView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -9890,6 +10214,8 @@ paths:
                         $ref: '#/components/schemas/DynamicAccessPolicyCommandCenterView'
                     summary:
                       $ref: '#/components/schemas/DynamicAccessPolicyCommandCenterViewSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -9938,6 +10264,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AccessAttributeCatalogView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: the governed attribute dictionary, defined by hand
     put:
       operationId: setAccessAttributeCatalog
@@ -9995,6 +10323,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /visual-dynamic-policy:
     put:
       operationId: setVisualDynamicPolicy
@@ -10055,6 +10385,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VisualDynamicPolicyBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /context-time-event:
     put:
       operationId: setContextTimeEvent
@@ -10110,6 +10442,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ContextTimeEventCapacityPolicyBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /identity-membership-accreditation:
     get:
       operationId: listIdentityMembershipAccreditation
@@ -10153,6 +10487,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/IdentityMembershipAccreditationPoliciesView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's identity, membership and accreditation policies, defined by hand
   /policy-scope-hierarchy:
     get:
@@ -10199,6 +10535,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PolicyScopeHierarchyInheritanceView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: policy scope assignments a tenant defines by hand
     put:
       operationId: setPolicyScopeHierarchy
@@ -10248,6 +10586,8 @@ paths:
                 $ref: '#/components/schemas/PolicyScopeHierarchyInheritanceView'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /authorization-governance-temporary:
     get:
       operationId: listAuthorizationGovernanceTemporary
@@ -10300,6 +10640,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AuthorizationGovernanceTemporaryAccessView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -10348,6 +10690,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PolicyEvaluationArchitectureOfflineDistributionView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: one row per policy category, configured by hand
   /policy-conflict-impact:
     put:
@@ -10397,6 +10741,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PolicySimulationConflictImpactAnalysisView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access-security-fraud:
     get:
       operationId: listAccessSecurityFraud
@@ -10447,6 +10793,8 @@ paths:
                         $ref: '#/components/schemas/AccessSecurityFraudCommandCenterView'
                     summary:
                       $ref: '#/components/schemas/AccessSecurityFraudCommandCenterViewSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - name: venue
         in: query
@@ -10519,6 +10867,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/FraudDetectionRuleSignalLibraryView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's configured fraud signals, defined by hand
     put:
       operationId: setFraudDetectionRule
@@ -10579,6 +10929,8 @@ paths:
                 $ref: '#/components/schemas/FraudDetectionRuleSignalLibraryView'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credential-sharing-concurrent:
     get:
       operationId: listCredentialSharingConcurrent
@@ -10632,6 +10984,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/CredentialSharingConcurrentUsageDetectionView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -10686,6 +11040,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/UnifiedIdentityCredentialLockManagerView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -10738,6 +11094,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/BiometricIdentityIntegrityMonitoringView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -10785,6 +11143,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RelationshipCompanionFraudMonitoringView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's relationship-fraud rules, configured by hand
   /access-risk-scoring:
     get:
@@ -10827,6 +11187,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccessRiskScoringDecisionEngineView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /real-time-security:
     put:
       operationId: setRealTimeSecurity
@@ -10881,6 +11243,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RealTimeSecurityResponsePlaybookBuilderView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /security-investigation-evidence:
     put:
       operationId: setSecurityInvestigationEvidence
@@ -10939,6 +11303,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SecurityInvestigationEvidenceWorkspaceView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /security-detection-governance:
     get:
       operationId: listSecurityDetectionGovernance
@@ -11053,6 +11419,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SecurityAnalyticsAiDetectionGovernanceView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access-monitoring:
     get:
       operationId: listAccessMonitoring
@@ -11102,6 +11470,8 @@ paths:
                         $ref: '#/components/schemas/AccessMonitoringAnalyticsCommandCenterView'
                     summary:
                       $ref: '#/components/schemas/AccessMonitoringAnalyticsCommandCenterViewSummary'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -11149,6 +11519,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/LiveVenueOccupancyPeopleCountingView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's areas, defined by hand in the topology
   /graphical-access-map:
     get:
@@ -11192,6 +11564,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GraphicalAccessMapLiveGatePerformanceView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's access points, drawn by hand in the topology
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
@@ -11328,6 +11702,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AttendanceAdmissionAnalyticsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /entry-exit-crossover:
     get:
       operationId: listEntryExitCrossover
@@ -11369,6 +11745,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EntryExitReEntryCrossoverAnalyticsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /throughput-queue-validation:
     get:
       operationId: listThroughputQueueValidation
@@ -11412,6 +11790,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ThroughputQueueValidationPerformanceAnalyticsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: one row per gate a venue has set up
   /validation-outcome-rejection:
     get:
@@ -11514,6 +11894,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ValidationOutcomeRejectionAnalyticsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guest-dwell-time:
     get:
       operationId: listGuestDwellTime
@@ -11556,6 +11938,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GuestDwellTimeLengthOfStayAttractionFlowView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access-report-scheduled:
     get:
       operationId: listAccessReportScheduled
@@ -11602,6 +11986,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AccessReportsScheduledReportingDataExportView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-bounded: a venue's saved report definitions, set up by hand
       parameters:
       - name: venue
@@ -11715,6 +12101,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AiAccessIntelligenceForecastingExecutiveInsightsView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access-changes:
     get:
       operationId: listAccessChanges
@@ -11749,6 +12137,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AccessAccessChange'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /admission-rules/{ruleId}/points:
     get:
       operationId: listEntryRulePoints
@@ -11788,6 +12178,8 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/AccessEntryRulePoint'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setEntryRulePoints
       x-ticvai-consumed-by:
@@ -11842,6 +12234,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AccessEntryRulePoint'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /biometric/simulate:
     post:
       operationId: simulateBiometricConfiguration
@@ -11885,6 +12279,8 @@ paths:
                 $ref: '#/components/schemas/BiometricSimulationAuditPublicationView'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dynamic-access-policy/{policyId}/rollback:
     parameters:
     - name: policyId
@@ -11959,6 +12355,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /hardware-deployments:
     post:
       operationId: publishHardwareDeployment
@@ -12016,6 +12414,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guest-journey/simulate:
     post:
       operationId: simulateGuestJourney
@@ -12055,6 +12455,8 @@ paths:
                 $ref: '#/components/schemas/GuestJourneySimulationView'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credential-issuance-retry-policy:
     get:
       operationId: getCredentialIssuanceRetryPolicy
@@ -12083,6 +12485,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CredentialIssuanceRetryPolicyView'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setCredentialIssuanceRetryPolicy
       x-ticvai-consumed-by:
@@ -12132,6 +12536,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credential-exceptions/{exceptionId}/resolve:
     parameters:
     - name: exceptionId
@@ -12200,6 +12606,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credential-generation-issuance/retry:
     post:
       operationId: retryCredentialGeneration
@@ -12247,6 +12655,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credentials/{credentialId}/deliveries:
     parameters:
     - name: credentialId
@@ -12323,6 +12733,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credentials/{credentialId}/replace:
     parameters:
     - name: credentialId
@@ -12397,6 +12809,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
       x-ticvai-step-up-reason: Moves a paid ticket onto new media; the old one stops working.
   /access-point-groups:
@@ -12479,6 +12893,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access-point-groups/{groupId}:
     parameters:
     - name: groupId
@@ -12531,6 +12947,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /offline-policies:
     put:
       operationId: setGateOfflinePolicy
@@ -12608,6 +13026,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /operating-calendar-entries:
     put:
       operationId: setOperatingCalendarEntry
@@ -12687,6 +13107,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /operating-calendar-entries/{entryId}:
     parameters:
     - name: entryId
@@ -12739,6 +13161,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /hardware-models:
     put:
       operationId: setHardwareModel
@@ -12761,8 +13185,8 @@ paths:
         are the server''s and are ignored in a body.
 
 
-        There is no delete: a model that devices name (`access.access_device.hardwareModelId`) stays in the library
-        for them.
+        There is no delete: a model that devices name (`platform.device.hardwareModelId`, ADR-0067) stays in the
+        library for them.
 
         '
       tags:
@@ -12808,9 +13232,11 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
-  /access-devices:
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /device-placements:
     post:
-      operationId: registerAccessDevice
+      operationId: placeAccessDevice
       x-ticvai-consumed-by:
         - "P08 BO-196 Physical Device Registration & Provisioning"
       x-ticvai-audience:
@@ -12818,22 +13244,21 @@ paths:
       x-ticvai-agreed: '29 September: writers pass; writes the table listPhysicalDeviceRegistration reads (pack ''Access
         Control Module'' p.73 (6.3); MoM 15 Sep 2026 (devices registered centrally with serial, type, model; enrolment
         code; approval workflow))'
-      summary: Register a physical access-control device
-      description: '**The write behind Physical Device Registration & Provisioning** (BO-196): registers one deployed
-        device (a turnstile, reader, handheld, podium unit or beacon) against a hardware model and places it in the
-        topology. The device starts at `provisioningStage: registered` and `lifecycleStatus: registered`; it moves
-        through the later stages as it authenticates and downloads its configuration (reported by the device, not
-        written here).
+      summary: Place a registered device in the gate topology
+      description: '**The write behind Physical Device Registration & Provisioning** (BO-196), and since 1 October
+        the second of two steps (ADR-0067, one device register). **Register in the platform, then place in Access**:
+        the device (a turnstile, reader, handheld, podium unit or beacon) is registered with tenancy `registerDevice`,
+        which records its kind, hardware type, hardware model, serial, versions, health and lifecycle in
+        `platform.device`; this operation then says where it serves: access area, access point, lane, role,
+        proximity threshold and controller. Was `registerAccessDevice`, which wrote a second register.
 
 
-        `id`, `provisioningStage`, the reported versions and health fields and `lastHeartbeatAt` are the server''s
-        and ignored in the body. A `serialNumber` already registered in the tenant is refused `409 duplicate-serial`.
-        `deviceGroupId` is a free deployment label, not a key (decided 29 September, writers pass).
-
-        **tenancy `platform.device` (`RegisteredDevice`) is the device register of record** (29 September, build);
-        this row is the device''s placement in the access topology. `access` consumes `device.enrolmentChanged` and
-        keeps `lifecycleStatus` in step with the register, so a device retired there is refused at the gate
-        whatever this row says. Merging the two registers is an open data-model decision.
+        `id`, `provisioningChecklist`, `createdAt` and `updatedAt` are the server''s and ignored in the body; the
+        checklist fills as the device authenticates and downloads its configuration (reported by the device, not
+        written here). `deviceGroupId` is a free deployment label, not a key (decided 29 September, writers pass).
+        **Refused `409 device-already-placed`** when the device already has an active placement, and **`422
+        device-not-registered`** when `deviceId` names no device in the register or one that is `deactivated` or
+        `retired`. Heartbeats have one path, tenancy `recordDeviceHeartbeat`, whatever the device.
 
         '
       tags:
@@ -12853,7 +13278,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AccessAccessDevice'
+              $ref: '#/components/schemas/AccessDevicePlacement'
       responses:
         '201':
           headers:
@@ -12863,27 +13288,41 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AccessAccessDevice'
+                $ref: '#/components/schemas/AccessDevicePlacement'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
-          description: '`duplicate-serial`: a device with this serial number is already registered.'
+          description: '`device-already-placed`: the device already has an active placement. Move it with
+            `updateAccessDevicePlacement`, or set that placement `isActive: false` first.'
+          x-ticvai-problem-types:
+          - device-already-placed
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
-  /access-devices/{deviceId}:
+        '422':
+          description: '`device-not-registered`: `deviceId` names no device in `platform.device`, or one that is
+            `deactivated` or `retired` there (ADR-0067).'
+          x-ticvai-problem-types:
+          - device-not-registered
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /device-placements/{placementId}:
     parameters:
-    - name: deviceId
+    - name: placementId
       in: path
       required: true
       schema:
         type: string
         format: uuid
     put:
-      operationId: updateAccessDevice
+      operationId: updateAccessDevicePlacement
       x-ticvai-consumed-by:
         - "P08 BO-194 Device & Gate Command Center"
         - "P08 BO-196 Physical Device Registration & Provisioning"
@@ -12892,16 +13331,17 @@ paths:
       x-ticvai-agreed: '29 September: writers pass; writes the table listPhysicalDeviceRegistration reads (pack ''Access
         Control Module'' p.73 (6.3); MoM 15 Sep 2026 (devices registered centrally with serial, type, model; enrolment
         code; approval workflow))'
-      summary: Replace a registered device's registration
-      description: 'Changes where a registered device sits and what it is: name, hardware model, area, access point,
-        lane, group label, network references, capabilities and `isActive`. **Replacing a failed unit keeps its place**:
-        register the new device, then give it the old one''s access point and lane here and set the old one `isActive:
-        false`; the gate''s configuration, rules, media profiles and mode belong to the access point, not the device,
-        so nothing else moves.
+      summary: Replace a device's placement
+      description: 'Changes where a placed device sits: area, access point, lane, role, label, group label, controller
+        reference, proximity threshold and `isActive` (ADR-0067; was `updateAccessDevice`). What the device *is*
+        (hardware model, serial, versions, capabilities) is changed in the register, tenancy `platform.device`, not
+        here. **Replacing a failed unit keeps its place**: register the new device with tenancy `registerDevice`, then
+        give this placement the new `deviceId`; the gate''s configuration, rules, media profiles and mode belong to
+        the access point, not the device, so nothing else moves.
 
 
-        PUT replaces the registration whole. Reported fields (provisioning stage, versions, health, heartbeat) are
-        the server''s and ignored.
+        PUT replaces the placement whole. `provisioningChecklist` is reported by the device and ignored in the body.
+        `422 device-not-registered` as for `placeAccessDevice`.
 
         '
       tags:
@@ -12921,7 +13361,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AccessAccessDevice'
+              $ref: '#/components/schemas/AccessDevicePlacement'
       responses:
         '200':
           headers:
@@ -12931,13 +13371,24 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AccessAccessDevice'
+                $ref: '#/components/schemas/AccessDevicePlacement'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '422':
+          description: '`device-not-registered`: `deviceId` names no device in `platform.device`, or one that is
+            `deactivated` or `retired` there (ADR-0067).'
+          x-ticvai-problem-types:
+          - device-not-registered
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /gate-mode-policies:
     put:
       operationId: setGateModePolicy
@@ -13004,6 +13455,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /gate-mode-changes/{changeId}/cancel:
     parameters:
     - name: changeId
@@ -13068,6 +13521,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /podiums:
     put:
       operationId: setPodium
@@ -13143,6 +13598,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /podiums/{podiumId}:
     parameters:
     - name: podiumId
@@ -13195,6 +13652,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /podiums/{podiumId}/shifts:
     parameters:
     - name: podiumId
@@ -13266,6 +13725,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /podium-shifts/{shiftId}/end:
     parameters:
     - name: shiftId
@@ -13334,6 +13795,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /reason-codes:
     put:
       operationId: setReasonCode
@@ -13405,6 +13868,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           $ref: ../shared/common.yaml#/components/responses/DuplicateCode
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /reason-codes/{reasonCodeId}:
     parameters:
     - name: reasonCodeId
@@ -13456,6 +13921,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credential-event-propagation-rules:
     put:
       operationId: setCredentialEventPropagationRule
@@ -13526,6 +13993,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /media-binding-rules:
     put:
       operationId: setMediaBindingRule
@@ -13604,6 +14073,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /media-binding-rules/{ruleId}:
     parameters:
     - name: ruleId
@@ -13650,6 +14121,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /ticket-status-transitions:
     put:
       operationId: setTicketStatusTransition
@@ -13722,6 +14195,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /verification-method-policies:
     put:
       operationId: setVerificationMethodPolicy
@@ -13794,6 +14269,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /device-binding-policy:
     put:
       operationId: setDeviceBindingPolicy
@@ -13848,6 +14325,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /my/credentials/{credentialId}/device-bindings:
     parameters:
     - name: credentialId
@@ -13925,6 +14404,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /device-bindings/{bindingId}/release:
     parameters:
     - name: bindingId
@@ -13993,6 +14474,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /journey-sequence-rules:
     put:
       operationId: setJourneySequenceRule
@@ -14060,6 +14543,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /journey-sequence-rules/{ruleId}:
     parameters:
     - name: ruleId
@@ -14105,6 +14590,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /journey-profiles:
     put:
       operationId: setJourneyProfile
@@ -14170,6 +14657,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fast-pass-profiles:
     put:
       operationId: setFastPassProfile
@@ -14244,6 +14733,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /policy-evaluation-settings:
     put:
       operationId: setPolicyEvaluationSetting
@@ -14317,6 +14808,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /risk-scoring-config:
     put:
       operationId: setRiskScoringConfig
@@ -14376,6 +14869,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /relationship-fraud-rules:
     put:
       operationId: setRelationshipFraudRule
@@ -14447,6 +14942,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /identity-locks:
     post:
       operationId: lockIdentity
@@ -14511,6 +15008,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /identity-locks/{lockId}/release:
     parameters:
     - name: lockId
@@ -14578,6 +15077,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /security-alerts/{alertId}/status:
     parameters:
     - name: alertId
@@ -14660,6 +15161,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /face-reenrolment-attempts/{attemptId}/review:
     parameters:
     - name: attemptId
@@ -14733,6 +15236,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /media-templates/{templateId}/archive:
     parameters:
     - name: templateId
@@ -14801,6 +15306,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /configuration-versions/{versionId}/rollback:
     parameters:
     - name: versionId
@@ -14875,6 +15382,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dynamic-policy-effectiveness:
     get:
       operationId: listDynamicPolicyEffectiveness
@@ -14899,8 +15408,8 @@ paths:
         `neverTriggered` is the other end, a policy that costs evaluation and decides nothing.
 
 
-        **Gate policies only.** Software-permission policies are identity''s `AccessPolicy`, reported by
-        `listAccessPolicyEffectiveness`; see `AccessDynamicPolicy` for which engine governs what.
+        **Gate policies only.** Software-permission policies are identity''s `AuthorisationPolicy`, reported by
+        `listAuthorisationPolicyEffectiveness`; see `AccessDynamicPolicy` for which engine governs what.
 
         '
       tags:
@@ -14967,6 +15476,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /access-risk-scores:
     get:
       operationId: getAccessRiskScore
@@ -15042,6 +15553,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
 components:
   schemas:
@@ -18136,69 +18649,43 @@ components:
         scopePath: *id001
         createdAt: *id002
         updatedAt: *id003
-    AccessAccessDevice:
+    AccessDevicePlacement:
       type: object
-      x-ticvai-persistence: access.access_device
-      description: 'One physical access-control device registered in a venue: a turnstile, reader, handheld, podium unit
-        or BLE beacon, with its model, location, network references, reported versions and health, and provisioning stage.
-        Merges access.gate_device and access.ble_beacon (a beacon is a device with a proximity threshold) (declared 29
-        September, data-model close-out DM1) Registered with registerAccessDevice and changed with updateAccessDevice;
-        provisioning stage, versions and health are reported by the device; deviceGroupId is a free deployment label,
-        not a key (decided 29 September, writers pass). **tenancy platform.device is the register of record**
-        (29 September, build): this is the topology placement, and lifecycleStatus follows the register through the
-        device.enrolmentChanged event.'
+      x-ticvai-persistence: access.device_placement
+      description: '**Where one registered device is placed in the gate topology, and nothing else about it**
+        (ADR-0067, accepted 1 October). The device itself (kind and hardware type, hardware model, serial, every
+        version, health, heartbeat and its one lifecycle) is `platform.device`, the only device register, owned
+        and migrated by Tenancy and registered with tenancy `registerDevice`. This row names that device
+        (`deviceId`) and says which access area, access point and lane it serves, in what role, at what
+        proximity threshold for a beacon, and through which controller. Access reads device facts only through
+        what Tenancy publishes (`getDevice`, `listDevices`), never with its own SQL.
+
+
+        **Access''s provisioning stages are a checklist on the placement, not a second lifecycle**
+        (`provisioningChecklist`). Placed with `placeAccessDevice` and changed with `updateAccessDevicePlacement`.
+        Was `access.access_device` (renamed 1 October, ADR-0067), which repeated the register''s serial, versions,
+        health and lifecycle; `device.enrolmentChanged` no longer keeps two registers in step. Not
+        `access.device_binding`, which binds a guest''s phone to an entitlement. `deviceGroupId` is a free
+        deployment label, not a key (decided 29 September, writers pass).'
       required:
       - id
       - venueId
-      - hardwareType
-      - provisioningStage
+      - deviceId
+      - role
       - isActive
       - scopePath
       properties:
         id:
-          type: string
-          format: uuid
+          $ref: ../shared/common.yaml#/components/schemas/Id
         venueId:
           type: string
           format: uuid
-        hardwareModelId:
+        deviceId:
           type: string
           format: uuid
-          nullable: true
-          description: Model from the hardware library (access.hardware_model)
-        hardwareType:
-          type: string
-          enum: &id004
-          - standardTurnstile
-          - fullHeightTurnstile
-          - tripodTurnstile
-          - speedGate
-          - wideLane
-          - accessiblePodGate
-          - buggyGate
-          - vipGate
-          - staffGate
-          - androidHandheld
-          - iosDevice
-          - tablet
-          - qrBarcodeReader
-          - rfidReader
-          - nfcReader
-          - multiTechnologyReader
-          - biometricReader
-          - podium
-          - counter
-          - beacon
-          - cameraController
-          - externalAccessDevice
-          description: Specific hardware type, as in the hardware library
-        name:
-          type: string
-          nullable: true
-          description: Device or beacon name, e.g. Gate A, HH-01
-        serialNumber:
-          type: string
-          nullable: true
+          x-ticvai-references: platform.device
+          description: The registered device placed here (`platform.device`, tenancy `registerDevice`). One active
+            placement per device; replacing a failed unit gives its placement the new `deviceId`.
         accessAreaId:
           type: string
           format: uuid
@@ -18214,102 +18701,73 @@ components:
           format: uuid
           nullable: true
           description: Lane the device is mounted on (access.gate_lane)
+        role:
+          type: string
+          enum:
+          - entry
+          - exit
+          - entryAndExit
+          - validationOnly
+          - proximity
+          - monitoring
+          default: entryAndExit
+          description: What the device does at this place. `proximity` is a beacon; `monitoring` a camera controller
+            that decides nothing.
+        name:
+          type: string
+          nullable: true
+          description: Label at this place, e.g. Gate A, HH-01
         deviceGroupId:
           type: string
           nullable: true
-          description: Device group the device belongs to, as targeted by hardware deployments and device configurations
-        ipNetworkReference:
-          type: string
-          nullable: true
+          description: Device group the placement belongs to, as targeted by hardware deployments and device configurations
         controllerReference:
           type: string
           nullable: true
-        installationDate:
-          type: string
-          format: date
-          nullable: true
-        provisioningStage:
-          type: string
-          enum:
-          - registered
-          - hardwareProfileAssigned
-          - locationAssigned
-          - authenticated
-          - configurationDownloaded
-          - securityPackageDownloaded
-          - connectivityTested
-          - active
-          default: registered
-        lifecycleStatus:
-          type: string
-          enum:
-          - registered
-          - configured
-          - tested
-          - approved
-          - production
-          default: registered
-          description: Certification stage; no device enters production until validated
-        capabilities:
-          type: array
-          items:
-            type: string
-            enum:
-            - dynamicQr
-            - rfid
-            - nfc
-            - facePass
-            - offline
-            - heightCheck
-          description: Capabilities this device supports, from the compatibility matrix
         proximityThresholdMeters:
           type: integer
           minimum: 0
           nullable: true
           description: 'Beacons only: activation distance in metres'
+        installationDate:
+          type: string
+          format: date
+          nullable: true
+        provisioningChecklist:
+          type: object
+          description: '**Access''s provisioning stages, as a checklist on the placement** (ADR-0067). Each item is
+            the time the step was confirmed, null until it is. The device''s lifecycle (registered, enrolled,
+            provisioned, active, deactivated, retired) is `platform.device.enrolment_state`, not this.'
+          properties:
+            hardwareProfileAssignedAt:
+              type: string
+              format: date-time
+              nullable: true
+            locationAssignedAt:
+              type: string
+              format: date-time
+              nullable: true
+            authenticatedAt:
+              type: string
+              format: date-time
+              nullable: true
+            configurationDownloadedAt:
+              type: string
+              format: date-time
+              nullable: true
+            securityPackageDownloadedAt:
+              type: string
+              format: date-time
+              nullable: true
+            connectivityTestedAt:
+              type: string
+              format: date-time
+              nullable: true
         isActive:
           type: boolean
           default: true
-          description: 'Active/inactive as configured (beacons: activeInactive)'
-        status:
-          type: string
-          enum:
-          - healthy
-          - active
-          - degraded
-          - offline
-          - localMode
-          nullable: true
-          description: Health as reported by the device or vendor; TICVAI does not detect it
-        connectivity:
-          type: string
-          nullable: true
-          description: Reported connectivity
-        scannerHealth:
-          type: string
-          nullable: true
-        controllerHealth:
-          type: string
-          nullable: true
-        cameraHealth:
-          type: string
-          nullable: true
-          description: Where the device has a camera
-        configurationVersion:
-          type: string
-          nullable: true
-          description: Configuration version the device reports running
-        localRuleVersion:
-          type: string
-          nullable: true
-        credentialSecurityPackageVersion:
-          type: string
-          nullable: true
-        lastHeartbeatAt:
-          type: string
-          format: date-time
-          nullable: true
-          description: Last heartbeat or, for a beacon, last detected
+          description: 'Whether this placement is in use (beacons: activeInactive). A device that is `retired` or
+            `deactivated` in the register is refused at the gate whatever this says.'
         scopePath: *id001
         createdAt: *id002
         updatedAt: *id003
@@ -18918,8 +19376,7 @@ components:
           - reader
           - other
         hardwareType:
-          type: string
-          enum: *id004
+          $ref: ../shared/common.yaml#/components/schemas/DeviceHardwareType
         supportedTechnologies:
           type: array
           items:
@@ -19257,7 +19714,7 @@ components:
           items:
             type: string
             format: uuid
-          description: Devices the package is distributed to (access.access_device)
+          description: Registered devices the package is distributed to (platform.device, ADR-0067)
         sizeBytes:
           type: integer
           minimum: 0
@@ -19354,7 +19811,8 @@ components:
           type: string
           format: uuid
           nullable: true
-          description: Device used (access.access_device)
+          x-ticvai-references: platform.device
+          description: Device used, from the one device register (platform.device, ADR-0067)
         loginAt:
           type: string
           format: date-time
@@ -20504,16 +20962,19 @@ components:
     AccessDynamicPolicy:
       type: object
       x-ticvai-persistence: access.dynamic_policy
-      description: 'One guest-admission dynamic (attribute-based) policy with its current content - type, context or identity it tests, condition expression, result, priority, zones, validity, status and current version. Not identity.access_policy, which is staff permission (declared 29 September, data-model close-out DM1).
+      description: 'One guest-admission dynamic (attribute-based) policy with its current content - type, context or identity it tests, condition expression, result, priority, zones, validity, status and current version. Not identity.authorisation_policy, which is staff permission (declared 29 September, data-model close-out DM1).
 
 
-        **Which of the two policy engines this is** (stated 29 September, build pass). **This one governs who may pass which gate**: admission of a guest, pass holder, accreditation holder or employee at an access point, decided in validation with results a gate acts on (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor). **identity `AccessPolicy` governs who may do what in the software**: a principal''s permissions on operations and screens, decided by identity `evaluateAccess`. An employee''s badge opening a staff door is decided here; the same employee approving a refund is decided in identity. Effectiveness is reported per engine: `listDynamicPolicyEffectiveness` here, `listAccessPolicyEffectiveness` in identity.'
+        **Guest admission lives here and nowhere else** (ADR-0068, accepted 1 October). `validateAccess` online and the gate offline evaluate the same active version: `getOfflinePackage` carries it, and every `scan_event` records the policy and version that decided it (`dynamicPolicyId`, `dynamicPolicyVersion`) and the set it was decided under (`policySetVersion`). The condition is `conditionRule`, a closed JSON format (`AdmissionRule`), not free text. Identity''s staff-permission engine was renamed `AuthorisationPolicy` on the same day, so "access policy" means this.
+
+
+        **Which of the two policy engines this is** (stated 29 September, build pass). **This one governs who may pass which gate**: admission of a guest, pass holder, accreditation holder or employee at an access point, decided in validation with results a gate acts on (allow, deny, review, requireId, requireBiometric, requireCompanion, requireSupervisor). **identity `AuthorisationPolicy` governs who may do what in the software**: a principal''s permissions on operations and screens, decided by identity `evaluateAccess`. An employee''s badge opening a staff door is decided here; the same employee approving a refund is decided in identity. Effectiveness is reported per engine: `listDynamicPolicyEffectiveness` here, `listAuthorisationPolicyEffectiveness` in identity.'
       required:
       - id
       - scopePath
       - name
       - policyType
-      - conditionExpression
+      - conditionRule
       - result
       - status
       - currentVersion
@@ -20575,9 +21036,9 @@ components:
           - eventStaff
           nullable: true
           description: Identity-based policies (listIdentityMembershipAccreditation)
-        conditionExpression:
-          type: string
-          description: Condition tree over access.access_attribute keys using AND, OR, NOT, IN and BETWEEN
+        conditionRule:
+          $ref: '#/components/schemas/AdmissionRule'
+          description: 'The condition, in the closed JSON rule format evaluated the same way online and at the gate (ADR-0068; replaces the free-text `conditionExpression`).'
         result:
           type: string
           enum:
@@ -20643,6 +21104,135 @@ components:
           type: string
           format: date-time
           readOnly: true
+    AdmissionRule:
+      type: object
+      x-ticvai-persistence: none — embedded as the jsonb column condition_rule of access.dynamic_policy, and in
+        each access.dynamic_policy_version definition
+      description: '**One rule format that runs on both sides** (ADR-0068, accepted 1 October). A guest-admission
+        condition was free text (`conditionExpression`, "AND, OR, NOT, IN and BETWEEN"), which a .NET server and
+        a TypeScript gate cannot be relied on to read the same way. This is a closed JSON format instead: every
+        condition is drawn from the `policyType` and `contextType` enums already on `AccessDynamicPolicy`, with a
+        fixed set of comparators, so `validateAccess` online and the gate offline evaluate the same active version
+        to the same answer. **One evaluator in .NET and one in TypeScript, proven equal by a shared set of test
+        vectors in CI** (ACC-RULE-EVAL, B1 with the scanner).
+
+
+        `match` combines `conditions` and `groups` (`all` is AND, `any` is OR); each group is its own `all` or
+        `any` over its conditions and counts as one condition of the rule; `negate` is NOT. **Two levels and no
+        more**: every rule the Access Control pack shows fits in them, and a deeper tree is refused `400` rather
+        than approximated. A rule that needs more than the closed set extends the set; free text does not come
+        back (ADR-0068, Revisit).'
+      required:
+      - match
+      - conditions
+      properties:
+        formatVersion:
+          type: integer
+          enum:
+          - 1
+          default: 1
+          description: The rule format's version. An evaluator refuses a version it does not know rather than guess.
+        match:
+          type: string
+          enum:
+          - all
+          - any
+        conditions:
+          type: array
+          minItems: 1
+          maxItems: 50
+          items:
+            $ref: '#/components/schemas/AdmissionCondition'
+        groups:
+          type: array
+          maxItems: 10
+          items:
+            type: object
+            required:
+            - match
+            - conditions
+            properties:
+              match:
+                type: string
+                enum:
+                - all
+                - any
+              negate:
+                type: boolean
+                default: false
+              conditions:
+                type: array
+                minItems: 1
+                maxItems: 50
+                items:
+                  $ref: '#/components/schemas/AdmissionCondition'
+    AdmissionCondition:
+      type: object
+      x-ticvai-persistence: none — embedded in AdmissionRule
+      description: 'One test in an `AdmissionRule` (ADR-0068): a subject from `AccessDynamicPolicy.policyType`, an
+        optional context from `contextType`, the attribute tested, a comparator and its operands.'
+      required:
+      - subject
+      - attributeKey
+      - comparator
+      properties:
+        subject:
+          type: string
+          enum:
+          - guestAttribute
+          - accreditation
+          - occupancy
+          - employee
+          - risk
+          - membership
+          - timeEvent
+          description: What the condition tests, from the `policyType` enum.
+        context:
+          type: string
+          nullable: true
+          enum:
+          - date
+          - day
+          - time
+          - season
+          - event
+          - performance
+          - specialEvent
+          - holiday
+          - operatingCalendar
+          - occupancy
+          - attractionStatus
+          description: For a `timeEvent` or `occupancy` subject, which context value is tested, from the `contextType` enum.
+        attributeKey:
+          type: string
+          maxLength: 100
+          description: An `access.access_attribute` key (for example `accreditationLevel`, `zone`), or the context's own
+            value where `context` is set.
+        comparator:
+          type: string
+          enum:
+          - equals
+          - notEquals
+          - in
+          - notIn
+          - between
+          - lessThan
+          - lessOrEqual
+          - greaterThan
+          - greaterOrEqual
+          - exists
+          - notExists
+        values:
+          type: array
+          maxItems: 100
+          items:
+            type: string
+          description: 'Operands as strings, read as the attribute''s type (a number, an ISO 8601 date or time, `true` or
+            `false`). `in` and `notIn` take one or more; `between` exactly two, inclusive; `exists` and `notExists`
+            none; every other comparator exactly one. A wrong count is refused `400`.'
+        negate:
+          type: boolean
+          default: false
     AccessDynamicPolicyVersion:
       type: object
       x-ticvai-persistence: access.dynamic_policy_version
@@ -20678,7 +21268,7 @@ components:
           - rejected
         definition:
           type: object
-          description: The policy content of this version - name, policyType, contextType, identityType, conditionExpression, result, priority, zones, thresholds and validity - as on access.dynamic_policy
+          description: The policy content of this version - name, policyType, contextType, identityType, conditionRule, result, priority, zones, thresholds and validity - as on access.dynamic_policy
         restoredFromVersion:
           type: integer
           minimum: 1
@@ -24297,6 +24887,12 @@ components:
           nullable: true
           description: The device-local sequence number of a scan recorded offline; null for an online scan (added 29
             September, data-model close-out DM1).
+        policySetVersion:
+          type: string
+          nullable: true
+          description: The admission policy set the scan was decided under (`OfflinePackage.policySetVersion`, or
+            the same fingerprint computed online by `validateAccess`), beside the one policy and version that
+            decided it (`dynamicPolicyId`, `dynamicPolicyVersion`). ADR-0068, 1 October.
         packageVersion:
           type: string
           nullable: true
@@ -24596,10 +25192,17 @@ components:
           description: The highest `access.entitlement` change included (SD-052, 29 September). A refresh sends it
             as `sinceVersion` and receives only what changed after it, so a 60,000-guest venue is not re-sent
             whole.
+        policySetVersion:
+          type: string
+          description: '**The active admission policy version the package carries** (ADR-0068, 1 October): a
+            fingerprint of the `(id, currentVersion)` of every policy in `dynamicPolicies`, computed the same way by
+            `validateAccess` online. Every scan the gate records carries it (`ScanEvent.policySetVersion`), so a scan
+            decided offline under a set that has since changed is visible at sync rather than assumed equal.'
         dynamicPolicies:
           type: array
-          description: The active guest-admission dynamic policies for this access point's zones (SD-052), so
-            an offline gate applies the same rules as an online one.
+          description: The active guest-admission dynamic policies for this access point's zones (SD-052), each at
+            its active version with its `conditionRule` (ADR-0068), so an offline gate applies the same rules as an
+            online one.
           items:
             $ref: '#/components/schemas/AccessDynamicPolicy'
         entitlements:
@@ -34417,10 +35020,9 @@ components:
         and configuration directory for this screen; each property names the sentence it came from. **Not
         a row** - the screen is a view over the module''s existing state.'
       properties:
-        conditionExpression:
-          type: string
-          description: Condition tree over catalogue attributes using AND, OR, NOT, IN and BETWEEN, e.g. Accreditation
-            = VIP AND Zone = Backstage
+        conditionRule:
+          $ref: '#/components/schemas/AdmissionRule'
+          description: 'The condition, in the closed JSON rule format evaluated the same way online and at the gate (ADR-0068; replaces the free-text `conditionExpression`). For example: Accreditation = VIP AND Zone = Backstage.'
         name:
           type: string
           description: e.g. VIP Backstage Access
@@ -34442,7 +35044,7 @@ components:
       required:
       - policyId
       - name
-      - conditionExpression
+      - conditionRule
       - result
     VisualDynamicPolicyBuilderInput:
       type: object
@@ -34453,10 +35055,9 @@ components:
         directory for this screen; the metrics the screen displays are deliberately absent, because a figure
         the system computed is not a figure a client may send back.'
       properties:
-        conditionExpression:
-          type: string
-          description: Condition tree over catalogue attributes using AND, OR, NOT, IN and BETWEEN, e.g. Accreditation
-            = VIP AND Zone = Backstage
+        conditionRule:
+          $ref: '#/components/schemas/AdmissionRule'
+          description: 'The condition, in the closed JSON rule format evaluated the same way online and at the gate (ADR-0068; replaces the free-text `conditionExpression`). For example: Accreditation = VIP AND Zone = Backstage.'
         name:
           type: string
           description: e.g. VIP Backstage Access
@@ -34496,7 +35097,7 @@ components:
       required:
       - policyId
       - name
-      - conditionExpression
+      - conditionRule
       - result
     ContextTimeEventCapacityPolicyBuilderView:
       type: object
@@ -34517,9 +35118,9 @@ components:
           - requireBiometric
           - requireCompanion
           - requireSupervisor
-        conditionExpression:
-          type: string
-          description: e.g. Zone Occupancy >= 90% AND Day = Friday AND Time BETWEEN 18:00 AND 23:59
+        conditionRule:
+          $ref: '#/components/schemas/AdmissionRule'
+          description: 'The condition, in the closed JSON rule format evaluated the same way online and at the gate (ADR-0068; replaces the free-text `conditionExpression`). For example: Zone Occupancy >= 90% AND Day = Friday AND Time BETWEEN 18:00 AND 23:59.'
         name:
           type: string
         policyId:
@@ -34549,7 +35150,7 @@ components:
       - policyId
       - name
       - contextType
-      - conditionExpression
+      - conditionRule
       - result
     ContextTimeEventCapacityPolicyBuilderInput:
       type: object
@@ -34570,9 +35171,9 @@ components:
           - requireBiometric
           - requireCompanion
           - requireSupervisor
-        conditionExpression:
-          type: string
-          description: e.g. Zone Occupancy >= 90% AND Day = Friday AND Time BETWEEN 18:00 AND 23:59
+        conditionRule:
+          $ref: '#/components/schemas/AdmissionRule'
+          description: 'The condition, in the closed JSON rule format evaluated the same way online and at the gate (ADR-0068; replaces the free-text `conditionExpression`). For example: Zone Occupancy >= 90% AND Day = Friday AND Time BETWEEN 18:00 AND 23:59.'
         name:
           type: string
         policyId:
@@ -34620,7 +35221,7 @@ components:
       - policyId
       - name
       - contextType
-      - conditionExpression
+      - conditionRule
       - result
     IdentityMembershipAccreditationPoliciesView:
       type: object
@@ -34664,9 +35265,9 @@ components:
           type: array
           items:
             type: string
-        conditionExpression:
-          type: string
-          description: e.g. Employee Status = Active AND Current Shift = Active
+        conditionRule:
+          $ref: '#/components/schemas/AdmissionRule'
+          description: 'The condition, in the closed JSON rule format evaluated the same way online and at the gate (ADR-0068; replaces the free-text `conditionExpression`). For example: Employee Status = Active AND Current Shift = Active.'
         validFrom:
           type: string
           format: date-time

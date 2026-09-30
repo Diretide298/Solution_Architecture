@@ -12388,19 +12388,19 @@ screens:
       components:
       - kind: dataTable
         derived: true
-        impliedBy: listAccessPolicies
+        impliedBy: listAuthorisationPolicies
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
       - kind: primaryButton
         derived: true
-        impliedBy: createAccessPolicy
+        impliedBy: createAuthorisationPolicy
         label: Create access policy
         notes: The act the screen exists for.
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
-        impliedBy: createAccessPolicy
+        impliedBy: createAuthorisationPolicy
   states:
     loading: The role-based asset access list.
     error: Could not load. Names which read failed and leaves the role-based asset access untouched.
@@ -12411,12 +12411,12 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: listAccessPolicies
+  - operationId: listAuthorisationPolicies
     contract: identity
     purpose: Who may see which assets
     trigger: onLoad
     provenance: board reading, 19 September 2026
-  - operationId: createAccessPolicy
+  - operationId: createAuthorisationPolicy
     contract: identity
     purpose: Write an asset access policy
     trigger: onAction
