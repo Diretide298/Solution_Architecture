@@ -215,6 +215,11 @@ fi
 # so `"root": "../ticvai"` in projects.json means the same thing in both places.
 # --delete is scoped to viewer/ for the same reason: the packages beside it are
 # not this repository's to remove.
+#
+# public/offline.html is excluded because it is placed on the box by hand and
+# is gitignored, so it is never in the checkout. Without the exclude, --delete
+# removes it on every deploy and the drop silently stops working. An excluded
+# path is also shielded from --delete on the receiving side.
 mkdir -p "$APP_DIR/viewer"
 rsync -a --delete \
   --exclude '.git' \
@@ -223,6 +228,7 @@ rsync -a --delete \
   --exclude 'api/ticvai.db-shm' \
   --exclude 'api/ticvai.db-wal' \
   --exclude '.versions' \
+  --exclude 'public/offline.html' \
   "$REPO/" "$APP_DIR/viewer/"
 
 ( cd "$APP_DIR/viewer" && npm install --omit=dev --silent >/dev/null 2>&1 || true )
