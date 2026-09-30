@@ -3,7 +3,84 @@
 How Block A went into OpenProject project 153 (`ticvai`) on pms.softlabsgroup.in, and the order to do it in next
 time. Written after the first push on 23-24 September, which learned most of this the slow way.
 
-## The order
+**From release `r1` on, a release reaches OpenProject through the release push below: three commands, pulled from
+git on the server.** The step-by-step order after it is how the first pushes were done, and its scripts stay in
+`tools/` for repairs and one-off jobs.
+
+## The release push (from r1; council items C6 and C7, 1 October)
+
+OpenProject holds who, when, state and order. The package, served by ADAM at a release tag, holds what. So a
+ticket's description is a **pointer**: a one-line summary, its key, the artefact ids it builds (operations,
+tables, screen, service), `Pull via ADAM: /ticket <id>` and the release it was written at.
+
+### Here, before tagging (Stage 3 of the release)
+
+```
+python3 tools/op-release.py --release r1        # writes handoff/service-docs/op-release.json
+```
+
+It refuses (and writes nothing) if two keys share one OpenProject id, a new ticket's parent is nowhere, the plan's
+waits have a cycle, or check-key-stability fails. `pms-map.json` is authoritative: a pushed key is never made
+again or re-keyed. Commit the bundle, then tag `r1`: the server checks out the tag and refuses a bundle built for
+another release. `--show KEY ...` prints a ticket's entry and pointer.
+
+### On the OpenProject server: the three commands
+
+```
+/opt/ticvai-release/ticvai/tools/op-release-server.sh dry-run r1
+/opt/ticvai-release/ticvai/tools/op-release-server.sh apply r1
+/opt/ticvai-release/ticvai/tools/op-release-server.sh apply r1 ONLY=descriptions BATCH=200    # staged pointers, repeat
+```
+
+- **dry-run** fetches the tags, checks out `r1` (a checkout with local changes is refused), copies
+  `tools/op-release.rb` and `op-release.json` into the container and prints the full plan of every phase (the
+  first 40 lines of each list; `SHOW=all` for all). The log is kept in `/opt/ticvai-release/.release-out/`.
+- **apply** refuses unless a dry run of the same tag and the same bundle came first, takes the database backup
+  (`/root/databaseBackup/openproject-<time>-r1.dump`), runs it, then copies the new ticket ids out of the
+  container to `.release-out/op-created-r1.json` and prints them.
+- Then, here: `scp root@193.34.144.157:/opt/ticvai-release/.release-out/op-created-r1.json .` (or paste the
+  printed JSON into a file), `python3 tools/op-created-merge.py op-created-r1.json`, commit `pms-map.json`.
+  Only when the create phase made tickets.
+
+`op-release.rb` runs these phases in order, each in one transaction, with no mail, authored by Chinmay Parab
+(`AUTHOR=<login>` if his account is not found by name). It is safe to run again: every phase compares first.
+
+| Phase | What it does |
+|---|---|
+| guard | Refuses if two keys map to one id, or a pushed plan ticket is missing from the project. Runs again after create with the new ids |
+| create | Makes the tickets with no id, parents before children, with assignee, accountable, week, Priority_No. and the pointer. A ticket with the same subject under the same parent and no key of its own is taken, not made twice. A New ticket under the wrong parent is moved under the plan's; a started one is listed. Writes `/tmp/op-created.json` |
+| priority | Priority_No. (the build order) on every plan ticket, started and closed ones too: it is an order, not content |
+| assign | Assignee, accountable and Block A week on New tickets (Surendra is `Surendra Loke`, from the bundle's aliases). A started ticket keeps its people and gets one comment per release naming the plan's (`ASSIGN_COMMENT=0`: none) |
+| links | Removes a direct follows link between two plan tasks that the plan no longer orders, even through a chain, then adds the missing ones. Duplicates are skipped |
+| retire | Tickets that left the plan, New only: on hold (off the board: no assignee, no week) or rejected, with `op-retire.py`'s reason as a comment. Tickets with no reason, and stale sub-tasks, are listed and never touched |
+| descriptions | A New ticket's description becomes its pointer. A started ticket keeps the text its work began against and gets **one** comment: its spec lives in ADAM from this release (found again by its wording, so never twice). New tickets are retitled to the plan (`RETITLE=all`: started ones too). `BATCH=n` limits rewrites and comments per run, earliest build order first |
+| health | Read-only: duplicates, missing, wrong type or parent, tickets the plan does not know, links to Rejected tickets, and how many New tickets still lack their pointer |
+
+`ONLY=phase,phase` runs just those phases (the guard always runs); `LIMIT=n` adds only n links, to time them.
+ADAM's links for new tickets are still loaded on the ADAM box (step 4 below).
+
+### Once: the checkout on the OpenProject server
+
+The repository is cloned read-only, and only the two folders the push needs are checked out. Use a GitLab
+**deploy key** (read-only) or a **deploy token** with `read_repository` only; never a personal token.
+
+```
+ssh-keygen -t ed25519 -N '' -f /root/.ssh/ticvai_release -C 'ticvai release (read-only)'
+cat /root/.ssh/ticvai_release.pub        # add it in GitLab: the project > Settings > Repository > Deploy keys, write access OFF
+export GIT_SSH_COMMAND='ssh -i /root/.ssh/ticvai_release -o IdentitiesOnly=yes'
+git clone --filter=blob:none --no-checkout git@gitlab.softlabsgroup.in:chinmay/ticvai_architecture.git /opt/ticvai-release
+git -C /opt/ticvai-release config core.sshCommand 'ssh -i /root/.ssh/ticvai_release -o IdentitiesOnly=yes'
+git -C /opt/ticvai-release sparse-checkout init --cone
+git -C /opt/ticvai-release sparse-checkout set ticvai/tools ticvai/handoff/service-docs
+git -C /opt/ticvai-release checkout main
+```
+
+With a deploy token over HTTPS instead, the clone URL is
+`https://<token name>:<token>@gitlab.softlabsgroup.in/chinmay/ticvai_architecture.git`. The token then sits in
+`/opt/ticvai-release/.git/config`: `chmod 700 /opt/ticvai-release/.git`. If the server refuses the partial clone,
+drop `--filter=blob:none`. The checkout only ever holds a release tag; nothing is edited or committed there.
+
+## The order (the first pushes, 23-30 September)
 
 1. **Tickets** (from here, through the API). Epics, features and tasks, then sub-tasks, parents first, with full
    descriptions from the start:
