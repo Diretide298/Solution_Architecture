@@ -1,0 +1,163 @@
+{
+ "prototype": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+ "plan": "tools/capture-plans/guest-web-v2.json",
+ "captured": [
+  {
+   "id": "WEB-005",
+   "name": "Ticket Type Selection",
+   "view": "Engine controls → Theme park → Multi-park combo → Book → Fri → 2 park ticket → three adults (the counters take the 2 park ticket's price; one cart line)",
+   "proof": [
+    "Summit Peaks",
+    "Choose your ticket",
+    "2 park ticket",
+    "Selected",
+    "2 park ticket · Adult × 3",
+    "AED 1,425"
+   ],
+   "file": "img/web-005.jpg",
+   "bytes": 154315
+  },
+  {
+   "id": "WEB-006",
+   "name": "Date & Performance Selection",
+   "view": "Engine controls → Water park → Surf sessions with filters → Book → Intermediate surf 09:00 → able to swim → one surfer (the session's tickets appear once it is chosen)",
+   "proof": [
+    "Tickets for Intermediate surf · 09:00",
+    "Surfer",
+    "Spectator",
+    "Intermediate surf · Surfer × 1"
+   ],
+   "file": "img/web-006.png",
+   "bytes": 225641
+  },
+  {
+   "id": "WEB-049",
+   "name": "Transport — Route & Schedule",
+   "view": "Engine controls → Transport → Route & schedule · one-way, multi-trip, favourites → Book → Fri (stations filled in, departures without a search)",
+   "proof": [
+    "Select Bus Station, Route & Schedule",
+    "One-way trip",
+    "Favourites",
+    "Time period",
+    "All departures",
+    "Arrives"
+   ],
+   "file": "img/web-049.png",
+   "bytes": 149724
+  },
+  {
+   "id": "WEB-050",
+   "name": "Plan Your Visit",
+   "view": "Visit Planner → the six questions (defaults) → Make my plan (Your plan)",
+   "proof": [
+    "Summit Peaks",
+    "Your plan",
+    "A day that fits your group",
+    "Change answers",
+    "Swap",
+    "Book this plan"
+   ],
+   "file": "img/web-050.png",
+   "bytes": 202147,
+   "prototype": "sources/designs/guest-rev3-30-september/TICVAI Visit Planner.dc.html"
+  },
+  {
+   "id": "WEB-036",
+   "name": "F&B – Browse & Order",
+   "view": "Summit Peaks → header 'At the venue' → Order food (table ordering)",
+   "proof": [
+    "Summit Peaks",
+    "The Crater Grill",
+    "Table 14",
+    "Your order",
+    "Send to the kitchen"
+   ],
+   "file": "img/web-036.png",
+   "bytes": 194783
+  },
+  {
+   "id": "WEB-039",
+   "name": "Venue Map & Wait Times",
+   "view": "Summit Peaks → header 'At the venue' → Map & waits (3D view, with the 2D plan one tap away)",
+   "proof": [
+    "Summit Peaks",
+    "3D view",
+    "2D plan",
+    "Same plan, drawn two ways",
+    "Rides & shows"
+   ],
+   "file": "img/web-039.png",
+   "bytes": 188206
+  },
+  {
+   "id": "WEB-040",
+   "name": "Virtual Queue",
+   "view": "Summit Peaks → header 'At the venue' → Virtual queue",
+   "proof": [
+    "Summit Peaks",
+    "Open for virtual queueing",
+    "Summit Coaster",
+    "Next return window",
+    "Join the queue"
+   ],
+   "file": "img/web-040.png",
+   "bytes": 136340
+  },
+  {
+   "id": "WEB-041",
+   "name": "Parking – Reserve & Pay",
+   "view": "Summit Peaks → header 'At the venue' → Parking",
+   "proof": [
+    "Summit Peaks",
+    "Choose a car park",
+    "Premium — by the gate",
+    "Number plate",
+    "Reserve and pay"
+   ],
+   "file": "img/web-041.png",
+   "bytes": 123071
+  },
+  {
+   "id": "WEB-042",
+   "name": "Retail & Shop and Drop",
+   "view": "Summit Peaks → header 'At the venue' → Shop (collect at the gate, at the car park kiosk, or delivered home)",
+   "proof": [
+    "Summit Peaks",
+    "In the shop today",
+    "Collect on the way out",
+    "Collect at the gate",
+    "Deliver to my home"
+   ],
+   "file": "img/web-042.png",
+   "bytes": 186024
+  },
+  {
+   "id": "WEB-043",
+   "name": "Loyalty & Rewards",
+   "view": "Summit Peaks → header 'At the venue' → Loyalty",
+   "proof": [
+    "Summit Peaks",
+    "Platinum at 5,000",
+    "Earned today",
+    "Spend them here",
+    "Redeem"
+   ],
+   "file": "img/web-043.png",
+   "bytes": 107510
+  },
+  {
+   "id": "WEB-046",
+   "name": "In-Venue Notifications",
+   "view": "Summit Peaks → header 'At the venue' → Alerts",
+   "proof": [
+    "Summit Peaks",
+    "Summit Coaster is calling your party",
+    "FNB-4471 is being made",
+    "Queue calls and order updates always send"
+   ],
+   "file": "img/web-046.png",
+   "bytes": 99863
+  }
+ ],
+ "missing": []
+}

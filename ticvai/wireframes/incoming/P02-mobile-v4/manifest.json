@@ -1,5 +1,5 @@
 {
- "prototype": "sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html",
+ "prototype": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
  "plan": "tools/capture-plans/guest-mobile-v4.json",
  "captured": [
   {
@@ -12,7 +12,7 @@
     "Start planning"
    ],
    "file": "img/gst-001.jpg",
-   "bytes": 82031
+   "bytes": 82143
   },
   {
    "id": "GST-002",
@@ -27,7 +27,7 @@
     "Junior Circuit"
    ],
    "file": "img/gst-002.jpg",
-   "bytes": 62995
+   "bytes": 63002
   },
   {
    "id": "GST-063",
@@ -37,7 +37,7 @@
     "Summit Coaster"
    ],
    "file": "img/gst-063.png",
-   "bytes": 158634
+   "bytes": 158738
   },
   {
    "id": "GST-003",
@@ -61,7 +61,7 @@
     "Where it is"
    ],
    "file": "img/gst-004.jpg",
-   "bytes": 65018
+   "bytes": 65005
   },
   {
    "id": "GST-006",
@@ -74,7 +74,7 @@
     "Choose an entry time"
    ],
    "file": "img/gst-006.png",
-   "bytes": 217128
+   "bytes": 217162
   },
   {
    "id": "GST-007",
@@ -87,7 +87,7 @@
     "12:00 – 15:00"
    ],
    "file": "img/gst-007.png",
-   "bytes": 54571
+   "bytes": 53754
   },
   {
    "id": "GST-008",
@@ -126,7 +126,7 @@
     "Pay AED 900"
    ],
    "file": "img/gst-041.jpg",
-   "bytes": 55117
+   "bytes": 55246
   },
   {
    "id": "GST-012",
@@ -138,7 +138,7 @@
     "Single day · 2 adults, 1 child"
    ],
    "file": "img/gst-012.jpg",
-   "bytes": 74325
+   "bytes": 74265
   },
   {
    "id": "GST-051",
@@ -189,20 +189,20 @@
     "Services"
    ],
    "file": "img/gst-038.png",
-   "bytes": 100583
+   "bytes": 100219
   },
   {
    "id": "GST-021",
    "name": "Interactive Map",
-   "view": "At the venue → Map (the venue map, scrolled to the map and nearest-place filters)",
+   "view": "At the venue → Nearest food → Start (walking navigation: the 3D map follows the route, turn-by-turn above it)",
    "proof": [
-    "Nearest toilets",
-    "Nearest food",
-    "Nearest rides",
-    "Alerts"
+    "End navigation",
+    "to go",
+    "The Crater Grill",
+    "Nearest toilets"
    ],
    "file": "img/gst-021.png",
-   "bytes": 94077
+   "bytes": 87944
   },
   {
    "id": "GST-022",
@@ -214,7 +214,55 @@
     "Canyon Rapids"
    ],
    "file": "img/gst-022.png",
-   "bytes": 124551
+   "bytes": 124691
+  },
+  {
+   "id": "GST-076",
+   "name": "Intercity Trip — Route & Schedule",
+   "view": "Emirates Link → Buy → Sharjah – Dubai – Abu Dhabi → Book now → a date (Plan your trip: stations filled in, the route map and the departures)",
+   "proof": [
+    "Save this route",
+    "Departures",
+    "8 stops · adult fare AED 25"
+   ],
+   "file": "img/gst-076.png",
+   "bytes": 41400
+  },
+  {
+   "id": "GST-077",
+   "name": "Intercity Trip — Route & Passengers",
+   "view": "… Plan your trip → departure 07:00 → one adult (the passengers under the chosen departure)",
+   "proof": [
+    "Adult",
+    "Person of determination",
+    "1 item",
+    "AED 25"
+   ],
+   "file": "img/gst-077.png",
+   "bytes": 49841
+  },
+  {
+   "id": "GST-078",
+   "name": "Intercity Trip — Multi-trip Passes",
+   "view": "… Plan your trip → Multi-trip (multi-trip cards for this route)",
+   "proof": [
+    "Multi-trip cards for this route",
+    "5-trip card",
+    "Monthly unlimited"
+   ],
+   "file": "img/gst-078.png",
+   "bytes": 52405
+  },
+  {
+   "id": "GST-079",
+   "name": "Intercity Trip — Favourite Routes",
+   "view": "… Plan your trip → Save this route → Favourites (the saved route)",
+   "proof": [
+    "Favourites · 1",
+    "Sharjah → AD Central"
+   ],
+   "file": "img/gst-079.png",
+   "bytes": 54311
   }
  ],
  "missing": []

@@ -1512,17 +1512,12 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-005
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (30 September build)
+      verified: '2026-10-01'
       match: partial
-      view: Header 'Book' (or any card's Book) → step 1 'Tickets' of the booking stepper; e.g. Tidewater
-        Museum → 'Category → subcategory tickets'
-      differences: 'Ticket choice is on the same step as date and time and comes last: ''Date → time →
-        ticket'' (Config ''Performance reveal'', Rev 3 item 2), whereas YAML goes WEB-005 → WEB-006. Prototype
-        adds category → subcategory browsing, info-only (not bookable) products, ''Help me choose'' questions,
-        location switcher (''Booking at'' bar), quick tour. Promo codes are entered in the cart, not on
-        this step (YAML keeps evaluatePromotions here).'
+      view: 'Engine controls → Theme park → Multi-park combo → Book → Fri → 2 park ticket → three adults (the counters take the 2 park ticket''s price; one cart line)'
+      differences: 'Ticket choice is on the same step as date and time and comes last: ''Date → time → ticket'' (Config ''Performance reveal'', Rev 3 item 2), whereas YAML goes WEB-005 → WEB-006. Prototype adds category → subcategory browsing, info-only (not bookable) products, ''Help me choose'' questions, location switcher (''Booking at'' bar), quick tour. Promo codes are entered in the cart, not on this step (YAML keeps evaluatePromotions here). 30 September: the guest counters take their price from the ticket chosen (2 park ticket, three adults: one line, AED 1,425), and Group / school booking starts from four group tickets with a typed headcount. The same flow''s Read more panel still prices guests at single-park rates (Adult AED 325, Infant AED 475): a prototype defect; the counters on the page are the reference.'
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -1601,7 +1596,20 @@ screens:
 
 
     **29 September.** W4: Help me choose filters. W8: in a product-first flow (workshop) this step comes
-    first and the date follows. W5: surf levels appear only after a time slot.'
+    first and the date follows. W5: surf levels appear only after a time slot.
+
+    **30 September (client feedback, CLIENT-RESPONSE-30SEP 1 and 2).** **Guest counters take the chosen
+    ticket''s prices:** the guest types (adult, child, senior, infant) are the chosen product''s
+    variants and are priced from it (`listProductVariants`), so *2 park ticket* with three adults is one
+    line, *2 park ticket · Adult × 3*, never a ticket line plus a separate adult line; child and senior
+    follow the chosen ticket, and an infant stays free where the ticket says so. **Group and school
+    booking starts from the group tickets** (in the client build: School, Corporate, Tour operator and
+    Community), each card with its per-person price and minimum group size, then **How many people** as
+    a number box the guest can type into (for example 45) or step with − and + (the app adds a +10
+    step); there is no Group size dropdown. The estimate reads *<ticket> · Guests × <n>*, and the
+    request is `requestGroupBooking` with the group ticket as `packageProductId` and the headcount as
+    `expectedSize`. Supervisors listed separately and free, and a water-park group choosing a session,
+    are not in the contract yet (questions of 1 October).'
 - id: WEB-006
   name: Date & Performance Selection
   module: Booking & Selection
@@ -1685,7 +1693,15 @@ screens:
     **29 September.** M17-08: the date strip shows the next seven days, with a calendar for later dates.
     W5: surf products (beginner, intermediate …) only after a time slot. W8: the date-first default no
     longer overrides product-first flows: order comes from the flow. W11: tours stay date → language →
-    time slot, unchanged.'
+    time slot, unchanged.
+
+    **30 September (client feedback, CLIENT-RESPONSE-30SEP 3 and 4).** **Choosing a session adds nothing
+    to the cart.** Once a session is chosen its tickets appear (for a surf session: Surfer at the
+    session price, Junior surfer 10–15, Spectator) and a line reaches the cart (`addCartLine`) only when
+    a quantity is set; until a session is chosen the ticket area says *Choose a session above to see its
+    tickets and prices.* **A question the flow already asks on the page is not asked again** in the
+    consent pop-up: on the water park''s swim-ability flow the *Are you able to swim?* answer given on
+    the page stands.'
   density: compact
   pattern: statusTracker
   patternReason: '`getAvailability` reads one record and nothing reads a population — the screen is about
@@ -1843,16 +1859,12 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-006
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (30 September build)
+      verified: '2026-10-01'
       match: partial
-      view: Book → step 1; e.g. Summit Peaks → 'Timed access — 10-minute slots', Coastal Aqua → 'Surf
-        sessions with filters'
-      differences: Merged into the ticket step (date first, time revealed after the date, tickets after
-        the time). Prototype adds morning/afternoon/evening filters, times-per-page paging, sold-out greying,
-        per-guest age/height eligibility dialog with 'Remove this guest', and the water-park 'Are you
-        able to swim?' pop-up. YAML's separate hold call (addCartLine / inventory hold) is implicit.
+      view: 'Engine controls → Water park → Surf sessions with filters → Book → Intermediate surf 09:00 → able to swim → one surfer (the session''s tickets appear once it is chosen)'
+      differences: 'Merged into the ticket step (date first, time revealed after the date, tickets after the time). Prototype adds morning/afternoon/evening filters, times-per-page paging, sold-out greying, per-guest age/height eligibility dialog with ''Remove this guest'', and the water-park ''Are you able to swim?'' pop-up. YAML''s separate hold call (addCartLine / inventory hold) is implicit. 30 September: a session''s tickets (Surfer, Junior surfer, Spectator) appear once the session is chosen, and choosing it adds nothing to the cart.'
   apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -8379,7 +8391,12 @@ screens:
     body: '**Collects what `requestGroupBooking` sends before it is called.** Required: `kind`, `packageProductId`,
       `preferredDate`, `expectedSize`. Optional: `organisationName`, `yearGroup`, `accessAndDietaryNeeds`,
       `celebrantName`, `celebrantTurningAge`, `allergiesAndRequests`. Dismissing sends nothing; the screen
-      behind is unchanged.'
+      behind is unchanged.
+
+      **30 September (client feedback, CLIENT-RESPONSE-30SEP 1).** The group ticket is chosen first
+      (`packageProductId`: cards with the per-person price and the minimum group size), then *How many
+      people* (`expectedSize`) as a number box the guest types into or steps with − and + (+10 on the
+      app); no Group size dropdown. The estimate reads *<ticket> · Guests × <n>*.'
     bindsTo: GroupBookingRequest
     confirm:
       label: Request group booking
@@ -9563,15 +9580,12 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-036
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (30 September build)
+      verified: '2026-10-01'
       match: exact
-      view: Header 'At the venue' → 'Order food'; also Saffron Table → 'Takeaway — collect' / 'Delivery'
-        flows
-      differences: Prototype splits in-venue table ordering (At the venue) from takeaway/delivery ordering
-        (a booking flow with a delivery-area and slot check). Table reservation and waitlist (in YAML
-        apis) are booking flows at Saffron Table.
+      view: 'Summit Peaks → header ''At the venue'' → Order food (table ordering)'
+      differences: 'Prototype splits in-venue table ordering (At the venue) from takeaway/delivery ordering (a booking flow with a delivery-area and slot check). Table reservation and waitlist (in YAML apis) are booking flows at Saffron Table.'
   apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -10145,12 +10159,12 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-039
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (30 September build)
+      verified: '2026-10-01'
       match: exact
-      view: At the venue → 'Map & waits'
-      differences: Prototype adds turn-by-turn walking directions and navigation mode.
+      view: 'Summit Peaks → header ''At the venue'' → Map & waits (3D view, with the 2D plan one tap away)'
+      differences: 'Prototype adds turn-by-turn walking directions and navigation mode. The map has a 3D view / 2D plan switch ("Same plan, drawn two ways"); no map3dUnavailable or weakGps state is drawn.'
     derivedFrom: wireframes/reference/Seat Board 3.dc.html
     note: '**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
@@ -10303,11 +10317,11 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-040
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (30 September build)
+      verified: '2026-10-01'
       match: exact
-      view: At the venue → 'Virtual queue'
+      view: 'Summit Peaks → header ''At the venue'' → Virtual queue'
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -10531,14 +10545,12 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-041
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (30 September build)
+      verified: '2026-10-01'
       match: partial
-      view: At the venue → 'Parking'
-      differences: Shows live free-bay counts, which the YAML says it does not have (no live availability;
-        full = soldOutForDay). Pays directly with 'Reserve and pay' rather than through cart and checkout
-        (R166). Also a plate field in the cabana/party flows.
+      view: 'Summit Peaks → header ''At the venue'' → Parking'
+      differences: 'Shows live free-bay counts, which the YAML says it does not have (no live availability; full = soldOutForDay). Pays directly with ''Reserve and pay'' rather than through cart and checkout (R166). Also a plate field in the cabana/party flows.'
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -10765,12 +10777,12 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-042
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (30 September build)
+      verified: '2026-10-01'
       match: exact
-      view: At the venue → 'Shop & drop'
-      differences: Pays in one tap on the page, not through the cart and checkout (YAML R236).
+      view: 'Summit Peaks → header ''At the venue'' → Shop (collect at the gate, at the car park kiosk, or delivered home)'
+      differences: 'Pays in one tap on the page, not through the cart and checkout (YAML R236). 29 September: collect at the gate, at the car park kiosk, or delivered home, with a collection code after paying.'
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -10944,13 +10956,12 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-043
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (30 September build)
+      verified: '2026-10-01'
       match: exact
-      view: At the venue → 'Loyalty'
-      differences: Placed inside the in-venue section; referral code appears under Account → Groups &
-        invitations (YAML createReferral is here).
+      view: 'Summit Peaks → header ''At the venue'' → Loyalty'
+      differences: 'Placed inside the in-venue section; referral code appears under Account → Groups & invitations (YAML createReferral is here).'
   apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -11473,13 +11484,12 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-046
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (30 September build)
+      verified: '2026-10-01'
       match: exact
-      view: At the venue → 'Alerts'
-      differences: 'Deferred in the YAML (release later, R242: no in-app feed in the first release), but
-        the prototype draws it as a live section, so the client will expect it.'
+      view: 'Summit Peaks → header ''At the venue'' → Alerts'
+      differences: 'Deferred in the YAML (release later, R242: no in-app feed in the first release), but the prototype draws it as a live section, so the client will expect it.'
   apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
@@ -11932,7 +11942,19 @@ screens:
     routes, *Book this route* prefills one-way; remove. *Change your trip free up to two hours before
     departure* is the proposed default of the venue''s modification policy, client to correct. **The real
     network (stations, fares, timetable) is an open value from the client**; the prototype''s Emirates
-    Link data is illustrative.'
+    Link data is illustrative.
+
+    **30 September (client feedback, CLIENT-RESPONSE-30SEP 5 and 6).** **A route opens with its stations
+    filled in:** entered from a route (a transport product or a route card), From and To are that
+    route''s first and last stops (for example E201: Abu Dhabi Central Bus Station to Al Ain Central Bus
+    Station); the guest can still change or swap them. **Departures show straight away** for those
+    stations and the date (`searchTransportDepartures` on load and on every change), with no need to
+    press *Search Trips*; the time-period buttons filter the departures listed, and pressing the chosen
+    period again shows them all. **Passengers appear only after a departure is chosen** (the departure
+    first, then the tickets). The client build also has a *Popular routes* card view (route cards with a
+    from-fare and *Book*, then the date, the departures and the passengers; on the app the first
+    transport product); a route list with a from-fare is not in the contract yet (a question of 1
+    October), so it is not specified here.'
   density: compact
   pattern: listDetail
   patternReason: '`searchTransportDepartures` reads the population of departures and one is chosen for
@@ -12096,7 +12118,7 @@ screens:
   - operationId: searchTransportDepartures
     contract: transport
     purpose: Departures for the stations, date, period and party, with counts per period
-    trigger: onAction
+    trigger: onLoad
   - operationId: getNextTransportDeparture
     contract: transport
     purpose: The next departure with room for the party
@@ -12152,11 +12174,12 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-049
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
-      verified: 2026-09-28
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (30 September build)
+      verified: '2026-10-01'
       match: exact
-      view: Emirates Link → 'Route & schedule · one-way, multi-trip, favourites'
+      view: 'Engine controls → Transport → Route & schedule · one-way, multi-trip, favourites → Book → Fri (stations filled in, departures without a search)'
+      differences: '30 September: the route opens with its stations filled in and the departures listed without a search; the time-period buttons filter them. The engine''s other transport flow, Popular routes (card view), is route cards with a from-fare and Book, then the date, the departures and the passengers. The route map needs a street-map tile provider (audit R038).'
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
   overlays:
@@ -12408,9 +12431,9 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-050
     prototype:
-      file: sources/designs/guest-rev3-29-september/TICVAI Visit Planner.dc.html
-      rev: Visit Planner (29 September build)
-      verified: '2026-09-29'
+      file: sources/designs/guest-rev3-30-september/TICVAI Visit Planner.dc.html
+      rev: Visit Planner (30 September build)
+      verified: '2026-10-01'
       match: exact
-      view: 'Header *Plan your visit* (web build), or the Visit Planner file: questions, then Your plan
-        and Book this plan'
+      view: 'Visit Planner → the six questions (defaults) → Make my plan (Your plan)'
+      differences: 'Single-park planner: no "Which park each day?" step, no shops or kiosks as plan stops and no preferenceNotAtVenue (MoM 4.7, 30 September); these are pending in design: specified, and built from the definition until the design shows it (handoff/design-batches/apps/1-guest-app/README.md).'

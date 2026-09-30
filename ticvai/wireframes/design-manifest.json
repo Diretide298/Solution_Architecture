@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/derive-design-manifest.py",
- "generated": "2026-09-30",
+ "generated": "2026-10-01",
  "note": "The Claude Design work list. Status is read off wireframes/frames/ every run and never stored, so a batch cannot claim to be finished and not be. Batches with thin screens sort last: a screen with fewer than 4 components cannot be drawn from what it declares, and drawing it invents requirements.",
  "batchSize": 10,
  "drawableAt": 4,
@@ -10,39 +10,22 @@
  "counts": {
   "batches": 303,
   "screens": 2445,
-  "framesOnDisk": 156,
+  "framesOnDisk": 157,
   "byStatus": {
    "pending": 264,
-   "partial": 1,
-   "drawn": 32,
+   "partial": 0,
+   "drawn": 33,
    "locked": 6
   },
   "screensByStatus": {
    "pending": 2288,
-   "partial": 5,
-   "drawn": 122,
+   "partial": 0,
+   "drawn": 127,
    "locked": 30
   },
   "fullyDrawableBatches": 61
  },
  "batches": [
-  {
-   "id": "P01-discovery-browse-01",
-   "kind": "module",
-   "label": "P01 · Discovery & Browse",
-   "platform": "P01",
-   "screens": [
-    "WEB-001",
-    "WEB-002",
-    "WEB-003",
-    "WEB-004",
-    "WEB-050"
-   ],
-   "drawable": 5,
-   "thin": 0,
-   "frames": 4,
-   "status": "partial"
-  },
   {
    "id": "P05-ai-01",
    "kind": "module",
@@ -5546,6 +5529,23 @@
     "WEB-012",
     "WEB-013",
     "WEB-014"
+   ],
+   "drawable": 5,
+   "thin": 0,
+   "frames": 5,
+   "status": "drawn"
+  },
+  {
+   "id": "P01-discovery-browse-01",
+   "kind": "module",
+   "label": "P01 · Discovery & Browse",
+   "platform": "P01",
+   "screens": [
+    "WEB-001",
+    "WEB-002",
+    "WEB-003",
+    "WEB-004",
+    "WEB-050"
    ],
    "drawable": 5,
    "thin": 0,
