@@ -26,6 +26,8 @@ ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "handoff" / "service-docs"
 sys.path.insert(0, str(Path(__file__).parent))
 LEAD = __import__("push-openproject").LEAD
+# The plan's short name -> the person's name in OpenProject, where they differ (Surendra's account, 30 September).
+OP_NAME = {"Surendra": "Surendra Loke"}
 
 
 def main() -> int:
@@ -56,7 +58,8 @@ def main() -> int:
             version = mp.get(f"VERSION-W{wk}") if wk else None
         else:
             assignee, version = r["assignee"] or None, None
-        acct = accountable(r)
+        acct = OP_NAME.get(accountable(r), accountable(r))
+        assignee = OP_NAME.get(assignee, assignee)
         tickets[str(wp)] = {"key": key, "assignee": assignee, "responsible": acct, "version": version,
                             "setVersion": r["type"] == "Task"}
         people.update(p for p in (assignee, acct) if p)
