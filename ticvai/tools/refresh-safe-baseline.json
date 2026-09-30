@@ -22,39 +22,7 @@
   }
  },
  "refresh_tools_coverage": {
-  "why": "refresh.sh ends by failing when tools/ holds a .py it neither runs nor names in _EXCLUDED. At 278cc437 it fails on these, and nobody saw, because refresh.sh stops at run-checks (two known gate failures) before reaching it. refresh-safe.sh runs the block and fails only on a name not listed here. Deciding each one (run it, or excuse it in _EXCLUDED with the reason) is refresh.sh's owner's call.",
-  "known_unexcused": [
-   "adam-links",
-   "build-audit-decisions",
-   "build-client-readiness",
-   "build-closeout-register",
-   "build-decisions-workbook",
-   "build-hld-lld",
-   "build-readiness-page",
-   "build-readiness-questions",
-   "ddl_forward",
-   "fix-audit-contract-screens",
-   "fix-audit-conventions",
-   "fix-audit-derived-labels",
-   "fix-audit-load-triggers",
-   "fix-audit-op-descriptions",
-   "fix-audit-stale-graph-refs",
-   "fix-audit-stale-inventory-questions",
-   "fix-audit-state-models",
-   "link-reference-frames",
-   "md-to-docx",
-   "op-assign-sync",
-   "op-bulk-links",
-   "op-check",
-   "op-created-merge",
-   "op-order-sync",
-   "op-recent",
-   "op-release",
-   "op-retire",
-   "op-review",
-   "push-openproject",
-   "release-notes",
-   "release_baseline"
-  ]
+  "why": "refresh.sh ends by failing when tools/ holds a .py it neither runs nor names in _EXCLUDED. At 278cc437 it fails on these, and nobody saw, because refresh.sh stops at run-checks (two known gate failures) before reaching it. refresh-safe.sh runs the block and fails only on a name not listed here. Deciding each one (run it, or excuse it in _EXCLUDED with the reason) is refresh.sh's owner's call. Emptied 1 October: every tool is now run or excused in _EXCLUDED.",
+  "known_unexcused": []
  }
 }
