@@ -69,6 +69,12 @@ NEW_QUESTIONS = [
      "captures, in each region you operate? (Asked before; restated with what we built.)", "a",
      "Face Tag deleted once the ticket is fully used; Face Pass retention set by each venue. The legal limit "
      "you confirm becomes a floor no venue setting can go below.", "Your data protection counsel"),
+    ("Guest data", "Biometrics for children",
+     "Adults may have face data stored with their consent. For guests under 18, should face capture (Face Pass, "
+     "Face Tag) be excluded entirely, or allowed with a consent form signed by a parent or guardian? (Raised in "
+     "the 30 September meeting.)", "a",
+     "Face capture is not offered to guests under 18 until you decide; with guardian consent, the guardian's "
+     "signed consent is recorded against the child's ticket before capture.", "Your data protection counsel"),
     ("Forecasting", "Weather data",
      "Do you approve a commercial weather data service as an input to attendance forecasting, and its monthly "
      "cost?", "d",

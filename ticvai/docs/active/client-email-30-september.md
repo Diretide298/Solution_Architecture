@@ -20,7 +20,7 @@ Thank you for yesterday's session. Everything we agreed is now in the specificat
 1. E-invoicing: your accredited provider, the date your mandate applies, whether B2C invoices are in the first phase, and the VAT 201 layout you file.
 2. Guest checkout: whether ticking marketing consent during a guest checkout counts as consent for you. Until you confirm, the box is shown unticked.
 3. Availability: which services the 99.99% commitment covers.
-4. Biometrics: where face templates may be stored and how long they are kept (for your data protection officer).
+4. Biometrics: where face templates may be stored and how long they are kept (for your data protection officer), and, for guests under 18, whether face capture is excluded entirely or allowed with a consent form signed by a parent or guardian. Until you decide, it is not offered to under-18s.
 5. App stores: an Apple Developer account (with a D-U-N-S number) and a Google Play account for each client.
 6. Still open from earlier: intercity stations, fares and timetable; cabana numbering and prices; real venue photos and videos; the Stripe and Network International sandbox credentials with the name of your finance or payments owner; and the name of your design reviewer, who signs off each wireframe batch within 3 working days.
 7. The B2B portal: we are drawing both options (POS-style and website-style) and will share them for your choice.
