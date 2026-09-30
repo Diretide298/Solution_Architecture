@@ -120034,76 +120034,6 @@
 "assignee": "Deep Khanvilkar"
 },
 {
-"key": "19391",
-"kind": "operation",
-"id": "wallet#transferWalletBalance",
-"url": "https://pms.softlabsgroup.in/work_packages/19391",
-"subject": "[BE] transferWalletBalance: POST /wallets/{walletId}/transfer",
-"status": "New",
-"type": "Sub Task",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "19391",
-"kind": "service",
-"id": "WalletService",
-"url": "https://pms.softlabsgroup.in/work_packages/19391",
-"subject": "[BE] transferWalletBalance: POST /wallets/{walletId}/transfer",
-"status": "New",
-"type": "Sub Task",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "19391",
-"kind": "table",
-"id": "pii.subject",
-"url": "https://pms.softlabsgroup.in/work_packages/19391",
-"subject": "[BE] transferWalletBalance: POST /wallets/{walletId}/transfer",
-"status": "New",
-"type": "Sub Task",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "19391",
-"kind": "table",
-"id": "wallet.wallet",
-"url": "https://pms.softlabsgroup.in/work_packages/19391",
-"subject": "[BE] transferWalletBalance: POST /wallets/{walletId}/transfer",
-"status": "New",
-"type": "Sub Task",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "19391",
-"kind": "table",
-"id": "wallet.wallet_transaction",
-"url": "https://pms.softlabsgroup.in/work_packages/19391",
-"subject": "[BE] transferWalletBalance: POST /wallets/{walletId}/transfer",
-"status": "New",
-"type": "Sub Task",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "19391",
-"kind": "screen",
-"id": "GST-071",
-"url": "https://pms.softlabsgroup.in/work_packages/19391",
-"subject": "[BE] transferWalletBalance: POST /wallets/{walletId}/transfer",
-"status": "New",
-"type": "Sub Task",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "19391",
-"kind": "screen",
-"id": "WEB-021",
-"url": "https://pms.softlabsgroup.in/work_packages/19391",
-"subject": "[BE] transferWalletBalance: POST /wallets/{walletId}/transfer",
-"status": "New",
-"type": "Sub Task",
-"assignee": "Deep Khanvilkar"
-},
-{
 "key": "19392",
 "kind": "operation",
 "id": "wallet#getWallet",
@@ -167164,56 +167094,6 @@
 "assignee": "Pranay Shinde"
 },
 {
-"key": "20189",
-"kind": "operation",
-"id": "orders#updateGroupBooking",
-"url": "https://pms.softlabsgroup.in/work_packages/20189",
-"subject": "[BE] updateGroupBooking: PATCH /group-bookings/{groupBookingId}",
-"status": "New",
-"type": "Sub Task",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "20189",
-"kind": "service",
-"id": "OrderService",
-"url": "https://pms.softlabsgroup.in/work_packages/20189",
-"subject": "[BE] updateGroupBooking: PATCH /group-bookings/{groupBookingId}",
-"status": "New",
-"type": "Sub Task",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "20189",
-"kind": "table",
-"id": "orders.group_booking",
-"url": "https://pms.softlabsgroup.in/work_packages/20189",
-"subject": "[BE] updateGroupBooking: PATCH /group-bookings/{groupBookingId}",
-"status": "New",
-"type": "Sub Task",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "20189",
-"kind": "table",
-"id": "pii.subject",
-"url": "https://pms.softlabsgroup.in/work_packages/20189",
-"subject": "[BE] updateGroupBooking: PATCH /group-bookings/{groupBookingId}",
-"status": "New",
-"type": "Sub Task",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "20189",
-"kind": "screen",
-"id": "BO-026",
-"url": "https://pms.softlabsgroup.in/work_packages/20189",
-"subject": "[BE] updateGroupBooking: PATCH /group-bookings/{groupBookingId}",
-"status": "New",
-"type": "Sub Task",
-"assignee": "Deep Khanvilkar"
-},
-{
 "key": "20190",
 "kind": "operation",
 "id": "orders#getRefundPolicy",
@@ -190574,76 +190454,6 @@
 "assignee": "Pallavi Sawant"
 },
 {
-"key": "18070",
-"kind": "operation",
-"id": "wallet#transferWalletBalance",
-"url": "https://pms.softlabsgroup.in/work_packages/18070",
-"subject": "[BE] WalletService: getWalletAutoReloadSetting, getWalletExitBalance, setWalletAutoReloadSetting, settleWalletAtExit",
-"status": "New",
-"type": "Task",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "18070",
-"kind": "service",
-"id": "WalletService",
-"url": "https://pms.softlabsgroup.in/work_packages/18070",
-"subject": "[BE] WalletService: getWalletAutoReloadSetting, getWalletExitBalance, setWalletAutoReloadSetting, settleWalletAtExit",
-"status": "New",
-"type": "Task",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "18070",
-"kind": "table",
-"id": "pii.subject",
-"url": "https://pms.softlabsgroup.in/work_packages/18070",
-"subject": "[BE] WalletService: getWalletAutoReloadSetting, getWalletExitBalance, setWalletAutoReloadSetting, settleWalletAtExit",
-"status": "New",
-"type": "Task",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "18070",
-"kind": "table",
-"id": "wallet.wallet",
-"url": "https://pms.softlabsgroup.in/work_packages/18070",
-"subject": "[BE] WalletService: getWalletAutoReloadSetting, getWalletExitBalance, setWalletAutoReloadSetting, settleWalletAtExit",
-"status": "New",
-"type": "Task",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "18070",
-"kind": "table",
-"id": "wallet.wallet_transaction",
-"url": "https://pms.softlabsgroup.in/work_packages/18070",
-"subject": "[BE] WalletService: getWalletAutoReloadSetting, getWalletExitBalance, setWalletAutoReloadSetting, settleWalletAtExit",
-"status": "New",
-"type": "Task",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "18070",
-"kind": "screen",
-"id": "GST-071",
-"url": "https://pms.softlabsgroup.in/work_packages/18070",
-"subject": "[BE] WalletService: getWalletAutoReloadSetting, getWalletExitBalance, setWalletAutoReloadSetting, settleWalletAtExit",
-"status": "New",
-"type": "Task",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "18070",
-"kind": "screen",
-"id": "WEB-021",
-"url": "https://pms.softlabsgroup.in/work_packages/18070",
-"subject": "[BE] WalletService: getWalletAutoReloadSetting, getWalletExitBalance, setWalletAutoReloadSetting, settleWalletAtExit",
-"status": "New",
-"type": "Task",
-"assignee": "Deep Khanvilkar"
-},
-{
 "key": "20686",
 "kind": "operation",
 "id": "wallet#listWalletTransactions",
@@ -199532,56 +199342,6 @@
 "status": "New",
 "type": "Task",
 "assignee": "Chinmay Patkar"
-},
-{
-"key": "18375",
-"kind": "operation",
-"id": "orders#updateGroupBooking",
-"url": "https://pms.softlabsgroup.in/work_packages/18375",
-"subject": "[BE] OrderService: getChargebackAnalytics, recordChargeback, recordChargebackOutcome, relinquishStoredValue",
-"status": "New",
-"type": "Task",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "18375",
-"kind": "service",
-"id": "OrderService",
-"url": "https://pms.softlabsgroup.in/work_packages/18375",
-"subject": "[BE] OrderService: getChargebackAnalytics, recordChargeback, recordChargebackOutcome, relinquishStoredValue",
-"status": "New",
-"type": "Task",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "18375",
-"kind": "table",
-"id": "orders.group_booking",
-"url": "https://pms.softlabsgroup.in/work_packages/18375",
-"subject": "[BE] OrderService: getChargebackAnalytics, recordChargeback, recordChargebackOutcome, relinquishStoredValue",
-"status": "New",
-"type": "Task",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "18375",
-"kind": "table",
-"id": "pii.subject",
-"url": "https://pms.softlabsgroup.in/work_packages/18375",
-"subject": "[BE] OrderService: getChargebackAnalytics, recordChargeback, recordChargebackOutcome, relinquishStoredValue",
-"status": "New",
-"type": "Task",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "18375",
-"kind": "screen",
-"id": "BO-026",
-"url": "https://pms.softlabsgroup.in/work_packages/18375",
-"subject": "[BE] OrderService: getChargebackAnalytics, recordChargeback, recordChargebackOutcome, relinquishStoredValue",
-"status": "New",
-"type": "Task",
-"assignee": "Deep Khanvilkar"
 },
 {
 "key": "20801",
