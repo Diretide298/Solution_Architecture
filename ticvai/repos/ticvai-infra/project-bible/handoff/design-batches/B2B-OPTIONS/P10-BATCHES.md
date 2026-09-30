@@ -18,6 +18,8 @@ Open the file and match it. Do not describe it in words.
 
 **Draw the two options first** (`../../B2B-OPTIONS/`). The client picks one after review (MoM 29 September, section 3). The P10 batches below wait for that choice, because the shell and the sell screens change with it. The workshop batches WS21 to WS23 are TICVAI's internal partner screens and do not depend on it.
 
+**Added once the option is finalised:** the partner cash drawer (Option A only), sent-ticket history, and an "opened" status on sent tickets have no operation yet. Draw them greyed out; see `ADD-ON-FINALISE.md`.
+
 ## Batches, in the order to run them
 
 Block A first: batches with a new or changed screen, then the rest of Block A. Then the rest, cheapest first (the manifest order: fully specified before thin).

@@ -321,6 +321,8 @@ Claude Design builds **one working file per app** (decided 30 September): the Gu
 - Chinmay's go on `handoff/service-docs/TICVAI_Block_A_Ticket_Review_30_September.xlsx`: 2,717 rewrites, 170 retitles, 1,252 new tickets, 35 leaving the plan.
 - ADAM deployed on the box, so the ticket re-audit can run against it.
 
+**Waiting on the B2B option (logged 30 September).** Three partner-portal gaps have no operation, ticket or hours yet: the partner cash drawer (Option A only), sent-ticket history, and an "opened" status on sent tickets. They are listed in `handoff/design-batches/B2B-OPTIONS/ADD-ON-FINALISE.md` (PA-1 to PA-3). When the client picks an option, add them to the contract backlog and the contracts, then re-run the refresh and the plan so their hours land in B2. Claude Design draws them greyed out until then.
+
 ## 16. Keeping this plan current
 
 After any change to the package:

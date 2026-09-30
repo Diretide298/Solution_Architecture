@@ -73,6 +73,8 @@ The full list per screen is in `screens.json` (`apis`), with paths and schemas i
 - **Sent-ticket history.** No operation lists the messages sent for a partner's orders. `getMessageStatus` reads one message. The history can be built from `listOrders` with each order's delivery, but say so.
 - **Delivery status "opened".** Nothing reports it. Show sent and used only, and note it.
 
+These three are logged in `ADD-ON-FINALISE.md` (PA-1 to PA-3) and are added to the build once the client picks an option.
+
 ## Seed data
 
 A fictional UAE partner, for example "Palm Crescent Hotel, Dubai" (concierge desk) for Option A, and "Desert Rose Travel, Abu Dhabi" (travel agent) for Option B. Products from a fictional venue: day pass, fast track, cabana, dinner cruise. Prices in AED, partner price below the public price. Credit limit AED 50,000. No real client names or logos.
