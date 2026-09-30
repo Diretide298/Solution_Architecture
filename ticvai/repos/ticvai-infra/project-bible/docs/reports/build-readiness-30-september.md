@@ -36,8 +36,8 @@
 
 ## Block A schedule and tickets
 
-- **The schedule is now derived** (`tools/derive-block-a-schedule.py`, run by every refresh): build order, dependencies and each person's pace give each of the 864 tasks a start day.
-- **Screens are built by 20 November** against the mock server, POS and guest by about 9 November. **They are wired when their back end lands:** the back-end owners carry 440–535 points against about 335 in 35 days, so their Block A work ends 24 December to 11 January, and the Venue Management screens that wait on it finish around 11 January. Tickets past week 7 say so ("Block A's tail, running into B1").
+- **The schedule is now derived** (`tools/derive-block-a-schedule.py`, run by every refresh): build order, dependencies and each person's pace give each of the 870 tasks a start day.
+- **Screens are built by 20 November** against the mock server, POS and guest by 10 to 16 November. **They are wired when their back end lands:** the back-end owners carry 450–540 points against about 335 in 35 days, so their Block A work ends 8 to 25 December (Deep 8 Dec, Tanmay 16 Dec, Pranay 18 Dec, Hrushikant 25 Dec), and the Venue Management screens that wait on it are wired by 25 December. The build follows the phases, platform waits are soft (services start from day 3 against the interfaces published in week 1) and a waiting person takes their next ready ticket; per person, Block A work ends between 10 November and 25 December. Tickets past week 7 say so ("Block A's tail, running into B1").
 - **Ticket review workbook** for your go: `handoff/service-docs/TICVAI_Block_A_Ticket_Review_30_September.xlsx`. It lists 2,717 description rewrites, 170 retitles, 1,252 new tickets (with sub-tasks) and 35 leaving the plan for decisions already on record. **Nothing has gone to OpenProject.**
 
 ## Waiting on decisions

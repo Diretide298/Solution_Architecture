@@ -8,7 +8,7 @@
    "aHours": 306,
    "bHours": 0,
    "start": "2026-10-05",
-   "end": "2026-12-28",
+   "end": "2026-12-15",
    "modules": [
     "Foundation & Setup",
     "Identity, Roles & Security",
@@ -35,8 +35,8 @@
    "hours": 2,
    "aHours": 2,
    "bHours": 0,
-   "start": "2026-10-05",
-   "end": "2026-10-05",
+   "start": "2026-10-06",
+   "end": "2026-10-06",
    "modules": [
     "White Label & CMS"
    ],
@@ -51,8 +51,8 @@
    "hours": 958,
    "aHours": 273,
    "bHours": 684,
-   "start": "2026-10-19",
-   "end": "2027-03-24",
+   "start": "2026-10-08",
+   "end": "2027-03-05",
    "modules": [
     "Subscription & Licensing",
     "Identity, Roles & Security",
@@ -64,12 +64,12 @@
     "Foundation & Setup"
    ],
    "people": [
-    "Tanmay Dukhande",
-    "Hrushikant Patkar",
     "Deep Khanvilkar",
-    "New full-stack developer 2",
-    "New full-stack developer 1",
-    "Pranay Shinde"
+    "Tanmay Dukhande",
+    "Sanket Keluskar",
+    "Hrushikant Patkar",
+    "Pranay Shinde",
+    "Pallavi Sawant"
    ]
   },
   {
@@ -80,7 +80,7 @@
    "aHours": 158,
    "bHours": 883,
    "start": "2026-10-05",
-   "end": "2027-03-17",
+   "end": "2027-03-01",
    "modules": [
     "Subscription & Licensing",
     "Approval Workflows",
@@ -93,11 +93,11 @@
    ],
    "people": [
     "Chitrangi Mestry",
-    "Pradnya Yeram",
     "Pallavi Sawant",
+    "Pradnya Yeram",
     "New full-stack developer 1",
-    "Surendra",
-    "New full-stack developer 2"
+    "New full-stack developer 2",
+    "Surendra"
    ]
   },
   {
@@ -107,8 +107,8 @@
    "hours": 2162,
    "aHours": 510,
    "bHours": 1652,
-   "start": "2026-10-21",
-   "end": "2027-04-05",
+   "start": "2026-10-14",
+   "end": "2027-03-26",
    "modules": [
     "Admission & Access Control",
     "Ticketing Catalogue & Products",
@@ -120,12 +120,12 @@
     "Foundation & Setup"
    ],
    "people": [
-    "Tanmay Dukhande",
     "Pranay Shinde",
-    "Deep Khanvilkar",
+    "Tanmay Dukhande",
     "Hrushikant Patkar",
-    "Sanket Keluskar",
-    "Pallavi Sawant"
+    "Deep Khanvilkar",
+    "Chinmay Patkar",
+    "New full-stack developer 1"
    ]
   },
   {
@@ -136,7 +136,7 @@
    "aHours": 491,
    "bHours": 1951,
    "start": "2026-10-06",
-   "end": "2027-03-19",
+   "end": "2027-03-08",
    "modules": [
     "Ticketing Catalogue & Products",
     "Orders & Reservations",
@@ -148,12 +148,12 @@
     "Payments"
    ],
    "people": [
-    "Chitrangi Mestry",
     "Pradnya Yeram",
-    "Pallavi Sawant",
+    "Chitrangi Mestry",
     "Chinmay Patkar",
-    "New full-stack developer 1",
-    "New full-stack developer 2"
+    "Pallavi Sawant",
+    "New full-stack developer 2",
+    "Sanket Keluskar"
    ]
   },
   {
@@ -163,8 +163,8 @@
    "hours": 1165,
    "aHours": 415,
    "bHours": 750,
-   "start": "2026-10-28",
-   "end": "2027-04-19",
+   "start": "2026-10-13",
+   "end": "2027-04-06",
    "modules": [
     "Food & Beverage",
     "Foundation & Setup",
@@ -180,7 +180,7 @@
     "Deep Khanvilkar",
     "Pranay Shinde",
     "Tanmay Dukhande",
-    "Sanket Keluskar",
+    "New full-stack developer 1",
     "New full-stack developer 2"
    ]
   },
@@ -192,7 +192,7 @@
    "aHours": 315,
    "bHours": 1012,
    "start": "2026-10-16",
-   "end": "2027-04-16",
+   "end": "2027-04-06",
    "modules": [
     "Rentals",
     "Food & Beverage",
@@ -204,8 +204,8 @@
     "Workforce & Staff"
    ],
    "people": [
-    "Pradnya Yeram",
     "Chitrangi Mestry",
+    "Pradnya Yeram",
     "Pallavi Sawant",
     "Chinmay Patkar",
     "Sanket Keluskar",
@@ -220,7 +220,7 @@
    "aHours": 177,
    "bHours": 2881,
    "start": "2026-10-05",
-   "end": "2027-05-10",
+   "end": "2027-04-26",
    "modules": [
     "AI & Intelligence",
     "Marketing & CRM",
@@ -230,9 +230,9 @@
     "Kalpita Mejari",
     "Second AI engineer",
     "Pranay Shinde",
-    "Deep Khanvilkar",
     "Tanmay Dukhande",
-    "Sanket Keluskar"
+    "Hrushikant Patkar",
+    "Deep Khanvilkar"
    ]
   },
   {
@@ -243,7 +243,7 @@
    "aHours": 141,
    "bHours": 630,
    "start": "2026-10-22",
-   "end": "2027-04-30",
+   "end": "2027-04-20",
    "modules": [
     "Marketing & CRM",
     "AI & Intelligence",
@@ -252,12 +252,12 @@
     "Orders & Reservations"
    ],
    "people": [
-    "Surendra",
-    "Chitrangi Mestry",
-    "Pallavi Sawant",
-    "Pradnya Yeram",
     "Chinmay Patkar",
-    "Sanket Keluskar"
+    "Pradnya Yeram",
+    "Pallavi Sawant",
+    "Sanket Keluskar",
+    "Chitrangi Mestry",
+    "New full-stack developer 2"
    ]
   },
   {
@@ -267,18 +267,17 @@
    "hours": 93,
    "aHours": 34,
    "bHours": 58,
-   "start": "2026-12-21",
-   "end": "2027-05-03",
+   "start": "2026-10-29",
+   "end": "2027-04-23",
    "modules": [
     "Reporting & Analytics",
     "Foundation & Setup"
    ],
    "people": [
+    "Deep Khanvilkar",
     "Hrushikant Patkar",
-    "Tanmay Dukhande",
     "Chinmay Patkar",
-    "Sanket Keluskar",
-    "Deep Khanvilkar"
+    "Sanket Keluskar"
    ]
   },
   {
@@ -289,18 +288,18 @@
    "aHours": 33,
    "bHours": 191,
    "start": "2026-10-26",
-   "end": "2027-05-03",
+   "end": "2027-04-20",
    "modules": [
     "Reporting & Analytics",
     "Foundation & Setup"
    ],
    "people": [
     "New full-stack developer 1",
+    "Chitrangi Mestry",
     "New full-stack developer 2",
-    "Chinmay Patkar",
+    "Pallavi Sawant",
     "Pradnya Yeram",
-    "Surendra",
-    "Pallavi Sawant"
+    "Surendra"
    ]
   }
  ],
@@ -316,7 +315,7 @@
   "blockBPoints": 12807,
   "totalPoints": 16238,
   "totalHours": 13559,
-  "forecastFinish": "2027-05-10",
+  "forecastFinish": "2027-04-26",
   "planEnd": "2027-04-02",
   "notCounted": "Chinmay Parab (lead) is not counted in capacity."
  },
@@ -342,7 +341,7 @@
    "end": "2026-10-23",
    "days": 15,
    "capacity": 1392,
-   "planned": 982,
+   "planned": 1273,
    "modules": [
     "Foundation & Setup",
     "Identity, Roles & Security",
@@ -383,12 +382,11 @@
    "end": "2026-11-13",
    "days": 15,
    "capacity": 1392,
-   "planned": 1144,
+   "planned": 1352,
    "modules": [
     "Foundation & Setup",
     "Identity, Roles & Security",
     "Tenancy, Venues & Devices",
-    "Subscription & Licensing",
     "Approval Workflows",
     "Developer Portal & Public API",
     "Digital Asset Management",
@@ -396,8 +394,6 @@
     "Pricing, Promotions & Bundles",
     "Seat Management & Venue Maps",
     "Orders & Reservations",
-    "Payments",
-    "Wallet & Cashless",
     "White Label & CMS",
     "Transport",
     "Food & Beverage",
@@ -405,6 +401,7 @@
     "Inventory & Procurement",
     "Admission & Access Control",
     "Resources & Capacity",
+    "Games & Rides",
     "Virtual Queue",
     "Finance, Ledger & Tax",
     "Reporting & Analytics",
@@ -420,27 +417,28 @@
    "end": "2026-12-04",
    "days": 12,
    "capacity": 1226,
-   "planned": 885,
+   "planned": 937,
    "modules": [
     "Foundation & Setup",
     "Identity, Roles & Security",
     "Tenancy, Venues & Devices",
     "Platform Operations",
     "Subscription & Licensing",
+    "Digital Asset Management",
     "Ticketing Catalogue & Products",
     "Pricing, Promotions & Bundles",
     "Seat Management & Venue Maps",
     "Orders & Reservations",
     "Payments",
     "Wallet & Cashless",
+    "White Label & CMS",
+    "Transport",
     "Food & Beverage",
     "Retail",
-    "Inventory & Procurement",
-    "Admission & Access Control",
-    "Maintenance & Safety",
-    "Games & Rides",
+    "Resources & Capacity",
     "Virtual Queue",
     "Finance, Ledger & Tax",
+    "Reporting & Analytics",
     "Marketing & CRM",
     "AI & Intelligence"
    ],
@@ -453,7 +451,7 @@
    "end": "2026-12-25",
    "days": 15,
    "capacity": 1632,
-   "planned": 1393,
+   "planned": 1548,
    "modules": [
     "Foundation & Setup",
     "Subscription & Licensing",
@@ -461,15 +459,7 @@
     "Developer Portal & Public API",
     "Digital Asset Management",
     "Ticketing Catalogue & Products",
-    "Seat Management & Venue Maps",
     "White Label & CMS",
-    "Transport",
-    "Food & Beverage",
-    "Retail",
-    "Inventory & Procurement",
-    "Resources & Capacity",
-    "Virtual Queue",
-    "Reporting & Analytics",
     "Marketing & CRM",
     "AI & Intelligence"
    ],
@@ -482,20 +472,24 @@
    "end": "2027-01-15",
    "days": 14,
    "capacity": 1523,
-   "planned": 1506,
+   "planned": 1523,
    "modules": [
-    "Foundation & Setup",
-    "Digital Asset Management",
     "Ticketing Catalogue & Products",
     "Pricing, Promotions & Bundles",
     "Seat Management & Venue Maps",
     "Orders & Reservations",
-    "White Label & CMS",
+    "Transport",
     "Food & Beverage",
     "Retail",
+    "Inventory & Procurement",
     "Admission & Access Control",
+    "Accreditation",
+    "Resources & Capacity",
+    "Workforce & Staff",
+    "Maintenance & Safety",
+    "Games & Rides",
+    "Virtual Queue",
     "Finance, Ledger & Tax",
-    "Reporting & Analytics",
     "Marketing & CRM",
     "AI & Intelligence"
    ],
@@ -508,25 +502,16 @@
    "end": "2027-02-05",
    "days": 15,
    "capacity": 1632,
-   "planned": 1629,
+   "planned": 1632,
    "modules": [
-    "Foundation & Setup",
     "Identity, Roles & Security",
     "Subscription & Licensing",
     "Developer Portal & Public API",
     "Ticketing Catalogue & Products",
     "Pricing, Promotions & Bundles",
-    "Transport",
-    "Food & Beverage",
-    "Retail",
-    "Inventory & Procurement",
-    "Accreditation",
-    "Resources & Capacity",
-    "Workforce & Staff",
-    "Maintenance & Safety",
-    "Games & Rides",
+    "Seat Management & Venue Maps",
+    "Orders & Reservations",
     "Virtual Queue",
-    "Finance, Ledger & Tax",
     "Reporting & Analytics",
     "Marketing & CRM",
     "AI & Intelligence"
@@ -542,11 +527,19 @@
    "capacity": 1632,
    "planned": 1632,
    "modules": [
-    "Pricing, Promotions & Bundles",
-    "Seat Management & Venue Maps",
+    "Identity, Roles & Security",
+    "Tenancy, Venues & Devices",
+    "Subscription & Licensing",
     "Orders & Reservations",
     "Payments",
     "Wallet & Cashless",
+    "Rentals",
+    "Admission & Access Control",
+    "Accreditation",
+    "Workforce & Staff",
+    "Finance, Ledger & Tax",
+    "Reporting & Analytics",
+    "Marketing & CRM",
     "AI & Intelligence"
    ],
    "blocks": "B"
@@ -560,10 +553,7 @@
    "capacity": 1306,
    "planned": 1306,
    "modules": [
-    "Identity, Roles & Security",
-    "Tenancy, Venues & Devices",
     "Platform Operations",
-    "Subscription & Licensing",
     "Approval Workflows",
     "Developer Portal & Public API",
     "Ticketing Catalogue & Products",
@@ -572,14 +562,16 @@
     "Orders & Reservations",
     "Payments",
     "Wallet & Cashless",
+    "Transport",
     "Food & Beverage",
+    "Retail",
     "Rentals",
+    "Inventory & Procurement",
     "Admission & Access Control",
     "Accreditation",
+    "Resources & Capacity",
     "Workforce & Staff",
     "Finance, Ledger & Tax",
-    "Reporting & Analytics",
-    "Marketing & CRM",
     "AI & Intelligence"
    ],
    "blocks": "B"
@@ -593,15 +585,13 @@
    "capacity": 1088,
    "planned": 1088,
    "modules": [
-    "Transport",
-    "Food & Beverage",
-    "Retail",
-    "Rentals",
-    "Inventory & Procurement",
-    "Admission & Access Control",
     "Accreditation",
     "Resources & Capacity",
-    "Finance, Ledger & Tax",
+    "Workforce & Staff",
+    "Maintenance & Safety",
+    "Games & Rides",
+    "Virtual Queue",
+    "Marketing & CRM",
     "AI & Intelligence"
    ],
    "blocks": "B"
@@ -629,17 +619,17 @@
    "screens": 425,
    "ops": 453,
    "start": "2026-10-05",
-   "end": "2027-03-24",
-   "lead": "Hrushikant Patkar",
+   "end": "2027-03-05",
+   "lead": "Pallavi Sawant",
    "team": [
-    "Hrushikant Patkar",
-    "Tanmay Dukhande",
     "Pallavi Sawant",
+    "Hrushikant Patkar",
     "Surendra",
-    "New full-stack developer 2",
+    "Tanmay Dukhande",
+    "Sanket Keluskar",
+    "Deep Khanvilkar",
     "New full-stack developer 1",
-    "Pradnya Yeram",
-    "Sanket Keluskar"
+    "Pradnya Yeram"
    ]
   },
   {
@@ -662,18 +652,18 @@
    "requirements": 866,
    "screens": 867,
    "ops": 908,
-   "start": "2026-10-05",
-   "end": "2027-04-01",
+   "start": "2026-10-06",
+   "end": "2027-03-16",
    "lead": "Tanmay Dukhande",
    "team": [
     "Tanmay Dukhande",
-    "Chitrangi Mestry",
     "Pranay Shinde",
-    "Deep Khanvilkar",
-    "Pradnya Yeram",
-    "Pallavi Sawant",
+    "Chitrangi Mestry",
     "Chinmay Patkar",
-    "New full-stack developer 1"
+    "Deep Khanvilkar",
+    "New full-stack developer 2",
+    "New full-stack developer 1",
+    "Pallavi Sawant"
    ]
   },
   {
@@ -692,17 +682,17 @@
    "requirements": 224,
    "screens": 216,
    "ops": 267,
-   "start": "2026-10-06",
-   "end": "2027-04-06",
-   "lead": "Pradnya Yeram",
+   "start": "2026-10-08",
+   "end": "2027-03-29",
+   "lead": "Chitrangi Mestry",
    "team": [
-    "Pradnya Yeram",
     "Chitrangi Mestry",
-    "Deep Khanvilkar",
-    "Pranay Shinde",
-    "New full-stack developer 1",
+    "Pradnya Yeram",
     "Hrushikant Patkar",
-    "Chinmay Patkar",
+    "Deep Khanvilkar",
+    "Tanmay Dukhande",
+    "Pallavi Sawant",
+    "New full-stack developer 1",
     "Sanket Keluskar"
    ]
   },
@@ -726,17 +716,17 @@
    "screens": 464,
    "ops": 507,
    "start": "2026-10-12",
-   "end": "2027-04-19",
-   "lead": "New full-stack developer 2",
+   "end": "2027-04-06",
+   "lead": "Hrushikant Patkar",
    "team": [
-    "New full-stack developer 2",
-    "Pallavi Sawant",
     "Hrushikant Patkar",
     "Chinmay Patkar",
     "Sanket Keluskar",
-    "Chitrangi Mestry",
     "Pranay Shinde",
-    "New full-stack developer 1"
+    "Pradnya Yeram",
+    "Pallavi Sawant",
+    "New full-stack developer 1",
+    "New full-stack developer 2"
    ]
   },
   {
@@ -754,17 +744,17 @@
    "screens": 117,
    "ops": 120,
    "start": "2026-10-07",
-   "end": "2027-05-03",
-   "lead": "Hrushikant Patkar",
+   "end": "2027-04-23",
+   "lead": "New full-stack developer 1",
    "team": [
-    "Hrushikant Patkar",
-    "Tanmay Dukhande",
     "New full-stack developer 1",
-    "New full-stack developer 2",
+    "Chitrangi Mestry",
     "Chinmay Patkar",
-    "Pradnya Yeram",
+    "Deep Khanvilkar",
+    "Surendra",
+    "New full-stack developer 2",
     "Pallavi Sawant",
-    "Sanket Keluskar"
+    "Pradnya Yeram"
    ]
   },
   {
@@ -780,18 +770,18 @@
    "requirements": 421,
    "screens": 219,
    "ops": 264,
-   "start": "2026-10-21",
-   "end": "2027-04-22",
-   "lead": "Pranay Shinde",
+   "start": "2026-10-22",
+   "end": "2027-04-15",
+   "lead": "Tanmay Dukhande",
    "team": [
+    "Tanmay Dukhande",
     "Pranay Shinde",
     "Deep Khanvilkar",
-    "Tanmay Dukhande",
-    "Surendra",
+    "New full-stack developer 2",
     "Chinmay Patkar",
     "Chitrangi Mestry",
-    "Pallavi Sawant",
-    "Pradnya Yeram"
+    "Sanket Keluskar",
+    "Pallavi Sawant"
    ]
   },
   {
@@ -808,17 +798,17 @@
    "screens": 137,
    "ops": 141,
    "start": "2026-10-05",
-   "end": "2027-05-10",
+   "end": "2027-04-26",
    "lead": "Kalpita Mejari",
    "team": [
     "Kalpita Mejari",
     "Second AI engineer",
     "Pranay Shinde",
     "Sanket Keluskar",
-    "Deep Khanvilkar",
-    "Tanmay Dukhande",
     "Pallavi Sawant",
-    "Chitrangi Mestry"
+    "Hrushikant Patkar",
+    "Chinmay Patkar",
+    "Pradnya Yeram"
    ]
   }
  ],
@@ -852,7 +842,7 @@
     {
      "block": "A",
      "start": "2026-10-05",
-     "end": "2027-01-22"
+     "end": "2026-12-25"
     }
    ],
    "points": 1006,
@@ -860,8 +850,8 @@
    "aHours": 840,
    "bHours": 0,
    "start": "2026-10-05",
-   "end": "2027-01-22",
-   "sprints": "1-6",
+   "end": "2026-12-25",
+   "sprints": "1-4",
    "lead": "Hrushikant Patkar",
    "team": [
     "Hrushikant Patkar",
@@ -885,14 +875,15 @@
    "bOps": 52,
    "people": {
     "Tanmay Dukhande": 43,
-    "Deep Khanvilkar": 69.19799139167861,
+    "Deep Khanvilkar": 15,
     "Sanket Keluskar": 9,
-    "Pallavi Sawant": 38,
-    "Chinmay Patkar": 24,
+    "Pallavi Sawant": 57,
+    "Chinmay Patkar": 3,
     "Pradnya Yeram": 5,
     "Chitrangi Mestry": 43,
-    "Surendra": 56.45624103299856,
-    "Hrushikant Patkar": 6.774748923959828
+    "New full-stack developer 2": 2,
+    "Hrushikant Patkar": 60.97274031563845,
+    "Surendra": 56.45624103299856
    },
    "bars": [
     {
@@ -903,7 +894,7 @@
     {
      "block": "B",
      "start": "2026-11-23",
-     "end": "2027-03-19"
+     "end": "2027-03-05"
     }
    ],
    "points": 294,
@@ -911,16 +902,16 @@
    "aHours": 83,
    "bHours": 162,
    "start": "2026-10-05",
-   "end": "2027-03-19",
+   "end": "2027-03-05",
    "sprints": "1-8",
-   "lead": "Deep Khanvilkar",
+   "lead": "Hrushikant Patkar",
    "team": [
-    "Deep Khanvilkar",
+    "Hrushikant Patkar",
+    "Pallavi Sawant",
     "Surendra",
     "Tanmay Dukhande",
     "Chitrangi Mestry",
-    "Pallavi Sawant",
-    "Chinmay Patkar"
+    "Deep Khanvilkar"
    ]
   },
   {
@@ -935,15 +926,15 @@
    "aOps": 18,
    "bOps": 37,
    "people": {
-    "Hrushikant Patkar": 37.357245337159256,
+    "Hrushikant Patkar": 8,
     "Tanmay Dukhande": 17,
-    "Deep Khanvilkar": 7,
+    "Deep Khanvilkar": 36.357245337159256,
     "Chinmay Patkar": 2,
     "Sanket Keluskar": 6,
     "Pallavi Sawant": 2,
     "Pradnya Yeram": 16,
-    "New full-stack developer 1": 63,
-    "New full-stack developer 2": 68.19799139167861
+    "New full-stack developer 1": 60,
+    "New full-stack developer 2": 71.19799139167861
    },
    "bars": [
     {
@@ -954,7 +945,7 @@
     {
      "block": "B",
      "start": "2026-11-23",
-     "end": "2027-03-17"
+     "end": "2027-03-03"
     }
    ],
    "points": 219,
@@ -962,16 +953,16 @@
    "aHours": 46,
    "bHours": 137,
    "start": "2026-10-05",
-   "end": "2027-03-17",
+   "end": "2027-03-03",
    "sprints": "1-8",
    "lead": "New full-stack developer 2",
    "team": [
     "New full-stack developer 2",
     "New full-stack developer 1",
-    "Hrushikant Patkar",
+    "Deep Khanvilkar",
     "Tanmay Dukhande",
     "Pradnya Yeram",
-    "Deep Khanvilkar"
+    "Hrushikant Patkar"
    ]
   },
   {
@@ -997,12 +988,12 @@
     {
      "block": "A",
      "start": "2026-10-12",
-     "end": "2026-10-12"
+     "end": "2026-10-13"
     },
     {
      "block": "B",
      "start": "2026-11-23",
-     "end": "2027-03-19"
+     "end": "2027-03-05"
     }
    ],
    "points": 159,
@@ -1010,7 +1001,7 @@
    "aHours": 7,
    "bHours": 126,
    "start": "2026-10-12",
-   "end": "2027-03-19",
+   "end": "2027-03-05",
    "sprints": "1-8",
    "lead": "Pallavi Sawant",
    "team": [
@@ -1034,28 +1025,29 @@
    "aOps": 10,
    "bOps": 138,
    "people": {
-    "Hrushikant Patkar": 117.4232424677188,
+    "Hrushikant Patkar": 70,
     "Chinmay Patkar": 37,
-    "Deep Khanvilkar": 5,
-    "Sanket Keluskar": 63,
+    "Deep Khanvilkar": 100.81922525107609,
+    "Sanket Keluskar": 50.423242467718794,
     "Pallavi Sawant": 65,
     "Chitrangi Mestry": 74,
     "Pradnya Yeram": 60,
-    "New full-stack developer 2": 120,
-    "New full-stack developer 1": 95.81922525107609,
-    "Surendra": 60,
-    "Tanmay Dukhande": 108.39598278335737
+    "New full-stack developer 2": 60,
+    "New full-stack developer 1": 60,
+    "Surendra": 120,
+    "Tanmay Dukhande": 60,
+    "Pranay Shinde": 48.39598278335737
    },
    "bars": [
     {
      "block": "A",
      "start": "2026-10-06",
-     "end": "2026-11-02"
+     "end": "2026-10-19"
     },
     {
      "block": "B",
      "start": "2026-11-25",
-     "end": "2027-03-24"
+     "end": "2027-03-05"
     }
    ],
    "points": 806,
@@ -1063,16 +1055,16 @@
    "aHours": 23,
    "bHours": 650,
    "start": "2026-10-06",
-   "end": "2027-03-24",
-   "sprints": "1-9",
-   "lead": "New full-stack developer 2",
+   "end": "2027-03-05",
+   "sprints": "1-8",
+   "lead": "Surendra",
    "team": [
-    "New full-stack developer 2",
-    "Hrushikant Patkar",
-    "Tanmay Dukhande",
-    "New full-stack developer 1",
+    "Surendra",
+    "Deep Khanvilkar",
     "Chitrangi Mestry",
-    "Pallavi Sawant"
+    "Hrushikant Patkar",
+    "Pallavi Sawant",
+    "Pradnya Yeram"
    ]
   },
   {
@@ -1089,23 +1081,24 @@
    "people": {
     "Tanmay Dukhande": 13,
     "Deep Khanvilkar": 10,
-    "Chinmay Patkar": 2,
-    "Pallavi Sawant": 62,
-    "Pradnya Yeram": 114,
+    "Chinmay Patkar": 56,
+    "Pallavi Sawant": 2,
+    "Pradnya Yeram": 60,
     "Chitrangi Mestry": 60,
-    "Pranay Shinde": 71.29124820659972,
-    "New full-stack developer 1": 30.329985652797745
+    "New full-stack developer 2": 71.29124820659972,
+    "Sanket Keluskar": 60,
+    "Pranay Shinde": 30.329985652797745
    },
    "bars": [
     {
      "block": "A",
      "start": "2026-10-05",
-     "end": "2026-11-03"
+     "end": "2026-11-02"
     },
     {
      "block": "B",
      "start": "2026-12-10",
-     "end": "2027-03-22"
+     "end": "2027-03-02"
     }
    ],
    "points": 363,
@@ -1113,16 +1106,16 @@
    "aHours": 23,
    "bHours": 280,
    "start": "2026-10-05",
-   "end": "2027-03-22",
-   "sprints": "1-9",
-   "lead": "Pradnya Yeram",
+   "end": "2027-03-02",
+   "sprints": "1-8",
+   "lead": "New full-stack developer 2",
    "team": [
+    "New full-stack developer 2",
     "Pradnya Yeram",
-    "Pranay Shinde",
-    "Pallavi Sawant",
     "Chitrangi Mestry",
-    "New full-stack developer 1",
-    "Tanmay Dukhande"
+    "Sanket Keluskar",
+    "Chinmay Patkar",
+    "Pranay Shinde"
    ]
   },
   {
@@ -1137,24 +1130,21 @@
    "aOps": 8,
    "bOps": 23,
    "people": {
-    "Deep Khanvilkar": 5,
-    "Pallavi Sawant": 4,
+    "Deep Khanvilkar": 7.258249641319942,
+    "Pallavi Sawant": 38.06599713055954,
     "Hrushikant Patkar": 8,
-    "Chitrangi Mestry": 43,
-    "New full-stack developer 2": 34.06599713055954,
-    "New full-stack developer 1": 31.615494978479195,
-    "Tanmay Dukhande": 2.2582496413199427
+    "New full-stack developer 1": 74.61549497847919
    },
    "bars": [
     {
      "block": "A",
      "start": "2026-10-05",
-     "end": "2026-10-29"
+     "end": "2026-10-28"
     },
     {
      "block": "B",
-     "start": "2026-12-18",
-     "end": "2027-03-19"
+     "start": "2026-12-17",
+     "end": "2027-03-03"
     }
    ],
    "points": 128,
@@ -1162,16 +1152,14 @@
    "aHours": 14,
    "bHours": 93,
    "start": "2026-10-05",
-   "end": "2027-03-19",
+   "end": "2027-03-03",
    "sprints": "1-8",
-   "lead": "Chitrangi Mestry",
+   "lead": "New full-stack developer 1",
    "team": [
-    "Chitrangi Mestry",
-    "New full-stack developer 2",
     "New full-stack developer 1",
+    "Pallavi Sawant",
     "Hrushikant Patkar",
-    "Deep Khanvilkar",
-    "Pallavi Sawant"
+    "Deep Khanvilkar"
    ]
   },
   {
@@ -1188,21 +1176,20 @@
    "people": {
     "Hrushikant Patkar": 13,
     "Chinmay Patkar": 13,
-    "Deep Khanvilkar": 5,
-    "Surendra": 60,
-    "New full-stack developer 2": 28,
-    "Tanmay Dukhande": 36.13199426111908
+    "Deep Khanvilkar": 41.13199426111908,
+    "Pallavi Sawant": 60,
+    "Pradnya Yeram": 28
    },
    "bars": [
     {
      "block": "A",
      "start": "2026-10-12",
-     "end": "2027-01-05"
+     "end": "2026-11-17"
     },
     {
      "block": "B",
-     "start": "2026-12-24",
-     "end": "2027-01-08"
+     "start": "2026-12-18",
+     "end": "2026-12-30"
     }
    ],
    "points": 155,
@@ -1210,16 +1197,15 @@
    "aHours": 26,
    "bHours": 104,
    "start": "2026-10-12",
-   "end": "2027-01-08",
+   "end": "2026-12-30",
    "sprints": "1-5",
-   "lead": "Surendra",
+   "lead": "Pallavi Sawant",
    "team": [
-    "Surendra",
-    "Tanmay Dukhande",
-    "New full-stack developer 2",
+    "Pallavi Sawant",
+    "Deep Khanvilkar",
+    "Pradnya Yeram",
     "Hrushikant Patkar",
-    "Chinmay Patkar",
-    "Deep Khanvilkar"
+    "Chinmay Patkar"
    ]
   },
   {
@@ -1235,27 +1221,28 @@
    "bOps": 182,
    "people": {
     "Tanmay Dukhande": 184,
-    "Sanket Keluskar": 9,
-    "Chinmay Patkar": 44,
+    "Sanket Keluskar": 73.51649928263988,
+    "Chinmay Patkar": 104,
     "Deep Khanvilkar": 90,
     "Chitrangi Mestry": 105,
-    "Pallavi Sawant": 176.87374461979914,
-    "Pradnya Yeram": 85,
-    "New full-stack developer 1": 120,
-    "New full-stack developer 2": 77.12769010042997,
+    "Pallavi Sawant": 79.48493543758923,
+    "Pradnya Yeram": 68,
+    "New full-stack developer 2": 67,
+    "New full-stack developer 1": 60,
+    "Surendra": 60,
     "Pranay Shinde": 120,
-    "Surendra": 60
+    "Hrushikant Patkar": 60
    },
    "bars": [
     {
      "block": "A",
      "start": "2026-10-06",
-     "end": "2026-12-30"
+     "end": "2026-11-25"
     },
     {
      "block": "B",
-     "start": "2026-12-25",
-     "end": "2027-03-22"
+     "start": "2026-12-22",
+     "end": "2027-03-04"
     }
    ],
    "points": 1071,
@@ -1263,16 +1250,16 @@
    "aHours": 175,
    "bHours": 719,
    "start": "2026-10-06",
-   "end": "2027-03-22",
-   "sprints": "1-9",
+   "end": "2027-03-04",
+   "sprints": "1-8",
    "lead": "Tanmay Dukhande",
    "team": [
     "Tanmay Dukhande",
-    "Pallavi Sawant",
-    "New full-stack developer 1",
     "Pranay Shinde",
     "Chitrangi Mestry",
-    "Deep Khanvilkar"
+    "Chinmay Patkar",
+    "Deep Khanvilkar",
+    "Pallavi Sawant"
    ]
   },
   {
@@ -1287,16 +1274,17 @@
    "aOps": 29,
    "bOps": 124,
    "people": {
-    "Tanmay Dukhande": 166.9067431850789,
-    "Sanket Keluskar": 56.34146341463398,
+    "Tanmay Dukhande": 124,
+    "Sanket Keluskar": 66,
     "Chinmay Patkar": 67,
     "Pallavi Sawant": 76,
-    "Chitrangi Mestry": 64,
+    "Chitrangi Mestry": 56,
     "Pradnya Yeram": 60,
-    "New full-stack developer 2": 60,
-    "New full-stack developer 1": 54,
-    "Deep Khanvilkar": 66.77474892395983,
-    "Pranay Shinde": 60
+    "New full-stack developer 2": 62,
+    "Deep Khanvilkar": 102.90674318507891,
+    "Hrushikant Patkar": 6.774748923959828,
+    "New full-stack developer 1": 60,
+    "Pranay Shinde": 50.34146341463398
    },
    "bars": [
     {
@@ -1306,8 +1294,8 @@
     },
     {
      "block": "B",
-     "start": "2027-01-06",
-     "end": "2027-03-25"
+     "start": "2026-12-31",
+     "end": "2027-03-12"
     }
    ],
    "points": 731,
@@ -1315,16 +1303,16 @@
    "aHours": 78,
    "bHours": 533,
    "start": "2026-10-08",
-   "end": "2027-03-25",
-   "sprints": "1-9",
+   "end": "2027-03-12",
+   "sprints": "1-8",
    "lead": "Tanmay Dukhande",
    "team": [
     "Tanmay Dukhande",
+    "Deep Khanvilkar",
     "Pallavi Sawant",
     "Chinmay Patkar",
-    "Deep Khanvilkar",
-    "Chitrangi Mestry",
-    "Pradnya Yeram"
+    "Sanket Keluskar",
+    "New full-stack developer 2"
    ]
   },
   {
@@ -1341,41 +1329,39 @@
    "people": {
     "Tanmay Dukhande": 3,
     "Hrushikant Patkar": 89,
-    "Chinmay Patkar": 24,
+    "Chinmay Patkar": 28.516499282639884,
     "Deep Khanvilkar": 53.39598278335734,
     "Pallavi Sawant": 65,
     "Pradnya Yeram": 73,
-    "Sanket Keluskar": 3,
+    "Sanket Keluskar": 63,
     "Chitrangi Mestry": 5,
-    "Surendra": 60,
-    "New full-stack developer 2": 25.516499282639884,
-    "New full-stack developer 1": 11.291248206599713
+    "New full-stack developer 2": 32.29124820659971
    },
    "bars": [
     {
      "block": "A",
-     "start": "2026-10-12",
-     "end": "2026-12-24"
+     "start": "2026-10-13",
+     "end": "2026-11-23"
     },
     {
      "block": "B",
-     "start": "2027-01-12",
-     "end": "2027-03-18"
+     "start": "2026-12-31",
+     "end": "2027-03-03"
     }
    ],
    "points": 412,
    "hours": 344,
    "aHours": 73,
    "bHours": 272,
-   "start": "2026-10-12",
-   "end": "2027-03-18",
+   "start": "2026-10-13",
+   "end": "2027-03-03",
    "sprints": "1-8",
    "lead": "Hrushikant Patkar",
    "team": [
     "Hrushikant Patkar",
     "Pradnya Yeram",
     "Pallavi Sawant",
-    "Surendra",
+    "Sanket Keluskar",
     "Deep Khanvilkar",
     "New full-stack developer 2"
    ]
@@ -1394,26 +1380,26 @@
    "people": {
     "Pranay Shinde": 177,
     "Chinmay Patkar": 87,
-    "Deep Khanvilkar": 144.52223816355811,
-    "Pradnya Yeram": 134,
+    "Deep Khanvilkar": 70,
+    "Pradnya Yeram": 50,
     "Chitrangi Mestry": 150,
-    "Pallavi Sawant": 53.314203730272254,
-    "Sanket Keluskar": 60,
-    "New full-stack developer 1": 60,
-    "New full-stack developer 2": 60,
-    "Tanmay Dukhande": 60,
+    "Pallavi Sawant": 31,
+    "New full-stack developer 2": 115,
+    "Surendra": 60,
+    "New full-stack developer 1": 134.52223816355811,
+    "Tanmay Dukhande": 111.31420373027225,
     "Hrushikant Patkar": 60
    },
    "bars": [
     {
      "block": "A",
      "start": "2026-10-12",
-     "end": "2026-12-30"
+     "end": "2026-11-17"
     },
     {
      "block": "B",
-     "start": "2027-01-07",
-     "end": "2027-03-25"
+     "start": "2026-12-31",
+     "end": "2027-03-12"
     }
    ],
    "points": 1046,
@@ -1421,16 +1407,16 @@
    "aHours": 211,
    "bHours": 662,
    "start": "2026-10-12",
-   "end": "2027-03-25",
-   "sprints": "1-9",
+   "end": "2027-03-12",
+   "sprints": "1-8",
    "lead": "Pranay Shinde",
    "team": [
     "Pranay Shinde",
     "Chitrangi Mestry",
-    "Deep Khanvilkar",
-    "Pradnya Yeram",
-    "Chinmay Patkar",
-    "Sanket Keluskar"
+    "New full-stack developer 1",
+    "New full-stack developer 2",
+    "Tanmay Dukhande",
+    "Chinmay Patkar"
    ]
   },
   {
@@ -1447,22 +1433,22 @@
    "people": {
     "Pranay Shinde": 76,
     "Pallavi Sawant": 2,
-    "Sanket Keluskar": 12,
-    "Chinmay Patkar": 11.774748923959828,
-    "Chitrangi Mestry": 65,
-    "Surendra": 60,
-    "Tanmay Dukhande": 28.071736011477824
+    "Sanket Keluskar": 63,
+    "Chinmay Patkar": 42.071736011477824,
+    "Chitrangi Mestry": 5,
+    "Tanmay Dukhande": 6.774748923959828,
+    "Pradnya Yeram": 60
    },
    "bars": [
     {
      "block": "A",
      "start": "2026-10-15",
-     "end": "2026-11-24"
+     "end": "2026-11-17"
     },
     {
      "block": "B",
-     "start": "2027-02-19",
-     "end": "2027-03-18"
+     "start": "2027-02-08",
+     "end": "2027-03-05"
     }
    ],
    "points": 255,
@@ -1470,16 +1456,16 @@
    "aHours": 26,
    "bHours": 187,
    "start": "2026-10-15",
-   "end": "2027-03-18",
+   "end": "2027-03-05",
    "sprints": "1-8",
    "lead": "Pranay Shinde",
    "team": [
     "Pranay Shinde",
-    "Chitrangi Mestry",
-    "Surendra",
-    "Tanmay Dukhande",
     "Sanket Keluskar",
-    "Chinmay Patkar"
+    "Pradnya Yeram",
+    "Chinmay Patkar",
+    "Tanmay Dukhande",
+    "Chitrangi Mestry"
    ]
   },
   {
@@ -1494,26 +1480,27 @@
    "aOps": 17,
    "bOps": 49,
    "people": {
-    "Pranay Shinde": 32,
-    "Sanket Keluskar": 69,
-    "Pallavi Sawant": 15,
+    "Pranay Shinde": 52.32424677187949,
+    "Sanket Keluskar": 9,
+    "Pallavi Sawant": 63,
     "Chinmay Patkar": 69,
-    "New full-stack developer 2": 80.32424677187949,
+    "Chitrangi Mestry": 60,
     "New full-stack developer 1": 60,
-    "Pradnya Yeram": 60,
+    "New full-stack developer 2": 60,
+    "Surendra": 12,
     "Hrushikant Patkar": 60,
-    "Tanmay Dukhande": 30.329985652797774
+    "Deep Khanvilkar": 30.329985652797774
    },
    "bars": [
     {
      "block": "A",
      "start": "2026-10-06",
-     "end": "2026-11-25"
+     "end": "2026-11-18"
     },
     {
      "block": "B",
-     "start": "2027-02-22",
-     "end": "2027-03-22"
+     "start": "2027-02-09",
+     "end": "2027-03-12"
     }
    ],
    "points": 476,
@@ -1521,15 +1508,15 @@
    "aHours": 44,
    "bHours": 353,
    "start": "2026-10-06",
-   "end": "2027-03-22",
-   "sprints": "1-9",
-   "lead": "New full-stack developer 2",
+   "end": "2027-03-12",
+   "sprints": "1-8",
+   "lead": "Chinmay Patkar",
    "team": [
-    "New full-stack developer 2",
-    "Sanket Keluskar",
     "Chinmay Patkar",
+    "Pallavi Sawant",
+    "Chitrangi Mestry",
     "New full-stack developer 1",
-    "Pradnya Yeram",
+    "New full-stack developer 2",
     "Hrushikant Patkar"
    ]
   },
@@ -1545,41 +1532,41 @@
    "aOps": 78,
    "bOps": 1,
    "people": {
-    "Chitrangi Mestry": 74,
+    "Chitrangi Mestry": 89,
     "Tanmay Dukhande": 64,
     "Deep Khanvilkar": 55,
     "Chinmay Patkar": 53,
     "Sanket Keluskar": 6,
-    "Pallavi Sawant": 3.2582496413199427,
-    "New full-stack developer 1": 15
+    "Pallavi Sawant": 1,
+    "Pranay Shinde": 2.2582496413199427
    },
    "bars": [
     {
      "block": "A",
-     "start": "2026-10-05",
-     "end": "2027-01-07"
+     "start": "2026-10-06",
+     "end": "2026-11-18"
     },
     {
      "block": "B",
-     "start": "2026-12-25",
-     "end": "2026-12-29"
+     "start": "2026-12-18",
+     "end": "2026-12-23"
     }
    ],
    "points": 270,
    "hours": 225,
    "aHours": 210,
    "bHours": 16,
-   "start": "2026-10-05",
-   "end": "2027-01-07",
-   "sprints": "1-5",
+   "start": "2026-10-06",
+   "end": "2026-12-23",
+   "sprints": "1-4",
    "lead": "Chitrangi Mestry",
    "team": [
     "Chitrangi Mestry",
     "Tanmay Dukhande",
     "Deep Khanvilkar",
     "Chinmay Patkar",
-    "New full-stack developer 1",
-    "Sanket Keluskar"
+    "Sanket Keluskar",
+    "Pranay Shinde"
    ]
   },
   {
@@ -1595,24 +1582,24 @@
    "bOps": 10,
    "people": {
     "Hrushikant Patkar": 24,
-    "Sanket Keluskar": 15,
-    "Deep Khanvilkar": 27.582496413199426,
+    "Sanket Keluskar": 18,
+    "Deep Khanvilkar": 9.516499282639884,
     "Chinmay Patkar": 13,
     "Pradnya Yeram": 8,
     "Pallavi Sawant": 6,
     "Chitrangi Mestry": 5,
-    "New full-stack developer 1": 3
+    "New full-stack developer 1": 18.06599713055954
    },
    "bars": [
     {
      "block": "A",
      "start": "2026-10-09",
-     "end": "2026-12-25"
+     "end": "2026-11-26"
     },
     {
      "block": "B",
-     "start": "2027-01-18",
-     "end": "2027-04-01"
+     "start": "2027-01-06",
+     "end": "2027-03-16"
     }
    ],
    "points": 102,
@@ -1620,16 +1607,16 @@
    "aHours": 63,
    "bHours": 21,
    "start": "2026-10-09",
-   "end": "2027-04-01",
-   "sprints": "1-9",
-   "lead": "Deep Khanvilkar",
+   "end": "2027-03-16",
+   "sprints": "1-8",
+   "lead": "Hrushikant Patkar",
    "team": [
-    "Deep Khanvilkar",
     "Hrushikant Patkar",
+    "New full-stack developer 1",
     "Sanket Keluskar",
     "Chinmay Patkar",
-    "Pradnya Yeram",
-    "Pallavi Sawant"
+    "Deep Khanvilkar",
+    "Pradnya Yeram"
    ]
   },
   {
@@ -1645,43 +1632,41 @@
    "bOps": 54,
    "people": {
     "Hrushikant Patkar": 96,
-    "Deep Khanvilkar": 90,
+    "Deep Khanvilkar": 144.1979913916786,
     "Pranay Shinde": 40,
-    "Pradnya Yeram": 162,
-    "Pallavi Sawant": 10,
-    "Sanket Keluskar": 66.19799139167861,
+    "Pradnya Yeram": 118,
+    "Pallavi Sawant": 17.74748923959828,
+    "Sanket Keluskar": 68,
     "Chinmay Patkar": 13,
-    "Chitrangi Mestry": 44,
-    "New full-stack developer 1": 56,
-    "Tanmay Dukhande": 7.747489239598281
+    "Chitrangi Mestry": 88
    },
    "bars": [
     {
      "block": "A",
-     "start": "2026-10-06",
-     "end": "2026-12-23"
+     "start": "2026-10-08",
+     "end": "2026-11-25"
     },
     {
      "block": "B",
-     "start": "2027-01-15",
-     "end": "2027-04-05"
+     "start": "2027-01-06",
+     "end": "2027-03-24"
     }
    ],
    "points": 585,
    "hours": 488,
    "aHours": 276,
    "bHours": 212,
-   "start": "2026-10-06",
-   "end": "2027-04-05",
-   "sprints": "1-10",
-   "lead": "Pradnya Yeram",
+   "start": "2026-10-08",
+   "end": "2027-03-24",
+   "sprints": "1-9",
+   "lead": "Deep Khanvilkar",
    "team": [
+    "Deep Khanvilkar",
     "Pradnya Yeram",
     "Hrushikant Patkar",
-    "Deep Khanvilkar",
+    "Chitrangi Mestry",
     "Sanket Keluskar",
-    "New full-stack developer 1",
-    "Chitrangi Mestry"
+    "Pranay Shinde"
    ]
   },
   {
@@ -1696,24 +1681,25 @@
    "aOps": 14,
    "bOps": 11,
    "people": {
-    "Pranay Shinde": 45.840746054519364,
+    "Pranay Shinde": 21,
     "Sanket Keluskar": 3,
     "Deep Khanvilkar": 5,
-    "Chitrangi Mestry": 10,
+    "Chitrangi Mestry": 5,
     "Chinmay Patkar": 8,
-    "Pradnya Yeram": 10,
-    "New full-stack developer 2": 6
+    "Pradnya Yeram": 15,
+    "New full-stack developer 1": 24.06599713055954,
+    "Hrushikant Patkar": 6.774748923959828
    },
    "bars": [
     {
      "block": "A",
      "start": "2026-10-19",
-     "end": "2026-12-28"
+     "end": "2026-11-20"
     },
     {
      "block": "B",
-     "start": "2027-01-19",
-     "end": "2027-04-01"
+     "start": "2027-01-07",
+     "end": "2027-03-18"
     }
    ],
    "points": 88,
@@ -1721,15 +1707,15 @@
    "aHours": 43,
    "bHours": 30,
    "start": "2026-10-19",
-   "end": "2027-04-01",
-   "sprints": "1-9",
-   "lead": "Pranay Shinde",
+   "end": "2027-03-18",
+   "sprints": "1-8",
+   "lead": "New full-stack developer 1",
    "team": [
+    "New full-stack developer 1",
     "Pranay Shinde",
-    "Chitrangi Mestry",
     "Pradnya Yeram",
     "Chinmay Patkar",
-    "New full-stack developer 2",
+    "Hrushikant Patkar",
     "Deep Khanvilkar"
    ]
   },
@@ -1745,35 +1731,33 @@
    "aOps": 0,
    "bOps": 43,
    "people": {
-    "Pradnya Yeram": 120,
-    "Chitrangi Mestry": 75,
-    "Deep Khanvilkar": 29.357245337159252,
-    "New full-stack developer 1": 60,
-    "Surendra": 7.747489239598281,
-    "Chinmay Patkar": 53
+    "Chitrangi Mestry": 120,
+    "Pradnya Yeram": 75,
+    "Tanmay Dukhande": 89.35724533715926,
+    "Hrushikant Patkar": 7.747489239598281,
+    "New full-stack developer 2": 53
    },
    "bars": [
     {
      "block": "B",
-     "start": "2027-03-03",
-     "end": "2027-04-06"
+     "start": "2027-02-19",
+     "end": "2027-03-29"
     }
    ],
    "points": 345,
    "hours": 288,
    "aHours": 0,
    "bHours": 288,
-   "start": "2027-03-03",
-   "end": "2027-04-06",
-   "sprints": "8-10",
-   "lead": "Pradnya Yeram",
+   "start": "2027-02-19",
+   "end": "2027-03-29",
+   "sprints": "7-9",
+   "lead": "Chitrangi Mestry",
    "team": [
-    "Pradnya Yeram",
     "Chitrangi Mestry",
-    "New full-stack developer 1",
-    "Chinmay Patkar",
-    "Deep Khanvilkar",
-    "Surendra"
+    "Tanmay Dukhande",
+    "Pradnya Yeram",
+    "New full-stack developer 2",
+    "Hrushikant Patkar"
    ]
   },
   {
@@ -1788,25 +1772,23 @@
    "aOps": 7,
    "bOps": 51,
    "people": {
-    "Hrushikant Patkar": 8,
+    "Hrushikant Patkar": 63.17073170731719,
     "Sanket Keluskar": 3,
     "Deep Khanvilkar": 10,
-    "Pallavi Sawant": 45,
-    "Chitrangi Mestry": 41,
-    "Tanmay Dukhande": 60,
-    "Pranay Shinde": 46.13773314203742,
-    "New full-stack developer 2": 9.03299856527977
+    "Pallavi Sawant": 69,
+    "Chinmay Patkar": 17,
+    "New full-stack developer 1": 60
    },
    "bars": [
     {
      "block": "A",
      "start": "2026-10-15",
-     "end": "2026-12-18"
+     "end": "2026-11-09"
     },
     {
      "block": "B",
-     "start": "2027-01-19",
-     "end": "2027-03-31"
+     "start": "2027-01-07",
+     "end": "2027-03-22"
     }
    ],
    "points": 222,
@@ -1814,16 +1796,16 @@
    "aHours": 21,
    "bHours": 165,
    "start": "2026-10-15",
-   "end": "2027-03-31",
+   "end": "2027-03-22",
    "sprints": "1-9",
-   "lead": "Tanmay Dukhande",
+   "lead": "Pallavi Sawant",
    "team": [
-    "Tanmay Dukhande",
-    "Pranay Shinde",
     "Pallavi Sawant",
-    "Chitrangi Mestry",
+    "Hrushikant Patkar",
+    "New full-stack developer 1",
+    "Chinmay Patkar",
     "Deep Khanvilkar",
-    "New full-stack developer 2"
+    "Sanket Keluskar"
    ]
   },
   {
@@ -1838,27 +1820,29 @@
    "aOps": 38,
    "bOps": 208,
    "people": {
-    "Hrushikant Patkar": 132,
+    "Hrushikant Patkar": 161.35724533715927,
     "Deep Khanvilkar": 25.358680057388142,
-    "Sanket Keluskar": 125,
-    "Chinmay Patkar": 136,
-    "Pallavi Sawant": 140,
-    "Chitrangi Mestry": 125,
-    "Pradnya Yeram": 4,
-    "New full-stack developer 2": 127.35724533715926,
+    "Sanket Keluskar": 138,
+    "Chinmay Patkar": 80,
+    "Pallavi Sawant": 80,
+    "Chitrangi Mestry": 65,
+    "Pradnya Yeram": 122,
+    "Tanmay Dukhande": 60,
+    "New full-stack developer 2": 83,
     "Pranay Shinde": 60,
-    "New full-stack developer 1": 120
+    "Surendra": 60,
+    "New full-stack developer 1": 60
    },
    "bars": [
     {
      "block": "A",
      "start": "2026-10-12",
-     "end": "2026-11-30"
+     "end": "2026-11-06"
     },
     {
      "block": "B",
-     "start": "2027-01-12",
-     "end": "2027-04-02"
+     "start": "2026-12-31",
+     "end": "2027-03-22"
     }
    ],
    "points": 995,
@@ -1866,16 +1850,16 @@
    "aHours": 101,
    "bHours": 730,
    "start": "2026-10-12",
-   "end": "2027-04-02",
+   "end": "2027-03-22",
    "sprints": "1-9",
-   "lead": "Pallavi Sawant",
+   "lead": "Hrushikant Patkar",
    "team": [
-    "Pallavi Sawant",
-    "Chinmay Patkar",
     "Hrushikant Patkar",
-    "New full-stack developer 2",
     "Sanket Keluskar",
-    "Chitrangi Mestry"
+    "Pradnya Yeram",
+    "New full-stack developer 2",
+    "Chinmay Patkar",
+    "Pallavi Sawant"
    ]
   },
   {
@@ -1890,33 +1874,35 @@
    "aOps": 0,
    "bOps": 47,
    "people": {
-    "New full-stack developer 2": 44.25824964131994,
-    "Pranay Shinde": 43.87948350071736,
-    "Deep Khanvilkar": 60,
-    "Surendra": 60,
-    "Pallavi Sawant": 60
+    "Pallavi Sawant": 21,
+    "Pranay Shinde": 98.39024390243902,
+    "Hrushikant Patkar": 7.747489239598281,
+    "New full-stack developer 1": 60,
+    "Chinmay Patkar": 60,
+    "Sanket Keluskar": 21
    },
    "bars": [
     {
      "block": "B",
-     "start": "2027-01-19",
-     "end": "2027-04-14"
+     "start": "2027-01-12",
+     "end": "2027-03-30"
     }
    ],
    "points": 268,
    "hours": 224,
    "aHours": 0,
    "bHours": 224,
-   "start": "2027-01-19",
-   "end": "2027-04-14",
-   "sprints": "6-10",
-   "lead": "Deep Khanvilkar",
+   "start": "2027-01-12",
+   "end": "2027-03-30",
+   "sprints": "5-9",
+   "lead": "Pranay Shinde",
    "team": [
-    "Deep Khanvilkar",
-    "Surendra",
+    "Pranay Shinde",
+    "New full-stack developer 1",
+    "Chinmay Patkar",
     "Pallavi Sawant",
-    "New full-stack developer 2",
-    "Pranay Shinde"
+    "Sanket Keluskar",
+    "Hrushikant Patkar"
    ]
   },
   {
@@ -1932,25 +1918,24 @@
    "bOps": 46,
    "people": {
     "Hrushikant Patkar": 81,
-    "Sanket Keluskar": 3,
-    "Pallavi Sawant": 6,
-    "Deep Khanvilkar": 5,
+    "Sanket Keluskar": 19,
+    "Pallavi Sawant": 66,
+    "Deep Khanvilkar": 33.071736011477824,
     "Pradnya Yeram": 65,
     "Chinmay Patkar": 5,
-    "New full-stack developer 2": 40.807747489239595,
-    "Pranay Shinde": 28.071736011477824,
-    "Chitrangi Mestry": 60
+    "Surendra": 9,
+    "Pranay Shinde": 15.807747489239597
    },
    "bars": [
     {
      "block": "A",
      "start": "2026-10-14",
-     "end": "2026-12-28"
+     "end": "2026-11-23"
     },
     {
      "block": "B",
-     "start": "2027-01-19",
-     "end": "2027-04-12"
+     "start": "2027-01-08",
+     "end": "2027-03-31"
     }
    ],
    "points": 294,
@@ -1958,16 +1943,16 @@
    "aHours": 38,
    "bHours": 208,
    "start": "2026-10-14",
-   "end": "2027-04-12",
-   "sprints": "1-10",
+   "end": "2027-03-31",
+   "sprints": "1-9",
    "lead": "Hrushikant Patkar",
    "team": [
     "Hrushikant Patkar",
+    "Pallavi Sawant",
     "Pradnya Yeram",
-    "Chitrangi Mestry",
-    "New full-stack developer 2",
-    "Pranay Shinde",
-    "Pallavi Sawant"
+    "Deep Khanvilkar",
+    "Sanket Keluskar",
+    "Pranay Shinde"
    ]
   },
   {
@@ -1982,22 +1967,23 @@
    "aOps": 2,
    "bOps": 47,
    "people": {
-    "Tanmay Dukhande": 63.25824964131994,
-    "Deep Khanvilkar": 5,
-    "Chinmay Patkar": 92,
-    "Sanket Keluskar": 21.263988522238165,
-    "Hrushikant Patkar": 31.615494978479195
+    "Tanmay Dukhande": 32.61549497847919,
+    "Deep Khanvilkar": 7.258249641319942,
+    "Pradnya Yeram": 44,
+    "New full-stack developer 2": 69,
+    "Sanket Keluskar": 12.263988522238165,
+    "Chitrangi Mestry": 48
    },
    "bars": [
     {
      "block": "A",
      "start": "2026-10-12",
-     "end": "2026-10-23"
+     "end": "2026-10-15"
     },
     {
      "block": "B",
-     "start": "2027-01-21",
-     "end": "2027-04-13"
+     "start": "2027-01-11",
+     "end": "2027-04-01"
     }
    ],
    "points": 213,
@@ -2005,13 +1991,14 @@
    "aHours": 5,
    "bHours": 173,
    "start": "2026-10-12",
-   "end": "2027-04-13",
-   "sprints": "1-10",
-   "lead": "Chinmay Patkar",
+   "end": "2027-04-01",
+   "sprints": "1-9",
+   "lead": "New full-stack developer 2",
    "team": [
-    "Chinmay Patkar",
+    "New full-stack developer 2",
+    "Chitrangi Mestry",
+    "Pradnya Yeram",
     "Tanmay Dukhande",
-    "Hrushikant Patkar",
     "Sanket Keluskar",
     "Deep Khanvilkar"
    ]
@@ -2029,24 +2016,23 @@
    "bOps": 41,
    "people": {
     "Hrushikant Patkar": 5,
-    "Chinmay Patkar": 2,
+    "Chinmay Patkar": 39,
     "Pallavi Sawant": 1,
-    "Chitrangi Mestry": 37,
-    "Sanket Keluskar": 34,
-    "New full-stack developer 2": 100,
-    "Surendra": 12.26398852223818,
-    "Pranay Shinde": 20.324246771879483
+    "Surendra": 74,
+    "Pranay Shinde": 60,
+    "New full-stack developer 2": 12.26398852223818,
+    "Tanmay Dukhande": 20.324246771879483
    },
    "bars": [
     {
      "block": "A",
      "start": "2026-10-15",
-     "end": "2026-11-25"
+     "end": "2026-10-20"
     },
     {
      "block": "B",
-     "start": "2027-01-22",
-     "end": "2027-04-12"
+     "start": "2027-01-12",
+     "end": "2027-04-05"
     }
    ],
    "points": 212,
@@ -2054,15 +2040,15 @@
    "aHours": 7,
    "bHours": 170,
    "start": "2026-10-15",
-   "end": "2027-04-12",
+   "end": "2027-04-05",
    "sprints": "1-10",
-   "lead": "New full-stack developer 2",
+   "lead": "Surendra",
    "team": [
-    "New full-stack developer 2",
-    "Chitrangi Mestry",
-    "Sanket Keluskar",
-    "Pranay Shinde",
     "Surendra",
+    "Pranay Shinde",
+    "Chinmay Patkar",
+    "Tanmay Dukhande",
+    "New full-stack developer 2",
     "Hrushikant Patkar"
    ]
   },
@@ -2079,23 +2065,23 @@
    "bOps": 37,
    "people": {
     "Hrushikant Patkar": 2,
-    "Deep Khanvilkar": 19.52223816355813,
-    "Pallavi Sawant": 69.03299856527977,
-    "Pranay Shinde": 60,
-    "New full-stack developer 1": 60,
+    "Deep Khanvilkar": 74.03299856527977,
+    "Pranay Shinde": 14.522238163558129,
     "Sanket Keluskar": 60,
-    "Pradnya Yeram": 6
+    "New full-stack developer 1": 60,
+    "Chinmay Patkar": 60,
+    "Chitrangi Mestry": 6
    },
    "bars": [
     {
      "block": "A",
      "start": "2026-10-12",
-     "end": "2026-11-17"
+     "end": "2026-11-02"
     },
     {
      "block": "B",
-     "start": "2027-01-25",
-     "end": "2027-04-19"
+     "start": "2027-01-15",
+     "end": "2027-04-06"
     }
    ],
    "points": 277,
@@ -2103,16 +2089,16 @@
    "aHours": 6,
    "bHours": 225,
    "start": "2026-10-12",
-   "end": "2027-04-19",
+   "end": "2027-04-06",
    "sprints": "1-10",
-   "lead": "Pallavi Sawant",
+   "lead": "Deep Khanvilkar",
    "team": [
-    "Pallavi Sawant",
-    "Pranay Shinde",
-    "New full-stack developer 1",
-    "Sanket Keluskar",
     "Deep Khanvilkar",
-    "Pradnya Yeram"
+    "Sanket Keluskar",
+    "New full-stack developer 1",
+    "Chinmay Patkar",
+    "Pranay Shinde",
+    "Chitrangi Mestry"
    ]
   },
   {
@@ -2127,26 +2113,26 @@
    "aOps": 11,
    "bOps": 11,
    "people": {
-    "Hrushikant Patkar": 24.549497847919653,
+    "Hrushikant Patkar": 11,
     "Deep Khanvilkar": 5,
     "Sanket Keluskar": 3,
-    "Pallavi Sawant": 2,
+    "Pallavi Sawant": 23,
     "Chinmay Patkar": 14,
-    "Pradnya Yeram": 13,
-    "Chitrangi Mestry": 3,
-    "New full-stack developer 1": 21,
-    "Pranay Shinde": 11.291248206599713
+    "Pradnya Yeram": 3,
+    "Chitrangi Mestry": 13,
+    "New full-stack developer 2": 11.291248206599713,
+    "Tanmay Dukhande": 13.549497847919655
    },
    "bars": [
     {
      "block": "A",
      "start": "2026-10-16",
-     "end": "2026-12-25"
+     "end": "2026-11-19"
     },
     {
      "block": "B",
-     "start": "2027-01-25",
-     "end": "2027-04-13"
+     "start": "2027-01-13",
+     "end": "2027-04-01"
     }
    ],
    "points": 97,
@@ -2154,16 +2140,16 @@
    "aHours": 34,
    "bHours": 47,
    "start": "2026-10-16",
-   "end": "2027-04-13",
-   "sprints": "1-10",
-   "lead": "Hrushikant Patkar",
+   "end": "2027-04-01",
+   "sprints": "1-9",
+   "lead": "Pallavi Sawant",
    "team": [
-    "Hrushikant Patkar",
-    "New full-stack developer 1",
+    "Pallavi Sawant",
     "Chinmay Patkar",
-    "Pradnya Yeram",
-    "Pranay Shinde",
-    "Deep Khanvilkar"
+    "Tanmay Dukhande",
+    "Chitrangi Mestry",
+    "New full-stack developer 2",
+    "Hrushikant Patkar"
    ]
   },
   {
@@ -2178,25 +2164,25 @@
    "aOps": 18,
    "bOps": 54,
    "people": {
-    "Tanmay Dukhande": 84,
+    "Tanmay Dukhande": 24,
     "Sanket Keluskar": 12,
-    "Chinmay Patkar": 6,
-    "Pallavi Sawant": 27,
+    "Chinmay Patkar": 62.45624103299856,
+    "Pallavi Sawant": 30,
     "Chitrangi Mestry": 8,
-    "Pradnya Yeram": 37,
-    "Deep Khanvilkar": 5.489239598278331,
-    "Hrushikant Patkar": 56.45624103299856
+    "Pradnya Yeram": 34,
+    "Surendra": 60,
+    "New full-stack developer 1": 5.489239598278331
    },
    "bars": [
     {
      "block": "A",
      "start": "2026-10-07",
-     "end": "2026-11-30"
+     "end": "2026-11-20"
     },
     {
      "block": "B",
-     "start": "2027-01-15",
-     "end": "2027-04-05"
+     "start": "2027-01-04",
+     "end": "2027-03-26"
     }
    ],
    "points": 236,
@@ -2204,16 +2190,16 @@
    "aHours": 49,
    "bHours": 148,
    "start": "2026-10-07",
-   "end": "2027-04-05",
-   "sprints": "1-10",
-   "lead": "Tanmay Dukhande",
+   "end": "2027-03-26",
+   "sprints": "1-9",
+   "lead": "Chinmay Patkar",
    "team": [
-    "Tanmay Dukhande",
-    "Hrushikant Patkar",
+    "Chinmay Patkar",
+    "Surendra",
     "Pradnya Yeram",
     "Pallavi Sawant",
-    "Sanket Keluskar",
-    "Chitrangi Mestry"
+    "Tanmay Dukhande",
+    "Sanket Keluskar"
    ]
   },
   {
@@ -2228,26 +2214,26 @@
    "aOps": 17,
    "bOps": 31,
    "people": {
-    "Hrushikant Patkar": 90.71449067431851,
-    "Chinmay Patkar": 63,
-    "Deep Khanvilkar": 5,
-    "Pallavi Sawant": 6,
-    "Pradnya Yeram": 23,
+    "Hrushikant Patkar": 43.29124820659971,
+    "Chinmay Patkar": 3,
+    "Deep Khanvilkar": 63.714490674318505,
+    "Pallavi Sawant": 18,
+    "Pradnya Yeram": 13,
     "Sanket Keluskar": 3,
+    "Chitrangi Mestry": 68,
     "New full-stack developer 1": 89,
-    "New full-stack developer 2": 70,
-    "Tanmay Dukhande": 11.291248206599713
+    "New full-stack developer 2": 60
    },
    "bars": [
     {
      "block": "A",
      "start": "2026-10-13",
-     "end": "2027-01-14"
+     "end": "2026-11-30"
     },
     {
      "block": "B",
-     "start": "2027-01-28",
-     "end": "2027-05-03"
+     "start": "2027-01-18",
+     "end": "2027-04-23"
     }
    ],
    "points": 361,
@@ -2255,16 +2241,16 @@
    "aHours": 52,
    "bHours": 250,
    "start": "2026-10-13",
-   "end": "2027-05-03",
+   "end": "2027-04-23",
    "sprints": "1-11",
-   "lead": "Hrushikant Patkar",
+   "lead": "New full-stack developer 1",
    "team": [
-    "Hrushikant Patkar",
     "New full-stack developer 1",
+    "Chitrangi Mestry",
+    "Deep Khanvilkar",
     "New full-stack developer 2",
-    "Chinmay Patkar",
-    "Pradnya Yeram",
-    "Tanmay Dukhande"
+    "Hrushikant Patkar",
+    "Pallavi Sawant"
    ]
   },
   {
@@ -2280,43 +2266,42 @@
    "bOps": 204,
    "people": {
     "Pranay Shinde": 145,
-    "Sanket Keluskar": 37.73170731707347,
+    "Sanket Keluskar": 79,
     "Deep Khanvilkar": 142.74748923959828,
     "Chinmay Patkar": 114,
-    "Pradnya Yeram": 83,
-    "Pallavi Sawant": 84,
-    "Chitrangi Mestry": 94,
-    "Surendra": 121,
-    "Tanmay Dukhande": 124.20373027259701,
-    "Hrushikant Patkar": 60,
-    "New full-stack developer 1": 60,
-    "New full-stack developer 2": 60
+    "Pradnya Yeram": 63,
+    "Pallavi Sawant": 72,
+    "Chitrangi Mestry": 114,
+    "New full-stack developer 2": 123,
+    "Hrushikant Patkar": 64.20373027259701,
+    "Tanmay Dukhande": 180,
+    "New full-stack developer 1": 28.73170731707347
    },
    "bars": [
     {
      "block": "A",
-     "start": "2026-10-21",
-     "end": "2027-01-13"
+     "start": "2026-10-22",
+     "end": "2026-12-14"
     },
     {
      "block": "B",
-     "start": "2027-01-26",
-     "end": "2027-04-22"
+     "start": "2027-01-14",
+     "end": "2027-04-15"
     }
    ],
    "points": 1126,
    "hours": 940,
    "aHours": 177,
    "bHours": 763,
-   "start": "2026-10-21",
-   "end": "2027-04-22",
+   "start": "2026-10-22",
+   "end": "2027-04-15",
    "sprints": "1-10",
-   "lead": "Pranay Shinde",
+   "lead": "Tanmay Dukhande",
    "team": [
+    "Tanmay Dukhande",
     "Pranay Shinde",
     "Deep Khanvilkar",
-    "Tanmay Dukhande",
-    "Surendra",
+    "New full-stack developer 2",
     "Chinmay Patkar",
     "Chitrangi Mestry"
    ]
@@ -2333,30 +2318,30 @@
    "aOps": 50,
    "bOps": 91,
    "people": {
-    "Pranay Shinde": 184,
-    "Chinmay Patkar": 21,
-    "Deep Khanvilkar": 130,
-    "Sanket Keluskar": 134.0,
-    "Pallavi Sawant": 88.0,
-    "Chitrangi Mestry": 83,
-    "New full-stack developer 2": 4,
+    "Pranay Shinde": 172.0,
+    "Chinmay Patkar": 93.0,
+    "Deep Khanvilkar": 16.774748923959827,
+    "Sanket Keluskar": 138,
+    "Pallavi Sawant": 123,
+    "Chitrangi Mestry": 8,
+    "Pradnya Yeram": 75,
     "Surendra": 60,
-    "Pradnya Yeram": 35,
-    "Tanmay Dukhande": 96.0,
-    "Hrushikant Patkar": 25.500717360114876,
+    "Hrushikant Patkar": 102.77474892395983,
+    "Tanmay Dukhande": 60,
+    "New full-stack developer 1": 11.951219512195223,
     "Kalpita Mejari": 1296.0,
     "Second AI engineer": 1272.0
    },
    "bars": [
     {
      "block": "A",
-     "start": "2026-10-12",
-     "end": "2027-01-12"
+     "start": "2026-10-13",
+     "end": "2026-12-11"
     },
     {
      "block": "B",
      "start": "2026-10-05",
-     "end": "2027-05-10"
+     "end": "2027-04-26"
     }
    ],
    "points": 3429,
@@ -2364,7 +2349,7 @@
    "aHours": 114,
    "bHours": 2748,
    "start": "2026-10-05",
-   "end": "2027-05-10",
+   "end": "2027-04-26",
    "sprints": "1-11",
    "lead": "Kalpita Mejari",
    "team": [
@@ -2372,8 +2357,8 @@
     "Second AI engineer",
     "Pranay Shinde",
     "Sanket Keluskar",
-    "Deep Khanvilkar",
-    "Tanmay Dukhande"
+    "Pallavi Sawant",
+    "Hrushikant Patkar"
    ]
   }
  ],
@@ -2395,17 +2380,17 @@
     "9": 80.0
    },
    "planned": {
-    "1": 83,
-    "2": 87,
-    "3": 50,
-    "4": 119,
-    "5": 111,
-    "6": 119,
+    "1": 121,
+    "2": 122,
+    "3": 92,
+    "4": 121,
+    "5": 112,
+    "6": 120,
     "7": 120,
     "8": 96,
     "9": 80,
     "10": 112,
-    "11": 51
+    "11": 1
    },
    "modules": [
     "Foundation & Setup",
@@ -2414,15 +2399,15 @@
     "Subscription & Licensing",
     "Developer Portal & Public API",
     "Digital Asset Management",
-    "Seat Management & Venue Maps",
-    "Orders & Reservations"
+    "Ticketing Catalogue & Products",
+    "Pricing, Promotions & Bundles"
    ],
-   "lastDay": "2027-05-03",
+   "lastDay": "2027-04-23",
    "blockAPoints": 540,
-   "hoursAfterPlanEnd": 163,
-   "overtimeHoursPerWeek": 6.6,
-   "blockAEnd": "2027-01-18",
-   "blockAOvertimeHours": 291
+   "hoursAfterPlanEnd": 113,
+   "overtimeHoursPerWeek": 4.6,
+   "blockAEnd": "2026-12-25",
+   "blockAOvertimeHours": 172
   },
   {
    "name": "Pranay Shinde",
@@ -2441,34 +2426,34 @@
     "9": 80.0
    },
    "planned": {
-    "1": 63,
-    "2": 121,
+    "1": 93,
+    "2": 119,
     "3": 98,
-    "4": 117,
+    "4": 118,
     "5": 112,
     "6": 120,
     "7": 120,
     "8": 96,
     "9": 80,
     "10": 112,
-    "11": 74
+    "11": 14
    },
    "modules": [
     "Foundation & Setup",
     "Platform Operations",
+    "Subscription & Licensing",
     "Approval Workflows",
     "Ticketing Catalogue & Products",
     "Pricing, Promotions & Bundles",
     "Orders & Reservations",
-    "Payments",
-    "Wallet & Cashless"
+    "Payments"
    ],
-   "lastDay": "2027-05-06",
+   "lastDay": "2027-04-26",
    "blockAPoints": 457,
-   "hoursAfterPlanEnd": 186,
-   "overtimeHoursPerWeek": 7.6,
-   "blockAEnd": "2026-12-23",
-   "blockAOvertimeHours": 159
+   "hoursAfterPlanEnd": 126,
+   "overtimeHoursPerWeek": 5.1,
+   "blockAEnd": "2026-12-18",
+   "blockAOvertimeHours": 131
   },
   {
    "name": "Tanmay Dukhande",
@@ -2487,17 +2472,16 @@
     "9": 80.0
    },
    "planned": {
-    "1": 100,
+    "1": 107,
     "2": 120,
-    "3": 97,
-    "4": 111,
+    "3": 90,
+    "4": 123,
     "5": 112,
     "6": 120,
     "7": 120,
     "8": 96,
     "9": 80,
-    "10": 112,
-    "11": 70
+    "10": 90
    },
    "modules": [
     "Foundation & Setup",
@@ -2506,15 +2490,15 @@
     "Platform Operations",
     "Subscription & Licensing",
     "Approval Workflows",
-    "Developer Portal & Public API",
-    "Digital Asset Management"
+    "Ticketing Catalogue & Products",
+    "Pricing, Promotions & Bundles"
    ],
-   "lastDay": "2027-05-05",
+   "lastDay": "2027-04-20",
    "blockAPoints": 453,
-   "hoursAfterPlanEnd": 182,
-   "overtimeHoursPerWeek": 7.4,
-   "blockAEnd": "2026-12-17",
-   "blockAOvertimeHours": 127
+   "hoursAfterPlanEnd": 90,
+   "overtimeHoursPerWeek": 3.6,
+   "blockAEnd": "2026-12-16",
+   "blockAOvertimeHours": 115
   },
   {
    "name": "Deep Khanvilkar",
@@ -2533,17 +2517,17 @@
     "9": 80.0
    },
    "planned": {
-    "1": 36,
-    "2": 81,
-    "3": 44,
-    "4": 52,
-    "5": 98,
+    "1": 84,
+    "2": 117,
+    "3": 27,
+    "4": 119,
+    "5": 112,
     "6": 120,
     "7": 120,
     "8": 96,
     "9": 80,
     "10": 112,
-    "11": 89
+    "11": 3
    },
    "modules": [
     "Foundation & Setup",
@@ -2555,12 +2539,12 @@
     "Digital Asset Management",
     "Ticketing Catalogue & Products"
    ],
-   "lastDay": "2027-05-10",
+   "lastDay": "2027-04-23",
    "blockAPoints": 287,
-   "hoursAfterPlanEnd": 201,
-   "overtimeHoursPerWeek": 8.2,
-   "blockAEnd": "2027-01-05",
-   "blockAOvertimeHours": 217
+   "hoursAfterPlanEnd": 115,
+   "overtimeHoursPerWeek": 4.7,
+   "blockAEnd": "2026-12-08",
+   "blockAOvertimeHours": 70
   },
   {
    "name": "Pallavi Sawant",
@@ -2588,8 +2572,7 @@
     "7": 120,
     "8": 96,
     "9": 80,
-    "10": 112,
-    "11": 26
+    "10": 106
    },
    "modules": [
     "Foundation & Setup",
@@ -2599,12 +2582,12 @@
     "Subscription & Licensing",
     "Approval Workflows",
     "Developer Portal & Public API",
-    "Ticketing Catalogue & Products"
+    "Digital Asset Management"
    ],
-   "lastDay": "2027-04-28",
+   "lastDay": "2027-04-22",
    "blockAPoints": 290,
-   "hoursAfterPlanEnd": 138,
-   "overtimeHoursPerWeek": 5.6,
+   "hoursAfterPlanEnd": 106,
+   "overtimeHoursPerWeek": 4.3,
    "blockAEnd": "2026-11-16",
    "blockAOvertimeHours": 0
   },
@@ -2625,33 +2608,34 @@
     "9": 80.0
    },
    "planned": {
-    "1": 36,
-    "2": 53,
-    "4": 16,
-    "5": 110,
-    "6": 119,
+    "1": 108,
+    "2": 107,
+    "3": 18,
+    "4": 74,
+    "5": 112,
+    "6": 120,
     "7": 120,
     "8": 96,
     "9": 80,
     "10": 112,
-    "11": 65
+    "11": 1
    },
    "modules": [
     "Foundation & Setup",
     "Identity, Roles & Security",
     "Tenancy, Venues & Devices",
     "Subscription & Licensing",
+    "Approval Workflows",
     "Ticketing Catalogue & Products",
     "Pricing, Promotions & Bundles",
-    "Seat Management & Venue Maps",
-    "Orders & Reservations"
+    "Seat Management & Venue Maps"
    ],
-   "lastDay": "2027-05-05",
+   "lastDay": "2027-04-23",
    "blockAPoints": 290,
-   "hoursAfterPlanEnd": 177,
-   "overtimeHoursPerWeek": 7.2,
-   "blockAEnd": "2027-01-21",
-   "blockAOvertimeHours": 317
+   "hoursAfterPlanEnd": 113,
+   "overtimeHoursPerWeek": 4.6,
+   "blockAEnd": "2026-12-15",
+   "blockAOvertimeHours": 112
   },
   {
    "name": "Chinmay Patkar",
@@ -2670,17 +2654,16 @@
     "9": 80.0
    },
    "planned": {
-    "1": 12,
-    "2": 36,
-    "3": 79,
-    "4": 66,
+    "1": 110,
+    "2": 119,
+    "3": 95,
+    "4": 81,
     "5": 112,
-    "6": 119,
+    "6": 120,
     "7": 120,
     "8": 96,
     "9": 80,
-    "10": 112,
-    "11": 30
+    "10": 71
    },
    "modules": [
     "Foundation & Setup",
@@ -2692,12 +2675,12 @@
     "Ticketing Catalogue & Products",
     "Pricing, Promotions & Bundles"
    ],
-   "lastDay": "2027-04-28",
+   "lastDay": "2027-04-15",
    "blockAPoints": 405,
-   "hoursAfterPlanEnd": 142,
-   "overtimeHoursPerWeek": 5.8,
-   "blockAEnd": "2027-01-22",
-   "blockAOvertimeHours": 322
+   "hoursAfterPlanEnd": 71,
+   "overtimeHoursPerWeek": 2.9,
+   "blockAEnd": "2026-12-15",
+   "blockAOvertimeHours": 110
   },
   {
    "name": "Chitrangi Mestry",
@@ -2725,8 +2708,7 @@
     "7": 120,
     "8": 96,
     "9": 80,
-    "10": 112,
-    "11": 11
+    "10": 63
    },
    "modules": [
     "Foundation & Setup",
@@ -2734,14 +2716,14 @@
     "Platform Operations",
     "Subscription & Licensing",
     "Approval Workflows",
-    "Developer Portal & Public API",
     "Ticketing Catalogue & Products",
-    "Pricing, Promotions & Bundles"
+    "Pricing, Promotions & Bundles",
+    "Seat Management & Venue Maps"
    ],
-   "lastDay": "2027-04-26",
+   "lastDay": "2027-04-14",
    "blockAPoints": 280,
-   "hoursAfterPlanEnd": 123,
-   "overtimeHoursPerWeek": 5.0,
+   "hoursAfterPlanEnd": 63,
+   "overtimeHoursPerWeek": 2.5,
    "blockAEnd": "2026-11-16",
    "blockAOvertimeHours": 0
   },
@@ -2771,7 +2753,7 @@
     "7": 120,
     "8": 96,
     "9": 80,
-    "10": 106
+    "10": 58
    },
    "modules": [
     "Foundation & Setup",
@@ -2780,13 +2762,13 @@
     "Platform Operations",
     "Subscription & Licensing",
     "Approval Workflows",
-    "Ticketing Catalogue & Products",
-    "Pricing, Promotions & Bundles"
+    "Digital Asset Management",
+    "Ticketing Catalogue & Products"
    ],
-   "lastDay": "2027-04-22",
+   "lastDay": "2027-04-14",
    "blockAPoints": 244,
-   "hoursAfterPlanEnd": 106,
-   "overtimeHoursPerWeek": 4.3,
+   "hoursAfterPlanEnd": 58,
+   "overtimeHoursPerWeek": 2.3,
    "blockAEnd": "2026-11-10",
    "blockAOvertimeHours": 0
   },
@@ -2807,8 +2789,8 @@
     "9": 48.0
    },
    "planned": {
-    "1": 68,
-    "2": 73,
+    "1": 66,
+    "2": 75,
     "3": 38,
     "4": 72,
     "5": 67,
@@ -2816,23 +2798,22 @@
     "7": 72,
     "8": 58,
     "9": 48,
-    "10": 67,
-    "11": 26
+    "10": 55
    },
    "modules": [
     "Foundation & Setup",
     "Identity, Roles & Security",
     "Subscription & Licensing",
-    "Digital Asset Management",
     "Ticketing Catalogue & Products",
-    "Seat Management & Venue Maps",
-    "Payments",
-    "Rentals"
+    "Orders & Reservations",
+    "Wallet & Cashless",
+    "Admission & Access Control",
+    "Resources & Capacity"
    ],
-   "lastDay": "2027-04-30",
+   "lastDay": "2027-04-20",
    "blockAPoints": 173,
-   "hoursAfterPlanEnd": 93,
-   "overtimeHoursPerWeek": 3.8,
+   "hoursAfterPlanEnd": 55,
+   "overtimeHoursPerWeek": 2.2,
    "blockAEnd": "2026-11-17",
    "blockAOvertimeHours": 0
   },
@@ -2860,23 +2841,22 @@
     "7": 120,
     "8": 96,
     "9": 80,
-    "10": 112,
-    "11": 49
+    "10": 91
    },
    "modules": [
     "Tenancy, Venues & Devices",
     "Platform Operations",
     "Subscription & Licensing",
-    "Approval Workflows",
     "Developer Portal & Public API",
     "Ticketing Catalogue & Products",
     "Pricing, Promotions & Bundles",
-    "Seat Management & Venue Maps"
+    "Orders & Reservations",
+    "Wallet & Cashless"
    ],
-   "lastDay": "2027-05-03",
+   "lastDay": "2027-04-20",
    "blockAPoints": 0,
-   "hoursAfterPlanEnd": 161,
-   "overtimeHoursPerWeek": 9.1,
+   "hoursAfterPlanEnd": 91,
+   "overtimeHoursPerWeek": 5.2,
    "blockAEnd": null,
    "blockAOvertimeHours": 0
   },
@@ -2904,23 +2884,22 @@
     "7": 120,
     "8": 96,
     "9": 80,
-    "10": 112,
-    "11": 31
+    "10": 91
    },
    "modules": [
+    "Identity, Roles & Security",
     "Tenancy, Venues & Devices",
     "Subscription & Licensing",
-    "Developer Portal & Public API",
-    "Digital Asset Management",
+    "Approval Workflows",
     "Ticketing Catalogue & Products",
     "Pricing, Promotions & Bundles",
     "Seat Management & Venue Maps",
     "Orders & Reservations"
    ],
-   "lastDay": "2027-04-28",
+   "lastDay": "2027-04-20",
    "blockAPoints": 0,
-   "hoursAfterPlanEnd": 143,
-   "overtimeHoursPerWeek": 8.1,
+   "hoursAfterPlanEnd": 91,
+   "overtimeHoursPerWeek": 5.2,
    "blockAEnd": null,
    "blockAOvertimeHours": 0
   },
@@ -2960,8 +2939,8 @@
    "blockAPoints": 0,
    "hoursAfterPlanEnd": 98,
    "overtimeHoursPerWeek": 4.0,
-   "blockAEnd": "2026-11-23",
-   "blockAOvertimeHours": 2
+   "blockAEnd": "2026-12-08",
+   "blockAOvertimeHours": 71
   },
   {
    "name": "Second AI engineer",
@@ -2999,8 +2978,8 @@
    "blockAPoints": 0,
    "hoursAfterPlanEnd": 78,
    "overtimeHoursPerWeek": 3.2,
-   "blockAEnd": "2026-11-23",
-   "blockAOvertimeHours": 2
+   "blockAEnd": "2026-12-08",
+   "blockAOvertimeHours": 71
   }
  ],
  "aiEngine": {

@@ -52,6 +52,20 @@ A link is a hard "cannot be finished before". It becomes a **follows** relation 
 | **A report that produces figures after every task that writes orders, money, catalogue, admissions, food and drink, stock, retail and wallets** | 30 Sep |
 | AI engine: gateway after CI and environments; Qdrant work after the Qdrant cluster; the rest after the gateway | 30 Sep |
 
+**Hard and soft, in the schedule** (decided 30 September). Every link above is a follows link in OpenProject: a
+ticket is never *finished* before what it waits on. For *starting*, the Block A schedule
+(`tools/derive-block-a-schedule.py`) treats some waits as soft, so nobody sits idle behind a finished interface:
+
+| Wait | Start | Finish |
+|---|---|---|
+| A screen on its services | any time, against the mock server | after the services land |
+| A service on the platform kernel, idempotency, the outbox | from day 3, against the interfaces published in week 1 | after the platform task |
+| The kernel on sign-in setup | any time | after sign-in setup |
+| A read-only or report task on the services whose data it reads | any time, against seeded data | after those services |
+| Setup, migrations, the AI engine's setup | after them | after them |
+
+A person whose next ticket is still waiting takes their next ticket that is ready, as ADAM's board shows it.
+
 Links a longer chain already implies (A waits on C when A waits on B and B on C) are not sent to OpenProject: the
 order is the same and OpenProject 10 is slow with large graphs.
 

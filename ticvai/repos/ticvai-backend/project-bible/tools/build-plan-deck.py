@@ -270,18 +270,28 @@ def main():
         a_items.append({"key": key, "subject": r["subject"], "module": mod, "points": pts, "area": r["area"],
                         "tier": int(r.get("tier") or 0), "track": r["track"],
                         "who": r["assignee"] or "client", "week": int(sched["start"].get(key, 0)) // 5,
+                        "start": float(sched["start"].get(key, 0)),
                         "seq": int(r["sequence"] or 0)})
     # Each person's Block A tasks, laid end to end at their pace in the order the schedule gives
     # (week first, then the sheet's sequence). A person whose sheet is longer than 35 days runs over;
     # that overrun is the Block A overtime, and it is reported rather than hidden.
+    # **Block A's dates are the schedule's** (30 September): each task starts on the day
+    # derive-block-a-schedule.py gives it (build order, soft platform waits, and a waiting person taking their
+    # next ready ticket), with the same length the schedule uses: points at the person's pace, or the
+    # engineer-days an AI engine task names. One source of dates, so the deck and the tickets agree.
     pace_of = {p[0]: p[3] for p in PEOPLE}
+    extra = json.load(io.open("docs/active/block-a-extra-tasks.json", encoding="utf-8"))
+    days_of = {t["key"]: float(t["days"]) for t in extra["tasks"] if t.get("days")}
     a_cursor = collections.Counter()
-    for it in sorted(a_items, key=lambda x: (x["week"], x["seq"])):
+    for it in sorted(a_items, key=lambda x: (x["start"], x["seq"])):
         who = it["who"]
-        s0 = max(a_cursor[who], it["week"] * 5)
-        dur = it["points"] / (pace * pace_of.get(who, 1.0)) if it["points"] else 0.2
+        s0 = it["start"]
+        if it["key"] in days_of:
+            dur = days_of[it["key"]]
+        else:
+            dur = it["points"] / (pace * pace_of.get(who, 1.0)) if it["points"] else 0.2
         it["s"], it["e"] = s0, s0 + dur
-        a_cursor[who] = s0 + dur
+        a_cursor[who] = max(a_cursor[who], s0 + dur)
         it["startIdx"], it["endIdx"] = int(s0), int(max(s0, s0 + dur - 1e-6))
 
     # Block B: everything else, sized with Block A's formulas

@@ -9,10 +9,11 @@
 
 - **When:** Monday 5 October 2026 to Friday 2 April 2027, in nine sprints of three weeks (the last is two).
 - **What:** seven apps, 31 modules in 7 packages, 2,660 operations, 2,445 screens. 3,153 of the client's 3,165 in-scope requirements are specified.
-- **Effort:** about **13,500 hours** (16,171 points at 0.84 hours a point).
+- **Effort:** about **13,559 hours** (16,238 points at 0.835 hours a point).
 - **Team:** 14 people. Chinmay Parab leads and is not counted in capacity.
-- **Finish:** 23 April 2027 at normal hours. **Finishing on 2 April needs about 1,000 overtime hours**, 2 to 6 hours a week per person.
-- **The constraint is the back end in Block A.** Screens are built by 20 November. They are wired end to end as the back end lands, between 24 December and 11 January.
+- **Finish:** 26 April 2027 at normal hours. **Finishing on 2 April needs about 1,270 overtime hours**, 2.2 to 5.2 hours a week per person.
+- **One build order, start to end** (30 September): 0 plumbing; 1 foundation (Tenancy, Identity, Platform control, White Label); 2 commerce (Catalogue, Order, Ledger, Access, Wallet); 3 operations (Venue Ops, F&B, Inventory, Retail); 4 engagement (Marketing, AI); 5 reporting.
+- **The back end is still the constraint in Block A,** but a shorter one. Screens are built by 20 November (Chinmay Patkar's last guest screens by 25 November). Block A work ends between 10 November and 25 December, depending on the person; the back end lands between 8 and 25 December, and every screen is wired end to end by 25 December (section 5).
 - **Every AI function ships inside the six months.** Each works on day one and learns from the venue's own data.
 
 ## 2. The seven apps
@@ -34,7 +35,7 @@ The Partner Portal became the seventh app on 30 September. It is drawn two ways 
 | Phase | Dates | What is built |
 |---|---|---|
 | **Block A** | 5 Oct – 20 Nov 2026 (35 working days) | POS with Kitchen Display; Guest Web; Guest App (Mobile v4 with the Plan tab); the CMS flow builder; Venue Management setup screens; the platform kernel and offline machinery; the AI gateway, concierge, Help me choose, translations, the planner agent and the baseline layer |
-| **Block A tail** | to 11 Jan 2027 | Back-end work that does not fit 35 days, and wiring the screens to it (section 5) |
+| **Block A tail** | to 25 Dec 2026 | Back-end work that does not fit 35 days, and wiring the screens to it (section 5) |
 | **B1** | 23 Nov 2026 – 1 Jan 2027 | Scanner; Staff App waves 1–2; Kiosk; remaining CMS steps; Venue Management waves 1–2 and the first wave-3 modules; TICVAI console waves 1–2; Sign-up; the AI action pipeline, forecasting and fraud baselines |
 | **B2** | 4 Jan – 12 Feb 2027 | Partner portal; Support; Accreditation; Developer Portal; Staff App wave 3; Venue Management wave 3; recommendations and the configuration assistant |
 | **B3** | 15 Feb – 2 Apr 2027 | The rest of Venue Management and the console, including the AI console; Analytics and the analytics assistant; hardening |
@@ -45,12 +46,12 @@ Holidays counted: 1–3 December (Commemoration and National Day), 1 January, an
 
 | Sprint | Dates | Block | Capacity (h) | Planned (h) |
 |---|---|---|---|---|
-| 1 | 5 Oct 2026 – 23 Oct 2026 | A | 1,392 | 982 |
-| 2 | 26 Oct 2026 – 13 Nov 2026 | A | 1,392 | 1,144 |
-| 3 | 16 Nov 2026 – 4 Dec 2026 | A ends 20 Nov, B1 starts | 1,226 | 885 |
-| 4 | 7 Dec 2026 – 25 Dec 2026 | B | 1,632 | 1,393 |
-| 5 | 28 Dec 2026 – 15 Jan 2027 | B | 1,523 | 1,506 |
-| 6 | 18 Jan 2027 – 5 Feb 2027 | B | 1,632 | 1,629 |
+| 1 | 5 Oct 2026 – 23 Oct 2026 | A | 1,392 | 1,273 |
+| 2 | 26 Oct 2026 – 13 Nov 2026 | A | 1,392 | 1,352 |
+| 3 | 16 Nov 2026 – 4 Dec 2026 | A ends 20 Nov, B1 starts | 1,226 | 937 |
+| 4 | 7 Dec 2026 – 25 Dec 2026 | B | 1,632 | 1,548 |
+| 5 | 28 Dec 2026 – 15 Jan 2027 | B | 1,523 | 1,523 |
+| 6 | 18 Jan 2027 – 5 Feb 2027 | B | 1,632 | 1,632 |
 | 7 | 8 Feb 2027 – 26 Feb 2027 | B | 1,632 | 1,632 |
 | 8 | 1 Mar 2027 – 19 Mar 2027 | B | 1,306 | 1,306 |
 | 9 | 22 Mar 2027 – 2 Apr 2027 | B | 1,088 | 1,088 |
@@ -65,50 +66,55 @@ One order from 5 October to the end: plumbing, then the foundation everything re
 
 | Phase | Starts | Ends | Hours (A / B) | Main modules | People |
 |---|---|---|---|---|---|
-| 0 Plumbing | 5 Oct 2026 | 28 Dec 2026 | 306 / 0 | Foundation & Setup, Identity, Roles & Security, Tenancy, Venues & Devices, Transport, Reporting & Analytics | Hrushikant Patkar, Tanmay Dukhande, Pranay Shinde, Pradnya Yeram |
-| 1 Foundation | 19 Oct 2026 | 24 Mar 2027 | 273 / 684 | Subscription & Licensing, Identity, Roles & Security, White Label & CMS, Approval Workflows, Platform Operations | Tanmay Dukhande, Hrushikant Patkar, Deep Khanvilkar, New full-stack developer 2 |
-| 2 Commerce | 21 Oct 2026 | 5 Apr 2027 | 510 / 1,652 | Admission & Access Control, Ticketing Catalogue & Products, Orders & Reservations, Pricing, Promotions & Bundles, Finance, Ledger & Tax | Tanmay Dukhande, Pranay Shinde, Deep Khanvilkar, Hrushikant Patkar |
-| 3 Operations | 28 Oct 2026 | 19 Apr 2027 | 415 / 750 | Food & Beverage, Foundation & Setup, Inventory & Procurement, Resources & Capacity, Accreditation | Hrushikant Patkar, Deep Khanvilkar, Pranay Shinde, Tanmay Dukhande |
-| 4 Engagement | 5 Oct 2026 | 10 May 2027 | 177 / 2,881 | AI & Intelligence, Marketing & CRM, Foundation & Setup | Kalpita Mejari, Second AI engineer, Pranay Shinde, Deep Khanvilkar |
-| 5 Reporting | 21 Dec 2026 | 3 May 2027 | 34 / 58 | Reporting & Analytics, Foundation & Setup | Hrushikant Patkar, Tanmay Dukhande, Chinmay Patkar, Sanket Keluskar |
+| 0 Plumbing | 5 Oct 2026 | 15 Dec 2026 | 306 / 0 | Foundation & Setup, Identity, Roles & Security, Tenancy, Venues & Devices, Transport, Reporting & Analytics | Hrushikant Patkar, Tanmay Dukhande, Pranay Shinde, Pradnya Yeram |
+| 1 Foundation | 8 Oct 2026 | 5 Mar 2027 | 273 / 684 | Subscription & Licensing, Identity, Roles & Security, White Label & CMS, Approval Workflows, Platform Operations | Deep Khanvilkar, Tanmay Dukhande, Sanket Keluskar, Hrushikant Patkar |
+| 2 Commerce | 14 Oct 2026 | 26 Mar 2027 | 510 / 1,652 | Admission & Access Control, Ticketing Catalogue & Products, Orders & Reservations, Pricing, Promotions & Bundles, Finance, Ledger & Tax | Pranay Shinde, Tanmay Dukhande, Hrushikant Patkar, Deep Khanvilkar |
+| 3 Operations | 13 Oct 2026 | 6 Apr 2027 | 415 / 750 | Food & Beverage, Foundation & Setup, Inventory & Procurement, Resources & Capacity, Accreditation | Hrushikant Patkar, Deep Khanvilkar, Pranay Shinde, Tanmay Dukhande |
+| 4 Engagement | 5 Oct 2026 | 26 Apr 2027 | 177 / 2,881 | AI & Intelligence, Marketing & CRM, Foundation & Setup | Kalpita Mejari, Second AI engineer, Pranay Shinde, Tanmay Dukhande |
+| 5 Reporting | 29 Oct 2026 | 23 Apr 2027 | 34 / 58 | Reporting & Analytics, Foundation & Setup | Deep Khanvilkar, Hrushikant Patkar, Chinmay Patkar, Sanket Keluskar |
 
 **Front end**
 
 | Phase | Starts | Ends | Hours (A / B) | Main modules | People |
 |---|---|---|---|---|---|
-| 0 Plumbing | 5 Oct 2026 | 5 Oct 2026 | 2 / 0 | White Label & CMS | Chitrangi Mestry |
-| 1 Foundation | 5 Oct 2026 | 17 Mar 2027 | 158 / 883 | Subscription & Licensing, Approval Workflows, Identity, Roles & Security, White Label & CMS, Tenancy, Venues & Devices | Chitrangi Mestry, Pradnya Yeram, Pallavi Sawant, New full-stack developer 1 |
-| 2 Commerce | 6 Oct 2026 | 19 Mar 2027 | 491 / 1,951 | Ticketing Catalogue & Products, Orders & Reservations, Admission & Access Control, Pricing, Promotions & Bundles, Wallet & Cashless | Chitrangi Mestry, Pradnya Yeram, Pallavi Sawant, Chinmay Patkar |
-| 3 Operations | 16 Oct 2026 | 16 Apr 2027 | 315 / 1,012 | Rentals, Food & Beverage, Games & Rides, Accreditation, Resources & Capacity | Pradnya Yeram, Chitrangi Mestry, Pallavi Sawant, Chinmay Patkar |
-| 4 Engagement | 22 Oct 2026 | 30 Apr 2027 | 141 / 630 | Marketing & CRM, AI & Intelligence, Foundation & Setup, White Label & CMS, Orders & Reservations | Surendra, Chitrangi Mestry, Pallavi Sawant, Pradnya Yeram |
-| 5 Reporting | 26 Oct 2026 | 3 May 2027 | 33 / 191 | Reporting & Analytics, Foundation & Setup | New full-stack developer 1, New full-stack developer 2, Chinmay Patkar, Pradnya Yeram |
+| 0 Plumbing | 6 Oct 2026 | 6 Oct 2026 | 2 / 0 | White Label & CMS | Chitrangi Mestry |
+| 1 Foundation | 5 Oct 2026 | 1 Mar 2027 | 158 / 883 | Subscription & Licensing, Approval Workflows, Identity, Roles & Security, White Label & CMS, Tenancy, Venues & Devices | Chitrangi Mestry, Pallavi Sawant, Pradnya Yeram, New full-stack developer 1 |
+| 2 Commerce | 6 Oct 2026 | 8 Mar 2027 | 491 / 1,951 | Ticketing Catalogue & Products, Orders & Reservations, Admission & Access Control, Pricing, Promotions & Bundles, Wallet & Cashless | Pradnya Yeram, Chitrangi Mestry, Chinmay Patkar, Pallavi Sawant |
+| 3 Operations | 16 Oct 2026 | 6 Apr 2027 | 315 / 1,012 | Rentals, Food & Beverage, Games & Rides, Accreditation, Resources & Capacity | Chitrangi Mestry, Pradnya Yeram, Pallavi Sawant, Chinmay Patkar |
+| 4 Engagement | 22 Oct 2026 | 20 Apr 2027 | 141 / 630 | Marketing & CRM, AI & Intelligence, Foundation & Setup, White Label & CMS, Orders & Reservations | Chinmay Patkar, Pradnya Yeram, Pallavi Sawant, Sanket Keluskar |
+| 5 Reporting | 26 Oct 2026 | 20 Apr 2027 | 33 / 191 | Reporting & Analytics, Foundation & Setup | New full-stack developer 1, Chitrangi Mestry, New full-stack developer 2, Pallavi Sawant |
+
+**Links.** Every service waits for the platform kernel, every write for idempotency, every event for the outbox, and every report for the data it reports on. These platform waits are **soft**: Pranay and Tanmay publish the interfaces in week 1 (ITenantContext, the current user, the idempotency filter, the outbox writer), so a service starts against them from day 3 and only finishes after the kernel; reports build on seeded data. Setup, migrations and the AI engine's setup stay hard waits. **A person who is waiting takes their next ready ticket**, as ADAM's board now shows, so a ticket blocked on somebody else no longer leaves its owner idle.
 
 The rules behind the order, and how new tickets join the ones in OpenProject: `handoff/service-docs/TICKET-STRUCTURE.md`. Every link, service by service and module by module: `handoff/service-docs/TICKET-LINKS.md`.
 
 ## 4. How the plan is measured
 
-- **Points** come from each screen's specification (operations, components, states, navigation, offline: 1 to 8 points), plus 2.2 points per back-end operation.
+- **Points** come from each screen's specification (operations, components, states, navigation, offline: 1 to 8 points), plus about 2.3 points per back-end operation.
 - **Pace** is Block A's plan of record: 3,018 points in 35 days for nine developers. That is 9.6 points per developer per day, so one point is about 0.84 hours. The measured pace replaces it on 23 October and the plan is regenerated.
-- **Hours** are points times 0.84. AI engine work (models, pipelines, the learning layer) is sized in engineer-weeks by the AI review and converted at the same rate.
+- **Hours** are points times 0.835. AI engine work (models, pipelines, the learning layer) is sized in engineer-weeks by the AI review and converted at the same rate.
 - **Names:** Block A comes from the task sheet. Block B is placed by a scheduler that follows skill and experience. **Loads are uneven on purpose.**
 - A re-plan is a rerun of the generators, not a re-estimate.
 
 ## 5. Block A in detail
 
-**1,056 tasks, 3,412 points, 696 operations.** The schedule is derived from the task sheet: build order, dependencies and each person's pace. Front-end tasks may start before their back end, because screens build against the generated API client and the mock server. They finish only when the back end they wire to has landed.
+**870 tasks, 3,431 points, 697 operations.** The schedule is derived from the task sheet (`tools/derive-block-a-schedule.py`): build order by phase, dependencies and each person's pace. Front-end tasks may start before their back end, because screens build against the generated API client and the mock server. They finish only when the back end they wire to has landed. Back-end tasks wait softly on the platform kernel, idempotency and the outbox: they start from day 3 against the interfaces published in week 1 and finish after the kernel. A report task starts against seeded data and finishes after the services it reads. Whenever a person's next ticket is blocked, the scheduler gives them the next one that is ready.
 
 | Who | Block A points | Screens built | Work ends |
 |---|---|---|---|
-| Pradnya Yeram (POS, KDS, guest app) | 244 | 9 Nov | wired by 17 Dec |
-| Chitrangi Mestry (guest app, web, white label) | 286 | 9 Nov | wired by 17 Dec |
-| Chinmay Patkar (guest web, white label, back-end helper) | 399 | 20 Nov | 6 Jan |
-| Pranay Shinde, Tanmay Dukhande (back end) | 441 – 446 | — | 24 Dec |
-| Deep Khanvilkar (back-end helper, tasks up to 5 points) | 292 | — | 28 Dec |
-| Hrushikant Patkar (back end, DevOps) | 535 | — | 11 Jan |
-| Pallavi Sawant, Sanket Keluskar, Surendra (Venue Management) | 175 – 291 | 20 Nov | 11 Jan, waiting on the Venue Management back end |
-| Kalpita Mejari, second AI engineer (AI engine) | 33 and 28 engineer-days | — | 20 Nov |
+| Pradnya Yeram (POS, KDS, guest app) | 244 | 10 Nov | 10 Nov; wired by 9 Dec |
+| Chitrangi Mestry (guest app, web, white label) | 280 | 16 Nov | 16 Nov; wired by 14 Dec |
+| Pallavi Sawant (Venue Management) | 290 | 16 Nov | 16 Nov; wired by 25 Dec, with the Venue Management back end |
+| Surendra (Venue Management) | 173 | 17 Nov | 17 Nov; wired by 25 Dec |
+| Deep Khanvilkar (back-end helper, tasks up to 5 points) | 287 | — | 8 Dec |
+| Kalpita Mejari, second AI engineer (AI engine) | 33 engineer-days each | — | 8 Dec |
+| Sanket Keluskar (Venue Management, back-end tasks up to 3 points) | 290 | 12 Nov | 15 Dec; his screens wired by 25 Dec |
+| Chinmay Patkar (guest web, white label, back-end helper) | 405 | 25 Nov | 15 Dec |
+| Tanmay Dukhande (back end) | 453 | — | 16 Dec |
+| Pranay Shinde (back end) | 457 | — | 18 Dec |
+| Hrushikant Patkar (back end, DevOps) | 540 | — | 25 Dec |
 
-**Why the tail.** One developer covers about 335 points in 35 days. The back-end owners carry 440–535, including the platform kernel the system-design review added: tenant routing, idempotency, outbox and relay, the payment adapter, audit and observability.
+**Why the tail.** One developer covers about 335 points in 35 days. The back-end owners carry 450–540, including the platform kernel the system-design review added: tenant routing, idempotency, outbox and relay, the payment adapter, audit and observability. The tail is shorter than in the plan of the morning of 30 September (which ran to 11 January) for three reasons: the work now follows the phases, so foundation and commerce come first; the platform waits are soft, so services no longer queue behind the whole kernel; and nobody sits idle while waiting, because they take their next ready ticket. Chinmay Patkar's last guest screens (engagement phase) run to 25 November.
 
 **How to shorten it.** The two new developers take back-end tasks from 23 November. Platform tasks off the first purchase path (release flags, migration fan-out) move into B1 on purpose.
 
@@ -124,13 +130,13 @@ The rules behind the order, and how new tickets join the ones in OpenProject: `h
 
 | Package | Modules | Requirements | Screens | Operations | Hours | Completion | Lead |
 |---|---|---|---|---|---|---|---|
-| **Platform Foundation** | 8 | 563 | 425 | 453 | 2,613 | 24 Mar 2027 | Hrushikant Patkar |
-| **Ticketing & Guest Commerce** | 8 | 866 | 867 | 908 | 3,641 | 1 Apr 2027 | Tanmay Dukhande |
-| **Food, Beverage & Retail** | 4 | 224 | 216 | 267 | 1,034 | 6 Apr 2027 | Pradnya Yeram |
-| **Venue Operations** | 7 | 411 | 464 | 507 | 1,967 | 19 Apr 2027 | New full-stack developer 2 |
-| **Finance & Insights** | 2 | 393 | 117 | 120 | 498 | 3 May 2027 | Hrushikant Patkar |
-| **Customer & Marketing** | 1 | 421 | 219 | 264 | 940 | 22 Apr 2027 | Pranay Shinde |
-| **AI & Intelligence** | 1 | 287 | 137 | 141 | 2,863 | 10 May 2027 | Kalpita Mejari |
+| **Platform Foundation** | 8 | 563 | 425 | 453 | 2,613 | 5 Mar 2027 | Pallavi Sawant |
+| **Ticketing & Guest Commerce** | 8 | 866 | 867 | 908 | 3,641 | 16 Mar 2027 | Tanmay Dukhande |
+| **Food, Beverage & Retail** | 4 | 224 | 216 | 267 | 1,034 | 29 Mar 2027 | Chitrangi Mestry |
+| **Venue Operations** | 7 | 411 | 464 | 507 | 1,967 | 6 Apr 2027 | Hrushikant Patkar |
+| **Finance & Insights** | 2 | 393 | 117 | 120 | 498 | 23 Apr 2027 | New full-stack developer 1 |
+| **Customer & Marketing** | 1 | 421 | 219 | 264 | 940 | 15 Apr 2027 | Tanmay Dukhande |
+| **AI & Intelligence** | 1 | 287 | 137 | 141 | 2,863 | 26 Apr 2027 | Kalpita Mejari |
 
 "Completion" is at normal hours. Dates after 2 April are brought in with overtime. In the module tables, A is Block A and B is Block B.
 
@@ -140,14 +146,14 @@ Everything the apps stand on: sign-in, tenants and venues, devices, licensing, a
 
 | Module | Requirements | Screens A / B | Operations A / B | Hours A / B | Sprints | Completion | Lead | Team |
 |---|---|---|---|---|---|---|---|---|
-| Foundation & Setup | 0 | 0 / 0 | 0 / 0 | 840 / 0 | 1-6 | 22 Jan 2027 | Hrushikant Patkar | Hrushikant Patkar, Surendra, Sanket Keluskar, Tanmay Dukhande |
-| Identity, Roles & Security | 144 | 9 / 22 | 37 / 52 | 83 / 162 | 1-8 | 19 Mar 2027 | Deep Khanvilkar | Deep Khanvilkar, Surendra, Tanmay Dukhande, Chitrangi Mestry |
-| Tenancy, Venues & Devices | 126 | 5 / 30 | 18 / 37 | 46 / 137 | 1-8 | 17 Mar 2027 | New full-stack developer 2 | New full-stack developer 2, New full-stack developer 1, Hrushikant Patkar, Tanmay Dukhande |
-| Platform Operations | 4 | 0 / 12 | 0 / 51 | 7 / 126 | 1-8 | 19 Mar 2027 | Pallavi Sawant | Pallavi Sawant, Pradnya Yeram, Pranay Shinde, New full-stack developer 1 |
-| Subscription & Licensing | 105 | 2 / 174 | 10 / 138 | 23 / 650 | 1-9 | 24 Mar 2027 | New full-stack developer 2 | New full-stack developer 2, Hrushikant Patkar, Tanmay Dukhande, New full-stack developer 1 |
-| Approval Workflows | 90 | 2 / 106 | 8 / 45 | 23 / 280 | 1-9 | 22 Mar 2027 | Pradnya Yeram | Pradnya Yeram, Pranay Shinde, Pallavi Sawant, Chitrangi Mestry |
-| Developer Portal & Public API | 80 | 3 / 21 | 8 / 23 | 14 / 93 | 1-8 | 19 Mar 2027 | Chitrangi Mestry | Chitrangi Mestry, New full-stack developer 2, New full-stack developer 1, Hrushikant Patkar |
-| Digital Asset Management | 14 | 1 / 38 | 10 / 16 | 26 / 104 | 1-5 | 8 Jan 2027 | Surendra | Surendra, Tanmay Dukhande, New full-stack developer 2, Hrushikant Patkar |
+| Foundation & Setup | 0 | 0 / 0 | 0 / 0 | 840 / 0 | 1-4 | 25 Dec 2026 | Hrushikant Patkar | Hrushikant Patkar, Surendra, Sanket Keluskar, Tanmay Dukhande |
+| Identity, Roles & Security | 144 | 9 / 22 | 37 / 52 | 83 / 162 | 1-8 | 5 Mar 2027 | Hrushikant Patkar | Hrushikant Patkar, Pallavi Sawant, Surendra, Tanmay Dukhande |
+| Tenancy, Venues & Devices | 126 | 5 / 30 | 18 / 37 | 46 / 137 | 1-8 | 3 Mar 2027 | New full-stack developer 2 | New full-stack developer 2, New full-stack developer 1, Deep Khanvilkar, Tanmay Dukhande |
+| Platform Operations | 4 | 0 / 12 | 0 / 51 | 7 / 126 | 1-8 | 5 Mar 2027 | Pallavi Sawant | Pallavi Sawant, Pradnya Yeram, Pranay Shinde, New full-stack developer 1 |
+| Subscription & Licensing | 105 | 2 / 174 | 10 / 138 | 23 / 650 | 1-8 | 5 Mar 2027 | Surendra | Surendra, Deep Khanvilkar, Chitrangi Mestry, Hrushikant Patkar |
+| Approval Workflows | 90 | 2 / 106 | 8 / 45 | 23 / 280 | 1-8 | 2 Mar 2027 | New full-stack developer 2 | New full-stack developer 2, Pradnya Yeram, Chitrangi Mestry, Sanket Keluskar |
+| Developer Portal & Public API | 80 | 3 / 21 | 8 / 23 | 14 / 93 | 1-8 | 3 Mar 2027 | New full-stack developer 1 | New full-stack developer 1, Pallavi Sawant, Hrushikant Patkar, Deep Khanvilkar |
+| Digital Asset Management | 14 | 1 / 38 | 10 / 16 | 26 / 104 | 1-5 | 30 Dec 2026 | Pallavi Sawant | Pallavi Sawant, Deep Khanvilkar, Pradnya Yeram, Hrushikant Patkar |
 
 ### 6.2 Ticketing & Guest Commerce
 
@@ -155,14 +161,14 @@ What a guest buys and how: catalogue, pricing, seats and maps, orders, payments,
 
 | Module | Requirements | Screens A / B | Operations A / B | Hours A / B | Sprints | Completion | Lead | Team |
 |---|---|---|---|---|---|---|---|---|
-| Ticketing Catalogue & Products | 266 | 40 / 170 | 55 / 182 | 175 / 719 | 1-9 | 22 Mar 2027 | Tanmay Dukhande | Tanmay Dukhande, Pallavi Sawant, New full-stack developer 1, Pranay Shinde |
-| Pricing, Promotions & Bundles | 105 | 15 / 150 | 29 / 124 | 78 / 533 | 1-9 | 25 Mar 2027 | Tanmay Dukhande | Tanmay Dukhande, Pallavi Sawant, Chinmay Patkar, Deep Khanvilkar |
-| Seat Management & Venue Maps | 100 | 12 / 93 | 20 / 55 | 73 / 272 | 1-8 | 18 Mar 2027 | Hrushikant Patkar | Hrushikant Patkar, Pradnya Yeram, Pallavi Sawant, Surendra |
-| Orders & Reservations | 269 | 30 / 140 | 57 / 162 | 211 / 662 | 1-9 | 25 Mar 2027 | Pranay Shinde | Pranay Shinde, Chitrangi Mestry, Deep Khanvilkar, Pradnya Yeram |
-| Payments | 9 | 4 / 51 | 6 / 42 | 26 / 187 | 1-8 | 18 Mar 2027 | Pranay Shinde | Pranay Shinde, Chitrangi Mestry, Surendra, Tanmay Dukhande |
-| Wallet & Cashless | 52 | 5 / 105 | 17 / 49 | 44 / 353 | 1-9 | 22 Mar 2027 | New full-stack developer 2 | New full-stack developer 2, Sanket Keluskar, Chinmay Patkar, New full-stack developer 1 |
-| White Label & CMS | 65 | 32 / 8 | 78 / 1 | 210 / 16 | 1-5 | 7 Jan 2027 | Chitrangi Mestry | Chitrangi Mestry, Tanmay Dukhande, Deep Khanvilkar, Chinmay Patkar |
-| Transport | 0 | 11 / 1 | 21 / 10 | 63 / 21 | 1-9 | 1 Apr 2027 | Deep Khanvilkar | Deep Khanvilkar, Hrushikant Patkar, Sanket Keluskar, Chinmay Patkar |
+| Ticketing Catalogue & Products | 266 | 40 / 170 | 55 / 182 | 175 / 719 | 1-8 | 4 Mar 2027 | Tanmay Dukhande | Tanmay Dukhande, Pranay Shinde, Chitrangi Mestry, Chinmay Patkar |
+| Pricing, Promotions & Bundles | 105 | 15 / 150 | 29 / 124 | 78 / 533 | 1-8 | 12 Mar 2027 | Tanmay Dukhande | Tanmay Dukhande, Deep Khanvilkar, Pallavi Sawant, Chinmay Patkar |
+| Seat Management & Venue Maps | 100 | 12 / 93 | 20 / 55 | 73 / 272 | 1-8 | 3 Mar 2027 | Hrushikant Patkar | Hrushikant Patkar, Pradnya Yeram, Pallavi Sawant, Sanket Keluskar |
+| Orders & Reservations | 269 | 30 / 140 | 57 / 162 | 211 / 662 | 1-8 | 12 Mar 2027 | Pranay Shinde | Pranay Shinde, Chitrangi Mestry, New full-stack developer 1, New full-stack developer 2 |
+| Payments | 9 | 4 / 51 | 6 / 42 | 26 / 187 | 1-8 | 5 Mar 2027 | Pranay Shinde | Pranay Shinde, Sanket Keluskar, Pradnya Yeram, Chinmay Patkar |
+| Wallet & Cashless | 52 | 5 / 105 | 17 / 49 | 44 / 353 | 1-8 | 12 Mar 2027 | Chinmay Patkar | Chinmay Patkar, Pallavi Sawant, Chitrangi Mestry, New full-stack developer 1 |
+| White Label & CMS | 65 | 32 / 8 | 78 / 1 | 210 / 16 | 1-4 | 23 Dec 2026 | Chitrangi Mestry | Chitrangi Mestry, Tanmay Dukhande, Deep Khanvilkar, Chinmay Patkar |
+| Transport | 0 | 11 / 1 | 21 / 10 | 63 / 21 | 1-8 | 16 Mar 2027 | Hrushikant Patkar | Hrushikant Patkar, New full-stack developer 1, Sanket Keluskar, Chinmay Patkar |
 
 ### 6.3 Food, Beverage & Retail
 
@@ -170,10 +176,10 @@ Selling at the venue: F&B with the kitchen display, retail, rentals, stock and p
 
 | Module | Requirements | Screens A / B | Operations A / B | Hours A / B | Sprints | Completion | Lead | Team |
 |---|---|---|---|---|---|---|---|---|
-| Food & Beverage | 95 | 37 / 37 | 87 / 54 | 276 / 212 | 1-10 | 5 Apr 2027 | Pradnya Yeram | Pradnya Yeram, Hrushikant Patkar, Deep Khanvilkar, Sanket Keluskar |
-| Retail | 14 | 5 / 4 | 14 / 11 | 43 / 30 | 1-9 | 1 Apr 2027 | Pranay Shinde | Pranay Shinde, Chitrangi Mestry, Pradnya Yeram, Chinmay Patkar |
-| Rentals | 0 | 0 / 106 | 0 / 43 | 0 / 288 | 8-10 | 6 Apr 2027 | Pradnya Yeram | Pradnya Yeram, Chitrangi Mestry, New full-stack developer 1, Chinmay Patkar |
-| Inventory & Procurement | 115 | 2 / 25 | 7 / 51 | 21 / 165 | 1-9 | 31 Mar 2027 | Tanmay Dukhande | Tanmay Dukhande, Pranay Shinde, Pallavi Sawant, Chitrangi Mestry |
+| Food & Beverage | 95 | 37 / 37 | 87 / 54 | 276 / 212 | 1-9 | 24 Mar 2027 | Deep Khanvilkar | Deep Khanvilkar, Pradnya Yeram, Hrushikant Patkar, Chitrangi Mestry |
+| Retail | 14 | 5 / 4 | 14 / 11 | 43 / 30 | 1-8 | 18 Mar 2027 | New full-stack developer 1 | New full-stack developer 1, Pranay Shinde, Pradnya Yeram, Chinmay Patkar |
+| Rentals | 0 | 0 / 106 | 0 / 43 | 0 / 288 | 7-9 | 29 Mar 2027 | Chitrangi Mestry | Chitrangi Mestry, Tanmay Dukhande, Pradnya Yeram, New full-stack developer 2 |
+| Inventory & Procurement | 115 | 2 / 25 | 7 / 51 | 21 / 165 | 1-9 | 22 Mar 2027 | Pallavi Sawant | Pallavi Sawant, Hrushikant Patkar, New full-stack developer 1, Chinmay Patkar |
 
 ### 6.4 Venue Operations
 
@@ -181,13 +187,13 @@ Running the venue day to day: gates and access, accreditation, capacity, staff, 
 
 | Module | Requirements | Screens A / B | Operations A / B | Hours A / B | Sprints | Completion | Lead | Team |
 |---|---|---|---|---|---|---|---|---|
-| Admission & Access Control | 108 | 23 / 149 | 38 / 208 | 101 / 730 | 1-9 | 2 Apr 2027 | Pallavi Sawant | Pallavi Sawant, Chinmay Patkar, Hrushikant Patkar, New full-stack developer 2 |
-| Accreditation | 58 | 0 / 72 | 0 / 47 | 0 / 224 | 6-10 | 14 Apr 2027 | Deep Khanvilkar | Deep Khanvilkar, Surendra, Pallavi Sawant, New full-stack developer 2 |
-| Resources & Capacity | 92 | 7 / 55 | 15 / 46 | 38 / 208 | 1-10 | 12 Apr 2027 | Hrushikant Patkar | Hrushikant Patkar, Pradnya Yeram, Chitrangi Mestry, New full-stack developer 2 |
-| Workforce & Staff | 27 | 0 / 34 | 2 / 47 | 5 / 173 | 1-10 | 13 Apr 2027 | Chinmay Patkar | Chinmay Patkar, Tanmay Dukhande, Hrushikant Patkar, Sanket Keluskar |
-| Maintenance & Safety | 75 | 1 / 28 | 1 / 41 | 7 / 170 | 1-10 | 12 Apr 2027 | New full-stack developer 2 | New full-stack developer 2, Chitrangi Mestry, Sanket Keluskar, Pranay Shinde |
-| Games & Rides | 14 | 0 / 81 | 3 / 37 | 6 / 225 | 1-10 | 19 Apr 2027 | Pallavi Sawant | Pallavi Sawant, Pranay Shinde, New full-stack developer 1, Sanket Keluskar |
-| Virtual Queue | 37 | 8 / 6 | 11 / 11 | 34 / 47 | 1-10 | 13 Apr 2027 | Hrushikant Patkar | Hrushikant Patkar, New full-stack developer 1, Chinmay Patkar, Pradnya Yeram |
+| Admission & Access Control | 108 | 23 / 149 | 38 / 208 | 101 / 730 | 1-9 | 22 Mar 2027 | Hrushikant Patkar | Hrushikant Patkar, Sanket Keluskar, Pradnya Yeram, New full-stack developer 2 |
+| Accreditation | 58 | 0 / 72 | 0 / 47 | 0 / 224 | 5-9 | 30 Mar 2027 | Pranay Shinde | Pranay Shinde, New full-stack developer 1, Chinmay Patkar, Pallavi Sawant |
+| Resources & Capacity | 92 | 7 / 55 | 15 / 46 | 38 / 208 | 1-9 | 31 Mar 2027 | Hrushikant Patkar | Hrushikant Patkar, Pallavi Sawant, Pradnya Yeram, Deep Khanvilkar |
+| Workforce & Staff | 27 | 0 / 34 | 2 / 47 | 5 / 173 | 1-9 | 1 Apr 2027 | New full-stack developer 2 | New full-stack developer 2, Chitrangi Mestry, Pradnya Yeram, Tanmay Dukhande |
+| Maintenance & Safety | 75 | 1 / 28 | 1 / 41 | 7 / 170 | 1-10 | 5 Apr 2027 | Surendra | Surendra, Pranay Shinde, Chinmay Patkar, Tanmay Dukhande |
+| Games & Rides | 14 | 0 / 81 | 3 / 37 | 6 / 225 | 1-10 | 6 Apr 2027 | Deep Khanvilkar | Deep Khanvilkar, Sanket Keluskar, New full-stack developer 1, Chinmay Patkar |
+| Virtual Queue | 37 | 8 / 6 | 11 / 11 | 34 / 47 | 1-9 | 1 Apr 2027 | Pallavi Sawant | Pallavi Sawant, Chinmay Patkar, Tanmay Dukhande, Chitrangi Mestry |
 
 ### 6.5 Finance & Insights
 
@@ -195,8 +201,8 @@ The money and the numbers: ledger, VAT and e-invoicing, reports and analytics.
 
 | Module | Requirements | Screens A / B | Operations A / B | Hours A / B | Sprints | Completion | Lead | Team |
 |---|---|---|---|---|---|---|---|---|
-| Finance, Ledger & Tax | 204 | 9 / 18 | 18 / 54 | 49 / 148 | 1-10 | 5 Apr 2027 | Tanmay Dukhande | Tanmay Dukhande, Hrushikant Patkar, Pradnya Yeram, Pallavi Sawant |
-| Reporting & Analytics | 189 | 9 / 81 | 17 / 31 | 52 / 250 | 1-11 | 3 May 2027 | Hrushikant Patkar | Hrushikant Patkar, New full-stack developer 1, New full-stack developer 2, Chinmay Patkar |
+| Finance, Ledger & Tax | 204 | 9 / 18 | 18 / 54 | 49 / 148 | 1-9 | 26 Mar 2027 | Chinmay Patkar | Chinmay Patkar, Surendra, Pradnya Yeram, Pallavi Sawant |
+| Reporting & Analytics | 189 | 9 / 81 | 17 / 31 | 52 / 250 | 1-11 | 23 Apr 2027 | New full-stack developer 1 | New full-stack developer 1, Chitrangi Mestry, Deep Khanvilkar, New full-stack developer 2 |
 
 ### 6.6 Customer & Marketing
 
@@ -204,7 +210,7 @@ Knowing and reaching the guest: CRM, segments, campaigns, loyalty, support.
 
 | Module | Requirements | Screens A / B | Operations A / B | Hours A / B | Sprints | Completion | Lead | Team |
 |---|---|---|---|---|---|---|---|---|
-| Marketing & CRM | 421 | 33 / 186 | 60 / 204 | 177 / 763 | 1-10 | 22 Apr 2027 | Pranay Shinde | Pranay Shinde, Deep Khanvilkar, Tanmay Dukhande, Surendra |
+| Marketing & CRM | 421 | 33 / 186 | 60 / 204 | 177 / 763 | 1-10 | 15 Apr 2027 | Tanmay Dukhande | Tanmay Dukhande, Pranay Shinde, Deep Khanvilkar, New full-stack developer 2 |
 
 ### 6.7 AI & Intelligence
 
@@ -212,7 +218,7 @@ The AI gateway and governance, the guest concierge, Help me choose, translations
 
 | Module | Requirements | Screens A / B | Operations A / B | Hours A / B | Sprints | Completion | Lead | Team |
 |---|---|---|---|---|---|---|---|---|
-| AI & Intelligence | 287 | 20 / 117 | 50 / 91 | 114 / 2,748 | 1-11 | 10 May 2027 | Kalpita Mejari | Kalpita Mejari, Second AI engineer, Pranay Shinde, Sanket Keluskar |
+| AI & Intelligence | 287 | 20 / 117 | 50 / 91 | 114 / 2,748 | 1-11 | 26 Apr 2027 | Kalpita Mejari | Kalpita Mejari, Second AI engineer, Pranay Shinde, Sanket Keluskar |
 
 ## 7. Team
 
@@ -262,22 +268,23 @@ Reviews rotate among peers in the same stack. The tester is never the person who
 
 | Name | Hours past 2 April | Per week |
 |---|---|---|
-| Pranay Shinde | 117 | 4.8 |
-| Tanmay Dukhande | 100 | 4.1 |
-| Deep Khanvilkar | 100 | 4.1 |
-| New full-stack developer 2 | 98 | 5.6 |
+| Pranay Shinde | 126 | 5.1 |
+| Deep Khanvilkar | 115 | 4.7 |
+| Hrushikant Patkar | 113 | 4.6 |
+| Sanket Keluskar | 113 | 4.6 |
+| Pallavi Sawant | 106 | 4.3 |
 | Kalpita Mejari | 98 | 4.0 |
-| New full-stack developer 1 | 95 | 5.4 |
-| Sanket Keluskar | 86 | 3.5 |
+| New full-stack developer 1 | 91 | 5.2 |
+| New full-stack developer 2 | 91 | 5.2 |
+| Tanmay Dukhande | 90 | 3.6 |
 | Second AI engineer | 78 | 3.2 |
-| Hrushikant Patkar | 77 | 3.1 |
-| Pallavi Sawant | 68 | 2.8 |
-| Surendra | 63 | 2.6 |
-| Chinmay Patkar | 56 | 2.3 |
-| Chitrangi Mestry, Pradnya Yeram | 0 | — |
-| **Total** | **about 1,036** | |
+| Chinmay Patkar | 71 | 2.9 |
+| Chitrangi Mestry | 63 | 2.5 |
+| Pradnya Yeram | 58 | 2.3 |
+| Surendra | 55 | 2.2 |
+| **Total** | **about 1,268** | |
 
-Chitrangi and Pradnya finish around 24 March. They can absorb web screens after the sprint 1 rebalance.
+Everyone now has some work past 2 April, from Surendra's 55 hours to Pranay's 126: the scheduler fills each person's waiting time with their next ready ticket, so the load is shared rather than parked. The new developers' figure is higher per week because they join on 23 November. Rerun on 23 October with the measured pace.
 
 ## 10. Architecture decisions the plan rests on
 
@@ -287,12 +294,12 @@ Chitrangi and Pradnya finish around 24 March. They can absorb web screens after 
 | Key shape | UUIDv7 ids everywhere; the six busiest tables split by month; venue partitioning deferred, not cancelled (ADR-0056, amends ADR-0044). Checked against the developers' skills matrix: PostgreSQL ratings top out at 3 | Decided 30 Sep |
 | Message broker and relay | One relay per region with an inbox per tenant database (ADR-0058). The broker is RabbitMQ or Kafka, behind one kernel interface; the client chooses (ADR-0057). We recommend RabbitMQ; development runs a local RabbitMQ until then | Relay decided 30 Sep; broker: client |
 | .NET version | .NET 10 LTS from day one (.NET 8 support ends 10 November) | Decided 30 Sep |
-| AI | Baseline first, learns per tenant (ADR-0051); phasing and slip order (ADR-0059); vectors in Qdrant from day one, one collection per tenant with its own collection-scoped token (ADR-0049) | Decided |
+| AI | Baseline first, learns per tenant (ADR-0051); phasing and slip order (ADR-0059); vectors in Qdrant from day one, hosted only in the UAE, one collection per tenant with its own collection-scoped token (ADR-0049) | Decided |
 | CMS | A flow builder | Agreed |
 | E-invoicing | A provider adapter; four questions to the client | Client |
 | Availability, biometrics | 99.99% at gate and POS; face templates stay with the vendor | Client |
 
-The decided records are in `docs/adr/`. The drafts still open (availability, replica floors, e-invoicing, encryption, per-tenant limits, the on-sale cache and waiting room, the device register, admission policy, risk ownership) are in `audit/ticvai/steps/SD/adr-drafts/`.
+The client's open questions (30, with hardware and suppliers added on 30 September) are in `handoff/TICVAI - Decisions Register.xlsx`. The decided records are in `docs/adr/`. The drafts still open (availability, replica floors, e-invoicing, encryption, per-tenant limits, the on-sale cache and waiting room, the device register, admission policy, risk ownership) are in `audit/ticvai/steps/SD/adr-drafts/`.
 
 ## 11. Release checklist
 
@@ -322,7 +329,7 @@ The decided records are in `docs/adr/`. The drafts still open (availability, rep
 
 | Risk | Signal | Action |
 |---|---|---|
-| Back-end owners overloaded | Block A work past 20 November | Deep's proportional share; new developers on back end from 23 Nov; non-critical platform tasks into B1 |
+| Back-end owners overloaded | Block A back end not in by 25 December | Soft platform waits and gap filling are already in the plan; Deep's proportional share; new developers on back end from 23 Nov; non-critical platform tasks into B1 |
 | Pace below plan | Measured pace on 23 Oct under 9.6 | Regenerate the plan; use the wave-3 deferral list on 18 Dec only if needed |
 | Hiring slips | Two developers not confirmed by 23 Oct | The PM chooses scope or date |
 | Second AI engineer not in place on 5 Oct | No start date this week | Kalpita starts alone; the baseline layer moves one sprint |
@@ -338,7 +345,7 @@ The decided records are in `docs/adr/`. The drafts still open (availability, rep
 | 23 Oct | End of sprint 1: measured pace, plan regenerated, hiring confirmed; one web purchase and one offline POS sale end to end |
 | 20 Nov | Block A screens built |
 | 18 Dec | Deferral decision, only if needed |
-| 11 Jan | Block A wired end to end |
+| 25 Dec | Block A back end in; every Block A screen wired end to end |
 | 2 Apr 2027 | End of the six months |
 
 ## 14. Design
