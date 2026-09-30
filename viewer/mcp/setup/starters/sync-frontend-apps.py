@@ -63,8 +63,10 @@ for x in apps:
     }
     json.dump(project, open(os.path.join(root, "project.json"), "w", encoding="utf-8", newline="\n"), indent=2)
     open(os.path.join(root, "project.json"), "a", encoding="utf-8", newline="\n").write("\n")
+    # No rootDir: an app imports the @ticvai/* packages by source path (tsconfig.base.json), and a
+    # rootDir of src refuses those files (TS6059). With noEmit, rootDir did nothing else.
     open(os.path.join(root, "tsconfig.json"), "w", encoding="utf-8", newline="\n").write(
-        '{\n  "extends": "../../tsconfig.base.json",\n  "compilerOptions": { "rootDir": "src", "noEmit": true },\n'
+        '{\n  "extends": "../../tsconfig.base.json",\n  "compilerOptions": { "noEmit": true },\n'
         '  "include": ["src/**/*.ts", "src/**/*.tsx"]\n}\n')
     index = os.path.join(root, "src", "index.ts")
     if not os.path.exists(index):

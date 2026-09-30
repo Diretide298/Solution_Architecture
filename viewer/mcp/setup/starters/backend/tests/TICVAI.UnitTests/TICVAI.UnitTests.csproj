@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\TICVAI.Domain\TICVAI.Domain.csproj" />
     <ProjectReference Include="..\..\src\TICVAI.Application\TICVAI.Application.csproj" />
+    <ProjectReference Include="..\..\src\TICVAI.Infrastructure\TICVAI.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

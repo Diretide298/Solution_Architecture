@@ -55,26 +55,35 @@ sounds.
 |---|---|---|
 | **Event** | A named happening that has one or more Performances | Show, Session, Occasion |
 | **Performance** | A dated, timed instance of an Event | Showtime, Session, Slot, Occurrence |
-| **Product** | A sellable thing | Item, SKU, Article, Offering |
+| **Product** | The sellable thing (decided 28 September, audit R131) | Item (bare), Article, Offering |
+| **Menu Item** | An F&B Product variant as a menu sells it (`MenuItem`) | Dish, F&B item |
+| **Merchandise Item** | A retail Product variant as a shop sells it (`MerchandiseItem`) | Retail item, Article |
+| **Inventory Item** | A stock record the venue counts, buys and consumes. **Not a Product** (`InventoryItem`) | Stock item |
+| **SKU** | A variant's stock-keeping code. A field (`sku`), never an entity | SKU for the Product |
 | **Component** | A part of a Product's definition | Element, Part, Piece |
 | **Attribute** | An axis that generates Product variants | Option, Variant, Property, Modifier |
 | **Envelope** | A capacity allocation container | Pool, Bucket, Quota, Allocation |
 | **Entitlement** | The right a holder has, separate from identity | Permission, Right, Access, Grant |
-| **Media** | The physical or digital carrier of a Ticket | Card, Wristband, Pass, Carrier |
-| **Media Code** | The identifier on the Media. **≠ Ticket ID** | Barcode, QR, Serial, Card number |
+| **Media** | The physical or digital carrier of a Ticket | Card (except Game Card, Gift Card), Wristband, Pass, Carrier |
+| **Media Code** | The identifier on the Media. **≠ Ticket ID** | Barcode, QR (except guest copy), Serial, Card number |
 | **Ticket** | The issued instrument granting entitlement | Pass, Admission, Voucher |
-| **Order** | A completed commercial transaction | Booking, Sale, Purchase, Basket |
-| **Reservation** | A held, not-yet-paid commitment. **≠ Order** | Booking, Hold, Provisional order |
+| **Order** | A completed commercial transaction | Booking (except guest labels), Sale, Purchase, Basket |
+| **Reservation** | A held, not-yet-paid commitment. **≠ Order** | Booking, Hold (except labels, see 3.3), Provisional order |
 | **Data Mask** | Configurable custom-field definition set | Custom fields, Extra fields, Metadata |
 | **Metric Sheet** | The grid defining product/price relationships | Matrix, Grid, Price table |
-| **Operating Area** | A grouping of Workstations by function | Zone, Department, Section |
+| **Operating Area** | A grouping of Workstations by function | Zone, Section |
+| **Department** | A functional area within a Venue. **Canonical** (decided 28 September, audit R194) | Section |
+| **Zone** | A physical area inside a Venue: dining, access, seating, queue (decided 28 September, audit R194) | Zone for an Operating Area |
 | **Access Point** | A physical validation location | Gate, Entry, Turnstile, Door |
-| **Workstation** | A configured device instance | Terminal, Till, Station, POS |
+| **Workstation** | A configured device instance. Staff copy may say *till* (audit R156) | Terminal, Station, Till or POS in code |
 | **Sale Board** | The configured front-end a Workstation loads | Screen, Layout, Menu, Interface |
 | **Admission Profile** | Rules governing entry for an entitlement | Access rules, Entry policy |
-| **Scope Node** | A node in the tenant hierarchy | Level, Org unit, Node |
+| **Org Unit** | A node in the tenant hierarchy (`OrgUnit`, renamed from Scope Node 26 August; accepted audit R194). Used for authorisation, it is a scope | Scope Node (retired), Level, Node |
 | **Cell** | One tenant in one jurisdiction | Instance, Stamp, Deployment, Region |
-| **Deposit Box** | The cash container assigned to a shift | Drawer, Float, Till |
+| **Deposit Box** | The cash container assigned to a shift. *Till* never means this | Drawer (in code), Float, Till |
+| **Kitchen Ticket** | The order slip on the kitchen display (`KitchenTicket`). Not a Ticket (decided 28 September, audit R210) | Chit, Docket, Ticket (bare) |
+| **Game Card** | A card loaded with game credits (`GameCard`). Recorded exception to *Card* (audit R220) | Play card |
+| **Gift Card** | A stored-value card bought as a gift (`GiftCard`). Recorded exception to *Card* and *Money Card* (audit R220) | Gift voucher |
 | **Principal** | An authenticated actor | User, Account, Login |
 | **Subject** | A person referenced from the ledger by opaque ID | Customer, Guest, Person |
 
@@ -96,14 +105,28 @@ Settled 07 Aug 2026. A Ticket may be re-linked to different Media over its life;
 Media Code changes, the Ticket ID does not. Any code that treats them as one field is
 wrong.
 
+
+### 3.3 Recorded exceptions (decided 28 September)
+
+A banned word may appear only where this list allows it. **Code, contracts and DDL never take one unless the row says so.** The full glossary, including the domain nouns proposed under audit R146 (Attraction, Queue, Wait Time, Itinerary, Accreditation, Form, Settlement, Reconciliation, Report, Channel, Work Order, Segment, Campaign, Journey, Category, Tile), is `docs/glossary.md`.
+
+| Word | Allowed in | Audit |
+|---|---|---|
+| Booking | Guest-facing labels only (*Booking Confirmation*, *Group Booking*) | R145 |
+| Release hold | Labels. Code says Reservation | R145 |
+| Till | Staff-facing copy, meaning the Workstation only | R156 |
+| POS, drawer | Staff-facing copy. Never code, contracts or DDL | R156 |
+| QR | Guest-facing copy only (GST-055 *Dynamic QR Ticket*) | R210 |
+| Game Card, Gift Card | Everywhere, code included (`GameCard`, `GiftCard`, `cardCode`) | R220 |
+
 ---
 
 ## 4. Identifiers
 
 | Use | Type | Why |
 |---|---|---|
-| High-volume entity created at the edge | **ULID** `char(26)` | Offline devices generate IDs before the server sees them; doubles as the idempotency key; time-ordered so index locality is preserved without a central allocator |
-| Configuration entity created server-side | **UUID v4** | No ordering requirement |
+| Every entity, wherever it is created | **`uuid`**, new values **UUIDv7** | One id type (ADR-0056). Minted by the application, `Id.New()` on the server or `newId()` on a device; offline devices generate IDs before the server sees them, and the id doubles as the idempotency key; time-ordered so index locality is preserved without a central allocator |
+| Human code (order number, ticket code) | **text**, its own column | People read and type it; it is not the id and never stands in for one |
 | Scope node addressing | **ltree path** | Ancestor queries without recursive CTEs |
 | Outbox sequence | `bigserial` | Single-writer, ordering is the point |
 | **Anything on a partitioned table** | **Never `bigserial`** | A shared sequence is a contention point |

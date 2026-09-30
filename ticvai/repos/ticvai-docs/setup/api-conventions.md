@@ -77,7 +77,7 @@ Redocly rules reject any operation missing the first four.
 | Pagination | Cursor-based. Never offset — it drifts under concurrent writes |
 | Timestamps | RFC 3339, UTC, always `timestamptz` semantics |
 | Enums | Closed. Clients must handle unknown values gracefully |
-| IDs | ULID for edge-created entities, UUID for configuration |
+| IDs | `format: uuid`, every one (ADR-0056). New ids are UUIDv7, minted by the server (`Id.New()`) or the device (`newId()`). Human codes people read or type (order numbers, ticket codes) are separate fields, never the id |
 
 ---
 

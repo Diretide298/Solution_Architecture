@@ -12818,24 +12818,12 @@
  },
  "check-starter-fit": {
   "updated": "2026-10-01",
-  "commit": "278cc437",
+  "commit": "e39b1cc0",
   "rules": {
-   "SF-DOCS-MIRROR": [
-    "api-conventions.md",
-    "backend-patterns.md",
-    "naming-and-style.md",
-    "quickstart.md"
-   ],
    "SF-DONE-GATES": [
     "fixture"
-   ],
-   "SF-EMPTY-STUB": [
-    "api-client",
-    "design-tokens",
-    "ui"
    ]
-  },
-  "note": "union of the working tree on 2026-10-01 (with other agents' uncommitted contract edits) and HEAD 278cc437, so neither state fails"
+  }
  },
  "check-ticket-text": {
   "updated": "2026-10-01",

@@ -4,9 +4,9 @@ Nx 20 workspace, pnpm, TypeScript (strict). 13 apps (React Native and React web)
 
 | Path | What it is |
 |---|---|
-| `packages/api-client` | the typed client for the API contracts |
-| `packages/design-tokens` | colours, type, spacing - depends on nothing |
-| `packages/ui` | shared components |
+| `packages/api-client` | the typed client for the API contracts: the transport now, the generated operations from SETUP-CLIENTS |
+| `packages/design-tokens` | colours, type, spacing, density, from the package's `screens/_design-tokens.yaml` - depends on nothing |
+| `packages/ui` | shared components; for now their props and the token-to-style mapping (`buttonStyle`, `badgeStyle`) |
 | `packages/offline-core` | the one offline store: SQLite adapter, outbox, sync, ids (UUIDv7) |
 
 <!-- apps:begin (sync-frontend-apps.py) -->
@@ -104,7 +104,10 @@ ADAM is connected for this folder. It holds the screens, journeys and contracts;
 
 **The API client is generated, not written.** `packages/api-client` is filled from the contracts by
 the `SETUP-CLIENTS` ticket. Until it lands, a screen ticket builds against the client's generated
-types as the contract names them and stubs the calls; do not hand-write a client.
+types as the contract names them and stubs the calls; do not hand-write a client. What is there
+already is the transport the generated operations call: `createApiClient` sends the `Idempotency-Key`
+(a UUIDv7) on every write, returns the `X-Consistency-Token`, and throws a problem+json response as
+`ApiError` - switch on its `slug`, never on the status or the text.
 
 **Wireframes.** Build from a screen's wireframe only when its record says it is client-verified.
 Otherwise build the logic (calls, state, offline) with a placeholder layout, and never from a

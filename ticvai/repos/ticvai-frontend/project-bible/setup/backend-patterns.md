@@ -15,23 +15,25 @@ This describes the backend repository as the setup zip creates it: `TICVAI-Backe
 | Banned (build error) | Use instead | Why |
 |---|---|---|
 | `DateTime.Now` / `.Today` / `.UtcNow`, `DateTimeOffset.Now` | `DateTimeOffset.UtcNow` or `TimeProvider` | Venues span time zones within one tenant; server-local time is meaningless |
+| `Guid.NewGuid()` | `TICVAI.Domain.Identity.Id.New()` | It mints UUID v4; every new id is UUIDv7 ([naming-and-style](naming-and-style.md) 4) |
 
 | Rule (review) | Use | Why |
 |---|---|---|
 | No bare `decimal` for money | `TICVAI.Domain.ValueObjects.Money` (amount + ISO 4217 code) | A raw decimal loses the currency and its scale (AED 2, OMR 3) |
-| Ids created at the edge (a device, an offline write) | `TICVAI.Domain.Identity.Ulid.New()` | Offline generation; time order; matches the contracts' ULID pattern |
-| Ids for configuration rows created on the server | `Guid.NewGuid()` (UUID v4, [naming-and-style](naming-and-style.md) 4) | The contracts type them `uuid`; a ULID there would not match |
+| Every id is a `Guid`, stored as `uuid` | `TICVAI.Domain.Identity.Id.New()` (UUIDv7) for a row created on the server; the device's id, unchanged, for one created offline | One id type ([naming-and-style](naming-and-style.md) 4); time-ordered, so indexes stay compact; PostgreSQL 16 has no `uuidv7()`, so the application mints every id |
+| Human codes people read or type (order numbers, ticket codes) | a separate column | A code is not the id; it can be reissued or reformatted without touching a key |
 
 `BaseEntity<TId>` takes the id from its caller and never mints one, so a row loaded from the
-database or created offline keeps the id it arrived with.
+database or created offline keeps the id it arrived with. Inside an entity its own `Id` property hides
+the `Id` class: write `Identity.Id.New()` there.
 
 ### 3.2 Structure
 
 | Project | Holds | May reference |
 |---|---|---|
-| `TICVAI.Domain` | entities, value objects (`Money`), `Ulid`, domain exceptions | nothing |
+| `TICVAI.Domain` | entities, value objects (`Money`), `Id`, domain exceptions | nothing |
 | `TICVAI.Contracts` | request, response and event types, named as the contract names them | nothing |
-| `TICVAI.Application` | `Features/<Module>/` use cases, `Result`/`Error`, abstractions (`ITenantContext`, `ICurrentPrincipal`, `IIdempotencyStore`) | Domain, Contracts |
+| `TICVAI.Application` | `Features/<Module>/` use cases, `Result`/`Error`, abstractions (`ITenantContext`, `ICurrentPrincipal`, `IIdempotencyStore`, `IOutbox`, `IBrokerPublisher`) | Domain, Contracts |
 | `TICVAI.Infrastructure` | EF Core `DbContext`, repositories, `SqlMigrationRunner`, external services | Application |
 | `TICVAI.Api` | controllers, middleware, `Program.cs` | Application, Contracts, Infrastructure |
 
@@ -104,12 +106,41 @@ public sealed class RefundAuthoriser(
   transaction.
 - No lazy loading. Fetch what you need.
 
+### 3.5 Events
+
+An event is published in two steps, by two interfaces that must not be confused (ADR-0033, ADR-0058
+as amended 1 October 2026):
+
+| Interface | Who calls it | What it does |
+|---|---|---|
+| `IOutbox` (`Application/Abstractions/Messaging`) | a module, in a use case | `EnqueueAsync` writes the event to `platform.outbox` **in the transaction of the state change**. It never talks to the broker |
+| `IBrokerPublisher` (same folder) | the outbox relay in the `workers` host, and nothing else | `PublishBatchAsync` sends a batch of `EventEnvelope`s, keyed by aggregate id, and returns once the broker has confirmed all of them. One adapter per broker implements it |
+
+- **A module never publishes to the broker.** A crash between commit and a direct publish loses the
+  event; the outbox row commits with the change or not at all. Modules do not reference a broker
+  client, and do not take `IBrokerPublisher`.
+- **An event implements `IIntegrationEvent`**, which carries the ADR-0058 envelope: `EventId`
+  (UUIDv7, the outbox row id and every consumer's inbox key), `EventName` and `EventVersion` as the
+  catalogue (`events/*.yaml`) names them, `AggregateType`, `AggregateId` (the ordering key),
+  `Sequence` (the aggregate's version after the change, assigned in the same transaction),
+  `TenantId`, `ScopePath` and `OccurredAt`. The type's own properties are the payload.
+- **The relay drains.** One loop per tenant database reads up to `Relay:BatchSize` unpublished rows
+  (200; 1,000 in the flash-sale burst environment), publishes them, marks them published and commits.
+  A full batch polls again at once; a partial one waits `Relay:BusyInterval` (100 ms); an empty one
+  backs off to `Relay:IdleInterval` (2 s). `RelayOptions` and `RelayPacing` in
+  `Infrastructure/Messaging` hold the rule.
+- **Consumers de-duplicate in their inbox**, in the transaction of their effect, and check
+  `Sequence` for gaps. Delivery is at least once on either broker.
+- **Republishing is the relay's job too.** Recovering a lost broker re-reads outbox rows by tenant
+  and time range and sends them through `IBrokerPublisher` again; the inboxes absorb the duplicates.
+
 ---
 
 ## 7. Terraform
 
 | Rule | Detail |
 |---|---|
+| Provider: `azurerm`, Azure in a UAE region | Decided 28 September, audit R057. The region per cell is a tfvar |
 | Modules parameterised, never copy-pasted per cell | One `cell` module, N tfvars |
 | `prevent_destroy` on databases and key vaults | — |
 | No inline secrets | Key vault references |

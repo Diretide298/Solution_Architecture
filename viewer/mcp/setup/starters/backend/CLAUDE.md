@@ -42,7 +42,8 @@ Read these when the work calls for them, not before:
 In one session, a document already read does not need reading again.
 
 The kernel those documents name is here: `Money` and `Id` (Domain), `ITenantContext`,
-`ICurrentPrincipal` and `IIdempotencyStore` (Application), `SqlMigrationRunner` (Infrastructure).
+`ICurrentPrincipal`, `IIdempotencyStore`, `IIntegrationEvent`, `IOutbox` and `IBrokerPublisher`
+(Application), `SqlMigrationRunner` and `RelayOptions` (Infrastructure).
 `Directory.Build.props` treats warnings as errors and bans server-local time and `Guid.NewGuid()`.
 
 ## Hard rules
@@ -54,6 +55,8 @@ The kernel those documents name is here: `Money` and `Id` (Domain), `ITenantCont
   Human codes people read or type (order numbers, ticket codes) are separate columns, not ids.
 - No secrets or connection strings in source. `appsettings.json` keeps them empty.
 - Every data path is scoped by `ITenantContext`.
+- A module publishes an event with `IOutbox.EnqueueAsync`, in the transaction of the change it reports.
+  `IBrokerPublisher` is the relay's; no module calls it or a broker client (backend-patterns 3.5).
 - A contract comes first: build what the ADAM contract says - status codes, error codes, field names.
 
 ## Working a ticket (ADAM)

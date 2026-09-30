@@ -13,7 +13,7 @@
 **Decided 30 September 2026 (Chinmay Parab):**
 
 - The broker is **RabbitMQ or Kafka**. Not Azure Service Bus.
-- The **kernel interface** (`IEventPublisher`, `IEventSubscriber`), the envelope, per-aggregate ordering, the dead-letter drain and the inbox. None of these depends on which broker is chosen.
+- The **kernel interface** (`IOutbox` for modules, `IBrokerPublisher` for the relay, `IEventSubscriber`; first written as one `IEventPublisher`, split 1 October in ADR-0058's amendment), the envelope, per-aggregate ordering, the dead-letter drain and the inbox. None of these depends on which broker is chosen.
 - **Local development runs a RabbitMQ container** until the client answers.
 
 **Not decided:** which of the two runs in the cloud. That question goes to the client. We need the
@@ -43,7 +43,9 @@ producing a ticket and a ledger entry.
 - Have an on-premise equivalent. The venue-local profile (ADR-0046) needs RabbitMQ anyway.
 - Be run by the team we have: 14 people, .NET and PostgreSQL, **no dedicated platform engineer**. In the developers' skills matrix **nobody rated Kafka or RabbitMQ**, and Kubernetes tops out at 2.
 
-**Volume is modest.** 69 events. A large cell peaks at about 7,000 rps, mostly reads. Events are a
+**Volume is modest.** 77 events with 198 consumer entries in 24 consuming contexts (the catalogue under
+`events/`, counted 1 October 2026; this said 69 events until then. 197 entries once ADR-0067 drops Access's
+consumer of `device.enrolmentChanged`). A large cell peaks at about 7,000 rps, mostly reads. Events are a
 fraction of writes: hundreds per second at peak, perhaps low thousands during an on-sale in a burst
 environment. Both brokers handle that with room to spare.
 
@@ -53,7 +55,7 @@ environment. Both brokers handle that with room to spare.
 
 ### Decided now, whichever broker is chosen
 
-- **One interface in the kernel.** Modules publish and subscribe through `IEventPublisher` and `IEventSubscriber`, never through a broker SDK. The relay (ADR-0058) publishes through the same interface. Swapping the broker is an adapter, not a change to any module.
+- **One interface in the kernel.** Modules publish through `IOutbox` (into the outbox, in their own transaction) and subscribe through `IEventSubscriber`, never through a broker SDK. The relay (ADR-0058) publishes to the broker through `IBrokerPublisher`, which no module uses. (Amended 1 October: this first said one `IEventPublisher` for both roles.) Swapping the broker is an adapter, not a change to any module.
 - **The envelope** is ADR-0058's: `eventId` (UUIDv7, ADR-0056), `eventName`, `aggregateType`, `aggregateId`, `sequence`, `tenantId`, `scopePath`, `occurredAt`, `payload`. Tenant id travels in the envelope and as a header. **No topic or queue per tenant**: tenants grow, and isolation already comes from the tenant database.
 - **Per-aggregate order through an ordering key = `aggregateId`.**
   - Kafka: the partition key. One partition keeps one aggregate's events in order.
@@ -128,7 +130,7 @@ itself to be a replayable stream.
 
 A .NET messaging library could implement the interface. Wolverine and MassTransit both support
 RabbitMQ and Kafka; MassTransit v9 moved to a commercial licence, so check licence terms before
-adopting either. A thin adapter over the official client is also enough for 69 events.
+adopting either. A thin adapter over the official client is also enough for 77 events.
 
 ---
 
@@ -164,7 +166,7 @@ adopting either. A thin adapter over the official client is also enough for 69 e
 **Sprint 1, weeks 1–2**
 
 5. [ ] **SETUP-ENV**: the chosen broker for dev and staging in Terraform, once the client answers; a RabbitMQ container until then. (2 pts)
-6. [ ] **PLATFORM-OUTBOX** (kernel events): `IEventPublisher` and `IEventSubscriber`, the envelope, the RabbitMQ adapter, the dead-letter drain into `platform.dead_letter`. With the relay and inbox of ADR-0058, 8 points together (review 7.3).
+6. [ ] **PLATFORM-OUTBOX** (kernel events): `IOutbox`, `IBrokerPublisher` and `IEventSubscriber` (the first two are in the starter since 1 October), the envelope, the RabbitMQ adapter, the dead-letter drain into `platform.dead_letter`. With the relay and inbox of ADR-0058, 8 points together (review 7.3).
 7. [ ] Prove it on `order.paid` → entitlement issuance → `entitlement.issued` by 23 October.
 
 **After the client answers**
@@ -198,7 +200,7 @@ Source: `docs/active/infra-answers-30-september.md` section 3. Azure prices from
 | Event Hubs Premium | Yes | 1 PU ≈ **$1,072** | 100 event hubs per PU, 90 days' retention, resource isolation |
 | Confluent Cloud on Azure | Yes (`uaenorth`; UAE Central not listed) | Standard ≈ $550 but public endpoints only; **Enterprise (private networking) ≈ $1,280–1,640** + $0.02–0.05/GB throughput + $0.08/GB-month storage | A second vendor contract. Public endpoints conflict with the LLD's "no public endpoints", so in practice Enterprise |
 
-**Kafka on Event Hubs Standard: design topics per deployable, not per event.** With 69 events plus dead-letter
+**Kafka on Event Hubs Standard: design topics per deployable, not per event.** With 77 events (69 on 30 September) plus dead-letter
 topics, the 10-topic limit forces a few coarse topics (for example one per deployable) or a second namespace.
 Otherwise Premium. Confluent only if the client already has a Confluent contract.
 
@@ -274,10 +276,12 @@ stops mattering.
 
 - **The kernel interface has two roles under one name.** The starter's `IEventPublisher` enqueues to the outbox
   inside the caller's transaction; this ADR and ADR-0058 also have the relay publish to the broker through it.
-  Modules keep `IEventPublisher`. The relay and the consumer wrapper use a separate broker-side interface
+  Modules keep an outbox interface. The relay and the consumer wrapper use a separate broker-side interface
   (publish a batch with an ordering key; subscribe by consumer name and event names; settle as `Ack`,
-  `RetryLater`, `DeadLetter` or `Halt`), and only its adapter knows the broker. The starter's
-  `IIntegrationEvent` still lacks `aggregateId`, `sequence` and `scopePath`. For PLATFORM-OUTBOX.
+  `RetryLater`, `DeadLetter` or `Halt`), and only its adapter knows the broker. **Done in the starter the
+  same day** (ADR-0058, amendment of 1 October): `IOutbox` for modules, `IBrokerPublisher` for the relay,
+  and `IIntegrationEvent` now carries `AggregateId`, `Sequence` and `ScopePath`. The subscriber side is
+  PLATFORM-OUTBOX's.
 - **One broker-agnostic contract-test suite** runs against every adapter in CI.
 - **16 shards per consumer** on RabbitMQ (or 16 partitions on Kafka) to start. Change only with the consumer
   drained.
