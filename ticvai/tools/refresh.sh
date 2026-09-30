@@ -364,6 +364,7 @@ retire-answered-questions                                          # never run: 
 retest-gap-rows                                                    # reports review candidates; a verdict is a judgement, not a rebuild
 build-provisional-review                                           # its sheets carry people's decisions; a rebuild would erase them
 bench derive-services render-screens                               # deliberate, not a rebuild
+refresh-manifest                                                   # traces this script (C13); run by refresh-safe.sh, never inside it
 build-plan-deck                                                    # the presentation plan, run by hand after a refresh
 build-mom-digest build-review-responses scan-domain-drift find-capability
 "
