@@ -119,3 +119,7 @@ fallback for a very large sale before B is proven.
 
 3. [ ] **EDGE-WAITING-ROOM**: Redis positions, cached page, release controller, token issue and check. (8 pts)
 4. [ ] Load test at 30,000 arrivals in the burst environment before the first large sale.
+
+## Amendment, 1 October 2026: admission token scope (Chinmay)
+
+The admission token is required on **online cart holds only** (`addCartLine`, `acquireInventoryHold` from a guest channel). Holds taken at a till, a kiosk or a venue workstation are exempt: those channels have a known device, a shift and a lease, and the queue in front of them is physical.

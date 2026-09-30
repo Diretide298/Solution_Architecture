@@ -105,3 +105,7 @@ checkout hop is bounded by a budget and fails open.
 **Block B (S5)**
 
 3. [ ] Engine runtime, decline store, events, attribution, experiment assignment, POS bundle list; `recommendationId` on cart lines.
+
+## Note, 1 October 2026 (Chinmay)
+
+Confirmed: the four recommendation operations stay as channel surfaces; the 29 September `deprecated` / `x-ticvai-superseded-by` flags are removed.

@@ -1,6 +1,6 @@
 # ADR-0060: Availability targets per tier, and how they are met
 
-**Status:** Proposed · waiting on the client (which services the 99.99% agreed on 31 July covers, and whether it accepts an SLO per tier and the cost of zone-redundant HA) and on Chinmay (one production HA mode for PostgreSQL)
+**Status:** Proposed · waiting on the client (which services the 99.99% agreed on 31 July covers, and whether it accepts an SLO per tier and the cost of zone-redundant HA) (Chinmay decided 1 October: production PostgreSQL is **zone-redundant on every tier**, the shared cell included; the Terraform follows)
 **Date:** 2026-10-01 (drafted 30 September from the system-design review) · **Deciders:** Chinmay Parab and the client (99.99% was agreed with the client on 31 July) · **Consulted:** Dinesh (infrastructure)
 **Finding:** SD-045 (high)
 **Related:** ADR-0047 (RPO floor, decided 21 September) · ADR-0013 (local-first POS) · ADR-0038, amended by ADR-0040 · ADR-0042 (pinned instances) · ADR-0057 (broker: RabbitMQ or Kafka, the client's choice) · ADR-0058 (relay and inbox) · ADR-0049 (Qdrant) · ADR-0061 (replica floors) · ADR-0032 (Redis product, amended 30 September: Azure Managed Redis)

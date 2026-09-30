@@ -18,7 +18,7 @@ same kind that nothing held:
   C-ENUM-OTHER             `other` in an enum with no note field beside it (R222: allowed only with
                            a required note, decided 28 September)
   C-ENUM-NON-STRING        an enum value YAML read as a boolean (`false`, `no`) (R238)
-  C-EVENT-NAME             an event not named <context>.<entity>.<verb>.v<n> (R186)
+  C-EVENT-NAME             an event not named <aggregate>.<pastTenseVerb> (R186, rule changed 1 October)
   C-MONEY-NUMBER           a money-named field typed number/integer instead of Money (R122, R177)
   C-UNTYPED-BODY           a request or 2xx body that is a bare object with no properties (R088)
   C-PAGED-ORDER            a cursor-paged list that says nothing about its order (R154)
@@ -43,7 +43,7 @@ RULES = {
     "C-ACTION-409": "a POST action on an item declares no 409 for the wrong state (R078 R095)",
     "C-ENUM-OTHER": "an enum carries 'other' with no note field beside it (R222, decided 28 Sep)",
     "C-ENUM-NON-STRING": "an enum value that YAML reads as a boolean (R238)",
-    "C-EVENT-NAME": "an event name breaks <context>.<entity>.<verb>.v<n> (R186)",
+    "C-EVENT-NAME": "an event name breaks <aggregate>.<pastTenseVerb> (R186)",
     "C-MONEY-NUMBER": "a money-named field typed number/integer, not Money (R122 R177)",
     "C-UNTYPED-BODY": "a request or 2xx body that is a bare object (R088)",
     "C-PAGED-ORDER": "a cursor-paged list that states no order (R154)",
@@ -64,8 +64,8 @@ SERVER_OWNED = {"id", "status", "scopePath", "createdAt", "updatedAt", "tenantId
                 "updatedBy", "version", "createdByPrincipalId"}
 MONEY = re.compile(r"^(price|amount|total|subtotal|grandTotal|fee|balance|cost|charge|tip|"
                    r"[a-z]+(Price|Amount|Fee))$")
-# naming-and-style 6.3: `<context>.<entity>.<past-tense-verb>.v<n>`; the entity may be kebab-case.
-EVENT = re.compile(r"^[a-z][a-z0-9-]*\.[a-z][a-zA-Z0-9-]*\.[a-z][a-zA-Z0-9-]*\.v\d+$")
+# naming-and-style 6.3 (changed 1 October): `<aggregate>.<pastTenseVerb>`, the version in the payload's `version`.
+EVENT = re.compile(r"^[a-z][a-zA-Z0-9]*\.[a-z][a-zA-Z0-9]*$")
 NOTE_FIELD = re.compile(r"(note|detail|text|description|comment|other|explanation|freeText)", re.I)
 SPLIT = re.compile(r"(?<![\w'’`-])([b-hj-z]) ([a-z]{3,})\b")
 
@@ -213,10 +213,10 @@ def main() -> int:
             continue
         doc = g.load_yaml(ev) or {}
         name = doc.get("name") or doc.get("event") or doc.get("type")
-        if isinstance(name, str) and not re.search(r"\.v\d+$", name) and doc.get("version"):
-            name = f"{name}.v{doc['version']}"  # the file's version field, read as the name's suffix
+        if not isinstance(doc.get("version"), int):
+            guard.add("C-EVENT-NAME", ev.stem, f"events/{ev.name}: no integer `version` field (the version lives in the payload)")
         if isinstance(name, str) and not EVENT.match(name):
-            guard.add("C-EVENT-NAME", ev.stem, f"events/{ev.name}: name {name!r} is not <context>.<entity>.<verb>.v<n>")
+            guard.add("C-EVENT-NAME", ev.stem, f"events/{ev.name}: name {name!r} is not <aggregate>.<pastTenseVerb>")
 
     # A split word: a lone consonant then a fragment, where the joined word is used elsewhere in the
     # contracts and the fragment is not a word on its own.

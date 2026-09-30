@@ -1,6 +1,6 @@
 # ADR-0065: Browse availability is read from a one-second cache; the hold decides
 
-**Status:** Proposed · waiting on Chinmay: it reverses the "availability is read live, never cached" rule that flows F01 and F07 state today
+**Status:** Accepted · 1 October 2026 · Chinmay Parab: it reverses the "availability is read live, never cached" rule, and flows F01 and F07 now say so
 **Date:** 2026-10-01 (drafted 30 September from the system-design review) · **Deciders:** Chinmay Parab
 **Finding:** SD-038 (high)
 **Depends on:** SD-023 (the capacity model: guarded decrement at hold and convert)

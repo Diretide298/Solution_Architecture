@@ -1891,10 +1891,15 @@ components:
         | `entitlement.expiringSoon` | access | 5.5.30 (a tenant's own CRM) |
         | `apiClient.anomalyDetected` | public-api | 17 September minutes M17-07 (added 30 September with its event file) |
 
+        **Deprecated** (1 October, ADR-0067 amendment): `device.enrolmentChanged` is still offered but nothing
+        inside the platform consumes it any more; it is removed at the next major version of this API.
+        Subscribers are told in the release note.
+
         **Published and deliberately not offered** (29 September, build pass, group G2):
         `identity.credentialResetRequested` and `identity.loginRecorded` are security signals, and a stream of
         them to an outside receiver is a map of which accounts are under attack; `storefront.sessionEvent` is
         high-volume fraud telemetry, not a business fact a receiver acts on.
+      x-ticvai-deprecated-values: [device.enrolmentChanged]   # ADR-0067 amendment, 1 October
       enum:
         - access.validated
         - accreditation.applicationDecided

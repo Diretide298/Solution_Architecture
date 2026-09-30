@@ -185,13 +185,15 @@ Prefer resources over actions. `POST /orders/{id}/refunds` beats
 
 ### 6.3 Events
 
-`<context>.<entity>.<past-tense-verb>.v<n>`
+`<aggregate>.<pastTenseVerb>`, the version in the event's `version` field
 
-`orders.sales-order.completed.v1` · `access.scan.recorded.v1` ·
-`ledger.journal-entry.posted.v1`
+`access.validated` · `device.enrolmentChanged` · `order.paid` · `ledger.entryPosted`
 
-Past tense, always. Events are facts, not commands. **Version in the name** — a schema
-change means `.v2` alongside `.v1`, never a silent reshape.
+Past tense, always. Events are facts, not commands. **The version is in the payload, not the name**
+(`events/_schema.yaml`: `version: 1`): adding a field is a minor, safe change; removing or reshaping one
+means a new version published alongside the old one until every consumer has moved, never a silent
+reshape. Decided 1 October 2026 (Chinmay): the rule follows the 77 events the package already has,
+rather than renaming them and every consumer.
 
 ### 6.4 Permissions
 

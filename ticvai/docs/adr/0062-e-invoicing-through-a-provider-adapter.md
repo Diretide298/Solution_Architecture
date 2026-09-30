@@ -1,6 +1,6 @@
 # ADR-0062: E-invoicing goes through a provider adapter, and a rejection stops for a person
 
-**Status:** Proposed · waiting on the client (which accredited provider, which mandate date applies, whether B2C is outside the first phase, and the VAT 201 layout) and on Chinmay's yes to the adapter design
+**Status:** Proposed · waiting on the client (which accredited provider, which mandate date applies, whether B2C is outside the first phase, and the VAT 201 layout) (Chinmay said yes to the adapter design on 1 October)
 **Date:** 2026-10-01 (drafted 30 September from the system-design review) · **Deciders:** Chinmay Parab and the client (make-or-break: the provider, the dates and the field mapping are the client's and the regulator's)
 **Finding:** SD-035 (high)
 **Related:** ADR-0033 (outbox, amended by ADR-0058; financial postings halt rather than dead-letter) · ADR-0057 (broker, proposed) · ADR-0055 (`workers`) · CF-133

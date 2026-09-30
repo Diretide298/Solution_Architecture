@@ -108,3 +108,7 @@ is truly its own: where a device is placed. C would make the gate module own the
 **B1**
 
 3. [ ] Build the placement operations with the scanner work. (about 3 pts)
+
+## Amendment, 1 October 2026: `device.enrolmentChanged` stays for now (Chinmay)
+
+The public-API webhook (16.9.56) still offers `device.enrolmentChanged` to outside subscribers, so it is not dropped yet: it is **deprecated in the webhook first** (marked in `public-api.yaml`), announced in a release note, and removed at the next major version of the public API. Internally nothing consumes it any more.
