@@ -1,5 +1,5 @@
 {
- "note": "Who owns which area of the first release. Read by tools/build-service-docs.py to assign tasks. Decided with Chinmay on 23 September; see developer-assignment-plan-23-september.md. Edit this file, not the task sheet. Updated 30 September: Surendra on Venue Management at 60% pace, Deep's proportional share, Kalpita and the second AI engineer on the AI engine.",
+ "note": "Who owns which area of the first release. Read by tools/build-service-docs.py to assign tasks. Decided with Chinmay on 23 September; see developer-assignment-plan-23-september.md. Edit this file, not the task sheet. Updated 30 September: Surendra on Venue Management at 60% pace, Deep's proportional share, Kalpita and the second AI engineer on the AI engine. 30 September (Chinmay): the Venue Management team builds first the setup screens and services the Block A apps use (area SETUP, now Pallavi and Surendra, split by load and pace), and takes Venue Management waves 1-2 only where there is space.",
  "areas": {
   "POS": [
    "Pradnya Yeram"
@@ -18,7 +18,8 @@
    "Chitrangi Mestry"
   ],
   "SETUP": [
-   "Pallavi Sawant"
+   "Pallavi Sawant",
+   "Surendra"
   ],
   "devops": [
    "Hrushikant Patkar"

@@ -95,21 +95,21 @@ flowchart LR
 | Service | Owner | Tasks | Points | Build order | Waits on | Needed by |
 |---|---|---:|---:|---|---|---|
 | **Tenancy** | Tanmay Dukhande, Deep Khanvilkar | 22 | 106 | #251 to #882 | Database 47, Platform 47 | screens: Sell 36, screens: Venue Operations 23, screens: People & Access Rights 12, screens: Shift 3, screens: Food & Beverage 3, screens: Guests & Marketing 2 ... |
-| **Identity** | Tanmay Dukhande, Deep Khanvilkar | 12 | 59 | #252 to #863 | Database 32, Platform 27, Order 1, Tenancy 1 | screens: Account & Self-Service 23, screens: Shift 7, screens: Membership, Loyalty & Value 6, Marketing 4, screens: People & Access Rights 4, screens: Branding & Localisation 3 ... |
+| **Identity** | Tanmay Dukhande, Deep Khanvilkar | 12 | 59 | #252 to #863 | Database 32, Platform 27, Order 1, Tenancy 1 | screens: Account & Self-Service 23, screens: Shift 7, screens: Membership, Loyalty & Value 6, screens: People & Access Rights 4, Marketing 4, screens: Branding & Localisation 3 ... |
 | **Platform** | Chinmay Patkar, Sanket Keluskar | 10 | 40 | #255 to #877 | Platform 21, Database 17 | screens: Tenants & Licensing 5, screens: Developer & API 5, screens: Branding & Localisation 3, screens: Sell 2, screens: Venue Operations 2, Identity 1 ... |
-| **WhiteLabel** | Deep Khanvilkar, Tanmay Dukhande | 23 | 122 | #259 to #336 | Platform 46, Database 33 | screens: White Label 54, screens: Branding & Localisation 9, screens: Booking & Selection 8, screens: Engagement & Support 5, screens: Discovery & Browse 5, screens: Cart & Checkout 5 ... |
+| **WhiteLabel** | Deep Khanvilkar, Tanmay Dukhande | 23 | 122 | #259 to #336 | Platform 46, Database 33 | screens: White Label 54, screens: Branding & Localisation 9, screens: Booking & Selection 8, screens: Discovery & Browse 5, screens: Engagement & Support 5, screens: Cart & Checkout 5 ... |
 | **Wallet** | Sanket Keluskar, Pranay Shinde | 7 | 34 | #338 to #502 | Platform 16, Database 14 | Reporting 36, screens: Membership, Loyalty & Value 8, screens: Other 4, screens: Account & Self-Service 2, Fnb 1, screens: Sell 1 |
 | **Catalogue** | Tanmay Dukhande, Chinmay Patkar | 43 | 209 | #340 to #918 | Platform 86, Database 73, Order 5, Inventory 3, WhiteLabel 3, VenueOps 1 | Reporting 182, screens: Sell 75, screens: Booking & Selection 31, screens: Discovery & Browse 28, screens: Commercial 22, screens: Membership, Loyalty & Value 11 ... |
-| **Ledger** | Sanket Keluskar, Tanmay Dukhande | 18 | 75 | #351 to #941 | Platform 39, Database 36, Order 6 | Reporting 60, screens: Orders & Money 27, screens: Account & Self-Service 4, screens: Sell 3, screens: Ticketing 2, screens: Commercial 2 ... |
+| **Ledger** | Sanket Keluskar, Tanmay Dukhande | 18 | 75 | #351 to #941 | Platform 39, Database 36, Order 6 | Reporting 60, screens: Orders & Money 27, screens: Account & Self-Service 4, screens: Sell 3, screens: Commercial 2, screens: Venue Operations 2 ... |
 | **Order** | Pranay Shinde, Chinmay Patkar | 32 | 205 | #380 to #953 | Database 104, Platform 72, Access 2, VenueOps 1 | Reporting 158, screens: Orders & Money 60, screens: Sell 52, screens: Cart & Checkout 26, screens: Account & Self-Service 25, screens: Shift 18 ... |
 | **Access** | Hrushikant Patkar, Chinmay Patkar | 15 | 88 | #412 to #937 | Database 33, Platform 29, Order 8, Catalogue 4, Identity 1, Inventory 1 | Reporting 58, screens: Access & Venue 28, screens: Account & Self-Service 12, screens: Venue Operations 5, screens: In-venue Services 5, screens: Sell 3 ... |
-| **VenueOps** | Hrushikant Patkar, Chinmay Patkar | 48 | 221 | #513 to #1008 | Platform 93, Database 87 | screens: Access & Venue 46, screens: Transport 15, screens: Booking & Selection 12, screens: Engagement & Support 12, screens: In-venue Services 12, screens: Venue Operations 9 ... |
-| **Inventory** | Hrushikant Patkar, Deep Khanvilkar | 17 | 95 | #519 to #1000 | Platform 33, Database 32, Ledger 1 | Reporting 40, screens: Stock & Supply 38, Catalogue 3, screens: Sell 3, Marketing 1, Access 1 ... |
+| **VenueOps** | Hrushikant Patkar, Chinmay Patkar | 48 | 221 | #513 to #1008 | Platform 93, Database 87 | screens: Access & Venue 46, screens: Transport 15, screens: Booking & Selection 12, screens: In-venue Services 12, screens: Engagement & Support 12, screens: Venue Operations 9 ... |
+| **Inventory** | Hrushikant Patkar, Deep Khanvilkar | 17 | 95 | #519 to #1000 | Platform 33, Database 32, Ledger 1 | Reporting 40, screens: Stock & Supply 38, screens: Sell 3, Catalogue 3, screens: Stock on the Floor 1, Marketing 1 ... |
 | **Fnb** | Hrushikant Patkar, Deep Khanvilkar | 28 | 154 | #542 to #1015 | Platform 57, Database 49, Order 8, Wallet 1 | Reporting 138, screens: Kitchen 30, screens: Sell 28, screens: In-venue Services 20, screens: Food & Beverage 17, screens: Stock & Supply 10 ... |
-| **Retail** | Sanket Keluskar, Pranay Shinde | 5 | 27 | #579 to #1024 | Platform 10, Database 8 | Reporting 26, screens: Sell 16, screens: Retail 6, screens: Payment 2, screens: Orders & Money 2, screens: Venue Operations 1 ... |
-| **Ai** | Pranay Shinde, Chinmay Patkar | 21 | 93 | #684 to #1035 | Database 41, Platform 41 | screens: Engagement & Support 11, screens: Platform 8, screens: White Label 7, screens: AI 4, screens: Sell 3, screens: Analytics 2 ... |
-| **Marketing** | Pranay Shinde, Sanket Keluskar | 22 | 119 | #710 to #1041 | Database 43, Platform 43, Order 6, Identity 4, Catalogue 3, Access 2, Inventory 1 | screens: Account & Self-Service 25, screens: Engagement & Support 24, screens: Membership, Loyalty & Value 12, screens: Sell 11, screens: Booking & Selection 7, screens: Cart & Checkout 5 ... |
-| **Reporting** | Chinmay Patkar, Hrushikant Patkar | 10 | 41 | #795 to #1051 | Catalogue 182, Order 158, Fnb 138, Ledger 60, Access 58, Inventory 40, Wallet 36, Retail 26, Platform 19, Database 18 | screens: Venue Operations 14, screens: Sell 7, screens: Orders & Money 6, screens: Stock & Supply 4, screens: Reports 3, screens: Analytics 3 ... |
+| **Retail** | Sanket Keluskar, Pranay Shinde | 5 | 27 | #579 to #1024 | Platform 10, Database 8 | Reporting 26, screens: Sell 16, screens: Retail 6, screens: Payment 2, screens: Orders & Money 2, screens: Shift 1 ... |
+| **Ai** | Pranay Shinde, Chinmay Patkar | 21 | 93 | #684 to #1035 | Database 41, Platform 41 | screens: Engagement & Support 11, screens: Platform 8, screens: White Label 7, screens: AI 4, screens: Sell 3, screens: Rentals 2 ... |
+| **Marketing** | Pranay Shinde, Sanket Keluskar | 22 | 119 | #710 to #1041 | Database 43, Platform 43, Order 6, Identity 4, Catalogue 3, Access 2, Inventory 1 | screens: Account & Self-Service 25, screens: Engagement & Support 24, screens: Membership, Loyalty & Value 12, screens: Sell 11, screens: Booking & Selection 7, screens: Discovery & Browse 5 ... |
+| **Reporting** | Chinmay Patkar, Hrushikant Patkar | 10 | 41 | #795 to #1051 | Catalogue 182, Order 158, Fnb 138, Ledger 60, Access 58, Inventory 40, Wallet 36, Retail 26, Platform 19, Database 18 | screens: Venue Operations 14, screens: Sell 7, screens: Orders & Money 6, screens: Stock & Supply 4, screens: Analytics 3, screens: Reports 3 ... |
 
 ## 4. Module builds: the services each module's screens need
 
@@ -119,43 +119,43 @@ flowchart LR
 | Venue Management — Back Office | People & Access Rights | 10 | #265 to #1052 | Tenancy 12, Identity 4, Ai 1, Reporting 1 | Setup 7 |
 | Developer Portal | Developer & API | 3 | #267 to #297 | - | Platform 5 |
 | TICVAI Web — Platform Console | Platform | 10 | #278 to #760 | Ai 8, Tenancy 1, Identity 1 | - |
-| Venue Management — Back Office | Sell | 37 | #281 to #1045 | Catalogue 56, Tenancy 22, Fnb 11, Retail 6, Marketing 6, Reporting 4, Ai 3, Order 2, Inventory 2, VenueOps 2, Identity 1, Access 1, WhiteLabel 1 | Setup 26, Platform 2 |
+| Venue Management — Back Office | Sell | 37 | #281 to #1045 | Catalogue 56, Tenancy 22, Fnb 11, Retail 6, Marketing 6, Reporting 4, Ai 3, VenueOps 2, Inventory 2, Order 2, Identity 1, WhiteLabel 1, Access 1 | Setup 26, Platform 2 |
 | Guest Web — Storefront | Engagement & Support | 6 | #282 to #793 | Marketing 10, Ai 3, Fnb 2, WhiteLabel 2 | Setup 6 |
 | Guest Web — Storefront | System States | 1 | #283 to #283 | WhiteLabel 1 | Setup 1 |
-| Venue CMS — White Label | White Label | 23 | #285 to #781 | WhiteLabel 54, Ai 7, Catalogue 7, VenueOps 6, Marketing 5, Order 2, Fnb 2, Identity 1, Tenancy 1 | Setup 23 |
+| Venue CMS — White Label | White Label | 23 | #285 to #781 | WhiteLabel 54, Ai 7, Catalogue 7, VenueOps 6, Marketing 5, Fnb 2, Order 2, Tenancy 1, Identity 1 | Setup 23 |
 | Venue POS — Terminal and Tablet | Shift | 4 | #294 to #798 | Order 18, Identity 7, Tenancy 3, Retail 1, Reporting 1 | Setup 4 |
 | TICVAI Web — Platform Console | Tenants & Licensing | 3 | #302 to #471 | Order 1 | Platform 5 |
-| Guest App — Mobile | Discovery & Browse | 7 | #319 to #719 | Catalogue 17, WhiteLabel 3, VenueOps 3, Marketing 3, Access 1, Ai 1 | Setup 7 |
-| Guest Web — Storefront | Support | 2 | #328 to #794 | Marketing 2, WhiteLabel 2 | Setup 2 |
+| Guest App — Mobile | Discovery & Browse | 7 | #319 to #719 | Catalogue 17, Marketing 3, WhiteLabel 3, VenueOps 3, Access 1, Ai 1 | Setup 7 |
+| Guest Web — Storefront | Support | 2 | #328 to #794 | WhiteLabel 2, Marketing 2 | Setup 2 |
 | TICVAI Web — Platform Console | Branding & Localisation | 3 | #329 to #331 | WhiteLabel 9, Identity 3 | Setup 3, Platform 3 |
 | Venue Management — Back Office | Engagement & Support | 6 | #337 to #776 | Marketing 5, WhiteLabel 1 | - |
 | Venue Management | Other | 14 | #350 to #972 | VenueOps 9, Catalogue 4, Wallet 4, Order 1, Tenancy 1 | Setup 2 |
 | Guest App — Mobile | Discovery | 1 | #355 to #355 | Catalogue 1 | Setup 1 |
-| TICVAI Web — Platform Console | Commercial | 24 | #356 to #510 | Catalogue 22, Ledger 2, Order 2 | - |
+| TICVAI Web — Platform Console | Commercial | 24 | #356 to #510 | Catalogue 22, Order 2, Ledger 2 | - |
 | Venue Management — Back Office | Access & Venue | 41 | #360 to #1054 | VenueOps 46, Access 28, Catalogue 8, Order 5, Marketing 2, Tenancy 2, Reporting 1 | Setup 16 |
-| Venue Management — Back Office | Orders & Money | 26 | #376 to #1047 | Order 60, Ledger 27, Reporting 6, Fnb 3, Retail 2, VenueOps 1, Access 1, Catalogue 1, Tenancy 1 | Setup 20 |
-| Venue POS — Terminal and Tablet | Sell | 24 | #386 to #800 | Order 50, Catalogue 19, Fnb 17, Tenancy 14, Retail 10, Marketing 5, VenueOps 5, Reporting 3, Ledger 3, Access 2, Identity 1, Wallet 1, Inventory 1 | Setup 24 |
+| Venue Management — Back Office | Orders & Money | 26 | #376 to #1047 | Order 60, Ledger 27, Reporting 6, Fnb 3, Retail 2, Catalogue 1, VenueOps 1, Access 1, Tenancy 1 | Setup 20 |
+| Venue POS — Terminal and Tablet | Sell | 24 | #386 to #800 | Order 50, Catalogue 19, Fnb 17, Tenancy 14, Retail 10, VenueOps 5, Marketing 5, Reporting 3, Ledger 3, Access 2, Identity 1, Wallet 1, Inventory 1 | Setup 24 |
 | TICVAI Web — Platform Console | Catalogue | 1 | #397 to #397 | Catalogue 1 | - |
 | Venue Management — Back Office | Games & Rides | 1 | #411 to #411 | Catalogue 1 | - |
-| Guest App — Mobile | Cart & Checkout | 3 | #442 to #618 | Order 13, WhiteLabel 2, Catalogue 2, VenueOps 1 | Setup 3 |
+| Guest App — Mobile | Cart & Checkout | 3 | #442 to #618 | Order 13, Catalogue 2, WhiteLabel 2, VenueOps 1 | Setup 3 |
 | Guest App — Mobile | Account & Self-Service | 14 | #443 to #788 | Order 16, Marketing 14, Identity 14, Access 10, Wallet 2, Ledger 2 | Setup 14 |
 | Venue Management — Back Office | Venue Operations | 15 | #453 to #1061 | Tenancy 23, Reporting 14, VenueOps 9, Order 6, Access 5, Fnb 3, Ledger 2, Retail 1 | Setup 12, Platform 2 |
-| Guest Web — Storefront | Cart & Checkout | 5 | #469 to #747 | Order 13, Marketing 5, WhiteLabel 3, Catalogue 3, VenueOps 1 | Setup 5 |
-| Guest Web — Storefront | Account & Self-Service | 5 | #477 to #749 | Marketing 11, Order 9, Identity 9, Access 2, Ledger 2 | Setup 5 |
-| Guest Web — Storefront | Ticketing | 3 | #478 to #630 | Order 7, Catalogue 3, Ledger 1, Fnb 1, VenueOps 1 | Setup 3 |
+| Guest Web — Storefront | Cart & Checkout | 5 | #469 to #747 | Order 13, Marketing 5, Catalogue 3, WhiteLabel 3, VenueOps 1 | Setup 5 |
+| Guest Web — Storefront | Account & Self-Service | 5 | #477 to #749 | Marketing 11, Identity 9, Order 9, Ledger 2, Access 2 | Setup 5 |
+| Guest Web — Storefront | Ticketing | 3 | #478 to #630 | Order 7, Catalogue 3, Fnb 1, VenueOps 1, Ledger 1 | Setup 3 |
 | Guest App — Mobile | Booking & Selection | 10 | #494 to #784 | Catalogue 19, Order 11, VenueOps 6, Marketing 4, WhiteLabel 3, Ai 1 | Setup 10 |
 | Guest Web — Storefront | Booking & Selection | 7 | #495 to #791 | Catalogue 12, VenueOps 6, Order 5, WhiteLabel 5, Marketing 3, Ai 1 | Setup 7 |
 | Guest App — Mobile | Promotions | 1 | #497 to #497 | Catalogue 3 | Setup 1 |
 | Guest Web — Storefront | Promotions | 1 | #498 to #498 | Catalogue 2 | Setup 1 |
 | Guest App — Mobile | Ticketing | 4 | #499 to #533 | Order 5, Catalogue 1, Ledger 1 | Setup 4 |
-| Guest App — Mobile | Membership, Loyalty & Value | 3 | #506 to #770 | Catalogue 4, Order 4, Wallet 3, Marketing 2, Identity 1, Ai 1 | Setup 3 |
-| Guest Web — Storefront | Membership, Loyalty & Value | 5 | #511 to #792 | Marketing 10, Catalogue 7, Order 7, Wallet 5, Identity 5, Access 2, Ai 1, VenueOps 1 | Setup 5 |
+| Guest App — Mobile | Membership, Loyalty & Value | 3 | #506 to #770 | Catalogue 4, Order 4, Wallet 3, Marketing 2, Ai 1, Identity 1 | Setup 3 |
+| Guest Web — Storefront | Membership, Loyalty & Value | 5 | #511 to #792 | Marketing 10, Catalogue 7, Order 7, Identity 5, Wallet 5, Access 2, Ai 1, VenueOps 1 | Setup 5 |
 | Venue Staff App — Operations | Operations | 1 | #518 to #518 | VenueOps 1 | - |
 | Guest Web — Storefront | Discovery & Browse | 5 | #524 to #746 | Catalogue 11, VenueOps 4, Marketing 2, WhiteLabel 2, Access 1, Ai 1 | Setup 5 |
 | Guest Web — Storefront | In-venue Services | 6 | #537 to #655 | Fnb 10, VenueOps 5, Order 3, Access 2, Catalogue 1 | Setup 6 |
-| Guest App — Mobile | In-venue Services | 10 | #538 to #680 | Fnb 10, VenueOps 7, Order 4, Access 3, Catalogue 3, WhiteLabel 2 | Setup 10 |
+| Guest App — Mobile | In-venue Services | 10 | #538 to #680 | Fnb 10, VenueOps 7, Order 4, Catalogue 3, Access 3, WhiteLabel 2 | Setup 10 |
 | Venue Management — Back Office | Stock & Supply | 16 | #541 to #1060 | Inventory 38, Fnb 10, Reporting 4, Ai 2, Tenancy 1, Order 1 | Setup 15 |
-| Guest App — Mobile | Engagement & Support | 12 | #569 to #789 | VenueOps 12, Marketing 9, Ai 8, Fnb 4, Catalogue 4, Order 3, WhiteLabel 2 | Setup 12 |
+| Guest App — Mobile | Engagement & Support | 12 | #569 to #789 | VenueOps 12, Marketing 9, Ai 8, Catalogue 4, Fnb 4, Order 3, WhiteLabel 2 | Setup 12 |
 | Guest App — Mobile | Retail | 1 | #583 to #583 | Order 2, Retail 2, VenueOps 1 | Setup 1 |
 | Guest Web — Storefront | Retail | 2 | #584 to #585 | Order 4, Retail 4 | Setup 2 |
 | Guest App — Mobile | High-Demand Access | 1 | #591 to #591 | VenueOps 2 | Setup 1 |

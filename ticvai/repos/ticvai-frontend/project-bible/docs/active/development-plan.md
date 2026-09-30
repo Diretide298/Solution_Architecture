@@ -46,9 +46,9 @@ Holidays counted: 1–3 December (Commemoration and National Day), 1 January, an
 
 | Sprint | Dates | Block | Capacity (h) | Planned (h) |
 |---|---|---|---|---|
-| 1 | 5 Oct 2026 – 23 Oct 2026 | A | 1,392 | 1,273 |
-| 2 | 26 Oct 2026 – 13 Nov 2026 | A | 1,392 | 1,352 |
-| 3 | 16 Nov 2026 – 4 Dec 2026 | A ends 20 Nov, B1 starts | 1,226 | 937 |
+| 1 | 5 Oct 2026 – 23 Oct 2026 | A | 1,392 | 1,281 |
+| 2 | 26 Oct 2026 – 13 Nov 2026 | A | 1,392 | 1,346 |
+| 3 | 16 Nov 2026 – 4 Dec 2026 | A ends 20 Nov, B1 starts | 1,226 | 935 |
 | 4 | 7 Dec 2026 – 25 Dec 2026 | B | 1,632 | 1,548 |
 | 5 | 28 Dec 2026 – 15 Jan 2027 | B | 1,523 | 1,523 |
 | 6 | 18 Jan 2027 – 5 Feb 2027 | B | 1,632 | 1,632 |
@@ -79,10 +79,10 @@ One order from 5 October to the end: plumbing, then the foundation everything re
 |---|---|---|---|---|---|
 | 0 Plumbing | 6 Oct 2026 | 6 Oct 2026 | 2 / 0 | White Label & CMS | Chitrangi Mestry |
 | 1 Foundation | 5 Oct 2026 | 1 Mar 2027 | 158 / 883 | Subscription & Licensing, Approval Workflows, Identity, Roles & Security, White Label & CMS, Tenancy, Venues & Devices | Chitrangi Mestry, Pallavi Sawant, Pradnya Yeram, New full-stack developer 1 |
-| 2 Commerce | 6 Oct 2026 | 8 Mar 2027 | 491 / 1,951 | Ticketing Catalogue & Products, Orders & Reservations, Admission & Access Control, Pricing, Promotions & Bundles, Wallet & Cashless | Pradnya Yeram, Chitrangi Mestry, Chinmay Patkar, Pallavi Sawant |
-| 3 Operations | 16 Oct 2026 | 6 Apr 2027 | 315 / 1,012 | Rentals, Food & Beverage, Games & Rides, Accreditation, Resources & Capacity | Chitrangi Mestry, Pradnya Yeram, Pallavi Sawant, Chinmay Patkar |
-| 4 Engagement | 22 Oct 2026 | 20 Apr 2027 | 141 / 630 | Marketing & CRM, AI & Intelligence, Foundation & Setup, White Label & CMS, Orders & Reservations | Chinmay Patkar, Pradnya Yeram, Pallavi Sawant, Sanket Keluskar |
-| 5 Reporting | 26 Oct 2026 | 20 Apr 2027 | 33 / 191 | Reporting & Analytics, Foundation & Setup | New full-stack developer 1, Chitrangi Mestry, New full-stack developer 2, Pallavi Sawant |
+| 2 Commerce | 6 Oct 2026 | 8 Mar 2027 | 491 / 1,951 | Ticketing Catalogue & Products, Orders & Reservations, Admission & Access Control, Pricing, Promotions & Bundles, Wallet & Cashless | Pradnya Yeram, Chitrangi Mestry, Pallavi Sawant, Chinmay Patkar |
+| 3 Operations | 9 Oct 2026 | 6 Apr 2027 | 315 / 1,012 | Rentals, Food & Beverage, Games & Rides, Accreditation, Resources & Capacity | Chitrangi Mestry, Pradnya Yeram, Pallavi Sawant, Chinmay Patkar |
+| 4 Engagement | 13 Oct 2026 | 20 Apr 2027 | 141 / 630 | Marketing & CRM, AI & Intelligence, Foundation & Setup, White Label & CMS, Orders & Reservations | Chinmay Patkar, Pradnya Yeram, Sanket Keluskar, Pallavi Sawant |
+| 5 Reporting | 15 Oct 2026 | 20 Apr 2027 | 33 / 191 | Reporting & Analytics, Foundation & Setup | New full-stack developer 1, Chitrangi Mestry, New full-stack developer 2, Pallavi Sawant |
 
 **Links.** Every service waits for the platform kernel, every write for idempotency, every event for the outbox, and every report for the data it reports on. These platform waits are **soft**: Pranay and Tanmay publish the interfaces in week 1 (ITenantContext, the current user, the idempotency filter, the outbox writer), so a service starts against them from day 3 and only finishes after the kernel; reports build on seeded data. Setup, migrations and the AI engine's setup stay hard waits. **A person who is waiting takes their next ready ticket**, as ADAM's board now shows, so a ticket blocked on somebody else no longer leaves its owner idle.
 
@@ -146,8 +146,8 @@ Everything the apps stand on: sign-in, tenants and venues, devices, licensing, a
 
 | Module | Requirements | Screens A / B | Operations A / B | Hours A / B | Sprints | Completion | Lead | Team |
 |---|---|---|---|---|---|---|---|---|
-| Foundation & Setup | 0 | 0 / 0 | 0 / 0 | 840 / 0 | 1-4 | 25 Dec 2026 | Hrushikant Patkar | Hrushikant Patkar, Surendra, Sanket Keluskar, Tanmay Dukhande |
-| Identity, Roles & Security | 144 | 9 / 22 | 37 / 52 | 83 / 162 | 1-8 | 5 Mar 2027 | Hrushikant Patkar | Hrushikant Patkar, Pallavi Sawant, Surendra, Tanmay Dukhande |
+| Foundation & Setup | 0 | 0 / 0 | 0 / 0 | 840 / 0 | 1-4 | 25 Dec 2026 | Pallavi Sawant | Pallavi Sawant, Hrushikant Patkar, Sanket Keluskar, Tanmay Dukhande |
+| Identity, Roles & Security | 144 | 9 / 22 | 37 / 52 | 83 / 162 | 1-8 | 5 Mar 2027 | Hrushikant Patkar | Hrushikant Patkar, Surendra, Pallavi Sawant, Tanmay Dukhande |
 | Tenancy, Venues & Devices | 126 | 5 / 30 | 18 / 37 | 46 / 137 | 1-8 | 3 Mar 2027 | New full-stack developer 2 | New full-stack developer 2, New full-stack developer 1, Deep Khanvilkar, Tanmay Dukhande |
 | Platform Operations | 4 | 0 / 12 | 0 / 51 | 7 / 126 | 1-8 | 5 Mar 2027 | Pallavi Sawant | Pallavi Sawant, Pradnya Yeram, Pranay Shinde, New full-stack developer 1 |
 | Subscription & Licensing | 105 | 2 / 174 | 10 / 138 | 23 / 650 | 1-8 | 5 Mar 2027 | Surendra | Surendra, Deep Khanvilkar, Chitrangi Mestry, Hrushikant Patkar |
@@ -162,7 +162,7 @@ What a guest buys and how: catalogue, pricing, seats and maps, orders, payments,
 | Module | Requirements | Screens A / B | Operations A / B | Hours A / B | Sprints | Completion | Lead | Team |
 |---|---|---|---|---|---|---|---|---|
 | Ticketing Catalogue & Products | 266 | 40 / 170 | 55 / 182 | 175 / 719 | 1-8 | 4 Mar 2027 | Tanmay Dukhande | Tanmay Dukhande, Pranay Shinde, Chitrangi Mestry, Chinmay Patkar |
-| Pricing, Promotions & Bundles | 105 | 15 / 150 | 29 / 124 | 78 / 533 | 1-8 | 12 Mar 2027 | Tanmay Dukhande | Tanmay Dukhande, Deep Khanvilkar, Pallavi Sawant, Chinmay Patkar |
+| Pricing, Promotions & Bundles | 105 | 15 / 150 | 29 / 124 | 78 / 533 | 1-8 | 12 Mar 2027 | Tanmay Dukhande | Tanmay Dukhande, Deep Khanvilkar, Chinmay Patkar, Pallavi Sawant |
 | Seat Management & Venue Maps | 100 | 12 / 93 | 20 / 55 | 73 / 272 | 1-8 | 3 Mar 2027 | Hrushikant Patkar | Hrushikant Patkar, Pradnya Yeram, Pallavi Sawant, Sanket Keluskar |
 | Orders & Reservations | 269 | 30 / 140 | 57 / 162 | 211 / 662 | 1-8 | 12 Mar 2027 | Pranay Shinde | Pranay Shinde, Chitrangi Mestry, New full-stack developer 1, New full-stack developer 2 |
 | Payments | 9 | 4 / 51 | 6 / 42 | 26 / 187 | 1-8 | 5 Mar 2027 | Pranay Shinde | Pranay Shinde, Sanket Keluskar, Pradnya Yeram, Chinmay Patkar |
@@ -189,7 +189,7 @@ Running the venue day to day: gates and access, accreditation, capacity, staff, 
 |---|---|---|---|---|---|---|---|---|
 | Admission & Access Control | 108 | 23 / 149 | 38 / 208 | 101 / 730 | 1-9 | 22 Mar 2027 | Hrushikant Patkar | Hrushikant Patkar, Sanket Keluskar, Pradnya Yeram, New full-stack developer 2 |
 | Accreditation | 58 | 0 / 72 | 0 / 47 | 0 / 224 | 5-9 | 30 Mar 2027 | Pranay Shinde | Pranay Shinde, New full-stack developer 1, Chinmay Patkar, Pallavi Sawant |
-| Resources & Capacity | 92 | 7 / 55 | 15 / 46 | 38 / 208 | 1-9 | 31 Mar 2027 | Hrushikant Patkar | Hrushikant Patkar, Pallavi Sawant, Pradnya Yeram, Deep Khanvilkar |
+| Resources & Capacity | 92 | 7 / 55 | 15 / 46 | 38 / 208 | 1-9 | 31 Mar 2027 | Hrushikant Patkar | Hrushikant Patkar, Pradnya Yeram, Pallavi Sawant, Deep Khanvilkar |
 | Workforce & Staff | 27 | 0 / 34 | 2 / 47 | 5 / 173 | 1-9 | 1 Apr 2027 | New full-stack developer 2 | New full-stack developer 2, Chitrangi Mestry, Pradnya Yeram, Tanmay Dukhande |
 | Maintenance & Safety | 75 | 1 / 28 | 1 / 41 | 7 / 170 | 1-10 | 5 Apr 2027 | Surendra | Surendra, Pranay Shinde, Chinmay Patkar, Tanmay Dukhande |
 | Games & Rides | 14 | 0 / 81 | 3 / 37 | 6 / 225 | 1-10 | 6 Apr 2027 | Deep Khanvilkar | Deep Khanvilkar, Sanket Keluskar, New full-stack developer 1, Chinmay Patkar |
@@ -201,7 +201,7 @@ The money and the numbers: ledger, VAT and e-invoicing, reports and analytics.
 
 | Module | Requirements | Screens A / B | Operations A / B | Hours A / B | Sprints | Completion | Lead | Team |
 |---|---|---|---|---|---|---|---|---|
-| Finance, Ledger & Tax | 204 | 9 / 18 | 18 / 54 | 49 / 148 | 1-9 | 26 Mar 2027 | Chinmay Patkar | Chinmay Patkar, Surendra, Pradnya Yeram, Pallavi Sawant |
+| Finance, Ledger & Tax | 204 | 9 / 18 | 18 / 54 | 49 / 148 | 1-9 | 26 Mar 2027 | Surendra | Surendra, Chinmay Patkar, Pradnya Yeram, Pallavi Sawant |
 | Reporting & Analytics | 189 | 9 / 81 | 17 / 31 | 52 / 250 | 1-11 | 23 Apr 2027 | New full-stack developer 1 | New full-stack developer 1, Chitrangi Mestry, Deep Khanvilkar, New full-stack developer 2 |
 
 ### 6.6 Customer & Marketing

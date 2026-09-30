@@ -233,9 +233,9 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-SEATING | `seating.seat_block` | 10 | scope_path |  | 0 | 0 | referenced by seating.seat_hold |
 | MIG-SEATING | `seating.seat_category` | 7 | venue_id |  | 2 | 1 | used by the first release |
 | MIG-SEATING | `seating.seat_hold` | 12 | none |  | 5 | 3 | used by the first release |
-| MIG-SEATING | `seating.seat_map` | 12 | venue_id |  | 0 | 0 | referenced by catalogue.performance |
+| MIG-SEATING | `seating.seat_map` | 12 | venue_id |  | 0 | 0 | referenced by seating.seat |
 | MIG-SEATING | `seating.seat_price_band` | 10 | none |  | 1 | 1 | used by the first release |
-| MIG-MAINTENANCE | `maintenance.asset` | 30 | venue_id |  | 0 | 0 | referenced by queue.queue |
+| MIG-MAINTENANCE | `maintenance.asset` | 30 | venue_id |  | 0 | 0 | referenced by maintenance.work_order |
 | MIG-MAINTENANCE | `maintenance.incident` | 26 | venue_id |  | 0 | 0 | referenced by maintenance.work_order |
 | MIG-MAINTENANCE | `maintenance.inspection` | 14 | venue_id |  | 0 | 0 | referenced by maintenance.work_order |
 | MIG-MAINTENANCE | `maintenance.inspection_template` | 9 | venue_id |  | 2 | 1 | used by the first release |
@@ -296,7 +296,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-CATALOGUE | `catalogue.variant` | 9 | none |  | 8 | 3 | used by the first release |
 | MIG-CATALOGUE | `catalogue.waitlist_entry` | 11 | none |  | 2 | 2 | used by the first release |
 | MIG-LEDGER | `ledger.account` | 15 | none |  | 3 | 2 | used by the first release |
-| MIG-LEDGER | `ledger.cost_center` | 6 | venue_id |  | 0 | 0 | referenced by ledger.event_budget |
+| MIG-LEDGER | `ledger.cost_center` | 6 | venue_id |  | 0 | 0 | referenced by marketing.invitation |
 | MIG-LEDGER | `ledger.credit_memo` | 21 | scope_path |  | 5 | 1 | used by the first release |
 | MIG-LEDGER | `ledger.credit_memo_line` | 10 | none |  | 3 | 1 | used by the first release |
 | MIG-LEDGER | `ledger.einvoice_transmission` | 17 | scope_path |  | 3 | 1 | used by the first release |
