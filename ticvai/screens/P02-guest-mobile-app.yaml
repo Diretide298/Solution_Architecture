@@ -158,7 +158,6 @@ screens:
     - GST-043
     - GST-044
     - GST-045
-    - GST-046
     - GST-047
     - GST-048
     - GST-049
@@ -194,8 +193,9 @@ screens:
       - productId
     - to: GST-005
       trigger: What's On
-      provenance: derived — GST-005 declares entryState.params eventId and GST-001 holds none of them,
-        so the edge carries nothing and GST-005 opens cold
+      provenance: 'derived — GST-005 declares entryState.params eventId and GST-001 holds none of them.
+        The edge carries nothing: eventId only pre-selects (deep link or optional), and GST-005 opens
+        on its own'
     - to: GST-006
       trigger: Event / Exhibition Details
       carries:
@@ -260,12 +260,14 @@ screens:
         and GST-001 holds subjectId, so an edge into it carries them
     - to: GST-016
       trigger: My Reservations
-      provenance: derived — GST-016 declares entryState.params reservationId and GST-001 holds none of
-        them, so the edge carries nothing and GST-016 opens cold
+      provenance: 'derived — GST-016 declares entryState.params reservationId and GST-001 holds none of
+        them. The edge carries nothing: reservationId only pre-selects (deep link or optional), and GST-016
+        opens on its own'
     - to: GST-017
       trigger: Reservation Details
-      provenance: derived — GST-017 declares entryState.params reservationId and GST-001 holds none of
-        them, so the edge carries nothing and GST-017 opens cold
+      provenance: 'derived — GST-017 declares entryState.params reservationId and GST-001 holds none of
+        them. The edge carries nothing: reservationId only pre-selects (deep link or optional), and GST-017
+        opens on its own'
     - to: GST-018
       trigger: Add to Calendar / Reminders
       carries:
@@ -286,12 +288,14 @@ screens:
         so an edge into it carries them
     - to: GST-021
       trigger: Interactive Map
-      provenance: derived — GST-021 declares entryState.params mapId and GST-001 holds none of them, so
-        the edge carries nothing and GST-021 opens cold
+      provenance: 'derived — GST-021 declares entryState.params mapId and GST-001 holds none of them.
+        The edge carries nothing: mapId only pre-selects (deep link or optional), and GST-021 opens on
+        its own'
     - to: GST-023
       trigger: Virtual Queue
-      provenance: derived — GST-023 declares entryState.params entryId and GST-001 holds none of them,
-        so the edge carries nothing and GST-023 opens cold
+      provenance: 'derived — GST-023 declares entryState.params entryId and GST-001 holds none of them.
+        The edge carries nothing: entryId only pre-selects (deep link or optional), and GST-023 opens
+        on its own'
     - to: GST-024
       trigger: F&B – Browse & Order
       carries:
@@ -306,8 +310,9 @@ screens:
         edge into it carries them
     - to: GST-026
       trigger: Retail / Merchandise
-      provenance: derived — GST-026 declares entryState.params cardCode and GST-001 holds none of them,
-        so the edge carries nothing and GST-026 opens cold
+      provenance: 'derived — GST-026 declares entryState.params cardCode and GST-001 holds none of them.
+        The edge carries nothing: cardCode only pre-selects (deep link or optional), and GST-026 opens
+        on its own'
     - to: GST-027
       trigger: Parking – Reserve & Pay
       carries:
@@ -316,8 +321,9 @@ screens:
         so an edge into it carries them
     - to: GST-031
       trigger: AI Concierge – Home
-      provenance: derived — GST-031 declares entryState.params conversationId, outletId and GST-001 holds
-        none of them, so the edge carries nothing and GST-031 opens cold
+      provenance: 'derived — GST-031 declares entryState.params conversationId, outletId and GST-001 holds
+        none of them. The edge carries nothing: conversationId, outletId only pre-select (deep link or
+        optional), and GST-031 opens on its own'
     - to: GST-032
       trigger: AI Concierge – Chat
       carries:
@@ -326,8 +332,9 @@ screens:
         GST-001 holds orderId, so an edge into it carries them
     - to: GST-033
       trigger: AI Concierge – Contextual Help
-      provenance: derived — GST-033 declares entryState.params conversationId and GST-001 holds none of
-        them, so the edge carries nothing and GST-033 opens cold
+      provenance: 'derived — GST-033 declares entryState.params conversationId and GST-001 holds none
+        of them. The edge carries nothing: conversationId only pre-selects (deep link or optional), and
+        GST-033 opens on its own'
     - to: GST-034
       trigger: Lost & Found
       carries:
@@ -336,8 +343,9 @@ screens:
         so an edge into it carries them
     - to: GST-037
       trigger: Offers & Promotions
-      provenance: derived — GST-037 declares entryState.params code, promotionId and GST-001 holds none
-        of them, so the edge carries nothing and GST-037 opens cold
+      provenance: 'derived — GST-037 declares entryState.params code, promotionId and GST-001 holds none
+        of them. The edge carries nothing: promotionId, code only pre-select (deep link or optional),
+        and GST-037 opens on its own'
     - to: GST-039
       trigger: Profile
       carries:
@@ -346,8 +354,9 @@ screens:
         so an edge into it carries them
     - to: GST-040
       trigger: Help & Support
-      provenance: derived — GST-040 declares entryState.params caseId and GST-001 holds none of them,
-        so the edge carries nothing and GST-040 opens cold
+      provenance: 'derived — GST-040 declares entryState.params caseId and GST-001 holds none of them.
+        The edge carries nothing: caseId only pre-selects (deep link or optional), and GST-040 opens on
+        its own'
     - to: GST-041
       trigger: Checkout Entry
       carries:
@@ -366,22 +375,19 @@ screens:
       - orderId
       provenance: derived — GST-045 declares entryState.params orderId and GST-001 holds orderId, so an
         edge into it carries them
-    - to: GST-046
-      trigger: Branded Queue / Waiting Room
-      provenance: derived — GST-046 declares entryState.params entryId and GST-001 holds none of them,
-        so the edge carries nothing and GST-046 opens cold
     - to: GST-049
       trigger: Interactive Seat Selection
       provenance: derived — GST-049 declares entryState.params eventId, holdId, performanceId and GST-001
         holds none of them, so the edge carries nothing and GST-049 opens cold
     - to: GST-052
       trigger: Suggested Itineraries
-      provenance: derived — GST-052 declares entryState.params  and GST-001 holds none of them, so the
-        edge carries nothing and GST-052 opens cold
+      provenance: 'derived — GST-052 declares entryState.params  and GST-001 holds none of them. The edge
+        carries nothing: GST-052 needs nothing to open'
     - to: GST-054
       trigger: AI Optimized Itinerary
-      provenance: derived — GST-054 declares entryState.params conversationId, planId and GST-001 holds
-        none of them, so the edge carries nothing and GST-054 opens cold
+      provenance: 'derived — GST-054 declares entryState.params conversationId, planId and GST-001 holds
+        none of them. The edge carries nothing: conversationId only pre-selects (deep link or optional);
+        GST-054 finds planId (sendAiMessage) itself, and GST-054 opens on its own'
     - to: GST-055
       trigger: Dynamic QR Ticket
       carries:
@@ -391,20 +397,24 @@ screens:
         GST-001 holds entitlementId, orderId, so an edge into it carries them
     - to: GST-056
       trigger: Bundle Package
-      provenance: derived — GST-056 declares entryState.params bundleId and GST-001 holds none of them,
-        so the edge carries nothing and GST-056 opens cold
+      provenance: 'derived — GST-056 declares entryState.params bundleId and GST-001 holds none of them.
+        The edge carries nothing: bundleId only pre-selects (deep link or optional), and GST-056 opens
+        on its own'
     - to: GST-059
       trigger: Plan My Day – In Progress
-      provenance: derived — GST-059 declares entryState.params itemId, planId and GST-001 holds none of
-        them, so the edge carries nothing and GST-059 opens cold
+      provenance: 'derived — GST-059 declares entryState.params itemId, planId and GST-001 holds none
+        of them. The edge carries nothing: itemId only pre-selects (deep link or optional); GST-059 opens
+        on getWaitTimes, and planId has no source on GST-059 yet (a gap in GST-059, not in this edge)'
     - to: GST-061
       trigger: Menu Item Detail
-      provenance: derived — GST-061 declares entryState.params outletId and GST-001 holds none of them,
-        so the edge carries nothing and GST-061 opens cold
+      provenance: 'derived — GST-061 declares entryState.params outletId and GST-001 holds none of them.
+        The edge carries nothing: outletId only pre-selects (deep link or optional), and GST-061 opens
+        on its own'
     - to: GST-070
       trigger: Reserve a Table
-      provenance: derived — GST-070 declares entryState.params entryId, reservationId and GST-001 holds
-        none of them, so the edge carries nothing and GST-070 opens cold
+      provenance: 'derived — GST-070 declares entryState.params entryId, reservationId and GST-001 holds
+        none of them. The edge carries nothing: entryId, reservationId only pre-select (deep link or optional),
+        and GST-070 opens on its own'
     - to: GST-022
       trigger: Attraction Wait Times
       provenance: structural — GST-001 is P02's home screen and its exits are its launcher
@@ -844,12 +854,14 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-002 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-002 holds none of them. The edge
+        carries nothing: GST-002 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-003
       trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-002 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
+      provenance: 'derived — GST-003 declares entryState.params eventId and GST-002 holds none of them.
+        The edge carries nothing: eventId only pre-selects (deep link or optional), and GST-003 opens
+        on its own'
     - to: GST-004
       trigger: Attraction Details
       carries:
@@ -1041,8 +1053,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-003 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-003 holds none of them. The edge
+        carries nothing: GST-003 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-004
       trigger: Attraction Details
       carries:
@@ -1331,8 +1344,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-004 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-004 holds none of them. The edge
+        carries nothing: GST-004 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-003
       trigger: Event & Attraction Listing
       carries:
@@ -1678,8 +1692,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-005 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-005 holds none of them. The edge
+        carries nothing: GST-005 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-003
       trigger: Event & Attraction Listing
       carries:
@@ -1844,8 +1859,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-006 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-006 holds none of them. The edge
+        carries nothing: GST-006 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-003
       trigger: Event & Attraction Listing
       carries:
@@ -1975,12 +1991,14 @@ screens:
     - GST-002
     - GST-003
     - GST-008
+    - GST-046
     - GST-049
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-007 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-007 holds none of them. The edge
+        carries nothing: GST-007 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-003
       trigger: Event & Attraction Listing
       carries:
@@ -2002,6 +2020,15 @@ screens:
       carries:
       - performanceId
       provenance: decided 29 September 2026, W8
+    - to: GST-046
+      trigger: Adds tickets for a performance whose on-sale waiting room is on
+      operation: addCartLine
+      precondition: '`addCartLine` refused `403 admission-required`: this performance''s room is on and
+        the app holds no admission token for it'
+      carries:
+      - performanceId
+      returnsTo: GST-007
+      provenance: ADR-0066 (accepted 1 October 2026) and its 1 October amendment
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
 
@@ -2547,8 +2574,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-009 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-009 holds none of them. The edge
+        carries nothing: GST-009 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: BO-020
       trigger: Kitchen accepts and prepares
       provenance: flow F11 step 4→5
@@ -2900,8 +2928,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-010 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-010 holds none of them. The edge
+        carries nothing: GST-010 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Wired 24 August from
     review**: getOrder. **The operations existed and this screen could not call them** — reviewers reported
@@ -3053,8 +3082,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-011 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-011 holds none of them. The edge
+        carries nothing: GST-011 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-020
       trigger: Saved items carry across sessions
       provenance: flow F53 step 4→5
@@ -3220,8 +3250,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-012 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-012 holds none of them. The edge
+        carries nothing: GST-012 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-013
       trigger: They open the one for now
       provenance: flow F50 step 4→5
@@ -3460,8 +3491,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-013 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-013 holds none of them. The edge
+        carries nothing: GST-013 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-055
       trigger: The QR rotates as they walk to the gate
       provenance: flow F50 step 5→6
@@ -3669,8 +3701,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-014 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-014 holds none of them. The edge
+        carries nothing: GST-014 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Cross-surface parity,
     31 August**: added listOrders. **The same screen on web and app was calling different operations**
@@ -3866,8 +3899,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-015 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-015 holds none of them. The edge
+        carries nothing: GST-015 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: ADM-003
       trigger: The right is propagated to the other cell
       provenance: flow F19 step 1→2
@@ -4212,8 +4246,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-016 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-016 holds none of them. The edge
+        carries nothing: GST-016 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-017
       trigger: On the day, they arrive
       provenance: flow F52 step 3→4
@@ -4363,8 +4398,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-017 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-017 holds none of them. The edge
+        carries nothing: GST-017 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
 
@@ -4474,8 +4510,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-018 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-018 holds none of them. The edge
+        carries nothing: GST-018 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. Add to Calendar and
     Reminders. **`issueWalletPass` is the operation this screen is for** — a wallet pass is the calendar
@@ -4727,8 +4764,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-019 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-019 holds none of them. The edge
+        carries nothing: GST-019 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-067
       trigger: Ask for a refund or resell a ticket
       carries:
@@ -4996,8 +5034,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-020 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-020 holds none of them. The edge
+        carries nothing: GST-020 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. Wishlist. **Device and
     consent operations removed 20 August** — Pranay asked why they were here, and the answer is that seven
@@ -5125,8 +5164,9 @@ screens:
       provenance: flow F48 step 1→2
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-021 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-021 holds none of them. The edge
+        carries nothing: GST-021 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: BO-096
       trigger: The attendant checks what is free for the requested window
       provenance: flow F25 step 1→2
@@ -5371,12 +5411,14 @@ screens:
       operation: getWaitTimes
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-022 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-022 holds none of them. The edge
+        carries nothing: GST-022 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-059
       trigger: Plan My Day – In Progress
-      provenance: derived — GST-059 declares entryState.params itemId, planId and GST-022 holds none of
-        them, so the edge carries nothing and GST-059 opens cold
+      provenance: 'derived — GST-059 declares entryState.params itemId, planId and GST-022 holds none
+        of them. The edge carries nothing: itemId only pre-selects (deep link or optional); GST-059 opens
+        on getWaitTimes, and planId has no source on GST-059 yet (a gap in GST-059, not in this edge)'
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101)
     with the queue platform F21 runs on.
@@ -5468,8 +5510,9 @@ screens:
       provenance: flow F48 step 3→4
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-023 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-023 holds none of them. The edge
+        carries nothing: GST-023 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Renamed 31 August**
     from *Virtual Queue / Join Queue*. **A guest surface is one product with two renderings** — a screen
@@ -5662,8 +5705,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-024 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-024 holds none of them. The edge
+        carries nothing: GST-024 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-009
       trigger: Pays
       provenance: flow F11 step 3→4
@@ -5996,8 +6040,9 @@ screens:
       provenance: flow F48 step 5→6
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-025 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-025 holds none of them. The edge
+        carries nothing: GST-025 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-023
       trigger: Their queue place comes up and the queue screen shows it
       provenance: flow F48 step 5→6
@@ -6142,8 +6187,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-026 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-026 holds none of them. The edge
+        carries nothing: GST-026 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: BO-069
       trigger: Machine records the play
       provenance: flow F18 step 2→3
@@ -6434,8 +6480,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-027 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-027 holds none of them. The edge
+        carries nothing: GST-027 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-028
       trigger: It is confirmed with a facility
       provenance: flow F50 step 2→3
@@ -6662,8 +6709,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-028 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-028 holds none of them. The edge
+        carries nothing: GST-028 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-012
       trigger: They open their tickets
       provenance: flow F50 step 3→4
@@ -6819,8 +6867,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-029 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-029 holds none of them. The edge
+        carries nothing: GST-029 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Contact added 28 September**
     from `getTenantAppStatus.contact`, as on the web's WEB-028 (decided 28 September, audit R073 (f)).
@@ -6990,8 +7039,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-030 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-030 holds none of them. The edge
+        carries nothing: GST-030 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-031
       trigger: AI Concierge – Home
       carries:
@@ -7114,8 +7164,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-031 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-031 holds none of them. The edge
+        carries nothing: GST-031 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-032
       trigger: AI Concierge – Chat
       carries:
@@ -7320,8 +7371,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-032 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-032 holds none of them. The edge
+        carries nothing: GST-032 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-033
       trigger: AI Concierge – Contextual Help
       carries:
@@ -7608,8 +7660,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-033 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-033 holds none of them. The edge
+        carries nothing: GST-033 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Guest concierge confirmed
     in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.**
@@ -7702,8 +7755,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-034 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-034 holds none of them. The edge
+        carries nothing: GST-034 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Navigation repointed
     to P15 on 20 August** — the F&B screens it linked to moved out of the back office when the client
@@ -7894,8 +7948,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-035 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-035 holds none of them. The edge
+        carries nothing: GST-035 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Guest case operations
     wired 24 August.** **No case operation was guest-callable** — a guest could raise nothing and read
@@ -8027,8 +8082,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-036 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-036 holds none of them. The edge
+        carries nothing: GST-036 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: WEB-024
       trigger: They see rewards and manage their devices
       provenance: flow F53 step 1→2
@@ -8181,8 +8237,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-037 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-037 holds none of them. The edge
+        carries nothing: GST-037 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-011
       trigger: Their wallet shows stored value
       provenance: flow F53 step 3→4
@@ -8365,8 +8422,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-038 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-038 holds none of them. The edge
+        carries nothing: GST-038 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-021
       trigger: Map view
       provenance: decided 29 September 2026, MOB-1
@@ -8595,20 +8653,25 @@ screens:
       provenance: flow F56 step 4→5
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-039 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-039 holds none of them. The edge
+        carries nothing: GST-039 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-069
       trigger: Face Pass
-      provenance: derived — GST-069 declares entryState.params enrolmentId and GST-039 holds none of them,
-        so the edge carries nothing and GST-069 opens cold
+      provenance: 'derived — GST-069 declares entryState.params enrolmentId and GST-039 holds none of
+        them. The edge carries nothing: enrolmentId only pre-selects (deep link or optional), and GST-069
+        opens on its own'
     - to: GST-071
       trigger: Payment Methods
-      provenance: derived — GST-071 declares entryState.params cardCode, walletId and GST-039 holds none
-        of them, so the edge carries nothing and GST-071 opens cold
+      provenance: 'derived — GST-071 declares entryState.params cardCode, walletId and GST-039 holds none
+        of them. The edge carries nothing: walletId only pre-selects (deep link or optional); GST-071
+        opens on listPaymentTokens, and cardCode has no source on GST-071 yet (a gap in GST-071, not in
+        this edge)'
     - to: GST-073
       trigger: Security & Sign-in
-      provenance: derived — GST-073 declares entryState.params challengeId, methodId and GST-039 holds
-        none of them, so the edge carries nothing and GST-073 opens cold
+      provenance: 'derived — GST-073 declares entryState.params challengeId, methodId and GST-039 holds
+        none of them. The edge carries nothing: GST-073 finds challengeId (createMfaChallenge), methodId
+        (enrolMfaMethod) itself, and GST-073 opens on its own'
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
 
@@ -8756,8 +8819,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-040 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-040 holds none of them. The edge
+        carries nothing: GST-040 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: WEB-034
       trigger: They report something lost
       provenance: flow F54 step 2→3
@@ -8964,8 +9028,9 @@ screens:
         contact; per-site guestCheckout off by default (matrix 2.6.28)
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-041 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-041 holds none of them. The edge
+        carries nothing: GST-041 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-059
       trigger: They follow it through the day
       provenance: flow F49 step 5→6
@@ -9266,8 +9331,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-042 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-042 holds none of them. The edge
+        carries nothing: GST-042 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-041
       trigger: Signed in and verified — back to the cart
       precondition: arrived from the cart
@@ -9677,8 +9743,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-043 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-043 holds none of them. The edge
+        carries nothing: GST-043 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: comfortable
@@ -9739,8 +9806,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-044 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-044 holds none of them. The edge
+        carries nothing: GST-044 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
   notes: 'Drawn in guest storyboard board 7 panel 4 — a selector across AED, USD, EUR, GBP and SAR with
     *"payment will be processed in AED"* — and board 8 carries an AED selector in its header. **Confirmed
     for both surfaces on 18 August (CF-111).** The matrix names the website (2.6.33, 2.9.1) and the storyboard
@@ -9901,8 +9969,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-045 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-045 holds none of them. The edge
+        carries nothing: GST-045 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
 
@@ -9974,7 +10043,7 @@ screens:
 - id: GST-046
   name: Branded Queue / Waiting Room
   module: High-Demand Access
-  requiresModule: queue
+  requiresModule: ticketing
   wave: 1
   capability: C98
   implementation:
@@ -9984,25 +10053,35 @@ screens:
     status: notStarted
   navigation:
     entryFrom:
-    - GST-001
-    inferred: true
+    - GST-007
     exitTo:
     - GST-001
     - GST-002
+    - GST-007
     transitions:
-    - to: GST-001
-      trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-046 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
-  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement. **Cross-surface parity,
-    31 August**: added getWaitingGuest, joinQueue. **A guest does not know which surface they are on**
-    — the same named screen on web and app now calls the same guest-callable operations.'
+    - to: GST-007
+      trigger: Continue to your tickets
+      precondition: '`getWaitingRoomPosition` answers `admitted`. The app keeps `admission.token` and sends
+        it as `X-Admission-Token` on `addCartLine` until `admission.expiresAt`'
+      carries:
+      - performanceId
+      provenance: ADR-0066 (accepted 1 October 2026) and its 1 October amendment
+  notes: '**The on-sale waiting room (Q2), not the ride queue (Q1). Re-pointed 1 October under ADR-0066**
+    from `getWaitTimes`, `getWaitingGuest` and `joinQueue`, which are the ride queue and wrote a `queue.entry`
+    row per arriving guest, the load the room exists to keep away. The ride queue stays on GST-023. Arrival
+    is `enterWaitingRoom` (a Redis counter, no database write, no personal data); the screen polls `getWaitingRoomPosition`
+    every `pollAfterSeconds`. Admitted, it holds a short-lived signed admission token that `addCartLine`
+    needs for this performance while its room is on (online cart holds only: the 1 October amendment exempts
+    tills, kiosks and venue workstations). **Reached from the sale, not the home screen:** GST-007 lands
+    here when `addCartLine` refuses `403 admission-required`, and admission returns there. `notRequired`
+    (the room is off) goes straight back. **A guest surface is one product with two renderings** (WEB-015):
+    the same named screen on web and app calls the same guest-callable operations.'
   density: comfortable
   pattern: statusTracker
-  patternReason: '`getWaitTimes` reads one record and nothing reads a population — the screen is about
-    that one thing'
-  purpose: Find branded queue / waiting room for this venue.
+  patternReason: '`getWaitingRoomPosition` reads one guest''s place in one performance''s room, polled — the
+    screen is about that one thing'
+  purpose: The on-sale waiting room for one performance — the guest's place, the wait, and the way on to
+    the sale once admitted.
   layout:
     template: detail
     regions:
@@ -10010,79 +10089,57 @@ screens:
       slot: record
       components:
       - kind: detailPanel
-        label: The wait time
-        bindsTo: WaitTime
+        label: Your place in the waiting room
+        bindsTo: WaitingRoomEntry
         columns:
-        - WaitTime.queueId
-        - WaitTime.queueName
-        - WaitTime.attractionProductId
-        - WaitTime.status
-        - WaitTime.waitMinutes
-        - WaitTime.source
-        - WaitTime.isStale
-        - WaitTime.heightRequirementCm
-        - WaitTime.zone
-        - WaitTime.asOf
-        operation: getWaitTimes
-        provenance: contract queue.yaml GET /queues/wait-times
-      - kind: detailPanel
-        label: The waiting guest
-        bindsTo: WaitingGuest
-        columns:
-        - WaitingGuest.id
-        - WaitingGuest.queueId
-        - WaitingGuest.queueName
-        - WaitingGuest.subjectId
-        - WaitingGuest.partyNumber
-        - WaitingGuest.partySize
-        - WaitingGuest.status
-        - WaitingGuest.positionInQueue
-        - WaitingGuest.partiesAhead
-        - WaitingGuest.estimatedCallAt
-        - WaitingGuest.isFastPass
-        - WaitingGuest.entitlementId
-        - WaitingGuest.calledAt
-        - WaitingGuest.returnWindowEndsAt
-        - WaitingGuest.redeemedAt
-        - WaitingGuest.admittedCount
-        operation: getWaitingGuest
-        provenance: contract queue.yaml GET /waiting-guests/{entryId}
+        - WaitingRoomEntry.state
+        - WaitingRoomEntry.position
+        - WaitingRoomEntry.aheadOfYou
+        - WaitingRoomEntry.estimatedWaitSeconds
+        operation: getWaitingRoomPosition
+        provenance: contract catalogue.yaml GET /performances/{performanceId}/waiting-room/entries/{waitingEntryId}
     - name: actionBar
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Join queue
-        operation: joinQueue
-        provenance: contract queue.yaml POST /waiting-guests
+        label: Take my place
+        operation: enterWaitingRoom
+        notes: The one write on this screen, pressed rather than fired on load so a prefetch or a bot
+          does not take a place. Hidden once the guest has one.
+        provenance: contract catalogue.yaml POST /performances/{performanceId}/waiting-room/entries
+      - kind: primaryButton
+        label: Continue to your tickets
+        provenance: ADR-0066; live when `getWaitingRoomPosition` answers `admitted`
   states:
-    loading: The branded queue waiting, read by `getWaitTimes`.
-    error: Could not load. Names which read failed and leaves the branded queue waiting untouched.
-    emptyFirstRun: No branded queue waiting yet. **Offers no create action** — this screen declares no
-      operation that makes one — and says so rather than showing an empty table.
-    offline: '**The offline banner shows.** The last known position stays on screen with its age. Joining,
-      leaving and being admitted all need the connection.'
+    loading: Taking a place in the room. *Take my place* (`enterWaitingRoom`) answers with a position, or
+      `notRequired` and the guest goes straight on to the sale
+    error: '**Lost the place.** A retry sends the same `Idempotency-Key` and gets the same entry back, so
+      the guest is not sent to the back, and the screen says so. `expired` (the admission was not used in
+      time) offers to enter again; `closed` (the room was switched off or the performance stopped selling)
+      says so and goes back to the event'
+    emptyFirstRun: —
+    offline: '**The offline banner shows.** The last known position stays on screen with its age, and polling
+      resumes with the same entry when the connection is back. Admission needs the connection.'
   apis:
-  - operationId: getWaitTimes
-    contract: queue
-    purpose: Wait times across a venue
-    trigger: onLoad
-  - operationId: getWaitingGuest
-    contract: queue
-    purpose: The guest's place and the call to come forward, read on entry and polled while the screen
-      is open; the queue call shows here, and in the in-venue notifications feed too, which is back in
-      the first release (decided 29 September, rev 3 GAP-C1, reversing the deferral of audit R242)
-    trigger: onInterval
-  - operationId: joinQueue
-    contract: queue
-    purpose: Join a virtual queue
+  - operationId: enterWaitingRoom
+    contract: catalogue
+    purpose: Take a place in the performance's on-sale waiting room (ADR-0066); `notRequired` when the
+      room is off
     trigger: onAction
+  - operationId: getWaitingRoomPosition
+    contract: catalogue
+    purpose: The guest's place, polled every `pollAfterSeconds`; admitted, it carries the admission token
+      for `addCartLine`
+    trigger: onInterval
   entryState:
     params:
-    - name: entryId
-      from: deepLink
-    coldEntry: '**Named, expired or withdrawn — never a 404** (ADR-0030). A guest holding a link that
-      no longer resolves did nothing wrong; the screen says what happened and offers the list it came
-      from.'
+    - name: performanceId
+      from: GST-007
+    - name: waitingEntryId
+      from: GST-046
+      optional: true
+    coldEntry: '**Named, closed or expired — never a 404** (ADR-0030). Opened with no performance, or one
+      no longer selling, the room says so and offers the event.'
   wireframe:
     status: notStarted
     provenance: client-verified
@@ -10093,30 +10150,8 @@ screens:
       verified: 2026-09-28
       match: exact
       view: Account → All screens → Wave 1 → Branded queue / waiting room
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
-  overlays:
-  - id: formJoinQueue
-    component: modal
-    trigger: Join queue
-    body: '**Collects what `joinQueue` sends before it is called.** Required: `id`, `queueId`, `partySize`,
-      `recordedAt`. Optional: `entitlementId`, `partyHeightsCm`. Dismissing sends nothing; the screen
-      behind is unchanged.'
-    bindsTo: JoinQueueRequest
-    confirm:
-      label: Join queue
-      operation: joinQueue
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - queueId
-      - partySize
-      - recordedAt
-      - entitlementId
-      - partyHeightsCm
-    provenance: client-verified
+  apisNote: Rebuilt 1 October 2026 on the two waiting-room operations (ADR-0066). Columns are the entry's
+    guest-facing fields; `pollAfterSeconds` and `admission` are plumbing the screen acts on rather than shows.
 - id: GST-047
   name: Maintenance / Upgrade Page
   module: System States
@@ -10138,8 +10173,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-047 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-047 holds none of them. The edge
+        carries nothing: GST-047 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
   notes: Merged with GST-060 on 18 August. The client storyboard shows this on two boards — G7 panel 7
     and G8 panel 10 — which is a **board convention for a screen every journey can land on**, not two
     screens. Both had the same single operation and the same purpose. **Bound 28 September** to `getTenantAppStatus.minimumAppVersion`
@@ -10251,8 +10287,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-048 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-048 holds none of them. The edge
+        carries nothing: GST-048 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: comfortable
@@ -10384,8 +10421,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-049 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-049 holds none of them. The edge
+        carries nothing: GST-049 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August**
     — `Seat Board 4.dc.html` frame `seat-4a`. **The frame names this screen on its own face**, which is
@@ -10609,8 +10647,9 @@ screens:
       provenance: flow F52 step 2→3
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-050 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-050 holds none of them. The edge
+        carries nothing: GST-050 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
   notes: 'Minuted 10 Aug §4.8: *"resource bookings (e.g., cabana rental) decrement a capacity-based inventory
     on booking"*. **Distinct from GST-058**: this is one resource with a price and a booking action; GST-058
     is availability across areas. Confirmed against storyboard boards 7.10 and 8.8 on 18 August.
@@ -11625,8 +11664,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-055 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-055 holds none of them. The edge
+        carries nothing: GST-055 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: comfortable
@@ -11826,8 +11866,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-056 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-056 holds none of them. The edge
+        carries nothing: GST-056 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-041
       trigger: Add the meal combo (admission included) to the basket
       operation: addCartLine
@@ -12022,12 +12063,14 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-057 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-057 holds none of them. The edge
+        carries nothing: GST-057 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-003
       trigger: Event & Attraction Listing
-      provenance: derived — GST-003 declares entryState.params eventId and GST-057 holds none of them,
-        so the edge carries nothing and GST-003 opens cold
+      provenance: 'derived — GST-003 declares entryState.params eventId and GST-057 holds none of them.
+        The edge carries nothing: eventId only pre-selects (deep link or optional), and GST-003 opens
+        on its own'
   notes: 'Minuted 10 Aug §4.1: custom content pages *"with accessibility-guideline compliance to be followed"*.
     **Tenant-authored content, not a built feature.**'
   density: comfortable
@@ -12158,8 +12201,9 @@ screens:
       provenance: flow F52 step 1→2
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-058 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-058 holds none of them. The edge
+        carries nothing: GST-058 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-074
       trigger: Choose on the map (a venue with its spots on a map)
       carries:
@@ -12457,8 +12501,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-061 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-061 holds none of them. The edge
+        carries nothing: GST-061 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
   notes: 'P02-019.1 in the client hierarchy. Absent from my page inventory until 14 August. **Cross-surface
     parity, 31 August**: added listModifierGroups. **The same screen on web and app was calling different
     operations** — one side could do something the other could not, and nothing recorded the difference
@@ -12616,12 +12661,14 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-062 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-062 holds none of them. The edge
+        carries nothing: GST-062 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-061
       trigger: Menu Item Detail
-      provenance: derived — GST-061 declares entryState.params outletId and GST-062 holds none of them,
-        so the edge carries nothing and GST-061 opens cold
+      provenance: 'derived — GST-061 declares entryState.params outletId and GST-062 holds none of them.
+        The edge carries nothing: outletId only pre-selects (deep link or optional), and GST-061 opens
+        on its own'
     - to: KSK-017
       trigger: Or they collect from a kiosk
       provenance: flow F51 step 3→4
@@ -12710,8 +12757,9 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-063 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-063 holds none of them. The edge
+        carries nothing: GST-063 is opened from GST-001, so this edge is the way back and GST-001 keeps
+        its own state'
     - to: GST-002
       trigger: Clears the search
       provenance: decided 29 September 2026, MOB-1
@@ -12831,8 +12879,8 @@ screens:
     transitions:
     - to: GST-001
       trigger: Home – Default
-      provenance: derived — GST-001 declares entryState.params  and GST-065 holds none of them, so the
-        edge carries nothing and GST-001 opens cold
+      provenance: 'derived — GST-001 declares entryState.params  and GST-065 holds none of them. The edge
+        carries nothing: GST-001 needs nothing to open'
   notes: Added 17 August for parity with WEB-027. **Not on the wireframe board** — needs drawing. CF-93.
   density: comfortable
   pattern: listDetail
@@ -15399,7 +15447,13 @@ screens:
     - name: favouriteId
       from: GST-079
       optional: true
-    coldEntry: Arrives with nothing; a saved route from GST-079 prefills both stations.
+    - name: routeId
+      from: navigation
+      optional: true
+    coldEntry: Arrives with nothing. **Opened from a route** (a route card or a transport product, client
+      feedback 30 September), `routeId` fills From and To with that route's first and last stops, and the
+      departures show at once; the guest can still change or swap them. A saved route from GST-079 prefills
+      both stations.
   wireframe:
     status: notStarted
     provenance: client-verified
@@ -15452,6 +15506,8 @@ screens:
       trigger: Back to departures
       back: true
       provenance: decided 29 September, rev 3 REV3-21
+      carries:
+      - routeId
   notes: '**New 29 September** (decided 29 September, rev 3 REV3-21: transport ticketing is in scope —
     stations, routes, timetabled departures, one-way trips, multi-trip passes, favourite routes and a
     route map). **One-way:** From and To stations with a swap, the travel date (timetables are released
@@ -15618,6 +15674,8 @@ screens:
       trigger: One-way instead
       back: true
       provenance: decided 29 September, rev 3 REV3-21; prototype r3busmulti
+      carries:
+      - routeId
   notes: '**New 29 September** (decided 29 September, rev 3 REV3-21: transport ticketing is in scope —
     stations, routes, timetabled departures, one-way trips, multi-trip passes, favourite routes and a
     route map). **One-way:** From and To stations with a swap, the travel date (timetables are released
