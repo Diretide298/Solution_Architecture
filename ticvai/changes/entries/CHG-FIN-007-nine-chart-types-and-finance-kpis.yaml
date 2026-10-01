@@ -1,0 +1,57 @@
+id: CHG-FIN-007
+date: '2026-10-02'
+source: mom
+kind: contract
+summary: The nine missing chart types bind through ReportColumn encodings, and the finance measures are seeded KPIs
+  and metric sources with formulas.
+decision:
+  what: Add ReportColumn role, encoding, axis, seriesType, hierarchyLevel, unitLabel with a per-mark binding table
+    (422 tile-encoding-missing); keep 24 tiles and the as-of/stale rule; seed grossSales, discounts, refunds, netRevenue,
+    recognisedRevenue, deferredRevenue, taxCollected (and takings) in ReportingSystemKpi and MetricSource with the
+    D-185 default formulas (gross sales excluding VAT; net = gross - discounts - refunds).
+  by: Chinmay
+  date: '2026-10-02'
+why: 'The client dashboard spec (BOARDREQ MOM-2593..2930, MoM 8 Sep 2026) marks all eighteen components MVP; DashboardTile
+  listed combo, matrix, funnel, waterfall, treemap, scatter, map, ribbon and decompositionTree but its own note
+  said they could not bind (finance-insights corrections ANL-001, ANL-004, ANL-005). BOARDREQ D-185 (finance tile
+  formulas) open; BO-1081 tiles had no source. Chinmay, 2 Oct 2026: build them.'
+keys_touched:
+  schemas:
+  - ReportColumn
+  - DashboardTile
+  - ReportingSystemKpi
+  - MetricSource
+  operations:
+  - createDashboard
+  - updateDashboard
+  - getKpiValues
+  tables:
+  - reporting.report_column
+  screens:
+  - ANL-023
+  - ANL-001
+  - ANL-004
+  - ANL-005
+  - BO-1081
+  - BO-1054
+root_class: 'new: unbindable-model'
+tickets:
+  started: []
+  unstarted:
+  - SVC-REPORTING-CATALOGUE-1 (#18087)
+  - SVC-REPORTING-DASHBOARD-1 (#18088)
+  - VM-REPORTING-REPORTING-1 (#18424)
+  - MIG-REPORTING (#17792)
+  - APP-SETUP-ANL-023 (#20782)
+release_tag: pending
+decision_owner: Chinmay
+client_signoff: pending
+prevention:
+  type: check
+  ref: tools/check-finance-rules.py
+status: closed
+closed_by_commit: 7a84e41a
+notes: 'Client finance signs off the formulas (D-185). MetricSource is also in Alert responses: check-contract-compat
+  passes it as additive, but a client switching on MetricSource sees new values; nothing is built against it yet.
+  Branch finance-decisions, not yet merged or released (release_tag: the next release). Started tickets: none; Block
+  A starts Monday 5 October.'

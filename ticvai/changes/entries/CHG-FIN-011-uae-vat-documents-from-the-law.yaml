@@ -1,0 +1,66 @@
+id: CHG-FIN-011
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: Tax invoice, simplified tax invoice and tax credit note carry the fields UAE law requires; the receipt
+  is the auto-issued simplified tax invoice titled "Tax Invoice".
+decision:
+  what: 'Apply Executive Regulation Art. 59-60 and Decree-Law Art. 65, 67, 69, 70: AED amounts with the Central
+    Bank rate, credit note before/after/difference and parties, titles "Tax Invoice" and "Tax Credit Note", auto-issue
+    on for a UAE registrant, simplified only for unregistered buyers or registered buyers up to AED 10,000; e-invoicing
+    from 2027 for B2B.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'CF-133 (the legal field set) was open on issueTaxInvoice and issueCreditMemo; Chinmay asked for online research
+  on 2 Oct 2026 with official citations. Findings and sources: docs/active/research-uae-vat-and-blind-close-2-october.md
+  (FTA consolidated Decree-Law and Executive Regulation; MoF e-invoicing guidelines v1.1; Ministerial Decisions
+  243/244 of 2025).'
+keys_touched:
+  operations:
+  - issueTaxInvoice
+  - issueCreditMemo
+  - setTaxInvoiceTemplate
+  schemas:
+  - FinTaxInvoice
+  - FinTaxInvoiceLine
+  - FinCreditMemo
+  - FinTaxInvoiceTemplate
+  - FinTaxInvoiceType
+  tables:
+  - ledger.tax_invoice
+  - ledger.tax_invoice_line
+  - ledger.credit_memo
+  screens:
+  - POS-026
+  - POS-005
+  - POS-030
+  - POS-011
+  - BO-022
+  - BO-023
+  - GST-019
+  - WEB-019
+  - ADM-069
+  files:
+  - docs/active/research-uae-vat-and-blind-close-2-october.md
+root_class: 'new: open-legal-field-set'
+tickets:
+  started: []
+  unstarted:
+  - SVC-LEDGER-TAX-1 (#20639)
+  - SVC-LEDGER-TAX-2 (#20640)
+  - MIG-LEDGER (#17801)
+  - APP-POS-POS-026 (#18006)
+  - APP-POS-POS-005 (#17999)
+  - APP-SETUP-ADM-069 (#20665)
+  - VM-BO-022 (#18256)
+  - VM-BO-023 (#18257)
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-finance-rules.py
+status: closed
+closed_by_commit: 7a84e41a
+notes: 'The client''s tax adviser confirms the Arabic titles, the reading of Art. 69 for a guest-selected currency,
+  and the B2B e-invoicing scope from 2027. Branch finance-decisions, not yet merged or released (release_tag: the
+  next release). Started tickets: none; Block A starts Monday 5 October.'

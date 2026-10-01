@@ -1,0 +1,38 @@
+id: CHG-FIN-009
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'Reconciliation is daily, per venue: one venue-day is the unit of work and sign-off.'
+decision:
+  what: Confirm audit R110 (b) on getUnifiedReconciliation and on BO-043, BO-1172, ADM-619, ADM-623, ADM-627; a
+    provider's monthly file is matched day by day.
+  by: Chinmay
+  date: '2026-10-02'
+why: Audit R110 (b) decided daily per venue on 28 Sep (recommendation, client to confirm); DI-268 (MoM 12 Aug 2026
+  section 17) mentions a monthly reconciliation file. Chinmay, 2 Oct 2026.
+keys_touched:
+  operations:
+  - getUnifiedReconciliation
+  - ingestSettlementFile
+  - listSettlements
+  screens:
+  - BO-043
+  - BO-1172
+  - ADM-619
+  - ADM-623
+  - ADM-627
+root_class: 'new: package-contradicts-decision'
+tickets:
+  started: []
+  unstarted:
+  - VM-LEDGER-SETTLEMENT-1 (#18358)
+  - VM-BO-043 (#18247)
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-finance-rules.py
+status: closed
+closed_by_commit: 7a84e41a
+notes: 'Branch finance-decisions, not yet merged or released (release_tag: the next release). Started tickets: none;
+  Block A starts Monday 5 October.'

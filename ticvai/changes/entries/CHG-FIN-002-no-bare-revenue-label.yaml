@@ -1,0 +1,50 @@
+id: CHG-FIN-002
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: 'No tile or label says a bare "Revenue": Takings, Gross sales, Net revenue, Recognised revenue and Deferred
+  revenue are distinct and named.'
+decision:
+  what: Relabel every bare or ambiguous revenue label to the measure it is (27 labels on 14 screens, and a BO-1054
+    table column); a tile bound to a seeded KPI takes its label from the KPI.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 Oct 2026, on the finance-insights correction "never a bare Revenue" (BOARDREQ MOM-2758..2761: gross,
+  net, recognised and deferred are different measures); BO-1054 bound a "Net revenue" tile to the takings KPI and
+  BO-1081 had no source for its tiles (finance-insights corrections).'
+keys_touched:
+  screens:
+  - ANL-013
+  - ANL-020
+  - ANL-057
+  - BO-534
+  - BO-1054
+  - BO-1081
+  - ADM-112
+  - ADM-228
+  - ADM-231
+  - ADM-234
+  - ADM-500
+  - ADM-505
+  - ADM-641
+  - ADM-684
+  - ADM-691
+  schemas:
+  - ReportingSystemKpi
+  - Shift
+root_class: 'new: ambiguous-measure'
+tickets:
+  started: []
+  unstarted:
+  - APP-SETUP-ANL-023 (#20782)
+  - VM-REPORTING-REPORTING-1 (#18424)
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-finance-rules.py
+status: closed
+closed_by_commit: 7a84e41a
+notes: 'Qualified labels such as "Upsell Revenue", "Bundle Revenue" and "Incremental Revenue" (about 60, mostly
+  P09) are not bare and were left; each should name gross or net in a later pass. Branch finance-decisions, not
+  yet merged or released (release_tag: the next release). Started tickets: none; Block A starts Monday 5 October.'

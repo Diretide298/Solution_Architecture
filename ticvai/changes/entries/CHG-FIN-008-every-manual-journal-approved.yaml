@@ -1,0 +1,34 @@
+id: CHG-FIN-008
+date: '2026-10-02'
+source: mom
+kind: contract
+summary: Every manual journal needs approval, whatever the amount; there is no posting threshold for now.
+decision:
+  what: State on createJournalEntry that no threshold exists; BO-089 drops "above the venue threshold".
+  by: Chinmay
+  date: '2026-10-02'
+why: 'MoM 12 Aug 2026 section 15 (DI-265: a finance user posts a voucher, a finance manager approves, only then
+  it hits the ledger); docs/active/configured-limits-proposal.md already says no journal threshold; BO-089 state
+  model said otherwise (finance-insights correction). Chinmay, 2 Oct 2026, "for now".'
+keys_touched:
+  operations:
+  - createJournalEntry
+  - approveJournalEntry
+  screens:
+  - BO-089
+root_class: 'new: package-contradicts-decision'
+tickets:
+  started: []
+  unstarted:
+  - VM-LEDGER-JOURNAL-1 (#18356)
+  - VM-BO-089 (#18249)
+release_tag: pending
+decision_owner: Chinmay
+client_signoff: pending
+prevention:
+  type: check
+  ref: tools/check-finance-rules.py
+status: closed
+closed_by_commit: 7a84e41a
+notes: 'Branch finance-decisions, not yet merged or released (release_tag: the next release). Started tickets: none;
+  Block A starts Monday 5 October.'
