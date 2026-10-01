@@ -98,14 +98,9 @@
        "label": "The cart",
        "bindsTo": "Cart",
        "columns": [
-        "Cart.id",
-        "Cart.token",
-        "Cart.venueId",
         "Cart.channel",
-        "Cart.subjectId",
         "Cart.status",
         "Cart.lines",
-        "Cart.conflicts",
         "Cart.subtotal",
         "Cart.discountTotal",
         "Cart.taxTotal",
@@ -125,19 +120,13 @@
        "bindsTo": "CouponCode",
        "columns": [
         "CouponCode.code",
-        "CouponCode.campaignId",
-        "CouponCode.batchId",
         "CouponCode.status",
-        "CouponCode.assignedSubjectId",
         "CouponCode.redemptionCount",
-        "CouponCode.maxRedemptions",
         "CouponCode.discount",
         "CouponCode.invalidReason",
         "CouponCode.validFrom",
         "CouponCode.validTo",
-        "CouponCode.redeemedAt",
-        "CouponCode.redeemedOrderId",
-        "CouponCode.scopePath"
+        "CouponCode.redeemedAt"
        ],
        "operation": "getCouponCode",
        "provenance": "contract promotions.yaml GET /coupon-codes/{code}"
@@ -159,8 +148,9 @@
       {
        "kind": "banner",
        "bindsTo": "PromotionEvaluation.rejected",
-       "notes": "When a code does not apply, say which condition failed. \"Expired\" and \"already used\" are very different conversations",
-       "provenance": "carried from the previous definition"
+       "notes": "When a code does not apply, say which condition failed. \"Expired\" and \"already used\" are very different conversations Promotions are evaluated by themselves on every change (`evaluatePromotions`); a guest never fills a promotions form (F01 step 4, GFIX-3).",
+       "provenance": "carried from the previous definition",
+       "operation": "evaluatePromotions"
       },
       {
        "kind": "cardList",
@@ -179,6 +169,20 @@
        "operation": "getPublishedBookingFlow",
        "notes": "The steps of the published flow in their `sortOrder`, this one (cart) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back.",
        "provenance": "decided 29 September 2026, W12; CMS-103 Booking Flows"
+      },
+      {
+       "kind": "numberField",
+       "label": "Quantity",
+       "operation": "updateCartLine",
+       "notes": "A stepper on each line; each change saves at once (`updateCartLine`).",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+      },
+      {
+       "kind": "cardList",
+       "label": "Add to your visit",
+       "operation": "addCartLine",
+       "notes": "The add-ons the booking flow suggests for what is in the cart; Add puts one in (`addCartLine`).",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       }
      ]
     },
@@ -187,57 +191,30 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Add cart line",
-       "operation": "addCartLine",
-       "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save cart line",
-       "operation": "updateCartLine",
-       "provenance": "contract orders.yaml PATCH /carts/{cartId}/lines/{lineId}"
-      },
-      {
        "kind": "destructiveButton",
-       "label": "Remove cart line",
+       "label": "Remove",
        "operation": "removeCartLine",
        "provenance": "contract orders.yaml DELETE /carts/{cartId}/lines/{lineId}"
       },
       {
        "kind": "secondaryButton",
-       "label": "Extend cart",
+       "label": "More time",
        "operation": "extendCart",
-       "provenance": "contract orders.yaml POST /carts/{cartId}/extend"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Checkout cart",
-       "operation": "checkoutCart",
-       "provenance": "contract orders.yaml POST /carts/{cartId}/checkout"
+       "provenance": "contract orders.yaml POST /carts/{cartId}/extend",
+       "notes": "Beside the countdown (`Cart.expiresAt`, the one clock the guest sees); `extendCart` up to `maxExtensions` times."
       },
       {
        "kind": "destructiveButton",
-       "label": "Abandon cart",
+       "label": "Empty cart",
        "operation": "abandonCart",
        "provenance": "contract orders.yaml DELETE /carts/{cartId}"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Evaluate promotions",
-       "operation": "evaluatePromotions",
-       "provenance": "contract promotions.yaml POST /promotions/evaluate"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create cart",
-       "operation": "createCart",
-       "provenance": "contract orders.yaml POST /carts"
-      },
-      {
        "kind": "primaryButton",
        "label": "Checkout",
-       "provenance": "carried from the previous definition"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "operation": "checkoutCart",
+       "notes": "Checks the cart out (`checkoutCart`) and moves on to the guest details."
       }
      ]
     }
@@ -247,117 +224,15 @@
    {
     "id": "confirmRemoveCartLine",
     "component": "confirmDialog",
-    "trigger": "Remove cart line",
+    "trigger": "Remove",
     "body": "**Names what `removeCartLine` changes and what it leaves alone**, in the consequence rather than the verb. A shopping cart this affects should be identified in the dialog, not just counted.",
     "provenance": "client-verified"
    },
    {
     "id": "confirmAbandonCart",
     "component": "confirmDialog",
-    "trigger": "Abandon cart",
+    "trigger": "Empty cart",
     "body": "**Names what `abandonCart` changes and what it leaves alone**, in the consequence rather than the verb. A shopping cart this affects should be identified in the dialog, not just counted.",
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formCreateCart",
-    "component": "modal",
-    "trigger": "Create cart",
-    "body": "**Collects what `createCart` sends before it is called.** Required: `venueId`, `channel`. Optional: `subjectId`, `locale`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Create cart",
-     "operation": "createCart"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "venueId",
-      "channel",
-      "subjectId",
-      "locale"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formAddCartLine",
-    "component": "modal",
-    "trigger": "Add cart line",
-    "body": "**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "AddCartLineRequest",
-    "confirm": {
-     "label": "Add cart line",
-     "operation": "addCartLine"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "variantId",
-      "quantity",
-      "performanceId",
-      "seatIds",
-      "parentLineId",
-      "attributes"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formUpdateCartLine",
-    "component": "modal",
-    "trigger": "Save cart line",
-    "body": "**Collects what `updateCartLine` sends before it is called.** Required: `quantity`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Save cart line",
-     "operation": "updateCartLine"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "quantity"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formCheckoutCart",
-    "component": "modal",
-    "trigger": "Checkout cart",
-    "body": "**Collects what `checkoutCart` sends before it is called.** Nothing in the body is required. Optional: `subjectId`, `attendees`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Checkout cart",
-     "operation": "checkoutCart"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "subjectId",
-      "attendees"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formEvaluatePromotions",
-    "component": "modal",
-    "trigger": "Evaluate promotions",
-    "body": "**Collects what `evaluatePromotions` sends before it is called.** Required: `venueId`, `channel`, `lines`. Optional: `subjectId`, `membershipTierId`, `couponCodes`, `evaluateAt`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "EvaluatePromotionsRequest",
-    "confirm": {
-     "label": "Evaluate promotions",
-     "operation": "evaluatePromotions"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "venueId",
-      "channel",
-      "lines",
-      "subjectId",
-      "membershipTierId",
-      "couponCodes",
-      "evaluateAt"
-     ]
-    },
     "provenance": "client-verified"
    }
   ],
@@ -381,7 +256,7 @@
    {
     "operationId": "getCart",
     "contract": "orders",
-    "purpose": "The cart, priced and checked, right now",
+    "purpose": "The cart, priced and checked, right now With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    },
    {
@@ -429,15 +304,15 @@
    {
     "operationId": "getCouponCode",
     "contract": "promotions",
-    "purpose": "Look up a code",
+    "purpose": "Look up a code With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    },
    {
     "operationId": "createCart",
     "contract": "orders",
-    "purpose": "Start a cart",
-    "trigger": "onAction",
-    "provenance": "client-verified"
+    "purpose": "Started by the runtime the first time a line is added, against the guest or the anonymous cart token (2.1.31); never a button or a form (GFIX-3). With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
+    "trigger": "background",
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    },
    {
     "operationId": "getPerformance",
@@ -448,7 +323,7 @@
    {
     "operationId": "getResourceHold",
     "contract": "resources",
-    "purpose": "The countdown of a cabana or spot held on the venue map (`expiresAt`)",
+    "purpose": "The countdown of a cabana or spot held on the venue map (`expiresAt`) With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onInterval"
    },
    {
@@ -1209,22 +1084,16 @@
        "label": "The order",
        "bindsTo": "Order",
        "columns": [
-        "Order.id",
         "Order.orderNumber",
         "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
         "Order.status",
         "Order.currency",
-        "Order.currencyScale",
         "Order.grossAmount",
         "Order.taxAmount",
         "Order.netAmount",
         "Order.refundedAmount",
-        "Order.totalPriceVariance",
         "Order.lines",
-        "Order.payments",
-        "Order.principalId"
+        "Order.payments"
        ],
        "operation": "getOrder",
        "provenance": "contract orders.yaml GET /orders/{orderId}"
@@ -1253,11 +1122,31 @@
        "provenance": "decided 29 September 2026, W1"
       },
       {
+       "kind": "detailPanel",
+       "label": "Read the terms",
+       "bindsTo": "PublishedPolicy",
+       "columns": [
+        "PublishedPolicy.title",
+        "PublishedPolicy.version",
+        "PublishedPolicy.body"
+       ],
+       "operation": "listPublishedPolicies",
+       "notes": "`kind=termsAndConditions`, opened from the T&Cs tick; the version shown is the version the consent records.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)"
+      },
+      {
        "kind": "toggle",
        "label": "Send me offers and news",
        "operation": "createOrder",
        "notes": "Marketing opt-in beside the T&Cs, **never pre-ticked** (M18-15): `marketingConsents[]` on the order, bound to the verified contact.",
        "provenance": "decided 29 September 2026, M18-15"
+      },
+      {
+       "kind": "banner",
+       "label": "Checking your payment",
+       "operation": "inquirePaymentStatus",
+       "notes": "Only in the unknown-outcome state: the screen asks the provider by itself (`inquirePaymentStatus`) and never offers to pay again.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       }
      ]
     },
@@ -1267,32 +1156,10 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Transfer order tickets",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create order",
-       "operation": "createOrder",
-       "provenance": "contract orders.yaml POST /orders"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Create payment",
-       "operation": "createPayment",
-       "provenance": "contract orders.yaml POST /payments"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Inquire payment status",
-       "operation": "inquirePaymentStatus",
-       "provenance": "contract orders.yaml POST /payments/{paymentId}/inquiry"
-      },
-      {
-       "kind": "primaryButton",
        "label": "Pay now",
-       "provenance": "carried from the previous definition"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "operation": "createPayment",
+       "notes": "One Pay: creates the order (`createOrder`, with the T&Cs tick and the opt-in above) and then the payment (`createPayment`) for card, Apple Pay, Google Pay or wallet (R080)."
       }
      ]
     }
@@ -1306,12 +1173,6 @@
    "offline": "**Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice."
   },
   "apis": [
-   {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction"
-   },
    {
     "operationId": "createOrder",
     "contract": "orders",
@@ -1327,7 +1188,7 @@
    {
     "operationId": "getOrder",
     "contract": "orders",
-    "purpose": "Read an order",
+    "purpose": "Read an order With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    },
    {
@@ -1342,6 +1203,13 @@
     "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
     "trigger": "onLoad",
     "provenance": "decided 29 September 2026, W12"
+   },
+   {
+    "operationId": "listPublishedPolicies",
+    "contract": "white-label",
+    "purpose": "The current terms and conditions the guest ticks, with their version, readable before sign-in (GFIX-2)",
+    "trigger": "onLoad",
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)"
    }
   ],
   "entryState": {
@@ -1375,80 +1243,15 @@
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
+  "x-ticvai-make-or-break": "M18-15: may a guest-checkout customer be sent marketing on an opt-in taken at checkout (law and the client's marketing policy)? Until the client confirms, the opt-in is shown unticked and nothing is sent without it.",
+  "gaps": [
    {
-    "id": "formTransferOrderTickets",
-    "component": "modal",
-    "trigger": "Transfer order tickets",
-    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Transfer order tickets",
-     "operation": "transferOrderTickets"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "ticketIds",
-      "recipient",
-      "message"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formCreateOrder",
-    "component": "modal",
-    "trigger": "Create order",
-    "body": "**Collects what `createOrder` sends before it is called.** Required: `id`, `venueId`, `channel`, `lines`, `recordedAt`. Optional: `shiftId`, `subjectId`, `guestLinkId`, `catalogueBundleVersion`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateOrderRequest",
-    "confirm": {
-     "label": "Create order",
-     "operation": "createOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "venueId",
-      "channel",
-      "lines",
-      "recordedAt",
-      "shiftId",
-      "subjectId",
-      "guestLinkId",
-      "catalogueBundleVersion"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
-    "id": "formCreatePayment",
-    "component": "modal",
-    "trigger": "Create payment",
-    "body": "**Collects what `createPayment` sends before it is called.** Required: `id`, `orderId`, `tender`, `amount`, `recordedAt`. Optional: `tenderCurrency`, `tenderAmount`, `walletAuthorisationId`, `deviceId`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreatePaymentRequest",
-    "confirm": {
-     "label": "Create payment",
-     "operation": "createPayment"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "orderId",
-      "tender",
-      "amount",
-      "recordedAt",
-      "tenderCurrency",
-      "tenderAmount",
-      "walletAuthorisationId",
-      "deviceId"
-     ]
-    },
-    "provenance": "client-verified"
+    "operation": "transferOrderTickets",
+    "removed": true,
+    "why": "Transfers happen after purchase from the tickets (WEB-030); on the payment screen it offered to give away tickets not yet paid for (F55 step 4).",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ],
-  "x-ticvai-make-or-break": "M18-15: may a guest-checkout customer be sent marketing on an opt-in taken at checkout (law and the client's marketing policy)? Until the client confirms, the opt-in is shown unticked and nothing is sent without it.",
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -1561,22 +1364,16 @@
        "label": "The order",
        "bindsTo": "Order",
        "columns": [
-        "Order.id",
         "Order.orderNumber",
         "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
         "Order.status",
         "Order.currency",
-        "Order.currencyScale",
         "Order.grossAmount",
         "Order.taxAmount",
         "Order.netAmount",
         "Order.refundedAmount",
-        "Order.totalPriceVariance",
         "Order.lines",
-        "Order.payments",
-        "Order.principalId"
+        "Order.payments"
        ],
        "operation": "getOrder",
        "provenance": "contract orders.yaml GET /orders/{orderId}"
@@ -1590,11 +1387,6 @@
        "kind": "secondaryButton",
        "label": "Add to wallet",
        "provenance": "carried from the previous definition"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Resend confirmation",
-       "provenance": "carried from the previous definition"
       }
      ]
     },
@@ -1603,16 +1395,16 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Transfer order tickets",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+       "kind": "secondaryButton",
+       "label": "Resend my tickets",
+       "operation": "reprintOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
       },
       {
        "kind": "secondaryButton",
-       "label": "Reprint order",
-       "operation": "reprintOrder",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
+       "label": "Transfer tickets",
+       "notes": "Opens Ticket Transfer (WEB-030 on the web, GST-014 in the app), after the tickets.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       }
      ]
     }
@@ -1627,15 +1419,9 @@
   },
   "apis": [
    {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction"
-   },
-   {
     "operationId": "getOrder",
     "contract": "orders",
-    "purpose": "Read an order",
+    "purpose": "Read an order With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    },
    {
@@ -1670,31 +1456,12 @@
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
    {
-    "id": "formTransferOrderTickets",
-    "component": "modal",
-    "trigger": "Transfer order tickets",
-    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Transfer order tickets",
-     "operation": "transferOrderTickets"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "ticketIds",
-      "recipient",
-      "message"
-     ]
-    },
-    "provenance": "client-verified"
-   },
-   {
     "id": "formReprintOrder",
     "component": "modal",
-    "trigger": "Reprint order",
-    "body": "**Collects what `reprintOrder` sends before it is called.** Required: `delivery`, `recordedAt`. Optional: `destination`, `lineIds`, `reason`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Resend my tickets",
+    "body": "**Where to send them**: email or SMS to the contact on the order, or another address the guest types. `reprintOrder` with `delivery` email or sms; nothing else is asked.",
     "confirm": {
-     "label": "Reprint order",
+     "label": "Send",
      "operation": "reprintOrder"
     },
     "dismiss": {
@@ -1707,7 +1474,15 @@
       "reason"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "transferOrderTickets",
+    "removed": true,
+    "why": "The tickets are the primary action here (wallet, resend); transfer is WEB-030's, opened from My Tickets.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ],
   "_platform": {
@@ -1789,29 +1564,18 @@
       {
        "kind": "detailPanel",
        "label": "The payment link",
-       "bindsTo": "PaymentLink",
+       "bindsTo": "PaymentLinkView",
        "columns": [
-        "PaymentLink.id",
-        "PaymentLink.orderId",
-        "PaymentLink.reservationId",
-        "PaymentLink.token",
-        "PaymentLink.status",
-        "PaymentLink.channel",
-        "PaymentLink.sentTo",
-        "PaymentLink.expiresAt",
-        "PaymentLink.releaseHoldOnExpiry",
-        "PaymentLink.viewedAt",
-        "PaymentLink.paidAt",
-        "PaymentLink.resendCount",
-        "PaymentLink.issuedByPrincipalId",
-        "PaymentLink.scopePath"
+        "PaymentLinkView.status",
+        "PaymentLinkView.expiresAt",
+        "PaymentLinkView.releaseHoldOnExpiry"
        ],
        "operation": "getPaymentLink",
        "provenance": "contract orders.yaml GET /payment-links/{token}"
       },
       {
        "kind": "detailPanel",
-       "bindsTo": "PaymentLink",
+       "bindsTo": "PaymentLinkView",
        "notes": "Venue, lines, total. **What they are paying for, before how to pay** — a guest who booked by phone may not recognise a reference number.",
        "provenance": "carried from the previous definition"
       },
@@ -1829,19 +1593,9 @@
       {
        "kind": "primaryButton",
        "label": "Pay now",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    },
-    {
-     "name": "actionBar",
-     "slot": "rowActions",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Pay by link",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
        "operation": "payByLink",
-       "provenance": "contract orders.yaml POST /payment-links/{token}/pay"
+       "notes": "One Pay: the gateway's card form produces the provider token and `payByLink` settles the link; the token is never a field (GFIX-3)."
       }
      ]
     }
@@ -1889,26 +1643,6 @@
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
-   {
-    "id": "formPayByLink",
-    "component": "modal",
-    "trigger": "Pay by link",
-    "body": "**Collects what `payByLink` sends before it is called.** Required: `providerToken`. Optional: `email`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Pay by link",
-     "operation": "payByLink"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "providerToken",
-      "email"
-     ]
-    },
-    "provenance": "designed"
-   }
-  ],
   "_platform": {
    "code": "P01",
    "audience": "guest",

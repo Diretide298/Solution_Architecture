@@ -1,6 +1,6 @@
 # P05-sell-02 — P05 · Sell (2 of 2)
 
-**6 screens · 10 operations · 27 schemas · 3 permissions**
+**6 screens · 10 operations · 27 schemas · 4 permissions**
 
 Platform P05 Guest Kiosk · ships as **guest** ·
 guest audience · kiosk ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `ORDER_CREATE, ORDER_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `ORDER_CREATE, ORDER_REPRINT, ORDER_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -68,7 +68,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `KSK-011` | Collect a booking | B–D | 1 | 16 | 5 | 4 | 2 | 6 | guest | notStarted (generated) |
-| `KSK-012` | Booking found | B–D | 8 | 0 | 4 | 5 | 0 | 6 | guest | notStarted (generated) |
+| `KSK-012` | Booking found | B–D | 6 | 0 | 4 | 6 | 0 | 6 | guest | notStarted (generated) |
 | `KSK-013` | Call staff | B–D | 0 | 0 | 4 | 0 | 0 | 0 | guest | notStarted (generated) |
 | `KSK-014` | Out of service | B–D | 0 | 0 | 4 | 0 | 0 | 0 | guest | notStarted (generated) |
 | `KSK-016` | Order Food | B–D | 23 | 7 | 6 | 5 | 0 | 0 | guest | notStarted (generated) |
@@ -76,7 +76,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**KSK-011, KSK-013, KSK-014 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**KSK-011, KSK-012, KSK-013, KSK-014 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

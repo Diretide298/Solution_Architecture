@@ -59,16 +59,9 @@
      "components": [
       {
        "kind": "searchField",
-       "label": "Q",
+       "label": "Search",
        "operation": "searchCatalogue",
        "notes": "Sends `?q=` to `searchCatalogue`.",
-       "provenance": "contract catalogue.yaml GET /search"
-      },
-      {
-       "kind": "textField",
-       "label": "Venue id",
-       "operation": "searchCatalogue",
-       "notes": "Sends `?venueId=` to `searchCatalogue`.",
        "provenance": "contract catalogue.yaml GET /search"
       },
       {
@@ -79,34 +72,11 @@
        "provenance": "contract catalogue.yaml GET /search"
       },
       {
-       "kind": "dataTable",
-       "label": "Every money",
-       "bindsTo": "Money",
-       "columns": [
-        "Money.amount",
-        "Money.currency",
-        "Money.scale"
-       ],
+       "kind": "cardList",
+       "label": "Results",
        "operation": "searchCatalogue",
-       "provenance": "contract catalogue.yaml GET /search"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected money",
-       "bindsTo": "Money",
-       "columns": [
-        "Money.amount",
-        "Money.currency",
-        "Money.scale"
-       ],
-       "operation": "searchCatalogue",
-       "provenance": "contract catalogue.yaml GET /search"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "One card per result: name, summary, photo (`primaryMedia`), from-price (`fromPrice`), sold out shown rather than hidden (`isAvailable`), and `notBookableLabel` for an info-only product. `searchCatalogue` answers with no named schema, so the card binds none. Was the generated table 'Every money'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       }
      ]
     }
@@ -116,7 +86,7 @@
    "loading": "The search list.",
    "error": "Could not load. Names which read failed and leaves the search untouched.",
    "emptyFirstRun": "No search yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on q, venueId, kind and the search are still there. Names the active filter and offers to clear it.",
+   "emptyNoResults": "Nothing matches what was typed. Names the search, suggests a shorter one and offers to clear it; a sold-out match is shown as sold out, not hidden.",
    "offline": "**The offline banner shows.** Results come only from what was already loaded, with a note that newer items may exist."
   },
   "apis": [

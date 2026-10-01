@@ -1,6 +1,6 @@
 # P02-discovery-browse-01 — P02 · Discovery & Browse
 
-**7 screens · 23 operations · 69 schemas · 6 permissions**
+**7 screens · 23 operations · 65 schemas · 6 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -51,7 +51,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 6 permissions apply here:
   `AI_USE, GUEST_VIEW, ORDER_VIEW, PRODUCT_VIEW, TENANT_CONFIGURE, VENUE_MAP_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **13 of these operations work offline**: getBundle, getPerformance, getProduct, getPublishedGuidedChoice, getTenantAppStatus, getVenueMap, getWaitTimes, listContentPages
+- **14 of these operations work offline**: getBundle, getPerformance, getProduct, getPublishedGuidedChoice, getPublishedTenantConfig, getTenantAppStatus, getVenueMap, getWaitTimes
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -69,17 +69,17 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-001` | Home | A | 3 | 178 | 7 | 65 | 6 | 0 | guest | notStarted (client-verified) |
-| `GST-002` | Explore | A | 4 | 68 | 6 | 15 | 4 | 0 | guest | notStarted (client-verified) |
-| `GST-003` | Buy Tickets | A | 3 | 91 | 6 | 24 | 10 | 0 | guest | notStarted (client-verified) |
-| `GST-004` | Item Detail | A | 3 | 136 | 8 | 29 | 11 | 0 | guest | notStarted (client-verified) |
-| `GST-005` | What's On | A | 2 | 30 | 6 | 17 | 0 | 0 | guest | notStarted (client-verified) |
+| `GST-001` | Home | A | 2 | 111 | 7 | 62 | 6 | 0 | guest | notStarted (client-verified) |
+| `GST-002` | Explore | A | 1 | 44 | 6 | 15 | 4 | 0 | guest | notStarted (client-verified) |
+| `GST-003` | Buy Tickets | A | 1 | 53 | 6 | 24 | 10 | 0 | guest | notStarted (client-verified) |
+| `GST-004` | Item Detail | A | 1 | 103 | 8 | 29 | 11 | 0 | guest | notStarted (client-verified) |
+| `GST-005` | What's On | A | 2 | 10 | 6 | 17 | 0 | 0 | guest | notStarted (client-verified) |
 | `GST-006` | Item Detail – Event / Exhibition | A | 0 | 25 | 5 | 11 | 2 | 0 | guest | notStarted (client-verified) |
-| `GST-057` | Accessibility Information | A | 3 | 22 | 6 | 3 | 2 | 0 | guest | notStarted (client-verified) |
+| `GST-057` | Accessibility Information | A | 0 | 4 | 6 | 0 | 2 | 0 | guest | notStarted (client-verified) |
 
 ## Thin screens in this batch
 
-**GST-006 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**GST-006, GST-057 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

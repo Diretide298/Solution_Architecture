@@ -219,9 +219,9 @@
  },
  "deferredScreens": [],
  "counts": {
-  "core": 469,
+  "core": 473,
   "setup": 234,
-  "allOperations": 2668
+  "allOperations": 2672
  },
  "services": {
   "AccessService": {
@@ -235,7 +235,7 @@
    "total": 141
   },
   "CatalogueService": {
-   "core": 43,
+   "core": 42,
    "setup": 50,
    "total": 449
   },
@@ -260,7 +260,7 @@
    "total": 72
   },
   "MarketingService": {
-   "core": 46,
+   "core": 47,
    "setup": 14,
    "total": 264
   },
@@ -300,9 +300,9 @@
    "total": 66
   },
   "WhiteLabelService": {
-   "core": 76,
+   "core": 80,
    "setup": 2,
-   "total": 79
+   "total": 83
   }
  },
  "operations": {
@@ -390,7 +390,6 @@
    "screens": [
     "GST-007",
     "GST-008",
-    "GST-009",
     "GST-026",
     "GST-027",
     "GST-032",
@@ -924,14 +923,12 @@
    "screens": [
     "GST-009",
     "GST-026",
-    "GST-027",
     "GST-032",
     "GST-041",
     "KSK-006",
     "PTR-010",
     "WEB-010",
     "WEB-033",
-    "WEB-041",
     "WEB-042"
    ],
    "enables": []
@@ -1033,12 +1030,10 @@
    "path": "/ticket-transfers/{transferId}/claim",
    "perm": null,
    "platforms": [
-    "MOB",
-    "WEB"
+    "MOB"
    ],
    "screens": [
-    "GST-014",
-    "WEB-030"
+    "GST-014"
    ],
    "enables": []
   },
@@ -2197,7 +2192,6 @@
     "EMP-059",
     "GST-009",
     "GST-026",
-    "GST-027",
     "KSK-007",
     "POS-002",
     "POS-004",
@@ -2205,7 +2199,6 @@
     "PTR-012",
     "WEB-012",
     "WEB-033",
-    "WEB-041",
     "WEB-042"
    ],
    "enables": []
@@ -2367,12 +2360,10 @@
    "path": "/referrals",
    "perm": "MARKETING_MANAGE",
    "platforms": [
-    "MOB",
     "WEB"
    ],
    "screens": [
     "BO-830",
-    "GST-072",
     "WEB-043"
    ],
    "enables": []
@@ -4223,7 +4214,6 @@
    "path": "/guests/{subjectId}",
    "perm": "GUEST_VIEW",
    "platforms": [
-    "MOB",
     "WEB"
    ],
    "screens": [
@@ -4232,7 +4222,6 @@
     "BO-738",
     "BO-740",
     "EMP-057",
-    "GST-001",
     "WEB-011",
     "WEB-020"
    ],
@@ -4456,12 +4445,10 @@
    "path": "/guests/me/challenges",
    "perm": "MARKETING_VIEW",
    "platforms": [
-    "MOB",
     "WEB"
    ],
    "screens": [
     "BO-824",
-    "GST-072",
     "WEB-017"
    ],
    "enables": []
@@ -4498,6 +4485,21 @@
     "GST-015",
     "WEB-022",
     "WEB-023"
+   ],
+   "enables": []
+  },
+  "getMyProfile": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "GET",
+   "path": "/guests/me/profile",
+   "perm": "GUEST_VIEW",
+   "platforms": [
+    "MOB"
+   ],
+   "screens": [
+    "GST-001"
    ],
    "enables": []
   },
@@ -4816,6 +4818,24 @@
     "GST-008",
     "WEB-002",
     "WEB-005"
+   ],
+   "enables": []
+  },
+  "getPublishedTenantConfig": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/storefront/tenant-config",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-001",
+    "KSK-002",
+    "WEB-001"
    ],
    "enables": []
   },
@@ -5166,8 +5186,6 @@
    "path": "/tenant-config",
    "perm": "TENANT_CONFIGURE",
    "platforms": [
-    "MOB",
-    "WEB",
     "WL"
    ],
    "screens": [
@@ -5175,10 +5193,7 @@
     "BO-834",
     "CMS-001",
     "CMS-012",
-    "CMS-016",
-    "GST-001",
-    "KSK-002",
-    "WEB-001"
+    "CMS-016"
    ],
    "enables": []
   },
@@ -6339,7 +6354,6 @@
     "BO-094",
     "EMP-018",
     "GST-052",
-    "GST-056",
     "WEB-008"
    ],
    "enables": []
@@ -6439,16 +6453,11 @@
    "path": "/tenant-config/pages",
    "perm": "TENANT_CONFIGURE",
    "platforms": [
-    "MOB",
-    "WEB",
     "WL"
    ],
    "screens": [
     "BO-837",
-    "CMS-007",
-    "GST-040",
-    "GST-057",
-    "WEB-045"
+    "CMS-007"
    ],
    "enables": []
   },
@@ -6650,15 +6659,11 @@
    "path": "/tenant-config/faqs",
    "perm": "TENANT_CONFIGURE",
    "platforms": [
-    "MOB",
-    "WEB",
     "WL"
    ],
    "screens": [
     "ADM-018",
-    "GST-040",
-    "SUP-006",
-    "WEB-045"
+    "SUP-006"
    ],
    "enables": []
   },
@@ -6766,24 +6771,6 @@
     "WEB-017",
     "WEB-024",
     "WEB-027"
-   ],
-   "enables": []
-  },
-  "listGuestMemberships": {
-   "part": "core",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "verb": "GET",
-   "path": "/guest/memberships",
-   "perm": "PRODUCT_VIEW",
-   "platforms": [
-    "MOB",
-    "WEB"
-   ],
-   "screens": [
-    "GST-015",
-    "WEB-022",
-    "WEB-023"
    ],
    "enables": []
   },
@@ -7085,8 +7072,10 @@
     "WEB"
    ],
    "screens": [
+    "GST-014",
     "GST-019",
-    "WEB-019"
+    "WEB-019",
+    "WEB-030"
    ],
    "enables": []
   },
@@ -7143,9 +7132,7 @@
    "path": "/orders",
    "perm": "ORDER_VIEW",
    "platforms": [
-    "MOB",
-    "POS",
-    "WEB"
+    "POS"
    ],
    "screens": [
     "ANL-009",
@@ -7158,9 +7145,6 @@
     "EMP-014",
     "EMP-034",
     "EMP-057",
-    "GST-014",
-    "GST-018",
-    "GST-019",
     "POS-002",
     "POS-006",
     "POS-012",
@@ -7169,9 +7153,7 @@
     "PTR-005",
     "PTR-008",
     "PTR-015",
-    "PTR-016",
-    "WEB-019",
-    "WEB-030"
+    "PTR-016"
    ],
    "enables": []
   },
@@ -7484,6 +7466,60 @@
     "PTR-010",
     "WEB-032",
     "WEB-043"
+   ],
+   "enables": []
+  },
+  "listPublishedContentPages": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/storefront/pages",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-040",
+    "GST-057",
+    "WEB-045"
+   ],
+   "enables": []
+  },
+  "listPublishedFaqs": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/storefront/faqs",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-040",
+    "WEB-045"
+   ],
+   "enables": []
+  },
+  "listPublishedPolicies": {
+   "part": "core",
+   "service": "WhiteLabelService",
+   "contract": "white-label",
+   "verb": "GET",
+   "path": "/storefront/policies",
+   "perm": null,
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-009",
+    "GST-040",
+    "WEB-012",
+    "WEB-045"
    ],
    "enables": []
   },
@@ -9289,6 +9325,9 @@
     "EMP-014",
     "EMP-034",
     "GST-010",
+    "KSK-009",
+    "KSK-010",
+    "KSK-012",
     "POS-002",
     "POS-006",
     "POS-026",
@@ -12130,22 +12169,12 @@
     "WEB"
    ],
    "screens": [
-    "GST-009",
-    "GST-010",
     "GST-012",
     "GST-013",
     "GST-014",
-    "GST-019",
     "GST-045",
     "GST-055",
-    "KSK-009",
-    "KSK-010",
-    "KSK-012",
-    "WEB-012",
-    "WEB-013",
     "WEB-018",
-    "WEB-019",
-    "WEB-023",
     "WEB-030"
    ],
    "enables": []

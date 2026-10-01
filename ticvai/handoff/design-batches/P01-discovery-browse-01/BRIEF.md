@@ -1,6 +1,6 @@
 # P01-discovery-browse-01 — P01 · Discovery & Browse
 
-**5 screens · 23 operations · 61 schemas · 4 permissions**
+**5 screens · 23 operations · 59 schemas · 4 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -68,10 +68,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `WEB-001` | Home / Landing | A | 3 | 79 | 6 | 68 | 8 | 0 | guest | review (client-verified) |
-| `WEB-002` | Event & Attraction Listing | A | 6 | 111 | 6 | 24 | 10 | 0 | guest | review (client-verified) |
-| `WEB-003` | Search Results | A | 3 | 18 | 6 | 15 | 0 | 0 | guest | review (client-verified) |
-| `WEB-004` | Attraction Details | A | 3 | 114 | 8 | 24 | 17 | 0 | guest | review (client-verified) |
+| `WEB-001` | Home / Landing | A | 1 | 67 | 6 | 63 | 8 | 0 | guest | review (client-verified) |
+| `WEB-002` | Event & Attraction Listing | A | 3 | 87 | 6 | 22 | 10 | 0 | guest | review (client-verified) |
+| `WEB-003` | Search Results | A | 2 | 18 | 6 | 15 | 0 | 0 | guest | review (client-verified) |
+| `WEB-004` | Attraction Details | A | 1 | 81 | 8 | 24 | 17 | 0 | guest | review (client-verified) |
 | `WEB-050` | Plan Your Visit | A | 39 | 60 | 7 | 3 | 7 | 1 | guest | review (client-verified) |
 
 ## Design inputs from the client meetings

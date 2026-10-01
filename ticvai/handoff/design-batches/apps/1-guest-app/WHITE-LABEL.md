@@ -58,7 +58,7 @@ Each line: the CMS field (input), the value an alternate tenant would set, and w
 - **Seat picker**: in `CMS-016` Site Settings, the tenant sets *Seat picker* to **Zones then seats** (default Bowl) → on GST-007, GST-008, GST-009, GST-041, WEB-005, WEB-006, WEB-007, WEB-008 … (11): Default `bowl`, as the prototype has it (decided 29 September, rev 3 CFG-6). Read only for a seated event..
 - **Steps: enabled**: in `CMS-102` Site Builder, the tenant sets *Steps: enabled* to **On** (default —) → on GST-007, GST-008, GST-009, GST-041, WEB-005, WEB-006, WEB-007, WEB-008 … (11): A `required` step cannot be off; the flow saves and `isValid` turns false..
 - **Settings: sign in at**: in `CMS-102` Site Builder, the tenant sets *Settings: sign in at* to **At payment** (default After add ons) → on GST-007, GST-008, GST-009, GST-041, WEB-005, WEB-006, WEB-007, WEB-008 … (11): Where the guest is asked to sign in, or for a guest-checkout code (rev 3 REV3-3)..
-- **Sections: kind**: in `CMS-007` Page Builder, the tenant sets *Sections: kind* to **Quick actions** (default —) → on GST-001, WEB-001: Which module each section needs, proposed, client to correct (decided 28 September, audit R163)..
+- **Sections: kind**: in `CMS-007` Page Builder, the tenant sets *Sections: kind* to **Quick actions** (default —) → on the guest home screens: Which module each section needs, proposed, client to correct (decided 28 September, audit R163)..
 
 ## The default theme and the alternate tenant theme
 
@@ -323,14 +323,14 @@ Set on `CMS-007` Page Builder through `setHomepageLayout`. Reaches the guest hom
 
 | Element | Control | Required | Allowed values and rules | Default | Reaches | What it changes | When it goes live |
 |---|---|---|---|---|---|---|---|
-| Sections `homepage.sections` | repeatable rows | yes | — | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Sections: kind `homepage.sections[].kind` | select | yes | Hero banner · Quick actions · Tickets · Whats on · Attractions · Membership · Dining · Shop · Promotions · Map · Custom content · Venue overview …; `tickets` needs `ticketsAndBooking`; `whatsOn` needs `events` … | — | GST-001, WEB-001 | Which module each section needs, proposed, client to correct (decided 28 September, audit R163). | on publish (CMS-014): web at once, the app on its next launch |
-| Sections: title `homepage.sections[].title` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Sections: sort order `homepage.sections[].sortOrder` | number field | yes | — | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Sections: is visible `homepage.sections[].isVisible` | toggle | yes | — | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Sections: content page `homepage.sections[].contentPageId` | picker: choose a content page | no | shows names, sends the id | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Sections: max items `homepage.sections[].maxItems` | number field | no | — | — | GST-001, WEB-001 | How many items the section shows. On the mobile Home, `attractions`, `dining`, `whatsOn` and `shop` show 1 or 2 highlights (decided 29 September, MOB-3). | on publish (CMS-014): web at once, the app on its next launch |
-| Sections: hero style `homepage.sections[].heroStyle` | radio group | no | Carousel · Video · Poster · Split | — | GST-001, WEB-001 | For `heroBanner` only (decided 29 September, MOB-3). | on publish (CMS-014): web at once, the app on its next launch |
+| Sections `homepage.sections` | repeatable rows | yes | — | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Sections: kind `homepage.sections[].kind` | select | yes | Hero banner · Quick actions · Tickets · Whats on · Attractions · Membership · Dining · Shop · Promotions · Map · Custom content · Venue overview …; `tickets` needs `ticketsAndBooking`; `whatsOn` needs `events` … | — | the guest home screens | Which module each section needs, proposed, client to correct (decided 28 September, audit R163). | on publish (CMS-014): web at once, the app on its next launch |
+| Sections: title `homepage.sections[].title` | text, one per language | no | English and Arabic (Arabic right to left) | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Sections: sort order `homepage.sections[].sortOrder` | number field | yes | — | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Sections: is visible `homepage.sections[].isVisible` | toggle | yes | — | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Sections: content page `homepage.sections[].contentPageId` | picker: choose a content page | no | shows names, sends the id | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Sections: max items `homepage.sections[].maxItems` | number field | no | — | — | GST-001 | How many items the section shows. On the mobile Home, `attractions`, `dining`, `whatsOn` and `shop` show 1 or 2 highlights (decided 29 September, MOB-3). | on publish (CMS-014): web at once, the app on its next launch |
+| Sections: hero style `homepage.sections[].heroStyle` | radio group | no | Carousel · Video · Poster · Split | — | GST-001 | For `heroBanner` only (decided 29 September, MOB-3). | on publish (CMS-014): web at once, the app on its next launch |
 
 ### Banners
 
@@ -338,22 +338,22 @@ Set on `CMS-008` Content Blocks through `createBanner`, `updateBanner`. Reaches 
 
 | Element | Control | Required | Allowed values and rules | Default | Reaches | What it changes | When it goes live |
 |---|---|---|---|---|---|---|---|
-| Banners title `banners.title` | text, one per language | yes | English and Arabic (Arabic right to left) | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Banners subtitle `banners.subtitle` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Image `banners.imageAssetRef` | upload, or pick from the media library | yes | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Banners placement `banners.placement` | radio group | no | Homepage hero · Homepage block · Explore · Checkout | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Banners link target `banners.linkTarget` | group | no | — | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Link target: kind `banners.linkTarget.kind` | select | yes | Module · Content page · Product · Event · External URL · App section · None | — | GST-001, WEB-001 | `appSection` points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets. | on publish (CMS-014): web at once, the app on its next launch |
-| Link target: module key `banners.linkTarget.moduleKey` | select | no | Tickets and booking · Membership · Events · Attractions · Virtual queue · Dining and fnb · Shop · Parking · Gamification · Photo gallery · Wallet · Loyalty … | — | GST-001, WEB-001, WEB-050 | `visitPlanner` (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. | on publish (CMS-014): web at once, the app on its next launch |
-| Link target: app section `banners.linkTarget.appSection` | select | no | Home · Explore · Plan · Tickets · Map · Account · Buy tickets; Required when `kind` is `appSection`. | — | GST-001, WEB-001 | Required when `kind` is `appSection`. `plan` needs the `visitPlanner` module and `map` the `map` module enabled, or `setNavigation` refuses it. | on publish (CMS-014): web at once, the app on its next launch |
-| Link target: content page `banners.linkTarget.contentPageId` | picker: choose a content page | no | shows names, sends the id | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Link target: product `banners.linkTarget.productId` | picker: choose a product | no | shows names, sends the id | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Link target: event `banners.linkTarget.eventId` | picker: choose an event | no | shows names, sends the id | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Link target: uRL `banners.linkTarget.url` | text field | no | — | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Banners starts at `banners.startsAt` | date and time picker | yes | 1 Oct 2026, 14:30 (venue time zone) | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Banners ends at `banners.endsAt` | date and time picker | no | 1 Oct 2026, 14:30 (venue time zone) | — | GST-001, WEB-001 | Must follow `startsAt` when set (decided 28 September, audit R163). Null runs the banner with no end. | on publish (CMS-014): web at once, the app on its next launch |
-| Banners sort order `banners.sortOrder` | number field | no | — | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Is active `banners.isActive` | toggle | no | — | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
+| Banners title `banners.title` | text, one per language | yes | English and Arabic (Arabic right to left) | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Banners subtitle `banners.subtitle` | text, one per language | no | English and Arabic (Arabic right to left) | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Image `banners.imageAssetRef` | upload, or pick from the media library | yes | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Banners placement `banners.placement` | radio group | no | Homepage hero · Homepage block · Explore · Checkout | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Banners link target `banners.linkTarget` | group | no | — | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Link target: kind `banners.linkTarget.kind` | select | yes | Module · Content page · Product · Event · External URL · App section · None | — | the guest home screens | `appSection` points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets. | on publish (CMS-014): web at once, the app on its next launch |
+| Link target: module key `banners.linkTarget.moduleKey` | select | no | Tickets and booking · Membership · Events · Attractions · Virtual queue · Dining and fnb · Shop · Parking · Gamification · Photo gallery · Wallet · Loyalty … | — | WEB-050 | `visitPlanner` (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. | on publish (CMS-014): web at once, the app on its next launch |
+| Link target: app section `banners.linkTarget.appSection` | select | no | Home · Explore · Plan · Tickets · Map · Account · Buy tickets; Required when `kind` is `appSection`. | — | the guest home screens | Required when `kind` is `appSection`. `plan` needs the `visitPlanner` module and `map` the `map` module enabled, or `setNavigation` refuses it. | on publish (CMS-014): web at once, the app on its next launch |
+| Link target: content page `banners.linkTarget.contentPageId` | picker: choose a content page | no | shows names, sends the id | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Link target: product `banners.linkTarget.productId` | picker: choose a product | no | shows names, sends the id | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Link target: event `banners.linkTarget.eventId` | picker: choose an event | no | shows names, sends the id | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Link target: uRL `banners.linkTarget.url` | text field | no | — | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Banners starts at `banners.startsAt` | date and time picker | yes | 1 Oct 2026, 14:30 (venue time zone) | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Banners ends at `banners.endsAt` | date and time picker | no | 1 Oct 2026, 14:30 (venue time zone) | — | the guest home screens | Must follow `startsAt` when set (decided 28 September, audit R163). Null runs the banner with no end. | on publish (CMS-014): web at once, the app on its next launch |
+| Banners sort order `banners.sortOrder` | number field | no | — | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Is active `banners.isActive` | toggle | no | — | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
 
 ### Promo blocks
 
@@ -361,21 +361,21 @@ Set on `CMS-008` Content Blocks through `createPromoBlock`, `updatePromoBlock`. 
 
 | Element | Control | Required | Allowed values and rules | Default | Reaches | What it changes | When it goes live |
 |---|---|---|---|---|---|---|---|
-| Promo blocks title `promoBlocks.title` | text, one per language | yes | English and Arabic (Arabic right to left) | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Promo blocks description `promoBlocks.description` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Icon `promoBlocks.iconAssetRef` | upload, or pick from the media library | no | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Promotion `promoBlocks.promotionId` | picker: choose a promotion | no | shows names, sends the id | — | GST-001, WEB-001 | Presentation only. A block may point at a promotion; it does not create or price one. | on publish (CMS-014): web at once, the app on its next launch |
-| Promo blocks link target `promoBlocks.linkTarget` | group | no | — | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Link target: kind `promoBlocks.linkTarget.kind` | select | yes | Module · Content page · Product · Event · External URL · App section · None | — | GST-001, WEB-001 | `appSection` points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets. | on publish (CMS-014): web at once, the app on its next launch |
-| Link target: module key `promoBlocks.linkTarget.moduleKey` | select | no | Tickets and booking · Membership · Events · Attractions · Virtual queue · Dining and fnb · Shop · Parking · Gamification · Photo gallery · Wallet · Loyalty … | — | GST-001, WEB-001, WEB-050 | `visitPlanner` (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. | on publish (CMS-014): web at once, the app on its next launch |
-| Link target: app section `promoBlocks.linkTarget.appSection` | select | no | Home · Explore · Plan · Tickets · Map · Account · Buy tickets; Required when `kind` is `appSection`. | — | GST-001, WEB-001 | Required when `kind` is `appSection`. `plan` needs the `visitPlanner` module and `map` the `map` module enabled, or `setNavigation` refuses it. | on publish (CMS-014): web at once, the app on its next launch |
-| Link target: content page `promoBlocks.linkTarget.contentPageId` | picker: choose a content page | no | shows names, sends the id | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Link target: product `promoBlocks.linkTarget.productId` | picker: choose a product | no | shows names, sends the id | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Link target: event `promoBlocks.linkTarget.eventId` | picker: choose an event | no | shows names, sends the id | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Link target: uRL `promoBlocks.linkTarget.url` | text field | no | — | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Promo blocks starts at `promoBlocks.startsAt` | date and time picker | no | 1 Oct 2026, 14:30 (venue time zone) | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Promo blocks ends at `promoBlocks.endsAt` | date and time picker | no | 1 Oct 2026, 14:30 (venue time zone) | — | GST-001, WEB-001 | Must follow `startsAt` when both are set (decided 28 September, audit R163). | on publish (CMS-014): web at once, the app on its next launch |
-| Promo blocks sort order `promoBlocks.sortOrder` | number field | no | — | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
+| Promo blocks title `promoBlocks.title` | text, one per language | yes | English and Arabic (Arabic right to left) | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Promo blocks description `promoBlocks.description` | text, one per language | no | English and Arabic (Arabic right to left) | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Icon `promoBlocks.iconAssetRef` | upload, or pick from the media library | no | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Promotion `promoBlocks.promotionId` | picker: choose a promotion | no | shows names, sends the id | — | the guest home screens | Presentation only. A block may point at a promotion; it does not create or price one. | on publish (CMS-014): web at once, the app on its next launch |
+| Promo blocks link target `promoBlocks.linkTarget` | group | no | — | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Link target: kind `promoBlocks.linkTarget.kind` | select | yes | Module · Content page · Product · Event · External URL · App section · None | — | the guest home screens | `appSection` points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets. | on publish (CMS-014): web at once, the app on its next launch |
+| Link target: module key `promoBlocks.linkTarget.moduleKey` | select | no | Tickets and booking · Membership · Events · Attractions · Virtual queue · Dining and fnb · Shop · Parking · Gamification · Photo gallery · Wallet · Loyalty … | — | WEB-050 | `visitPlanner` (decided 29 September, MOB-1 and the Plan tab in Block A) is the Plan tab and WEB-050; off, the tab and the page are not shown. | on publish (CMS-014): web at once, the app on its next launch |
+| Link target: app section `promoBlocks.linkTarget.appSection` | select | no | Home · Explore · Plan · Tickets · Map · Account · Buy tickets; Required when `kind` is `appSection`. | — | the guest home screens | Required when `kind` is `appSection`. `plan` needs the `visitPlanner` module and `map` the `map` module enabled, or `setNavigation` refuses it. | on publish (CMS-014): web at once, the app on its next launch |
+| Link target: content page `promoBlocks.linkTarget.contentPageId` | picker: choose a content page | no | shows names, sends the id | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Link target: product `promoBlocks.linkTarget.productId` | picker: choose a product | no | shows names, sends the id | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Link target: event `promoBlocks.linkTarget.eventId` | picker: choose an event | no | shows names, sends the id | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Link target: uRL `promoBlocks.linkTarget.url` | text field | no | — | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Promo blocks starts at `promoBlocks.startsAt` | date and time picker | no | 1 Oct 2026, 14:30 (venue time zone) | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Promo blocks ends at `promoBlocks.endsAt` | date and time picker | no | 1 Oct 2026, 14:30 (venue time zone) | — | the guest home screens | Must follow `startsAt` when both are set (decided 28 September, audit R163). | on publish (CMS-014): web at once, the app on its next launch |
+| Promo blocks sort order `promoBlocks.sortOrder` | number field | no | — | — | the guest home screens | — | on publish (CMS-014): web at once, the app on its next launch |
 
 ### Help me choose
 
@@ -409,14 +409,14 @@ Set on `CMS-007` Page Builder through `createContentPage`, `updateContentPage`. 
 
 | Element | Control | Required | Allowed values and rules | Default | Reaches | What it changes | When it goes live |
 |---|---|---|---|---|---|---|---|
-| Slug `pages.slug` | text field | yes | pattern `^[a-z0-9-]+$` | — | GST-040, GST-057, WEB-045 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Content pages title `pages.title` | text, one per language | yes | English and Arabic (Arabic right to left) | — | GST-040, GST-057, WEB-045 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Body `pages.body` | rich text, one per language | yes | English and Arabic (Arabic right to left) | — | GST-040, GST-057, WEB-045 | Keyed by language code. Values are sanitised HTML. | on publish (CMS-014): web at once, the app on its next launch |
-| Content pages is enabled `pages.isEnabled` | toggle | no | — | on | GST-040, GST-057, WEB-045 | BL-005. Enablement is not publication. | on publish (CMS-014): web at once, the app on its next launch |
-| Icon `pages.iconAssetRef` | upload, or pick from the media library | no | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | GST-040, GST-057, WEB-045 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Category code `pages.categoryCode` | text field | no | — | — | GST-040, GST-057, WEB-045 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Content pages sort order `pages.sortOrder` | number field | no | — | — | GST-040, GST-057, WEB-045 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Content pages status `pages.status` | segmented control | no | Draft · Published · Archived | — | GST-040, GST-057, WEB-045 | Only `archived` is taken — send it to withdraw a published page or abandon a draft (`states/content.yaml`). | on publish (CMS-014): web at once, the app on its next launch |
+| Slug `pages.slug` | text field | yes | pattern `^[a-z0-9-]+$` | — | the content and policy pages | — | on publish (CMS-014): web at once, the app on its next launch |
+| Content pages title `pages.title` | text, one per language | yes | English and Arabic (Arabic right to left) | — | the content and policy pages | — | on publish (CMS-014): web at once, the app on its next launch |
+| Body `pages.body` | rich text, one per language | yes | English and Arabic (Arabic right to left) | — | the content and policy pages | Keyed by language code. Values are sanitised HTML. | on publish (CMS-014): web at once, the app on its next launch |
+| Content pages is enabled `pages.isEnabled` | toggle | no | — | on | the content and policy pages | BL-005. Enablement is not publication. | on publish (CMS-014): web at once, the app on its next launch |
+| Icon `pages.iconAssetRef` | upload, or pick from the media library | no | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | the content and policy pages | — | on publish (CMS-014): web at once, the app on its next launch |
+| Category code `pages.categoryCode` | text field | no | — | — | GST-057 | — | on publish (CMS-014): web at once, the app on its next launch |
+| Content pages sort order `pages.sortOrder` | number field | no | — | — | the content and policy pages | — | on publish (CMS-014): web at once, the app on its next launch |
+| Content pages status `pages.status` | segmented control | no | Draft · Published · Archived | — | the content and policy pages | Only `archived` is taken — send it to withdraw a published page or abandon a draft (`states/content.yaml`). | on publish (CMS-014): web at once, the app on its next launch |
 
 ### Policies (terms, privacy, refunds)
 
@@ -424,9 +424,9 @@ Set on `CMS-018` Consent & Legal, `ADM-018` Localisation & Language Pack through
 
 | Element | Control | Required | Allowed values and rules | Default | Reaches | What it changes | When it goes live |
 |---|---|---|---|---|---|---|---|
-| Body `policies.body` | rich text, one per language | yes | English and Arabic (Arabic right to left) | — | GST-040, GST-057, WEB-045 | Keyed by language code. Values are sanitised HTML. | on publish (CMS-014): web at once, the app on its next launch |
-| Requires reconsent `policies.requiresReconsent` | toggle | yes | — | — | GST-040, GST-057, WEB-045 | True prompts existing guests to consent again on next launch. Material changes to a privacy notice generally require it. | on publish (CMS-014): web at once, the app on its next launch |
-| Effective from `policies.effectiveFrom` | date picker | no | 1 Oct 2026 (dd MMM yyyy) | — | GST-040, GST-057, WEB-045 | — | on publish (CMS-014): web at once, the app on its next launch |
+| Body `policies.body` | rich text, one per language | yes | English and Arabic (Arabic right to left) | — | the content and policy pages | Keyed by language code. Values are sanitised HTML. | on publish (CMS-014): web at once, the app on its next launch |
+| Requires reconsent `policies.requiresReconsent` | toggle | yes | — | — | the content and policy pages | True prompts existing guests to consent again on next launch. Material changes to a privacy notice generally require it. | on publish (CMS-014): web at once, the app on its next launch |
+| Effective from `policies.effectiveFrom` | date picker | no | 1 Oct 2026 (dd MMM yyyy) | — | the content and policy pages | — | on publish (CMS-014): web at once, the app on its next launch |
 
 ### FAQs
 
@@ -434,16 +434,16 @@ Set on `ADM-018` Localisation & Language Pack through `setFaqs`. Reaches the FAQ
 
 | Element | Control | Required | Allowed values and rules | Default | Reaches | What it changes | When it goes live |
 |---|---|---|---|---|---|---|---|
-| Categories `faqs.categories` | repeatable rows | yes | — | — | GST-040, WEB-045 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Categories: code `faqs.categories[].code` | text field | yes | — | — | GST-040, WEB-045 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Categories: name `faqs.categories[].name` | text, one per language | yes | English and Arabic (Arabic right to left) | — | GST-040, WEB-045 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Categories: sort order `faqs.categories[].sortOrder` | number field | no | — | — | GST-040, WEB-045 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Categories: entries `faqs.categories[].entries` | repeatable rows | yes | — | — | GST-040, WEB-045 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Entries: iD `faqs.categories[].entries[].id` | picker: choose an id | yes | shows names, sends the id | — | GST-040, WEB-045 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Entries: question `faqs.categories[].entries[].question` | text, one per language | yes | English and Arabic (Arabic right to left) | — | GST-040, WEB-045 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Entries: answer `faqs.categories[].entries[].answer` | rich text, one per language | yes | English and Arabic (Arabic right to left) | — | GST-040, WEB-045 | Keyed by language code. Values are sanitised HTML. | on publish (CMS-014): web at once, the app on its next launch |
-| Entries: sort order `faqs.categories[].entries[].sortOrder` | number field | no | — | — | GST-040, WEB-045 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Entries: is published `faqs.categories[].entries[].isPublished` | toggle | no | — | — | GST-040, WEB-045 | — | on publish (CMS-014): web at once, the app on its next launch |
+| Categories `faqs.categories` | repeatable rows | yes | — | — | the FAQ screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Categories: code `faqs.categories[].code` | text field | yes | — | — | the FAQ screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Categories: name `faqs.categories[].name` | text, one per language | yes | English and Arabic (Arabic right to left) | — | the FAQ screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Categories: sort order `faqs.categories[].sortOrder` | number field | no | — | — | the FAQ screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Categories: entries `faqs.categories[].entries` | repeatable rows | yes | — | — | the FAQ screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Entries: iD `faqs.categories[].entries[].id` | picker: choose an id | yes | shows names, sends the id | — | the FAQ screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Entries: question `faqs.categories[].entries[].question` | text, one per language | yes | English and Arabic (Arabic right to left) | — | the FAQ screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Entries: answer `faqs.categories[].entries[].answer` | rich text, one per language | yes | English and Arabic (Arabic right to left) | — | the FAQ screens | Keyed by language code. Values are sanitised HTML. | on publish (CMS-014): web at once, the app on its next launch |
+| Entries: sort order `faqs.categories[].entries[].sortOrder` | number field | no | — | — | the FAQ screens | — | on publish (CMS-014): web at once, the app on its next launch |
+| Entries: is published `faqs.categories[].entries[].isPublished` | toggle | no | — | — | the FAQ screens | — | on publish (CMS-014): web at once, the app on its next launch |
 
 ### Availability and maintenance
 
@@ -484,7 +484,7 @@ Set on `CMS-013` SEO & Metadata through `setSeoMetadata`. Reaches every website 
 |---|---|---|---|---|---|---|---|
 | Entity kind `seo.entityKind` | select | yes | Content page · Product · Event · Performance · Membership · Promotion · Venue | — | every website screen | — | on publish (CMS-014): web at once, the app on its next launch |
 | Entity `seo.entityId` | picker: choose an entity | yes | shows names, sends the id | — | every website screen | — | on publish (CMS-014): web at once, the app on its next launch |
-| Locale `seo.locale` | text field | no | — | — | GST-031, GST-073, WEB-010, WEB-011, WEB-017, WEB-024, WEB-027, WEB-044 | — | on publish (CMS-014): web at once, the app on its next launch |
+| Locale `seo.locale` | text field | no | — | — | GST-031, GST-073, WEB-011, WEB-017, WEB-024, WEB-027, WEB-044 | — | on publish (CMS-014): web at once, the app on its next launch |
 | SEO metadata title `seo.title` | text field | no | — | — | every website screen | — | on publish (CMS-014): web at once, the app on its next launch |
 | Meta description `seo.metaDescription` | text field | no | — | — | every website screen | — | on publish (CMS-014): web at once, the app on its next launch |
 | Keywords `seo.keywords` | list of values (chips) | no | — | — | every website screen | — | on publish (CMS-014): web at once, the app on its next launch |
@@ -589,7 +589,7 @@ Every guest screen takes the shell-wide parts (brand, theme, fonts, header, navi
 
 | Screen | Takes |
 |---|---|
-| `GST-001` Home | Brand (2); Booking settings (tenant, with per-venue overrides) (1); Homepage sections (8); Banners (16); Promo blocks (15); Availability and maintenance (14); Cookie banner (22) |
+| `GST-001` Home | Brand (2); Booking settings (tenant, with per-venue overrides) (1); Homepage sections (2); Availability and maintenance (14); Cookie banner (22) |
 | `GST-002` Explore | Booking settings (tenant, with per-venue overrides) (5) |
 | `GST-003` Buy Tickets | Navigation (1); Booking settings (tenant, with per-venue overrides) (5); Help me choose (19) |
 | `GST-004` Item Detail | Booking settings (tenant, with per-venue overrides) (4) |
@@ -628,7 +628,7 @@ Every guest screen takes the shell-wide parts (brand, theme, fonts, header, navi
 | `GST-037` Offers & Promotions | the shell only |
 | `GST-038` At the Venue | Availability and maintenance (14) |
 | `GST-039` Profile | the shell only |
-| `GST-040` Help & Support | Content pages (8); Policies (terms, privacy, refunds) (3); FAQs (10); Availability and maintenance (14) |
+| `GST-040` Help & Support | Availability and maintenance (14) |
 | `GST-041` Checkout Entry | Booking settings (tenant, with per-venue overrides) (61); Booking flows (16) |
 | `GST-042` Simple Registration & OTP | Booking settings (tenant, with per-venue overrides) (2); Cookie banner (1) |
 | `GST-043` Arabic / RTL Experience | the shell only |
@@ -645,7 +645,7 @@ Every guest screen takes the shell-wide parts (brand, theme, fonts, header, navi
 | `GST-054` AI Planner | the shell only |
 | `GST-055` Dynamic QR Ticket | the shell only |
 | `GST-056` Bundle Package | the shell only |
-| `GST-057` Accessibility Information | Content pages (8); Policies (terms, privacy, refunds) (3) |
+| `GST-057` Accessibility Information | Content pages (1) |
 | `GST-058` Resource Availability (Cabana) | the shell only |
 | `GST-059` Plan in Progress | the shell only |
 | `GST-061` Menu Item Detail | the shell only |
@@ -683,7 +683,7 @@ Every guest screen takes the shell-wide parts (brand, theme, fonts, header, navi
 | `KSK-015` Assistant | the shell only |
 | `KSK-016` Order Food | the shell only |
 | `KSK-017` Shop | the shell only |
-| `WEB-001` Home / Landing | Booking settings (tenant, with per-venue overrides) (7); Homepage sections (8); Banners (16); Promo blocks (15); Availability and maintenance (14); Cookie banner (22) |
+| `WEB-001` Home / Landing | Booking settings (tenant, with per-venue overrides) (7); Availability and maintenance (14); Cookie banner (22) |
 | `WEB-002` Event & Attraction Listing | Booking settings (tenant, with per-venue overrides) (9); Help me choose (19) |
 | `WEB-003` Search Results | Booking settings (tenant, with per-venue overrides) (2) |
 | `WEB-004` Attraction Details | Booking settings (tenant, with per-venue overrides) (6) |
@@ -692,7 +692,7 @@ Every guest screen takes the shell-wide parts (brand, theme, fonts, header, navi
 | `WEB-007` Interactive Seat Selection | Booking settings (tenant, with per-venue overrides) (61); Booking flows (16) |
 | `WEB-008` Add-ons & Upsell | Booking settings (tenant, with per-venue overrides) (61); Booking flows (16) |
 | `WEB-009` Wishlist | the shell only |
-| `WEB-010` Shopping Cart | Booking settings (tenant, with per-venue overrides) (61); Booking flows (16); SEO metadata (1) |
+| `WEB-010` Shopping Cart | Booking settings (tenant, with per-venue overrides) (61); Booking flows (16) |
 | `WEB-011` Guest Details & Attendee Forms | Footer (1); Booking settings (tenant, with per-venue overrides) (61); Booking flows (16); SEO metadata (1) |
 | `WEB-012` Checkout — Payment | Booking settings (tenant, with per-venue overrides) (61); Booking flows (16) |
 | `WEB-013` Booking Confirmation | the shell only |
@@ -727,7 +727,7 @@ Every guest screen takes the shell-wide parts (brand, theme, fonts, header, navi
 | `WEB-042` Retail & Shop and Drop | the shell only |
 | `WEB-043` Loyalty & Rewards | the shell only |
 | `WEB-044` AI Concierge – Home | Booking settings (tenant, with per-venue overrides) (2); SEO metadata (1) |
-| `WEB-045` Help Centre & Accessibility | Content pages (8); Policies (terms, privacy, refunds) (3); FAQs (10); Availability and maintenance (14) |
+| `WEB-045` Help Centre & Accessibility | Availability and maintenance (14) |
 | `WEB-046` In-Venue Notifications | the shell only |
 | `WEB-047` Map Booking — Cabanas & Spots | the shell only |
 | `WEB-048` Book a Space by the Hour | the shell only |

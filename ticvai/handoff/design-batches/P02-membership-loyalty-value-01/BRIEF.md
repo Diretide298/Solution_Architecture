@@ -1,6 +1,6 @@
 # P02-membership-loyalty-value-01 — P02 · Membership, Loyalty & Value
 
-**3 screens · 22 operations · 37 schemas · 11 permissions**
+**3 screens · 21 operations · 37 schemas · 11 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -69,8 +69,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-011` | Wallet Overview | A | 0 | 28 | 6 | 30 | 14 | 6 | guest | notStarted (designed) |
-| `GST-015` | Memberships | A | 10 | 72 | 6 | 53 | 7 | 0 | guest | notStarted (designed) |
+| `GST-011` | Wallet Overview | A | 0 | 13 | 6 | 30 | 14 | 6 | guest | notStarted (designed) |
+| `GST-015` | Memberships | A | 10 | 42 | 6 | 53 | 7 | 0 | guest | notStarted (designed) |
 | `GST-036` | Loyalty & Rewards | A | 0 | 30 | 6 | 52 | 2 | 2 | guest | notStarted (designed) |
 
 ## Thin screens in this batch

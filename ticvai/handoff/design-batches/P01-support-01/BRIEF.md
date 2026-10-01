@@ -1,6 +1,6 @@
 # P01-support-01 — P01 · Support
 
-**2 screens · 6 operations · 17 schemas · 1 permissions**
+**2 screens · 7 operations · 18 schemas · 0 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 1 permissions apply here:
-  `TENANT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 0 permissions apply here:
+  ``. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store. Offline, a screen shows what was already loaded, under the banner below.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
@@ -69,7 +69,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `WEB-034` | Lost & Found | A | 8 | 28 | 6 | 0 | 1 | 0 | guest | review (client-verified) |
-| `WEB-045` | Help Centre & Accessibility | A | 0 | 41 | 6 | 3 | 3 | 0 | guest | review (client-verified) |
+| `WEB-045` | Help Centre & Accessibility | A | 0 | 27 | 6 | 0 | 3 | 0 | guest | review (client-verified) |
 
 ## Design inputs from the client meetings
 

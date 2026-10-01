@@ -68,7 +68,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `WEB-032` | Offers & Promotions | A | 3 | 28 | 6 | 1 | 0 | 2 | guest | review (client-verified) |
+| `WEB-032` | Offers & Promotions | A | 0 | 13 | 6 | 1 | 0 | 2 | guest | review (client-verified) |
+
+## Thin screens in this batch
+
+**WEB-032 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

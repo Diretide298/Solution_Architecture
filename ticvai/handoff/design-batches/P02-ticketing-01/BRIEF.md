@@ -1,6 +1,6 @@
 # P02-ticketing-01 — P02 · Ticketing
 
-**4 screens · 8 operations · 20 schemas · 4 permissions**
+**4 screens · 8 operations · 22 schemas · 4 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -51,7 +51,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 4 permissions apply here:
   `LEDGER_VIEW, ORDER_CANCEL, ORDER_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **3 of these operations work offline**: listFxRates, listOrders, listProducts
+- **2 of these operations work offline**: listFxRates, listProducts
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -69,14 +69,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-014` | Ticket Transfer | A | 12 | 14 | 6 | 10 | 4 | 0 | guest | notStarted (client-verified) |
-| `GST-016` | My Reservations | A | 2 | 12 | 6 | 1 | 2 | 0 | guest | notStarted (client-verified) |
+| `GST-014` | Ticket Transfer | A | 5 | 18 | 6 | 5 | 4 | 0 | guest | notStarted (client-verified) |
+| `GST-016` | My Reservations | A | 0 | 8 | 6 | 1 | 2 | 0 | guest | notStarted (client-verified) |
 | `GST-017` | Reservation Details | A | 0 | 6 | 5 | 1 | 3 | 0 | guest | notStarted (client-verified) |
-| `GST-044` | Multi-Currency & Pricing | A | 3 | 34 | 6 | 12 | 2 | 4 | guest | notStarted (client-verified) |
+| `GST-044` | Multi-Currency & Pricing | A | 0 | 9 | 6 | 12 | 2 | 4 | guest | notStarted (client-verified) |
 
 ## Thin screens in this batch
 
-**GST-017 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**GST-014, GST-016, GST-017, GST-044 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

@@ -1037,79 +1037,6 @@
    "callCentre"
   ]
  },
- "ContentPage": {
-  "x-ticvai-persistence": "whitelabel.content_page",
-  "type": "object",
-  "required": [
-   "id",
-   "slug",
-   "title",
-   "body",
-   "status"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "slug": {
-    "type": "string",
-    "pattern": "^[a-z0-9-]+$"
-   },
-   "title": {
-    "$ref": "#/components/schemas/LocalisedText"
-   },
-   "body": {
-    "$ref": "#/components/schemas/LocalisedRichText"
-   },
-   "isEnabled": {
-    "type": "boolean",
-    "default": true,
-    "description": "BL-005. **Enablement is not publication.** A published page that is disabled exists, keeps its URL and its history, and does not render — which is what a tenant wants when a section is seasonal.\n**Unpublishing loses the version; disabling does not.** Collapsing them means a venue turning off its water-park section for winter has to republish it every spring.\n"
-   },
-   "status": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/ContentStatus"
-     }
-    ],
-    "readOnly": true,
-    "description": "Created as `draft`, published by `publishTenantConfig`, archived through `updateContentPage` (`states/content.yaml`)."
-   },
-   "iconAssetRef": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "categoryCode": {
-    "type": "string",
-    "nullable": true
-   },
-   "sortOrder": {
-    "type": "integer"
-   },
-   "isReferenced": {
-    "type": "boolean",
-    "readOnly": true,
-    "x-ticvai-derived": "onWrite",
-    "description": "True when navigation or the homepage links to this page. Blocks deletion. Maintained by `setNavigation` and `setHomepageLayout` in the same transaction as the links they write."
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
-   }
-  }
- },
- "ContentStatus": {
-  "type": "string",
-  "enum": [
-   "draft",
-   "published",
-   "archived"
-  ]
- },
  "Conversation": {
   "type": "object",
   "x-ticvai-persistence": "marketing.conversation",
@@ -1498,60 +1425,6 @@
    "collectionPoint",
    "namedLocation"
   ]
- },
- "FaqCategory": {
-  "x-ticvai-persistence": "whitelabel.faq_category + whitelabel.faq_entry",
-  "type": "object",
-  "required": [
-   "code",
-   "name",
-   "entries"
-  ],
-  "properties": {
-   "code": {
-    "type": "string"
-   },
-   "name": {
-    "$ref": "#/components/schemas/LocalisedText"
-   },
-   "sortOrder": {
-    "type": "integer"
-   },
-   "entries": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "id",
-      "question",
-      "answer"
-     ],
-     "properties": {
-      "id": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "question": {
-       "$ref": "#/components/schemas/LocalisedText"
-      },
-      "answer": {
-       "$ref": "#/components/schemas/LocalisedRichText"
-      },
-      "sortOrder": {
-       "type": "integer"
-      },
-      "isPublished": {
-       "type": "boolean"
-      }
-     }
-    }
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
-   }
-  }
  },
  "FnbOrderStatus": {
   "type": "string",
@@ -2577,6 +2450,16 @@
    }
   }
  },
+ "PolicyKind": {
+  "type": "string",
+  "enum": [
+   "privacy",
+   "termsAndConditions",
+   "refund",
+   "cookie",
+   "accessibility"
+  ]
+ },
  "Product": {
   "x-ticvai-persistence": "catalogue.product",
   "type": "object",
@@ -3077,6 +2960,129 @@
     "nullable": true,
     "readOnly": true,
     "description": "Hash of the change set approved; execution refuses a plan whose hash differs (AIC-181)."
+   }
+  }
+ },
+ "PublishedContentPage": {
+  "x-ticvai-persistence": "none — a public projection of whitelabel.content_page",
+  "type": "object",
+  "x-ticvai-agreed": "2 October: decided by Chinmay, fix before Block A starts (GFIX-2)",
+  "description": "A live content page as a guest reads it (`listPublishedContentPages`). Only published and enabled pages exist in this view, so it carries no status.",
+  "required": [
+   "id",
+   "slug",
+   "title",
+   "body"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "slug": {
+    "type": "string",
+    "pattern": "^[a-z0-9-]+$"
+   },
+   "title": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "body": {
+    "$ref": "#/components/schemas/LocalisedRichText"
+   },
+   "iconAssetRef": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "categoryCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "sortOrder": {
+    "type": "integer"
+   }
+  }
+ },
+ "PublishedFaqCategory": {
+  "x-ticvai-persistence": "none — a public projection of whitelabel.faq_category + whitelabel.faq_entry",
+  "type": "object",
+  "x-ticvai-agreed": "2 October: decided by Chinmay, fix before Block A starts (GFIX-2)",
+  "description": "One FAQ category with its published entries only (`listPublishedFaqs`).",
+  "required": [
+   "code",
+   "name",
+   "entries"
+  ],
+  "properties": {
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "sortOrder": {
+    "type": "integer"
+   },
+   "entries": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "id",
+      "question",
+      "answer"
+     ],
+     "properties": {
+      "id": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "question": {
+       "$ref": "#/components/schemas/LocalisedText"
+      },
+      "answer": {
+       "$ref": "#/components/schemas/LocalisedRichText"
+      },
+      "sortOrder": {
+       "type": "integer"
+      }
+     }
+    }
+   }
+  }
+ },
+ "PublishedPolicy": {
+  "x-ticvai-persistence": "none — a public projection of whitelabel.policy",
+  "type": "object",
+  "x-ticvai-agreed": "2 October: decided by Chinmay, fix before Block A starts (GFIX-2)",
+  "description": "The current version of one policy as a guest reads it (`listPublishedPolicies`). Who published it and the partition key stay on `Policy`.",
+  "required": [
+   "kind",
+   "version",
+   "body",
+   "effectiveFrom"
+  ],
+  "properties": {
+   "kind": {
+    "$ref": "#/components/schemas/PolicyKind"
+   },
+   "title": {
+    "type": "string"
+   },
+   "version": {
+    "type": "string",
+    "description": "The version a consent records (a guest who consented to version 3 consented to version 3)."
+   },
+   "body": {
+    "$ref": "#/components/schemas/LocalisedRichText"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "requiresReconsent": {
+    "type": "boolean",
+    "description": "True when guests who consented to an earlier version are asked again on next launch."
    }
   }
  },

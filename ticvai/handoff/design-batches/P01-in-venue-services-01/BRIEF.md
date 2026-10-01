@@ -1,6 +1,6 @@
 # P01-in-venue-services-01 — P01 · In-venue Services
 
-**6 screens · 28 operations · 62 schemas · 6 permissions**
+**6 screens · 26 operations · 54 schemas · 5 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 6 permissions apply here:
-  `ORDER_CREATE, ORDER_MODIFY, PARKING_CONFIGURE, PRODUCT_VIEW, QUEUE_VIEW, VENUE_MAP_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `ORDER_MODIFY, PARKING_CONFIGURE, PRODUCT_VIEW, QUEUE_VIEW, VENUE_MAP_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store. Offline, a screen shows what was already loaded, under the banner below.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
@@ -71,9 +71,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `WEB-036` | F&B – Browse & Order | A | 57 | 61 | 6 | 27 | 11 | 0 | guest | review (client-verified) |
 | `WEB-037` | Menu Item Detail | A | 0 | 21 | 6 | 5 | 2 | 2 | guest | review (client-verified) |
 | `WEB-038` | F&B – Order Tracking | A | 2 | 14 | 6 | 1 | 0 | 0 | guest | review (client-verified) |
-| `WEB-039` | Venue Map & Wait Times | A | 2 | 47 | 6 | 5 | 4 | 6 | guest | review (client-verified) |
+| `WEB-039` | Venue Map & Wait Times | A | 0 | 18 | 6 | 5 | 4 | 6 | guest | review (client-verified) |
 | `WEB-040` | Virtual Queue | A | 13 | 27 | 6 | 13 | 3 | 6 | guest | review (client-verified) |
-| `WEB-041` | Parking – Reserve & Pay | A | 44 | 25 | 7 | 25 | 2 | 2 | guest | review (client-verified) |
+| `WEB-041` | Parking – Reserve & Pay | A | 22 | 2 | 7 | 7 | 2 | 2 | guest | review (client-verified) |
 
 ## Design inputs from the client meetings
 

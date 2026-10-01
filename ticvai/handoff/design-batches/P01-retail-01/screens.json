@@ -44,27 +44,6 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Outlet id",
-       "operation": "listMerchandise",
-       "notes": "Sends `?outletId=` to `listMerchandise`.",
-       "provenance": "contract retail.yaml GET /merchandise"
-      },
-      {
-       "kind": "textField",
-       "label": "Category id",
-       "operation": "listMerchandise",
-       "notes": "Sends `?categoryId=` to `listMerchandise`.",
-       "provenance": "contract retail.yaml GET /merchandise"
-      },
-      {
-       "kind": "toggle",
-       "label": "In stock only",
-       "operation": "listMerchandise",
-       "notes": "Sends `?inStockOnly=` to `listMerchandise`.",
-       "provenance": "contract retail.yaml GET /merchandise"
-      },
-      {
        "kind": "searchField",
        "label": "Search",
        "operation": "listMerchandise",
@@ -72,63 +51,42 @@
        "provenance": "contract retail.yaml GET /merchandise"
       },
       {
-       "kind": "dataTable",
-       "label": "Every merchandise",
+       "kind": "cardList",
+       "label": "Products",
        "bindsTo": "MerchandiseItem",
        "columns": [
-        "MerchandiseItem.id",
-        "MerchandiseItem.sku",
-        "MerchandiseItem.barcode",
         "MerchandiseItem.name",
-        "MerchandiseItem.outletId",
-        "MerchandiseItem.categoryId",
-        "MerchandiseItem.variantId",
-        "MerchandiseItem.inventoryItemId",
+        "MerchandiseItem.description",
+        "MerchandiseItem.imageAssetRef",
         "MerchandiseItem.price",
-        "MerchandiseItem.onHand",
-        "MerchandiseItem.isReturnable",
-        "MerchandiseItem.returnWindowDays"
+        "MerchandiseItem.isReturnable"
        ],
        "operation": "listMerchandise",
-       "provenance": "contract retail.yaml GET /merchandise"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Was the generated table 'Every merchandise'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
        "kind": "searchField",
        "derived": true,
        "impliedBy": "lookupMerchandise",
        "label": "Search",
-       "notes": "A search that returns nothing must say so differently from a search not yet run.",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
+       "notes": "The product's current price and stock at the chosen shop when its page opens (`lookupMerchandise`); a guest never scans a barcode.",
+       "provenance": "carried from the previous definition",
+       "operation": "lookupMerchandise"
+      },
       {
-       "kind": "detailPanel",
-       "label": "The selected merchandise",
-       "bindsTo": "MerchandiseItem",
-       "columns": [
-        "MerchandiseItem.id",
-        "MerchandiseItem.sku",
-        "MerchandiseItem.barcode",
-        "MerchandiseItem.name",
-        "MerchandiseItem.outletId",
-        "MerchandiseItem.categoryId",
-        "MerchandiseItem.variantId",
-        "MerchandiseItem.inventoryItemId",
-        "MerchandiseItem.price",
-        "MerchandiseItem.onHand",
-        "MerchandiseItem.isReturnable",
-        "MerchandiseItem.returnWindowDays",
-        "MerchandiseItem.requiresSerialNumber",
-        "MerchandiseItem.imageAssetRef",
-        "MerchandiseItem.isActive"
-       ],
+       "kind": "selectField",
+       "label": "Shop",
        "operation": "listMerchandise",
-       "provenance": "contract retail.yaml GET /merchandise"
+       "notes": "The venue's shops by name; sends the chosen shop's `outletId`.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Category",
+       "operation": "listMerchandise",
+       "notes": "The shop's categories by name; sends the chosen `categoryId`.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       }
      ]
     },
@@ -136,13 +94,6 @@
      "name": "actionBar",
      "slot": "rowActions",
      "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Lookup merchandise",
-       "operation": "lookupMerchandise",
-       "notes": "Sends `?outletId=` — the outlet the guest is browsing — because a web caller has no workstation; price and stock are that outlet's, and an inactive item is not found (decided 28 September, audit R215 (1)).",
-       "provenance": "contract retail.yaml GET /merchandise/lookup"
-      },
       {
        "kind": "secondaryButton",
        "label": "Check out to collect on the way out",
@@ -157,10 +108,11 @@
        "provenance": "contract orders.yaml POST /payments"
       },
       {
-       "kind": "secondaryButton",
-       "label": "Add cart line",
+       "kind": "primaryButton",
+       "label": "Add to cart",
        "operation": "addCartLine",
-       "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
+       "notes": "Adds the product with the quantity on its card (`addCartLine`).",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       }
      ]
     }
@@ -170,7 +122,7 @@
    "loading": "The shop list.",
    "error": "Could not load. Names which read failed and leaves the shop untouched.",
    "emptyFirstRun": "No shop yet. Offers Add cart line (`addCartLine`); distinct from a filter that matched nothing.",
-   "emptyNoResults": "Nothing matches the filter on outletId, categoryId, inStockOnly, search and the shop are still there. Names the active filter and offers to clear it.",
+   "emptyNoResults": "Nothing matches the shop, category or search picked; the other products are still there. Names it and offers to clear it.",
    "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
@@ -243,31 +195,6 @@
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
-  "overlays": [
-   {
-    "id": "formAddCartLine",
-    "component": "modal",
-    "trigger": "Add cart line",
-    "body": "**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "AddCartLineRequest",
-    "confirm": {
-     "label": "Add cart line",
-     "operation": "addCartLine"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "variantId",
-      "quantity",
-      "performanceId",
-      "seatIds",
-      "parentLineId",
-      "attributes"
-     ]
-    },
-    "provenance": "client-verified"
-   }
-  ],
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -467,7 +394,7 @@
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows, and lookup cannot run.** A drop reference already on screen stays visible so the guest can quote it at the collection point. Reserving merchandise needs the connection."
   },
   "apis": [

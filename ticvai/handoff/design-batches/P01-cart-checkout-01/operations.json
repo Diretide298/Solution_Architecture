@@ -406,6 +406,25 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listPublishedPolicies": {
+  "method": "GET",
+  "path": "/storefront/policies",
+  "contract": "white-label",
+  "summary": "The tenant's current legal policies, readable before sign-in",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "PublishedPolicy"
+ },
  "payByLink": {
   "method": "POST",
   "path": "/payment-links/{token}/pay",
@@ -548,25 +567,6 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "transferOrderTickets": {
-  "method": "POST",
-  "path": "/orders/{orderId}/transfer",
-  "contract": "orders",
-  "summary": "Transfer tickets to another guest",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
   "parameters": [
    {
     "name": null,

@@ -1,6 +1,6 @@
 # P05-sell-01 — P05 · Sell (1 of 2)
 
-**10 screens · 13 operations · 49 schemas · 5 permissions**
+**10 screens · 13 operations · 47 schemas · 5 permissions**
 
 Platform P05 Guest Kiosk · ships as **guest** ·
 guest audience · kiosk ·
@@ -49,7 +49,7 @@ convincingly. It is never a caption.
 ## Rules that are not style preferences
 
 - **Every control that can be refused must be gated.** 5 permissions apply here:
-  `ORDER_CREATE, ORDER_VIEW, PRICE_VIEW, PRODUCT_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
+  `ORDER_CREATE, ORDER_REPRINT, ORDER_VIEW, PRICE_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -68,19 +68,19 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `KSK-001` | Attract Loop | B–D | 0 | 0 | 4 | 0 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-002` | Language Select | B–D | 0 | 28 | 5 | 5 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-003` | What are you buying | B–D | 3 | 28 | 6 | 12 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-004` | Choose tickets | B–D | 0 | 20 | 6 | 14 | 2 | 0 | guest | notStarted (generated) |
-| `KSK-005` | Choose a performance | B–D | 19 | 15 | 5 | 9 | 1 | 0 | guest | notStarted (generated) |
-| `KSK-006` | Review | B–D | 41 | 16 | 5 | 29 | 1 | 0 | guest | notStarted (generated) |
-| `KSK-007` | Payment | B–D | 20 | 0 | 5 | 9 | 2 | 0 | guest | notStarted (generated) |
+| `KSK-002` | Language Select | B–D | 1 | 20 | 5 | 0 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-003` | What are you buying | B–D | 0 | 4 | 6 | 12 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-004` | Choose tickets | B–D | 0 | 17 | 6 | 14 | 2 | 0 | guest | notStarted (generated) |
+| `KSK-005` | Choose a performance | B–D | 0 | 35 | 5 | 9 | 1 | 0 | guest | notStarted (generated) |
+| `KSK-006` | Review | B–D | 10 | 29 | 5 | 29 | 1 | 0 | guest | notStarted (generated) |
+| `KSK-007` | Payment | B–D | 0 | 20 | 5 | 9 | 2 | 0 | guest | notStarted (generated) |
 | `KSK-008` | Payment unresolved | B–D | 0 | 0 | 5 | 0 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-009` | Ticket issued | B–D | 5 | 16 | 5 | 9 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-010` | Print failure | B–D | 8 | 0 | 4 | 5 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-009` | Ticket issued | B–D | 5 | 10 | 5 | 10 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-010` | Print failure | B–D | 6 | 0 | 4 | 6 | 0 | 0 | guest | notStarted (generated) |
 
 ## Thin screens in this batch
 
-**KSK-001, KSK-002, KSK-004, KSK-005, KSK-008, KSK-009 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**KSK-001, KSK-002, KSK-003, KSK-004, KSK-005, KSK-007, KSK-008, KSK-009, KSK-010 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

@@ -3865,7 +3865,7 @@
   "white-label": {
    "title": "19 — Guest Mobile App & Branding (builder)",
    "capabilityCount": 3,
-   "unguardedOperations": 5,
+   "unguardedOperations": 9,
    "capabilities": [
     {
      "key": "MARKETING_VIEW",

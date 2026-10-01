@@ -281,58 +281,6 @@
   "requestBody": null,
   "responds": "BundleSummary"
  },
- "listContentPages": {
-  "method": "GET",
-  "path": "/tenant-config/pages",
-  "contract": "white-label",
-  "summary": "List custom content pages",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "categoryCode",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "slug",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "listFaqs": {
-  "method": "GET",
-  "path": "/tenant-config/faqs",
-  "contract": "white-label",
-  "summary": "List FAQs",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "FaqCategory"
- },
  "listMyCases": {
   "method": "GET",
   "path": "/my/cases",
@@ -444,6 +392,72 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "listPublishedContentPages": {
+  "method": "GET",
+  "path": "/storefront/pages",
+  "contract": "white-label",
+  "summary": "The live content pages, readable before sign-in",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "categoryCode",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "slug",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPublishedFaqs": {
+  "method": "GET",
+  "path": "/storefront/faqs",
+  "contract": "white-label",
+  "summary": "The published FAQs, readable before sign-in",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PublishedFaqCategory"
+ },
+ "listPublishedPolicies": {
+  "method": "GET",
+  "path": "/storefront/policies",
+  "contract": "white-label",
+  "summary": "The tenant's current legal policies, readable before sign-in",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "PublishedPolicy"
  },
  "listVisitPlanAlternatives": {
   "method": "GET",

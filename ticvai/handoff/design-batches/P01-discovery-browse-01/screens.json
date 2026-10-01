@@ -290,128 +290,32 @@
        "provenance": "contract white-label.yaml GET /tenant-config/status"
       },
       {
-       "kind": "textField",
-       "label": "Kind",
-       "operation": "listProducts",
-       "notes": "Sends `?kind=` to `listProducts`.",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "toggle",
-       "label": "Is sellable",
-       "operation": "listProducts",
-       "notes": "Sends `?isSellable=` to `listProducts`.",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every product",
+       "kind": "cardList",
+       "label": "What's on",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
-        "Product.code",
         "Product.name",
         "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
-        "Product.onSaleFrom",
-        "Product.onSaleTo"
+        "Product.media",
+        "Product.displayTags"
        ],
        "operation": "listProducts",
-       "provenance": "contract catalogue.yaml GET /products"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Guest cards show name, image, from-price, tags and availability only (DI-026). The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
        "kind": "banner",
        "bindsTo": "TenantAppStatus.maintenanceMessage",
        "notes": "Only when isInMaintenance. Tenant-branded, never a generic error page",
-       "provenance": "carried from the previous definition"
+       "provenance": "carried from the previous definition",
+       "operation": "getTenantAppStatus"
       },
       {
        "kind": "cardList",
        "bindsTo": "HomepageLayout.sections",
-       "notes": "Section order comes from tenant configuration (WLB-011), not from code. A section referencing a disabled module must not render at all",
-       "provenance": "carried from the previous definition"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected product",
-       "bindsTo": "Product",
-       "columns": [
-        "Product.id",
-        "Product.code",
-        "Product.name",
-        "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
-        "Product.onSaleFrom",
-        "Product.onSaleTo",
-        "Product.categoryId",
-        "Product.lifecycleState",
-        "Product.isSellable",
-        "Product.isStockTracked"
-       ],
-       "operation": "listProducts",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The tenant config",
-       "bindsTo": "TenantConfig",
-       "columns": [
-        "TenantConfig.isDraft",
-        "TenantConfig.brand",
-        "TenantConfig.appIcons",
-        "TenantConfig.bookingFlow",
-        "TenantConfig.theme",
-        "TenantConfig.fonts",
-        "TenantConfig.footer",
-        "TenantConfig.notificationBranding",
-        "TenantConfig.enabledPaymentMethods",
-        "TenantConfig.accessibility",
-        "TenantConfig.header",
-        "TenantConfig.navigation",
-        "TenantConfig.homepage",
-        "TenantConfig.modules",
-        "TenantConfig.features",
-        "TenantConfig.languages"
-       ],
-       "operation": "getTenantConfig",
-       "provenance": "contract white-label.yaml GET /tenant-config"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The tenant app status",
-       "bindsTo": "TenantAppStatus",
-       "columns": [
-        "TenantAppStatus.isPublished",
-        "TenantAppStatus.publishedVersion",
-        "TenantAppStatus.publishedAt",
-        "TenantAppStatus.draftVersion",
-        "TenantAppStatus.hasUnpublishedChanges",
-        "TenantAppStatus.activeModuleCount",
-        "TenantAppStatus.licensedModuleCount",
-        "TenantAppStatus.activePageCount",
-        "TenantAppStatus.isInMaintenance",
-        "TenantAppStatus.maintenanceMessage",
-        "TenantAppStatus.expectedBackAt",
-        "TenantAppStatus.recentChanges"
-       ],
-       "operation": "getTenantAppStatus",
-       "provenance": "contract white-label.yaml GET /tenant-config/status"
+       "notes": "Section order comes from tenant configuration (WLB-011), not from code. A section referencing a disabled module must not render at all The sections, their order and their styling come from `getPublishedTenantConfig` `homepage`, read with no session (GFIX-1).",
+       "provenance": "carried from the previous definition",
+       "operation": "getPublishedTenantConfig"
       }
      ]
     },
@@ -444,7 +348,7 @@
    "loading": "The home landing list.",
    "error": "Could not load. Names which read failed and leaves the home landing untouched.",
    "emptyFirstRun": "No home landing yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the home landing are still there. Names the active filter and offers to clear it.",
+   "emptyNoResults": "Nothing is on sale at this venue today. Said in the tenant's voice, with **Change venue**; the homepage sections that do not list products stay.",
    "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
@@ -456,10 +360,11 @@
     "contract": "white-label"
    },
    {
-    "operationId": "getTenantConfig",
+    "operationId": "getPublishedTenantConfig",
     "contract": "white-label",
-    "purpose": "Full working configuration",
-    "trigger": "onLoad"
+    "purpose": "The published brand, theme, fonts, header, footer, navigation, homepage, booking-flow display settings and languages, read before anyone signs in (GFIX-1)",
+    "trigger": "onLoad",
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-1)"
    },
    {
     "operationId": "listProducts",
@@ -540,6 +445,14 @@
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "gaps": [
+   {
+    "operation": "getTenantConfig",
+    "removed": true,
+    "why": "Replaced by `getPublishedTenantConfig`, the guest read of the same data.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-1)"
+   }
+  ],
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -636,81 +549,10 @@
        "provenance": "decided 29 September, rev 3 REV3-16, 23SEP-18"
       },
       {
-       "kind": "textField",
-       "label": "Venue id",
-       "operation": "listProducts",
-       "notes": "Sends `?venueId=` to `listProducts`.",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "textField",
-       "label": "Kind",
-       "operation": "listProducts",
-       "notes": "Sends `?kind=` to `listProducts`.",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "toggle",
-       "label": "Is sellable",
-       "operation": "listProducts",
-       "notes": "Sends `?isSellable=` to `listProducts`.",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every product",
-       "bindsTo": "Product",
-       "columns": [
-        "Product.id",
-        "Product.code",
-        "Product.name",
-        "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
-        "Product.onSaleFrom",
-        "Product.onSaleTo"
-       ],
-       "operation": "listProducts",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every performance",
-       "bindsTo": "Performance",
-       "columns": [
-        "Performance.id",
-        "Performance.eventId",
-        "Performance.startsAt",
-        "Performance.endsAt",
-        "Performance.approvalRequestId",
-        "Performance.requiresApprovalToCancel",
-        "Performance.status",
-        "Performance.admissionRulesId",
-        "Performance.seatMapId"
-       ],
-       "operation": "listPerformances",
-       "provenance": "contract catalogue.yaml GET /events/{eventId}/performances"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every money",
-       "bindsTo": "Money",
-       "columns": [
-        "Money.amount",
-        "Money.currency",
-        "Money.scale"
-       ],
-       "operation": "searchCatalogue",
-       "provenance": "contract catalogue.yaml GET /search"
-      },
-      {
        "kind": "searchField",
        "label": "Search events and attractions",
-       "provenance": "carried from the previous definition"
+       "provenance": "carried from the previous definition",
+       "operation": "searchCatalogue"
       },
       {
        "kind": "multiSelect",
@@ -720,14 +562,16 @@
       {
        "kind": "datePicker",
        "label": "Date",
-       "notes": "Format from region settings, not a locale guess",
-       "provenance": "carried from the previous definition"
+       "notes": "Picks a day; the listing keeps the events with a performance that day (`listPerformances`).",
+       "provenance": "carried from the previous definition",
+       "operation": "listPerformances"
       },
       {
        "kind": "cardList",
        "bindsTo": "Product[]",
        "notes": "Cursor pagination. Infinite scroll with an explicit load-more fallback",
-       "provenance": "carried from the previous definition"
+       "provenance": "carried from the previous definition",
+       "operation": "listProducts"
       },
       {
        "kind": "banner",
@@ -759,41 +603,12 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected product",
-       "bindsTo": "Product",
-       "columns": [
-        "Product.id",
-        "Product.code",
-        "Product.name",
-        "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
-        "Product.onSaleFrom",
-        "Product.onSaleTo",
-        "Product.categoryId",
-        "Product.lifecycleState",
-        "Product.isSellable",
-        "Product.isStockTracked"
-       ],
-       "operation": "listProducts",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "detailPanel",
        "label": "The wait time",
        "bindsTo": "WaitTime",
        "columns": [
-        "WaitTime.queueId",
         "WaitTime.queueName",
-        "WaitTime.attractionProductId",
-        "WaitTime.attractionCategoryId",
         "WaitTime.status",
         "WaitTime.waitMinutes",
-        "WaitTime.source",
         "WaitTime.isStale",
         "WaitTime.heightRequirementCm",
         "WaitTime.zone",
@@ -810,7 +625,7 @@
    "loading": "The event attraction listing list.",
    "error": "Could not load. Names which read failed and leaves the event attraction listing untouched.",
    "emptyFirstRun": "No event attraction listing yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the event attraction listing are still there. Names the active filter and offers to clear it.",
+   "emptyNoResults": "Nothing matches the search, category or date picked, and the other events are still there. Names what was picked and offers to clear it.",
    "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
@@ -970,16 +785,9 @@
      "components": [
       {
        "kind": "searchField",
-       "label": "Q",
+       "label": "Search",
        "operation": "searchCatalogue",
        "notes": "Sends `?q=` to `searchCatalogue`.",
-       "provenance": "contract catalogue.yaml GET /search"
-      },
-      {
-       "kind": "textField",
-       "label": "Venue id",
-       "operation": "searchCatalogue",
-       "notes": "Sends `?venueId=` to `searchCatalogue`.",
        "provenance": "contract catalogue.yaml GET /search"
       },
       {
@@ -990,55 +798,25 @@
        "provenance": "contract catalogue.yaml GET /search"
       },
       {
-       "kind": "dataTable",
-       "label": "Every money",
-       "bindsTo": "Money",
-       "columns": [
-        "Money.amount",
-        "Money.currency",
-        "Money.scale"
-       ],
+       "kind": "cardList",
+       "label": "Results",
        "operation": "searchCatalogue",
-       "provenance": "contract catalogue.yaml GET /search"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "One card per result: name, summary, photo (`primaryMedia`), from-price (`fromPrice`), sold out shown rather than hidden (`isAvailable`), and `notBookableLabel` for an info-only product. `searchCatalogue` answers with no named schema, so the card binds none. Was the generated table 'Every money'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
-       "kind": "dataTable",
-       "label": "Every product",
+       "kind": "cardList",
+       "label": "Suggestions",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
-        "Product.code",
         "Product.name",
         "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
-        "Product.onSaleFrom",
-        "Product.onSaleTo"
+        "Product.media",
+        "Product.displayTags"
        ],
        "operation": "listProducts",
-       "provenance": "contract catalogue.yaml GET /products"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected money",
-       "bindsTo": "Money",
-       "columns": [
-        "Money.amount",
-        "Money.currency",
-        "Money.scale"
-       ],
-       "operation": "searchCatalogue",
-       "provenance": "contract catalogue.yaml GET /search"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Before the guest types: what is on sale at the venue. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       }
      ]
     }
@@ -1048,7 +826,7 @@
    "loading": "The search results list.",
    "error": "Could not load. Names which read failed and leaves the search results untouched.",
    "emptyFirstRun": "No search results yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on q, venueId, kind and the search results are still there. Names the active filter and offers to clear it.",
+   "emptyNoResults": "Nothing matches what was typed. Names the search, suggests a shorter one and offers to clear it; a sold-out match is shown as sold out, not hidden.",
    "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Results come only from what was already loaded, with a note that newer items may exist."
   },
@@ -1213,38 +991,6 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "datePicker",
-       "label": "From",
-       "operation": "listPerformances",
-       "notes": "Sends `?from=` to `listPerformances`.",
-       "provenance": "contract catalogue.yaml GET /events/{eventId}/performances"
-      },
-      {
-       "kind": "datePicker",
-       "label": "To",
-       "operation": "listPerformances",
-       "notes": "Sends `?to=` to `listPerformances`.",
-       "provenance": "contract catalogue.yaml GET /events/{eventId}/performances"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every performance",
-       "bindsTo": "Performance",
-       "columns": [
-        "Performance.id",
-        "Performance.eventId",
-        "Performance.startsAt",
-        "Performance.endsAt",
-        "Performance.approvalRequestId",
-        "Performance.requiresApprovalToCancel",
-        "Performance.status",
-        "Performance.admissionRulesId",
-        "Performance.seatMapId"
-       ],
-       "operation": "listPerformances",
-       "provenance": "contract catalogue.yaml GET /events/{eventId}/performances"
-      },
-      {
        "kind": "dataTable",
        "label": "Availability",
        "operation": "getAvailability",
@@ -1300,15 +1046,9 @@
        "label": "The selected performance",
        "bindsTo": "Performance",
        "columns": [
-        "Performance.id",
-        "Performance.eventId",
         "Performance.startsAt",
         "Performance.endsAt",
-        "Performance.approvalRequestId",
-        "Performance.requiresApprovalToCancel",
-        "Performance.status",
-        "Performance.admissionRulesId",
-        "Performance.seatMapId"
+        "Performance.status"
        ],
        "operation": "listPerformances",
        "provenance": "contract catalogue.yaml GET /events/{eventId}/performances"
@@ -1318,7 +1058,6 @@
        "label": "The product eligibility rule",
        "bindsTo": "ProductEligibilityRule",
        "columns": [
-        "ProductEligibilityRule.id",
         "ProductEligibilityRule.productId",
         "ProductEligibilityRule.minAgeYears",
         "ProductEligibilityRule.maxAgeYears",
@@ -1330,8 +1069,7 @@
         "ProductEligibilityRule.guardianSignatureAgeTo",
         "ProductEligibilityRule.waiverRequired",
         "ProductEligibilityRule.swimAbility",
-        "ProductEligibilityRule.refundableIfIneligibleAtGate",
-        "ProductEligibilityRule.scopePath"
+        "ProductEligibilityRule.refundableIfIneligibleAtGate"
        ],
        "operation": "getProductEligibilityRule",
        "provenance": "contract catalogue.yaml GET /products/{productId}/eligibility-rule"
@@ -1341,13 +1079,9 @@
        "label": "The wait time",
        "bindsTo": "WaitTime",
        "columns": [
-        "WaitTime.queueId",
         "WaitTime.queueName",
-        "WaitTime.attractionProductId",
-        "WaitTime.attractionCategoryId",
         "WaitTime.status",
         "WaitTime.waitMinutes",
-        "WaitTime.source",
         "WaitTime.isStale",
         "WaitTime.heightRequirementCm",
         "WaitTime.zone",
@@ -1361,22 +1095,10 @@
        "label": "The product",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
-        "Product.code",
         "Product.name",
         "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
         "Product.onSaleFrom",
-        "Product.onSaleTo",
-        "Product.categoryId",
-        "Product.lifecycleState",
-        "Product.isSellable",
-        "Product.isStockTracked"
+        "Product.onSaleTo"
        ],
        "operation": "getProduct",
        "provenance": "contract catalogue.yaml GET /products/{productId}"
@@ -1403,7 +1125,7 @@
    "videoUnavailable": "The video cannot play (no video, a failed stream, data saver on). The poster stays and the details are unaffected; no error screen and no loader.",
    "error": "Could not load. Names which read failed and leaves the attraction untouched.",
    "emptyFirstRun": "No attraction yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on from, to and the attraction are still there. Names the active filter and offers to clear it.",
+   "emptyNoResults": "No performance in the next days shown; the strip says so and offers the calendar.",
    "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
@@ -1742,7 +1464,7 @@
    {
     "operationId": "getVisitPlan",
     "contract": "venue-map",
-    "purpose": "The plan: days, timed items and add-on suggestions, at its current version",
+    "purpose": "The plan: days, timed items and add-on suggestions, at its current version Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad",
     "provenance": "decided 29 September 2026, MOB-6"
    },

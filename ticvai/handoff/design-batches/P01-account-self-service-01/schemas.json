@@ -2265,66 +2265,6 @@
   ],
   "description": "`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"
  },
- "OrderSummary": {
-  "x-ticvai-persistence": "none — projection",
-  "type": "object",
-  "required": [
-   "id",
-   "orderNumber",
-   "status",
-   "grossAmount",
-   "createdAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "orderNumber": {
-    "type": "string"
-   },
-   "status": {
-    "$ref": "#/components/schemas/OrderStatus"
-   },
-   "grossAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "refundedAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "channel": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/OrderChannel"
-     }
-    ],
-    "description": "The same vocabulary as `Order.channel`, which this projects."
-   },
-   "lineCount": {
-    "type": "integer"
-   },
-   "principalId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The cashier who raised it — what the held-orders list shows."
-   },
-   "holdLabel": {
-    "type": "string",
-    "nullable": true,
-    "description": "As `Order.holdLabel`."
-   },
-   "heldUntil": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "description": "As `Order.heldUntil`, so a held-orders list can warn about the ones about to lapse."
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
  "Page": {
   "type": "object",
   "required": [

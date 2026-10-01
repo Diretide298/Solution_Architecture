@@ -1,6 +1,6 @@
 # P01-ticketing-01 — P01 · Ticketing
 
-**3 screens · 15 operations · 30 schemas · 6 permissions**
+**3 screens · 14 operations · 31 schemas · 6 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -68,9 +68,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `WEB-030` | Ticket Transfer | A | 15 | 14 | 6 | 10 | 3 | 0 | guest | review (client-verified) |
-| `WEB-031` | My Reservations | A | 25 | 54 | 6 | 35 | 9 | 0 | guest | review (client-verified) |
-| `WEB-035` | Multi-Currency & Pricing | A | 3 | 34 | 6 | 12 | 3 | 4 | guest | review (client-verified) |
+| `WEB-030` | Ticket Transfer | A | 8 | 6 | 6 | 5 | 3 | 0 | guest | review (client-verified) |
+| `WEB-031` | My Reservations | A | 25 | 44 | 6 | 35 | 9 | 0 | guest | review (client-verified) |
+| `WEB-035` | Multi-Currency & Pricing | A | 0 | 9 | 6 | 12 | 3 | 4 | guest | review (client-verified) |
+
+## Thin screens in this batch
+
+**WEB-030, WEB-035 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

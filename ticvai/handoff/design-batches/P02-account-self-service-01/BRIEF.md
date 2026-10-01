@@ -1,6 +1,6 @@
 # P02-account-self-service-01 — P02 · Account & Self-Service (1 of 2)
 
-**10 screens · 46 operations · 48 schemas · 6 permissions**
+**10 screens · 45 operations · 47 schemas · 6 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -51,7 +51,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 6 permissions apply here:
   `GUEST_MANAGE, GUEST_VIEW, GUEST_VIEW_PII, LEDGER_POST, LEDGER_VIEW, ORDER_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **5 of these operations work offline**: getEntitlement, getGuestSession, getOrder, listMyEntitlements, listOrders
+- **4 of these operations work offline**: getEntitlement, getGuestSession, getOrder, listMyEntitlements
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -71,18 +71,18 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `GST-012` | My Tickets | A | 7 | 55 | 6 | 7 | 10 | 0 | guest | notStarted (client-verified) |
 | `GST-013` | Ticket Details | A | 10 | 31 | 5 | 7 | 16 | 0 | guest | notStarted (client-verified) |
-| `GST-018` | Add to Calendar / Reminders | A | 11 | 40 | 6 | 9 | 1 | 0 | guest | notStarted (client-verified) |
-| `GST-019` | Order History | A | 11 | 45 | 6 | 15 | 0 | 0 | guest | notStarted (designed) |
+| `GST-018` | Add to Calendar / Reminders | A | 5 | 14 | 6 | 4 | 1 | 0 | guest | notStarted (client-verified) |
+| `GST-019` | Order History | A | 0 | 16 | 6 | 5 | 0 | 0 | guest | notStarted (designed) |
 | `GST-020` | Saved Items / Wishlist | A | 3 | 2 | 4 | 1 | 1 | 0 | guest | notStarted (client-verified) |
 | `GST-039` | Profile | A | 19 | 17 | 5 | 14 | 1 | 0 | guest | notStarted (designed) |
 | `GST-042` | Simple Registration & OTP | A | 36 | 6 | 6 | 13 | 8 | 0 | guest | notStarted (designed) |
-| `GST-045` | Ticket Delivery & Sharing | A | 8 | 0 | 4 | 5 | 3 | 0 | guest | notStarted (client-verified) |
+| `GST-045` | Ticket Delivery & Sharing | A | 7 | 12 | 5 | 5 | 3 | 0 | guest | notStarted (client-verified) |
 | `GST-055` | Dynamic QR Ticket | A | 13 | 38 | 5 | 7 | 10 | 0 | guest | notStarted (client-verified) |
 | `GST-066` | Privacy & My Data | A | 12 | 2 | 6 | 16 | 2 | 4 | guest | notStarted (designed) |
 
 ## Thin screens in this batch
 
-**GST-020 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**GST-019, GST-020 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

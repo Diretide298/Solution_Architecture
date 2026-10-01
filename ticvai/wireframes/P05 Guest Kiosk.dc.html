@@ -183,12 +183,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><b>The tenant app status</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>The tenant config</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Choose your language</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">One large button per published language (`languages`), each in its own script; the right-to-left ones lay the kiosk out right to left. From the cached configuration when </span></div><div class="panel"><b>Closed for maintenance</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Only when `isInMaintenance`: the tenant&#x27;s message and expected-back time, and nothing can be bought.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getTenantAppStatus · getTenantConfig</div>
+          <div><b>OPERATIONS</b> &middot; getTenantAppStatus · getPublishedTenantConfig</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#ksk-001">KSK-001</a> <br><a href="#ksk-003">KSK-003</a>  &mdash; <i>Chooses buy or collect</i><br><a href="#ksk-004">KSK-004</a>  &mdash; <i>Choose tickets</i></div>
@@ -213,7 +213,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><b>Venue id</b><div class="chip">Venue id</div><span class="why">Sends `?venueId=` to `listProducts`.</span></div><div class="panel"><b>Kind</b><div class="chip">Kind</div><span class="why">Sends `?kind=` to `listProducts`.</span></div><div class="panel"><b>Is sellable</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Sends `?isSellable=` to `listProducts`.</span></div></div><div class="side"><div class="panel"><b>Every product</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>What would you like?</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table &#x27;Every product&#x27;; staff and plumbing</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
@@ -243,7 +243,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><b>Every product variant</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Availability</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Shows `channelCapacityId`, `performanceId`, `capacity`, `sold`, `leased`, `remaining`, `byChannel` from `getAvailability`&#x27;s inline response. **The response has no na</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Tickets</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Large counters per ticket type; inactive variants never shown. Was the generated table &#x27;Every product variant&#x27;; staff and plumbing columns removed (decided by C</span></div><div class="panel"><b>Availability</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Shows `channelCapacityId`, `performanceId`, `capacity`, `sold`, `leased`, `remaining`, `byChannel` from `getAvailability`&#x27;s inline response. **The response has no na</span></div></div></div>
             </div>
           </div>
         </div>
@@ -273,7 +273,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><b>Availability</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Shows `channelCapacityId`, `performanceId`, `capacity`, `sold`, `leased`, `remaining`, `byChannel` from `getAvailability`&#x27;s inline response. **The response has no na</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Availability</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Shows `channelCapacityId`, `performanceId`, `capacity`, `sold`, `leased`, `remaining`, `byChannel` from `getAvailability`&#x27;s inline response. **The response has no na</span></div><div class="panel"><b>Times</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">A tap on a time adds the chosen tickets for it (`addCartLine`), which takes the hold; the guest never sees the word hold.</span></div></div></div>
             </div>
           </div>
         </div>
@@ -283,7 +283,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; cartId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#ksk-001">KSK-001</a> <br><a href="#ksk-002">KSK-002</a> <br><a href="#ksk-003">KSK-003</a> <br><a href="#ksk-006">KSK-006</a>  &mdash; <i>Reviews the order</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formAcquireInventoryHold &middot; <i>Add to cart</i> &middot; <b>Add to cart</b> &middot; Cancel <span class="dis">discards id · channelCapacityId · requestedUnits · ttlSeconds · channel</span></div></div>
+          
         </div>
       </div>
       <div id="ksk-006" class="scr">
@@ -303,7 +303,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><b>The cart</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The cart</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Offers applied</b><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">The promotions that apply and the near misses, evaluated by themselves (`evaluatePromotions`) and shown before payment (F75 step 4).</span></div><div class="panel"><b>Quantity</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">A large stepper per line; + adds one more (`addCartLine`).</span></div></div></div>
             </div>
           </div>
         </div>
@@ -313,7 +313,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; cartId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#ksk-001">KSK-001</a> <br><a href="#ksk-002">KSK-002</a> <br><a href="#ksk-003">KSK-003</a> <br><a href="#ksk-007">KSK-007</a>  &mdash; <i>Pays at the terminal</i><br><a href="#ksk-008">KSK-008</a>  &mdash; <i>The payment does not resolve</i> <span class="car">paymentId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formAddCartLine &middot; <i>Add cart line</i> &middot; <b>Add cart line</b> &middot; Cancel <span class="dis">discards variantId · quantity · performanceId · seatIds · parentLineId · attributes</span></div><div class="ov"><b>modal</b> formCheckoutCart &middot; <i>Checkout cart</i> &middot; <b>Checkout cart</b> &middot; Cancel <span class="dis">discards subjectId · attendees</span></div><div class="ov"><b>modal</b> formEvaluatePromotions &middot; <i>Evaluate promotions</i> &middot; <b>Evaluate promotions</b> &middot; Cancel <span class="dis">discards venueId · channel · lines · subjectId · membershipTierId · couponCodes · evaluateAt</span></div></div>
+          
         </div>
       </div>
       <div id="ksk-007" class="scr">
@@ -333,7 +333,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><b>id</b><div class="chip">id</div></div><div class="panel"><b>orderId</b><div class="chip">orderId</div></div><div class="panel"><b>tender</b><div class="chip">tender</div></div></div><div class="side"><div class="panel"><b>amount</b><div class="chip">amount</div></div><div class="panel"><b>tenderedAmount</b><div class="chip">tenderedAmount</div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Tap, insert or scan to pay</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The amount due and the card terminal&#x27;s prompt. The kiosk and the terminal fill the payment (`createPayment`): order, tender, amount and device are never typed. Card </span></div><div class="panel"><span class="kind">textField</span><div class="chip">Search</div><span class="why">Implied by the form template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
@@ -398,12 +398,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; transferOrderTickets · getOrder</div>
+          <div><b>OPERATIONS</b> &middot; reprintOrder · getOrder</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#ksk-001">KSK-001</a> <br><a href="#ksk-002">KSK-002</a> <br><a href="#ksk-003">KSK-003</a> <br><a href="#ksk-010">KSK-010</a>  &mdash; <i>Print failure</i> <span class="car">orderId</span><br><a href="#ksk-013">KSK-013</a>  &mdash; <i>Something goes wrong and they call staff</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formTransferOrderTickets &middot; <i>Transfer order tickets</i> &middot; <b>Transfer order tickets</b> &middot; Cancel <span class="dis">discards ticketIds · recipient · message</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> sendTickets &middot; <i>Send to my phone</i> &middot; <b>Send to my phone</b> &middot; Back <span class="dis">discards destination</span></div></div>
         </div>
       </div>
       <div id="ksk-010" class="scr">
@@ -423,12 +423,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><b>Ticket ids</b><div class="chip">Ticket ids</div><span class="why">Required.</span></div><div class="panel"><b>Recipient</b><div class="chip">Recipient</div><span class="why">Required.</span></div><div class="panel"><b>Message</b><div class="chip">Message</div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Send to</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Email or SMS, then the address on the kiosk keyboard. `reprintOrder` with `reason` `printerFault`: the sale stands and the tickets go to the guest&#x27;s phone.</span></div><div class="panel"><span class="kind">textField</span><div class="chip">Search</div><span class="why">Implied by the form template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; transferOrderTickets</div>
+          <div><b>OPERATIONS</b> &middot; reprintOrder</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#ksk-001">KSK-001</a> <br><a href="#ksk-002">KSK-002</a> <br><a href="#ksk-003">KSK-003</a> <br><a href="#ksk-013">KSK-013</a>  &mdash; <i>They call for help</i></div>
@@ -483,12 +483,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               
-              <div class="two"><div class="grow"><div class="panel"><b>Ticket ids</b><div class="chip">Ticket ids</div><span class="why">Required.</span></div><div class="panel"><b>Recipient</b><div class="chip">Recipient</div><span class="why">Required.</span></div><div class="panel"><b>Message</b><div class="chip">Message</div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Send to</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Email or SMS, then the address on the kiosk keyboard. `reprintOrder` with `delivery` `print`, or email or SMS: collecting is printing, not a transfer (DI-637).</span></div><div class="panel"><span class="kind">textField</span><div class="chip">Search</div><span class="why">Implied by the form template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; transferOrderTickets</div>
+          <div><b>OPERATIONS</b> &middot; reprintOrder</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#ksk-001">KSK-001</a> <br><a href="#ksk-002">KSK-002</a> <br><a href="#ksk-003">KSK-003</a> </div>

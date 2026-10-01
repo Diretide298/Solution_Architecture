@@ -1,6 +1,6 @@
 # P05-sell-02 — P05 · Sell (2 of 2)
 
-**6 screens · 10 operations · 27 schemas · 3 permissions**
+**6 screens · 10 operations · 27 schemas · 4 permissions**
 
 Platform P05 Guest Kiosk · ships as **guest** ·
 guest audience · kiosk ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `ORDER_CREATE, ORDER_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `ORDER_CREATE, ORDER_REPRINT, ORDER_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -68,7 +68,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `KSK-011` | Collect a booking | B–D | 1 | 16 | 5 | 4 | 2 | 6 | guest | notStarted (generated) |
-| `KSK-012` | Booking found | B–D | 8 | 0 | 4 | 5 | 0 | 6 | guest | notStarted (generated) |
+| `KSK-012` | Booking found | B–D | 6 | 0 | 4 | 6 | 0 | 6 | guest | notStarted (generated) |
 | `KSK-013` | Call staff | B–D | 0 | 0 | 4 | 0 | 0 | 0 | guest | notStarted (generated) |
 | `KSK-014` | Out of service | B–D | 0 | 0 | 4 | 0 | 0 | 0 | guest | notStarted (generated) |
 | `KSK-016` | Order Food | B–D | 23 | 7 | 6 | 5 | 0 | 0 | guest | notStarted (generated) |
@@ -76,7 +76,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**KSK-011, KSK-013, KSK-014 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**KSK-011, KSK-012, KSK-013, KSK-014 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -141,7 +141,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|
 | Lookup shop and drop (primary button) | `lookupShopAndDrop` GET `/shop-and-drop/lookup` | — | ShopAndDrop[] | 400 No identifier supplied | — |
 
-**Data it reads**: `getOrder` (onLoad, Read an order)
+**Data it reads**: `getOrder` (onLoad, Read an order With the guest session the device already …)
 
 **Where the user goes next**
 
@@ -154,7 +154,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Loading (`?state=loading`) | The collect booking, read by `getOrder`. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the collect booking untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No collect booking yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | **A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission. |
 | Offline (`?state=offline`) | Not available |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 No identifier supplied |
 
@@ -163,7 +163,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 - `lookupShopAndDrop` → `ORDER_VIEW` (read) · staff, guest
 - `getOrder` → `ORDER_VIEW` (read) · staff, guest, partner
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** **A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission.
 
 #### Requirements it meets
 
@@ -205,6 +205,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Wireframe frame: `wireframes/P05 Guest Kiosk.dc.html#ksk-011` · status **notStarted** · provenance generated · **Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed …
 - Derived from `wireframes/reference/Kiosk Board 2.dc.html`
 - Client design-board frames: `Kiosk Board 2.dc.html#KSK-011`
+- ADR-0045 *Every order carries a proven contact, and the gate is the checkout page* (`docs/adr/0045-every-order-carries-a-proven-contact.md`)
 
 #### Acceptance for the design
 
@@ -238,25 +239,25 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.
 
+**Known gaps.** A transfer changes the tickets' owner; at a kiosk the guest is resending or printing their own tickets, which is `reprintOrder` by email, SMS or print.
+
 #### Inputs: what the user enters or picks
 
 **On the screen**
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Ticket ids | multi select | — | — | — | — | Required. | — |
-| Recipient | text field | — | — | — | — | Required. | — |
-| Message | text field | — | — | — | — | — | — |
+| Send to | select field | — | — | — | — | Email or SMS, then the address on the kiosk keyboard. `reprintOrder` with `delivery` `print`, or email or SMS: collecting is printing, not a transfer (DI-637). | — |
 
-**Sent by *Transfer order tickets*** (`transferOrderTickets`; no form is declared, so these are filled from the screen or collected inline)
+**Sent by *Print my tickets*** (`reprintOrder`; no form is declared, so these are filled from the screen or collected inline)
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
-| Tickets `ticketIds` | multi-picker: choose tickets | required | — | at least 1 | — | The entitlements to hand over. A ticket is an entitlement, so each value is an `Entitlement.id` on this order — the ids in `OrderLine.entitlementIds`. | `transferOrderTickets` body |
-| Recipient `recipient` | group | required | — | — | — | — | `transferOrderTickets` body |
-| Channel `recipient.channel` | segmented control | required | — | Email · SMS · Whatsapp | — | — | `transferOrderTickets` body |
-| Address `recipient.address` | text field | required | — | — | — | — | `transferOrderTickets` body |
-| Message `message` | text area | optional | — | max length 500 | — | — | `transferOrderTickets` body |
+| Delivery `delivery` | radio group | required | — | Print · Email · SMS · Whatsapp · Wallet | — | — | `reprintOrder` body |
+| Destination `destination` | text field | optional | — | — | — | — | `reprintOrder` body |
+| Lines `lineIds` | multi-picker: choose lines | optional | — | — | — | Omit to reprint every line. | `reprintOrder` body |
+| Reason `reason` | radio group | optional | — | Printer fault · Guest request · Lost ticket · Not received · Other | — | — | `reprintOrder` body |
+| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | When the till reprinted — device time, as for every offline-capable write. | `reprintOrder` body |
 
 #### Outputs: what the screen shows and produces
 
@@ -264,7 +265,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Transfer order tickets (primary button) | `transferOrderTickets` POST `/orders/{orderId}/transfer` | inline | TicketTransfer | 409 Ticket already redeemed (`alreadyRedeemed`), already offered (`alreadyOffered`), or the product forbids transfer (`transferNotAllowed`). (TicketTransferProblem) | produces a document or message: Transfer tickets to another guest |
+| Print my tickets (primary button) | `reprintOrder` POST `/orders/{orderId}/reprints` | inline | inline | 400 Validation failed | produces a document or message: Reprint or resend tickets |
 
 #### States
 
@@ -274,23 +275,24 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Error (`?state=error`) | Not found. Offers KSK-013 |
 | Empty, first run (`?state=emptyFirstRun`) | No booking for that reference |
 | Offline (`?state=offline`) | Not available |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 Ticket already redeemed (`alreadyRedeemed`), already offered (`alreadyOffered`), or the product forbids transfer (`transferNotAllowed`). (TicketTransferProblem) |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
 #### Permissions
 
-- `transferOrderTickets` → no permission · guest
+- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner
 
 #### Requirements it meets
 
-5 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+6 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
-| 19.2.13 | Ticket Transfer - System shall support ticket transfers. | Guest Mobile App & Branding | CONTRACTED | `transferOrderTickets` |
-| 1.1.27 | System shall support ticket ownership transfer between guests according to configurable policies, fees and approval workflows. | Ticketing Catalogue | CONTRACTED | `transferOrderTickets` |
-| 1.6.17 | System shall expose marketplace functionality through APIs for websites, mobile applications, partner platforms, and third-party integrations. | Ticketing Catalogue | CONTRACTED | `transferOrderTickets` |
-| 2.6.39 | Customer should have the ability to view the order transactions with all the details for the logged in users and should be able to resend the tickets / Transfer Tickets to Friend / Download tickets | Ticketing Sales | CONTRACTED | `transferOrderTickets` |
-| 2.13.37 | Ticket Transfer & Reassignment | Ticketing Sales | CONTRACTED | `transferOrderTickets` |
+| 2.7.43 | The system should have the ability for B2B client and resellers to issue and re-issue tickets online, sending the final ticket to guests via email and/or mobile SMS - printing in PDF. | Ticketing Sales | CONTRACTED | `reprintOrder` |
+| 2.7.46 | The system should allow Partners to come and print their tickets with a booking number: the number of allowed tickets to print and type of tickets (open-dated, dated, etc.) must be configurable.(the … | Ticketing Sales | CONTRACTED | `reprintOrder` |
+| 2.7.47 | The system should record reissuing or reprinting of a ticket media. | Ticketing Sales | CONTRACTED | `reprintOrder` |
+| 2.12.22 | The systems allows to manage Ticket re-issuance | Ticketing Sales | CONTRACTED | `reprintOrder` |
+| 2.16.3 | System should provide the ability to print the tickets virtually on screen upon completing the sale | Ticketing Sales | CONTRACTED | `reprintOrder` |
+| 5.10.1 | The system should provide a simple way to print receipts for guests depending on their purchases and their consumptions (i.e. pay‐per‐use). | F&B & Guest Management | CONTRACTED | `reprintOrder` |
 
 #### Client meeting inputs
 
@@ -321,10 +323,10 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (8), with its required mark, default, format and its error state (409).
+- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#KSK-012?state=<state>`: loading, error, emptyFirstRun, offline.
-- [ ] Every action is wired with its success and its failure: Transfer order tickets.
+- [ ] Every action is wired with its success and its failure: Print my tickets.
 - [ ] No transition is declared; back returns where the user came from.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The module and platform inputs below are applied.
@@ -1032,8 +1034,8 @@ Method, path, parameters, request and response for every operation these screens
 "listMerchandise": {"method":"GET","path":"/merchandise","contract":"retail","summary":"List merchandise","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"outletId","in":"query","required":null},{"name":"categoryId","in":"query","required":null},{"name":"inStockOnly","in":"query","required":null},{"name":"search","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "lookupMerchandise": {"method":"GET","path":"/merchandise/lookup","contract":"retail","summary":"Price and stock check by barcode","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"barcode","in":"query","required":null},{"name":"sku","in":"query","required":null},{"name":"includeSiblingOutlets","in":"query","required":null},{"name":"outletId","in":"query","required":null}],"requestBody":null,"responds":"PriceCheck"},
 "lookupShopAndDrop": {"method":"GET","path":"/shop-and-drop/lookup","contract":"retail","summary":"Find a guest's dropped goods","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"entitlementId","in":"query","required":null},{"name":"dropReference","in":"query","required":null},{"name":"receiptNumber","in":"query","required":null}],"requestBody":null,"responds":"ShopAndDrop"},
-"reserveMerchandise": {"method":"POST","path":"/outlets/{outletId}/reserve","contract":"retail","summary":"Reserve an item for collection","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MerchandiseReservation"},
-"transferOrderTickets": {"method":"POST","path":"/orders/{orderId}/transfer","contract":"orders","summary":"Transfer tickets to another guest","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null}
+"reprintOrder": {"method":"POST","path":"/orders/{orderId}/reprints","contract":"orders","summary":"Reprint or resend tickets","permission":"ORDER_REPRINT","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
+"reserveMerchandise": {"method":"POST","path":"/outlets/{outletId}/reserve","contract":"retail","summary":"Reserve an item for collection","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MerchandiseReservation"}
 }
 ```
 

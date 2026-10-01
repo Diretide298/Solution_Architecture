@@ -383,7 +383,7 @@
    {
     "operationId": "getGuestSession",
     "contract": "identity",
-    "purpose": "Read the current guest session",
+    "purpose": "Read the current guest session Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    },
    {
@@ -1245,6 +1245,10 @@
   "entryState": {
    "params": [
     {
+     "name": "subjectId",
+     "from": "session"
+    },
+    {
      "name": "entitlementId",
      "from": "deepLink"
     },
@@ -1432,44 +1436,20 @@
        "provenance": "contract orders.yaml GET /my/orders"
       },
       {
-       "kind": "dataTable",
-       "label": "Every order",
+       "kind": "cardList",
+       "label": "Your orders",
        "bindsTo": "Order",
        "columns": [
-        "Order.id",
         "Order.orderNumber",
-        "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
         "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
         "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount"
+        "Order.currency",
+        "Order.lines",
+        "Order.createdAt"
        ],
        "operation": "listMyOrders",
-       "provenance": "contract orders.yaml GET /my/orders"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every order",
-       "bindsTo": "OrderSummary",
-       "columns": [
-        "OrderSummary.id",
-        "OrderSummary.orderNumber",
-        "OrderSummary.status",
-        "OrderSummary.grossAmount",
-        "OrderSummary.refundedAmount",
-        "OrderSummary.channel",
-        "OrderSummary.lineCount",
-        "OrderSummary.principalId",
-        "OrderSummary.holdLabel",
-        "OrderSummary.heldUntil"
-       ],
-       "operation": "listOrders",
-       "provenance": "contract orders.yaml GET /orders"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Was the generated table 'Every order'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       }
      ]
     },
@@ -1482,22 +1462,16 @@
        "label": "The selected order",
        "bindsTo": "Order",
        "columns": [
-        "Order.id",
         "Order.orderNumber",
         "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
         "Order.status",
         "Order.currency",
-        "Order.currencyScale",
         "Order.grossAmount",
         "Order.taxAmount",
         "Order.netAmount",
         "Order.refundedAmount",
-        "Order.totalPriceVariance",
         "Order.lines",
-        "Order.payments",
-        "Order.principalId"
+        "Order.payments"
        ],
        "operation": "getOrder",
        "provenance": "contract orders.yaml GET /orders/{orderId}"
@@ -1509,14 +1483,8 @@
      "slot": "rowActions",
      "components": [
       {
-       "kind": "primaryButton",
-       "label": "Transfer order tickets",
-       "operation": "transferOrderTickets",
-       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      },
-      {
        "kind": "secondaryButton",
-       "label": "Create refund request",
+       "label": "Ask for a refund",
        "operation": "createRefundRequest",
        "provenance": "contract orders.yaml POST /refund-requests"
       }
@@ -1534,15 +1502,6 @@
   },
   "apis": [
    {
-    "operationId": "transferOrderTickets",
-    "contract": "orders",
-    "purpose": "Transfer tickets to another guest",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMyOrders"
-    ]
-   },
-   {
     "operationId": "listMyOrders",
     "contract": "orders",
     "purpose": "The orders this guest placed",
@@ -1553,12 +1512,6 @@
     "contract": "orders",
     "purpose": "Read an order",
     "trigger": "onAction"
-   },
-   {
-    "operationId": "listOrders",
-    "contract": "orders",
-    "purpose": "List orders",
-    "trigger": "onLoad"
    },
    {
     "operationId": "createRefundRequest",
@@ -1605,6 +1558,10 @@
   "entryState": {
    "params": [
     {
+     "name": "subjectId",
+     "from": "session"
+    },
+    {
      "name": "orderId",
      "from": "deepLink"
     },
@@ -1644,7 +1601,7 @@
    {
     "id": "formCreateRefundRequest",
     "component": "modal",
-    "trigger": "Create refund request",
+    "trigger": "Ask for a refund",
     "body": "**Collects what `createRefundRequest` sends before it is called.** Required: `orderId`, `reason`. Optional: `lineIds`. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Create refund request",
@@ -1659,25 +1616,20 @@
      ]
     },
     "provenance": "client-verified"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "listOrders",
+    "removed": true,
+    "why": "The staff-scoped order list; a guest screen lists the caller's own orders with `listMyOrders` (removed from guest screens on 24 August, back with the 31 August parity pass).",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    },
    {
-    "id": "formTransferOrderTickets",
-    "component": "modal",
-    "trigger": "Transfer order tickets",
-    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Transfer order tickets",
-     "operation": "transferOrderTickets"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "ticketIds",
-      "recipient",
-      "message"
-     ]
-    },
-    "provenance": "client-verified"
+    "operation": "transferOrderTickets",
+    "removed": true,
+    "why": "Transfer is WEB-030's; order history views, downloads and refunds.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ],
   "_platform": {

@@ -148,6 +148,14 @@
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    }
+   ]
+  },
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -285,7 +293,7 @@
    "loading": "The concierge home, read by `getGuestMenu`.",
    "error": "Could not load. Names which read failed and leaves the concierge home untouched.",
    "emptyFirstRun": "No concierge home yet. Offers Create AI conversation (`createAiConversation`).",
-   "emptyNoAccess": "Shown when the caller lacks `AI_USE`, which `sendAiMessage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** The assistant needs the connection; conversations already loaded stay readable."
   },
   "apis": [
@@ -527,14 +535,9 @@
        "label": "The cart",
        "bindsTo": "Cart",
        "columns": [
-        "Cart.id",
-        "Cart.token",
-        "Cart.venueId",
         "Cart.channel",
-        "Cart.subjectId",
         "Cart.status",
         "Cart.lines",
-        "Cart.conflicts",
         "Cart.subtotal",
         "Cart.discountTotal",
         "Cart.taxTotal",
@@ -546,6 +549,13 @@
        ],
        "operation": "getCart",
        "provenance": "contract orders.yaml GET /carts/{cartId}"
+      },
+      {
+       "kind": "cardList",
+       "label": "Order to confirm",
+       "operation": "createGuestFnbOrder",
+       "notes": "An order the concierge proposes is a card in the conversation: items, total and Confirm, which places it (`createGuestFnbOrder`). No raw form.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       }
      ]
     },
@@ -553,12 +563,6 @@
      "name": "actionBar",
      "slot": "rowActions",
      "components": [
-      {
-       "kind": "primaryButton",
-       "label": "Create guest F&B order",
-       "operation": "createGuestFnbOrder",
-       "provenance": "contract fnb.yaml POST /guest-orders"
-      },
       {
        "kind": "secondaryButton",
        "label": "Add cart line",
@@ -597,8 +601,9 @@
    "loading": "The concierge chat, read by `getGuestOrderStatus`.",
    "error": "Could not load. Names which read failed and leaves the concierge chat untouched.",
    "emptyFirstRun": "No concierge chat yet. Offers Create guest F&B order (`createGuestFnbOrder`).",
-   "emptyNoAccess": "Shown when the caller lacks `AI_USE`, which `sendAiMessage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**Not available, and the offline banner says why.** The assistant needs the connection; conversations already loaded stay readable."
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available, and the offline banner says why.** The assistant needs the connection; conversations already loaded stay readable.",
+   "emptyNoResults": "Nothing the concierge found matches the question; it says so in the conversation and offers to hand over to a person."
   },
   "apis": [
    {
@@ -610,13 +615,13 @@
    {
     "operationId": "getGuestOrderStatus",
     "contract": "fnb",
-    "purpose": "Track an order",
+    "purpose": "Track an order Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    },
    {
     "operationId": "getCart",
     "contract": "orders",
-    "purpose": "The cart, priced and checked, right now",
+    "purpose": "The cart, priced and checked, right now With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    },
    {
@@ -693,31 +698,6 @@
   },
   "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
   "overlays": [
-   {
-    "id": "formCreateGuestFnbOrder",
-    "component": "modal",
-    "trigger": "Create guest F&B order",
-    "body": "**Collects what `createGuestFnbOrder` sends before it is called.** Required: `id`, `lines`, `quotedTotal`, `recordedAt`. Optional: `locationSessionId`, `outletId`, `fulfilment`, `paymentMethod`. Dismissing sends nothing; the screen behind is unchanged.",
-    "bindsTo": "CreateGuestOrderRequest",
-    "confirm": {
-     "label": "Create guest F&B order",
-     "operation": "createGuestFnbOrder"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "lines",
-      "quotedTotal",
-      "recordedAt",
-      "locationSessionId",
-      "outletId",
-      "fulfilment",
-      "paymentMethod"
-     ]
-    },
-    "provenance": "client-verified"
-   },
    {
     "id": "formAddCartLine",
     "component": "modal",
@@ -921,7 +901,7 @@
    "loading": "The saved concierge contextual help.",
    "error": "Could not load. Names which read failed and leaves the concierge contextual help untouched.",
    "emptyFirstRun": "No concierge contextual help configured. The form opens empty and `sendAiMessage` saves the first one; it says what the platform does in the meantime.",
-   "emptyNoAccess": "Shown when the caller lacks `AI_USE`, which `sendAiMessage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** The assistant needs the connection; conversations already loaded stay readable."
   },
   "apis": [
@@ -1239,39 +1219,55 @@
      "slot": "headline",
      "components": [
       {
-       "kind": "metricTile",
-       "label": "Faqs",
-       "bindsTo": "FaqCategory",
-       "operation": "listFaqs",
-       "provenance": "contract white-label.yaml GET /tenant-config/faqs"
+       "kind": "cardList",
+       "label": "Questions and answers",
+       "bindsTo": "PublishedFaqCategory",
+       "columns": [
+        "PublishedFaqCategory.name",
+        "PublishedFaqCategory.entries"
+       ],
+       "operation": "listPublishedFaqs",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Categories in their order, each opening to its questions. Was the generated table 'Every faq category'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
-       "kind": "metricTile",
-       "label": "Content pages",
-       "bindsTo": "ContentPage",
-       "operation": "listContentPages",
-       "provenance": "contract white-label.yaml GET /tenant-config/pages"
+       "kind": "cardList",
+       "label": "Help pages",
+       "bindsTo": "PublishedContentPage",
+       "columns": [
+        "PublishedContentPage.title",
+        "PublishedContentPage.iconAssetRef"
+       ],
+       "operation": "listPublishedContentPages",
+       "notes": "The live help pages; the accessibility ones open GST-057.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)"
       },
       {
-       "kind": "metricTile",
+       "kind": "cardList",
+       "label": "Policies",
+       "bindsTo": "PublishedPolicy",
+       "columns": [
+        "PublishedPolicy.title",
+        "PublishedPolicy.version",
+        "PublishedPolicy.effectiveFrom"
+       ],
+       "operation": "listPublishedPolicies",
+       "notes": "The current terms, privacy, refund, cookie and accessibility policies.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)"
+      },
+      {
+       "kind": "cardList",
        "label": "My cases",
        "bindsTo": "Case",
-       "operation": "listMyCases",
-       "provenance": "contract marketing-crm.yaml GET /my/cases"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every faq category",
-       "bindsTo": "FaqCategory",
        "columns": [
-        "FaqCategory.code",
-        "FaqCategory.name",
-        "FaqCategory.sortOrder",
-        "FaqCategory.entries",
-        "FaqCategory.scopePath"
+        "Case.caseNumber",
+        "Case.subject",
+        "Case.status",
+        "Case.recordedAt"
        ],
-       "operation": "listFaqs",
-       "provenance": "contract white-label.yaml GET /tenant-config/faqs"
+       "operation": "listMyCases",
+       "notes": "Only when signed in: the cases this guest raised, newest first.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       },
       {
        "kind": "cardList",
@@ -1303,30 +1299,32 @@
    ]
   },
   "states": {
-   "loading": "The help support figures; each tile loads on its own.",
+   "loading": "Questions, pages and policies load in place; each list loads on its own.",
    "error": "Could not load. Names which read failed and leaves the help support untouched.",
    "emptyFirstRun": "No help support yet. Offers Raise my case (`raiseMyCase`).",
-   "emptyNoResults": "Never shown: `listFaqs` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listFaqs` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "Never shown: `listPublishedFaqs` takes no filter, so an empty list is always the first-run state above.",
+   "emptyNoAccess": "Reading help needs no sign-in (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)). **Raising or reading a case needs a signed-in guest**: one who is not signed in is offered sign-in and brought back to this screen; the questions, pages and policies stay readable.",
    "offline": "**The offline banner shows.** Help already loaded stays readable, marked with its age. **Raising a case is disabled offline** — it needs the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk, or any member of staff."
   },
   "apis": [
    {
-    "operationId": "listFaqs",
+    "operationId": "listPublishedFaqs",
     "contract": "white-label",
-    "purpose": "List FAQs",
-    "trigger": "onLoad"
+    "purpose": "The published FAQs, readable before sign-in (GFIX-2)",
+    "trigger": "onLoad",
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)"
    },
    {
-    "operationId": "listContentPages",
+    "operationId": "listPublishedContentPages",
     "contract": "white-label",
-    "purpose": "List custom content pages",
-    "trigger": "onLoad"
+    "purpose": "The live help and accessibility pages, readable before sign-in (GFIX-2)",
+    "trigger": "onLoad",
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)"
    },
    {
     "operationId": "listMyCases",
     "contract": "marketing-crm",
-    "purpose": "The cases this guest raised",
+    "purpose": "The cases this guest raised Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    },
    {
@@ -1335,7 +1333,7 @@
     "purpose": "Report something — lost property, a complaint, a question",
     "trigger": "onAction",
     "invalidates": [
-     "listFaqs"
+     "listMyCases"
     ]
    },
    {
@@ -1344,7 +1342,7 @@
     "purpose": "Reply on a case the guest raised",
     "trigger": "onAction",
     "invalidates": [
-     "listFaqs"
+     "listMyCases"
     ]
    },
    {
@@ -1352,6 +1350,13 @@
     "contract": "white-label",
     "purpose": "App status and the public *What's new*",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPublishedPolicies",
+    "contract": "white-label",
+    "purpose": "Terms, privacy, refund, cookie and accessibility policies, readable before sign-in (GFIX-2)",
+    "trigger": "onLoad",
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)"
    }
   ],
   "entryState": {
@@ -1417,6 +1422,20 @@
      ]
     },
     "provenance": "client-verified"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "listFaqs",
+    "removed": true,
+    "why": "Replaced by `listPublishedFaqs`, the guest read of the same data.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)"
+   },
+   {
+    "operation": "listContentPages",
+    "removed": true,
+    "why": "Replaced by `listPublishedContentPages`, the guest read of the same data.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)"
    }
   ],
   "_platform": {
@@ -2097,7 +2116,7 @@
    {
     "operationId": "getCart",
     "contract": "orders",
-    "purpose": "The cart, priced and checked, right now",
+    "purpose": "The cart, priced and checked, right now With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    },
    {
@@ -2115,7 +2134,7 @@
    {
     "operationId": "getVisitPlan",
     "contract": "venue-map",
-    "purpose": "The plan: days, timed items and add-on suggestions, at its current version",
+    "purpose": "The plan: days, timed items and add-on suggestions, at its current version Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad",
     "provenance": "decided 29 September 2026, MOB-6"
    },
@@ -2353,7 +2372,7 @@
    {
     "operationId": "getVisitPlan",
     "contract": "venue-map",
-    "purpose": "The plan: days, timed items and add-on suggestions, at its current version",
+    "purpose": "The plan: days, timed items and add-on suggestions, at its current version Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad",
     "provenance": "decided 29 September 2026, MOB-6"
    },
@@ -2367,7 +2386,7 @@
    {
     "operationId": "createAiConversation",
     "contract": "ai",
-    "purpose": "Open the planner conversation for this plan",
+    "purpose": "Open the planner conversation for this plan Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad",
     "provenance": "decided 29 September 2026, MOB-6"
    },

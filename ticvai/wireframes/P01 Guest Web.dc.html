@@ -147,7 +147,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getTenantAppStatus · getTenantConfig · listProducts · listMyEntitlements +6</div>
+          <div><b>OPERATIONS</b> &middot; getTenantAppStatus · getPublishedTenantConfig · listProducts · listMyEntitlements +6</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           
           <div><b>GOES TO</b> &middot; entry point · <a href="#web-002">WEB-002</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#web-003">WEB-003</a>  &mdash; <i>Search Results</i><br><a href="#web-004">WEB-004</a>  &mdash; <i>Opens a product and decides</i> <span class="car">productId</span><br><a href="#web-008">WEB-008</a>  &mdash; <i>Add-ons &amp; Upsell</i><br><a href="#web-009">WEB-009</a>  &mdash; <i>Wishlist</i><br><a href="#web-016">WEB-016</a>  &mdash; <i>Login / Register</i><br><a href="#web-017">WEB-017</a>  &mdash; <i>My Account Dashboard</i><br><a href="#web-018">WEB-018</a>  &mdash; <i>My Tickets</i> <span class="car">entitlementId · orderId</span><br><a href="#web-019">WEB-019</a>  &mdash; <i>Order History</i><br><a href="#web-020">WEB-020</a>  &mdash; <i>Profile &amp; Preferences</i><br><a href="#web-021">WEB-021</a>  &mdash; <i>Wallet &amp; Gift Cards</i><br><a href="#web-022">WEB-022</a>  &mdash; <i>Membership Plans</i> <span class="car">productId</span><br><a href="#web-023">WEB-023</a>  &mdash; <i>Membership Management</i><br><a href="#web-024">WEB-024</a>  &mdash; <i>Devices, Wishlist &amp; Consent</i><br><a href="#web-025">WEB-025</a>  &mdash; <i>Help Centre / FAQ</i><br><a href="#web-026">WEB-026</a>  &mdash; <i>Survey &amp; Feedback</i><br><a href="#web-027">WEB-027</a>  &mdash; <i>Newsletter Subscription</i><br><a href="#web-028">WEB-028</a>  &mdash; <i>Contact &amp; Venue Information</i><br><a href="#web-029">WEB-029</a>  &mdash; <i>Error / Sold Out / Maintenance</i><br><a href="#web-032">WEB-032</a>  &mdash; <i>Offers &amp; Promotions</i><br><a href="#web-033">WEB-033</a>  &mdash; <i>Shop</i><br><a href="#web-034">WEB-034</a>  &mdash; <i>Lost &amp; Found</i><br><a href="#web-036">WEB-036</a>  &mdash; <i>F&amp;B – Browse &amp; Order</i><br><a href="#web-037">WEB-037</a>  &mdash; <i>Menu Item Detail</i><br><a href="#web-038">WEB-038</a>  &mdash; <i>F&amp;B – Order Tracking</i><br><a href="#web-039">WEB-039</a>  &mdash; <i>Venue Map &amp; Wait Times</i><br><a href="#web-040">WEB-040</a>  &mdash; <i>Virtual Queue</i><br><a href="#web-041">WEB-041</a>  &mdash; <i>Parking – Reserve &amp; Pay</i> <span class="car">entitlementId</span><br><a href="#web-042">WEB-042</a>  &mdash; <i>Retail &amp; Shop and Drop</i><br><a href="#web-043">WEB-043</a>  &mdash; <i>Loyalty &amp; Rewards</i><br><a href="#web-044">WEB-044</a>  &mdash; <i>AI Concierge – Home</i><br><a href="#web-045">WEB-045</a>  &mdash; <i>Help Centre &amp; Accessibility</i><br><a href="#web-046">WEB-046</a>  &mdash; <i>In-Venue Notifications</i><br><a href="#web-049">WEB-049</a>  &mdash; <i>Book a trip (a transport venue)</i><br><a href="#web-050">WEB-050</a>  &mdash; <i>Plan your visit (header)</i></div>
@@ -247,7 +247,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; productId&larr;WEB-004, venueId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-006">WEB-006</a>  &mdash; <i>Change date or time (the dated flow picks th</i> <span class="car">eventId</span><br><a href="#web-007">WEB-007</a>  &mdash; <i>Interactive Seat Selection</i> <span class="car">eventId</span><br><a href="#web-008">WEB-008</a>  &mdash; <i>Add-ons &amp; Upsell</i><br><a href="#web-010">WEB-010</a>  &mdash; <i>Shopping Cart</i> <span class="car">code · lineId</span><br><a href="#web-016">WEB-016</a>  &mdash; <i>Continue, when sign-in is asked after add-on</i> <span class="car">cartId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formEvaluatePromotions &middot; <i>Evaluate promotions</i> &middot; <b>Evaluate promotions</b> &middot; Cancel <span class="dis">discards venueId · channel · lines · subjectId · membershipTierId · couponCodes · evaluateAt</span></div><div class="ov"><b>modal</b> helpMeChoose &middot; <i>Help me choose (the button, the banner, or once on first arrival when the mode is popupOnArrival)</i> &middot; <b>Show me</b> &middot; Close <span class="dis">discards answers</span></div><div class="ov"><b>modal</b> quickTour &middot; <i>First booking visit on this device, or Quick tour</i> &middot; End tour</div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> helpMeChoose &middot; <i>Help me choose (the button, the banner, or once on first arrival when the mode is popupOnArrival)</i> &middot; <b>Show me</b> &middot; Close <span class="dis">discards answers</span></div><div class="ov"><b>modal</b> quickTour &middot; <i>First booking visit on this device, or Quick tour</i> &middot; End tour</div></div>
         </div>
       </div>
       <div id="web-006" class="scr">
@@ -266,7 +266,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; performanceId&larr;navigation, cartId&larr;navigation, eventId&larr;WEB-004</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-005">WEB-005</a>  &mdash; <i>Picks a time; the tickets for it appear</i> <span class="car">performanceId</span><br><a href="#web-007">WEB-007</a>  &mdash; <i>Selects seats on the map</i> <span class="car">eventId · performanceId</span><br><a href="#web-008">WEB-008</a>  &mdash; <i>Add-ons &amp; Upsell</i><br><a href="#web-010">WEB-010</a>  &mdash; <i>Reviews the cart and may enter a promotion c</i> <span class="car">cartId</span><br><a href="#web-015">WEB-015</a>  &mdash; <i>Adds tickets for a performance whose on-sale</i> <span class="car">performanceId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCheckBookingEligibility &middot; <i>Check booking eligibility</i> &middot; <b>Check booking eligibility</b> &middot; Cancel <span class="dis">discards productIds · party</span></div><div class="ov"><b>modal</b> formAcquireInventoryHold &middot; <i>Add to cart</i> &middot; <b>Add to cart</b> &middot; Cancel <span class="dis">discards id · channelCapacityId · requestedUnits · ttlSeconds · channel</span></div><div class="ov"><b>modal</b> consentQuestions &middot; <i>Once, after the session or date is picked, when the cart has consent questions</i> &middot; <b>Next</b> &middot; Back <span class="dis">discards answers</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>drawer</b> eligibilityDeclaration &middot; <i>Once, on leaving selection, when a chosen product has an eligibility rule</i> &middot; <b>Continue</b> &middot; Back <span class="dis">discards party</span></div><div class="ov"><b>modal</b> consentQuestions &middot; <i>Once, after the session or date is picked, when the cart has consent questions</i> &middot; <b>Next</b> &middot; Back <span class="dis">discards answers</span></div></div>
         </div>
       </div>
       <div id="web-007" class="scr">
@@ -285,7 +285,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; performanceId&larr;deepLink, eventId&larr;WEB-006, holdId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-005">WEB-005</a>  &mdash; <i>Ticket Type Selection</i><br><a href="#web-006">WEB-006</a>  &mdash; <i>Date &amp; Performance Selection</i> <span class="car">eventId · performanceId</span><br><a href="#web-008">WEB-008</a>  &mdash; <i>Add-ons &amp; Upsell</i><br><a href="#web-010">WEB-010</a>  &mdash; <i>Reviews the cart</i> <span class="car">holdId · performanceId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateSeatHold &middot; <i>Create seat hold</i> &middot; <b>Create seat hold</b> &middot; Cancel <span class="dis">discards id · performanceId · seatIds · ttlSeconds · subjectId</span></div><div class="ov"><b>modal</b> formRecommendSeats &middot; <i>Recommend seats</i> &middot; <b>Recommend seats</b> &middot; Cancel <span class="dis">discards partySize · strategy · categoryIds · maxPrice · accessibleCount · maxOptions</span></div><div class="ov"><b>modal</b> dateTimeOnSeatMap &middot; <i>The seat map opens for an event with several performances and `seatEventDateMode` is `popupOnSeatMap`</i> &middot; <b>Show seats</b> &rarr; <a href="#web-007">WEB-007</a> <span class="car">performanceId</span> &middot; Close</div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRecommendSeats &middot; <i>Recommend seats</i> &middot; <b>Recommend seats</b> &middot; Cancel <span class="dis">discards partySize · strategy · categoryIds · maxPrice · accessibleCount · maxOptions</span></div><div class="ov"><b>modal</b> dateTimeOnSeatMap &middot; <i>The seat map opens for an event with several performances and `seatEventDateMode` is `popupOnSeatMap`</i> &middot; <b>Show seats</b> &rarr; <a href="#web-007">WEB-007</a> <span class="car">performanceId</span> &middot; Close</div></div>
         </div>
       </div>
       <div id="web-008" class="scr">
@@ -380,7 +380,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; cartId&larr;WEB-008, code&larr;deepLink, lineId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-011">WEB-011</a>  &mdash; <i>Answers attendee forms and consent, only whe</i><br><a href="#web-012">WEB-012</a>  &mdash; <i>Checkout — Payment</i> <span class="car">orderId · paymentId</span><br><a href="#web-013">WEB-013</a>  &mdash; <i>Booking Confirmation</i> <span class="car">orderId</span><br><a href="#web-016">WEB-016</a>  &mdash; <i>Login / Register</i> <span class="car">subjectId</span><br><a href="#web-030">WEB-030</a>  &mdash; <i>They transfer three tickets</i> <span class="car">orderId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRemoveCartLine &middot; <i>Remove cart line</i></div><div class="ov"><b>confirmDialog</b> confirmAbandonCart &middot; <i>Abandon cart</i></div><div class="ov"><b>modal</b> formCreateCart &middot; <i>Create cart</i> &middot; <b>Create cart</b> &middot; Cancel <span class="dis">discards venueId · channel · subjectId · locale</span></div><div class="ov"><b>modal</b> formAddCartLine &middot; <i>Add cart line</i> &middot; <b>Add cart line</b> &middot; Cancel <span class="dis">discards variantId · quantity · performanceId · seatIds · parentLineId · attributes</span></div><div class="ov"><b>modal</b> formUpdateCartLine &middot; <i>Save cart line</i> &middot; <b>Save cart line</b> &middot; Cancel <span class="dis">discards quantity</span></div><div class="ov"><b>modal</b> formCheckoutCart &middot; <i>Checkout cart</i> &middot; <b>Checkout cart</b> &middot; Cancel <span class="dis">discards subjectId · attendees</span></div><div class="ov"><b>modal</b> formEvaluatePromotions &middot; <i>Evaluate promotions</i> &middot; <b>Evaluate promotions</b> &middot; Cancel <span class="dis">discards venueId · channel · lines · subjectId · membershipTierId · couponCodes · evaluateAt</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRemoveCartLine &middot; <i>Remove</i></div><div class="ov"><b>confirmDialog</b> confirmAbandonCart &middot; <i>Empty cart</i></div></div>
         </div>
       </div>
       <div id="web-011" class="scr">
@@ -413,12 +413,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; transferOrderTickets · createOrder · createPayment · getOrder +2</div>
+          <div><b>OPERATIONS</b> &middot; createOrder · createPayment · getOrder · inquirePaymentStatus +2</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink, paymentId&larr;navigation, venueId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-010">WEB-010</a>  &mdash; <i>Shopping Cart</i> <span class="car">performanceId</span><br><a href="#web-011">WEB-011</a>  &mdash; <i>Guest Details &amp; Attendee Forms</i><br><a href="#web-013">WEB-013</a>  &mdash; <i>Receives confirmation and tickets</i> <span class="car">orderId</span><br><a href="#web-016">WEB-016</a>  &mdash; <i>Sign in or use a guest code (when sign-in is</i> <span class="car">cartId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formTransferOrderTickets &middot; <i>Transfer order tickets</i> &middot; <b>Transfer order tickets</b> &middot; Cancel <span class="dis">discards ticketIds · recipient · message</span></div><div class="ov"><b>modal</b> formCreateOrder &middot; <i>Create order</i> &middot; <b>Create order</b> &middot; Cancel <span class="dis">discards id · venueId · channel · lines · recordedAt · shiftId · subjectId · guestLinkId · catalogueBundleVersion</span></div><div class="ov"><b>modal</b> formCreatePayment &middot; <i>Create payment</i> &middot; <b>Create payment</b> &middot; Cancel <span class="dis">discards id · orderId · tender · amount · recordedAt · tenderCurrency · tenderAmount · walletAuthorisationId · deviceId</span></div></div>
+          
         </div>
       </div>
       <div id="web-013" class="scr">
@@ -432,12 +432,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; transferOrderTickets · getOrder · reprintOrder</div>
+          <div><b>OPERATIONS</b> &middot; getOrder · reprintOrder</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; orderId&larr;WEB-012</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-010">WEB-010</a>  &mdash; <i>Shopping Cart</i> <span class="car">lineId · performanceId</span><br><a href="#web-011">WEB-011</a>  &mdash; <i>Guest Details &amp; Attendee Forms</i><br><a href="#web-012">WEB-012</a>  &mdash; <i>Checkout — Payment</i> <span class="car">orderId · paymentId</span><br><a href="#web-014">WEB-014</a>  &mdash; <i>Pay for a Booking</i><br><a href="#web-018">WEB-018</a>  &mdash; <i>My Tickets</i> <span class="car">orderId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formTransferOrderTickets &middot; <i>Transfer order tickets</i> &middot; <b>Transfer order tickets</b> &middot; Cancel <span class="dis">discards ticketIds · recipient · message</span></div><div class="ov"><b>modal</b> formReprintOrder &middot; <i>Reprint order</i> &middot; <b>Reprint order</b> &middot; Cancel <span class="dis">discards delivery · recordedAt · destination · lineIds · reason</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formReprintOrder &middot; <i>Resend my tickets</i> &middot; <b>Send</b> &middot; Cancel <span class="dis">discards delivery · recordedAt · destination · lineIds · reason</span></div></div>
         </div>
       </div>
       <div id="web-014" class="scr">
@@ -548,7 +548,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; token&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#web-013">WEB-013</a>  &mdash; <i>Booking Confirmation</i> <span class="car">orderId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formPayByLink &middot; <i>Pay by link</i> &middot; <b>Pay by link</b> &middot; Cancel <span class="dis">discards providerToken · email</span></div></div>
+          
         </div>
       </div></div><div class="grp">04 — High-Demand Access · 1 screens</div><div class="stack">
       <div id="web-015" class="scr">
@@ -621,7 +621,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; listMyEntitlements · getEntitlement · getEntitlementCredential · getEntitlementHistory +4</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; entitlementId&larr;deepLink, orderId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session, entitlementId&larr;deepLink, orderId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-016">WEB-016</a>  &mdash; <i>Login / Register</i><br><a href="#web-017">WEB-017</a>  &mdash; <i>My Account Dashboard</i><br><a href="#web-019">WEB-019</a>  &mdash; <i>Order History</i> <span class="car">orderId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formIssueWalletPass &middot; <i>Issue wallet pass</i> &middot; <b>Issue wallet pass</b> &middot; Cancel <span class="dis">discards entitlementId · platform</span></div><div class="ov"><b>modal</b> formShareEntitlement &middot; <i>Share entitlement</i> &middot; <b>Share entitlement</b> &middot; Cancel <span class="dis">discards toSubjectId · validUntil</span></div><div class="ov"><b>modal</b> formTransferOrderTickets &middot; <i>Transfer order tickets</i> &middot; <b>Transfer order tickets</b> &middot; Cancel <span class="dis">discards ticketIds · recipient · message</span></div></div>
@@ -638,12 +638,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; transferOrderTickets · listMyOrders · getOrder · listOrders +6</div>
+          <div><b>OPERATIONS</b> &middot; listMyOrders · getOrder · createRefundRequest · listTaxInvoices +4</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink, documentId&larr;navigation, invoiceId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session, orderId&larr;deepLink, documentId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-016">WEB-016</a>  &mdash; <i>Login / Register</i> <span class="car">subjectId</span><br><a href="#web-017">WEB-017</a>  &mdash; <i>My Account Dashboard</i><br><a href="#web-018">WEB-018</a>  &mdash; <i>My Tickets</i> <span class="car">orderId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateRefundRequest &middot; <i>Create refund request</i> &middot; <b>Create refund request</b> &middot; Cancel <span class="dis">discards orderId · reason · lineIds</span></div><div class="ov"><b>modal</b> formTransferOrderTickets &middot; <i>Transfer order tickets</i> &middot; <b>Transfer order tickets</b> &middot; Cancel <span class="dis">discards ticketIds · recipient · message</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateRefundRequest &middot; <i>Ask for a refund</i> &middot; <b>Create refund request</b> &middot; Cancel <span class="dis">discards orderId · reason · lineIds</span></div></div>
         </div>
       </div>
       <div id="web-020" class="scr">
@@ -681,7 +681,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; cardCode&larr;deepLink, subjectId&larr;session, walletId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-022">WEB-022</a>  &mdash; <i>Membership Plans</i><br><a href="#web-023">WEB-023</a>  &mdash; <i>Membership Management</i> <span class="car">orderId</span><br><a href="#web-024">WEB-024</a>  &mdash; <i>Devices, Wishlist &amp; Consent</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formStorePaymentToken &middot; <i>Store payment token</i> &middot; <b>Store payment token</b> &middot; Cancel <span class="dis">discards providerId · providerToken · consentPurposeId · setDefault</span></div><div class="ov"><b>modal</b> formTransferWalletBalance &middot; <i>Transfer wallet balance</i> &middot; <b>Transfer wallet balance</b> &middot; Cancel <span class="dis">discards amount · toSubjectId · toWalletId · message</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formStorePaymentToken &middot; <i>Add a card</i> &middot; <b>Save card</b> &middot; Cancel</div><div class="ov"><b>modal</b> formTransferWalletBalance &middot; <i>Transfer wallet balance</i> &middot; <b>Transfer wallet balance</b> &middot; Cancel <span class="dis">discards amount · toSubjectId · toWalletId · message</span></div></div>
         </div>
       </div>
       <div id="web-022" class="scr">
@@ -695,7 +695,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listProducts · getProduct · getMyMemberships · listGuestMemberships</div>
+          <div><b>OPERATIONS</b> &middot; listProducts · getProduct · getMyMemberships</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; productId&larr;WEB-001</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-021">WEB-021</a>  &mdash; <i>Wallet &amp; Gift Cards</i><br><a href="#web-023">WEB-023</a>  &mdash; <i>Membership Management</i><br><a href="#web-024">WEB-024</a>  &mdash; <i>Devices, Wishlist &amp; Consent</i></div>
@@ -714,12 +714,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listBillingStatements · getBillingStatement · listMyPaymentIssues · retryMyDunningPayment +5</div>
+          <div><b>OPERATIONS</b> &middot; listBillingStatements · getBillingStatement · listMyPaymentIssues · retryMyDunningPayment +3</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink, caseId&larr;navigation, statementId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session, orderId&larr;deepLink, caseId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-021">WEB-021</a>  &mdash; <i>Wallet &amp; Gift Cards</i><br><a href="#web-022">WEB-022</a>  &mdash; <i>Membership Plans</i> <span class="car">productId</span><br><a href="#web-024">WEB-024</a>  &mdash; <i>Devices, Wishlist &amp; Consent</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRetryMyDunningPayment &middot; <i>Retry my dunning payment</i> &middot; <b>Retry my dunning payment</b> &middot; Cancel <span class="dis">discards paymentTokenId</span></div><div class="ov"><b>modal</b> formTransferOrderTickets &middot; <i>Transfer order tickets</i> &middot; <b>Transfer order tickets</b> &middot; Cancel <span class="dis">discards ticketIds · recipient · message</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRetryMyDunningPayment &middot; <i>Retry the payment</i> &middot; <b>Retry my dunning payment</b> &middot; Cancel <span class="dis">discards paymentTokenId</span></div></div>
         </div>
       </div>
       <div id="web-024" class="scr">
@@ -754,7 +754,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; getLoyaltyPosition · listLoyaltyProgrammes · listPromotions · createReferral +3</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> </div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateReferral &middot; <i>Create referral</i> &middot; <b>Create referral</b> &middot; Cancel <span class="dis">discards id · referrerSubjectId · code · status · refereeSubjectId · qualifyingAction · referrerRewardId · refereeRewardId · expiresAt · scopePath</span></div><div class="ov"><b>modal</b> formRedeemLoyaltyPoints &middot; <i>Redeem loyalty points</i> &middot; <b>Redeem loyalty points</b> &middot; Cancel <span class="dis">discards subjectId · programmeId · points · rewardId · orderId</span></div></div>
@@ -868,7 +868,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; claimLocationSession · listMyNotifications · markMyNotificationsRead</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline · emptyNoResults</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> </div>
           
           
@@ -904,12 +904,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; transferOrderTickets · claimTicketTransfer · listOrders · createResaleListing</div>
+          <div><b>OPERATIONS</b> &middot; transferOrderTickets · listMyOrders · createResaleListing</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink, transferId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session, orderId&larr;deepLink, transferId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-031">WEB-031</a>  &mdash; <i>My Reservations</i><br><a href="#web-035">WEB-035</a> </div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateResaleListing &middot; <i>Create resale listing</i> &middot; <b>Create resale listing</b> &middot; Cancel <span class="dis">discards entitlementId · askPrice · sellerSubjectId</span></div><div class="ov"><b>modal</b> formTransferOrderTickets &middot; <i>Transfer order tickets</i> &middot; <b>Transfer order tickets</b> &middot; Cancel <span class="dis">discards ticketIds · recipient · message</span></div><div class="ov"><b>modal</b> formClaimTicketTransfer &middot; <i>Claim ticket transfer</i> &middot; <b>Claim ticket transfer</b> &middot; Cancel <span class="dis">discards claimToken</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateResaleListing &middot; <i>Create resale listing</i> &middot; <b>Create resale listing</b> &middot; Cancel <span class="dis">discards entitlementId · askPrice · sellerSubjectId</span></div><div class="ov"><b>modal</b> formTransferOrderTickets &middot; <i>Transfer tickets</i> &middot; <b>Transfer tickets</b> &middot; Cancel <span class="dis">discards ticketIds · recipient · message</span></div></div>
         </div>
       </div>
       <div id="web-031" class="scr">
@@ -925,10 +925,10 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; listGroupPackages · getGroupPackageDefinition · requestGroupBooking · listReservations +5</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; reservationId&larr;deepLink, groupBookingId&larr;navigation, resourceId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session, reservationId&larr;deepLink, groupBookingId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-030">WEB-030</a>  &mdash; <i>Ticket Transfer</i> <span class="car">orderId</span><br><a href="#web-035">WEB-035</a> </div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmCancelReservation &middot; <i>Cancel reservation</i></div><div class="ov"><b>modal</b> formRequestGroupBooking &middot; <i>Request group booking</i> &middot; <b>Request group booking</b> &middot; Cancel <span class="dis">discards kind · packageProductId · preferredDate · expectedSize · organisationName · yearGroup · accessAndDietaryNeeds · celebrantName · celebrantTurningAge · allergiesAndRequests</span></div><div class="ov"><b>modal</b> formUpdateTableReservation &middot; <i>Save table reservation</i> &middot; <b>Save table reservation</b> &middot; Cancel <span class="dis">discards outletId · partySize · startsAt · id · subjectId · guestName · contactPoint · durationMinutes · tables · status · groupId · notes · actualPartySize · tableVisitId</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmCancelReservation &middot; <i>Cancel reservation</i></div><div class="ov"><b>modal</b> formRequestGroupBooking &middot; <i>Request group booking</i> &middot; <b>Request group booking</b> &middot; Cancel <span class="dis">discards kind · packageProductId · preferredDate · expectedSize · organisationName · yearGroup · accessAndDietaryNeeds · celebrantName · celebrantTurningAge · allergiesAndRequests</span></div><div class="ov"><b>modal</b> formUpdateTableReservation &middot; <i>Change reservation</i> &middot; <b>Save</b> &middot; Cancel <span class="dis">discards partySize · startsAt</span></div></div>
         </div>
       </div>
       <div id="web-035" class="scr">
@@ -985,7 +985,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; cartId&larr;session, outletId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> </div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formAddCartLine &middot; <i>Add cart line</i> &middot; <b>Add cart line</b> &middot; Cancel <span class="dis">discards variantId · quantity · performanceId · seatIds · parentLineId · attributes</span></div></div>
+          
         </div>
       </div>
       <div id="web-042" class="scr">
@@ -1020,7 +1020,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; listMyCases · raiseMyCase · replyToMyCase</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; caseId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session, caseId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> </div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRaiseMyCase &middot; <i>Raise my case</i> &middot; <b>Raise my case</b> &middot; Cancel <span class="dis">discards id · kind · summary · recordedAt · detail · venueId · orderRef</span></div><div class="ov"><b>modal</b> formReplyToMyCase &middot; <i>Reply to my case</i> &middot; <b>Reply to my case</b> &middot; Cancel <span class="dis">discards message</span></div></div>
@@ -1037,7 +1037,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listFaqs · listContentPages · getTenantAppStatus</div>
+          <div><b>OPERATIONS</b> &middot; listPublishedFaqs · listPublishedContentPages · getTenantAppStatus · listPublishedPolicies</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> </div>
@@ -1096,7 +1096,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; getGuestOrderStatus · getGuestBill · claimTableSession</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink, sessionId&larr;deepLink, venueId&larr;session</div>
+          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session, orderId&larr;deepLink, sessionId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> </div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formClaimTableSession &middot; <i>Claim table session</i> &middot; <b>Claim table session</b> &middot; Cancel <span class="dis">discards tableCode · partySize</span></div></div>
@@ -1134,7 +1134,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; joinQueue · getWaitingGuest · leaveQueue · getWaitTimes +2</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; entryId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session, entryId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> </div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formJoinWaitlist &middot; <i>Join waitlist</i> &middot; <b>Join waitlist</b> &middot; Cancel <span class="dis">discards performanceId · partySize · id · variantId · subjectId · contactPoint · status · position · offeredAt · offerExpiresAt · joinedAt</span></div><div class="ov"><b>modal</b> formJoinQueue &middot; <i>Join queue</i> &middot; <b>Join queue</b> &middot; Cancel <span class="dis">discards id · queueId · partySize · recordedAt · entitlementId · partyHeightsCm</span></div></div>
@@ -1151,12 +1151,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listParkingFacilities · addCartLine · checkoutCart · createPayment +1</div>
+          <div><b>OPERATIONS</b> &middot; listParkingFacilities · addCartLine · updateParkingEntitlement</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline · soldOutForDay</span></div>
           <div><b>ARRIVES WITH</b> &middot; entitlementId&larr;deepLink, venueId&larr;session, cartId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> </div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formAddCartLine &middot; <i>Add parking to my cart</i> &middot; <b>Add to cart</b> &middot; Cancel <span class="dis">discards variantId · quantity · performanceId · attributes</span></div><div class="ov"><b>modal</b> formUpdateParkingEntitlement &middot; <i>Save parking entitlement</i> &middot; <b>Save parking entitlement</b> &middot; Cancel <span class="dis">discards plateNumber · plateCountry · status</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formAddCartLine &middot; <i>Add parking to my cart</i> &middot; <b>Add to cart</b> &middot; Cancel <span class="dis">discards variantId · quantity · performanceId · attributes</span></div><div class="ov"><b>modal</b> formUpdateParkingEntitlement &middot; <i>Change plate</i> &middot; <b>Save</b> &middot; Cancel <span class="dis">discards plate</span></div></div>
         </div>
       </div></div><div class="grp">14 — Transport · 1 screens</div><div class="stack">
       <div id="web-049" class="scr">

@@ -68,7 +68,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `WEB-029` | Error / Sold Out / Maintenance | A | 0 | 34 | 7 | 0 | 1 | 2 | guest | review (client-verified) |
+| `WEB-029` | Error / Sold Out / Maintenance | A | 0 | 28 | 7 | 0 | 1 | 2 | guest | review (client-verified) |
 
 ## Thin screens in this batch
 
@@ -113,17 +113,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Is published | yes / no (icon or chip) | True once any version has been published. |
 | Published version | text | — |
 | Published at | 1 Oct 2026, 14:30 | — |
-| Draft version | text | Staff only. |
-| Has unpublished changes | yes / no (icon or chip) | Staff only. The working draft differs from the current version's `snapshot`. |
-| Active module count | 1,234 | Staff only. `ModuleEnablement` rows with `isEnabled` true. |
-| Licensed module count | 1,234 | Staff only. `ModuleEnablement` rows with `isLicensed` true. |
-| Active page count | 1,234 | Staff only. Content pages that are `published` and enabled. |
 | Is in maintenance | yes / no (icon or chip) | — |
 | Maintenance message | in the reader's language | — |
 | Expected back at | 1 Oct 2026, 14:30 | — |
 | Availability | chip: Open, Sold out, Closed | The sold-out or closed signal (decided 28 September, audit R073). `open` is the normal state. |
 | Availability message | in the reader's language | What the sold-out or closed screen says (WEB-029). Null shows the default wording. |
-| Recent changes | list or chips (count when long) | Staff only. Names the principal behind each change, so it never reaches a public response. |
 
 **Sold out or closed today** (banner, from `getTenantAppStatus`): **From `getTenantAppStatus.availability`** (`open`, `soldOut`, `closed`) and its `availabilityMessage`, set live from CMS-001 through `setMaintenanceMode` (decided 28 September, audit R073 (f)). `soldOut` and `closed` read differently: sold out means come another day, closed means the venue is not open. Nothing shows while it is `open`.
 
@@ -159,7 +153,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Loading (`?state=loading`) | — |
 | Error (`?state=error`) | **This screen is the error state.** It distinguishes sold out, closed, and platform unavailable — three different things a guest must not confuse, because only one means come back later |
 | Empty, first run (`?state=emptyFirstRun`) | — |
-| Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the … |
+| Permission denied (`?state=emptyNoAccess`) | **Nothing here needs a sign-in** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page. |
 | Offline (`?state=offline`) | **The offline banner shows instead of this page.** Being offline is the guest's connection, not the venue's — an error or maintenance page shown for a dropped signal tells a guest the venue is down. |
 | Sold out (`?state=soldOut`) | **Sold out today.** `getTenantAppStatus.availability` is `soldOut`: the page says so with the tenant's `availabilityMessage` and offers another day, never a generic error (decided 28 September, audit R073 (f)). |
 | Closed (`?state=closed`) | **Closed.** `getTenantAppStatus.availability` is `closed`: the page says the venue is not open, with the tenant's `availabilityMessage` and the opening hours from `contact` (decided 28 September, audit R073 (f)). |
@@ -168,7 +162,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - `getTenantAppStatus` → no permission · device, guest
 
-**A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the …
+**A refused user sees:** **Nothing here needs a sign-in** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page.
 
 #### Requirements it meets
 
@@ -216,12 +210,11 @@ Also set there, as content the tenant writes: is in maintenance, minimum app ver
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-029` · status **review** · provenance client-verified
 - Prototype (rev 3, verified 2026-09-28, match exact): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Footer 'Service status', or Discover → 'Service status'*. Differences: Prototype has 'Maintenance' where YAML has 'closed'; sold-out offers 'Join the waitlist' (holds a returned place for 15 minutes), which the YAML screen (getTenantAppStatus only) cannot call.
-- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (34 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (28 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-029?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline, soldOut, closed.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] No transition is declared; back returns where the user came from.

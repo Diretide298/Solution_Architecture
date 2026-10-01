@@ -85,7 +85,7 @@
    "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
    "emptyFirstRun": "**No refunds or listings yet.** The venue's policy is shown regardless, so a guest knows the answer before they need it.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist.",
-   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `getWaiverStatus` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** Refunds and resale listings need the server — a queued refund request is a promise nobody made."
   },
   "apis": [
@@ -338,7 +338,7 @@
    "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
    "emptyFirstRun": "**Not enrolled.** What a face pass is for, where it works, and what withdrawing it does — **before** the camera opens.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist.",
-   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `getFacePassEnrolment` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Not available, and the offline banner says why.** Biometric enrolment never happens offline — a face captured and queued is a face the guest cannot withdraw until it uploads.",
    "subjectNotLinked": "**Refused: that person is not linked to you** (403 `subject-not-linked`). A guest may enrol only themselves or a child linked to them by a family-member or primary-holder delegation; the screen says so and returns to **Who is this for**, which is refreshed in case the link was just removed (decided 28 September, audit R205)."
   },
@@ -472,22 +472,18 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every payment token",
+       "kind": "cardList",
+       "label": "Saved cards",
        "bindsTo": "PaymentToken",
        "columns": [
-        "PaymentToken.id",
-        "PaymentToken.subjectId",
-        "PaymentToken.providerId",
-        "PaymentToken.token",
         "PaymentToken.method",
         "PaymentToken.maskedIdentifier",
         "PaymentToken.expiresAt",
-        "PaymentToken.isDefault",
-        "PaymentToken.consentPurposeId"
+        "PaymentToken.isDefault"
        ],
        "operation": "listPaymentTokens",
-       "provenance": "contract orders.yaml GET /payment-tokens"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Was the generated table 'Every payment token'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       }
      ]
     },
@@ -495,24 +491,6 @@
      "name": "contextPanel",
      "slot": "selection",
      "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected payment token",
-       "bindsTo": "PaymentToken",
-       "columns": [
-        "PaymentToken.id",
-        "PaymentToken.subjectId",
-        "PaymentToken.providerId",
-        "PaymentToken.token",
-        "PaymentToken.method",
-        "PaymentToken.maskedIdentifier",
-        "PaymentToken.expiresAt",
-        "PaymentToken.isDefault",
-        "PaymentToken.consentPurposeId"
-       ],
-       "operation": "listPaymentTokens",
-       "provenance": "contract orders.yaml GET /payment-tokens"
-      },
       {
        "kind": "detailPanel",
        "label": "The gift card",
@@ -539,7 +517,7 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Store payment token",
+       "label": "Add a card",
        "operation": "storePaymentToken",
        "provenance": "contract orders.yaml POST /payment-tokens"
       },
@@ -564,7 +542,7 @@
    "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
    "emptyFirstRun": "**No stored cards.** A guest arrives here after a first purchase, so the empty state is the common one.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listPaymentTokens` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server."
   },
   "apis": [
@@ -650,22 +628,17 @@
    {
     "id": "formStorePaymentToken",
     "component": "modal",
-    "trigger": "Store payment token",
-    "body": "**Collects what `storePaymentToken` sends before it is called.** Required: `providerId`, `providerToken`, `consentPurposeId`. Optional: `setDefault`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Add a card",
+    "body": "**The gateway's own card form**, hosted by the provider; it returns the token that `storePaymentToken` saves with the guest's consent. No token, provider or consent id is ever a field.",
     "confirm": {
-     "label": "Store payment token",
+     "label": "Save card",
      "operation": "storePaymentToken"
     },
     "dismiss": {
      "label": "Cancel",
-     "discards": [
-      "providerId",
-      "providerToken",
-      "consentPurposeId",
-      "setDefault"
-     ]
+     "discards": []
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    },
    {
     "id": "formTransferWalletBalance",
@@ -691,7 +664,7 @@
     "id": "formRedeemLoyaltyPoints",
     "component": "modal",
     "trigger": "Redeem loyalty points",
-    "body": "**Collects what `redeemLoyaltyPoints` sends before it is called.** Required: `subjectId`, `programmeId`, `points`. Optional: `rewardId`, `orderId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**How many points to spend.** The guest is the caller and the programme is the venue's; `redeemLoyaltyPoints` is sent with both, never typed.",
     "confirm": {
      "label": "Redeem loyalty points",
      "operation": "redeemLoyaltyPoints"
@@ -706,7 +679,7 @@
       "orderId"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ],
   "_platform": {
@@ -870,7 +843,7 @@
    "loading": "Content loads.",
    "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
    "emptyFirstRun": "**Only this device is signed in.** The device list holds one row, this one, and the screen says that signing in elsewhere will add a row here.",
-   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `verifyGuestEmail` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**Nothing here is offered offline, and the banner says so.** An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a device signed out offline is still signed in."
   },
   "apis": [

@@ -71,7 +71,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `GST-067` | Refunds & Resale | A | 6 | 3 | 6 | 10 | 7 | 6 | guest | notStarted (client-verified) |
 | `GST-069` | Face Pass | A | 12 | 10 | 7 | 36 | 5 | 6 | guest | notStarted (client-verified) |
-| `GST-071` | Payment Methods | A | 9 | 27 | 6 | 7 | 1 | 0 | guest | notStarted (client-verified) |
+| `GST-071` | Payment Methods | A | 9 | 13 | 6 | 7 | 1 | 0 | guest | notStarted (client-verified) |
 | `GST-073` | Security & Sign-in | A | 11 | 23 | 5 | 4 | 2 | 0 | guest | notStarted (designed) |
 
 ## Thin screens in this batch
@@ -169,7 +169,7 @@ Errors to draw in the form: 409 Not resellable, and the reason says which — pa
 | Error (`?state=error`) | Could not load. **Says what failed and offers one way onward**, never a bare failure. |
 | Empty, first run (`?state=emptyFirstRun`) | **No refunds or listings yet.** The venue's policy is shown regardless, so a guest knows the answer before they need it. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing here yet.** The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `GUEST_VIEW`, which `getWaiverStatus` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that … |
 | Offline (`?state=offline`) | **Not available, and the offline banner says why.** Refunds and resale listings need the server — a queued refund request is a promise nobody made. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Not resellable, and the reason says which — partly consumed (`partlyConsumed`), name-bound (`nameBound`), or outside the resale window (`outsideResaleWindow`) … (ResaleRefusedProblem) |
 
@@ -179,7 +179,7 @@ Errors to draw in the form: 409 Not resellable, and the reason says which — pa
 - `createResaleListing` → `ORDER_CREATE` (operate) · staff, guest
 - `getWaiverStatus` → `GUEST_VIEW` (read) · staff, guest, device
 
-**A refused user sees:** Shown when the caller lacks `GUEST_VIEW`, which `getWaiverStatus` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that …
 
 #### Requirements it meets
 
@@ -231,6 +231,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 - Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-067` · status **notStarted** · provenance client-verified
 - Prototype (rev 3, verified 2026-09-28, match exact): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html`, view *Account → All screens → Wave 2 → Refunds & resale*
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0030 *A deep link is a pointer, not authorisation* (`docs/adr/0030-deep-link-cold-entry.md`)
 
 #### Acceptance for the design
@@ -337,7 +338,7 @@ Errors to draw in the form: 403 A guest enrolling a subject who is neither thems
 | Error (`?state=error`) | Could not load. **Says what failed and offers one way onward**, never a bare failure. |
 | Empty, first run (`?state=emptyFirstRun`) | **Not enrolled.** What a face pass is for, where it works, and what withdrawing it does — **before** the camera opens. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing here yet.** The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `GUEST_VIEW`, which `getFacePassEnrolment` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that … |
 | Offline (`?state=offline`) | **Not available, and the offline banner says why.** Biometric enrolment never happens offline — a face captured and queued is a face the guest cannot withdraw until it uploads. |
 | Subject not linked (`?state=subjectNotLinked`) | **Refused: that person is not linked to you** (403 `subject-not-linked`). A guest may enrol only themselves or a child linked to them by a family-member or primary-holder delegation; the screen says so and returns to **Who is this for**, which is refreshed in case the link was just removed (decided 28 September, audit R205). |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 This face is already on another annual pass. Returned with the reason and without naming the other pass — a counter agent needs to know it is a duplicate, not …; 422 Capture quality too low to enrol. Retake rather than store something that will not match. |
@@ -349,7 +350,7 @@ Errors to draw in the form: 403 A guest enrolling a subject who is neither thems
 - `getFacePassEnrolment` → `GUEST_VIEW` (read) · staff, guest
 - `revokeFacePass` → `GUEST_MANAGE` (configure) · staff, guest
 
-**A refused user sees:** Shown when the caller lacks `GUEST_VIEW`, which `getFacePassEnrolment` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that …
 
 #### Requirements it meets
 
@@ -402,6 +403,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 - Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-069` · status **notStarted** · provenance client-verified
 - Prototype (rev 3, verified 2026-09-28, match exact): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html`, view *Account → All screens → Wave 2 → Face Pass (also Account → Face Pass)*
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0030 *A deep link is a pointer, not authorisation* (`docs/adr/0030-deep-link-cold-entry.md`)
 
 #### Acceptance for the design
@@ -438,9 +440,9 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 #### Inputs: what the user enters or picks
 
-**Form: Store payment token** (modal, opened by *Store payment token*; *Store payment token* calls `storePaymentToken`, *Cancel* sends nothing)
+**Form: Add a card** (modal, opened by *Add a card*; *Save card* calls `storePaymentToken`, *Cancel* sends nothing)
 
-**Collects what `storePaymentToken` sends before it is called.** Required: `providerId`, `providerToken`, `consentPurposeId`. Optional: `setDefault`. Dismissing sends nothing; the screen behind is unchanged.
+**The gateway's own card form**, hosted by the provider; it returns the token that `storePaymentToken` saves with the guest's consent. No token, provider or consent id is ever a field.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -459,7 +461,7 @@ Errors to draw in the form: 409 Insufficient cash credit, distinct from insuffic
 
 **Form: Redeem loyalty points** (modal, opened by *Redeem loyalty points*; *Redeem loyalty points* calls `redeemLoyaltyPoints`, *Cancel* sends nothing)
 
-**Collects what `redeemLoyaltyPoints` sends before it is called.** Required: `subjectId`, `programmeId`, `points`. Optional: `rewardId`, `orderId`. Dismissing sends nothing; the screen behind is unchanged.
+**How many points to spend.** The guest is the caller and the programme is the venue's; `redeemLoyaltyPoints` is sent with both, never typed.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -475,33 +477,14 @@ Errors to draw in the form: 409 The balance does not cover `points` (`insufficie
 
 **Shown**
 
-**Every payment token** (data table, from `listPaymentTokens`)
+**Saved cards** (card list, from `listPaymentTokens`): Was the generated table 'Every payment token'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | — |
-| Provider | the name it points at, never the id | — |
-| Token | text | Write-only, never returned. The provider's reference to a credential it holds. |
 | Method | text | — |
 | Masked identifier | text | What a guest sees — the last four digits, the card brand. Enough to choose between two saved cards and not enough to use one. |
 | Expires at | 1 Oct 2026 | — |
 | Is default | yes / no (icon or chip) | — |
-| Consent purpose | the name it points at, never the id | Storing a card for future use is a purpose a guest consents to, separate from the payment they are making now. |
-
-**The selected payment token** (detail panel, from `listPaymentTokens`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | — |
-| Provider | the name it points at, never the id | — |
-| Token | text | Write-only, never returned. The provider's reference to a credential it holds. |
-| Method | text | — |
-| Masked identifier | text | What a guest sees — the last four digits, the card brand. Enough to choose between two saved cards and not enough to use one. |
-| Expires at | 1 Oct 2026 | — |
-| Is default | yes / no (icon or chip) | — |
-| Consent purpose | the name it points at, never the id | Storing a card for future use is a purpose a guest consents to, separate from the payment they are making now. |
 
 **The gift card** (detail panel, from `getGiftCard`)
 
@@ -521,7 +504,7 @@ Errors to draw in the form: 409 The balance does not cover `points` (`insufficie
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Store payment token (primary button) | `storePaymentToken` POST `/payment-tokens` | inline | PaymentToken | 409 The provider cannot hold a stored credential (`tokenisationNotSupported`, `PaymentProvider.supportsTokenisation` false), or the guest has not consented to the … (PaymentProblem) | opens modal first |
+| Add a card (primary button) | `storePaymentToken` POST `/payment-tokens` | inline | PaymentToken | 409 The provider cannot hold a stored credential (`tokenisationNotSupported`, `PaymentProvider.supportsTokenisation` false), or the guest has not consented to the … (PaymentProblem) | opens modal first |
 | Transfer wallet balance (secondary button) | `transferWalletBalance` POST `/wallets/{walletId}/transfer` | inline | WalletTransaction | 409 Insufficient cash credit, distinct from insufficient balance — a guest with 200 of bonus credit and 10 of cash can transfer 10, and telling them they have 200 … (WalletTransferProblem) | opens modal first |
 | Redeem loyalty points (secondary button) | `redeemLoyaltyPoints` POST `/loyalty/redemptions` | inline | LoyaltyPosition | 409 The balance does not cover `points` (`insufficientPoints`). Nothing is held. (LoyaltyRefusedProblem) | opens modal first |
 
@@ -539,7 +522,7 @@ Errors to draw in the form: 409 The balance does not cover `points` (`insufficie
 | Error (`?state=error`) | Could not load. **Says what failed and offers one way onward**, never a bare failure. |
 | Empty, first run (`?state=emptyFirstRun`) | **No stored cards.** A guest arrives here after a first purchase, so the empty state is the common one. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing here yet.** The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listPaymentTokens` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that … |
 | Offline (`?state=offline`) | **The offline banner shows.** Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Insufficient cash credit, distinct from insufficient balance — a guest with 200 of bonus credit and 10 of cash can transfer 10, and telling them they have 200 … (WalletTransferProblem); 409 The balance does not cover `points` (`insufficientPoints`). Nothing is held. (LoyaltyRefusedProblem); 409 The provider cannot hold a stored credential (`tokenisationNotSupported` … |
 
@@ -551,7 +534,7 @@ Errors to draw in the form: 409 The balance does not cover `points` (`insufficie
 - `redeemLoyaltyPoints` → `LOYALTY_REDEEM` (operate) · staff, guest
 - `getGiftCard` → `WALLET_VIEW` (read) · staff, guest
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listPaymentTokens` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that …
 
 #### Requirements it meets
 
@@ -589,14 +572,15 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 - Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-071` · status **notStarted** · provenance client-verified
 - Prototype (rev 3, verified 2026-09-28, match exact): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html`, view *Account → All screens → Wave 2 → Payment methods*. Differences: The Account → "Payment methods" row opens Engine settings instead of this screen.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0030 *A deep link is a pointer, not authorisation* (`docs/adr/0030-deep-link-cold-entry.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (9), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-071?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Store payment token, Transfer wallet balance, Redeem loyalty points.
+- [ ] Every action is wired with its success and its failure: Add a card, Transfer wallet balance, Redeem loyalty points.
 - [ ] Every transition is wired: `GST-039`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -733,7 +717,7 @@ Errors to draw in the form: 410 The token expired or was already used. Distinct 
 | Loading (`?state=loading`) | Content loads. |
 | Error (`?state=error`) | Could not load. **Says what failed and offers one way onward**, never a bare failure. |
 | Empty, first run (`?state=emptyFirstRun`) | **Only this device is signed in.** The device list holds one row, this one, and the screen says that signing in elsewhere will add a row here. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `GUEST_VIEW`, which `verifyGuestEmail` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that … |
 | Offline (`?state=offline`) | **Nothing here is offered offline, and the banner says so.** An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a device signed out offline is still signed in. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 A verification is already pending for this guest; 409 Last remaining method of a principal who holds a permission that requires MFA (audit R135); 422 A kind the caller may not enrol. Staff use `totp`, with `emailOtp` as the fallback (audit R126); a guest the same (rev 3 GAP-B1).; 422 The document has expired, or its kind is not accepted by the tenant's policy |
 
@@ -754,7 +738,7 @@ Errors to draw in the form: 410 The token expired or was already used. Distinct 
 - `getMyIdentityVerification` → no permission · guest
 - `submitGuestIdentityDocument` → no permission · guest
 
-**A refused user sees:** Shown when the caller lacks `GUEST_VIEW`, which `verifyGuestEmail` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that …
 
 #### Requirements it meets
 
@@ -801,6 +785,7 @@ Also set there, as content the tenant writes: locale.
 - Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-073` · status **notStarted** · provenance designed · **Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no …
 - Prototype (Mobile App v4, 29 September 2026, verified —, match none): `sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html`, view **
 - Drawn by: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0030 *A deep link is a pointer, not authorisation* (`docs/adr/0030-deep-link-cold-entry.md`)
 - ADR-0045 *Every order carries a proven contact, and the gate is the checkout page* (`docs/adr/0045-every-order-carries-a-proven-contact.md`)
 

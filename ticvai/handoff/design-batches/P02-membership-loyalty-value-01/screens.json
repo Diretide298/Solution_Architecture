@@ -52,22 +52,19 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every wallet transaction",
+       "kind": "cardList",
+       "label": "Activity",
        "bindsTo": "WalletTransaction",
        "columns": [
-        "WalletTransaction.id",
         "WalletTransaction.kind",
         "WalletTransaction.amount",
         "WalletTransaction.balanceAfter",
-        "WalletTransaction.orderId",
-        "WalletTransaction.venueId",
         "WalletTransaction.reason",
-        "WalletTransaction.principalId",
         "WalletTransaction.recordedAt"
        ],
        "operation": "listWalletTransactions",
-       "provenance": "contract retail.yaml GET /wallets/{subjectId}/transactions"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Was the generated table 'Every wallet transaction'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)). From `wallet.yaml` `listWalletTransactions`."
       }
      ]
     },
@@ -77,29 +74,9 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected wallet transaction",
-       "bindsTo": "WalletTransaction",
-       "columns": [
-        "WalletTransaction.id",
-        "WalletTransaction.kind",
-        "WalletTransaction.amount",
-        "WalletTransaction.balanceAfter",
-        "WalletTransaction.orderId",
-        "WalletTransaction.venueId",
-        "WalletTransaction.reason",
-        "WalletTransaction.principalId",
-        "WalletTransaction.recordedAt"
-       ],
-       "operation": "listWalletTransactions",
-       "provenance": "contract wallet.yaml GET /wallets/{subjectId}/transactions"
-      },
-      {
-       "kind": "detailPanel",
        "label": "The wallet",
        "bindsTo": "Wallet",
        "columns": [
-        "Wallet.id",
-        "Wallet.subjectId",
         "Wallet.balance",
         "Wallet.credits",
         "Wallet.bonusBalance",
@@ -121,7 +98,7 @@
    "error": "Could not load. Names which read failed and leaves the wallet overview untouched.",
    "emptyFirstRun": "No wallet overview yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Never shown: `listWalletTransactions` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `WALLET_VIEW`, which `getWallet` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server."
   },
   "apis": [
@@ -170,7 +147,7 @@
    "params": [
     {
      "name": "subjectId",
-     "from": "GST-001"
+     "from": "session"
     },
     {
      "name": "walletId",
@@ -282,25 +259,22 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every memberships",
+       "kind": "cardList",
+       "label": "Family and who may use it",
        "bindsTo": "DelegatedAccess",
        "columns": [
-        "DelegatedAccess.id",
-        "DelegatedAccess.principalId",
         "DelegatedAccess.roleId",
         "DelegatedAccess.permission",
-        "DelegatedAccess.subjectId",
         "DelegatedAccess.overSubjectId",
         "DelegatedAccess.overObjectRef",
         "DelegatedAccess.delegationKind",
         "DelegatedAccess.quota",
         "DelegatedAccess.isRevocableBySubject",
-        "DelegatedAccess.scopePath",
         "DelegatedAccess.effect"
        ],
        "operation": "listDelegations",
-       "provenance": "contract identity.yaml GET /guests/{subjectId}/delegations"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Was the generated table 'Every memberships'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
        "kind": "datePicker",
@@ -317,12 +291,10 @@
        "provenance": "contract orders.yaml GET /billing-statements"
       },
       {
-       "kind": "dataTable",
-       "label": "Every billing statement",
+       "kind": "cardList",
+       "label": "Statements",
        "bindsTo": "BillingStatement",
        "columns": [
-        "BillingStatement.id",
-        "BillingStatement.subjectId",
         "BillingStatement.periodStart",
         "BillingStatement.periodEnd",
         "BillingStatement.lines",
@@ -330,15 +302,14 @@
         "BillingStatement.isTaxInvoice"
        ],
        "operation": "listBillingStatements",
-       "provenance": "contract orders.yaml GET /billing-statements"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Was the generated table 'Every billing statement'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
-       "kind": "dataTable",
-       "label": "Every dunning case",
+       "kind": "cardList",
+       "label": "Payments that need you",
        "bindsTo": "DunningCase",
        "columns": [
-        "DunningCase.id",
-        "DunningCase.subjectId",
         "DunningCase.orderId",
         "DunningCase.amount",
         "DunningCase.state",
@@ -351,48 +322,21 @@
         "DunningCase.resolutionNote"
        ],
        "operation": "listMyPaymentIssues",
-       "provenance": "contract payments.yaml GET /guests/me/payment-issues"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Was the generated table 'Every dunning case'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
-       "kind": "dataTable",
-       "label": "Every product",
+       "kind": "cardList",
+       "label": "Membership plans",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
-        "Product.code",
         "Product.name",
         "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
-        "Product.onSaleFrom",
-        "Product.onSaleTo"
+        "Product.media"
        ],
        "operation": "listProducts",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every guest membership",
-       "bindsTo": "GuestMembership",
-       "columns": [
-        "GuestMembership.entitlementId",
-        "GuestMembership.productId",
-        "GuestMembership.name",
-        "GuestMembership.tier",
-        "GuestMembership.status",
-        "GuestMembership.validFrom",
-        "GuestMembership.validTo",
-        "GuestMembership.frozenDays",
-        "GuestMembership.benefits",
-        "GuestMembership.renewsOn",
-        "GuestMembership.previousTerms"
-       ],
-       "operation": "listGuestMemberships",
-       "provenance": "contract catalogue.yaml GET /guest/memberships"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "The venue's membership plans, to join or upgrade. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       }
      ]
     },
@@ -405,8 +349,6 @@
        "label": "The selected billing statement",
        "bindsTo": "BillingStatement",
        "columns": [
-        "BillingStatement.id",
-        "BillingStatement.subjectId",
         "BillingStatement.periodStart",
         "BillingStatement.periodEnd",
         "BillingStatement.lines",
@@ -418,7 +360,7 @@
       },
       {
        "kind": "detailPanel",
-       "label": "The guest membership",
+       "label": "Your membership",
        "bindsTo": "GuestMembership",
        "columns": [
         "GuestMembership.entitlementId",
@@ -444,13 +386,13 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Grant delegation",
+       "label": "Let a family member use it",
        "operation": "grantDelegation",
        "provenance": "contract identity.yaml POST /guests/{subjectId}/delegations"
       },
       {
        "kind": "secondaryButton",
-       "label": "Retry my dunning payment",
+       "label": "Retry the payment",
        "operation": "retryMyDunningPayment",
        "provenance": "contract payments.yaml POST /dunning-cases/{caseId}/retry"
       }
@@ -463,7 +405,7 @@
    "error": "Could not load. Names which read failed and leaves the memberships untouched.",
    "emptyFirstRun": "No memberships yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on from, to and the memberships are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getMyMemberships` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
@@ -519,12 +461,6 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "listGuestMemberships",
-    "contract": "catalogue",
-    "purpose": "A guest's memberships, benefits and history",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "listInstalmentPlans",
     "contract": "payments",
     "purpose": "Instalment plans and schedule",
@@ -547,7 +483,7 @@
     },
     {
      "name": "subjectId",
-     "from": "GST-001"
+     "from": "session"
     },
     {
      "name": "caseId",
@@ -585,7 +521,7 @@
    {
     "id": "formRetryMyDunningPayment",
     "component": "modal",
-    "trigger": "Retry my dunning payment",
+    "trigger": "Retry the payment",
     "body": "**Collects what `retryMyDunningPayment` sends before it is called.** Nothing in the body is required. Optional: `paymentTokenId`. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "RetryDunningPaymentRequest",
     "confirm": {
@@ -603,10 +539,10 @@
    {
     "id": "formGrantDelegation",
     "component": "modal",
-    "trigger": "Grant delegation",
-    "body": "**Collects what `grantDelegation` sends before it is called.** Required: `overSubjectId`, `delegationKind`, `permission`. Optional: `overObjectRef`, `quota`, `validTo`, `isRevocableBySubject`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Let a family member use it",
+    "body": "**Pick the family member, then what they may do, in plain words** (book with it, enter with it, see the bills), and how many times. `grantDelegation` with the person and the permission the choice stands for; no subject id, delegation kind or permission key is shown.",
     "confirm": {
-     "label": "Grant delegation",
+     "label": "Allow",
      "operation": "grantDelegation"
     },
     "dismiss": {
@@ -621,7 +557,15 @@
       "isRevocableBySubject"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "listGuestMemberships",
+    "removed": true,
+    "why": "The staff-shaped membership list; the guest's own are `getMyMemberships`.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ],
   "_platform": {
@@ -772,7 +716,7 @@
    "error": "Could not load. Names which read failed and leaves the loyalty rewards untouched.",
    "emptyFirstRun": "No loyalty rewards yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Never shown: `listLoyaltyProgrammes` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listLoyaltyProgrammes` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** The last known balance stays with its age, and **points earned since are not shown** — and that is said. Redeeming and referring need the connection."
   },
   "apis": [
@@ -823,6 +767,14 @@
    "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the operations this screen declares (4 then; evaluatePromotions removed 27 September), not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    }
+   ]
+  },
   "_platform": {
    "code": "P02",
    "audience": "guest",

@@ -1,6 +1,6 @@
 # P02-engagement-support-01 — P02 · Engagement & Support (1 of 2)
 
-**10 screens · 30 operations · 77 schemas · 4 permissions**
+**10 screens · 31 operations · 78 schemas · 3 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -48,10 +48,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `AI_USE, CASE_MANAGE, PRODUCT_VIEW, TENANT_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `AI_USE, CASE_MANAGE, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **9 of these operations work offline**: getTenantAppStatus, getVisitPlan, getWaitTimes, listCatalogueBundles, listContentPages, listFaqs, listMyNotifications, listProducts
+- **10 of these operations work offline**: getTenantAppStatus, getVisitPlan, getWaitTimes, listCatalogueBundles, listMyNotifications, listProducts, listPublishedContentPages, listPublishedFaqs
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -71,10 +71,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `GST-030` | In-Venue Notifications | A | 11 | 12 | 5 | 5 | 4 | 0 | guest | notStarted (client-verified) |
 | `GST-031` | AI Concierge – Home | A | 11 | 7 | 5 | 30 | 3 | 0 | guest | notStarted (designed) |
-| `GST-032` | AI Concierge – Chat | A | 60 | 22 | 5 | 34 | 3 | 0 | guest | notStarted (designed) |
+| `GST-032` | AI Concierge – Chat | A | 37 | 26 | 6 | 34 | 3 | 0 | guest | notStarted (designed) |
 | `GST-033` | AI Concierge – Contextual Help | A | 4 | 0 | 5 | 11 | 0 | 0 | guest | notStarted (client-verified) |
 | `GST-035` | Feedback & Ratings | A | 23 | 0 | 4 | 7 | 2 | 0 | guest | notStarted (client-verified) |
-| `GST-040` | Help & Support | A | 8 | 67 | 6 | 3 | 3 | 0 | guest | notStarted (client-verified) |
+| `GST-040` | Help & Support | A | 8 | 31 | 6 | 0 | 3 | 0 | guest | notStarted (client-verified) |
 | `GST-051` | Plan | A | 26 | 0 | 7 | 7 | 8 | 1 | guest | notStarted (client-verified) |
 | `GST-052` | Suggested Itineraries | A | 17 | 28 | 6 | 3 | 2 | 1 | guest | notStarted (designed) |
 | `GST-053` | Your Plan | A | 15 | 91 | 7 | 9 | 8 | 1 | guest | notStarted (client-verified) |

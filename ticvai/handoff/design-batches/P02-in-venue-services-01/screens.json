@@ -60,46 +60,17 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Venue id",
-       "operation": "listProducts",
-       "notes": "Sends `?venueId=` to `listProducts`.",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "textField",
-       "label": "Kind",
-       "operation": "listProducts",
-       "notes": "Sends `?kind=` to `listProducts`.",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "toggle",
-       "label": "Is sellable",
-       "operation": "listProducts",
-       "notes": "Sends `?isSellable=` to `listProducts`.",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every product",
+       "kind": "cardList",
+       "label": "Points on the map",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
-        "Product.code",
         "Product.name",
-        "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
-        "Product.onSaleFrom",
-        "Product.onSaleTo"
+        "Product.media",
+        "Product.displayTags"
        ],
        "operation": "listProducts",
-       "provenance": "contract catalogue.yaml GET /products"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Pins by point category (rides, dining, shows); a pin opens Item Detail. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       }
      ]
     },
@@ -107,31 +78,6 @@
      "name": "contextPanel",
      "slot": "selection",
      "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected product",
-       "bindsTo": "Product",
-       "columns": [
-        "Product.id",
-        "Product.code",
-        "Product.name",
-        "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
-        "Product.onSaleFrom",
-        "Product.onSaleTo",
-        "Product.categoryId",
-        "Product.lifecycleState",
-        "Product.isSellable",
-        "Product.isStockTracked"
-       ],
-       "operation": "listProducts",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
       {
        "kind": "detailPanel",
        "label": "The venue map",
@@ -163,13 +109,9 @@
        "label": "The wait time",
        "bindsTo": "WaitTime",
        "columns": [
-        "WaitTime.queueId",
         "WaitTime.queueName",
-        "WaitTime.attractionProductId",
-        "WaitTime.attractionCategoryId",
         "WaitTime.status",
         "WaitTime.waitMinutes",
-        "WaitTime.source",
         "WaitTime.isStale",
         "WaitTime.heightRequirementCm",
         "WaitTime.zone",
@@ -186,8 +128,8 @@
    "loading": "The interactive map list.",
    "error": "Could not load. Names which read failed and leaves the interactive map untouched.",
    "emptyFirstRun": "No interactive map yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the interactive map are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "No point of that category on this map; the other categories stay.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** A map and route graph already loaded stay usable, so directions do not need a signal. Wait times show their last reading marked out of date, never as live — a queue length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks the guest to reconnect.",
    "map3dUnavailable": "**No 3D model for this map: the 2D map, same route** (ADR-0069; client meeting 30 September, MoM 4.8). The venue has not published a GLB model for this map (the default for every venue until it supplies one), the phone fails the 3D capability check, or rendering drops below 20 fps. The 2D map shows the same route from `getVenueMapGraph` and the same live position dot; the 2D/3D toggle is hidden and nothing else is said: no message, no error.",
    "weakGps": "**Position approximate** (ADR-0069, section 4): reported GPS accuracy worse than 30 metres, or the route runs along an indoor path. The dot dims and an approximate-position ring is drawn round the last confident position, labelled *Position approximate*; the turn list and the remaining distance stay, and *I am at…* (tap a nearby location, or scan its QR sign) re-anchors. Routing does not stop, in 3D or in 2D."
@@ -570,7 +512,7 @@
    "loading": "The virtual queue, read by `getWaitingGuest`.",
    "error": "Could not load. Names which read failed and leaves the virtual queue untouched.",
    "emptyFirstRun": "No virtual queue yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** The guest's place stays on screen with its age, so they can see they hold it. Joining and leaving need the connection — a place taken offline is a place nobody else can see."
   },
   "apis": [
@@ -607,6 +549,10 @@
   ],
   "entryState": {
    "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
     {
      "name": "entryId",
      "from": "deepLink"
@@ -933,7 +879,7 @@
    "error": "Could not load. Names which read failed and leaves the browse order untouched.",
    "emptyFirstRun": "No browse order yet. Offers Create guest F&B order (`createGuestFnbOrder`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on mode, date and the browse order are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getFnbDeliveryPolicy` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** The menu already loaded stays with its age. Ordering, claiming a table and booking wait for the connection — an order placed offline is food nobody is making."
   },
   "apis": [
@@ -976,7 +922,7 @@
    {
     "operationId": "getGuestOrderStatus",
     "contract": "fnb",
-    "purpose": "Track an order",
+    "purpose": "Track an order Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    },
    {
@@ -1400,32 +1346,15 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Venue id",
-       "operation": "listParkingFacilities",
-       "notes": "Sends `?venueId=` to `listParkingFacilities`.",
-       "provenance": "contract access.yaml GET /parking-facilities"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every parking facility",
+       "kind": "cardList",
+       "label": "Car parks",
        "bindsTo": "ParkingFacility",
        "columns": [
-        "ParkingFacility.id",
-        "ParkingFacility.name",
-        "ParkingFacility.venueId",
-        "ParkingFacility.mode",
-        "ParkingFacility.capacity",
-        "ParkingFacility.takesPayment",
-        "ParkingFacility.vendorSwapTargetDays",
-        "ParkingFacility.vendorName",
-        "ParkingFacility.endpoint",
-        "ParkingFacility.credentialRef",
-        "ParkingFacility.pushLeadMinutes",
-        "ParkingFacility.accessPointIds"
+        "ParkingFacility.name"
        ],
        "operation": "listParkingFacilities",
-       "provenance": "contract access.yaml GET /parking-facilities"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "The venue's car parks by name; no live free-bay count in the first release. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every parking facility'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       }
      ]
     },
@@ -1438,19 +1367,7 @@
        "label": "The selected parking facility",
        "bindsTo": "ParkingFacility",
        "columns": [
-        "ParkingFacility.id",
-        "ParkingFacility.name",
-        "ParkingFacility.venueId",
-        "ParkingFacility.mode",
-        "ParkingFacility.capacity",
-        "ParkingFacility.takesPayment",
-        "ParkingFacility.vendorSwapTargetDays",
-        "ParkingFacility.vendorName",
-        "ParkingFacility.endpoint",
-        "ParkingFacility.credentialRef",
-        "ParkingFacility.pushLeadMinutes",
-        "ParkingFacility.accessPointIds",
-        "ParkingFacility.isActive"
+        "ParkingFacility.name"
        ],
        "operation": "listParkingFacilities",
        "provenance": "contract access.yaml GET /parking-facilities"
@@ -1470,19 +1387,7 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Check out",
-       "operation": "checkoutCart",
-       "provenance": "contract orders.yaml POST /carts/{cartId}/checkout"
-      },
-      {
-       "kind": "primaryButton",
-       "label": "Pay",
-       "operation": "createPayment",
-       "provenance": "contract orders.yaml POST /payments"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Save parking entitlement",
+       "label": "Change plate",
        "operation": "updateParkingEntitlement",
        "provenance": "contract access.yaml PATCH /parking-entitlements/{entitlementId}"
       }
@@ -1494,8 +1399,8 @@
    "loading": "Terminal or gateway state, shown plainly",
    "error": "**Declined reads differently from unresolved.** An unresolved payment inquires rather than retries, and nothing is issued until it resolves",
    "emptyFirstRun": "—",
-   "emptyNoResults": "Nothing matches the filter on venueId and the parking reserve pay are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PARKING_CONFIGURE`, which `listParkingFacilities` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "Never shown: the car parks are the venue's, with no filter a guest sets.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection.",
    "soldOutForDay": "**The car park is full.** `addCartLine` refused the parking line with `soldOutForDay`: issued entitlements have reached the facility's capacity for that day. Shown only then — there is no live space count in the first release, so the screen never promises spaces before the guest tries (decided 28 September, audit R166)."
   },
@@ -1504,18 +1409,6 @@
     "operationId": "addCartLine",
     "contract": "orders",
     "purpose": "Put the car park's parking product in the cart; refused `soldOutForDay` when the car park is at capacity (decided 28 September, audit R166)",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "checkoutCart",
-    "contract": "orders",
-    "purpose": "Turn the cart into an order",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "createPayment",
-    "contract": "orders",
-    "purpose": "Pay for it; the parking entitlement is issued at payment with the order's id (audit R166)",
     "trigger": "onAction"
    },
    {
@@ -1591,22 +1484,34 @@
    {
     "id": "formUpdateParkingEntitlement",
     "component": "modal",
-    "trigger": "Save parking entitlement",
-    "body": "**Collects what `updateParkingEntitlement` sends before it is called.** Nothing in the body is required. Optional: `plateNumber`, `plateCountry`, `status`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Change plate",
+    "body": "**The plate only.** `updateParkingEntitlement` with the new plate; a guest never sets a status.",
     "bindsTo": "UpdateParkingEntitlementRequest",
     "confirm": {
-     "label": "Save parking entitlement",
+     "label": "Save",
      "operation": "updateParkingEntitlement"
     },
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "plateNumber",
-      "plateCountry",
-      "status"
+      "plate"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "checkoutCart",
+    "removed": true,
+    "why": "Parking goes through the basket (R166); checkout is the basket's.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+   },
+   {
+    "operation": "createPayment",
+    "removed": true,
+    "why": "Payment is the basket's, after checkout (R166).",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ],
   "_platform": {
@@ -1689,61 +1594,15 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
-     "slot": "collection",
-     "components": [
-      {
-       "kind": "textField",
-       "label": "Venue id",
-       "operation": "listParkingFacilities",
-       "notes": "Sends `?venueId=` to `listParkingFacilities`.",
-       "provenance": "contract access.yaml GET /parking-facilities"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every parking facility",
-       "bindsTo": "ParkingFacility",
-       "columns": [
-        "ParkingFacility.id",
-        "ParkingFacility.name",
-        "ParkingFacility.venueId",
-        "ParkingFacility.mode",
-        "ParkingFacility.capacity",
-        "ParkingFacility.takesPayment",
-        "ParkingFacility.vendorSwapTargetDays",
-        "ParkingFacility.vendorName",
-        "ParkingFacility.endpoint",
-        "ParkingFacility.credentialRef",
-        "ParkingFacility.pushLeadMinutes",
-        "ParkingFacility.accessPointIds"
-       ],
-       "operation": "listParkingFacilities",
-       "provenance": "contract access.yaml GET /parking-facilities"
-      }
-     ]
-    },
-    {
      "name": "contextPanel",
      "slot": "selection",
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected parking facility",
+       "label": "Your car park",
        "bindsTo": "ParkingFacility",
        "columns": [
-        "ParkingFacility.id",
-        "ParkingFacility.name",
-        "ParkingFacility.venueId",
-        "ParkingFacility.mode",
-        "ParkingFacility.capacity",
-        "ParkingFacility.takesPayment",
-        "ParkingFacility.vendorSwapTargetDays",
-        "ParkingFacility.vendorName",
-        "ParkingFacility.endpoint",
-        "ParkingFacility.credentialRef",
-        "ParkingFacility.pushLeadMinutes",
-        "ParkingFacility.accessPointIds",
-        "ParkingFacility.isActive"
+        "ParkingFacility.name"
        ],
        "operation": "listParkingFacilities",
        "provenance": "contract access.yaml GET /parking-facilities"
@@ -1759,7 +1618,6 @@
        "label": "The order the parking was paid on",
        "bindsTo": "Order",
        "columns": [
-        "Order.id",
         "Order.status"
        ],
        "operation": "getOrder",
@@ -1774,15 +1632,15 @@
    "loading": "The parking reservation confirmed list.",
    "error": "Could not load. Names which read failed and leaves the parking reservation confirmed untouched.",
    "emptyFirstRun": "**Paid, entitlement not yet shown.** The order is paid and the entitlement is issued at payment; until it appears the screen shows the order and says the car park pass follows (audit R166).",
-   "emptyNoResults": "Nothing matches the filter on venueId and the parking reservation confirmed are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PARKING_CONFIGURE`, which `listParkingFacilities` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "Never shown: the confirmation shows one order's parking.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection."
   },
   "apis": [
    {
     "operationId": "getOrder",
     "contract": "orders",
-    "purpose": "The paid order that carries the parking entitlement (audit R166)",
+    "purpose": "The paid order that carries the parking entitlement (audit R166) With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
     "trigger": "onLoad"
    },
    {
@@ -2165,46 +2023,17 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Venue id",
-       "operation": "listProducts",
-       "notes": "Sends `?venueId=` to `listProducts`.",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "textField",
-       "label": "Kind",
-       "operation": "listProducts",
-       "notes": "Sends `?kind=` to `listProducts`.",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "toggle",
-       "label": "Is sellable",
-       "operation": "listProducts",
-       "notes": "Sends `?isSellable=` to `listProducts`.",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every product",
+       "kind": "cardList",
+       "label": "Around you now",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
-        "Product.code",
         "Product.name",
-        "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
-        "Product.onSaleFrom",
-        "Product.onSaleTo"
+        "Product.media",
+        "Product.displayTags"
        ],
        "operation": "listProducts",
-       "provenance": "contract catalogue.yaml GET /products"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "What is on at the venue under the chosen tab (map, waits, food, shows, shop, services). The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
        "kind": "selectField",
@@ -2218,6 +2047,14 @@
        "operation": "getWaitTimes",
        "notes": "Live orders, queue calls and the next show, from the guest's own orders and queues.",
        "provenance": "decided 29 September 2026, MOB-1"
+      },
+      {
+       "kind": "banner",
+       "label": "Closed or sold out today",
+       "bindsTo": "TenantAppStatus.availabilityMessage",
+       "operation": "getTenantAppStatus",
+       "notes": "From `availability` and `availabilityMessage`; nothing shows while open.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       }
      ]
     },
@@ -2227,41 +2064,12 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected product",
-       "bindsTo": "Product",
-       "columns": [
-        "Product.id",
-        "Product.code",
-        "Product.name",
-        "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
-        "Product.onSaleFrom",
-        "Product.onSaleTo",
-        "Product.categoryId",
-        "Product.lifecycleState",
-        "Product.isSellable",
-        "Product.isStockTracked"
-       ],
-       "operation": "listProducts",
-       "provenance": "contract catalogue.yaml GET /products"
-      },
-      {
-       "kind": "detailPanel",
        "label": "The wait time",
        "bindsTo": "WaitTime",
        "columns": [
-        "WaitTime.queueId",
         "WaitTime.queueName",
-        "WaitTime.attractionProductId",
-        "WaitTime.attractionCategoryId",
         "WaitTime.status",
         "WaitTime.waitMinutes",
-        "WaitTime.source",
         "WaitTime.isStale",
         "WaitTime.heightRequirementCm",
         "WaitTime.zone",
@@ -2269,27 +2077,6 @@
        ],
        "operation": "getWaitTimes",
        "provenance": "contract queue.yaml GET /queues/wait-times"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The tenant app status",
-       "bindsTo": "TenantAppStatus",
-       "columns": [
-        "TenantAppStatus.isPublished",
-        "TenantAppStatus.publishedVersion",
-        "TenantAppStatus.publishedAt",
-        "TenantAppStatus.draftVersion",
-        "TenantAppStatus.hasUnpublishedChanges",
-        "TenantAppStatus.activeModuleCount",
-        "TenantAppStatus.licensedModuleCount",
-        "TenantAppStatus.activePageCount",
-        "TenantAppStatus.isInMaintenance",
-        "TenantAppStatus.maintenanceMessage",
-        "TenantAppStatus.expectedBackAt",
-        "TenantAppStatus.recentChanges"
-       ],
-       "operation": "getTenantAppStatus",
-       "provenance": "contract white-label.yaml GET /tenant-config/status"
       }
      ]
     }
@@ -2299,8 +2086,8 @@
    "loading": "The digital companion mode list.",
    "error": "Could not load. Names which read failed and leaves the digital companion mode untouched.",
    "emptyFirstRun": "No digital companion mode yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the digital companion mode are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "Nothing under the chosen tab right now; the other tabs stay.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing.",
    "map3dUnavailable": "**No 3D model for this map: the 2D map, same route** (ADR-0069; client meeting 30 September, MoM 4.8). The Map view of this screen is GST-021's map (one implementation): where the venue has not published a GLB model (the default until it supplies one), the phone fails the 3D capability check or rendering drops below 20 fps, the 2D map shows with the same route and the same live position dot; the 2D/3D toggle is hidden and nothing else is said.",
    "weakGps": "**Position approximate** (ADR-0069, section 4): reported GPS accuracy worse than 30 metres, or indoors. The Map view dims the dot and draws an approximate-position ring round the last confident position, labelled *Position approximate*; directions keep their turn list and remaining distance, and *I am at…* (a nearby location, or its QR sign) re-anchors. Waits, shows and services are unaffected."

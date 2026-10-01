@@ -42,84 +42,27 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Venue id",
-       "operation": "listOrders",
-       "notes": "Sends `?venueId=` to `listOrders`.",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "textField",
-       "label": "Principal id",
-       "operation": "listOrders",
-       "notes": "Sends `?principalId=` to `listOrders`.",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "textField",
-       "label": "Shift id",
-       "operation": "listOrders",
-       "notes": "Sends `?shiftId=` to `listOrders`.",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "textField",
-       "label": "Status",
-       "operation": "listOrders",
-       "notes": "Sends `?status=` to `listOrders`.",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "datePicker",
-       "label": "Created from",
-       "operation": "listOrders",
-       "notes": "Sends `?createdFrom=` to `listOrders`.",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "datePicker",
-       "label": "Created to",
-       "operation": "listOrders",
-       "notes": "Sends `?createdTo=` to `listOrders`.",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every order",
-       "bindsTo": "OrderSummary",
+       "kind": "cardList",
+       "label": "Your orders with tickets",
+       "bindsTo": "Order",
        "columns": [
-        "OrderSummary.id",
-        "OrderSummary.orderNumber",
-        "OrderSummary.status",
-        "OrderSummary.grossAmount",
-        "OrderSummary.refundedAmount",
-        "OrderSummary.channel",
-        "OrderSummary.lineCount"
+        "Order.orderNumber",
+        "Order.status",
+        "Order.grossAmount",
+        "Order.currency",
+        "Order.lines",
+        "Order.createdAt"
        ],
-       "operation": "listOrders",
-       "provenance": "contract orders.yaml GET /orders"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
+       "operation": "listMyOrders",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Was the generated table 'Every order'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
+      },
       {
-       "kind": "detailPanel",
-       "label": "The selected order",
-       "bindsTo": "OrderSummary",
-       "columns": [
-        "OrderSummary.id",
-        "OrderSummary.orderNumber",
-        "OrderSummary.status",
-        "OrderSummary.grossAmount",
-        "OrderSummary.refundedAmount",
-        "OrderSummary.channel",
-        "OrderSummary.lineCount"
-       ],
-       "operation": "listOrders",
-       "provenance": "contract orders.yaml GET /orders"
+       "kind": "banner",
+       "label": "Tickets sent to you",
+       "operation": "claimTicketTransfer",
+       "notes": "When the app is opened from a transfer link: Accept claims the tickets (`claimTicketTransfer`) with the link's token; nothing is typed.",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
       }
      ]
     },
@@ -129,15 +72,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Transfer order tickets",
+       "label": "Transfer tickets",
        "operation": "transferOrderTickets",
        "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Claim ticket transfer",
-       "operation": "claimTicketTransfer",
-       "provenance": "contract orders.yaml POST /ticket-transfers/{transferId}/claim"
       }
      ]
     }
@@ -148,7 +85,7 @@
    "error": "Availability unavailable. **Selection is blocked** — overselling is worse than waiting",
    "emptyFirstRun": "**Sold out is a real answer.** Offers the next available rather than a dead end",
    "emptyNoResults": "Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the ticket transfer are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Sending, claiming and listing for resale need the connection — a transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible."
   },
   "apis": [
@@ -158,7 +95,7 @@
     "purpose": "Transfer tickets to another guest",
     "trigger": "onAction",
     "invalidates": [
-     "listOrders"
+     "listMyOrders"
     ]
    },
    {
@@ -167,18 +104,23 @@
     "purpose": "Claim transferred tickets",
     "trigger": "onAction",
     "invalidates": [
-     "listOrders"
+     "listMyOrders"
     ]
    },
    {
-    "operationId": "listOrders",
+    "operationId": "listMyOrders",
     "contract": "orders",
-    "purpose": "List orders",
-    "trigger": "onLoad"
+    "purpose": "The orders this guest placed",
+    "trigger": "onLoad",
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ],
   "entryState": {
    "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
     {
      "name": "orderId",
      "from": "deepLink"
@@ -214,10 +156,10 @@
    {
     "id": "formTransferOrderTickets",
     "component": "modal",
-    "trigger": "Transfer order tickets",
-    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Transfer tickets",
+    "body": "**Pick the tickets on their cards, then the friend**: a channel (email, SMS or WhatsApp) and the address, with an optional message. `transferOrderTickets` moves ownership; the recipient claims from the link they receive.",
     "confirm": {
-     "label": "Transfer order tickets",
+     "label": "Transfer tickets",
      "operation": "transferOrderTickets"
     },
     "dismiss": {
@@ -228,24 +170,15 @@
       "message"
      ]
     },
-    "provenance": "client-verified"
-   },
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+   }
+  ],
+  "gaps": [
    {
-    "id": "formClaimTicketTransfer",
-    "component": "modal",
-    "trigger": "Claim ticket transfer",
-    "body": "**Collects what `claimTicketTransfer` sends before it is called.** Required: `claimToken`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Claim ticket transfer",
-     "operation": "claimTicketTransfer"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "claimToken"
-     ]
-    },
-    "provenance": "client-verified"
+    "operation": "listOrders",
+    "removed": true,
+    "why": "The staff-scoped order list; a guest screen lists the caller's own orders with `listMyOrders` (removed from guest screens on 24 August, back with the 31 August parity pass).",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ],
   "_platform": {
@@ -333,33 +266,18 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "selectField",
-       "label": "Status",
-       "operation": "listReservations",
-       "notes": "Sends `?status=` to `listReservations`.",
-       "provenance": "contract orders.yaml GET /reservations"
-      },
-      {
-       "kind": "numberField",
-       "label": "Expiring within minutes",
-       "operation": "listReservations",
-       "notes": "Sends `?expiringWithinMinutes=` to `listReservations`.",
-       "provenance": "contract orders.yaml GET /reservations"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every reservation",
+       "kind": "cardList",
+       "label": "Your reservations",
        "bindsTo": "Reservation",
        "columns": [
-        "Reservation.id",
-        "Reservation.venueId",
         "Reservation.status",
         "Reservation.lines",
         "Reservation.expiresAt",
         "Reservation.convertedOrderId"
        ],
        "operation": "listReservations",
-       "provenance": "contract orders.yaml GET /reservations"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Upcoming and Past, as two tabs; each card shows when it expires. Was the generated table 'Every reservation'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       }
      ]
     },
@@ -372,8 +290,6 @@
        "label": "The selected reservation",
        "bindsTo": "Reservation",
        "columns": [
-        "Reservation.id",
-        "Reservation.venueId",
         "Reservation.status",
         "Reservation.lines",
         "Reservation.expiresAt",
@@ -411,8 +327,8 @@
    "loading": "The reservations list.",
    "error": "Could not load. Names which read failed and leaves the reservations untouched.",
    "emptyFirstRun": "No reservations yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on status, expiringWithinMinutes and the reservations are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listReservations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "Never shown as a filter result: an empty tab says there is nothing upcoming (or past) and offers to book.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Reservations already loaded stay visible with their age. Booking, changing and cancelling need the connection — a table held offline is a table two people think they have."
   },
   "apis": [
@@ -440,6 +356,10 @@
   ],
   "entryState": {
    "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
     {
      "name": "reservationId",
      "from": "deepLink"
@@ -586,7 +506,7 @@
    "loading": "The reservation, read by `getReservation`.",
    "error": "Could not load. Names which read failed and leaves the reservation untouched.",
    "emptyFirstRun": "No reservation yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getReservation` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows.** Reservations already loaded stay visible with their age. Booking, changing and cancelling need the connection — a table held offline is a table two people think they have."
   },
   "apis": [
@@ -605,6 +525,10 @@
   ],
   "entryState": {
    "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
     {
      "name": "reservationId",
      "from": "deepLink"
@@ -700,66 +624,29 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "selectField",
-       "label": "Venue",
-       "operation": "listFxRates",
-       "notes": "Sends `?venueId=` to `listFxRates`, from the venue the guest picked (see the home screen), so the list is the region's rates narrowed to the currencies this venue shows. Rates are set per region and each venue picks which currencies it shows (decided 28 September, audit R120 (a)).",
-       "provenance": "contract finance.yaml GET /fx-rates"
-      },
-      {
-       "kind": "datePicker",
-       "label": "As at",
-       "operation": "listFxRates",
-       "notes": "Sends `?asAt=` to `listFxRates`.",
-       "provenance": "contract finance.yaml GET /fx-rates"
-      },
-      {
-       "kind": "textField",
-       "label": "Purpose",
-       "operation": "listFxRates",
-       "notes": "Sends `?purpose=` to `listFxRates`.",
-       "provenance": "contract finance.yaml GET /fx-rates"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every FX rate",
+       "kind": "cardList",
+       "label": "Currencies",
        "bindsTo": "FxRate",
        "columns": [
-        "FxRate.id",
-        "FxRate.fromCurrency",
         "FxRate.toCurrency",
         "FxRate.rate",
-        "FxRate.purpose",
-        "FxRate.source",
-        "FxRate.effectiveFrom",
-        "FxRate.effectiveTo",
-        "FxRate.setByPrincipalId",
-        "FxRate.providerReference",
-        "FxRate.fetchedAt"
+        "FxRate.effectiveFrom"
        ],
        "operation": "listFxRates",
-       "provenance": "contract finance.yaml GET /fx-rates"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Fixed by the screen: the venue from Home, as at now, purpose tender. A guest never chooses a purpose: that would let them browse internal treasury rates. Was the generated table 'Every FX rate'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
-       "kind": "dataTable",
-       "label": "Every product",
+       "kind": "cardList",
+       "label": "Prices in your currency",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
-        "Product.code",
         "Product.name",
-        "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
-        "Product.onSaleFrom",
-        "Product.onSaleTo"
+        "Product.description"
        ],
        "operation": "listProducts",
-       "provenance": "contract catalogue.yaml GET /products"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "The venue's products with the price converted at the rate above; the venue's own currency stays the price charged. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       }
      ]
     },
@@ -769,20 +656,13 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected FX rate",
+       "label": "The rate",
        "bindsTo": "FxRate",
        "columns": [
-        "FxRate.id",
         "FxRate.fromCurrency",
         "FxRate.toCurrency",
         "FxRate.rate",
-        "FxRate.purpose",
-        "FxRate.source",
-        "FxRate.effectiveFrom",
-        "FxRate.effectiveTo",
-        "FxRate.setByPrincipalId",
-        "FxRate.providerReference",
-        "FxRate.fetchedAt"
+        "FxRate.effectiveFrom"
        ],
        "operation": "listFxRates",
        "provenance": "contract finance.yaml GET /fx-rates"
@@ -794,9 +674,9 @@
   "states": {
    "loading": "The multi-currency pricing list.",
    "error": "Could not load. Names which read failed and leaves the multi-currency pricing untouched.",
-   "emptyFirstRun": "No multi-currency pricing yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on asAt, purpose and the multi-currency pricing are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `listFxRates` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyFirstRun": "Not reachable: with no other currency at the venue the screen is not linked, and prices stay in the venue's currency.",
+   "emptyNoResults": "Never shown: the screen sends no filter a guest chose.",
+   "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows. Last known rates stay, with their age.** A rate is a number a guest may act on, and an undated one they cannot judge."
   },
   "apis": [

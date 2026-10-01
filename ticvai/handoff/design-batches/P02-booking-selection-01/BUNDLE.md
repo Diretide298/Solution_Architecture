@@ -1,6 +1,6 @@
 # P02-booking-selection-01 — P02 · Booking & Selection
 
-**10 screens · 35 operations · 70 schemas · 10 permissions**
+**10 screens · 32 operations · 66 schemas · 8 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -48,10 +48,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 10 permissions apply here:
-  `AI_USE, GUEST_VIEW, MARKETING_MANAGE, MARKETING_VIEW, ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW, PRODUCT_VIEW, RESOURCE_VIEW, VENUE_MAP_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 8 permissions apply here:
+  `AI_USE, GUEST_VIEW, ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW, PRODUCT_VIEW, RESOURCE_VIEW, VENUE_MAP_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **10 of these operations work offline**: getBundle, getPublishedBookingFlow, getPublishedGuidedChoice, getVenueMap, listBookableVenueMaps, listCatalogueBundles, listPerformances, listProductCategories
+- **9 of these operations work offline**: getBundle, getPublishedBookingFlow, getPublishedGuidedChoice, getVenueMap, listBookableVenueMaps, listPerformances, listProductCategories, listProductVariants
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -69,20 +69,20 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-007` | Select Date & Time | A | 25 | 39 | 6 | 20 | 28 | 0 | guest | notStarted (client-verified) |
+| `GST-007` | Select Date & Time | A | 23 | 30 | 6 | 20 | 28 | 0 | guest | notStarted (client-verified) |
 | `GST-008` | Tickets & Add-ons | A | 19 | 66 | 6 | 26 | 25 | 0 | guest | notStarted (client-verified) |
 | `GST-048` | Upsell / Cross-Sell | A | 19 | 9 | 5 | 55 | 9 | 0 | guest | notStarted (designed) |
-| `GST-049` | Interactive Seat Selection | A | 13 | 39 | 5 | 29 | 21 | 6 | guest | notStarted (client-verified) |
-| `GST-050` | Resource Booking – Cabana | A | 22 | 27 | 6 | 21 | 4 | 6 | guest | notStarted (designed) |
-| `GST-056` | Bundle Package | A | 19 | 34 | 6 | 4 | 4 | 0 | guest | notStarted (designed) |
-| `GST-058` | Resource Availability (Cabana) | A | 3 | 27 | 6 | 17 | 4 | 0 | guest | notStarted (designed) |
-| `GST-072` | Share & Group Booking | A | 17 | 46 | 6 | 30 | 8 | 6 | guest | notStarted (client-verified) |
+| `GST-049` | Interactive Seat Selection | A | 8 | 38 | 5 | 29 | 21 | 6 | guest | notStarted (client-verified) |
+| `GST-050` | Resource Booking – Cabana | A | 19 | 18 | 6 | 21 | 4 | 6 | guest | notStarted (designed) |
+| `GST-056` | Bundle Package | A | 19 | 14 | 6 | 4 | 4 | 0 | guest | notStarted (designed) |
+| `GST-058` | Resource Availability (Cabana) | A | 0 | 18 | 6 | 17 | 4 | 0 | guest | notStarted (designed) |
+| `GST-072` | Share & Group Booking | A | 14 | 27 | 6 | 8 | 8 | 6 | guest | notStarted (client-verified) |
 | `GST-074` | Map Booking — Cabanas & Spots | A | 24 | 38 | 6 | 5 | 4 | 6 | guest | notStarted (designed) |
 | `GST-075` | Book a Space by the Hour | A | 23 | 40 | 6 | 25 | 7 | 0 | guest | notStarted (designed) |
 
 ## Thin screens in this batch
 
-**GST-048 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**GST-048, GST-050, GST-056, GST-058 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -118,14 +118,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Tour language | select field | — | — | — | — | Sends `?language=`; shows `Performance.language`, and `format` for cinema. | — |
 | Choose your experience | select field | — | — | — | — | Options with their `ProductCategory.description`. | — |
 | Select level | text field | optional | — | max length 120 | — | `listProducts?segmentTag=level/<code>`; Reset clears both filters. A four-day calendar lays out the times with places left and price per person. | `listProducts` ?segmentTag |
-| From | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Sends `?from=` to `listPerformances`. | `listPerformances` ?from |
-| To | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Sends `?to=` to `listPerformances`. | `listPerformances` ?to |
 | Next 7 days | date picker | — | — | — | — | **A date strip of the next `BookingFlowSettings.dateStripDays` days** (default 7, 3-31) with a calendar icon that opens the full month for later dates (M17-08). | — |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
+| From | date and time picker | — | — | `listPerformances` ?from |
+| To | date and time picker | — | — | `listPerformances` ?to |
 | Category | picker: choose a category | — | — | `listPerformances` ?categoryId |
 | Language | text field | — | max length 35; pattern `^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$` | `listPerformances` ?language |
 | Performance | picker: choose a performance | — | — | `getAvailability` ?performanceId |
@@ -141,9 +141,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Product category | picker: choose a product category | — | — | `getPublishedBookingFlow` ?productCategoryId |
 | Flow type key | select | — | Dated day pass · Timed entry · Open dated · Seated fixed performance · Seated date time seat map · Experience workshop · Surf session · Meeting room hourly · Cabana map · Cabana by size · Guided tour by language · Transport … | `getPublishedBookingFlow` ?flowTypeKey |
 
-**Form: Check booking eligibility** (modal, opened by *Check booking eligibility*; *Check booking eligibility* calls `checkBookingEligibility`, *Cancel* sends nothing)
+**Form: Once, on leaving selection, when a chosen product has an eligibility rule** (drawer, opened by *Once, on leaving selection, when a chosen product has an eligibility rule*; *Continue* calls `checkBookingEligibility`, *Back* sends nothing)
 
-**Collects what `checkBookingEligibility` sends before it is called.** Required: `productIds`, `party`. Dismissing sends nothing; the screen behind is unchanged.
+**The party's age and height, asked once per person** (DI-1037; REV3 DG-3) for the products that set a rule, then checked with `checkBookingEligibility`. A person who does not meet a rule is named with the product, and the guest changes the selection; never a button, and never a form of product ids.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -200,20 +200,6 @@ Errors to draw in the form: 409 The question has changed since the cart was read
 | Next cursor | text | — |
 | Has more | yes / no (icon or chip) | — |
 
-**Every performance** (data table, from `listPerformances`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Event | the name it points at, never the id | — |
-| Starts at | 1 Oct 2026, 14:30 | — |
-| Ends at | 1 Oct 2026, 14:30 | — |
-| Approval request | the name it points at, never the id | BL-048. The approval chain and the occurrence lifecycle sat on different entities, so neither was complete: `states/performance.yaml` … |
-| Requires approval to cancel | yes / no (icon or chip) | Cancelling a sold performance is the one transition that needs a name against it. |
-| Status | chip: Scheduled, On sale, Sold out, Suspended, Cancelled, Completed | — |
-| Admission rules | the name it points at, never the id | — |
-| Seat map | the name it points at, never the id | — |
-
 **Availability** (data table, from `getAvailability`): From `getAvailability`, now a `PerformanceAvailabilityPage` (a Page of `PerformanceAvailability`, each with `startsAt`): `channelCapacityId`, `performanceId`, `startsAt`, `capacity`, `sold`, `leased`, `remaining`, `byChannel`. The time grid calls it once with `eventId`, `from` and `to` for every performance in the window (decided 29 September, rev 3 REV3-1), not once per tile.
 
 | Shows | Format | Notes |
@@ -245,7 +231,6 @@ Errors to draw in the form: 409 The question has changed since the cart was read
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Quick tour (icon button) | navigation or local | — | — | — | — |
-| Check booking eligibility (primary button) | `checkBookingEligibility` POST `/eligibility-checks` | EligibilityCheckRequest | EligibilityCheckResult | — | opens modal first |
 
 **Data it reads**: `listPerformances` (onLoad, List performances of an event); `getAvailability` (onLoad, Live remaining capacity); `listProductCategories` (onLoad, The experience filter with descriptions); `listProducts` (onLoad, Products of a category or level); `getPublishedBookingFlow` (onLoad, The published booking flow for this product: which steps it …)
 
@@ -269,8 +254,8 @@ Errors to draw in the form: 409 The question has changed since the cart was read
 | Loading (`?state=loading`) | The select date time list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the select date time untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No select date time yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on from, to and the select date time are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listPerformances` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Empty, no results (`?state=emptyNoResults`) | No time matches the part of the day or the language picked, and the other times are still there. Names the filter and offers to clear it. |
+| Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that … |
 | Offline (`?state=offline`) | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 400 Validation failed; 409 No capacity, or the product is not sellable on this channel (`notSellableOnChannel`). (CartProblem); 409 The question has changed since the cart was read (`questionVersionSuperseded`); the client re-reads the cart … |
 
@@ -286,7 +271,7 @@ Errors to draw in the form: 409 The question has changed since the cart was read
 - `recordConsentAnswers` → `ORDER_CREATE` (operate) · guest, staff
 - `getPublishedBookingFlow` → no permission · guest
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listPerformances` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that …
 
 #### Requirements it meets
 
@@ -414,15 +399,16 @@ Also set there, as content the tenant writes: settings.
 - Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-007` · status **notStarted** · provenance client-verified
 - Prototype (mobile v4 (30 September build), verified 2026-10-01, match partial): `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, view *Buy tickets → Timed entry → Book now (step 1: date, then entry window)*. Differences: Booking in the app runs the website booking engine; per-flow step order.
 - ADR-0066 *The on-sale waiting room sits at the edge, apart from the ride queue* (`docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md`)
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
 - ADR-0037 *A lock holds one statement, not a transaction* (`docs/adr/0037-what-may-be-inside-a-lock.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (25), with its required mark, default, format and its error state (400, 403, 404, 409, 410, 422).
-- [ ] Every output is drawn (39 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (23), with its required mark, default, format and its error state (400, 403, 404, 409, 410, 422).
+- [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-007?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Quick tour, Check booking eligibility.
+- [ ] Every action is wired with its success and its failure: Quick tour.
 - [ ] Every transition is wired: `GST-001`, `GST-003`, `GST-008`, `GST-049`, `GST-008`, `GST-046`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 28 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -878,7 +864,7 @@ Errors to draw in the form: 403 The performance's on-sale waiting room is on and
 | Loading (`?state=loading`) | The upsell cross-sell, read by `getUpsellSuggestions`. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the upsell cross-sell untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No upsell cross-sell yet. Offers Add cart line (`addCartLine`). |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getUpsellSuggestions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that … |
 | Offline (`?state=offline`) | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 No capacity, or the product is not sellable on this channel (`notSellableOnChannel`). (CartProblem); 422 The booked window is missing, not allowed or the wrong length for the variant (`windowRequired`, `windowNotAllowed`, `windowLengthMismatch`; rev 3 REV3-13), or … (CartProblem) |
 
@@ -889,7 +875,7 @@ Errors to draw in the form: 403 The performance's on-sale waiting room is on and
 - `recordRecommendationEvents` → `AI_USE` (operate) · staff, guest, anonymous
 - `getUpsellSuggestions` → `PRODUCT_VIEW` (read) · staff, guest
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getUpsellSuggestions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that …
 
 #### Requirements it meets
 
@@ -942,6 +928,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-048` · status **notStarted** · provenance designed · **Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no …
 - Prototype (Mobile App v4, 29 September 2026, verified —, match none): `sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html`, view **
 - Drawn by: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0037 *A lock holds one statement, not a transaction* (`docs/adr/0037-what-may-be-inside-a-lock.md`)
 - ADR-0066 *The on-sale waiting room sits at the edge, apart from the ride queue* (`docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md`)
 - ADR-0052 *One recommendation engine; runtime in AI, configuration in Promotions* (`docs/adr/0052-one-recommendation-engine.md`)
@@ -1000,23 +987,9 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Category | picker: choose a category | — | — | `listPerformances` ?categoryId |
 | Language | text field | — | max length 35; pattern `^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$` | `listPerformances` ?language |
 
-**Form: Create seat hold** (modal, opened by *Create seat hold*; *Create seat hold* calls `createSeatHold`, *Cancel* sends nothing)
-
-**Collects what `createSeatHold` sends before it is called.** Required: `id`, `performanceId`, `seatIds`, `ttlSeconds`. Optional: `subjectId`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `createSeatHold` body |
-| Performance `performanceId` | picker: choose a performance | required | — | — | shows names, sends the id | — | `createSeatHold` body |
-| Seats `seatIds` | list of values (chips) | required | — | at least 1; at most 50; Either is refused with `422` `seat-limit-exceeded`. | — | 50 is the ceiling of the venue setting, not the limit a caller gets. On a guest channel the limit is `VenueSettings.seating.maxSeatsPerGuestOrder` (default 10, bounds 1 to 50 … | `createSeatHold` body |
-| Ttl seconds `ttlSeconds` | number field (seconds) | optional | 480 | min 60; max 1800 | — | 8 minutes by default, extendable to 30 in all (decided 28 September, audit R169). | `createSeatHold` body |
-| Subject `subjectId` | picker: choose a subject | optional | — | — | shows names, sends the id | — | `createSeatHold` body |
-
-Errors to draw in the form: 409 One or more seats are no longer available, or the selection breaks a seating rule. (SeatConflictProblem); 422 More seats than one booking may take: above `VenueSettings.seating.maxSeatsPerGuestOrder` on a guest channel (decided 29 September, rev 3 REV3-7), or above 10 … (SeatLimitProblem)
-
 **Form: Recommend seats** (modal, opened by *Recommend seats*; *Recommend seats* calls `recommendSeats`, *Cancel* sends nothing)
 
-**Collects what `recommendSeats` sends before it is called.** Required: `partySize`, `strategy`. Optional: `categoryIds`, `maxPrice`, `accessibleCount`, `maxOptions`. Dismissing sends nothing; the screen behind is unchanged.
+**How many seats, and best available or together.** The party size is the tickets already chosen; the guest only picks the preference, then `recommendSeats` places them.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1038,7 +1011,6 @@ Errors to draw in the form: 404 No selection satisfies the constraints
 | Shows | Format | Notes |
 |---|---|---|
 | Performance | the name it points at, never the id | — |
-| Seat map | the name it points at, never the id | — |
 | Totals | grouped details | — |
 | By category | list or chips (count when long) | — |
 | Seats | list or chips (count when long) | — |
@@ -1091,7 +1063,6 @@ Errors to draw in the form: 404 No selection satisfies the constraints
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Create seat hold (primary button) | `createSeatHold` POST `/seat-holds` | CreateSeatHoldRequest | SeatHold | 409 One or more seats are no longer available, or the selection breaks a seating rule. (SeatConflictProblem); 422 More seats than one booking may take: above `VenueSettings.seating.maxSeatsPerGuestOrder` on a guest … | opens modal first |
 | Recommend seats (secondary button) | `recommendSeats` POST `/performances/{performanceId}/seat-recommendations` | SeatRecommendationRequest | inline | 404 No selection satisfies the constraints | opens modal first |
 
 **Data it reads**: `getSeatAvailability` (onLoad, Seat status for a performance); `listPerformances` (onLoad, The event's other times (time bar, date and time pop-up))
@@ -1111,7 +1082,7 @@ Errors to draw in the form: 404 No selection satisfies the constraints
 | Loading (`?state=loading`) | The interactive seat selection, read by `getSeatAvailability`. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the interactive seat selection untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No interactive seat selection yet. Offers Create seat hold (`createSeatHold`). |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getSeatAvailability` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that … |
 | Offline (`?state=offline`) | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 One or more seats are no longer available, or the selection breaks a seating rule. (SeatConflictProblem); 409 The hold is no longer active (`holdNotActive`) - converted to an order, already released or expired.; 422 More seats than one booking may take: above `VenueSettings.seating.maxSeatsPerGuestOrder` on a guest channel (decided 29 September, rev 3 REV3-7), or above 10 … (SeatLimitProblem) |
 
@@ -1123,7 +1094,7 @@ Errors to draw in the form: 404 No selection satisfies the constraints
 - `listPerformances` → `PRODUCT_VIEW` (read) · staff, guest
 - `relinquishSeatHold` → `ORDER_CREATE` (operate) · staff, guest
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getSeatAvailability` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that …
 
 #### Requirements it meets
 
@@ -1210,15 +1181,16 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Prototype (mobile v4 (30 September build), verified 2026-10-01, match partial): `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, view *Union Arena → Buy tickets → Direct seat map → 2D plan → section 104 (← Whole map)*. Differences: The app runs the website seat engine (2D and 3D).
 - Derived from `wireframes/reference/Seat Board 4.dc.html`
 - Client design-board frames: `Seat Board 4.dc.html#seat-4a`
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0037 *A lock holds one statement, not a transaction* (`docs/adr/0037-what-may-be-inside-a-lock.md`)
 - ADR-0031 *Contention is leased, not locked — and where a lock is unavoidable it is named* (`docs/adr/0031-contention-and-locking.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (13), with its required mark, default, format and its error state (404, 409, 422).
-- [ ] Every output is drawn (39 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (8), with its required mark, default, format and its error state (404, 409, 422).
+- [ ] Every output is drawn (38 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-049?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Create seat hold, Recommend seats.
+- [ ] Every action is wired with its success and its failure: Recommend seats.
 - [ ] Every transition is wired: `GST-001`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 21 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -1247,18 +1219,12 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 #### Inputs: what the user enters or picks
 
-**On the screen**
-
-| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
-|---|---|---|---|---|---|---|---|
-| Venue id | picker: choose a venue (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?venueId=` to `listProducts`. | `listProducts` ?venueId |
-| Kind | select | optional | — | Admission · Timed admission · Dated admission · Open dated · Seated · Membership · Bundle · Fnb · Retail · Rental · Add on · Gift card | — | Sends `?kind=` to `listProducts`. | `listProducts` ?kind |
-| Is sellable | toggle | optional | — | — | — | Sends `?isSellable=` to `listProducts`. | `listProducts` ?isSellable |
-
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
+| Kind | select | — | Admission · Timed admission · Dated admission · Open dated · Seated · Membership · Bundle · Fnb · Retail · Rental · Add on · Gift card | `listProducts` ?kind |
+| Is sellable | toggle | — | — | `listProducts` ?isSellable |
 | Category | picker: choose a category | — | — | `listProducts` ?categoryId |
 | Segment tag | text field | — | max length 120 | `listProducts` ?segmentTag |
 | Guided answers | multi-picker: choose guided answers | — | at most 10 | `listProducts` ?guidedAnswerIds |
@@ -1268,9 +1234,9 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | From | date and time picker | — | — | `getAvailability` ?from |
 | To | date and time picker | — | Exclusive; at most 31 days after `from`. | `getAvailability` ?to |
 
-**Form: Add cart line** (modal, opened by *Add cart line*; *Add cart line* calls `addCartLine`, *Cancel* sends nothing)
+**Form: Add to cart** (modal, opened by *Add to cart*; *Add cart line* calls `addCartLine`, *Cancel* sends nothing)
 
-**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.
+**Type, date and guests**, then `addCartLine`; nothing else is asked.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1300,22 +1266,13 @@ Errors to draw in the form: 403 The performance's on-sale waiting room is on and
 
 **Shown**
 
-**Every product** (data table, from `listProducts`)
+**Cabanas** (card list, from `listProducts`): The venue's cabanas and other bookable spaces. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Code | text | — |
 | Name | text | — |
 | Description | text | — |
-| Kind | chip: Admission, Timed admission, Dated admission, Open dated, Seated, Membership… | `openDated` added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Created by principal | the name it points at, never the id | 1.4.18. The approval gate refuses an approver who is the author, and nothing recorded either. |
-| Approved by principal | the name it points at, never the id | — |
-| Responsible department | the name it points at, never the id | Who owns this product commercially. A scope node at `department` level. |
-| On sale from | 1 Oct 2026, 14:30 | 1.4.8. A seasonal product should not need somebody awake at midnight. |
-| On sale to | 1 Oct 2026, 14:30 | Retires the product automatically. Retirement is not deletion — the product stops selling and every order that referenced it still resolves. |
+| Media | list or chips (count when long) | The product's own photos and video (decided 29 September, 23SEP-4). *Read more* opens on the `isPrimary` item, and a listing shows each … |
 
 **Availability** (data table, from `getAvailability`): From `getAvailability`, now a `PerformanceAvailabilityPage` (a Page of `PerformanceAvailability`, each with `startsAt`): `channelCapacityId`, `performanceId`, `startsAt`, `capacity`, `sold`, `leased`, `remaining`, `byChannel`. The time grid calls it once with `eventId`, `from` and `to` for every performance in the window (decided 29 September, rev 3 REV3-1), not once per tile.
 
@@ -1341,7 +1298,7 @@ Errors to draw in the form: 403 The performance's on-sale waiting room is on and
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Add cart line (primary button) | `addCartLine` POST `/carts/{cartId}/lines` | AddCartLineRequest | Cart | 403 The performance's on-sale waiting room is on and the request has no valid admission token (ADR-0066).; 409 No capacity, or the product is not sellable on this channel (`notSellableOnChannel`). (CartProblem); 422 The … | opens modal first |
+| Add to cart (primary button) | `addCartLine` POST `/carts/{cartId}/lines` | AddCartLineRequest | Cart | 403 The performance's on-sale waiting room is on and the request has no valid admission token (ADR-0066).; 409 No capacity, or the product is not sellable on this channel (`notSellableOnChannel`). (CartProblem); 422 The … | opens modal first |
 
 **Data it reads**: `listProducts` (onLoad, List products); `getAvailability` (onLoad, Live remaining capacity)
 
@@ -1357,8 +1314,8 @@ Errors to draw in the form: 403 The performance's on-sale waiting room is on and
 | Loading (`?state=loading`) | The resource booking cabana list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the resource booking cabana untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No resource booking cabana yet. Offers Add cart line (`addCartLine`); distinct from a filter that matched nothing. |
-| Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, kind, isSellable and the resource booking cabana are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Empty, no results (`?state=emptyNoResults`) | Nothing free on the date picked; offers the next free date. |
+| Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that … |
 | Offline (`?state=offline`) | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 400 Validation failed; 409 No capacity, or the product is not sellable on this channel (`notSellableOnChannel`). (CartProblem); 422 The booked window is missing, not allowed or the wrong length for the variant (`windowRequired` … |
 
@@ -1368,7 +1325,7 @@ Errors to draw in the form: 403 The performance's on-sale waiting room is on and
 - `listProducts` → `PRODUCT_VIEW` (read) · staff, guest, partner
 - `getAvailability` → `PRODUCT_VIEW` (read) · staff, guest, partner
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that …
 
 #### Requirements it meets
 
@@ -1421,16 +1378,17 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-050` · status **notStarted** · provenance designed · **Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no …
 - Prototype (Mobile App v4, 29 September 2026, verified —, match none): `sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html`, view **
 - Drawn by: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0037 *A lock holds one statement, not a transaction* (`docs/adr/0037-what-may-be-inside-a-lock.md`)
 - ADR-0066 *The on-sale waiting room sits at the edge, apart from the ride queue* (`docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md`)
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (22), with its required mark, default, format and its error state (400, 403, 409, 422).
-- [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (19), with its required mark, default, format and its error state (400, 403, 409, 422).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-050?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Add cart line.
+- [ ] Every action is wired with its success and its failure: Add to cart.
 - [ ] Every transition is wired: `GST-016`, `GST-001`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 4 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -1457,11 +1415,13 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 **What the spec says about it.** States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **29 September (MOB-4).** A **meal combo with admission** is a bundle with an admission component and a meal component: *Buy meal combo* on Item Detail (GST-004) opens it here, and checkout is about three steps.
 
+**Known gaps.** The screen opens on one bundle (`bundleId` from Item Detail); the list of every bundle was the generator's.
+
 #### Inputs: what the user enters or picks
 
-**Form: Add cart line** (modal, opened by *Add cart line*; *Add cart line* calls `addCartLine`, *Cancel* sends nothing)
+**Form: Add to cart** (modal, opened by *Add to cart*; *Add cart line* calls `addCartLine`, *Cancel* sends nothing)
 
-**Collects what `addCartLine` sends before it is called.** Required: `variantId`, `quantity`. Optional: `performanceId`, `seatIds`, `parentLineId`, `attributes`. Dismissing sends nothing; the screen behind is unchanged.
+**The choices the bundle asks for, and how many.** `addCartLine` with the bundle's variant.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1491,34 +1451,6 @@ Errors to draw in the form: 403 The performance's on-sale waiting room is on and
 
 **Shown**
 
-**Every bundle** (data table, from `listCatalogueBundles`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Venue | the name it points at, never the id | — |
-| Published at | 1 Oct 2026, 14:30 | — |
-| Published by | the name it points at, never the id | — |
-| Content hash | text | — |
-| Signature key | text | Key that signed this bundle. A terminal offline across a key rotation needs a grace window, or it cannot verify the next bundle. |
-| Stale after | 1 Oct 2026, 14:30 | — |
-| Size bytes | 1,234 | — |
-| Note | text | — |
-| Applied by workstations | 1,234 | — |
-
-**The selected bundle** (detail panel, from `listCatalogueBundles`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| Venue | the name it points at, never the id | — |
-| Published at | 1 Oct 2026, 14:30 | — |
-| Published by | the name it points at, never the id | — |
-| Content hash | text | — |
-| Signature key | text | Key that signed this bundle. A terminal offline across a key rotation needs a grace window, or it cannot verify the next bundle. |
-| Stale after | 1 Oct 2026, 14:30 | — |
-| Size bytes | 1,234 | — |
-| Note | text | — |
-| Applied by workstations | 1,234 | — |
-
 **The bundle** (detail panel, from `getBundle`)
 
 | Shows | Format | Notes |
@@ -1526,7 +1458,6 @@ Errors to draw in the form: 403 The performance's on-sale waiting room is on and
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
-| Venue | the name it points at, never the id | — |
 | Kind | chip: Fixed, Dynamic, Mandatory, Optional, Promotional | — |
 | Price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Components | list or chips (count when long) | — |
@@ -1534,7 +1465,6 @@ Errors to draw in the form: 403 The performance's on-sale waiting room is on and
 | Allocation | grouped details | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | — |
-| ID | the name it points at, never the id | — |
 | Savings amount | AED 1,234.50 | Sum of component list prices less the bundle price. |
 | Savings percentage | 1,234.5 | — |
 | Has been sold | yes / no (icon or chip) | True locks components and allocation against amendment. |
@@ -1544,9 +1474,9 @@ Errors to draw in the form: 403 The performance's on-sale waiting room is on and
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Add cart line (primary button) | `addCartLine` POST `/carts/{cartId}/lines` | AddCartLineRequest | Cart | 403 The performance's on-sale waiting room is on and the request has no valid admission token (ADR-0066).; 409 No capacity, or the product is not sellable on this channel (`notSellableOnChannel`). (CartProblem); 422 The … | opens modal first |
+| Add to cart (primary button) | `addCartLine` POST `/carts/{cartId}/lines` | AddCartLineRequest | Cart | 403 The performance's on-sale waiting room is on and the request has no valid admission token (ADR-0066).; 409 No capacity, or the product is not sellable on this channel (`notSellableOnChannel`). (CartProblem); 422 The … | opens modal first |
 
-**Data it reads**: `listCatalogueBundles` (onLoad, List published bundles); `getBundle` (onLoad, Read a bundle with components and allocation)
+**Data it reads**: `getBundle` (onLoad, Read a bundle with components and allocation)
 
 **Where the user goes next**
 
@@ -1560,18 +1490,17 @@ Errors to draw in the form: 403 The performance's on-sale waiting room is on and
 | Loading (`?state=loading`) | The bundle package list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the bundle package untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No bundle package yet. Offers Add cart line (`addCartLine`). |
-| Empty, no results (`?state=emptyNoResults`) | Never shown: `listCatalogueBundles` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listCatalogueBundles` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Empty, no results (`?state=emptyNoResults`) | Never shown: the screen opens on one bundle and has no filter. |
+| Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that … |
 | Offline (`?state=offline`) | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 No capacity, or the product is not sellable on this channel (`notSellableOnChannel`). (CartProblem); 422 The booked window is missing, not allowed or the wrong length for the variant (`windowRequired`, `windowNotAllowed`, `windowLengthMismatch`; rev 3 REV3-13), or … (CartProblem) |
 
 #### Permissions
 
-- `listCatalogueBundles` → `PRODUCT_VIEW` (read) · staff, guest
 - `getBundle` → `PRODUCT_VIEW` (read) · staff, guest
 - `addCartLine` → no permission · guest, partner, staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listCatalogueBundles` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that …
 
 #### Requirements it meets
 
@@ -1610,16 +1539,16 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-056` · status **notStarted** · provenance designed · **Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no …
 - Prototype (Mobile App v4, 29 September 2026, verified —, match none): `sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html`, view **
 - Drawn by: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-- ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0037 *A lock holds one statement, not a transaction* (`docs/adr/0037-what-may-be-inside-a-lock.md`)
 - ADR-0066 *The on-sale waiting room sits at the edge, apart from the ride queue* (`docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (19), with its required mark, default, format and its error state (403, 404, 409, 422).
-- [ ] Every output is drawn (34 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-056?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Add cart line.
+- [ ] Every action is wired with its success and its failure: Add to cart.
 - [ ] Every transition is wired: `GST-001`, `GST-041`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 4 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -1648,14 +1577,6 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 #### Inputs: what the user enters or picks
 
-**On the screen**
-
-| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
-|---|---|---|---|---|---|---|---|
-| Venue id | picker: choose a venue (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?venueId=` to `listProducts`. | `listProducts` ?venueId |
-| Kind | select | optional | — | Admission · Timed admission · Dated admission · Open dated · Seated · Membership · Bundle · Fnb · Retail · Rental · Add on · Gift card | — | Sends `?kind=` to `listProducts`. | `listProducts` ?kind |
-| Is sellable | toggle | optional | — | — | — | Sends `?isSellable=` to `listProducts`. | `listProducts` ?isSellable |
-
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
@@ -1665,30 +1586,25 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Event | picker: choose an event | — | — | `getAvailability` ?eventId |
 | From | date and time picker | — | — | `getAvailability` ?from |
 | To | date and time picker | — | Exclusive; at most 31 days after `from`. | `getAvailability` ?to |
+| Kind | select | — | Admission · Timed admission · Dated admission · Open dated · Seated · Membership · Bundle · Fnb · Retail · Rental · Add on · Gift card | `listProducts` ?kind |
+| Is sellable | toggle | — | — | `listProducts` ?isSellable |
 | Category | picker: choose a category | — | — | `listProducts` ?categoryId |
 | Segment tag | text field | — | max length 120 | `listProducts` ?segmentTag |
 | Guided answers | multi-picker: choose guided answers | — | at most 10 | `listProducts` ?guidedAnswerIds |
+
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Every product** (data table, from `listProducts`)
+**Cabanas** (card list, from `listProducts`): The venue's cabanas and other bookable spaces. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Code | text | — |
 | Name | text | — |
 | Description | text | — |
-| Kind | chip: Admission, Timed admission, Dated admission, Open dated, Seated, Membership… | `openDated` added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Created by principal | the name it points at, never the id | 1.4.18. The approval gate refuses an approver who is the author, and nothing recorded either. |
-| Approved by principal | the name it points at, never the id | — |
-| Responsible department | the name it points at, never the id | Who owns this product commercially. A scope node at `department` level. |
-| On sale from | 1 Oct 2026, 14:30 | 1.4.8. A seasonal product should not need somebody awake at midnight. |
-| On sale to | 1 Oct 2026, 14:30 | Retires the product automatically. Retirement is not deletion — the product stops selling and every order that referenced it still resolves. |
+| Media | list or chips (count when long) | The product's own photos and video (decided 29 September, 23SEP-4). *Read more* opens on the `isPrimary` item, and a listing shows each … |
 
 **Availability** (data table, from `getAvailability`): From `getAvailability`, now a `PerformanceAvailabilityPage` (a Page of `PerformanceAvailability`, each with `startsAt`): `channelCapacityId`, `performanceId`, `startsAt`, `capacity`, `sold`, `leased`, `remaining`, `byChannel`. The time grid calls it once with `eventId`, `from` and `to` for every performance in the window (decided 29 September, rev 3 REV3-1), not once per tile.
 
@@ -1725,8 +1641,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Loading (`?state=loading`) | The resource availability (cabana) list. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the resource availability (cabana) untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No resource availability (cabana) yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, kind, isSellable and the resource availability (cabana) are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getAvailability` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Empty, no results (`?state=emptyNoResults`) | Nothing free on the date picked; offers the next free date. |
+| Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that … |
 | Offline (`?state=offline`) | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 400 Validation failed |
 
@@ -1735,7 +1651,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - `getAvailability` → `PRODUCT_VIEW` (read) · staff, guest, partner
 - `listProducts` → `PRODUCT_VIEW` (read) · staff, guest, partner
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getAvailability` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that …
 
 #### Requirements it meets
 
@@ -1783,12 +1699,13 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-058` · status **notStarted** · provenance designed · **Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no …
 - Prototype (Mobile App v4, 29 September 2026, verified —, match none): `sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html`, view **
 - Drawn by: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (3), with its required mark, default, format and its error state (400, 403).
-- [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-058?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `GST-050`, `GST-001`, `GST-074`.
@@ -1817,6 +1734,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 **What the spec says about it.** **A guest buying eight tickets could not give seven of them away.** `shareEntitlement`, `getGroupBooking` and `respondToInvitation` had no surface, so a group booking was one person holding eight barcodes. **`createReferral` writes `marketing.referral`, which nothing reads** — one of the sixteen orphan writes. This screen is where the reward would be visible, and it stays an open question until the wallet session settles what a referral credit is.
 
+**Known gaps.** Referrals are not this screen's job, and the referral write has no reader yet. Challenges are not this screen's job.
+
 #### Inputs: what the user enters or picks
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -1827,7 +1746,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 **Form: Request group booking** (modal, opened by *Request group booking*; *Request group booking* calls `requestGroupBooking`, *Cancel* sends nothing)
 
-**Collects what `requestGroupBooking` sends before it is called.** Required: `kind`, `packageProductId`, `preferredDate`, `expectedSize`. Optional: `organisationName`, `yearGroup`, `accessAndDietaryNeeds`, `celebrantName`, `celebrantTurningAge`, `allergiesAndRequests`. Dismissing sends nothing; the screen behind is unchanged. **30 September (client feedback, CLIENT-RESPONSE-30SEP 1).** The group ticket is chosen first (`packageProductId`: cards with the per-person price and the minimum group size), then *How many people* (`expectedSize`) as a number box the guest types into or steps with − and + (+10 on the app); no Group size dropdown. The estimate reads *<ticket> · Guests × <n>*.
+**Only what GST-008 did not ask**: the date wanted and a note. The kind, the package and the expected size come from the booking already started (DI-1000: never ask twice).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1866,16 +1785,6 @@ Errors to draw in the form: 409 Not shareable, and the reason says which: the en
 
 Errors to draw in the form: 409 Already answered, expired or revoked — the token is single-use — or an acceptance when the campaign's `quota` of places is taken. (InvitationResponseProblem)
 
-**Form: Create referral** (modal, opened by *Create referral*; *Create referral* calls `createReferral`, *Cancel* sends nothing)
-
-**Collects what `createReferral` sends before it is called.** Required: `id`, `referrerSubjectId`, `code`, `status`. Optional: `refereeSubjectId`, `qualifyingAction`, `referrerRewardId`, `refereeRewardId`, `expiresAt`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Referrer subject `referrerSubjectId` | picker: choose a referrer subject | required | — | — | shows names, sends the id | — | `createReferral` body |
-| Qualifying action `qualifyingAction` | segmented control | optional | — | First purchase · First visit · Membership purchase | — | — | `createReferral` body |
-| Expires at `expiresAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createReferral` body |
-
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -1884,7 +1793,6 @@ Errors to draw in the form: 409 Already answered, expired or revoked — the tok
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Order | the name it points at, never the id | — |
 | Leader subject | the name it points at, never the id | — |
 | Organisation name | text | — |
@@ -1895,11 +1803,10 @@ Errors to draw in the form: 409 Already answered, expired or revoked — the tok
 | Attendee capture due by | 1 Oct 2026, 14:30 | — |
 | Status | chip: Provisional, Confirmed, Names pending, Complete, Cancelled | — |
 
-**Every group package definition** (data table, from `listGroupPackages`)
+**Group packages** (card list, from `listGroupPackages`): Was the generated table 'Every group package definition'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Product | text | — |
 | Kind | chip: School, Party | — |
 | Max participants | 1,234 | Pupils or children, e.g. 30 or 10. |
@@ -1909,32 +1816,11 @@ Errors to draw in the form: 409 Already answered, expired or revoked — the tok
 | Free leader ratio | 1,234 | Schools: one teacher or assistant enters free per this many pupils. |
 | Payment mode | chip: Invoice, Deposit, Full | Schools are invoiced; parties take a deposit (see `DepositPolicy`). |
 | Includes | list or chips (count when long) | — |
-| Scope path | text | The partition key (ADR-0005). Operations write it at `venue` scope. |
-
-**The challenge** (detail panel, from `getMyChallenges`)
-
-| Shows | Format | Notes |
-|---|---|---|
-| ID | the name it points at, never the id | — |
-| Name | text | — |
-| Kind | chip: Visit, Spend, Ride, Collection, Streak, Referral… | What an entrant does to progress. `scan`, `activity` and `purchase` were added from the BO-825 pack (decided 28 September, audit R275 (c)) … |
-| Scope | chip: Individual, Family, Group, Team | 22.6.7 and 22.6.8. A family challenge is not a per-person challenge counted twice — members contribute toward one shared goal, and a school … |
-| Goal | grouped details | What completes it. |
-| Event | the name it points at, never the id | — |
-| Reward kind | chip: Badge, Loyalty points, Wallet credit, Voucher, Entitlement, None | 22.6.13. A reward that issues wallet credit is money, and it goes through the same stored-value mechanism as everything else rather than a … |
-| Reward value | 1,234 | Points, for `rewardKind: loyaltyPoints` only. A count, not an amount — a money reward is `rewardAmount`, never this. |
-| Reward amount | AED 1,234.50 | The credit, for `rewardKind: walletCredit` only. The shared `Money`, stored as `numeric(18,4)` with currency and scale resolved from the … |
-| Badge image | the image or video | — |
-| Starts at | 1 Oct 2026, 14:30 | — |
-| Ends at | 1 Oct 2026, 14:30 | — |
-| Status | chip: Draft, Active, Paused, Ended, Archived | — |
-| Scope path | text | The partition key (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it … |
 
 **The group package definition** (detail panel, from `getGroupPackageDefinition`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Product | text | — |
 | Kind | chip: School, Party | — |
 | Max participants | 1,234 | Pupils or children, e.g. 30 or 10. |
@@ -1944,7 +1830,6 @@ Errors to draw in the form: 409 Already answered, expired or revoked — the tok
 | Free leader ratio | 1,234 | Schools: one teacher or assistant enters free per this many pupils. |
 | Payment mode | chip: Invoice, Deposit, Full | Schools are invoiced; parties take a deposit (see `DepositPolicy`). |
 | Includes | list or chips (count when long) | — |
-| Scope path | text | The partition key (ADR-0005). Operations write it at `venue` scope. |
 
 **Actions and what each produces**
 
@@ -1952,10 +1837,9 @@ Errors to draw in the form: 409 Already answered, expired or revoked — the tok
 |---|---|---|---|---|---|
 | Share entitlement (primary button) | `shareEntitlement` POST `/entitlements/{entitlementId}/share` | inline | EntitlementShare | 409 Not shareable, and the reason says which: the entitlement's template does not allow sharing (`sharingNotAllowed`, `EntitlementTemplate.canShareMedia` false) … (EntitlementRefusedProblem) | opens modal first |
 | Respond to invitation (secondary button) | `respondToInvitation` POST `/invitations/{token}/respond` | inline | Invitation | 409 Already answered, expired or revoked — the token is single-use — or an acceptance when the campaign's `quota` of places is taken. (InvitationResponseProblem) | opens modal first |
-| Create referral (secondary button) | `createReferral` POST `/referrals` | Referral | Referral | — | opens modal first |
 | Request group booking (secondary button) | `requestGroupBooking` POST `/group-booking-requests` | GroupBookingRequest | GroupBooking | 409 The date is no longer available (`dateUnavailable`), or the package is not (`packageUnavailable`). (GroupBookingProblem); 422 More participants than the package allows (`aboveParticipantLimit`). (GroupBookingProblem) | opens modal first |
 
-**Data it reads**: `listGroupPackages` (onLoad, School-trip formats and party packages); `getGroupBooking` (onLoad, getGroupBooking); `getMyChallenges` (onLoad, Active challenges and how far along I am)
+**Data it reads**: `listGroupPackages` (onLoad, School-trip formats and party packages); `getGroupBooking` (onLoad, getGroupBooking)
 
 **Where the user goes next**
 
@@ -1969,7 +1853,7 @@ Errors to draw in the form: 409 Already answered, expired or revoked — the tok
 | Error (`?state=error`) | Could not load. **Says what failed and offers one way onward**, never a bare failure. |
 | Empty, first run (`?state=emptyFirstRun`) | **Nothing shared.** A guest holding eight tickets sees the option here rather than discovering it at the gate. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing here yet.** The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listGroupPackages` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that … |
 | Offline (`?state=offline`) | **The offline banner shows.** Tickets already shared stay visible. Sharing, invitations and referrals need the connection — a transfer nobody received is a ticket nobody holds. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Already answered, expired or revoked — the token is single-use — or an acceptance when the campaign's `quota` of places is taken. (InvitationResponseProblem); 409 Not shareable, and the reason says which: the entitlement's template does not allow sharing (`sharingNotAllowed`, `EntitlementTemplate.canShareMedia` false) … (EntitlementRefusedProblem); 409 The date is no longer available … |
 
@@ -1981,30 +1865,23 @@ Errors to draw in the form: 409 Already answered, expired or revoked — the tok
 - `shareEntitlement` → `ORDER_MODIFY` (operate) · staff, guest
 - `getGroupBooking` → `ORDER_VIEW` (read) · staff, guest
 - `respondToInvitation` → `GUEST_VIEW` (read) · guest, public
-- `createReferral` → `MARKETING_MANAGE` (configure) · staff, guest
-- `getMyChallenges` → `MARKETING_VIEW` (read) · staff, guest
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listGroupPackages` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that …
 
 #### Requirements it meets
 
-30 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+8 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 19.2.14 | Ticket Sharing - System shall support ticket sharing. | Guest Mobile App & Branding | CONTRACTED | `shareEntitlement` |
-| 19.2.73 | Gamification - System shall support gamification features. | Guest Mobile App & Branding | CONTRACTED | data `Challenge` |
-| 19.2.74 | Digital Badges - System shall support digital badges. | Guest Mobile App & Branding | CONTRACTED | data `Challenge` |
-| 19.2.75 | Challenges & Activities - System shall support challenges and activities. | Guest Mobile App & Branding | CONTRACTED | data `Challenge` |
-| 22.6.1 | Challenge Management | Marketing & CRM | CONTRACTED | data `Challenge` |
-| 22.6.2 | Achievement Engine | Marketing & CRM | CONTRACTED | data `Challenge` |
-| 22.6.3 | Digital Badges | Marketing & CRM | CONTRACTED | data `Challenge` |
-| 22.6.4 | Points-Based Activities | Marketing & CRM | CONTRACTED | data `Challenge` |
-| 22.6.5 | Visit Streak Tracking | Marketing & CRM | CONTRACTED | data `Challenge` |
-| 22.6.6 | Milestone Rewards | Marketing & CRM | CONTRACTED | data `Challenge` |
-| 22.6.7 | Family Challenges | Marketing & CRM | CONTRACTED | data `Challenge` |
-| 22.6.8 | Team & Group Challenges | Marketing & CRM | CONTRACTED | data `Challenge` |
-| … 18 more | | | | `traceability.json` |
+| 1.1.28 | System shall support group ticket products with configurable group sizes, group pricing, quotas, approvals and group leader management. | Ticketing Catalogue | CONTRACTED | data `GroupBooking` |
+| 1.1.114 | Fixed quantity group tickets | Ticketing Catalogue | CONTRACTED | data `GroupBooking` |
+| 1.1.115 | Dynamic quantity group tickets | Ticketing Catalogue | CONTRACTED | data `GroupBooking` |
+| 1.1.117 | Group capacity calculation | Ticketing Catalogue | CONTRACTED | data `GroupBooking` |
+| 1.1.118 | Individual attendee tracking | Ticketing Catalogue | CONTRACTED | data `GroupBooking` |
+| 1.1.119 | Extended guest information capture | Ticketing Catalogue | CONTRACTED | data `GroupBooking` |
+| 2.7.10 | Provide online self-service group booking with customizable options and rules to reduce manual coordination. | Ticketing Sales | CONTRACTED | data `GroupBooking` |
 
 #### Client meeting inputs
 
@@ -2040,14 +1917,15 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 - Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-072` · status **notStarted** · provenance client-verified
 - Prototype (rev 3, verified 2026-09-28, match exact): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html`, view *Account → All screens → Wave 2 → Share & group booking*
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0030 *A deep link is a pointer, not authorisation* (`docs/adr/0030-deep-link-cold-entry.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (17), with its required mark, default, format and its error state (403, 409, 422).
-- [ ] Every output is drawn (46 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (14), with its required mark, default, format and its error state (403, 409, 422).
+- [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-072?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Share entitlement, Respond to invitation, Create referral, Request group booking.
+- [ ] Every action is wired with its success and its failure: Share entitlement, Respond to invitation, Request group booking.
 - [ ] Every transition is wired: `GST-039`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 8 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -2196,7 +2074,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Keep it longer (secondary button) | `extendResourceHold` POST `/resource-holds/{holdId}/extend` | — | ResourceHold | 409 Already expired or converted, or the extension limit is reached. `refusedReason` says which. (ResourceHoldExtendProblem) | — |
 | Pick another (secondary button) | `relinquishResourceHold` DELETE `/resource-holds/{holdId}` | — | — | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | opens confirmDialog first |
 
-**Data it reads**: `getVenueMap` (onLoad, The map with its placed spots (label, kind, zone, capacity …); `getMapResourceAvailability` (onLoad, Every spot's status for the day in one call); `getResourceHold` (onInterval, The hold's countdown); `listBookableVenueMaps` (onLoad, Find the venue's published map with bookable spots (with …)
+**Data it reads**: `getVenueMap` (onLoad, The map with its placed spots (label, kind, zone, capacity …); `getMapResourceAvailability` (onLoad, Every spot's status for the day in one call); `getResourceHold` (onInterval, The hold's countdown With the guest session the device …); `listBookableVenueMaps` (onLoad, Find the venue's published map with bookable spots (with …)
 
 **Where the user goes next**
 
@@ -2279,6 +2157,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Flow F52 branch at step 2 (low): when The venue's cabana flow is *by size* rather than *pick on the map*., Map booking is optional per flow (decided 29 September, W6): with the *Cabana: by size* flow (CMS-103) the guest chooses a size on GST-050 and the unit is assigned; the resource selection policy …
 - ADR-0037 *A lock holds one statement, not a transaction* (`docs/adr/0037-what-may-be-inside-a-lock.md`)
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
+- ADR-0045 *Every order carries a proven contact, and the gate is the checkout page* (`docs/adr/0045-every-order-carries-a-proven-contact.md`)
 - ADR-0031 *Contention is leased, not locked — and where a lock is unavoidable it is named* (`docs/adr/0031-contention-and-locking.md`)
 - ADR-0066 *The on-sale waiting room sits at the edge, apart from the ride queue* (`docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md`)
 
@@ -2722,7 +2601,6 @@ Method, path, parameters, request and response for every operation these screens
 {
 "addCartLine": {"method":"POST","path":"/carts/{cartId}/lines","contract":"orders","summary":"Add something","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"AddCartLineRequest","responds":"Cart"},
 "checkBookingEligibility": {"method":"POST","path":"/eligibility-checks","contract":"catalogue","summary":"Can this party take part","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"EligibilityCheckRequest","responds":"EligibilityCheckResult"},
-"createReferral": {"method":"POST","path":"/referrals","contract":"marketing-crm","summary":"Issue a referral code","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"Referral","responds":"Referral"},
 "createResourceHold": {"method":"POST","path":"/resource-holds","contract":"resources","summary":"Hold a specific resource picked on the map","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateResourceHoldRequest","responds":"ResourceHold"},
 "createSeatHold": {"method":"POST","path":"/seat-holds","contract":"seating","summary":"Hold specific seats","permission":"ORDER_CREATE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateSeatHoldRequest","responds":"SeatHold"},
 "decideRecommendations": {"method":"POST","path":"/recommendations/decide","contract":"ai","summary":"Fill a recommendation slot","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AiRecommendationResult"},
@@ -2733,14 +2611,12 @@ Method, path, parameters, request and response for every operation these screens
 "getGroupBooking": {"method":"GET","path":"/group-bookings/{groupBookingId}","contract":"orders","summary":"A group, its leader and its name-capture duty","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"GroupBooking"},
 "getGroupPackageDefinition": {"method":"GET","path":"/products/{productId}/group-package","contract":"catalogue","summary":"A school-trip format or party package","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"productId","in":"path","required":true}],"requestBody":null,"responds":"GroupPackageDefinition"},
 "getMapResourceAvailability": {"method":"GET","path":"/resource-availability","contract":"resources","summary":"Every bookable resource on a venue map, free or taken, in one call","permission":"RESOURCE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"mapId","in":"query","required":true},{"name":"from","in":"query","required":true},{"name":"to","in":"query","required":true},{"name":"kind","in":"query","required":null}],"requestBody":null,"responds":"MapResourceAvailability"},
-"getMyChallenges": {"method":"GET","path":"/guests/me/challenges","contract":"marketing-crm","summary":"Active challenges and how far along I am","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":null},
 "getPublishedBookingFlow": {"method":"GET","path":"/venues/{venueId}/booking-flow","contract":"white-label","summary":"The published booking flow a product or category books through","permission":null,"offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"productId","in":"query","required":false},{"name":"productCategoryId","in":"query","required":false},{"name":"flowTypeKey","in":"query","required":false}],"requestBody":null,"responds":"BookingFlow"},
 "getPublishedGuidedChoice": {"method":"GET","path":"/venues/{venueId}/guided-choice","contract":"white-label","summary":"The venue's published Help me choose","permission":null,"offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"GuidedChoice"},
 "getResourceHold": {"method":"GET","path":"/resource-holds/{holdId}","contract":"resources","summary":"Read a resource hold","permission":"ORDER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ResourceHold"},
 "getSeatAvailability": {"method":"GET","path":"/performances/{performanceId}/seat-availability","contract":"seating","summary":"Seat status for a performance","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"sectionCode","in":"query","required":null},{"name":"categoryId","in":"query","required":null},{"name":"availableOnly","in":"query","required":null},{"name":"mode","in":"query","required":null}],"requestBody":null,"responds":"SeatAvailability"},
 "getVenueMap": {"method":"GET","path":"/venue-maps/{mapId}","contract":"venue-map","summary":"A map with its points and paths","permission":"VENUE_MAP_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"version","in":"query","required":null},{"name":"draft","in":"query","required":null}],"requestBody":null,"responds":"VenueMapDetail"},
 "listBookableVenueMaps": {"method":"GET","path":"/bookable-venue-maps","contract":"venue-map","summary":"The published maps of a venue that carry bookable spots","permission":"VENUE_MAP_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":true},{"name":"productId","in":"query","required":false},{"name":"kind","in":"query","required":false}],"requestBody":null,"responds":"BookableVenueMaps"},
-"listCatalogueBundles": {"method":"GET","path":"/catalogue/bundles","contract":"catalogue","summary":"List published catalogue bundles","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"BundleSummary"},
 "listGroupPackages": {"method":"GET","path":"/group-packages","contract":"catalogue","summary":"The school-trip formats or party packages on offer","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"kind","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listPerformances": {"method":"GET","path":"/events/{eventId}/performances","contract":"catalogue","summary":"List performances of an event","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":"categoryId","in":"query","required":null},{"name":"language","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listProductCategories": {"method":"GET","path":"/product-categories","contract":"catalogue","summary":"The merchandise hierarchy — categories, brands, collections","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ProductCategoryNode"},
@@ -2776,13 +2652,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "BookingFlowStep": {"x-ticvai-persistence":"whitelabel.booking_flow_step","type":"object","description":"One step of a venue's flow, in the venue's order (decided 29 September, W12).","required":["stepKey","enabled","sortOrder"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"bookingFlowId":{"type":"string","format":"uuid","readOnly":true},"stepKey":{"$ref":"#/components/schemas/BookingFlowStepKey"},"enabled":{"type":"boolean","description":"A `required` step cannot be off; the flow saves and `isValid` turns false."},"sortOrder":{"type":"integer","minimum":0},"requirement":{"type":"string","enum":["required","optional","conditional"],"readOnly":true,"x-ticvai-derived":"onRead","description":"From the flow type, so the CMS can mark the step without a second read."},"settings":{"type":"object","additionalProperties":true,"default":{},"description":"The step's own settings, by the names the type's `stepSettings` gives for this step (e.g. `languages` on `language`, `minHours` on `duration`). A name the type does not give is refused with 400."}}},
 "BookingFlowTypeKey": {"type":"string","description":"**The flow types the system catalogue offers (decided 29 September, W12; impact.md b).** `seatedFixedPerformance` and `seatedDateTimeSeatMap` are the two seated flows; `cabanaMap` and `cabanaBySize` are the two cabana flows (W6); `experienceWorkshop` puts the product before the date (W8); `multiLocation` opens on the location switcher.\n","enum":["datedDayPass","timedEntry","openDated","seatedFixedPerformance","seatedDateTimeSeatMap","experienceWorkshop","surfSession","meetingRoomHourly","cabanaMap","cabanaBySize","guidedTourByLanguage","transport","tableReservation","membership","giftCard","multiLocation"]},
 "Bundle": {"x-ticvai-persistence":"promotions.bundle + promotions.bundle_component","allOf":[{"$ref":"#/components/schemas/CreateBundleRequest"},{"type":"object","required":["id","savingsAmount","isActive","hasBeenSold"],"properties":{"id":{"type":"string","format":"uuid"},"savingsAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Sum of component list prices less the bundle price."},"savingsPercentage":{"type":"number"},"hasBeenSold":{"type":"boolean","description":"True locks components and allocation against amendment."},"isActive":{"type":"boolean"}}}]},
-"BundleSummary": {"x-ticvai-persistence":"none — projection over bundle","type":"object","description":"One published catalogue bundle — the signed snapshot terminals pull (ADR-0013). Not `promotions.Bundle`, which is a sellable product made of other products.","required":["version","venueId","publishedAt","publishedBy","contentHash","staleAfter","sizeBytes"],"properties":{"version":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"publishedAt":{"type":"string","format":"date-time"},"publishedBy":{"type":"string","format":"uuid"},"contentHash":{"type":"string"},"signatureKeyId":{"type":"string","description":"Key that signed this bundle. A terminal offline across a key rotation needs a grace window, or it cannot verify the next bundle.\n"},"staleAfter":{"type":"string","format":"date-time"},"sizeBytes":{"type":"integer"},"note":{"type":"string"},"appliedByWorkstations":{"type":"integer"}}},
 "Cart": {"type":"object","x-ticvai-persistence":"orders.cart","required":["id","venueId","channel","status","lines"],"properties":{"id":{"type":"string","format":"uuid"},"token":{"type":"string","readOnly":true,"description":"**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n"},"venueId":{"type":"string","format":"uuid"},"channel":{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"},"subjectId":{"type":"string","format":"uuid","nullable":true,"description":"Null while anonymous. Set by `claimCart`."},"status":{"$ref":"#/components/schemas/CartStatus"},"lines":{"type":"array","items":{"$ref":"#/components/schemas/CartLine"}},"conflicts":{"type":"array","items":{"$ref":"#/components/schemas/CartConflict"}},"consentQuestions":{"type":"array","readOnly":true,"description":"**The consent questions this cart's products and flow ask** (decided 29 September, rev 3 REV3-26), computed on read at their current version as **the union of each line's published booking flow's `white-label.BookingFlow.settings.consentQuestionIds`** (the flow `getPublishedBookingFlow` resolves for the line's product: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig`, 29 September W12) **and every line's `catalogue.Product.consentQuestionIds`, each question once**: the flow's first, in its order, then each product's in cart-line order, a question already listed not repeated (its `lineIds` gain the line). The client asks them, in the order given, and sends the answers to `marketing.recordConsentAnswers`; `answered` then turns true. One or several, as the venue chose. `checkoutCart` refuses while a required one is unanswered.\n","items":{"allOf":[{"$ref":"../satellite/marketing-crm.yaml#/components/schemas/ConsentQuestion"},{"type":"object","properties":{"lineIds":{"type":"array","description":"The cart lines that ask it. Empty for a question the flow asks.","items":{"type":"string","format":"uuid"}},"answered":{"type":"boolean","description":"Every person (for `perPerson`) or the booking (for `perBooking`) has an answer."}}}]}},"subtotal":{"x-ticvai-column":"net_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"discountTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"taxTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"total":{"x-ticvai-column":"gross_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"appliedPromotionIds":{"type":"array","description":"**Re-evaluated on every read.** A promotion that expired while the cart sat must not still be applied at checkout, and a promotion that became applicable should be.\n","items":{"type":"string","format":"uuid"}},"couponCodes":{"type":"array","readOnly":true,"description":"The promo codes the guest entered through `applyCartPromoCode` (decided 28 September, audit R073 (e)). **Sent as `couponCodes` on every promotions evaluation of this cart**, so a code is re-checked on each read like any promotion; a code that stops qualifying stays listed here and its promotion drops out of `appliedPromotionIds`.\n","items":{"type":"string","maxLength":100}},"expiresAt":{"type":"string","format":"date-time","description":"The earliest lease expiry in the cart, or the cart's own window where it holds none."},"extensionsUsed":{"type":"integer","readOnly":true},"maxExtensions":{"type":"integer","readOnly":true},"locale":{"type":"string"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time"}}},
 "CartConflict": {"type":"object","x-ticvai-persistence":"none — computed on read","description":"2.9.5. Golf at 13:00 and karting at 13:00 for the same guest. **A prompt, not a refusal** — a party of four may legitimately split, and refusing would be wrong more often than right.\n","properties":{"kind":{"type":"string","enum":["overlappingTime","sameSessionDifferentVenue","exceedsPartySize","requiresPrerequisite","consentBlocksBooking"]},"lineIds":{"type":"array","items":{"type":"string","format":"uuid"}},"message":{"type":"string"},"isBlocking":{"type":"boolean","description":"Most are not. `requiresPrerequisite` is — an add-on with no ticket to attach to cannot be sold. So is `consentBlocksBooking`: a consent question answered with the answer the venue set to block the booking (decided 29 September, rev 3 REV3-26).\n"}}},
 "CartLine": {"type":"object","x-ticvai-persistence":"orders.cart_line","required":["id","variantId","quantity"],"properties":{"id":{"type":"string","format":"uuid"},"variantId":{"type":"string","format":"uuid"},"productName":{"type":"string","readOnly":true},"quantity":{"type":"integer","minimum":1},"performanceId":{"type":"string","format":"uuid","nullable":true},"bookedWindow":{"$ref":"#/components/schemas/BookedWindow"},"recommendationId":{"type":"string","format":"uuid","nullable":true,"description":"The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather than guessed. Set from `addCartLine`; checkout copies it to the order line.\n"},"tableReservationId":{"type":"string","format":"uuid","nullable":true,"description":"Set on a table deposit line only (decided 29 September, rev 3 REV3-8b): the `fnb.TableReservation` this line secures. Priced from the deposit the booking snapshotted, not from the variant. Becomes an `orders.deposit` row at checkout, not revenue. A table booking with no deposit never has a line (rev 3 REV3-8).\n"},"seatIds":{"type":"array","maxItems":50,"items":{"type":"string","format":"uuid"}},"resourceHoldId":{"type":"string","format":"uuid","nullable":true,"description":"The `resources.ResourceHold` this line buys (decided 29 September, rev 3 REV3-15). While set, `leaseExpiresAt` is the hold's `expiresAt` and `inventoryHoldId` is null."},"attributes":{"$ref":"#/components/schemas/OrderLineAttributes"},"parentLineId":{"type":"string","format":"uuid","nullable":true,"description":"The line this add-on is attached to, from `AddCartLineRequest.parentLineId`. Kept on the line because **removing the parent removes the child**, and `removeCartLine` has to be able to find the children.\n"},"overridePrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"overrideReason":{"type":"string","nullable":true,"enum":["priceMatch","serviceRecovery","negotiated","damagedGoods","staffSale","error"],"description":"BL-085. **An operator could apply an approved discount and not enter a price.** A price match against a competitor and a service-recovery gesture are not discounts off a list — they are a number somebody decided.\n**Escalated above a configured threshold, and the reason is a closed set**: a free-text override reason is an override nobody can report on, and this is the field an auditor reads first.\n"},"feeKind":{"type":"string","nullable":true,"enum":["booking","transaction","service","delivery","convenience","cancellation"],"description":"**A fee is a line, not an adjustment.** `orders` already separates a service charge from a tip for the reason that applies here: **a guest is entitled to see what they are being charged for**, and a fee folded into the ticket price is a fee nobody can question.\nItemised at checkout, taxed on its own code, and refundable separately — **a cancellation fee is usually the one thing not refunded**, which only works if it is its own line.\n"},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"lineTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"inventoryHoldId":{"type":"string","nullable":true,"description":"The capacity held for this line — a `catalogue.InventoryHold.id`, typed as that id is. **Null for a product with no capacity** — a t-shirt needs stock, not a lease.\n"},"leaseExpiresAt":{"type":"string","format":"date-time","nullable":true,"description":"Shown to the guest. *\"Your seats are held for 6 minutes\"* is better than discovering it at checkout.\n"},"isAvailable":{"type":"boolean","readOnly":true,"description":"Re-checked on every read. **A line can become unavailable while the cart sits** — a lease expiring is not the same as the product selling out, and both land here.\n"}}},
 "CartStatus": {"type":"string","enum":["active","expiring","expired","abandoned","checkedOut"]},
-"Challenge": {"type":"object","x-ticvai-persistence":"marketing.challenge","description":"BL-022, CF-137. **Section 22.6 is twenty requirements and 19.2.73–75 three more** — checked against the matrix on 18 August rather than assumed. It is asked for explicitly.\n**Gamification is not loyalty.** Loyalty pays for spend; a challenge pays for behaviour the venue wants and spend does not produce — a second visit, a quiet Tuesday, a ride nobody rides. **A challenge that only rewards spending is a loyalty programme with worse arithmetic.**\n","required":["id","name","kind","goal","status"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"name":{"type":"string"},"kind":{"type":"string","description":"What an entrant does to progress. `scan`, `activity` and `purchase` were added from the BO-825 pack (decided 28 September, audit R275 (c)): `scan` counts scans of a named code or point (a trail marker, a stand), `activity` counts completions of a named attraction or activity that is not a ride, and `purchase` counts purchases of named products or categories. **`purchase` is not `spend`**: `spend` counts money, whatever was bought; `purchase` counts items bought.\n","enum":["visit","spend","ride","collection","streak","referral","survey","social","milestone","scan","activity","purchase"]},"scope":{"type":"string","enum":["individual","family","group","team"],"default":"individual","description":"22.6.7 and 22.6.8. **A family challenge is not a per-person challenge counted twice** — members contribute toward one shared goal, and a school competing against another school is a group scoring against a group.\n**This is the field that needs the portfolio work** (CF-132): a family challenge without a family is an individual challenge with a label.\n"},"goal":{"type":"object","description":"What completes it.","properties":{"metric":{"type":"string"},"target":{"type":"number"},"withinDays":{"type":"integer","nullable":true}}},"eventId":{"type":"string","format":"uuid","nullable":true},"rewardKind":{"type":"string","enum":["badge","loyaltyPoints","walletCredit","voucher","entitlement","none"],"description":"22.6.13. **A reward that issues wallet credit is money**, and it goes through the same stored-value mechanism as everything else rather than a parallel one.\n"},"rewardValue":{"type":"integer","nullable":true,"minimum":1,"description":"**Points, for `rewardKind: loyaltyPoints` only.** A count, not an amount — a money reward is `rewardAmount`, never this.\n"},"rewardAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"**The credit, for `rewardKind: walletCredit` only.** The shared `Money`, stored as `numeric(18,4)` with currency and scale resolved from the region, because a wallet credit is money and naming-and-style 5.1 forbids money as a bare number.\n"},"badgeAssetId":{"type":"string","format":"uuid","nullable":true},"startsAt":{"type":"string","format":"date-time"},"endsAt":{"type":"string","format":"date-time","nullable":true},"status":{"readOnly":true,"type":"string","enum":["draft","active","paused","ended","archived"]},"scopePath":{"readOnly":true,"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
-"ChallengeProgress": {"type":"object","x-ticvai-persistence":"marketing.challenge_progress","description":"22.6.15. **Progress is shown, not just the outcome.** A guest two visits from a reward behaves differently from one who does not know how close they are, which is the entire mechanism.\n","required":["id","challengeId","subjectId","current","target"],"properties":{"id":{"type":"string","format":"uuid"},"challengeId":{"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid"},"portfolioId":{"type":"string","format":"uuid","nullable":true,"description":"For a family or group challenge — where the shared progress accrues."},"current":{"type":"number"},"target":{"type":"number"},"streakCount":{"type":"integer","nullable":true},"completedAt":{"type":"string","format":"date-time","nullable":true},"rewardIssuedAt":{"type":"string","format":"date-time","nullable":true}}},
 "Channel": {"type":"string","enum":["pos","kiosk","web","mobile","b2b","ota","callCentre"]},
 "ConsentQuestionKind": {"type":"string","description":"What the question is about (decided 29 September, rev 3 REV3-26). `swim` feeds the derived `confidentSwimmer` on the order line; the others are recorded and checked as the venue set them.","enum":["swim","scuba","risk","custom"]},
 "ConsentSource": {"type":"string","enum":["guestApp","website","kiosk","pos","callCentre","import","agentRecorded","cookieBanner","checkout"],"description":"`checkout` (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders `checkoutCart` `marketingConsents[]` and recorded by `recordCheckoutConsents`, bound to the order and the verified contact. `cookieBanner` (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by `claimDeviceConsent`. Kept apart from `website`, a form submission, because the audit trail (2.6.56) has to tell the two apart."},
@@ -2821,7 +2694,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "ProductStartTime": {"x-ticvai-persistence":"none — computed on read","type":"object","description":"One start time a room type can be booked at for the chosen length (rev 3 REV3-13).","required":["startsAt","endsAt","freeCount"],"properties":{"startsAt":{"type":"string","format":"date-time"},"endsAt":{"type":"string","format":"date-time","description":"`startsAt` plus the variant's `durationMinutes`; the cart line's `bookedWindow.endsAt`."},"freeCount":{"type":"integer","minimum":1,"description":"Resources of the room type free for the whole window. Only times with at least one are returned."}}},
 "ProductVariant": {"x-ticvai-persistence":"catalogue.variant","type":"object","required":["id","productId","sku","axisValues","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"productId":{"type":"string","format":"uuid"},"sku":{"type":"string"},"axisValues":{"type":"object","additionalProperties":{"type":"string"}},"name":{"type":"string","maxLength":150,"nullable":true,"description":"**Taken from their variant tables, 20 September.** `axisValues` gives `{size: L}` and no string a guest can read. A menu showing *Large* needs somewhere for the word to live.\n"},"barcode":{"type":"string","maxLength":64,"nullable":true,"description":"**Taken from their variant tables, 20 September.** `catalogue.alternative_code` is a partner's own code for a variant and **requires `partnerId`**, so a manufacturer's EAN had nowhere to go. One per variant against many per variant is a different cardinality and belongs in a different place — and a POS scan should be an indexed column lookup, not a join.\n"},"isDefault":{"type":"boolean","default":false,"description":"Taken from their variant tables. Which variant a product page opens on. Ours had no way to say, so a three-size drink opened on whichever row sorted first.\n"},"isActive":{"type":"boolean","description":"False when retired. Retired variants are never deleted — orders reference them."},"description":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"**Who this ticket type is for and what it includes**, shown behind the (i) on each Adult, Child, Senior or Infant row (decided 29 September, 23SEP-6). Each language value at most 300 characters; longer is a `400`. Set with `updateProductVariant`. Whether the guest screen shows it is `BookingFlowConfig.cardInfo` (white-label).\n"}}},
 "RecordConsentAnswersRequest": {"type":"object","x-ticvai-persistence":"none — request only","required":["cartId","answers","source","answeredAt"],"properties":{"cartId":{"type":"string","format":"uuid","description":"The cart the answers are given for. `checkoutCart` binds them to its order."},"answers":{"type":"array","minItems":1,"maxItems":200,"items":{"type":"object","required":["questionId","questionVersion","answer"],"properties":{"questionId":{"type":"string","format":"uuid"},"questionVersion":{"type":"integer","minimum":1,"description":"The version the guest was shown, from `Cart.consentQuestions`."},"answer":{"type":"string","enum":["yes","no"]},"cartLineId":{"type":"string","format":"uuid","nullable":true,"description":"For a `perPerson` question, the line the person is on."},"personIndex":{"type":"integer","minimum":0,"nullable":true,"description":"For a `perPerson` question, the person's row in that line's `eligibilityDeclaration`, counting from 0."},"personName":{"type":"string","maxLength":120,"nullable":true},"personSubjectId":{"type":"string","format":"uuid","nullable":true,"description":"Where the person is a known guest, such as the booker or a family member."}}}},"source":{"$ref":"#/components/schemas/ConsentSource"},"answeredAt":{"type":"string","format":"date-time"}}},
-"Referral": {"type":"object","x-ticvai-persistence":"marketing.referral","description":"BL-034. **No referrer, no reward, nothing anywhere.**\n**The reward fires on the referee's qualifying act, not on the sign-up**, because a referral that pays on registration pays for accounts rather than for guests.\n","required":["id","referrerSubjectId","code","status"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"referrerSubjectId":{"type":"string","format":"uuid"},"refereeSubjectId":{"readOnly":true,"type":"string","format":"uuid","nullable":true},"code":{"readOnly":true,"type":"string"},"status":{"readOnly":true,"type":"string","enum":["issued","registered","qualified","rewarded","expired","void"]},"qualifyingAction":{"type":"string","enum":["firstPurchase","firstVisit","membershipPurchase"]},"referrerRewardId":{"readOnly":true,"type":"string","format":"uuid","nullable":true},"refereeRewardId":{"readOnly":true,"type":"string","format":"uuid","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"readOnly":true,"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
 "ResourceHold": {"x-ticvai-persistence":"resources.resource_hold","type":"object","description":"**A guest's pick on the map, held while they pay** (decided 29 September, rev 3 REV3-15). The resource counterpart of `seating.SeatHold`: named resources, short-lived, converted by the order rather than released. States in `states/resource-hold.yaml`.\n","required":["id","mapId","resourceIds","from","to","status","createdAt","expiresAt"],"properties":{"id":{"type":"string","format":"uuid"},"mapId":{"type":"string","format":"uuid"},"resourceIds":{"type":"array","items":{"type":"string","format":"uuid"}},"from":{"type":"string","format":"date-time"},"to":{"type":"string","format":"date-time"},"partySize":{"type":"integer","nullable":true},"status":{"type":"string","enum":["held","converted","released","expired"]},"totalPrice":{"x-ticvai-column":"gross_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"heldByPrincipalId":{"type":"string","format":"uuid","nullable":true},"subjectId":{"type":"string","format":"uuid","nullable":true},"orderId":{"type":"string","format":"uuid","nullable":true,"description":"Set when the order converts it."},"extensionCount":{"type":"integer","default":0},"createdAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time"},"scopePath":{"type":"string","description":"The partition key (ADR-0005), written at `venue` scope."}}},
 "ResourceKind": {"type":"string","description":"BL-135. **`locker` was an entitlement kind in `orders` and nothing issued, assigned or released one.** A locker is a specific object checked out to a named guest and returned — which is this context exactly, and modelling it as an entitlement would have needed a second check-out mechanism.\nA seed for `ResourceType` rather than the law (board 1.02): a customer adding a class does it with `createResourceType`, not by waiting for this list to grow.\n**`table` is a non-dining spot** (decided 29 September, rev 3 GAP-C2, confirmed by Chinmay): a beach or event table placed on a venue map, picked and sold like a cabana (`createResourceHold`, then the order). **A dining table is not this**: restaurant tables stay `fnb` tables, booked with `fnb.createTableReservation` and the waitlist (audit R073 (d)).\n","enum":["cabana","lounger","locker","wheelchair","stroller","equipment","room","auditorium","vehicle","instructor","staff","table","pitch","studio","other"],"x-ticvai-refuses":{"mealPlan":"**Listed by 5.5.8b and deliberately not a kind.** 5.5.8b groups meal plans with lockers and parking, but a meal plan is a balance rather than an object. It resolves to `retail.Wallet` with a `mealPlan` credit kind (CF-126), not to a resource — so it is not offered here, and a form built from this enum cannot offer it either."}},
 "SeatAvailability": {"x-ticvai-persistence":"none — computed from seat, hold and block","type":"object","required":["performanceId","seatMapId","renderMode","totals","seats"],"properties":{"performanceId":{"type":"string","format":"uuid"},"seatMapId":{"type":"string","format":"uuid"},"renderMode":{"type":"string","enum":["graphical","list"],"description":"The mode the server actually used. With `mode=auto` this is how a client knows what it got: `list` means the map has no geometry (the seat map's `noGeometry` state), so the client sells from categories and best-available groups and does not draw a plan. `graphical` means every seat carries `position`.\n"},"totals":{"type":"object","properties":{"total":{"type":"integer"},"available":{"type":"integer"},"held":{"type":"integer"},"sold":{"type":"integer"},"blocked":{"type":"integer"},"buffered":{"type":"integer"}}},"byCategory":{"type":"array","items":{"type":"object","properties":{"categoryId":{"type":"string","format":"uuid"},"available":{"type":"integer"},"sold":{"type":"integer"},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"sections":{"type":"array","description":"The map's sections with what a guest screen needs to show the view from each (decided 29 September, rev 3 23SEP-14): the photo where the venue supplied one, otherwise null and the client renders the view from `boundary` and the seat positions. In this response so WEB-007 and GST-049 need no second call.\n","items":{"type":"object","required":["code","name"],"properties":{"code":{"type":"string"},"name":{"type":"string"},"viewAssetId":{"type":"string","format":"uuid","nullable":true,"description":"As `Section.viewAssetId`. Null means render the view from geometry."},"boundary":{"type":"array","nullable":true,"items":{"$ref":"#/components/schemas/Point"},"description":"As `Section.boundary`. Null when `renderMode` is `list`."}}}},"seats":{"type":"array","items":{"type":"object","required":["seatId","status"],"properties":{"seatId":{"type":"string"},"status":{"$ref":"#/components/schemas/SeatStatus"},"categoryId":{"type":"string","format":"uuid","nullable":true},"displayLabel":{"type":"string","description":"What the guest sees, e.g. `A2-7-11`, as on `Seat`."},"position":{"allOf":[{"$ref":"#/components/schemas/Point"}],"nullable":true,"description":"The seat's coordinates on the map, as on `Seat`. Present when `renderMode` is `graphical`; null when it is `list`."}}}}}},

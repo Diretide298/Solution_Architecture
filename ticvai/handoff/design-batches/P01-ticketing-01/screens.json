@@ -54,84 +54,20 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "textField",
-       "label": "Venue id",
-       "operation": "listOrders",
-       "notes": "Sends `?venueId=` to `listOrders`.",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "textField",
-       "label": "Principal id",
-       "operation": "listOrders",
-       "notes": "Sends `?principalId=` to `listOrders`.",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "textField",
-       "label": "Shift id",
-       "operation": "listOrders",
-       "notes": "Sends `?shiftId=` to `listOrders`.",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "textField",
-       "label": "Status",
-       "operation": "listOrders",
-       "notes": "Sends `?status=` to `listOrders`.",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "datePicker",
-       "label": "Created from",
-       "operation": "listOrders",
-       "notes": "Sends `?createdFrom=` to `listOrders`.",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "datePicker",
-       "label": "Created to",
-       "operation": "listOrders",
-       "notes": "Sends `?createdTo=` to `listOrders`.",
-       "provenance": "contract orders.yaml GET /orders"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every order",
-       "bindsTo": "OrderSummary",
+       "kind": "cardList",
+       "label": "Your orders with tickets",
+       "bindsTo": "Order",
        "columns": [
-        "OrderSummary.id",
-        "OrderSummary.orderNumber",
-        "OrderSummary.status",
-        "OrderSummary.grossAmount",
-        "OrderSummary.refundedAmount",
-        "OrderSummary.channel",
-        "OrderSummary.lineCount"
+        "Order.orderNumber",
+        "Order.status",
+        "Order.grossAmount",
+        "Order.currency",
+        "Order.lines",
+        "Order.createdAt"
        ],
-       "operation": "listOrders",
-       "provenance": "contract orders.yaml GET /orders"
-      }
-     ]
-    },
-    {
-     "name": "contextPanel",
-     "slot": "selection",
-     "components": [
-      {
-       "kind": "detailPanel",
-       "label": "The selected order",
-       "bindsTo": "OrderSummary",
-       "columns": [
-        "OrderSummary.id",
-        "OrderSummary.orderNumber",
-        "OrderSummary.status",
-        "OrderSummary.grossAmount",
-        "OrderSummary.refundedAmount",
-        "OrderSummary.channel",
-        "OrderSummary.lineCount"
-       ],
-       "operation": "listOrders",
-       "provenance": "contract orders.yaml GET /orders"
+       "operation": "listMyOrders",
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Was the generated table 'Every order'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       }
      ]
     },
@@ -141,15 +77,9 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Transfer order tickets",
+       "label": "Transfer tickets",
        "operation": "transferOrderTickets",
        "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Claim ticket transfer",
-       "operation": "claimTicketTransfer",
-       "provenance": "contract orders.yaml POST /ticket-transfers/{transferId}/claim"
       },
       {
        "kind": "secondaryButton",
@@ -176,23 +106,15 @@
     "purpose": "Transfer tickets to another guest",
     "trigger": "onAction",
     "invalidates": [
-     "listOrders"
+     "listMyOrders"
     ]
    },
    {
-    "operationId": "claimTicketTransfer",
+    "operationId": "listMyOrders",
     "contract": "orders",
-    "purpose": "Claim transferred tickets",
-    "trigger": "onAction",
-    "invalidates": [
-     "listOrders"
-    ]
-   },
-   {
-    "operationId": "listOrders",
-    "contract": "orders",
-    "purpose": "List orders",
-    "trigger": "onLoad"
+    "purpose": "The orders this guest placed",
+    "trigger": "onLoad",
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    },
    {
     "operationId": "createResaleListing",
@@ -203,6 +125,10 @@
   ],
   "entryState": {
    "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
     {
      "name": "orderId",
      "from": "deepLink"
@@ -259,10 +185,10 @@
    {
     "id": "formTransferOrderTickets",
     "component": "modal",
-    "trigger": "Transfer order tickets",
-    "body": "**Collects what `transferOrderTickets` sends before it is called.** Required: `ticketIds`, `recipient`. Optional: `message`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Transfer tickets",
+    "body": "**Pick the tickets on their cards, then the friend**: a channel (email, SMS or WhatsApp) and the address, with an optional message. `transferOrderTickets` moves ownership; the recipient claims from the link they receive.",
     "confirm": {
-     "label": "Transfer order tickets",
+     "label": "Transfer tickets",
      "operation": "transferOrderTickets"
     },
     "dismiss": {
@@ -273,24 +199,21 @@
       "message"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "listOrders",
+    "removed": true,
+    "why": "The staff-scoped order list; a guest screen lists the caller's own orders with `listMyOrders` (removed from guest screens on 24 August, back with the 31 August parity pass).",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    },
    {
-    "id": "formClaimTicketTransfer",
-    "component": "modal",
-    "trigger": "Claim ticket transfer",
-    "body": "**Collects what `claimTicketTransfer` sends before it is called.** Required: `claimToken`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Claim ticket transfer",
-     "operation": "claimTicketTransfer"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "claimToken"
-     ]
-    },
-    "provenance": "client-verified"
+    "operation": "claimTicketTransfer",
+    "removed": true,
+    "why": "The recipient claims from the link (GST-014 or a claim landing); the token is never typed on the sender's screen.",
+    "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ],
   "_platform": {
@@ -368,19 +291,18 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Every reservations",
+       "kind": "cardList",
+       "label": "Your reservations",
        "bindsTo": "Reservation",
        "columns": [
-        "Reservation.id",
-        "Reservation.venueId",
         "Reservation.status",
         "Reservation.lines",
         "Reservation.expiresAt",
         "Reservation.convertedOrderId"
        ],
        "operation": "listReservations",
-       "provenance": "contract orders.yaml GET /reservations"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Was the generated table 'Every reservations'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
        "kind": "selectField",
@@ -390,11 +312,10 @@
        "provenance": "contract catalogue.yaml GET /group-packages"
       },
       {
-       "kind": "dataTable",
-       "label": "Every group package definition",
+       "kind": "cardList",
+       "label": "Group packages",
        "bindsTo": "GroupPackageDefinition",
        "columns": [
-        "GroupPackageDefinition.id",
         "GroupPackageDefinition.productId",
         "GroupPackageDefinition.kind",
         "GroupPackageDefinition.maxParticipants",
@@ -403,11 +324,11 @@
         "GroupPackageDefinition.pricingBasis",
         "GroupPackageDefinition.freeLeaderRatio",
         "GroupPackageDefinition.paymentMode",
-        "GroupPackageDefinition.includes",
-        "GroupPackageDefinition.scopePath"
+        "GroupPackageDefinition.includes"
        ],
        "operation": "listGroupPackages",
-       "provenance": "contract catalogue.yaml GET /group-packages"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "School trips, parties and corporate days, as cards. Was the generated table 'Every group package definition'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
        "kind": "confirmDialog",
@@ -427,7 +348,6 @@
        "label": "The selected group package definition",
        "bindsTo": "GroupPackageDefinition",
        "columns": [
-        "GroupPackageDefinition.id",
         "GroupPackageDefinition.productId",
         "GroupPackageDefinition.kind",
         "GroupPackageDefinition.maxParticipants",
@@ -436,8 +356,7 @@
         "GroupPackageDefinition.pricingBasis",
         "GroupPackageDefinition.freeLeaderRatio",
         "GroupPackageDefinition.paymentMode",
-        "GroupPackageDefinition.includes",
-        "GroupPackageDefinition.scopePath"
+        "GroupPackageDefinition.includes"
        ],
        "operation": "getGroupPackageDefinition",
        "provenance": "contract catalogue.yaml GET /products/{productId}/group-package"
@@ -447,7 +366,6 @@
        "label": "The group booking",
        "bindsTo": "GroupBooking",
        "columns": [
-        "GroupBooking.id",
         "GroupBooking.kind",
         "GroupBooking.packageProductId",
         "GroupBooking.yearGroup",
@@ -484,9 +402,6 @@
        "label": "The reservation",
        "bindsTo": "Reservation",
        "columns": [
-        "Reservation.id",
-        "Reservation.venueId",
-        "Reservation.subjectId",
         "Reservation.status",
         "Reservation.lines",
         "Reservation.expiresAt",
@@ -515,7 +430,7 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Save table reservation",
+       "label": "Change reservation",
        "operation": "updateTableReservation",
        "provenance": "contract fnb.yaml PATCH /table-reservations/{reservationId}"
       }
@@ -561,33 +476,21 @@
    {
     "id": "formUpdateTableReservation",
     "component": "modal",
-    "trigger": "Save table reservation",
-    "body": "**Collects what `updateTableReservation` sends before it is called.** Required: `outletId`, `partySize`, `startsAt`. Optional: `id`, `subjectId`, `guestName`, `contactPoint`, `durationMinutes`, `tables`, `status`, `groupId`, `notes`, `actualPartySize`, `tableVisitId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Change reservation",
+    "body": "**Party size and time, or cancel.** `updateTableReservation` with what the guest changed; the outlet, tables, status and visit are the venue's and never shown.",
     "bindsTo": "TableReservation",
     "confirm": {
-     "label": "Save table reservation",
+     "label": "Save",
      "operation": "updateTableReservation"
     },
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "outletId",
       "partySize",
-      "startsAt",
-      "id",
-      "subjectId",
-      "guestName",
-      "contactPoint",
-      "durationMinutes",
-      "tables",
-      "status",
-      "groupId",
-      "notes",
-      "actualPartySize",
-      "tableVisitId"
+      "startsAt"
      ]
     },
-    "provenance": "client-verified"
+    "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
    }
   ],
   "states": {
@@ -659,6 +562,10 @@
   ],
   "entryState": {
    "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
     {
      "name": "reservationId",
      "from": "deepLink"
@@ -779,66 +686,29 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "selectField",
-       "label": "Venue",
-       "operation": "listFxRates",
-       "notes": "Sends `?venueId=` to `listFxRates`, from the venue the guest picked (see the home screen), so the list is the region's rates narrowed to the currencies this venue shows. Rates are set per region and each venue picks which currencies it shows (decided 28 September, audit R120 (a)).",
-       "provenance": "contract finance.yaml GET /fx-rates"
-      },
-      {
-       "kind": "datePicker",
-       "label": "As at",
-       "operation": "listFxRates",
-       "notes": "Sends `?asAt=` to `listFxRates`.",
-       "provenance": "contract finance.yaml GET /fx-rates"
-      },
-      {
-       "kind": "textField",
-       "label": "Purpose",
-       "operation": "listFxRates",
-       "notes": "Sends `?purpose=` to `listFxRates`.",
-       "provenance": "contract finance.yaml GET /fx-rates"
-      },
-      {
-       "kind": "dataTable",
-       "label": "Every FX rate",
+       "kind": "cardList",
+       "label": "Currencies",
        "bindsTo": "FxRate",
        "columns": [
-        "FxRate.id",
-        "FxRate.fromCurrency",
         "FxRate.toCurrency",
         "FxRate.rate",
-        "FxRate.purpose",
-        "FxRate.source",
-        "FxRate.effectiveFrom",
-        "FxRate.effectiveTo",
-        "FxRate.setByPrincipalId",
-        "FxRate.providerReference",
-        "FxRate.fetchedAt"
+        "FxRate.effectiveFrom"
        ],
        "operation": "listFxRates",
-       "provenance": "contract finance.yaml GET /fx-rates"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "Fixed by the screen: the venue from Home, as at now, purpose tender. A guest never chooses a purpose: that would let them browse internal treasury rates. Was the generated table 'Every FX rate'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
-       "kind": "dataTable",
-       "label": "Every product",
+       "kind": "cardList",
+       "label": "Prices in your currency",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
-        "Product.code",
         "Product.name",
-        "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
-        "Product.onSaleFrom",
-        "Product.onSaleTo"
+        "Product.description"
        ],
        "operation": "listProducts",
-       "provenance": "contract catalogue.yaml GET /products"
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
+       "notes": "The venue's products with the price converted at the rate above; the venue's own currency stays the price charged. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       }
      ]
     },
@@ -848,20 +718,13 @@
      "components": [
       {
        "kind": "detailPanel",
-       "label": "The selected FX rate",
+       "label": "The rate",
        "bindsTo": "FxRate",
        "columns": [
-        "FxRate.id",
         "FxRate.fromCurrency",
         "FxRate.toCurrency",
         "FxRate.rate",
-        "FxRate.purpose",
-        "FxRate.source",
-        "FxRate.effectiveFrom",
-        "FxRate.effectiveTo",
-        "FxRate.setByPrincipalId",
-        "FxRate.providerReference",
-        "FxRate.fetchedAt"
+        "FxRate.effectiveFrom"
        ],
        "operation": "listFxRates",
        "provenance": "contract finance.yaml GET /fx-rates"
@@ -873,8 +736,8 @@
   "states": {
    "loading": "The multi-currency pricing list.",
    "error": "Could not load. Names which read failed and leaves the multi-currency pricing untouched.",
-   "emptyFirstRun": "No multi-currency pricing yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoResults": "Nothing matches the filter on asAt, purpose and the multi-currency pricing are still there. Names the active filter and offers to clear it.",
+   "emptyFirstRun": "Not reachable: with no other currency at the venue the screen is not linked, and prices stay in the venue's currency.",
+   "emptyNoResults": "Never shown: the screen sends no filter a guest chose.",
    "emptyNoAccess": "**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "offline": "**The offline banner shows. Last known rates stay, with their age.** A rate is a number a guest may act on, and an undated one they cannot judge."
   },

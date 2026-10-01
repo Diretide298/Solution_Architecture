@@ -1,6 +1,6 @@
 # P01-account-self-service-01 — P01 · Account & Self-Service
 
-**5 screens · 47 operations · 48 schemas · 7 permissions**
+**5 screens · 46 operations · 47 schemas · 7 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -71,7 +71,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `WEB-016` | Login / Register | A | 36 | 6 | 6 | 15 | 11 | 0 | guest | review (client-verified) |
 | `WEB-017` | My Account Dashboard | A | 17 | 42 | 6 | 31 | 1 | 0 | guest | review (client-verified) |
 | `WEB-018` | My Tickets | A | 11 | 55 | 6 | 8 | 8 | 0 | guest | review (client-verified) |
-| `WEB-019` | Order History | A | 9 | 38 | 6 | 25 | 2 | 0 | guest | review (client-verified) |
+| `WEB-019` | Order History | A | 4 | 16 | 6 | 15 | 2 | 0 | guest | review (client-verified) |
 | `WEB-020` | Profile & Preferences | A | 20 | 47 | 6 | 18 | 0 | 0 | guest | review (client-verified) |
 
 ## Design inputs from the client meetings
