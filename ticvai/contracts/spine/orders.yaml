@@ -6637,7 +6637,6 @@ paths:
     get:
       operationId: getB2bCredit
       x-ticvai-consumed-by:
-        - "P10 PTR-001 Partner Login / MFA"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-013 Credit Limit & Balance"
       x-ticvai-api-scope: ticketing.read
@@ -6670,7 +6669,6 @@ paths:
     put:
       operationId: setB2bCreditLimit
       x-ticvai-consumed-by:
-        - "P10 PTR-001 Partner Login / MFA"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-013 Credit Limit & Balance"
       x-ticvai-api-scope: ticketing.write
@@ -6738,7 +6736,6 @@ paths:
     post:
       operationId: overrideCreditLimit
       x-ticvai-consumed-by:
-        - "P10 PTR-001 Partner Login / MFA"
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-013 Credit Limit & Balance"
       x-ticvai-api-scope: ticketing.write

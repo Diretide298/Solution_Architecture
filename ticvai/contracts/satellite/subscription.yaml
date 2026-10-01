@@ -557,7 +557,6 @@ paths:
       operationId: listPartnerAgreements
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
-        - "P10 PTR-001 Partner Login / MFA"
         - "P10 PTR-011 Quote Management"
         - "P10 PTR-017 Commission Statement"
       x-ticvai-api-scope: partner.read

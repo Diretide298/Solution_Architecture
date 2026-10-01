@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Identity & Authorisation
   version: 1.0.0
-  x-ticvai-screen-count: 71
+  x-ticvai-screen-count: 73
   x-ticvai-tier: spine
   x-ticvai-module: 19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth
   x-ticvai-requirements: 107
@@ -77,6 +77,19 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       summary: Authenticate and open a session
+      description: 'One sign-in for every staff and partner door. **A browser door sends no
+        `workstationId`** (the TICVAI Console ADM-001, Venue Management SUP-001, the partner portal
+        PTR-001): a desk browser is not a registered device, and requiring one locked every web door
+        out (CHG-DOOR-001, Chinmay, 2 October 2026: fix the Block A blockers now). **A device door
+        sends it** (the till POS-000, the staff handheld EMP-001, the scanner SCN-001), and a
+        device-bound `method` (`pin`, `card`, `rfid`) without it is refused 400 (problem type
+        `workstation-required`), because the device is what bounds a PIN. Nothing else about the
+        sign-in changes: the second factor is asked by permission (audit R135), five wrong codes lock
+        step-up (R126), a second sign-in is refused 409 (R184), and several roles mean a role prompt
+        (ADR-0003). Where the tenant has SSO, the same doors offer `startSsoAuthorization` /
+        `completeSsoAuthorization`, which return the same `LoginResponse`.
+
+        '
       security: []
       requestBody:
         required: true
@@ -914,6 +927,9 @@ paths:
         - "P04 POS-001 Begin Shift"
         - "P06 EMP-002 Select venue & role"
         - "P07 SCN-001 Sign in"
+        - "P09 ADM-001 Platform Login / MFA"
+        - "P10 PTR-001 Partner Login / MFA"
+        - "P12 SUP-001 Venue Management Sign In"
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
@@ -1014,6 +1030,11 @@ paths:
       operationId: changeOwnCredential
       x-ticvai-consumed-by:
         - "P04 POS-000 Sign In"
+        - "P06 EMP-001 Sign in"
+        - "P07 SCN-001 Sign in"
+        - "P09 ADM-001 Platform Login / MFA"
+        - "P10 PTR-001 Partner Login / MFA"
+        - "P12 SUP-001 Venue Management Sign In"
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
@@ -1107,9 +1128,7 @@ paths:
       operationId: forceLogout
       x-ticvai-consumed-by:
         - "P04 POS-000 Sign In"
-        - "P09 ADM-001 Platform Login / MFA"
-        - "P10 PTR-001 Partner Login / MFA"
-        - "P12 SUP-001 Venue Management Sign In"
+        - "P08 BO-053 Staff Directory"
       x-ticvai-audience:
       - staff
       - partner
@@ -1697,7 +1716,6 @@ paths:
     post:
       operationId: resolvePermissions
       x-ticvai-consumed-by:
-        - "P07 SCN-001 Sign in"
         - "P08 BO-068 Audit Log"
       x-ticvai-audience:
       - staff
@@ -2402,7 +2420,6 @@ paths:
         - "P06 EMP-001 Sign in"
         - "P06 EMP-002 Select venue & role"
         - "P06 EMP-042 Profile"
-        - "P07 SCN-001 Sign in"
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
         - "P12 SUP-001 Venue Management Sign In"
@@ -2440,6 +2457,11 @@ paths:
         format: uuid
     get:
       operationId: startSsoAuthorization
+      x-ticvai-consumed-by:
+        - "P06 EMP-001 Sign in"
+        - "P09 ADM-001 Platform Login / MFA"
+        - "P10 PTR-001 Partner Login / MFA"
+        - "P12 SUP-001 Venue Management Sign In"
       x-ticvai-audience:
       - anonymous
       x-ticvai-read-routing: replica
@@ -2491,6 +2513,11 @@ paths:
         format: uuid
     post:
       operationId: completeSsoAuthorization
+      x-ticvai-consumed-by:
+        - "P06 EMP-001 Sign in"
+        - "P09 ADM-001 Platform Login / MFA"
+        - "P10 PTR-001 Partner Login / MFA"
+        - "P12 SUP-001 Venue Management Sign In"
       x-ticvai-audience:
       - anonymous
       summary: Exchange an SSO code for a session
@@ -2635,14 +2662,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-073 Security & Sign-in"
-        - "P06 EMP-001 Sign in"
         - "P06 EMP-002 Select venue & role"
         - "P06 EMP-042 Profile"
-        - "P07 SCN-001 Sign in"
-        - "P09 ADM-001 Platform Login / MFA"
         - "P09 ADM-342 Authentication & MFA Policy Manager"
-        - "P10 PTR-001 Partner Login / MFA"
-        - "P12 SUP-001 Venue Management Sign In"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -2689,6 +2711,8 @@ paths:
         - "P02 GST-073 Security & Sign-in"
         - "P06 EMP-042 Profile"
         - "P09 ADM-001 Platform Login / MFA"
+        - "P10 PTR-001 Partner Login / MFA"
+        - "P12 SUP-001 Venue Management Sign In"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -2792,6 +2816,8 @@ paths:
         - "P02 GST-073 Security & Sign-in"
         - "P06 EMP-042 Profile"
         - "P09 ADM-001 Platform Login / MFA"
+        - "P10 PTR-001 Partner Login / MFA"
+        - "P12 SUP-001 Venue Management Sign In"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -2860,7 +2886,6 @@ paths:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-073 Security & Sign-in"
         - "P06 EMP-042 Profile"
-        - "P09 ADM-001 Platform Login / MFA"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -2921,6 +2946,7 @@ paths:
         - "P04 POS-000 Sign In"
         - "P06 EMP-001 Sign in"
         - "P07 SCN-001 Sign in"
+        - "P08 BO-053 Staff Directory"
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
         - "P12 SUP-001 Venue Management Sign In"
@@ -3033,6 +3059,7 @@ paths:
         - "P04 POS-000 Sign In"
         - "P06 EMP-001 Sign in"
         - "P07 SCN-001 Sign in"
+        - "P08 BO-053 Staff Directory"
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
         - "P12 SUP-001 Venue Management Sign In"
@@ -3130,9 +3157,7 @@ paths:
       operationId: listActiveSessions
       x-ticvai-consumed-by:
         - "P04 POS-000 Sign In"
-        - "P09 ADM-001 Platform Login / MFA"
-        - "P10 PTR-001 Partner Login / MFA"
-        - "P12 SUP-001 Venue Management Sign In"
+        - "P08 BO-053 Staff Directory"
       x-ticvai-audience:
       - staff
       - partner
@@ -3193,9 +3218,7 @@ paths:
     post:
       operationId: revokeAllSessions
       x-ticvai-consumed-by:
-        - "P09 ADM-001 Platform Login / MFA"
-        - "P10 PTR-001 Partner Login / MFA"
-        - "P12 SUP-001 Venue Management Sign In"
+        - "P08 BO-053 Staff Directory"
       x-ticvai-audience:
       - staff
       - partner
@@ -7905,10 +7928,19 @@ components:
           format: date-time
     LoginRequest:
       type: object
+      description: '**`workstationId` is required for a device door and absent from a browser door**
+        (CHG-DOOR-001, 2 October 2026). It was required on every login, so no browser could sign in:
+        the TICVAI Console (ADM-001), Venue Management (SUP-001) and the partner portal (PTR-001) have no
+        workstation. Optional in the schema is additive against r1; the rule moved to where it belongs,
+        the device-bound methods: `pin`, `card` and `rfid` without a `workstationId` are refused 400
+        (`workstation-required`). A `password` sign-in from a till, handheld or scanner still sends it,
+        because the workstation decides the Sale Board, the hardware and the till identity (never a
+        permission, ADR-0002).
+
+        '
       required:
       - username
       - credential
-      - workstationId
       properties:
         username:
           type: string
@@ -7930,8 +7962,9 @@ components:
 
 
             **A PIN is weaker than a password and the difference is bounded by the device, not by
-            the secret.** `workstationId` is required on every login and is *NOT a permission
-            source*: it says which till, and the till is on a venue network in a staff area. A PIN
+            the secret.** A `pin` (like `card` and `rfid`) is accepted only with a `workstationId`,
+            refused 400 `workstation-required` without one (CHG-DOOR-001), and the workstation is *NOT
+            a permission source*: it says which till, and the till is on a venue network in a staff area. A PIN
             is a reasonable credential there and nowhere else, which is why this is an enum value
             and not a policy flag — a surface that wants it has to ask for it by name.
 
@@ -7951,6 +7984,12 @@ components:
           format: uuid
           description: 'Identifies the device. Determines Sale Board, connected hardware, till identity
             and Access Point inheritance. NOT a permission source.
+
+
+            **Sent by a device door, never by a browser** (CHG-DOOR-001, 2 October 2026). Required in
+            effect for the device-bound methods `pin`, `card` and `rfid` (400 `workstation-required`
+            without it); absent on the TICVAI Console, Venue Management and partner portal sign-ins,
+            which have no workstation.
 
             '
         deviceFingerprint:
