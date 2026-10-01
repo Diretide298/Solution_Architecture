@@ -333,6 +333,8 @@ screens:
     emptyNoAccess: Signed in, and the person holds no role in this app. Says who at the tenant grants
       access; distinct from a wrong password. A door has no permission of its own to name, because the
       person is not signed in until it succeeds.
+    emptyNoResults: 'Never shown: `listSsoProviders` takes no filter; a tenant with no identity provider shows
+      no SSO buttons at all, and the form is the whole door.'
     sessionHeld: '`login` answered 409: this person already holds a session elsewhere (audit R184, ADR-0004).
       Says where and since when; only a holder of SESSION_FORCE_LOGOUT ends it, on the staff directory
       (BO-053), and signing in never ends it by itself.'
