@@ -91,12 +91,18 @@ def main():
               "days": float(r.get("days") or 0) or days_of.get(r["key"]),
               "notBefore": float(r.get("notBefore") or 0), "deps": (r["dependsOn"] or "").split(),
               "client": r["area"] == "client", "block": r.get("block") or "A"} for r in rows]
+    pace_at, pace_line, _ = sp.pace_model(team, items)
     res = sp.schedule(items, people, caps=caps, svc_owner=svc_owner,
                       backend_owners=(team.get("areas") or {}).get("backend") or [],
-                      helper_share=team.get("helperShare") or {}, freeze=freeze)
+                      helper_share=team.get("helperShare") or {}, freeze=freeze,
+                      open_blocks=settings["fixed"], pace_at=pace_at)
+    # **AI engine tasks past 2 April stay unassigned** (Chinmay, 1 October): they are timed here like any task,
+    # but the plan left them without an owner, so the schedule gives them none either
+    unowned_ai = {r["key"] for r in rows if r["track"] == "AI" and not r["assignee"] and not pins.get(r["key"])}
     block = {r["key"]: r.get("block") or "A" for r in rows}
     ai_engine = {r["key"] for r in rows if r["track"] == "AI" and r["block"] != "A"}
     placed = {k: v for k, v in res.items() if v["who"]}
+    assigned = {k: v["who"] for k, v in placed.items() if k not in unowned_ai}
     b_end, b_ai = defaultdict(float), defaultdict(float)
     for k, v in placed.items():
         if k.startswith("TEST-BLOCK-"):
@@ -113,20 +119,25 @@ def main():
         w = freeze.get(b)
         # the block's final sprint: the one its test window is in (build-service-docs.py placed it after the work)
         n = sp.sprint_of_index(w[0]) if w else sp.final_sprint(b_end[b])
+        normal = sp.final_sprint(b_end[b], sp.BLOCK_TEST_DAYS, at_least=1)       # where it would end at normal hours
         bt = [v for k, v in placed.items() if k.startswith(f"TEST-BLOCK-{b}-")]
         blocks[b] = {"lastDay": sp.day(max(b_end[b] - 1e-6, 0.0)).isoformat(), "endSprint": n,
                      "endsOn": sp.SPRINTS_ALL[n - 1]["end"].isoformat(), "targetSprint": t,
                      "targetEndsOn": sp.SPRINTS_ALL[t - 1]["end"].isoformat(),
                      "testFrom": sp.day(w[0]).isoformat() if w else "", "testTo": sp.day(w[1] - 1).isoformat() if w else "",
                      "testEnds": sp.day(max(max((v["end"] for v in bt), default=0.0) - 1e-6, 0)).isoformat() if bt else "",
-                     "aiEngineLastDay": sp.day(max(b_ai[b] - 1e-6, 0.0)).isoformat() if b in b_ai else ""}
+                     "aiEngineLastDay": sp.day(max(b_ai[b] - 1e-6, 0.0)).isoformat() if b in b_ai else "",
+                     "fixed": b in settings["fixed"], "normalEndSprint": max(normal, n if b not in settings["fixed"] else 1),
+                     "normalEndsOn": sp.SPRINTS_ALL[max(normal, n if b not in settings["fixed"] else 1) - 1]["end"].isoformat()}
     out = {"note": ("Derived by tools/derive-block-a-schedule.py from plan-tasks.csv (the sprint plan of 1 October): "
                     "build order, dependencies, each person's pace, two-week sprints. start and end = working days "
                     "from Monday 5 October 2026; sprint = the sprint a task starts in (Sprint 1 = 5-16 Oct 2026, "
                     "Sprint 13 = 22 Mar-2 Apr 2027; a sprint past 13 is past the six months). " + note),
            "start": {k: round(v["start"], 2) for k, v in res.items()},
            "end": {k: round(v["end"], 2) for k, v in res.items()},
-           "assign": {k: v["who"] for k, v in placed.items()},
+           "assign": assigned,
+           "duration": {k: round(v.get("dur") or 0.0, 3) for k, v in placed.items()},
+           "pace": pace_line,
            "sprint": {k: sp.sprint_of_index(v["start"]) for k, v in placed.items()},
            "endSprint": {k: sp.sprint_of_index(max(v["end"] - 1e-6, 0.0)) for k, v in placed.items()},
            "block": block,

@@ -268,7 +268,45 @@ def sprint_settings(team):
         targets.setdefault(b, n)
     return {"targets": targets, "ticketBlocks": list(sp.get("ticketBlocks") or ["A", "B"]),
             "fePointsPerAppModule": int(sp.get("fePointsPerAppModule") or 45),
-            "stableOwnersSince": (sp.get("stableOwners") or {}).get("since", "r2")}
+            "stableOwnersSince": (sp.get("stableOwners") or {}).get("since", "r2"),
+            # the apps Block A completes all the functionality of (Chinmay, 1 October)
+            "blockAApps": list(sp.get("blockAApps") or ["P01", "P02", "P04", "P15"]),
+            # a block whose end is decided (Block A: 40 working days, Sprint 4): its test sits in its target sprint
+            # whatever the work at normal hours says; the overtime to get there is reported
+            "fixed": {b["block"] for b in sp.get("blocks") or [] if b.get("fixed")},
+            "pace": dict(sp.get("pace") or {})}
+
+
+def pace_model(team, items):
+    """Points per developer per working day as a function of the day index, and a line saying what it is.
+
+    Default (team.json sprintPlan.pace.tasksPerDevDay null): PLAN_PACE, Block A's plan of record, every sprint.
+    A scenario (Chinmay, 1 October: "5 tasks per day ... ramp up towards the next block ... 2x by Block D"):
+    tasksPerDevDay x the average points of a non-AI task in the plan, held through Sprint rampFromSprint - 1,
+    then rising linearly sprint by sprint to rampTo x that at Sprint rampFullSprint, and held. Per-person pace
+    (Surendra 60%) still applies on top; AI engine tasks are sized in days and are not affected."""
+    cfg = sprint_settings(team)["pace"]
+    tpd = cfg.get("tasksPerDevDay")
+    if not tpd:
+        return (lambda i: PLAN_PACE), f"{PLAN_PACE:.2f} points per developer per day (Block A's plan of record)", PLAN_PACE
+    pts = [float(it.get("points") or 0) for it in items if it.get("track") != "AI"]
+    avg = sum(pts) / max(len(pts), 1)
+    base = float(tpd) * avg
+    to, a, b = float(cfg.get("rampTo") or 1.0), int(cfg.get("rampFromSprint") or 5), int(cfg.get("rampFullSprint") or 11)
+
+    def factor(n):
+        if n < a:
+            return 1.0
+        if n >= b:
+            return to
+        return 1.0 + (to - 1.0) * (n - a + 1) / (b - a + 1)
+
+    by_sprint = {sp_["n"]: base * factor(sp_["n"]) for sp_ in SPRINTS_ALL}
+
+    def at(i):
+        return by_sprint.get(sprint_of_index(max(i, 0.0)), base * to)
+    return at, (f"{tpd:g} tasks per developer per day x {avg:.2f} points a task = {base:.1f} points, through Sprint "
+                f"{a - 1}; rising to {to:g}x ({base * to:.1f}) by Sprint {b}, then held"), base
 
 
 def release_number(tag):
@@ -414,15 +452,16 @@ def is_soft(item, dep):
     return k == "PLATFORM-KERNEL" and dep["key"] == "SETUP-AUTH"
 
 
-def duration(item, pace_of):
+def duration(item, pace_of, pace_at=None, at=0.0):
     if item.get("days"):
         return float(item["days"])
     pts = float(item.get("points") or 0)
-    return pts / (PLAN_PACE * pace_of.get(item["who"], 1.0)) if pts else 0.25
+    pace = pace_at(at) if pace_at else PLAN_PACE
+    return pts / (pace * pace_of.get(item["who"], 1.0)) if pts else 0.25
 
 
 def schedule(items, people, caps=None, svc_owner=None, backend_owners=(), helper_share=None, choose=True,
-             freeze=None):
+             freeze=None, open_blocks=(), pace_at=None):
     """A list scheduler over working days from Monday 5 October 2026, for every task of every block.
 
     Items come in build order (each after everything it waits on). Each is placed in its person's first free gap
@@ -453,15 +492,28 @@ def schedule(items, people, caps=None, svc_owner=None, backend_owners=(), helper
     busy = {p["name"]: ([(0.0, p["fromIndex"])] if p["fromIndex"] > 0 else []) for p in people}
     be_load = Counter()
     by_key = {it["key"]: it for it in items}
-    start, end, who_of = {}, {}, {}
+    start, end, who_of, dur_of = {}, {}, {}, {}
 
     def forbidden(it):
         if it["track"] == "Test" or not freeze:
             return ()
         b = it.get("block") or "A"
         dep_blocks = {(by_key[d].get("block") or "A") for d in it.get("deps") or () if d in by_key}
+        # a block whose end is decided (open_blocks) keeps working in its own window at normal hours: that work is
+        # the overtime the plan reports, not something the window can stop
         return sorted(w for x, w in freeze.items()
-                      if not (rank_b.get(b, 0) > rank_b.get(x, 0) and x not in dep_blocks))
+                      if not (rank_b.get(b, 0) > rank_b.get(x, 0) and x not in dep_blocks)
+                      and not (x == b and x in open_blocks))
+
+    def place(slots, ready, it_, forbid):
+        d = duration(it_, pace_of, pace_at, ready)
+        s = _gap(slots, ready, d, forbid)
+        if pace_at:
+            d2 = duration(it_, pace_of, pace_at, s)
+            if abs(d2 - d) > 1e-9:
+                d = d2
+                s = _gap(slots, ready, d, forbid)
+        return s, d
 
     for it in items:
         k = it["key"]
@@ -505,7 +557,7 @@ def schedule(items, people, caps=None, svc_owner=None, backend_owners=(), helper
                         be_load[name] + pts > helper_share[name] * (sum(owners_be) / len(owners_be)):
                     continue
                 it_ = dict(it, who=name)
-                s = _gap(busy[name], ready, duration(it_, pace_of), forbid)
+                s, _ = place(busy[name], ready, it_, forbid)
                 score = s + (2 if r else 0) + 2 * j
                 if pool == "be" and name in backend_owners and svc_owner.get(it.get("service")) not in (None, name):
                     score += 1
@@ -516,12 +568,12 @@ def schedule(items, people, caps=None, svc_owner=None, backend_owners=(), helper
                 start[k], end[k] = 0.0, 0.0
                 continue
         it_ = dict(it, who=who)
-        dur = duration(it_, pace_of)
         slots = busy.setdefault(who, [])
-        s = _gap(slots, ready, dur, forbid)
+        s, dur = place(slots, ready, it_, forbid)
+        dur_of[k] = dur
         slots.append((s, s + dur))
         slots.sort()
         start[k], end[k], who_of[k] = s, max(s + dur, wire), who
         if it.get("pool") == "be" or it["track"] in ("Backend", "Database"):
             be_load[who] += float(it.get("points") or 0)
-    return {k: {"start": start[k], "end": end[k], "who": who_of.get(k)} for k in start}
+    return {k: {"start": start[k], "end": end[k], "who": who_of.get(k), "dur": dur_of.get(k, 0.0)} for k in start}

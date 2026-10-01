@@ -128,14 +128,16 @@ def main():
                 "block test of the journeys it completes, then the client's acceptance.", "How it is tested:")
     bullet(doc, f" about {n(b['totalHours'])} hours: build {n(b['buildHours'])}, testing {n(b['testHours'])}, "
                 f"AI engine {n(b['aiEngineHours'])}.", "Effort:")
-    bullet(doc, f" Block A (the first release) ends Sprint {a['targetSprint']}, {d(a['targetEndsOn'])}, with about "
+    bullet(doc, f" Block A (the first release and all the functionality of Guest Web, Guest App, POS and the Kitchen "
+                f"Display; 40 working days, it was 35) ends Sprint {a['targetSprint']}, {d(a['targetEndsOn'])}, with about "
                 f"{n(opt_a['overtimeHours'])} hours of overtime. Block D finishes by {d(b['planEnd'])} with about "
                 f"{n(b['overtimeHoursDevelopers'])} developer overtime hours over the six months. The AI engine work past "
                 f"{d(b['planEnd'])} is created as tasks and left unassigned for the AI developers joining.",
            "Decided 1 October:")
     table(doc, ["Block", "Sprints", "Ends (decided)", "At normal hours", "App-modules", "Screens", "Journeys tested end to end"],
           [[k, f"{x['firstSprint']}–{x['targetSprint']}", f"{d(x['targetEndsOn'])} (Sprint {x['targetSprint']})",
-            f"{d(x['endsOn'])} (Sprint {x['endSprint']})", x["appModuleCount"], n(x["screens"]),
+            f"{d(x.get('normalEndsOn') or x['endsOn'])} (Sprint {x.get('normalEndSprint') or x['endSprint']})",
+            x["appModuleCount"], n(x["screens"]),
             f"{x['flowsClaimed']}" + (f" (+{x['flowsPartly']} partly)" if x["flowsPartly"] else "")]
            for k, x in blocks.items()], widths=[1.2, 1.6, 3.4, 3.4, 2, 1.6, 3])
 
@@ -159,9 +161,10 @@ def main():
         para(doc, f" {x['appModuleCount']} app-modules: {n(x['screens'])} screens, {n(x['ops'])} operations, "
                   f"{n(x['tables'])} tables; {n(x['hours'])} build hours and {n(x['testHours'])} test hours.", "Scope.")
         para(doc, f" {apps}.", "App-modules by app.")
-        para(doc, f" {d(x['testFrom'])} to {d(x['testTo'])} at normal hours, by {' and '.join(x['testers'])}, led by "
-                  f"{x['testLead']}." + (f" With the decided overtime the block, and its test, close by "
-                                          f"{d(x['targetEndsOn'])}." if x['targetSprint'] != x['endSprint'] else ""),
+        para(doc, f" {d(x['testFrom'])} to {d(x['testTo'])}, by {' and '.join(x['testers'])}, led by "
+                  f"{x['testLead']}." + (f" At normal hours its work runs to {d(x.get('normalEndsOn') or x['endsOn'])}; "
+                                          f"with the decided overtime the block, and its test, close by "
+                                          f"{d(x['targetEndsOn'])}." if x['targetSprint'] != (x.get('normalEndSprint') or x['endSprint']) else ""),
              "Block test.")
         crit = [f for f in plan["flows"] if f["complete"] == k and f["criticality"] in ("revenue", "safety", "legal")]
         if crit:
@@ -231,7 +234,8 @@ def main():
     table(doc, ["Question", "Decision", "What it costs"],
           [["When Block A ends", f"Sprint {a['targetSprint']}, {d(a['targetEndsOn'])}",
             f"About {n(opt_a['overtimeHours'])} h of overtime: " + ", ".join(f"{k} {v}" for k, v in opt_a["byPerson"].items())
-            + f". Without it Block A ends {d(a['endsOn'])}."],
+            + f". Without it Block A ends {d(a.get('normalEndsOn') or a['endsOn'])}. Block A is 40 working days "
+              "(decided 1 October; it was 35)."],
            ["Block D past 2 April", f"Keep its scope; finish by {d(b['planEnd'])} with overtime",
             f"About {n(b['overtimeHoursDevelopers'])} developer hours over the six months (the People table), about 4 to 5 "
             f"hours a week each. At normal hours the developers finish {d(b['forecastFinish'])}."],

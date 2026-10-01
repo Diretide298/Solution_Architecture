@@ -1222,7 +1222,8 @@
     "tools/op-retire.py",
     "docs/active/ai-functions-review-30-september.json",
     "handoff/service-docs/op-release.json",
-    "tools/sprint_plan.py"
+    "tools/sprint_plan.py",
+    "flows/*"
    ],
    "writes": [
     "handoff/service-docs/README.md",

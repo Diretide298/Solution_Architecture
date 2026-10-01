@@ -49,6 +49,7 @@ NOT_COUNTED = "Chinmay Parab (lead) is not counted in capacity."
 PREVIOUS = {"date": "30 September 2026", "finish": "2027-04-26", "overtimeHours": 1293,
             "blockA": "screens by 20 November, back end wired by 25 December"}
 AI_REVIEW = "docs/active/ai-functions-review-30-september.json"
+AI_PEOPLE = ("Kalpita Mejari", "Second AI engineer")
 OPS_RE = re.compile(r"Operations(?: beyond the first release)?: ([^.]+)\.")
 TABLES_RE = re.compile(r"Tables: (.+?)\. Source")
 SCREEN_RE = re.compile(r"(?:APP-[A-Z]+|VM)-([A-Z]+-\d{3,}[A-Z]?)(?:-REST)?$")
@@ -146,8 +147,10 @@ def main():
         if days:
             hours, dur = days * HOURS_PER_DAY, days
         else:
-            hours = pts * hpp
-            dur = pts / (PLAN_PACE * pace_of.get(who, 1.0)) if pts else 0.25
+            # the scheduled working days (they follow the pace model, team.json sprintPlan.pace), in hours of effort
+            dur = float((sched.get("duration") or {}).get(k) or 0) or (
+                pts / (PLAN_PACE * pace_of.get(who, 1.0)) if pts else 0.25)
+            hours = dur * HOURS_PER_DAY * pace_of.get(who, 1.0) if pts else 0.25 * HOURS_PER_DAY
         s0 = float(sched["start"].get(k, 0))
         kind = ("block test" if k.startswith("TEST-BLOCK-") else "module test" if r["track"] == "Test"
                 else "AI engine" if r["track"] == "AI" else "build")
@@ -265,6 +268,19 @@ def main():
                           "workDoneBy": sp.day(cut - 1).isoformat(), "overtimeHours": round(sum(per.values())),
                           "byPerson": {w: round(h) for w, h in per.most_common() if h >= 1}})
 
+    def target_ot(b):
+        """Hours of a block's work (its tickets and module tests; the AI engine of later blocks apart) still running
+        when its target sprint's block-test window opens, per person: the overtime it takes to end on target."""
+        cut = sp.window_of(settings["targets"][b], tests["days"])[0]
+        per = collections.Counter()
+        for it in items:
+            if it["block"] != b or it["kind"] == "block test" or not it["who"] or it["e"] <= cut:
+                continue
+            if it["kind"] == "AI engine" and b != "A":
+                continue
+            per[it["who"]] += it["hours"] * (it["e"] - max(it["s"], cut)) / max(it["e"] - it["s"], 1e-6)
+        return per
+
     blocks = []
     for b in sp.BLOCKS:
         mine = [a for a in ams if a["block"] == b]
@@ -282,6 +298,10 @@ def main():
             "endsOn": x.get("endsOn"), "targetEndsOn": x.get("targetEndsOn"), "lastWork": x.get("lastDay"),
             "testFrom": x.get("testFrom"), "testTo": x.get("testTo"), "testers": pair, "testLead": tests["lead"],
             "aiEngineLastDay": x.get("aiEngineLastDay"),
+            "normalEndSprint": x.get("normalEndSprint") or n, "normalEndsOn": x.get("normalEndsOn") or x.get("endsOn"),
+            "fixed": bool(x.get("fixed")),
+            "targetOvertimeHours": round(sum(target_ot(b).values())),
+            "targetOvertimeByPerson": {w: round(h) for w, h in target_ot(b).most_common() if h >= 1},
             "firstSprint": first_sprint(its),
             "appModules": [a["name"] for a in mine], "appModuleCount": len(mine),
             "platforms": dict(plats.most_common()),
@@ -388,6 +408,9 @@ def main():
                         "inPlan": s["inPlan"],
                         "capacity": round(sum(r["capacity"].get(s["n"], 0) for r in people_rows)),
                         "planned": round(sum(load[w][s["n"]] for w in load)),
+                        # developers only (the AI engineers apart): capacity left unplanned in the sprint
+                        "devIdle": round(sum(r["capacity"].get(s["n"], 0) - load[r["name"]][s["n"]]
+                                             for r in people_rows if r["name"] not in AI_PEOPLE)),
                         "blocks": active, "blockEnding": ending,
                         "blockTest": [{"block": b["block"], "from": b["testFrom"], "to": b["testTo"]}
                                       for b in blocks if b["endSprint"] == s["n"]],
@@ -421,9 +444,30 @@ def main():
     # ---------------------------------------------------------------- totals
     dev = [it for it in items if it["kind"] == "build"]
     devs_finish = max(it["e"] for it in dev if it["who"])
-    ai_finish = max([it["e"] for it in items if it["kind"] == "AI engine" and it["who"]] or [0.0])
+    ai_finish = max([it["e"] for it in items if it["kind"] == "AI engine"] or [0.0])   # unassigned ones included
     test_items = [it for it in items if it["kind"] in ("module test", "block test")]
-    counted = [p for p in people_rows if p["name"] not in ("Kalpita Mejari", "Second AI engineer")]
+    counted = [p for p in people_rows if p["name"] not in AI_PEOPLE]
+    # **Block A's critical path** (asked 1 October): its longest chain of waits with every task on its own person
+    # (no one waits for a free person), at the scheduled durations; soft waits hold only the finish. The shortest
+    # Block A can take whatever the team size.
+    a_its = sorted((it for it in items if it["block"] == "A" and it["kind"] != "block test"), key=lambda it: it["seq"])
+    a_keys_ = {it["key"] for it in a_its}
+    ef = {}
+    for it in a_its:
+        r = by_key[it["key"]]
+        st = 0.0
+        wire = 0.0
+        for d in (r["dependsOn"] or "").split():
+            if d not in a_keys_ or d not in ef:
+                continue
+            soft = sp.is_soft({"track": r["track"], "key": r["key"], "service": r["service"]},
+                              {"track": by_key[d]["track"], "key": d, "service": by_key[d]["service"]})
+            if soft:
+                wire = max(wire, ef[d])
+            else:
+                st = max(st, ef[d])
+        ef[it["key"]] = max(st + (it["e"] - it["s"]), wire)
+    a_critical = round(max(ef.values() or [0.0]), 1)
     out = {
         "generatedBy": "tools/build-plan-deck.py", "generated": dt.date.today().isoformat(),
         "basis": {"pacePointsPerDeveloperDay": round(PLAN_PACE, 2), "hoursPerPoint": round(hpp, 3),
@@ -442,7 +486,11 @@ def main():
                   "overtimeHoursDevelopers": round(sum(p["hoursAfterPlanEnd"] for p in counted)),
                   "notCounted": NOT_COUNTED, "previous": PREVIOUS,
                   "tasks": len(tasks), "ticketedTasks": len([r for r in tasks if r.get("ticketed") == "yes"]),
-                  "appModules": len(ams), "blockAOptions": a_options},
+                  "appModules": len(ams), "blockAOptions": a_options,
+                  "pace": sched.get("pace") or "", "blockACriticalPathDays": a_critical,
+                  "aiUnassignedHours": round(sum(it["hours"] for it in items if it["kind"] == "AI engine"
+                                                 and not it["who"])),
+                  "devIdleHoursToPlanEnd": round(sum(s_["devIdle"] for s_ in sprints if s_["inPlan"]))},
         "calendar": {"start": START.isoformat(), "planEnd": PLAN_END.isoformat(), "sprintDays": sp.SPRINT_DAYS,
                      "holidays": {d.isoformat(): n for d, n in HOLIDAYS.items()}},
         "blocks": blocks, "sprints": sprints, "appModules": ams, "packages": pk, "modules": mod_rows,
@@ -549,18 +597,22 @@ def summary_rows(plan):
          f"block tests {_pp(b['blockTestHours'])}), AI engine {_pp(b['aiEngineHours'])} h."],
         ["Overtime to finish by 2 April", f"{_pp(b['overtimeHoursDevelopers'])} hours (developers)",
          f"Decided 1 October: Block D keeps its scope and finishes by 2 April with overtime. The AI engine's "
-         f"{_pp(b['overtimeHours'] - b['overtimeHoursDevelopers'])} h past 2 April is not overtime: those tasks are "
+         f"{_pp(b.get('aiUnassignedHours', 0))} h past 2 April is not overtime: those tasks are "
          f"unassigned for the AI developers joining. The plan of {PREVIOUS['date']} needed about "
          f"{_pp(PREVIOUS['overtimeHours'])} h without the tests."],
         ["Block A", f"{a['appModuleCount']} app-modules, ends {_d(a['targetEndsOn'])} (Sprint {a['targetSprint']})",
          f"Previously: {PREVIOUS['blockA']}. Now complete, tested and accepted as one block. Decided 1 October: "
          f"Sprint {a['targetSprint']} with about {_pp(_opt_a(b, a)['overtimeHours'])} h of overtime ("
          + ", ".join(f"{n} {h}" for n, h in _opt_a(b, a)['byPerson'].items())
-         + f"); at normal hours it would end {_d(a['endsOn'])}."],
+         + f"); at normal hours it would end {_d(a.get('normalEndsOn') or a['endsOn'])}."],
         ["Tasks", f"{_pp(b['tasks'])} ({_pp(b['ticketedTasks'])} ticketed)",
          "Blocks A and B task by task; C and D at app-module level in OpenProject until they are planned."],
-        ["Pace", f"{b['pacePointsPerDeveloperDay']} points per developer per day; {b['hoursPerPoint']} h a point",
-         "Block A's plan of record (3,018 points, 35 days, 9 developers); replaced by the measured pace."],
+        ["Pace", b.get("pace") or f"{b['pacePointsPerDeveloperDay']} points per developer per day",
+         "Default: Block A's plan of record (3,018 points, 35 days, 9 developers), replaced by the measured pace; "
+         "team.json sprintPlan.pace sets a scenario (tasks a developer-day, ramp)."],
+        ["Block A's critical path", f"{b.get('blockACriticalPathDays')} working days",
+         "Its longest chain of waits with every task on its own person: the shortest Block A can take at this pace, "
+         "whatever the team size. Block A is 40 working days (decided 1 October; it was 35)."],
         ["Points per back-end operation", f"{b['pointsPerOperation']}", "Block A's back-end points divided by its operations."],
         ["Team", f"{len(plan['people'])} people", b["notCounted"]],
     ]
@@ -705,11 +757,13 @@ def write_sprint_xlsx(plan, task_rows, path):
         rows.append([s["name"] + ("" if s["inPlan"] else " (past 2 Apr)"), _d(s["start"]), _d(s["end"]), s["days"],
                      ", ".join(s["blocks"]), ", ".join(f"Block {b}" for b in s["blockEnding"]), bt,
                      s["capacity"], s["planned"], f"{s['planned'] / max(s['capacity'], 1):.0%}",
-                     s["moduleTests"], s["moduleTestHours"], len(s["appModulesDone"]), "; ".join(s["holidays"])])
+                     s["moduleTests"], s["moduleTestHours"], len(s["appModulesDone"]), s.get("devIdle", ""),
+                     "; ".join(s["holidays"])])
     ws = _sheet(wb, "Sprints", ["Sprint", "Starts", "Ends", "Working days", "Blocks in progress", "Block ending",
                                 "Block test window (no new feature work starts)", "Capacity (hours)", "Planned (hours)",
-                                "Used", "Module tests", "Module test hours", "App-modules done", "Holidays"],
-                rows, [18, 12, 12, 8, 11, 10, 34, 10, 10, 7, 8, 9, 9, 36])
+                                "Used", "Module tests", "Module test hours", "App-modules done",
+                                "Developer hours unplanned", "Holidays"],
+                rows, [18, 12, 12, 8, 11, 10, 34, 10, 10, 7, 8, 9, 9, 10, 36])
     for row in ws.iter_rows(min_row=2):
         if row[6].value:
             row[6].fill = st["TEST"]
@@ -725,15 +779,18 @@ def write_sprint_xlsx(plan, task_rows, path):
             for c in row[:9]:
                 c.fill = st["SUB"]
     rows = [[x["block"], x["firstSprint"], x["endSprint"], _d(x["endsOn"]), x["targetSprint"], _d(x["targetEndsOn"]),
+             f"Sprint {x.get('normalEndSprint')}, {_d(x.get('normalEndsOn'))}", x.get("targetOvertimeHours", 0),
+             ", ".join(f"{k} {v}" for k, v in (x.get("targetOvertimeByPerson") or {}).items()),
              f"{_d(x['testFrom'])} to {_d(x['testTo'])}", " + ".join(x["testers"]) + f", led by {x['testLead']}",
              x["appModuleCount"], x["screens"], x["ops"], x["tables"], x["hours"], x["testHours"], x["aiHours"],
              x["tasks"], x["ticketedTasks"], x["flowsClaimed"], x["flowsPartly"], ", ".join(x["criticalFlows"]),
              x["testScope"], "; ".join(x["appModules"])] for x in plan["blocks"]]
     _sheet(wb, "Blocks", ["Block", "First sprint", "Final sprint", "Ends", "Target sprint", "Target end",
+                          "At normal hours", "Overtime to end on target (hours)", "By person",
                           "Block test", "Block testers", "App-modules", "Screens", "Operations", "Tables", "Build hours",
                           "Test hours", "AI engine hours", "Tasks", "Ticketed", "Flows end to end", "Flows partly testable",
                           "Revenue, safety and financial flows end to end", "Test scope", "App-modules in it"],
-           rows, [6, 7, 7, 12, 7, 12, 24, 34, 8, 8, 8, 7, 8, 8, 8, 7, 8, 8, 8, 30, 60, 120])
+           rows, [6, 7, 7, 12, 7, 12, 20, 10, 50, 24, 34, 8, 8, 8, 7, 8, 8, 8, 7, 8, 8, 8, 30, 60, 120])
     write_people(wb, plan)
     rows = [[a["block"], a["name"], a["platform"], a["module"], a["package"], a["screens"], a["ops"], a["tables"],
              a["tasks"], a["ticketedTasks"], a["points"], a["hours"], a["testHours"], a["tester"],
@@ -798,7 +855,7 @@ ARCH_DECISIONS = [
 ]
 
 RISKS = [
-    ("Back-end owners overloaded in Block A", "Their Block A work runs past Sprint 5 (People sheet).", "Decided 1 October: Block A ends Sprint 5 with about 195 hours of overtime, most of it Hrushikant and Pranay; the two new developers take back-end tasks from their first day. If the overtime does not happen, Block A ends Sprint 6 (25 December)."),
+    ("Back-end owners overloaded in Block A", "Their Block A work runs past Sprint 4 (People sheet).", "Decided 1 October: Block A is 40 working days (it was 35) and ends Sprint 4, 27 November, with the overtime the Summary sheet gives, most of it on the three back-end owners; the two new developers take back-end tasks from their first day. Its critical path is about as long as the window, so overtime cannot be bought later in the block: it has to start early. Without it, Block A ends where the Blocks sheet says at normal hours."),
     ("Pace below plan", "Measured pace after the first sprints under 9.6 points per developer per day.", "Rerun the plan with the measured pace; blocks B to D re-cut to their sprints."),
     ("Hiring the two developers slips", "Not confirmed by 23 October.", "Blocks C and D move out by the scheduler's figure; the PM decides scope or date."),
     ("Client inputs late", "Wireframe sign-off over 3 working days; sandbox credentials; stations and fares; cabana numbering; real photos.", "Those tickets wait in 'Waiting on client' and do not count against the team's pace."),
@@ -887,7 +944,7 @@ def write_md(plan, path):
     w("")
     w(f"About **{_pp(b['overtimeHoursDevelopers'])} developer hours** past 2 April at normal hours. Decided 1 October: Block D keeps its scope "
       f"and is finished by 2 April with that overtime; Block A ends Sprint {a['targetSprint']} with about {_pp(_opt_a(b, a)['overtimeHours'])} hours of it. "
-      f"The AI engine's {_pp(b['overtimeHours'] - b['overtimeHoursDevelopers'])} hours past 2 April are not overtime: those tasks are unassigned for the AI developers joining. "
+      f"The AI engine's {_pp(b.get('aiUnassignedHours', 0))} hours past 2 April are not overtime: those tasks are unassigned for the AI developers joining. "
       f"The plan of {PREVIOUS['date']} needed about {_pp(PREVIOUS['overtimeHours'])} hours, without the module and block tests.")
     w("")
     w("## 9. Architecture decisions the plan rests on")
