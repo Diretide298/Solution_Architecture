@@ -5,10 +5,11 @@ kind: spec
 summary: POS-002 (the till) and BO-831 read getLoyaltyPosition, the caller's own loyalty, so the till would show
   the cashier's points; they should read getGuestLoyalty for the named guest.
 decision:
-  what: 'Recommended, not yet decided: swap POS-002 and BO-831 to getGuestLoyalty (staff, GUEST_VIEW, venue scope,
-    the guest named in the path); getLoyaltyPosition stays guest-only.'
-  by: 'pending: Chinmay'
-  date: '2026-10-01'
+  what: POS-002 and BO-831 read getGuestLoyalty for the named guest (the guest attached to the cart; the participant
+    viewed), with GUEST_VIEW at venue scope, which the seeded Cashier role already holds; getLoyaltyPosition keeps
+    its guest consumers (WEB-043, GST-036).
+  by: Chinmay
+  date: '2026-10-02'
 why: 'Found by the POS v2 follow-up (commit 0d59727e): getLoyaltyPosition has no subject parameter and is guest-scoped.
   Council of 2 October: ''a loyalty read that would have returned the cashier''s own loyalty''; typed property ''acts
   on the caller or a named customer''.'
@@ -19,6 +20,9 @@ keys_touched:
   operations:
   - getLoyaltyPosition
   - getGuestLoyalty
+  flows:
+  - F34
+  - F58
 root_class: 'new: wrong-subject'
 tickets:
   started: []
@@ -28,8 +32,10 @@ decision_owner: Chinmay
 prevention:
   type: check
   ref: tools/check-subject.py
-status: open
-notes: 'A partial edit sits in `git stash` (''POS loyalty swap ... partial'', 1 October, agent stopped at the usage
-  limit); finish it in a worktree, not from main. check-subject reports POS-002 (SUB-UNDECLARED-ON-STAFF); check-audience-match
-  reports POS-002 and BO-831 (AM-STAFF-OP). Also: getLoyaltyPosition should declare x-ticvai-self-scoped: subject
-  (contracts/README.md: a null permission must say why).'
+status: closed
+closed_by_commit: 23d49afe
+notes: 'Landed on main in 23d49afe (00:22, 2 October), which also consumed the partial edit left in git stash at
+  the usage limit. check-subject reports a staff screen naming a guest that binds an operation acting on the caller
+  (it reported POS-002 here before the merge; check-audience-match reported POS-002 and BO-831). Both are report-only
+  until the lead baselines them. Still open as a contract tidy-up: getLoyaltyPosition should declare x-ticvai-self-scoped:
+  subject (contracts/README.md: a null permission must say why).'
