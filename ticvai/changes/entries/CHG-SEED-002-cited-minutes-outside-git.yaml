@@ -1,0 +1,29 @@
+id: CHG-SEED-002
+date: '2026-10-01'
+source: audit
+kind: process
+summary: The 30 September mobile-redesign minutes, cited by the design-input index, sat outside git; they moved
+  into sources/mom so the citations resolve on every clone.
+decision:
+  what: Every minute the design-input index cites lives in sources/mom/ inside git.
+  by: Chinmay
+  date: '2026-10-01'
+why: 'Council of 2 October: ''A cited source file sat outside git''. A refresh-safe worktree is a clean clone, so
+  a citation to a file outside git cannot resolve there (commit 9df11e40).'
+keys_touched:
+  files:
+  - sources/mom/TICVAI_MoM_2026-09-30_Tracker_MobileAppRedesign.docx
+  - handoff/design-inputs/mom-design-inputs.yaml
+root_class: 'new: source-outside-git'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: generator-rule
+  ref: tools/build-design-inputs.py::source.file
+status: closed
+closed_by_commit: 9df11e40
+notes: build-design-inputs.py fails an entry whose source.file does not exist; refresh-safe runs it in a clean worktree,
+  where a file outside git does not exist. CHG-SEED-012 covers the other sources cited from outside git.

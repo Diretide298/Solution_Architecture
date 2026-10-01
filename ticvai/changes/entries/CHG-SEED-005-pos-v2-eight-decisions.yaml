@@ -1,0 +1,43 @@
+id: CHG-SEED-005
+date: '2026-10-01'
+source: client-review
+kind: spec
+summary: 'POS v2 arrived as a client design build and needed eight decisions: POS-030 Sales Journal and POS-031
+  Reservations & Group Arrivals added, listOrders gains optional terminal, customer and tender filters, design corrections
+  on the v2 candidates, seven P04 screens unlocked for Claude Design.'
+decision:
+  what: All eight POS v2 decisions (POSV2-1..8) approved as recommended; POS-028 move/merge deferred past r2.
+  by: Chinmay
+  date: '2026-10-01'
+why: 'The client''s POS v2 build (sources/designs/TICVAI_POS_Terminal_v2.html, imported as candidate frames in 3d9b755d)
+  differed from the approved POS. POSV2-1..8 are recorded in docs/registers/pos-v2-decisions.md (commit d5862420).
+  Chinmay, 2 October, on this entry''s first draft (prevention: none): "there should be a prevention against a repeat".'
+keys_touched:
+  screens:
+  - POS-030
+  - POS-031
+  - POS-005
+  - POS-009
+  - POS-028
+  - POS-029
+  - KIT-007
+  operations:
+  - listOrders
+  files:
+  - docs/registers/pos-v2-decisions.md
+  - contracts/spine/orders.yaml
+root_class: 'new: design-return'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-candidate-decisions.py
+status: closed
+closed_by_commit: d5862420
+notes: 'check-candidate-decisions: every wireframe.candidate whose differences change behaviour carries a decision
+  (POSV2-n, an R-root or a CHG id), an `applied` marker, or no differences. It is report-only with 5 undecided P04
+  candidates (POS-000, POS-003, POS-004, POS-012, POS-023); the lead baselines it and makes it gate once those are
+  decided.'

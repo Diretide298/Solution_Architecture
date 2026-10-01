@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Audit Council Verdict</title>
+<style>
+:root{--bg:#fff;--ink:#14213D;--muted:#5B6570;--line:#E3E6EA;--card:#F7F8FA;--acc:#0E7C86;--warn:#B45309;--good:#15803D;--bad:#B91C1C}
+@media (prefers-color-scheme:dark){:root{--bg:#0F141B;--ink:#E8ECF1;--muted:#9AA4AF;--line:#26303B;--card:#161D26;--acc:#3BB6C0}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:920px;margin:0 auto;padding:28px 16px 60px}
+h1{font-size:24px;margin:0 0 6px}h2{font-size:18px;margin:28px 0 10px;border-bottom:1px solid var(--line);padding-bottom:6px}
+.q{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;color:var(--muted)}
+.verdict{border-left:4px solid var(--acc);padding:4px 0 4px 16px}
+.first{background:var(--card);border:1px solid var(--acc);border-radius:10px;padding:14px 16px;font-weight:600}
+table{border-collapse:collapse;width:100%;font-size:14px}th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}th{background:var(--card)}
+.y{color:var(--good);font-weight:600}.n{color:var(--bad);font-weight:600}.p{color:var(--warn);font-weight:600}
+details{border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:8px 0}summary{cursor:pointer;font-weight:600}
+footer{margin-top:40px;color:var(--muted);font-size:13px}code{font-size:13px}
+.wrap{overflow-x:auto}
+</style></head><body><main>
+<h1>Council verdict: a complete audit, and a change log with prevention rules</h1>
+<div class="q">"I feel let's do a complete audit, not just for Block A. Then, for any changes ahead, we write a log and instructions, so we can avoid them going forward and have a better way to integrate them." (Chinmay, 2 October 2026)</div>
+
+<h2>The one thing to do first</h2>
+<div class="first">Today, write <code>known-issues-block-a.md</code> and declare the freeze line, so Block A is stable for Monday. Then start the F8 re-audit at 12:30 on Monday 5 October.</div>
+
+<h2>The recommendation</h2>
+<div class="verdict">
+<p><b>Phase 0: before Monday, no AI.</b></p>
+<ul>
+<li>Commit or discard any partial agent work.</li>
+<li>Bring every cited source into git.</li>
+<li>Write <code>known-issues-block-a.md</code>, organised by ticket.</li>
+<li>Declare the <b>freeze line</b>: a ticket past "New" changes only through an ADAM change-request delta, as a comment plus an addendum ticket. Its body is never rewritten.</li>
+</ul>
+<p><b>Phase 1: Monday after 12:30.</b></p>
+<ul>
+<li>Run the F8 re-audit of Block A.</li>
+<li>With scripts only, turn the 293 root issues and the 248 corrections into checks:
+<ul>
+<li>audience vs field;</li>
+<li>a config read that needs a session;</li>
+<li>an enum that differs between contract, screen and prototype;</li>
+<li>an orphan control;</li>
+<li>an operation with no contract behind it;</li>
+<li>an unbound field.</li>
+</ul>
+</li>
+<li>Validate each check against the F1–F7 set.</li>
+<li>Sweep all 16 apps in the order A, B, C, D. That is the <b>complete audit count, at zero AI cost</b>.</li>
+</ul>
+<p><b>Phase 2: weeks 1–2.</b></p>
+<ul>
+<li>Use AI on a sample of 20 screens per app, to find new classes of issue.</li>
+<li>Finish the 7 process agents, in block order.</li>
+<li>Review each app's contracts for meaning.</li>
+<li>Collect the contract decisions and the 53 open questions into <b>one client sign-off queue</b>. Silence counts as acceptance after 5 working days.</li>
+<li>Fix forward, block by block.</li>
+</ul>
+<p><b>Change log: <code>ticvai/changes/CHANGELOG.yaml</code>.</b></p>
+<ul>
+<li>One row per change: id, date, source, root class, what it cascaded to, blast radius, frozen tickets affected, decision owner, <code>check_added</code> (or "none possible" with the reason), and the release tag.</li>
+<li><b>No row closes and no change merges without a check that fails before the fix and passes after.</b></li>
+<li>The first rows are this week's churn.</li>
+</ul>
+<p><b>Integration.</b></p>
+<ul>
+<li>One decision register, owned by the lead.</li>
+<li>No reversing a decision within 48 hours.</li>
+<li>Nothing is announced until it is committed.</li>
+<li>Every change request is triaged as a blocker, a fix-forward or a deferral.</li>
+<li>Releases go out Tuesday and Friday, with no spec edits the day before.</li>
+<li>After each release, a canary run pulls 5 tickets.</li>
+<li>A daily 30-minute triage slot for the lead.</li>
+</ul>
+</div>
+
+<h2>Where the advisors stand</h2>
+<div class="wrap"><table>
+<tr><th>Position</th><th>Contrarian</th><th>First Principles</th><th>Expansionist</th><th>Outsider</th><th>Executor</th></tr>
+<tr><td>Audit by root cause, with scripted checks</td><td class="y">yes</td><td class="y">yes</td><td class="y">yes</td><td class="y">yes</td><td class="y">yes</td></tr>
+<tr><td>Freeze started tickets</td><td class="y">yes</td><td class="y">yes</td><td class="y">yes</td><td class="y">yes</td><td class="y">yes</td></tr>
+<tr><td>A log row closes only with a check</td><td class="y">yes</td><td class="y">yes</td><td class="y">yes</td><td class="y">yes</td><td class="y">yes</td></tr>
+<tr><td>F8 re-audit of Block A first</td><td class="y">yes</td><td class="p">implied</td><td class="p">after rules</td><td class="y">yes</td><td class="y">yes</td></tr>
+<tr><td>Full AI audit now</td><td class="n">no</td><td class="n">no, rules</td><td class="p">later, as a product</td><td class="n">no</td><td class="n">no</td></tr>
+<tr><td>Fix decision churn</td><td class="p">single point of failure</td><td class="y">one register, one owner</td><td class="p">blast radius</td><td class="y">48-hour rule</td><td>—</td></tr>
+</table></div>
+
+<h2>Where the council agrees</h2>
+<ul>
+<li>The audit is by root cause, and the checks sweep every screen for free.</li>
+<li>AI is used only where scripts can't see.</li>
+<li>Started tickets are frozen.</li>
+<li>The F8 re-audit comes first.</li>
+<li>A change-log row closes only when a check is linked.</li>
+</ul>
+
+<h2>Where it clashes</h2>
+<ul>
+<li><b>When to run the full audit.</b> The council's answer: in full, but scripted first and then AI by block.</li>
+<li><b>Sample size.</b> 20 screens per app.</li>
+<li><b>The 48-hour rule vs one register.</b> Both.</li>
+<li><b>Commercial extras.</b> Parked.</li>
+<li>The Executor's claim that C1–C15 isn't built is wrong, and was discarded.</li>
+</ul>
+
+<h2>Blind spots caught in review</h2>
+<ul>
+<li>A fix reaches a started ticket only as a change-request delta against the release tag.</li>
+<li>Check each new check for false positives: 367 findings in the last audit were false.</li>
+<li>Controls with no field, the theme load that needs sign-in, and the guest policy read are <b>decisions</b>, not checks.</li>
+<li>Errors of meaning in the contracts, such as the cart audience and the loyalty read, need a review for meaning.</li>
+<li>The client needs a sign-off queue with a default for silence.</li>
+<li>Developers need a known-issues note and a way to escalate.</li>
+<li>The lead is a single point of failure.</li>
+</ul>
+
+<details><summary>The Contrarian</summary><p>A whole-package audit run by AI repeats the method that already hit the capacity cap. Counting findings is not de-duplicating them. Fixes will break started work unless there is a freeze line. The change log is not the product. The lead is a single point of failure. First: run F8, then write scripted checks for the three deterministic classes.</p></details>
+<details><summary>The First Principles Thinker</summary><p>The package has no single place where a fact is decided, and the audit is a symptom of that. The findings are 30–50 rule violations multiplied by the generator. Work rule-first: deterministic checks over all screens, AI only to find new classes. The log requires a link to a check. Churn needs one register and one owner.</p></details>
+<details><summary>The Expansionist</summary><p>The root-cause catalogue is the deliverable. Make an unbacked control a hard error in the generator. The change log is a data asset that predicts blast radius and prices change requests. Run the meeting-input loop in reverse as sign-off evidence. Simulation before go-live uses the same machinery.</p></details>
+<details><summary>The Outsider</summary><p>The audit is not the bottleneck; what happens to the findings is. Define what "done" means, and set a severity bar. The churn is a process signal: no decision reversed within 48 hours, nothing announced before it is committed. The log needs one required field: the check. Jargon makes it unreadable to newcomers.</p></details>
+<details><summary>The Executor</summary><p>Monday is not about the audit. Run F8 on Block A and freeze. Audit by root cause through the merge-gate checks. Use AI only for the 7 process agents after the reset, in block order. One log file, and no row closes without its check.</p></details>
+<details><summary>Peer review highlights</summary><p>Two reviewers ranked the Contrarian's response strongest and three ranked First Principles. All five flagged the Executor's response for its wrong claim about C1–C15. All the reviewers raised the same missing pieces:</p><ul><li>an addendum path for frozen tickets;</li><li>validating each check against F1–F7;</li><li>contract semantics;</li><li>a client sign-off queue with a service level;</li><li>a known-issues note for developers;</li><li>a decision-rights matrix;</li><li>a canary pull after each release;</li><li>seeding the log with this week's churn.</li></ul></details>
+
+<footer>LLM Council, 2 October 2026. Five advisors and five peer reviews (Sonnet), and a chairman's synthesis. Full transcript: <code>council-transcript-2026-10-02.md</code> in the same folder.</footer>
+</main></body></html>

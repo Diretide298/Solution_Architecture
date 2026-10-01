@@ -1,0 +1,39 @@
+id: CHG-SEED-003
+date: '2026-10-01'
+source: plan
+kind: plan
+summary: 'The plan changed four times in one evening on 1 October: Block A to end Sprint 5 with overtime, then Block
+  A as 40 working days ending Sprint 4 (it was 35), then the pace adoption (5 tasks a developer a day, ramping to
+  2x), then the blocks re-cut to fixed targets (A Sprint 4, B 6, C 8, D 10; Sprints 11-13 buffer).'
+decision:
+  what: 'The final state of 1 October stands: Block A completes all of Guest Web, Guest App, POS and Kitchen Display
+    in 40 working days to Sprint 4; blocks of similar size on fixed targets (A S4, B S6, C S8, D S10), Sprints 11-13
+    buffer, planned overtime; 5 tasks a developer a day ramping to 2x.'
+  by: Chinmay
+  date: '2026-10-01'
+why: 'Council of 2 October: ''Plan decisions were reversed several times in a day ... nothing stopped them''; the
+  fix is plan changes only at a release, after 24 hours cooling off, never reversed within 48 hours. Commits aea3d90b
+  (19:07), f984dc7e (20:19), be5b0ed8 (21:09), bd540aac (21:41).'
+keys_touched:
+  files:
+  - docs/active/team.json
+  - tools/sprint_plan.py
+  - docs/active/block-a-extra-tasks.json
+  other:
+  - Block A-D boundaries
+  - pace setting
+root_class: 'new: plan-churn'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-changelog.py
+status: closed
+closed_by_commit: d2dd286f
+notes: 'check-changelog''s plan-change rule: from 5 October a plan entry records `proposed` and is decided at least
+  24 hours later, may not reverse a change decided less than 48 hours earlier, and a commit touching team.json,
+  block-a-extra-tasks.json or sprint_plan.py must name a change of kind plan. The rules are in ticvai/CLAUDE.md
+  (9) and release-runbook R7.'

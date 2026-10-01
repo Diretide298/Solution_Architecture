@@ -80,8 +80,9 @@ _EXCLUDED = {
 
 WRITE_METHODS = {"write_text", "write_bytes"}
 READ_METHODS = {"read_text", "read_bytes", "exists", "is_file", "glob", "rglob", "iterdir"}
+# `checks/` (the binding ratchet's baseline and allowlist) and `changes/` (the change log) since 2 October.
 PATHY = re.compile(r"(?<![\w./-])((?:handoff|docs|tools|contracts|wireframes|screens|events"
-                   r"|states|diagrams|repos|sources)/[A-Za-z0-9_./-]+\.[A-Za-z0-9]{1,5})")
+                   r"|states|diagrams|repos|sources|checks|changes)/[A-Za-z0-9_./-]+\.[A-Za-z0-9]{1,5})")
 # **Root-level artefacts have no directory to match on.** `OVERVIEW.md` and `roles-by-app.yaml`
 # are referenced by their bare name or not at all, so a directory-anchored pattern reports every
 # one of them as an orphan. Over-matching here is the safe direction: a stray word that looks

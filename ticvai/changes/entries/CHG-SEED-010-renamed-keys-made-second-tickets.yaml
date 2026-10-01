@@ -1,0 +1,38 @@
+id: CHG-SEED-010
+date: '2026-09-30'
+source: audit
+kind: process
+summary: The 30 September push made 25 second OpenProject tickets for work that already had one, because plan moves
+  renamed keys (VM-BO-005 to APP-SETUP-BO-005, SVC- and VM- operations, VM-MIG- to MIG-), and a split re-numbered
+  SVC-WALLET-RETAIL-1.
+decision:
+  what: A pushed key is the ticket's identity and is never renamed; a move between prefixes is metadata, and the
+    25 duplicates are closed pointing at the ticket carrying the work.
+  by: Chinmay
+  date: '2026-10-01'
+why: Commits 6625dd3d (25 renamed-key tickets retired) and f8ca3474 (split halves matched to one old ticket); the
+  council of 1 October made key stability a gate (C4, commit 278cc437).
+keys_touched:
+  tickets:
+  - VM-BO-005
+  - APP-SETUP-BO-005
+  - SVC-WALLET-RETAIL-1
+  - SVC-WALLET-RETAIL-2
+  - VM-ORDER-ORDERS-2
+  - VM-ORDER-ORDERS-3
+  - VM-MIG-SEATING
+  - MIG-SEATING
+  files:
+  - tools/op-retire.py
+  - handoff/service-docs/pms-map.json
+root_class: 'new: key-rename'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-key-stability.py
+status: closed
+closed_by_commit: 278cc437

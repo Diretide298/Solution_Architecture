@@ -1,0 +1,13 @@
+# Exceptions to the binding ratchet (tools/check-binding-ratchet.py; council of 2 October 2026).
+# An entry leaves its item out of the counts until it expires. Every field is required; `expires` is at most
+# 14 days after `added`, and an expired entry fails the run: fix the screen, or renew the entry with a new
+# decision (a change-log entry says why).
+#
+#   - screen: WEB-001
+#     kind: unbound-control          # unbound-control | undefined-operation | unknown-field
+#     item: Hero tagline             # the control label, the operationId, or Schema.path; omit for every item of the kind
+#     reason: static marketing copy, not a field (DI-0123)
+#     added: 2026-10-02
+#     expires: 2026-10-16
+#     approved_by: Chinmay
+entries: []

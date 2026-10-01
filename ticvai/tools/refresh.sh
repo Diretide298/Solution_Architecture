@@ -343,6 +343,9 @@ echo
 # **The answer to "one failure stops the report" is to collect failures, not to drop them.**
 # `tools/run-checks.py` runs every checker, keeps each exit code, prints the same table, and exits
 # non-zero at the end if a gating checker failed. The report survives; the gate comes back.
+# **The change log's index is derived** (council of 2 October): one entry file per change in changes/entries/,
+# so parallel branches never conflict, and the index is written here rather than committed from a branch.
+python3 tools/build-changelog-index.py
 python3 tools/run-checks.py
 
 # **Coverage is a number that can quietly go down.** A regeneration that dropped transitions would
@@ -384,6 +387,7 @@ build-mom-digest build-review-responses scan-domain-drift find-capability
 audit_guard release_baseline ddl_forward                           # imported by checkers and derive-ddl, no main (1 October)
 sprint_plan                                                        # imported by build-service-docs, derive-block-a-schedule and build-plan-deck, no main (1 October)
 design_spec                                                        # imported by export-design-batch and build-white-label-map, no main (1 October)
+typed_props                                                        # imported by check-audience-match, check-preauth-session and check-subject, no main (2 October)
 build-tracker-index                                                # intake: reads the two task-tracker workbooks at the repository root, outside git, once per tracker drop (1 October)
 push-openproject op-release op-retire op-check op-assign-sync op-order-sync op-bulk-links op-created-merge op-recent op-review adam-links   # distribution: run per release (docs/active/release-runbook.md), never on a rebuild
 release-notes                                                      # per release, between two tags

@@ -1,0 +1,33 @@
+{
+ "_about": "Binding counts per app|block|kind that may only fall (tools/check-binding-ratchet.py). Written by --update-baseline in a reviewed commit, never by hand.",
+ "recorded": "2026-10-02",
+ "commit": "f495bbf6",
+ "totals": {
+  "unbound-control": 5638,
+  "undefined-operation": 55,
+  "unknown-field": 43
+ },
+ "screens": 2447,
+ "fully_resolved": 1343,
+ "block_source": "tasks.csv",
+ "counts": {
+  "guest|-|unbound-control": 8,
+  "guest|A|unbound-control": 80,
+  "guest|A|unknown-field": 17,
+  "ticvai-control|-|unbound-control": 1715,
+  "ticvai-control|-|undefined-operation": 41,
+  "ticvai-control|-|unknown-field": 13,
+  "ticvai-control|A|unbound-control": 148,
+  "ticvai-control|A|undefined-operation": 11,
+  "ticvai-control|A|unknown-field": 11,
+  "venue-management|-|unbound-control": 3414,
+  "venue-management|-|undefined-operation": 3,
+  "venue-management|-|unknown-field": 1,
+  "venue-management|A|unbound-control": 178,
+  "venue-pos|-|unbound-control": 7,
+  "venue-pos|A|unbound-control": 26,
+  "venue-pos|A|unknown-field": 1,
+  "venue-staff-mobile|-|unbound-control": 60,
+  "venue-staff-mobile|A|unbound-control": 2
+ }
+}

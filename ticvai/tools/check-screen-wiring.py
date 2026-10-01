@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """What a screen record says against what it can actually do.
 
-**Audit classes A-SCREEN-* (audit/ticvai/ROOT-CLASSES.md).** Screens were generated, then
+**Audit classes A-SCREEN-* (docs/active/root-classes.md).** Screens were generated, then
 patched, and the 26 September pull audit found the marks of both: state texts pasted from the list
 pattern onto screens with no create operation or filter (R250), a region name used twice
 (R253), a declared operation no component reaches (R273), a write fired on load (R268), a button

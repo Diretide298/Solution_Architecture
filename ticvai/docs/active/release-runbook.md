@@ -1,6 +1,6 @@
 # Release runbook: how a change becomes a release
 
-> **For:** Chinmay (lead) and anyone running a release. **Decided 1 October 2026** (LLM Council, `audit/ticvai/council/`).
+> **For:** Chinmay (lead) and anyone running a release. **Decided 1 October 2026** (LLM Council, `docs/active/council/council-report-2026-10-01.html`).
 > **The rule:** OpenProject holds who, when, state and order. The package, served by ADAM at a release tag, holds what. ADAM's propose-then-confirm CR flow is the only way a change gets in.
 
 ## Cadence
@@ -32,7 +32,7 @@ The rule for agent edits:
 - **Keys:** a pushed key is never renamed (`check-key-stability`).
 - **Migrations:** the baseline migrations are frozen at `r1`; table changes come out as new forward migrations (`check-migration-freeze`); anything destructive goes to `handoff/migration-review.md` for a person.
 - **Contracts:** a breaking change must be listed in `breaking-changes.yaml` (`check-contract-compat` against `r1`).
-- **Audit classes:** every root-issue class from the audit has its check (`audit/ticvai/ROOT-CLASSES.md`).
+- **Audit classes:** every root-issue class from the audit has its check (`docs/active/root-classes.md`).
 
 ## 5. Tag
 Once everything is green:
@@ -55,3 +55,65 @@ Once everything is green:
 - Every check is green.
 - Pull a **sample of 20 to 30 tickets** through ADAM at the new tag, across every developer's board.
 - A new root issue gets a check before it counts as closed.
+
+## Rules from 5 October (council of 2 October)
+Source: the council's final reports, `docs/active/council/council-report-2026-10-02-opus.html` and `docs/active/council/council-report-2026-10-02.html`. The short form every agent loads is `ticvai/CLAUDE.md`. These
+rules add to sections 1 to 7; they do not replace them.
+
+**R1. Every change is a change-log entry, with its decision and why.** One file per change in
+`changes/entries/` (`changes/README.md`), plus the ADAM CR from §1. The entry records the decision (what,
+who, when), why (citing the MoM, DI, R-root, ADR, council, finding or commit), the keys touched, the
+started and unstarted tickets, the release tag and a prevention. The commit names the id. Gate:
+`check-changelog`. At a release, run `python3 tools/check-changelog.py --since r<N-1>`: every commit that
+touched an authored input since the last tag must name an entry. A release refresh commit may instead carry
+`CHG-exempt: <reason>`, and the tool prints every exemption.
+
+**R2. No change closes without a prevention.** The prevention is a check registered in `run-checks.py`, a
+generator rule or a template field, and it must fail on the commit before the fix (the author runs it there
+and says so). `prevention: none` needs a reason and the lead's approval. A new root class gets its check
+before its fix merges (`change-rules.md` CR-7).
+
+**R3. Triage.** Every CR is triaged `blocker` (fixed in the next release, even on started tickets, as a
+delta), `fix-forward` (into unstarted tickets at the next tag) or `defer` (logged, open). The lead triages
+in a **daily 30-minute slot**.
+
+**R4. Client sign-off.** A minutes-sourced change carries `client_signoff`. Sign-offs go to the client as
+one batch a week (contract decisions and open questions included). Silence for 5 working days after the
+batch is sent is acceptance, recorded as `by: "silence (5 working days)"` with the date.
+
+**R5. Started tickets.** A ticket past "New" is frozen. A fix to it is a comment plus a linked delta
+ticket, and ADAM keeps serving the developer's start tag until they re-pin. Unstarted tickets get the fix at
+the next tag through their pointer bodies.
+
+**R6. The release window.** Releases go out on Tuesday and Friday. No spec edits on Monday or Thursday after
+the noon CR cut-off. Edits wait for the next window.
+
+**R7. Plan changes.** A plan change is an entry of kind `plan`: proposed, decided no sooner than 24 hours
+later, shipped only at a release, never announced before it is committed, and never reversed within 48
+hours. Gate: `check-changelog` (the plan-change rule and the plan-file commit rule).
+
+**R8. Agents.** Every agent works in its own git worktree on its own branch (`cr/<id>-<slug>` or a batch
+branch), makes checkpoint commits, and never leaves partial work in the main checkout. When agents share a
+tree, each writes only its own files. Every source an agent cites is inside git. `refresh-safe.sh` already
+refuses a release over uncommitted authored changes.
+
+**R9. Audit order and AI budget.** Checks first: every known root class is a deterministic check, run over
+all 16 apps in block order A, B, C, D. AI is spent only where checks cannot see, on new classes, sampled at
+20 screens per app and widened only where a new class appears. Each new class gets a check. The weekly AI
+budget is **Block A 50%, Block B 25%, Blocks C and D 15%, discovery of new kinds of issue 10%**. Agent output
+lands in the next release tag, never straight into one already served.
+
+**R10. The ratchet.** `check-binding-ratchet` holds the design-handoff generator's three counts (unbound
+controls, forms calling undefined operations, bound fields missing from the contracts) per app and block to
+`checks/baseline.json`. Any count that rises fails the run. After a fix lowers a count, the lead runs
+`--update-baseline` in a reviewed commit. An exception goes in `checks/allowlist.yaml` with a reason, an
+approver and an expiry no more than 14 days out. **Re-record the baseline at r2 on main.**
+
+**R11. Typed properties.** `check-audience-match`, `check-preauth-session` and `check-subject` hold every
+screen against three operation properties: its audience, whether it needs a session, and whether it acts on
+the caller or a named customer. `check-audience-match` also reports an operation whose declared audience
+includes guests while its security admits no guest. They are report-only until the guest fixes and the POS loyalty swap land.
+The lead then records each baseline (`--update-baseline`) and takes the check out of `REPORT_ONLY`.
+
+**R12. Canary.** After each release, one AI session pulls **5 tickets** through ADAM at the new tag, as a
+developer would. A problem it finds is a CR. This comes before the wider §7 sample.

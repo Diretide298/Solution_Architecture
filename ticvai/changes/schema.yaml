@@ -1,0 +1,84 @@
+# The change-log entry schema. Read by tools/check-changelog.py; explained in changes/README.md.
+# Decided by the council of 2 October 2026 (Chinmay: "take in the council's input, log them, hard-code
+# them as strict instructions"). Changing this file is itself a change: log it (kind: process).
+
+version: 1
+
+# One file per change: changes/entries/<id>-<slug>.yaml. Ids are allocated per batch (one batch per
+# branch or agent run): CHG-SEED-001, CHG-FIN-001, CHG-WIR-001, CHG-GST-001 ... and run 001, 002, ...
+# with no gap inside a batch. Two branches never share a batch code, so they never collide on merge.
+id_pattern: '^CHG-[A-Z]{2,6}-\d{3}$'
+slug_pattern: '^[a-z0-9]+(-[a-z0-9]+)*$'
+
+required: [id, date, source, kind, summary, decision, why, keys_touched, root_class, tickets,
+           release_tag, decision_owner, prevention, status]
+
+enums:
+  source: [mom, cr, audit, client-review, plan, design-input, developer]
+  kind: [spec, contract, plan, design-input, process]
+  status: [open, closed]
+  prevention_type: [check, generator-rule, template-field, none]
+  triage: [blocker, fix-forward, defer]
+
+# keys_touched: a mapping of these lists (any may be empty or absent; at least one key overall unless
+# the kind is process or plan).
+keys_touched_lists: [screens, operations, tables, schemas, flows, tickets, files, other]
+
+# `why` must cite where the change came from, so a reader can open it. One of these must match (any case).
+why_cites:
+  - '\bMoM\b|\bminutes\b|sources/mom/'                # a meeting
+  - '\bDI-[A-Z0-9-]+'                                 # a design input (handoff/design-inputs/mom-design-inputs.yaml)
+  - '\bR\d{3}\b'                                      # an audit root issue (26 September pull audit)
+  - '\bADR-\d{4}\b'                                   # an architecture decision
+  - '\bcouncil\b'                                     # an LLM council report (docs/active/council/*.html)
+  - '\bF[1-9]\d?\b'                                   # an audit fix or re-audit (F1-F8)
+  - '\bPOSV2-\d+\b|\bREV3[- ]'                        # client design returns / revisions
+  - '\bCR[- ]?\d+\b|\bCF-\d+\b|\bQ\d+\b'              # an ADAM CR, a conflict, a client question
+  - '\bfinding\b|\bcorrection\b'                      # a process-agent or audit finding
+  - '\b[0-9a-f]{8,40}\b'                              # a commit
+  - '\bCHG-[A-Z]{2,6}-\d{3}\b'                        # an earlier change
+
+# When `source` is mom, client_signoff is required: {by: <name>, date: YYYY-MM-DD} or "pending".
+# Sign-offs are batched weekly; silence for 5 working days after the batch is sent is acceptance
+# (record by: "silence (5 working days)" and the date it lapsed).
+signoff_required_for: [mom]
+
+# From this date every entry also needs `adam_cr` (the ADAM change request id) and `triage`.
+adam_cr_required_from: '2026-10-05'
+
+# **The closing rule.** status: closed needs
+#   - closed_by_commit: the commit that merged the fix (7-40 hex; checked against git when git is there);
+#   - prevention.type check:          prevention.ref is tools/<name>.py, it exists, and run-checks.py runs it;
+#   - prevention.type generator-rule: prevention.ref is <path>[::<symbol>]; the path exists (and names the symbol);
+#   - prevention.type template-field: prevention.ref is <path>[::<field>]; the same;
+#   - prevention.type none:           prevention.reason and prevention.approved_by (the lead) are both set.
+# A prevention ref may be relative to ticvai/ or to the repository root.
+
+# **The commit rule** (tools/check-changelog.py --since [REF], default the latest r* tag): a commit in the
+# range that touches an AUTHORED package input below must name an existing change id (CHG-XXX-nnn) in its
+# message. Merge commits are skipped (their parents carry the ids). Commits dated before
+# `commit_rule_from` are grandfathered. A refresh commit at a release (the lead only) may carry the trailer
+# `CHG-exempt: <reason>` instead; every exemption is printed.
+commit_rule_from: '2026-10-05'
+authored_roots:
+  - contracts/
+  - screens/
+  - flows/
+  - states/
+  - events/
+  - docs/adr/
+  - docs/registers/
+  - sources/mom/
+authored_files:
+  - docs/active/team.json
+  - handoff/design-inputs/mom-design-inputs.yaml
+
+# **The plan-change rule.** A commit touching a plan input must name a change of kind plan. From
+# commit_rule_from a plan entry also records `proposed` (YYYY-MM-DD[THH:MM]) and is decided at least 24 hours
+# later (cooling off); one that reverses an earlier change names it in `reverses`, and that change was decided
+# at least 48 hours before; a closed plan change names its release (r<N>). Plan changes ship only in a Tue/Fri
+# release and are never announced before they are committed (ticvai/CLAUDE.md).
+plan_files:
+  - docs/active/team.json
+  - docs/active/block-a-extra-tasks.json
+  - tools/sprint_plan.py

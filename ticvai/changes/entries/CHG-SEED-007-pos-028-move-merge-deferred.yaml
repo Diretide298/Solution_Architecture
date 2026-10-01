@@ -1,0 +1,30 @@
+id: CHG-SEED-007
+date: '2026-10-01'
+source: client-review
+kind: spec
+summary: moveTableVisit and mergeTableVisits come off POS-028 until after r2 (POSV2-8); both stay in the fnb contract
+  and on EMP-058.
+decision:
+  what: Defer table move and merge on the till past r2; keep the operations on EMP-058 so neither is screenless.
+  by: Chinmay
+  date: '2026-10-01'
+why: POSV2-8 (docs/registers/pos-v2-decisions.md), applied in commit 5726cc36.
+keys_touched:
+  screens:
+  - POS-028
+  - EMP-058
+  operations:
+  - moveTableVisit
+  - mergeTableVisits
+root_class: CR-3
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/audit-screenless-operations.py
+status: closed
+closed_by_commit: 5726cc36
+notes: Taking an operation off a screen can leave it with none; audit-screenless-operations fails that.

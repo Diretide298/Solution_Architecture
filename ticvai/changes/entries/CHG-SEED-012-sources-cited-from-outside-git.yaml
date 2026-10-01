@@ -1,0 +1,40 @@
+id: CHG-SEED-012
+date: '2026-10-02'
+source: audit
+kind: process
+summary: Documents in git cited sources git ignores (the root classes and the councils in audit/); the councils'
+  final HTML reports and the root classes are now in docs/active/, every citation points there, and check-cited-sources
+  keeps decision documents citing only files git tracks.
+decision:
+  what: The councils' final HTML reports are the cited input (docs/active/council/), and the root classes are docs/active/root-classes.md;
+    nothing under audit/ or a scratchpad is cited. The transcripts and the 2 October verdict copy are not cited.
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Chinmay, 2 October: "we cannot cite them, they are outside of git; we can have them, but the HTML is final,
+  so that is the input." Council of 2 October: ''A cited source file sat outside git'' (CHG-SEED-002 fixed one minute;
+  ticvai/CLAUDE.md 12).'
+keys_touched:
+  files:
+  - docs/active/council/council-report-2026-10-01.html
+  - docs/active/council/council-report-2026-10-02.html
+  - docs/active/council/council-report-2026-10-02-opus.html
+  - docs/active/root-classes.md
+  - docs/active/release-runbook.md
+  - docs/active/change-rules.md
+  - changes/README.md
+  - ticvai/CLAUDE.md
+root_class: 'new: source-outside-git'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-cited-sources.py
+status: closed
+closed_by_commit: 820e47d3
+notes: 'check-cited-sources (gating) reads docs/registers, docs/active, docs/adr, changes/entries, handoff/design-inputs
+  and CLAUDE.md. The findings older than this change (other documents citing audit/ working files, renamed files,
+  and sources/designs/TICVAI_POS_Terminal_v2.html, which .git/info/exclude keeps out of git) are its baseline in
+  handoff/audit-baseline.json: only a new one fails.'

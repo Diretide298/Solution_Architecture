@@ -1,0 +1,33 @@
+id: CHG-SEED-011
+date: '2026-10-01'
+source: cr
+kind: design-input
+summary: Every design batch leads with a screen-by-screen specification (inputs, outputs, states, permissions, requirements,
+  meetings, tracker, white label, references, acceptance) generated from the package by tools/design_spec.py.
+decision:
+  what: Make the design handoffs as detailed as possible for each screen, from the package and nothing else.
+  by: Chinmay
+  date: '2026-10-01'
+why: 'Chinmay, 1 October: ''Make them as detailed as possible for each screen. Reference all the material, mom,
+  matrix assisted task.'' (commit 4fdd1318). Resolving every screen against the contracts exposed 5,638 controls
+  with no schema field, 55 forms calling undefined operations and 43 unknown bound fields (council of 2 October).'
+keys_touched:
+  files:
+  - tools/design_spec.py
+  - tools/export-design-batch.py
+  - tools/build-white-label-map.py
+  other:
+  - every design batch under handoff/design-batches/
+root_class: 'new: unresolved-binding'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-binding-ratchet.py
+status: closed
+closed_by_commit: d2dd286f
+notes: The generator's three counts are now a ratchet per app and block (checks/baseline.json; re-record at r2 on
+  main).

@@ -1,0 +1,41 @@
+id: CHG-SEED-006
+date: '2026-10-01'
+source: client-review
+kind: contract
+summary: The till's cart operations (addCartLine, getCart) and getGuestMenu declare the staff audience, because
+  POS screens call them.
+decision:
+  what: Add staff to x-ticvai-audience on the cart operations the till calls and on getGuestMenu (POS-021 reads
+    it at the till).
+  by: Chinmay
+  date: '2026-10-01'
+why: 'POS v2 follow-up (POSV2 decisions of 1 October, commits 5726cc36 and 0d59727e): a fix exposed that operations
+  bound on staff screens declared only the guest audience, so a staff caller would be refused or served guest-shaped
+  data. Same root as the process-agent finding on guest screens binding staff operations (council of 2 October:
+  typed audience property).'
+keys_touched:
+  operations:
+  - getGuestMenu
+  - getCart
+  - addCartLine
+  screens:
+  - POS-002
+  - POS-010
+  - POS-021
+  - POS-023
+  - POS-030
+root_class: 'new: audience-mismatch'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-audience-match.py
+status: closed
+closed_by_commit: 0d59727e
+notes: 'check-audience-match (AM-STAFF-OP) reports a staff screen binding an operation whose audience lacks staff.
+  It is report-only until the guest fixes land; the lead then baselines it and makes it gate. check-subject still
+  reports addCartLine on POS-002 and POS-030 (self-scoped subject on a screen naming a guest): whether the till''s
+  cart is the session''s own is for the lead (see CHG-SEED-008).'
