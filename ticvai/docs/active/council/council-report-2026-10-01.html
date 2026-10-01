@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Change Handling Council</title>
+<style>
+:root{--ink:#14213D;--muted:#5A6478;--line:#E3E6EC;--bg:#fff;--soft:#F6F7F9;--ok:#2F7D5B;--warn:#B7791F;--no:#B23B3B;--acc:#2E5AAC}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+main{max-width:920px;margin:0 auto;padding:32px 16px 64px}
+h1{font-size:26px;margin:0 0 6px}h2{font-size:18px;margin:28px 0 8px}h3{font-size:15px;margin:16px 0 6px}
+.q{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:14px 16px;color:var(--muted)}
+.verdict{border:2px solid var(--acc);border-radius:12px;padding:18px 20px;margin-top:20px}
+.first{background:#EEF3FC;border-radius:10px;padding:12px 14px;font-weight:600}
+table{border-collapse:collapse;width:100%;font-size:14px}th,td{border:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}th{background:var(--soft)}
+.y{color:var(--ok);font-weight:600}.p{color:var(--warn);font-weight:600}.n{color:var(--no);font-weight:600}
+details{border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:8px 0}summary{cursor:pointer;font-weight:600}
+ul{padding-left:20px}li{margin:3px 0}footer{margin-top:40px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:12px}
+.wrap{overflow-x:auto}
+</style></head><body><main>
+<h1>How TICVAI should handle change</h1>
+<div class="q"><b>Question (1 October 2026):</b> What is the best way to handle change from now on, whether a table, a UI screen, a missed service or a new requirement? The change should be captured once and pushed only to the affected modules or services. The refresh should become incremental and safe to interrupt. The two channels, ADAM and OpenProject tickets, should be simplified so tickets never drift. In-flight tickets need a rule for when their spec changes. The "audit everything from ingestion to refresh, then re-audit" pass should improve the process rather than only produce findings. Constraints: OpenProject 10 stays, the build starts in 4 days, and the least possible rework.</div>
+
+<div class="verdict">
+<h2 style="margin-top:0">The recommendation</h2>
+<p><b>One rule:</b> OpenProject holds <b>who, when, state and order</b>. The package, served by ADAM at a <b>release tag</b>, holds <b>what</b>. ADAM's existing propose-then-confirm CR flow is the <b>only way a change gets in</b>.</p>
+<h3>Before Monday 5 October: fences only, nothing new</h3>
+<ol>
+<li>Run <code>refresh.sh</code> in a throwaway worktree, and swap it into main only when all checks pass. An interrupted run is simply deleted.</li>
+<li>Cut tag <code>r1</code> on the package and the 6 mirrors. ADAM's <code>/ticket</code> records the tag when a ticket is pulled.</li>
+<li>Freeze the baseline DDL, with a check that fails if a baseline migration changes. From then on, a table change is a new forward migration.</li>
+<li>Pushed keys are frozen. The key-stability check <b>blocks</b> a rename instead of warning.</li>
+<li>A one-page developer brief: pull only through ADAM, the OpenProject text is a snapshot, and raise gaps as a CR.</li>
+</ol>
+<h3>Weeks 1–2</h3>
+<ul>
+<li><b>One push script.</b> A single idempotent Ruby file: key check, upsert by key, the assignee and week sync, link pruning. Dry run, then apply, on release days only, from a git checkout on the OpenProject server.</li>
+<li><b>Pointer ticket bodies, in stages.</b> New tickets first. Unstarted tickets in dry-run batches. A started ticket gets one comment.</li>
+<li><b>CR intake.</b> Each CR records its source line, its approver, its triage class (clarification, scope or defect; now or later), the artefact IDs it touches, whether a contract change is breaking or additive, and its effort change. Minutes need client sign-off first. Cut-off is Monday or Thursday noon. The client gets a release note with every drop.</li>
+<li><b>Agents on branches.</b> One CR per branch, with the lead reviewing each diff before merging.</li>
+</ul>
+<h3>Later (week 3 on)</h3>
+<ul><li>Record what each refresh step reads and writes, then scope derives to what a change touches.</li><li>A reach and cost report for pricing CRs, once the links are proven clean. No client portal.</li></ul>
+<h3>Audit, then re-audit</h3>
+<ul><li>Group the 293 root issues into classes. Each class becomes a check, or a rule on how CRs are written.</li><li>The ingestion-to-refresh audit must produce the manifest of what each refresh step reads and writes.</li><li>The re-audit is every check green, plus 20–30 sampled pulls after each drop. A root issue with no check is not closed.</li></ul>
+<p class="first">First thing: before any developer pulls on Monday, run a clean refresh, tag <code>r1</code> on the package and the 6 mirrors, and make <code>/ticket</code> record that tag on pull.</p>
+</div>
+
+<h2>Where the advisors stand</h2>
+<div class="wrap"><table>
+<tr><th>Position</th><th>Contrarian</th><th>First Principles</th><th>Expansionist</th><th>Outsider</th><th>Executor</th></tr>
+<tr><td>Tickets point to the spec, not copy it</td><td class="y">Yes</td><td class="y">Yes</td><td class="y">Yes</td><td class="y">Yes</td><td class="y">Yes</td></tr>
+<tr><td>Atomic refresh, not incremental (for now)</td><td class="y">Yes</td><td class="y">Yes</td><td class="n">Graph-scoped derive</td><td class="p">Record dependencies</td><td class="y">Yes (worktree)</td></tr>
+<tr><td>In-flight tickets</td><td>Pin; comment only</td><td>Pin to commit; diff</td><td>Versioned diff, acknowledged</td><td>"Spec changed" diff</td><td>Stamp SHA; live with a warning</td></tr>
+<tr><td>Keys</td><td>Immutable ID once</td><td>Derived from the artefact</td><td>Permanent key</td><td>Permanent ID, not from names</td><td>Keep the key-stability check</td></tr>
+<tr><td>Release cadence</td><td class="y">Weekly or batched</td><td class="y">Weekly</td><td>—</td><td>—</td><td class="y">Tue and Fri</td></tr>
+<tr><td>Audit output = checks</td><td class="y">Yes</td><td class="y">Yes</td><td class="y">Yes</td><td class="y">Yes</td><td class="y">Yes</td></tr>
+<tr><td>Rated strongest by reviewers</td><td></td><td>1 of 5</td><td></td><td></td><td class="y">4 of 5</td></tr>
+<tr><td>Rated biggest blind spot</td><td></td><td></td><td class="n">5 of 5</td><td></td><td></td></tr>
+</table></div>
+
+<h2>Where they clashed, and how it was settled</h2>
+<ul>
+<li><b>Pin or live-with-warning → pin, with the diff visible.</b> ADAM serves the latest release tag, never working HEAD. A ticket keeps the tag it was pulled at. A <i>breaking</i> contract change forces the producer and consumer tickets onto the same tag.</li>
+<li><b>Keys derived from the artefact, or immutable IDs → immutable IDs, and those are the keys already pushed.</b> Nothing is re-keyed. A move between modules is a metadata change. A split creates new keys linked to the parent. Artefact IDs become a field on the ticket.</li>
+</ul>
+
+<h2>Blind spots caught in peer review</h2>
+<ul>
+<li>Once code exists, schema changes must be forward-only migrations.</li>
+<li>Pins can differ between the producer and consumer of the same operation. Contract changes need an additive or breaking label and a compatibility gate.</li>
+<li>The 6 mirrored repos must carry the same tag.</li>
+<li>Stripping 4,000 descriptions is itself a mass migration, so it is staged.</li>
+<li>ADAM becomes a single point of failure. The fallback is the tagged mirrors in git.</li>
+<li>Plan fields (assignee, week) drift when a change shifts effort.</li>
+<li>Nothing covers intake: who decides, triage, where a change came from, client sign-off, conflicts with the Decisions Register, changes raised by developers, a feedback note to the client, and review of the edits AI agents make.</li>
+</ul>
+
+<h2>Full advisor responses</h2>
+<details><summary>The Contrarian</summary><p>The fatal flaw is the plan to make a live, interlinked system handle change while it is still changing. ADAM reading the live package is itself a bug: pin a package version and release on a cadence. Incremental refresh is a trap for now, so generate into a temporary tree and swap. Keys are the root cause, so assign an immutable ID once. OpenProject holds the plan, never the spec. The lead pasting Ruby into a shell is a single point of failure. An audit is theatre unless each root issue becomes a check. Nobody faces the volume, and upstream triage has to say "no" or "later".</p></details>
+<details><summary>The First Principles Thinker</summary><p>Every failure comes from one choice: the ticket holds a copy of the spec. Tickets should point to the spec, not copy it. Keys should come from what is built, not from where it sits in the plan. The refresh should be atomic (build in staging, then swap), not incremental. Pin started tickets to a commit and show the diff, with a weekly release. Turn the 293 root issues into classes, and each class into a check.</p></details>
+<details><summary>The Expansionist</summary><p>The links and the lineage are an impact engine already. Point them at a change and you get its reach, and they can drive the incremental derive. ADAM is the only home of ticket content. Each client answer could come with its reach and cost already worked out, which turns scope creep into priced change orders. A decision portal for the 577 decisions. Audits that produce gates. A reusable spec-to-delivery compiler.</p></details>
+<details><summary>The Outsider</summary><p>You copy generated content into a system that can't regenerate it. Stop copying: a permanent ID, a title, an owner, a week and a link to ADAM. Things that look strange from outside: pasting Ruby when you have shell access (put a git checkout on the server instead); a one-field change costing an hour-long rebuild (nothing records which outputs depend on which inputs); 400 tickets per developer; 9,976 findings that nobody will act on.</p></details>
+<details><summary>The Executor</summary><p>Don't build anything new before Monday; put fences around what you have. Ticket bodies become pointers, and the sync script becomes the only thing that touches existing tickets. The push becomes one idempotent paste, run twice a week. The refresh runs in a throwaway worktree. CRs list their artefact IDs and ship on Tuesday and Friday. Stamp the commit SHA when a ticket is pulled and show "spec changed" with the diff. Re-pull 20 sampled tickets after each drop. Monday: stamp the SHA and make ticket bodies pointers.</p></details>
+
+<h2>Peer review highlights</h2>
+<details><summary>What the reviewers said</summary><ul>
+<li>Four of five reviewers rated the Executor strongest: it fits the 4 days, reuses what exists, and names a Monday action. One rated the First Principles Thinker strongest, for its root cause and its keys.</li>
+<li>All five named the Expansionist as the biggest blind spot: it ignores the constraints, and it trusts a link graph that had 646 stale links this week.</li>
+<li>What they missed: forward-only migrations; mixed pins; mirrors; ADAM as a single point of failure; mass-migration risk; intake and who decides; changes raised by developers; the feedback loop to the client; review of AI edits; plan fields drifting with effort.</li>
+</ul></details>
+
+<footer>LLM Council · 1 October 2026 · 5 advisors, 5 anonymous peer reviews, chairman synthesis · Full transcript: council-transcript-2026-10-01.md</footer>
+</main></body></html>

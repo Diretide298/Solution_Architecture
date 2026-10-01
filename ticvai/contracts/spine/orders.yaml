@@ -2641,7 +2641,12 @@ paths:
       - partner
       - staff
       summary: The cart, priced and checked, right now
-      description: '**Staff since 1 October 2026**: the till reads its own cart (`cartId` from the workstation
+      description: '**A till''s cart is the session''s own** (decided 2 October 2026, CHG-SEED-013). On the till the cart
+        belongs to the workstation session that opened it; `x-ticvai-self-scoped: subject` means the caller''s
+        own cart, and for a till that is the session''s. A guest identified at the till is attached to
+        the cart, never its owner, and there is no guest-scoped cart operation.
+
+        **Staff since 1 October 2026**: the till reads its own cart (`cartId` from the workstation
         session) on POS-010; the declaration said guest and partner while P04 called it.
 
         2.9.2. **Re-prices and re-checks on every read**, because a cart is a claim about
@@ -2785,7 +2790,12 @@ paths:
       - partner
       - staff
       summary: Add something
-      description: '**Staff since 1 October 2026**: the till adds lines to its own cart (`cartId` from the
+      description: '**A till''s cart is the session''s own** (decided 2 October 2026, CHG-SEED-013). On the till the cart
+        belongs to the workstation session that opened it; `x-ticvai-self-scoped: subject` means the caller''s
+        own cart, and for a till that is the session''s. A guest identified at the till is attached to
+        the cart, never its owner, and there is no guest-scoped cart operation.
+
+        **Staff since 1 October 2026**: the till adds lines to its own cart (`cartId` from the
         workstation session) on POS-002, POS-021, POS-023 and POS-030; the declaration said guest
         and partner while P04 called it.
 

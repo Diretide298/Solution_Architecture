@@ -1,6 +1,6 @@
 # Release runbook: how a change becomes a release
 
-> **For:** Chinmay (lead) and anyone running a release. **Decided 1 October 2026** (LLM Council, `audit/ticvai/council/`).
+> **For:** Chinmay (lead) and anyone running a release. **Decided 1 October 2026** (LLM Council, `docs/active/council/council-report-2026-10-01.html`).
 > **The rule:** OpenProject holds who, when, state and order. The package, served by ADAM at a release tag, holds what. ADAM's propose-then-confirm CR flow is the only way a change gets in.
 
 ## Cadence
@@ -32,7 +32,7 @@ The rule for agent edits:
 - **Keys:** a pushed key is never renamed (`check-key-stability`).
 - **Migrations:** the baseline migrations are frozen at `r1`; table changes come out as new forward migrations (`check-migration-freeze`); anything destructive goes to `handoff/migration-review.md` for a person.
 - **Contracts:** a breaking change must be listed in `breaking-changes.yaml` (`check-contract-compat` against `r1`).
-- **Audit classes:** every root-issue class from the audit has its check (`audit/ticvai/ROOT-CLASSES.md`).
+- **Audit classes:** every root-issue class from the audit has its check (`docs/active/root-classes.md`).
 
 ## 5. Tag
 Once everything is green:
@@ -57,7 +57,7 @@ Once everything is green:
 - A new root issue gets a check before it counts as closed.
 
 ## Rules from 5 October (council of 2 October)
-Source: `docs/active/council-2-october.md`. The short form every agent loads is `ticvai/CLAUDE.md`. These
+Source: the council's final reports, `docs/active/council/council-report-2026-10-02-opus.html` and `docs/active/council/council-report-2026-10-02.html`. The short form every agent loads is `ticvai/CLAUDE.md`. These
 rules add to sections 1 to 7; they do not replace them.
 
 **R1. Every change is a change-log entry, with its decision and why.** One file per change in

@@ -1,5 +1,53 @@
 {
  "_about": "Known members of the audit classes (audit/ticvai/ROOT-CLASSES.md) still present when a guard was baselined. A guard fails only on a finding not listed here. Written by `python3 tools/check-<name>.py --update-baseline`; never add an entry by hand to silence a new finding.",
+ "check-cited-sources": {
+  "updated": "2026-10-02",
+  "commit": "c9d5b383",
+  "rules": {
+   "CS-MISSING": [
+    "changes/entries/CHG-SEED-005-pos-v2-eight-decisions.yaml|sources/designs/TICVAI_POS_Terminal_v2.html",
+    "changes/entries/CHG-SEED-012-sources-cited-from-outside-git.yaml|sources/designs/TICVAI_POS_Terminal_v2.html",
+    "docs/active/action-register-22-september.md|docs/active/build-readiness-21-september.md",
+    "docs/active/adr-0038-implementation-log.md|contracts/spine/cross-cell.yaml",
+    "docs/active/claude-design-runbook.md|wireframes/incoming/BATCH-LOG.md",
+    "docs/active/deep-audit-21-september.md|docs/registers/decisions.md",
+    "docs/active/deployment-and-scaling-brief.md|docs/adr/0001-cells-and-jurisdictions.md",
+    "docs/active/dump-audit-3-september.md|backend/010-access.sql",
+    "docs/active/dump-audit-3-september.md|contracts/spine/cross-cell.yaml",
+    "docs/active/dump-audit-3-september.md|diagrams/lld/lifecycles/redemption-right.yaml",
+    "docs/active/dump-audit-3-september.md|states/entitlement.yaml",
+    "docs/active/dump-audit-3-september.md|states/redemption-right.yaml",
+    "docs/active/infra-answers-30-september.md|repos/ticvai-ai/.../vector_store.py",
+    "docs/active/interactive-wireframes-plan.md|handoff/navigation-graph.json",
+    "docs/active/interactive-wireframes-plan.md|tools/derive-navigation.py",
+    "docs/active/pos-prototype-audit-9-september.md|contracts/orders.yaml",
+    "docs/active/release-runbook.md|handoff/migration-review.md",
+    "docs/active/spec-coverage-19-september.md|sources/specifications/technical/Ch03_Functional_Domain_Coverage_v1_4.docx",
+    "docs/active/workbook-audit-9-september.md|sources/planning/TAIS_Product_Planning_and_Delivery_Plan_4_1.xlsx",
+    "docs/active/workbook-audit-9-september.md|sources/planning/TICVAI_Task_Track_From_Workshops.xlsx",
+    "docs/active/workshop-pack-log.md|tools/derive-pack-boards.py",
+    "docs/adr/0042-when-a-region-grows-and-where-a-tenant-lands.md|backend/900-foreign-keys.sql",
+    "docs/registers/conflict-status.md|sources/client/TAIS_Platform_RFP.pdf",
+    "docs/registers/conflict-status.md|sources/rfp/TAIS_Platform_RFP_From_Miracle_Star_Trading_2.p",
+    "docs/registers/conflict-status.md|states/entitlement.yaml",
+    "docs/registers/conflicts.md|sources/client/TAIS_Platform_RFP.pdf",
+    "docs/registers/conflicts.md|sources/planning/TAIS_Product_Planning_and_Delivery_Plan_4_1.xlsx",
+    "docs/registers/conflicts.md|sources/rfp/TAIS_Platform_RFP_From_Miracle_Star_Trading_2.pdf",
+    "docs/registers/conflicts.md|states/entitlement.yaml",
+    "docs/registers/pos-v2-decisions.md|sources/designs/TICVAI_POS_Terminal_v2.html"
+   ],
+   "CS-OUTSIDE-GIT": [
+    "docs/active/action-register-22-september.md|scratchpad/partial-build-check.jsonl",
+    "docs/active/six-month-plan-29-september.md|audit/ticvai/steps/AI2/ai-functions-review.md",
+    "docs/active/system-design-review-30-september.md|audit/ticvai/STEPS.md",
+    "docs/adr/0051-ai-ships-on-a-baseline-and-learns-per-tenant.md|audit/ticvai/steps/AI2/ai-functions-review.md",
+    "docs/adr/0059-ai-phasing-against-the-six-month-plan.md|audit/ticvai/steps/AI2/ai-functions-review.md",
+    "docs/adr/0067-one-device-register.md|audit/ticvai/steps/B/RD.json",
+    "docs/registers/readiness-closeout.md|audit/ticvai/steps.jsonl",
+    "docs/registers/readiness-closeout.md|audit/ticvai/steps/Q/BRIEF.md"
+   ]
+  }
+ },
  "check-contract-shapes": {
   "updated": "2026-10-01",
   "commit": "23cabef7",

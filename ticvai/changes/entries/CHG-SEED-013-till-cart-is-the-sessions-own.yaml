@@ -1,0 +1,40 @@
+id: CHG-SEED-013
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: 'A till''s cart is the workstation session''s own: the guest is attached to it, and no guest-scoped cart
+  operation is added.'
+decision:
+  what: 'Keep the simplest: the till''s cart IS the session''s own cart. getCart and addCartLine say so in their
+    descriptions (additive text); check-subject treats a cart as session-owned.'
+  by: Chinmay
+  date: '2026-10-02'
+why: 'check-subject (council of 2 October, typed property: caller or named customer) reported addCartLine on POS-002
+  and POS-030, screens acting for a named guest, because the cart operations are x-ticvai-self-scoped: subject.
+  Chinmay''s answer of 2 October settles which subject a till''s cart has.'
+keys_touched:
+  operations:
+  - getCart
+  - addCartLine
+  screens:
+  - POS-002
+  - POS-010
+  - POS-021
+  - POS-023
+  - POS-030
+  files:
+  - contracts/spine/orders.yaml
+  - tools/typed_props.py
+  - tools/check-subject.py
+root_class: 'new: wrong-subject'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-subject.py
+status: open
+notes: 'check-contract-compat: additive against r1. The cart descriptions reach the handoffs and ticket text at
+  the next refresh (refresh-safe).'

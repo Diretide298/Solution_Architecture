@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """The three binding counts the design-handoff generator measures may only go down.
 
-**Council of 2 October 2026, "the one thing to do first"** (`docs/active/council-2-october.md`): the
+**Council of 2 October 2026, "the one thing to do first"** (`docs/active/council/council-report-2026-10-02-opus.html`): the
 per-screen design-handoff generator (`tools/design_spec.py`, 1 October) resolves every screen against
 the contracts and found, mechanically and at no AI cost,
 

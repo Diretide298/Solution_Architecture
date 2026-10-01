@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Navigation that was inferred, read back against what each end of the edge holds.
 
-**Audit class A-SCREEN-NAV (audit/ticvai/ROOT-CLASSES.md), roots R251, R262, R281, R287.** Exit
+**Audit class A-SCREEN-NAV (docs/active/root-classes.md), roots R251, R262, R281, R287.** Exit
 lists came from module nav-sets and `carries` was copied from the destination's params without
 asking whether the source had them, so a Stock Count "carried" `eventId`, `feedId` and `queueId`
 into a Queue Directory; a child's `entryFrom` named a parent whose `exitTo` did not name the

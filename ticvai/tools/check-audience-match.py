@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """A screen calls only operations its audience may call, and a guest screen shows only data guests are served.
 
-**Council of 2 October 2026** (typed properties, `docs/active/council-2-october.md`). The ticketing-guest
+**Council of 2 October 2026** (typed properties, `docs/active/council/council-report-2026-10-02-opus.html`). The ticketing-guest
 process agent found guest screens showing staff-only fields; the POS v2 follow-ups found the till calling
 cart operations and `getGuestMenu` that declared only the guest audience (CHG-SEED-006). Each was found by
 reading. Both are a mismatch between two declared properties: the platform's `operator` and the

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Every field a persisted contract schema carries has somewhere to live.
 
-**Audit class A-STORAGE (audit/ticvai/ROOT-CLASSES.md): 21 root issues, the largest single class
+**Audit class A-STORAGE (docs/active/root-classes.md): 21 root issues, the largest single class
 in the contracts layer.** R086, R099, R107, R112, R115, R130, R135, R159, R172, R173, R179, R201,
 R216, R217, R218, R248 are one finding per service: a schema declares `x-ticvai-persistence:
 <schema.table>` and accepts or returns fields the DDL has no column or child table for, so a

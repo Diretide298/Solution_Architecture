@@ -30,7 +30,7 @@ why_cites:
   - '\bDI-[A-Z0-9-]+'                                 # a design input (handoff/design-inputs/mom-design-inputs.yaml)
   - '\bR\d{3}\b'                                      # an audit root issue (26 September pull audit)
   - '\bADR-\d{4}\b'                                   # an architecture decision
-  - '\bcouncil\b'                                     # an LLM council verdict (docs/active/council-*.md)
+  - '\bcouncil\b'                                     # an LLM council report (docs/active/council/*.html)
   - '\bF[1-9]\d?\b'                                   # an audit fix or re-audit (F1-F8)
   - '\bPOSV2-\d+\b|\bREV3[- ]'                        # client design returns / revisions
   - '\bCR[- ]?\d+\b|\bCF-\d+\b|\bQ\d+\b'              # an ADAM CR, a conflict, a client question

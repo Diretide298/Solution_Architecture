@@ -1,7 +1,7 @@
 # TICVAI package: rules for every change (binding from Monday 5 October 2026)
 
 These rules bind every person and every AI agent who changes this package. They are not advice. They come
-from the council of 2 October (`docs/active/council-2-october.md`); the detail is in
+from the council of 2 October (its final report, `docs/active/council/council-report-2026-10-02-opus.html`); the detail is in
 `docs/active/release-runbook.md` ("Rules from 5 October") and `changes/README.md`. If a rule blocks you,
 stop and ask the lead (Chinmay). Do not work around it.
 

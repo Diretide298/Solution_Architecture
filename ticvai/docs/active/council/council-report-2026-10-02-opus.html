@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Audit Council (Opus)</title>
+<style>
+:root{--bg:#fff;--ink:#14213D;--muted:#5B6570;--line:#E3E6EA;--card:#F7F8FA;--acc:#0E7C86;--good:#15803D;--bad:#B91C1C;--warn:#B45309}
+@media (prefers-color-scheme:dark){:root{--bg:#0F141B;--ink:#E8ECF1;--muted:#9AA4AF;--line:#26303B;--card:#161D26;--acc:#3BB6C0}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:920px;margin:0 auto;padding:28px 16px 60px}h1{font-size:24px;margin:0 0 6px}
+h2{font-size:18px;margin:28px 0 10px;border-bottom:1px solid var(--line);padding-bottom:6px}
+.q{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;color:var(--muted)}
+.first{background:var(--card);border:1px solid var(--acc);border-radius:10px;padding:14px 16px;font-weight:600}
+.verdict{border-left:4px solid var(--acc);padding:2px 0 2px 16px}
+table{border-collapse:collapse;width:100%;font-size:14px}th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}th{background:var(--card)}
+.y{color:var(--good);font-weight:600}.n{color:var(--bad);font-weight:600}.p{color:var(--warn);font-weight:600}
+details{border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:8px 0}summary{cursor:pointer;font-weight:600}
+footer{margin-top:40px;color:var(--muted);font-size:13px}code{font-size:13px}.wrap{overflow-x:auto}
+</style></head><body><main>
+<h1>Council verdict (Opus): a complete audit, and a change log that prevents repeats</h1>
+<div class="q">"I feel let's do a complete audit, not just for Block A. Then, for any changes ahead, we write a log and instructions, so we can avoid them going forward and have a better way to integrate them." (Chinmay, 2 October 2026; re-run on Opus after the limits were reset)</div>
+
+<h2>The one thing to do first</h2>
+<div class="first">When r2 lands, record its counts in <code>checks/baseline.json</code>. Make <code>check-binding-ratchet</code> a merge gate before any audit fix merges. From then on, every finding becomes a permanent check rather than a repeat.</div>
+
+<h2>The recommendation</h2>
+<div class="verdict">
+<p><b>Today and this weekend</b></p>
+<ul>
+<li>Apply r2 to OpenProject. It becomes the baseline, and every fix goes into a later tag.</li>
+<li>Fix in Friday's release, before any Block A ticket starts:
+<ul>
+<li>the storefront theme read before sign-in;</li>
+<li>the guest policy read;</li>
+<li>staff fields on guest screens.</li>
+</ul></li>
+<li>Write the checks:
+<ul>
+<li><b>binding ratchet</b> on the 5,613 / 55 / 42 counts, with an allowlist whose entries expire after 14 days;</li>
+<li><b>audience match</b>;</li>
+<li><b>pre-sign-in session</b>;</li>
+<li><b>subject</b> (acting on the caller or on a named customer);</li>
+<li><b>change log</b>.</li>
+</ul></li>
+<li>Re-audit the Sprint 1–2 Block A tickets (F8).</li>
+<li>Run the process agents on the Block A apps first, each in its own worktree with checkpoint commits.</li>
+<li>Budget the AI capacity: A 50%, B 25%, C and D 15%, discovery 10%.</li>
+<li>Publish the Sprint 1 pull list.</li>
+</ul>
+<p><b>Monday</b></p>
+<ul>
+<li>Developers pull from that list.</li>
+<li>ADAM gets a <b>"spec defect"</b> change-request type that names the broken invariant, so the 12 developers become auditors.</li>
+</ul>
+<p><b>Complete audit, block by block</b></p>
+<ul>
+<li><b>A:</b> F8 on all 659 tickets, plus process agents on the guest web, guest app, POS and kitchen display.</li>
+<li><b>B:</b> all checks, plus a simulated pull of one ticket per root class per app.</li>
+<li><b>C and D:</b> checks and process agents now; a ticket-level audit once they are broken into tasks.</li>
+<li><b>Everywhere:</b>
+<ul>
+<li>trace the 1,119 MoM inputs and 53 open questions;</li>
+<li>check that command centres, dashboards and simulation are complete;</li>
+<li>close the 435 tracker rows.</li>
+</ul></li>
+</ul>
+<p><b>Change log: <code>ticvai/changes/CHANGELOG.yaml</code></b></p>
+<ul>
+<li><b>Fields:</b>
+<ul>
+<li>id, date, source and kind;</li>
+<li>keys touched and root class;</li>
+<li>tickets, marked started or unstarted;</li>
+<li>release tag;</li>
+<li>client sign-off (required when the change comes from a MoM);</li>
+<li><b>prevention</b>: a check, a generator rule, a template field, or <code>none:&lt;reason&gt;</code>;</li>
+<li>status.</li>
+</ul></li>
+<li><b>An entry closes only when its prevention is merged and fails on the commit before the fix.</b> <code>check-changelog</code> blocks any spec merge that has no CHG id.</li>
+</ul>
+<p><b>How changes reach tickets</b></p>
+<ul>
+<li><b>Unstarted:</b> the ticket picks up the fix at the next tag, through its pointer body.</li>
+<li><b>Started:</b> never rewritten. The change request creates a linked delta ticket, and ADAM keeps serving the developer's starting tag until they finish.</li>
+</ul>
+<p><b>Decision churn</b></p>
+<ul>
+<li>A plan change is a CHG entry of kind "plan".</li>
+<li>It changes only at a Tue/Fri release, after 24 hours of cooling off.</li>
+<li>MoM sign-offs are batched weekly.</li>
+</ul>
+</div>
+
+<h2>Where the advisors stand</h2>
+<div class="wrap"><table>
+<tr><th>Position</th><th>Contrarian</th><th>First Principles</th><th>Expansionist</th><th>Outsider</th><th>Executor</th></tr>
+<tr><td>Checks, not an AI sweep</td><td class="y">yes</td><td class="y">yes, ratchet</td><td class="y">yes, invariants</td><td class="p">re-audit Sprint 1</td><td class="y">yes</td></tr>
+<tr><td>The generator counts as merge gates now</td><td class="y">yes</td><td class="y">yes</td><td class="y">yes</td><td>—</td><td class="y">yes</td></tr>
+<tr><td>Developers as auditors through ADAM</td><td>—</td><td>—</td><td class="y">yes</td><td class="y">yes</td><td>—</td></tr>
+<tr><td>Gate Monday's pulls</td><td class="y">fully resolved only</td><td class="p">baseline ratchet</td><td>—</td><td class="y">Sprint 1 buildable</td><td class="n">no, pull at r2</td></tr>
+<tr><td>Freeze plan changes to releases</td><td class="y">yes</td><td class="y">weekly slot</td><td>—</td><td class="p">overloaded decider</td><td class="y">Tue only</td></tr>
+</table></div>
+
+<h2>Blind spots caught in review</h2>
+<ul>
+<li>The 5,613 count needs classifying, because much of it is static text, so it needs an allowlist whose entries expire.</li>
+<li>No weekly AI budget.</li>
+<li>No tag or worktree named for the agents' output.</li>
+<li>No contract tests on the developers' code.</li>
+<li>Completeness of command centres, dashboards and simulation.</li>
+<li>Two screen counts that disagree: 2,447 and 2,422.</li>
+</ul>
+
+<details><summary>The Contrarian</summary><p>An audit can't finish before Block A starts; it schedules churn instead of stopping it. The backlog already outruns one lead. The generator's counts should be merge gates. r2 pushes known defects into Block A, so only tickets that fully resolve should be pullable. Freeze plan decisions at releases.</p></details>
+<details><summary>The First Principles Thinker</summary><p>The real question is not "a complete audit". It is that the rules are missing, at 34 findings per root cause. The counts are failing checks. Declare and check audience, need for a session, and subject. Build a ratchet, not a sweep. The log is the history of commits that added checks. Plan decisions belong in a fixed weekly slot.</p></details>
+<details><summary>The Expansionist</summary><p>Build a catalogue of invariants, where each one becomes a check that runs forever. The 12 developers become auditors through a "spec defect" change request. The change log is the client's sign-off surface. Simulate-before-live is the same discipline, so it can be a product feature.</p></details>
+<details><summary>The Outsider</summary><p>The specification is still being written, not finished with defects. One person is at the centre of everything. The developers are the cheapest auditors. The jargon blocks newcomers. The screen counts disagree. First: are the Sprint 1 tickets buildable?</p></details>
+<details><summary>The Executor</summary><p>Clean the tree today. Ratchet checks and a change-log template with a required check ID this weekend. On Monday, developers pull at r2, and AI goes to the A re-audit, then the process agents on the Block A apps, then B. Fix the theme and policy reads before Monday. Plan changes only on Tuesday.</p></details>
+<details><summary>Peer review</summary><p>Both reviews ranked the Executor's response strongest: it is sequenced, enforceable and fits one lead. They said to add First Principles' typed properties and to move the timing forward now that capacity is reset. They flagged the Contrarian's gate as the biggest blind spot, because it would leave developers idle. Three of the five reviews could not run: the 7 process agents had used up the limit on concurrent agents.</p></details>
+
+<footer>LLM Council (Opus), 2 October 2026: five advisors, two peer reviews and a chairman's synthesis. Transcript: <code>council-transcript-2026-10-02-opus.md</code>. The earlier Sonnet run is <code>council-report-2026-10-02.html</code>.</footer>
+</main></body></html>

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Every change is logged with its decision and why, and an entry closes only on a prevention that exists.
 
-**Council of 2 October 2026** (`docs/active/council-2-october.md`): *"a change closes only when it ships a
+**Council of 2 October 2026** (`docs/active/council/council-report-2026-10-02-opus.html`): *"a change closes only when it ships a
 check, a generator rule or a schema field. A prose 'lesson' doesn't close anything."* And Chinmay, the
 same night: *"all the changes and fixes: log them, also the decision and why."* The log is
 `changes/entries/*.yaml`, one file per change; the rules are `changes/schema.yaml`; the README explains

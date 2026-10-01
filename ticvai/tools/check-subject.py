@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """A staff screen acting for a guest calls the operation that names the guest, never the caller's own.
 
-**Council of 2 October 2026** (typed properties, `docs/active/council-2-october.md`). A POS v2 follow-up
+**Council of 2 October 2026** (typed properties, `docs/active/council/council-report-2026-10-02-opus.html`). A POS v2 follow-up
 (commit 0d59727e) found that POS-002, the till, reads `getLoyaltyPosition`: the caller's own loyalty
 position, with no parameter naming whose. Called from a till it returns the cashier's loyalty, not the
 guest's in front of them. The till's operation is `getGuestLoyalty` (staff, the guest named in the path).
@@ -28,6 +28,8 @@ check-audience-match (AM-STAFF-OP).
 
 `x-ticvai-self-scoped: principal` (the caller's own session, MFA, password) is right on any screen and is
 not reported.
+Nor is a cart (`/carts/...`): a till's cart is the workstation session's own and the guest is attached to
+it (decided 2 October 2026, CHG-SEED-013; contracts/spine/orders.yaml `getCart`, `addCartLine`).
 
 **Report-only until the guest fixes land**; the lead then baselines it and makes it gate.
 

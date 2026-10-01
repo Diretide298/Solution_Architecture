@@ -1,6 +1,6 @@
 # The change log: every change, its decision, why, and what stops it coming back
 
-> **Owner:** Chinmay. **Decided:** council of 2 October 2026 (`docs/active/council-2-october.md`).
+> **Owner:** Chinmay. **Decided:** council of 2 October 2026 (`docs/active/council/council-report-2026-10-02-opus.html`, with the Sonnet run `docs/active/council/council-report-2026-10-02.html`).
 > **Binding from Monday 5 October 2026** for every person and every AI agent (`ticvai/CLAUDE.md`).
 > **Checked by:** `tools/check-changelog.py` (gating, in `run-checks.py`). **Schema:** `changes/schema.yaml`.
 
@@ -42,7 +42,7 @@ changes/
 | `decision` | yes | `what` was decided, `by` whom, on what `date` |
 | `why` | yes | the reason, **citing its source** so a reader can open it: a MoM (`sources/mom/...`), a design input (`DI-...`), an audit root (`R123`), an ADR (`ADR-0060`), the council, an audit fix (`F1`-`F8`), a client return (`POSV2-3`), a CR, a finding, a commit or another `CHG-` id. The check refuses a `why` with no citation |
 | `keys_touched` | yes | lists of the keys it changes: `screens`, `operations`, `tables`, `schemas`, `flows`, `tickets`, `files`, `other`. At least one key unless the kind is `process` or `plan` |
-| `root_class` | yes | the audit class it belongs to (`audit/ticvai/ROOT-CLASSES.md` id, e.g. `CR-3`) or `new: <name>` for a new class (`change-rules.md` CR-7: a new class gets a guard) |
+| `root_class` | yes | the audit class it belongs to (`docs/active/root-classes.md` id, e.g. `CR-3`) or `new: <name>` for a new class (`change-rules.md` CR-7: a new class gets a guard) |
 | `tickets` | yes | `started: [...]` and `unstarted: [...]` OpenProject keys or ids it affects |
 | `release_tag` | yes | the tag that carries it (`r3`), or `pending` until it is tagged |
 | `decision_owner` | yes | who owns the decision (the lead, or the client for a minutes-sourced change) |

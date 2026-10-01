@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """A screen a guest reaches before signing in must load without a session.
 
-**Council of 2 October 2026** (typed properties, `docs/active/council-2-october.md`). The white-label
+**Council of 2 October 2026** (typed properties, `docs/active/council/council-report-2026-10-02-opus.html`). The white-label
 process agent found that the storefront cannot load the tenant's theme before sign-in: WEB-001 calls
 `getTenantConfig` on load, and `getTenantConfig` requires `guestAuth` or `bearerAuth`. Every guest
 arrives signed out, so the home page of every tenant renders unbranded or not at all. Guests could not

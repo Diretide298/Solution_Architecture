@@ -51,6 +51,8 @@ SESSION_IDENTITY = {"subjectId", "sessionId", "principalId", "operatorId"}
 SESSION_CREATORS = {"login", "verifyGuestOtp", "guestSocialLogin", "guestUaePassLogin"}
 LOAD_TRIGGERS = {"onLoad", "onInterval", "background", None}
 # A parameter that names whose record it is: the operation then acts on a named customer, not the caller.
+# Resources owned by the session that opened them, whoever the caller is (decided 2 October 2026, CHG-SEED-013).
+SESSION_OWNED = re.compile(r"^/carts(/|$)")
 GUEST_PARAM = re.compile(r"^(subject|guest|customer|member)Id$")
 SUBJECT_PARAM = re.compile(r"^(subject|guest|customer|member|account|holder|principal|person|profile)Id$")
 INPUT_KINDS = {"selectField", "textField", "toggle", "numberField", "datePicker", "multiSelect",
@@ -136,6 +138,10 @@ def acts_on(op_id: str) -> str:
         return "named"
     x = o["op"]
     ss = x.get("x-ticvai-self-scoped")
+    if SESSION_OWNED.match(o["path"]):
+        # **A cart is the session's own** (decided 2 October 2026, CHG-SEED-013): a till's cart belongs to the
+        # workstation session and a guest is attached to it, so a till calling its cart acts on its own cart.
+        return "named"
     if ss == "subject" and x.get("x-ticvai-permission") is None:
         return "caller-declared"
     if ss or x.get("x-ticvai-permission") is not None or x.get("x-ticvai-auth") == "service":

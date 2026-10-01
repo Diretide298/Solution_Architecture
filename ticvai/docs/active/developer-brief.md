@@ -37,7 +37,7 @@ happens:
    delta ticket. Your ticket is never rewritten.
 
 **Known issues** are listed in three places:
-- the change log, `changes/CHANGELOG.md`; open entries are the known, unfixed changes;
+- the change log, one file per change in `changes/entries/` (indexed in `CHANGELOG.md` beside it at each release); open entries are the known, unfixed changes;
 - the check reports in the last release run (`python3 tools/run-checks.py`): `check-audience-match`,
   `check-preauth-session`, `check-subject` and `check-binding-ratchet` list issues by screen;
 - `/ticket`, where each one shows what changed since your pin.
