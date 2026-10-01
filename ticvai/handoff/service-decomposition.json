@@ -145,7 +145,7 @@
     "orders",
     "payments"
    ],
-   "operations": 288,
+   "operations": 289,
    "tables": 113,
    "why": "**The transactional core.** 96 operations, 34 tables, and the highest write rate in the platform. Separate because its scaling profile is unlike anything else — a Saturday evening is ten times a Tuesday morning.\n\n**`shift` belongs here and not in Tenancy.** A shift is venue-scoped, which is what made it look like a tenancy concern — but **venue scope is the platform's default rather than a service boundary**: 675 of 1,014 operations are venue-scoped.\n\n**What decides the service is who owns the tables.** A shift holds cash, `orders.deposit_box` reconciles against payments, and `orders.cash_movement` posts to `ledger.posting` at close. **A till's takings and a till's drawer are the same money counted twice** — separating them makes every settlement a distributed join.\n\n**Guest recurring billing lives here, decided by [ADR-0048](../../docs/adr/0048-guest-recurring-billing-is-commerce.md)** rather than in the Control Plane that provisions cells. `payments.dunning_policy` and `payments.dunning_case` are the two newest tables in the service. **A charge on a schedule fails differently from a charge at a till** — nobody is standing at the counter when a renewal declines, so the recovery path is a queue and a timetable rather than a second card.",
    "scale": "Write-heavy, spiky, latency-critical. **The one that autoscales.**",

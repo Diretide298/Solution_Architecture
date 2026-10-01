@@ -139,8 +139,8 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
       <div id="adm-001" class="scr">
         <div>
           <div class="hdr"><span class="code">ADM-001</span>
-            <span class="ttl">Platform Login / MFA</span></div>
-          <div class="pur">Get someone into the app, fast, on a device that may be shared.</div>
+            <span class="ttl">Platform Login / MFA</span><span class="pill off">offline</span></div>
+          <div class="pur">Get a TICVAI platform operator into the TICVAI Console: username and password (or TICVAI&#x27;s own SSO), then always the authentication code, then th</div>
         </div>
         <div class="frame">
           <aside class="rail"><div class="brand"><b>TICVAI</b><span>Access &amp; Identity</span></div><nav class="nav"><i class="">Tenants</i><i class="on">Cells</i><i class="">Releases</i><i class="">Health</i><i class="">Audit</i></nav></aside>
@@ -150,20 +150,20 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
                 <small>TICVAI Web &middot; wave 1 &middot; compact</small></div>
               <div class="acts"><div class="chip">All tenants &#9662;</div><div class="chip cta">Deploy</div></div>
             </div>
-            
+            <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Tenants</b><span>184</span></div><div class="kpi"><b>Cells</b><span>3</span></div><div class="kpi"><b>Incidents</b><span>2</span></div><div class="kpi"><b>Releases</b><span>11</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Venue id</b><div class="chip">Venue id</div><span class="why">Sends `?venueId=` to `listActiveSessions`.</span></div><div class="panel"><b>Principal id</b><div class="chip">Principal id</div><span class="why">Sends `?principalId=` to `listActiveSessions`.</span></div><div class="panel"><b>Workstation id</b><div class="chip">Workstation id</div><span class="why">Sends `?workstationId=` to `listActiveSessions`.</span></div></div><div class="side"><div class="panel"><b>Every active session</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Every MFA method</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Username</b><div class="chip">Username</div><span class="why">Goes into `LoginRequest.username`.</span></div><div class="panel"><b>Password</b><div class="chip">Password</div><span class="why">Goes into `LoginRequest.credential` with `method: password`. Minimum 8, show/hide. **No workstation is sent: a browser is not a registered device** (CHG-DOOR-001), and no</span></div><div class="panel"><b>Sign in</b><div class="chip cta">Sign in</div><span class="why">Sends `LoginRequest`. 409 means this person already holds a session elsewhere (audit R184): the screen says where and since when, and that only a holder of SESSION_FORCE_</span></div></div><div class="side"><div class="panel"><b>Sign in with your organisation</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">One button per identity provider TICVAI uses for its own staff; **absent, not disabled, when there is none.** Read before sign-in, unauthenticated. When a provider `isEnf</span></div><div class="panel"><b>Continue with your organisation</b><div class="chip">Continue with your organisation</div><span class="why">Hands off to the identity provider with this door&#x27;s `redirectUri`; nothing is typed here. Staff and partner doors only, never a guest door (audit R167).</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createMfaChallenge · verifyMfaChallenge · enrolMfaMethod · verifyMfaEnrolment +8</div>
-          <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · mfaRequired · mfaEnrolmentRequired</span></div>
-          <div><b>ARRIVES WITH</b> &middot; challengeId&larr;navigation, methodId&larr;navigation</div>
+          <div><b>OPERATIONS</b> &middot; login · listSsoProviders · startSsoAuthorization · completeSsoAuthorization +7</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · error · denied · emptyNoAccess · sessionHeld · mfaRequired</span></div>
+          <div><b>ARRIVES WITH</b> &middot; challengeId&larr;navigation, providerId&larr;deepLink, methodId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-004">ADM-004</a>  &mdash; <i>Platform Audit Log</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formEnrolMfaMethod &middot; <i>Enrol MFA method</i> &middot; <b>Enrol</b> &middot; Cancel <span class="dis">discards kind · target</span></div><div class="ov"><b>modal</b> formVerifyMfaEnrolment &middot; <i>Confirm enrolment</i> &middot; <b>Confirm enrolment</b> &middot; Cancel <span class="dis">discards code</span></div><div class="ov"><b>confirmDialog</b> confirmRemoveMfaMethod &middot; <i>Remove MFA method</i> &middot; <b>Remove</b></div><div class="ov"><b>confirmDialog</b> confirmForceLogout &middot; <i>Force logout</i></div><div class="ov"><b>confirmDialog</b> confirmRevokeAllSessions &middot; <i>Revoke all sessions</i></div><div class="ov"><b>modal</b> formLogin &middot; <i>Login</i> &middot; <b>Login</b> &middot; Cancel <span class="dis">discards username · credential · workstationId · method · deviceFingerprint</span></div></div>
+          
         </div>
       </div>
       <div id="adm-020" class="scr">
@@ -3618,7 +3618,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listAiProviders · listTenants · getRegionSettings · listOwnPlatformStaffGrants +10</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; providerId&larr;deepLink, regionId&larr;navigation, modelId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#adm-001">ADM-001</a>  &mdash; <i>Platform Login / MFA</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-001">ADM-001</a>  &mdash; <i>Platform Login / MFA</i> <span class="car">providerId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formOpenPlatformStaffGrant &middot; <i>Open access grant</i> &middot; <b>Open access grant</b> &middot; Cancel <span class="dis">discards permissions · reason · ticketRef · expiresAt</span></div><div class="ov"><b>modal</b> formSetAiProvider &middot; <i>Save AI provider</i> &middot; <b>Save AI provider</b> &middot; Cancel <span class="dis">discards kind · capability · priority · isActive · id · model · failoverProviderId · degradeGracefully · scopeLevel · scopePath · credentialRef · credentialRotatedAt · credentialExpiresAt · lastVerifiedAt · endpoint · residency · maxTokens</span></div><div class="ov"><b>modal</b> formSetAiCredential &middot; <i>Save AI credential</i> &middot; <b>Save AI credential</b> &middot; Cancel <span class="dis">discards secret · expiresAt · graceMinutes</span></div></div>
         </div>

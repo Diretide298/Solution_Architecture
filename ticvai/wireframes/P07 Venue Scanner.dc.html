@@ -140,7 +140,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div>
           <div class="hdr"><span class="code">SCN-001</span>
             <span class="ttl">Sign in</span><span class="pill off">offline</span></div>
-          <div class="pur">PIN or badge. Session carries the workstation.</div>
+          <div class="pur">PIN or badge, so every scan is attributable to a person at this gate. The scanner sends its workstation.</div>
         </div>
         <div class="frame">
           <aside class="rail"><div class="brand"><b>TICVAI</b><span>Access</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Access</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
@@ -153,17 +153,17 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Every MFA method</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><b>Every SSO provider</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Employee number</b><div class="chip">Employee number</div><span class="why">Goes into `LoginRequest.username`; a badge tap fills it.</span></div><div class="panel"><b>PIN</b><div class="chip">PIN</div><span class="why">Goes into `LoginRequest.credential` with `method: pin`, or the badge with `method: card` or `rfid`. The scanner sends its own `workstationId` (CHG-DOOR-001), so every sca</span></div><div class="panel"><b>Sign in</b><div class="chip cta">Sign in</div><span class="why">Sends `LoginRequest`. 409 means this person already holds a session elsewhere (audit R184): the screen says where and since when, and that only a holder of SESSION_FORCE_</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; login · getCurrentShift · getCurrentSession · listMfaMethods +5</div>
-          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · mfaRequired · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; shiftId&larr;session, challengeId&larr;navigation</div>
+          <div><b>OPERATIONS</b> &middot; login · createMfaChallenge · verifyMfaChallenge · selectRole +2</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · error · denied · emptyNoAccess · sessionHeld · mfaRequired</span></div>
+          <div><b>ARRIVES WITH</b> &middot; challengeId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; entry point · <a href="#scn-002">SCN-002</a>  &mdash; <i>Confirms access point and direction</i><br><a href="#scn-003">SCN-003</a>  &mdash; <i>Ready to scan</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formLogin &middot; <i>Login</i> &middot; <b>Login</b> &middot; Cancel <span class="dis">discards username · credential · workstationId · method · deviceFingerprint</span></div><div class="ov"><b>modal</b> formSelectRole &middot; <i>Select role</i> &middot; <b>Select role</b> &middot; Cancel <span class="dis">discards roleId</span></div><div class="ov"><b>modal</b> formResolvePermissions &middot; <i>Resolve permissions</i> &middot; <b>Resolve permissions</b> &middot; Cancel <span class="dis">discards principalId · roleId · atScopePath</span></div></div>
+          
         </div>
       </div>
       <div id="scn-002" class="scr">

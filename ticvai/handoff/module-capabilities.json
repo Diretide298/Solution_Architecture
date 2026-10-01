@@ -3237,9 +3237,10 @@
      "key": "REPORT_VIEW_WORKSTATION",
      "label": null,
      "group": "Reporting",
-     "operationCount": 3,
+     "operationCount": 4,
      "operations": [
       "getShift",
+      "getWorkstationShift",
       "listCashMovements",
       "listShifts"
      ],
@@ -4297,6 +4298,7 @@
    ],
    "REPORT_VIEW_WORKSTATION": [
     "getShift",
+    "getWorkstationShift",
     "listCashMovements",
     "listShifts"
    ],

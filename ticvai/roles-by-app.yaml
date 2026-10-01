@@ -1,7 +1,7 @@
 $id: ticvai/roles-by-app.yaml
 title: Permissions each shipped app requires
 generatedBy: tools/derive-app-roles.py
-generated: '2026-10-01'
+generated: '2026-10-02'
 description: '**Derived from what each app''s screens call, not decided here.** For every app, the permissions
   its operations declare in `x-ticvai-permission`, tiered by what the key permits. Role names, headcounts
   and the approval hierarchy are deliberately absent: who at a venue may configure pricing is the client''s
@@ -10,7 +10,7 @@ theTwoVocabularies:
   onOperations: 170
   inRolesYaml: 43
   shared: 0
-  note: '**Zero shared keys.** The contracts carry 170 permission keys across 2520 operations; `roles.yaml`
+  note: '**Zero shared keys.** The contracts carry 170 permission keys across 2521 operations; `roles.yaml`
     grants 43, all of them POS. `check-screens` validates a screen''s `guard` against `roles.yaml`, so
     the only guards anyone could write were POS ones — and that is what the package shows: venue-pos declares
     every guard in it and the other four apps declare none. **Joining these two is the work; this file
@@ -114,7 +114,7 @@ apps:
     - P17
     screens: 767
     operations: 865
-    permissions: 90
+    permissions: 89
     tiers:
       read:
       - ACCREDITATION_VIEW
@@ -172,7 +172,6 @@ apps:
       - REPORT_VIEW_VENUE
       - RISK_INVESTIGATE
       - RISK_REVIEW
-      - SESSION_FORCE_LOGOUT
       - SETTLEMENT_RECONCILE
       - TICKET_LOOKUP
       configure:
@@ -211,7 +210,9 @@ apps:
       - WORK_ORDER_MANAGE
     operationsWithNoPermission:
     - addCartLine
+    - changeOwnCredential
     - checkoutCart
+    - completeSsoAuthorization
     - createMfaChallenge
     - createRefundRequest
     - enrolMfaMethod
@@ -223,11 +224,12 @@ apps:
     - propagateCrossRegionEntitlement
     - reconcileRedemptions
     - removeCartLine
-    - removeMfaMethod
+    - selectRole
+    - startSsoAuthorization
     - updateCartLine
     - verifyMfaChallenge
     - verifyMfaEnrolment
-    operationsWithNoPermissionCount: 17
+    operationsWithNoPermissionCount: 20
   venue-management:
     name: TICVAI Venue Management
     platforms:
@@ -236,7 +238,7 @@ apps:
     - P13
     - P16
     screens: 1387
-    operations: 1644
+    operations: 1649
     permissions: 146
     tiers:
       read:
@@ -389,8 +391,11 @@ apps:
       - WORKSTATION_CONFIGURE
       - WORK_ORDER_MANAGE
     operationsWithNoPermission:
+    - changeOwnCredential
+    - completeSsoAuthorization
     - createMfaChallenge
     - createRefundRequest
+    - enrolMfaMethod
     - getCurrentSession
     - getGameCard
     - getGuestMenu
@@ -404,7 +409,6 @@ apps:
     - handoverToAgent
     - listDeliveryLocations
     - listDiningOutlets
-    - listMfaMethods
     - listMyCases
     - listSsoProviders
     - listTransportRoutes
@@ -415,16 +419,19 @@ apps:
     - recordConsent
     - recordDeviceHeartbeat
     - recordGamePlay
+    - selectRole
+    - startSsoAuthorization
     - syncGamePlays
     - verifyMfaChallenge
-    operationsWithNoPermissionCount: 28
+    - verifyMfaEnrolment
+    operationsWithNoPermissionCount: 33
   venue-pos:
     name: TICVAI POS
     platforms:
     - P04
     - P15
     screens: 42
-    operations: 175
+    operations: 176
     permissions: 52
     tiers:
       read:
@@ -501,8 +508,8 @@ apps:
     - P06
     - P07
     screens: 107
-    operations: 234
-    permissions: 64
+    operations: 237
+    permissions: 63
     tiers:
       read:
       - ASSET_LIBRARY_VIEW
@@ -513,7 +520,6 @@ apps:
       - INCIDENT_VIEW
       - INSPECTION_VIEW
       - ORDER_VIEW
-      - PERMISSION_VIEW
       - PROCUREMENT_VIEW
       - PRODUCT_VIEW
       - QUEUE_VIEW
@@ -572,6 +578,8 @@ apps:
       - WORKFORCE_MANAGE
       - WORK_ORDER_MANAGE
     operationsWithNoPermission:
+    - changeOwnCredential
+    - completeSsoAuthorization
     - createMfaChallenge
     - createTableReservation
     - enrolMfaMethod
@@ -585,6 +593,7 @@ apps:
     - logout
     - removeMfaMethod
     - selectRole
+    - startSsoAuthorization
     - verifyMfaChallenge
     - verifyMfaEnrolment
-    operationsWithNoPermissionCount: 15
+    operationsWithNoPermissionCount: 18
