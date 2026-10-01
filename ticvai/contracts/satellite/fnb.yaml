@@ -4045,8 +4045,13 @@ paths:
         - "P08 BO-044 F&B Outlets"
       x-ticvai-audience:
       - guest
+      - staff
       summary: The menu a guest sees
-      description: 'The menu in force **at this moment** — breakfast at nine, lunch at one. The staff
+      description: '**Staff since 1 October 2026**: the till''s Food & Drink sale (POS-021) shows the same menu in
+        force that a guest sees; the declaration said guest only while P04 called it. A read with no
+        permission and no subject scope, so the audience is the only change.
+
+        The menu in force **at this moment** — breakfast at nine, lunch at one. The staff
         endpoint returns every menu with its availability window; this returns the one that applies, because
         a guest does not want to work out which.
 

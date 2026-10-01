@@ -8723,7 +8723,8 @@
    "postgres"
   ],
   "audience": [
-   "guest"
+   "guest",
+   "staff"
   ]
  },
  "listDeliveryLocations": {

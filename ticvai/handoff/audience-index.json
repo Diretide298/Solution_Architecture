@@ -2316,6 +2316,7 @@
     "getGuestIntelligence",
     "getGuestLoyalty",
     "getGuestMatchPolicy",
+    "getGuestMenu",
     "getGuestProfile",
     "getGuestRelationships",
     "getGuestTimeline",
@@ -7702,7 +7703,7 @@
     "workforce.work_assignment"
    ],
    "counts": {
-    "operations": 2480,
+    "operations": 2481,
     "screens": 2198,
     "flows": 135,
     "contracts": 33,
