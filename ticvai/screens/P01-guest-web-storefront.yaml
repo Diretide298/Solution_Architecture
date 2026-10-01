@@ -4464,10 +4464,16 @@ screens:
         provenance: contract identity.yaml POST /auth/guest/password
       - kind: secondaryButton
         label: Continue with Apple or Google
+        notes: '**Nothing is typed.** The Apple or Google sheet returns the `idToken` and the client sends
+          it with `provider` and the device''s `deviceId` straight to `guestSocialLogin`; there is no
+          form (CHG-DOOR-006: the overlay that asked the guest for an idToken was removed).'
         operation: guestSocialLogin
         provenance: contract identity.yaml POST /auth/guest/social
       - kind: secondaryButton
         label: Continue with UAE Pass
+        notes: '**Nothing is typed.** The UAE Pass app or web flow redirects back with `code` and `state`,
+          and the client sends them with its own `redirectUri` to `guestUaePassLogin`; there is no form
+          (CHG-DOOR-006: the overlay that asked the guest for a code and redirect URI was removed).'
         operation: guestUaePassLogin
         provenance: contract identity.yaml POST /auth/guest/uae-pass
       - kind: secondaryButton
@@ -4514,11 +4520,6 @@ screens:
         notes: Called after sign-in when the guest arrived from the cart, so the anonymous cart becomes
           theirs.
         provenance: contract orders.yaml POST /carts/{cartId}/claim
-      - kind: secondaryButton
-        label: Refresh token
-        operation: refreshToken
-        notes: Not a button the guest sees; the client rotates the access token before it expires.
-        provenance: contract identity.yaml POST /auth/refresh
   overlays:
   - id: formRegisterGuest
     component: modal
@@ -4557,37 +4558,6 @@ screens:
       - password
       - deviceId
     provenance: client-verified
-  - id: formGuestSocialLogin
-    component: modal
-    trigger: Continue with Apple or Google
-    body: '**Collects what `guestSocialLogin` sends before it is called.** Required: `provider`, `idToken`.
-      Optional: `deviceId`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Guest social login
-      operation: guestSocialLogin
-    dismiss:
-      label: Cancel
-      discards:
-      - provider
-      - idToken
-      - deviceId
-    provenance: client-verified
-  - id: formGuestUaePassLogin
-    component: modal
-    trigger: Continue with UAE Pass
-    body: '**Collects what `guestUaePassLogin` sends before it is called.** Required: `code`, `redirectUri`.
-      Optional: `state`, `deviceId`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Guest uae pass login
-      operation: guestUaePassLogin
-    dismiss:
-      label: Cancel
-      discards:
-      - code
-      - redirectUri
-      - state
-      - deviceId
-    provenance: client-verified
   - id: formLinkGuestCheckout
     component: modal
     trigger: Link an order I placed as a guest
@@ -4601,19 +4571,6 @@ screens:
       discards:
       - orderReference
       - verificationCode
-    provenance: client-verified
-  - id: formRefreshToken
-    component: modal
-    trigger: Refresh token
-    body: '**Collects what `refreshToken` sends before it is called.** Required: `refreshToken`. Dismissing
-      sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Refresh token
-      operation: refreshToken
-    dismiss:
-      label: Cancel
-      discards:
-      - refreshToken
     provenance: client-verified
   - id: formRequestGuestOtp
     component: modal
@@ -4705,7 +4662,7 @@ screens:
   - operationId: refreshToken
     contract: identity
     purpose: Rotate the access token
-    trigger: onAction
+    trigger: background
   - operationId: requestGuestOtp
     contract: identity
     purpose: Request a one-time code

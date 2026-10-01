@@ -69,6 +69,10 @@ CHECKS = [
     # 2 October (Chinmay's answers, CHG-SEED-005 and -012): a design import's differences carry a decision, and
     # decision documents cite only files git tracks.
     "check-candidate-decisions", "check-cited-sources",
+    # 2 October (CHG-DOOR-001..006): every app has a sign-in door, every staff and partner door is a sign-in
+    # form with the second factor, the role prompt and (in a browser) SSO and no workstation, no form asks a
+    # person for a token, and no door lands on a read gated by a right to act.
+    "check-doors",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.

@@ -30,10 +30,11 @@ trigger:
 steps:
 - step: 1
   screen: PTR-001
-  action: Signs in and sees the allocation
+  action: Signs in; the partner home shows the allocation and the credit
   operations:
-  - getB2bCredit
-  outcome: Knows what they may sell and what they owe
+  - login
+  outcome: Knows what they may sell and what they owe. The door reads no credit (CHG-DOOR-003); the partner
+    home PTR-002 reads `getB2bCredit`
 - step: 2
   screen: PTR-005
   action: Books against the allocation

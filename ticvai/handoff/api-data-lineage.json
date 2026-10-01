@@ -72790,5 +72790,30 @@
    "redis"
   ],
   "note": "CHG-FIN-003 (2 October 2026): the cashier-facing blind close; reads and writes as closeShift, returns no expected figure"
+ },
+ "getWorkstationShift": {
+  "contract": "shift",
+  "verb": "GET",
+  "path": "/shifts/current/overview",
+  "reads": [
+   "orders.pos_shift",
+   "orders.pos_shift_approval",
+   "orders.pos_shift_incident"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "workstation",
+  "perm": "REPORT_VIEW_WORKSTATION",
+  "offline": true,
+  "summary": "Read the open or suspended shift on the session's workstation, without the right to open one",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
  }
 }

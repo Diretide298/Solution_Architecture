@@ -77,270 +77,146 @@ screens:
     - to: SCN-003
       trigger: Ready to scan
       provenance: structural — SCN-001 is P07's home screen and its exits are its launcher
-  notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. **createCashMovement removed 18 August** — attached by module resemblance, not
-    by what this screen does. A screen that does not handle money should not be able to move it (CF-87''s
-    class). **Sign in.** The session carries the workstation, so the device cannot scan before it knows
-    who is holding it. **Declared 20 August** — `isEntryPoint` existed in the schema and five platforms
-    used none, so every screen in them read as unreachable. **`selectRole` and `resolvePermissions` wired
-    24 August.** ADR-0002 makes authorisation user-driven and **a sign-in screen that does not resolve
-    a role is a sign-in that grants nothing** — found by walking F61. **Removed 24 August**: acceptShiftVariance,
-    approveShiftOpen, closeShift, forceLogout, getShift, listActiveSessions, listCashMovements, listShifts,
-    openShift, recordNoSale, reopenShift, resumeShift, revokeAllSessions, suspendShift. **Bulk-attach
-    residue** — the 18 August defect that put identical operation sets on unrelated screens. A till does
-    not cancel a performance, a staff app does not create roles, and **a scanner does not run a cash shift.**'
+  notes: '**Rebuilt as a sign-in form on 2 October 2026 (CHG-DOOR-002/003; Chinmay, 2 October 2026: fix
+    the Block A blockers now).** It was generated as a list over active sessions, MFA methods and SSO
+    providers with Force logout and Revoke all sessions on the door, which a person who is not yet signed
+    in can never use (platform-foundation process notes). The sequence is the same on every staff and
+    partner door: credentials (or the organisation''s SSO) -> the authentication code only when a permission
+    demands it (R135) -> the role prompt when several roles are held (ADR-0003) -> the landing. Managing
+    sessions moved to the staff directory (BO-053); managing MFA methods stays on each app''s own security
+    or profile screen. **resolvePermissions and getCurrentShift left the door**: simulating a principal''s
+    permissions is an administration tool (BO-068), and a scanner runs no cash shift, so a steward was
+    shown a SHIFT_OPEN no-access state at sign-in.'
   density: comfortable
-  pattern: listDetail
-  patternReason: '`listMfaMethods` reads the population and `getCurrentShift` reads one of them — list,
-    select, act'
-  purpose: PIN or badge. Session carries the workstation.
+  pattern: form
+  patternReason: PIN or badge on a gate scanner, then the role - a form, not a list.
+  purpose: PIN or badge, so every scan is attributable to a person at this gate. The scanner sends its
+    workstation.
   layout:
-    template: split
+    template: form
     regions:
     - name: contentBody
-      slot: collection
+      slot: form
       components:
-      - kind: dataTable
-        label: Every MFA method
-        bindsTo: MfaMethod
-        columns:
-        - MfaMethod.id
-        - MfaMethod.kind
-        - MfaMethod.label
-        - MfaMethod.maskedTarget
-        - MfaMethod.isActive
-        - MfaMethod.isPrimary
-        - MfaMethod.enrolledAt
-        - MfaMethod.lastUsedAt
-        operation: listMfaMethods
-        provenance: contract identity.yaml GET /auth/mfa/methods
-      - kind: dataTable
-        label: Every SSO provider
-        bindsTo: SsoProvider
-        columns:
-        - SsoProvider.id
-        - SsoProvider.displayName
-        - SsoProvider.protocol
-        - SsoProvider.iconAssetRef
-        - SsoProvider.isEnforced
-        - SsoProvider.scopePath
-        operation: listSsoProviders
-        provenance: contract identity.yaml GET /auth/sso/providers
-    - name: contextPanel
-      slot: selection
-      components:
-      - kind: detailPanel
-        label: The selected MFA method
-        bindsTo: MfaMethod
-        columns:
-        - MfaMethod.id
-        - MfaMethod.kind
-        - MfaMethod.label
-        - MfaMethod.maskedTarget
-        - MfaMethod.isActive
-        - MfaMethod.isPrimary
-        - MfaMethod.enrolledAt
-        - MfaMethod.lastUsedAt
-        operation: listMfaMethods
-        provenance: contract identity.yaml GET /auth/mfa/methods
-      - kind: detailPanel
-        label: The session
-        bindsTo: Session
-        columns:
-        - Session.sessionId
-        - Session.principalId
-        - Session.roleId
-        - Session.displayName
-        - Session.scope
-        - Session.effectivePermissions
-        - Session.permissionsByScope
-        - Session.saleBoardId
-        - Session.workstation
-        - Session.openedAt
-        - Session.expiresAt
-        operation: getCurrentSession
-        provenance: contract identity.yaml GET /auth/session
-      - kind: detailPanel
-        label: The shift
-        bindsTo: Shift
-        columns:
-        - Shift.id
-        - Shift.workstationId
-        - Shift.venueId
-        - Shift.scopePath
-        - Shift.principalId
-        - Shift.principalDisplayName
-        - Shift.incidents
-        - Shift.status
-        - Shift.currency
-        - Shift.currencyScale
-        - Shift.depositBoxCode
-        - Shift.bagNumber
-        - Shift.openingFloat
-        - Shift.salesTotal
-        - Shift.refundsTotal
-        - Shift.liftsTotal
-        operation: getCurrentShift
-        provenance: contract shift.yaml GET /shifts/current
-    - name: actionBar
-      slot: rowActions
-      components:
+      - kind: textField
+        label: Employee number
+        notes: Goes into `LoginRequest.username`; a badge tap fills it.
+      - kind: textField
+        label: PIN
+        notes: 'Goes into `LoginRequest.credential` with `method: pin`, or the badge with `method: card`
+          or `rfid`. The scanner sends its own `workstationId` (CHG-DOOR-001), so every scan is attributable
+          to a person at this gate.'
       - kind: primaryButton
-        label: Login
+        label: Sign in
         operation: login
+        notes: 'Sends `LoginRequest`. 409 means this person already holds a session elsewhere (audit R184):
+          the screen says where and since when, and that only a holder of SESSION_FORCE_LOGOUT can end
+          it; signing in never ends the other session.'
         provenance: contract identity.yaml POST /auth/login
+    - name: secondFactor
+      slot: form
+      components:
       - kind: textField
         label: Authentication code
         operation: verifyMfaChallenge
+        notes: 'Shown only when the sign-in comes back `requiresMfa`: the person holds a permission in
+          `PasswordPolicy.mfaRequiredForPermissions` (ROLE_MANAGE, LEDGER_APPROVE, every PLATFORM_* permission,
+          or one the tenant added; audit R135). Six digits from the authenticator app.'
         provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
-        notes: Shown only in the mfaRequired state (audit R135).
       - kind: primaryButton
         label: Verify
         operation: verifyMfaChallenge
+        notes: Completes the sign-in; the session is usable only after it. Five wrong codes lock step-up
+          for the policy's lockout minutes, never permanently (audit R126 (6)), and the screen says until
+          when.
         provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
       - kind: secondaryButton
         label: Email me a code instead
         operation: createMfaChallenge
+        notes: '`action: signIn`. The authenticator app is the primary method and an emailed code the
+          fallback (audit R126 (5)).'
         provenance: contract identity.yaml POST /auth/mfa/challenge
-        notes: The fallback -- issues the challenge against the principal's email (`emailOtp`) method
-          (audit R126 (5)).
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: banner
+        label: Signed in as
+        operation: getCurrentSession
+        notes: 'Read once the sign-in is complete (after the code and the role, where asked): the person''s
+          name and role, then straight on. Then the access point is confirmed (SCN-002).'
+        provenance: contract identity.yaml GET /auth/session
       - kind: secondaryButton
-        label: Select role
+        label: Choose role
         operation: selectRole
+        notes: Only when sign-in returns several roles (ADR-0003; F61 step 1). One role goes straight
+          to confirming the access point (SCN-002).
         provenance: contract identity.yaml POST /auth/select-role
-      - kind: secondaryButton
-        label: Resolve permissions
-        operation: resolvePermissions
-        provenance: contract identity.yaml POST /permissions/resolve
+      - kind: textField
+        label: New PIN
+        operation: changeOwnCredential
+        notes: Only when the PIN was reset and is temporary (audit R132).
+        provenance: contract identity.yaml POST /auth/credential
   states:
-    loading: The sign list.
-    error: Could not load. Names which read failed and leaves the sign untouched.
-    emptyFirstRun: No sign yet. **Offers no create action** — this screen declares no operation that makes
-      one — and says so rather than showing an empty table.
-    emptyNoResults: 'Never shown: `listMfaMethods` takes no filter, so an empty list is always the first-run
-      state above.'
-    emptyNoAccess: Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires, and names
-      that permission. **Never an empty table** — that reads as *there is no data* and sends somebody
-      to support with the wrong question.
+    loading: Checking the credential. The form stays visible and disabled.
+    emptyFirstRun: '**Nobody signed in** - the normal state of a door. A scanner between shifts shows
+      the keypad and a badge prompt.'
+    error: Identity could not be reached. **Says so rather than saying the password is wrong**, and keeps
+      what was typed.
+    denied: The credential does not match, or the account is locked. One message for both, with the attempts
+      left before the lock; a locked account says when to try again.
+    emptyNoAccess: Signed in, and the person holds no role in this app. Says who at the tenant grants
+      access; distinct from a wrong password. A door has no permission of its own to name, because the
+      person is not signed in until it succeeds.
+    sessionHeld: '`login` answered 409: this person already holds a session elsewhere (audit R184, ADR-0004).
+      Says where and since when; only a holder of SESSION_FORCE_LOGOUT ends it, on the staff directory
+      (BO-053), and signing in never ends it by itself.'
     mfaRequired: '**Signed in, not yet through.** The principal holds a permission that requires MFA (ROLE_MANAGE,
-      LEDGER_APPROVE, any platform-staff permission, or one the tenant added), so after `login` the screen
-      calls `createMfaChallenge` and asks for the authenticator code; `verifyMfaChallenge` completes the
-      sign-in. **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy''s
-      lockout minutes and the screen says so. A principal with no enrolled method is sent to enrol first
-      (decided 28 September, audit R135, R126).'
+      LEDGER_APPROVE, any PLATFORM_* permission, or one the tenant added), so the screen calls `createMfaChallenge`
+      (`action: signIn`) and asks for the authentication code; `verifyMfaChallenge` completes the sign-in.
+      **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy''s lockout
+      minutes and the screen says until when (audit R135, R126). A person without such a permission never
+      reaches this state.'
     offline: '**Signs in against the cached principal list from the last bundle.** A steward locked out
-      at 08:00 because the venue wifi is down is a gate that does not open'
+      at 08:00 because the venue wifi is down is a gate that does not open.'
   apis:
   - operationId: login
     contract: identity
-    purpose: From the flow it appears in
+    purpose: Authenticate at this scanner with PIN or badge; the device sends its workstationId
     trigger: onAction
-  - operationId: getCurrentShift
-    contract: shift
-    purpose: From the flow it appears in
-    trigger: onLoad
-  - operationId: getCurrentSession
-    contract: identity
-    purpose: Current session and effective permissions
-    trigger: onLoad
-  - operationId: listMfaMethods
-    contract: identity
-    purpose: Enrolled MFA methods
-    trigger: onLoad
-  - operationId: listSsoProviders
-    contract: identity
-    purpose: Identity providers configured for this tenant
-    trigger: onLoad
-  - operationId: selectRole
-    contract: identity
-    purpose: Choose a role for a multi-role session
-    trigger: onAction
-    invalidates:
-    - listMfaMethods
-  - operationId: resolvePermissions
-    contract: identity
-    purpose: Simulate a principal's effective permissions
-    trigger: onAction
-    invalidates:
-    - listMfaMethods
   - operationId: createMfaChallenge
     contract: identity
-    purpose: Second factor after login when the principal holds a permission in mfaRequiredForPermissions;
-      action `signIn`, the primary method (authenticator app), or the email method as the fallback (decided
-      28 September, audit R135, R126 (5))
+    purpose: Second factor after sign-in when the principal holds a permission in mfaRequiredForPermissions;
+      action `signIn`, the authenticator app, or the email method as the fallback (audit R135, R126 (5))
     trigger: onAction
   - operationId: verifyMfaChallenge
     contract: identity
     purpose: Completes sign-in with the code; the session is usable only after it. Five wrong codes lock
       step-up (audit R126 (6))
     trigger: onAction
+  - operationId: selectRole
+    contract: identity
+    purpose: Choose which role to work as when sign-in returns more than one (ADR-0003)
+    trigger: onAction
+  - operationId: changeOwnCredential
+    contract: identity
+    purpose: Replace a temporary password or PIN at the first sign-in after a reset (audit R132)
+    trigger: onAction
+  - operationId: getCurrentSession
+    contract: identity
+    purpose: Read the session the sign-in just opened, for the landing
+    trigger: onAction
   entryState:
     params:
-    - name: shiftId
-      from: session
     - name: challengeId
       from: navigation
-    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
-    preloaded:
-    - MfaMethod.id
-    - MfaMethod.kind
-    - MfaMethod.label
-    - MfaMethod.maskedTarget
-    - MfaMethod.isActive
+    coldEntry: '**The only screen of the scanner that needs nothing.** The scanner''s `workstationId`
+      travels in the sign-in request from the device itself (CHG-DOOR-001).'
+  apisNote: 'Declared by hand on 2 October 2026 (CHG-DOOR-003): sign-in by PIN or badge, the second factor,
+    the role prompt, a temporary PIN''s replacement and the session read.'
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P07 Venue Scanner.dc.html#scn-001
-  apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
-  overlays:
-  - id: formLogin
-    component: modal
-    trigger: Login
-    body: '**Collects what `login` sends before it is called.** Required: `username`, `credential`, `workstationId`.
-      Optional: `method`, `deviceFingerprint`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: LoginRequest
-    confirm:
-      label: Login
-      operation: login
-    dismiss:
-      label: Cancel
-      discards:
-      - username
-      - credential
-      - workstationId
-      - method
-      - deviceFingerprint
-    provenance: contract identity.yaml POST /auth/login
-  - id: formSelectRole
-    component: modal
-    trigger: Select role
-    body: '**Collects what `selectRole` sends before it is called.** Required: `roleId`. Dismissing sends
-      nothing; the screen behind is unchanged.'
-    confirm:
-      label: Select role
-      operation: selectRole
-    dismiss:
-      label: Cancel
-      discards:
-      - roleId
-    provenance: contract identity.yaml POST /auth/select-role
-  - id: formResolvePermissions
-    component: modal
-    trigger: Resolve permissions
-    body: '**Collects what `resolvePermissions` sends before it is called.** Required: `principalId`,
-      `roleId`. Optional: `atScopePath`. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Resolve permissions
-      operation: resolvePermissions
-    dismiss:
-      label: Cancel
-      discards:
-      - principalId
-      - roleId
-      - atScopePath
-    provenance: contract identity.yaml POST /permissions/resolve
 - id: SCN-002
   name: Access point & direction
   module: Access

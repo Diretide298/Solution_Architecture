@@ -9981,8 +9981,8 @@ screens:
     screens named that set and shared no destination**, because the destination they share is this one.'
   density: touchLarge
   pattern: dashboard
-  patternReason: '`getCurrentShift` reads the one thing that is true right now and the tiles read counts
-    — a dashboard, not a list'
+  patternReason: '`getWorkstationShift` reads the one thing that is true right now and the tiles read
+    counts — a dashboard, not a list'
   purpose: The surface a cashier lands on after opening a shift, and the one they return to between sales.
   layout:
     template: split
@@ -9993,6 +9993,11 @@ screens:
       - kind: metricTile
         label: Shift takings so far
         bindsTo: Shift
+        operation: getWorkstationShift
+        notes: Whose shift, since when and its takings where the role may see figures (DI-802); counts
+          only otherwise. Read with `getWorkstationShift` under REPORT_VIEW_WORKSTATION, not `getCurrentShift`
+          (SHIFT_OPEN), so a supervisor covering the till without a shift of their own loads the home
+          (CHG-DOOR-005). A 404 `no-current-shift` is the no-shift state, not an error.
       - kind: metricTile
         label: Open holds
         bindsTo: Order
@@ -10019,9 +10024,10 @@ screens:
     denied: Names the permission the operator does not hold and who at this venue does. **Never a disabled
       tile with no explanation** — that reads as a broken till.
   apis:
-  - operationId: getCurrentShift
+  - operationId: getWorkstationShift
     contract: shift
-    purpose: Whose shift this is and when it opened
+    purpose: Whose shift this is and when it opened, read under a view permission so a supervisor covering
+      the till can load the home (CHG-DOOR-005)
     trigger: onLoad
   - operationId: listSaleBoards
     contract: tenancy

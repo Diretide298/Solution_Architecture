@@ -657,12 +657,9 @@ paths:
         - "P04 POS-007 Close Shift"
         - "P04 POS-009 Staff Roster"
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
-        - "P04 POS-025 Till Home"
-        - "P06 EMP-003 Home — on duty"
         - "P06 EMP-008 Shift summary"
         - "P06 EMP-009 End shift"
         - "P06 EMP-022 My rota"
-        - "P07 SCN-001 Sign in"
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
       x-ticvai-audience: [staff]
@@ -683,6 +680,50 @@ paths:
           description: >
             No shift open or suspended on this workstation, or the session has no workstation
             (problem type `no-current-shift`)
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /shifts/current/overview:
+    get:
+      operationId: getWorkstationShift
+      x-ticvai-consumed-by:
+        - "P04 POS-025 Till Home"
+        - "P06 EMP-003 Home — on duty"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: primary   # the till home shows the live shift, not a replica's
+      summary: Read the open or suspended shift on the session's workstation, without the right to open one
+      description: >
+        **A read needs a view permission, not the right to open a shift** (CHG-DOOR-005, Chinmay,
+        2 October 2026: fix the Block A blockers now; platform-foundation process notes, correction on
+        POS-025). `getCurrentShift` declares SHIFT_OPEN, so a supervisor covering a till who holds no
+        shift of their own could not load the till home (POS-025) at all. This is the same answer for
+        a person who may only look: the shift on the session's workstation under
+        REPORT_VIEW_WORKSTATION, the permission `getShift` and `listShifts` already use to read a shift.
+        `getCurrentShift` keeps SHIFT_OPEN unchanged for the screens that act on the shift (begin,
+        close), so nothing built against r1 changes. The response is the same `Shift`; what a role may
+        see of the figures is decided on the screen (DI-802), not by a second shape.
+      tags: [shift]
+      x-ticvai-permission: REPORT_VIEW_WORKSTATION
+      x-ticvai-scope-level: workstation
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The open or suspended shift on this workstation
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Shift' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404':
+          description: >
+            No shift open or suspended on this workstation, or the session has no workstation
+            (problem type `no-current-shift`). On the till home this is the "no shift open" state,
+            not an error.
+          x-ticvai-problem-types:
+          - no-current-shift
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }

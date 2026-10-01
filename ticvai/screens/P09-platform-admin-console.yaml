@@ -87,277 +87,183 @@ screens:
     - to: PTR-001
       trigger: A partner user signs in through the same door
       provenance: flow F104 step 3→4
+      operation: getCurrentSession
       crossesDevice: true
       back: false
       carries:
       - challengeId
-  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+      - methodId
+      - providerId
+  notes: '**Rebuilt as a sign-in form on 2 October 2026 (CHG-DOOR-002/003; Chinmay, 2 October 2026: fix
+    the Block A blockers now).** It was generated as a list over active sessions, MFA methods and SSO
+    providers with Force logout and Revoke all sessions on the door, which a person who is not yet signed
+    in can never use (platform-foundation process notes). The sequence is the same on every staff and
+    partner door: credentials (or the organisation''s SSO) -> the authentication code only when a permission
+    demands it (R135) -> the role prompt when several roles are held (ADR-0003) -> the landing. Managing
+    sessions moved to the staff directory (BO-053); managing MFA methods stays on each app''s own security
+    or profile screen. **Every platform operator holds a PLATFORM_* permission, so the code is always
+    asked** and the first sign-in always enrols (F104). Platform operators'' sessions are not listed here:
+    a session list on the Console would call tenant-permission operations with no platform-staff grant
+    (R098).'
   density: compact
-  pattern: listDetail
-  patternReason: '`listActiveSessions` reads the population and `getCurrentSession` reads one of them
-    — list, select, act'
-  purpose: Get someone into the app, fast, on a device that may be shared.
+  pattern: form
+  patternReason: 'A sign-in: two fields, the organisation''s SSO where configured, and the second-factor
+    and role steps in place - a form, not a list to browse.'
+  purpose: 'Get a TICVAI platform operator into the TICVAI Console: username and password (or TICVAI''s
+    own SSO), then always the authentication code, then the Platform Dashboard.'
   layout:
-    template: split
+    template: form
     regions:
     - name: contentBody
-      slot: collection
+      slot: form
       components:
       - kind: textField
-        label: Venue id
-        operation: listActiveSessions
-        notes: Sends `?venueId=` to `listActiveSessions`.
-        provenance: contract identity.yaml GET /auth/sessions
+        label: Username
+        notes: Goes into `LoginRequest.username`.
       - kind: textField
-        label: Principal id
-        operation: listActiveSessions
-        notes: Sends `?principalId=` to `listActiveSessions`.
-        provenance: contract identity.yaml GET /auth/sessions
-      - kind: textField
-        label: Workstation id
-        operation: listActiveSessions
-        notes: Sends `?workstationId=` to `listActiveSessions`.
-        provenance: contract identity.yaml GET /auth/sessions
-      - kind: dataTable
-        label: Every active session
-        bindsTo: ActiveSession
-        columns:
-        - ActiveSession.sessionId
-        - ActiveSession.principalId
-        - ActiveSession.principalName
-        - ActiveSession.roleId
-        - ActiveSession.roleName
-        - ActiveSession.workstationId
-        - ActiveSession.workstationName
-        - ActiveSession.venueId
-        - ActiveSession.ipAddress
-        - ActiveSession.deviceInfo
-        - ActiveSession.hasOpenShift
-        - ActiveSession.mfaSatisfied
-        operation: listActiveSessions
-        provenance: contract identity.yaml GET /auth/sessions
-      - kind: dataTable
-        label: Every MFA method
-        bindsTo: MfaMethod
-        columns:
-        - MfaMethod.id
-        - MfaMethod.kind
-        - MfaMethod.label
-        - MfaMethod.maskedTarget
-        - MfaMethod.isActive
-        - MfaMethod.isPrimary
-        - MfaMethod.enrolledAt
-        - MfaMethod.lastUsedAt
-        operation: listMfaMethods
-        provenance: contract identity.yaml GET /auth/mfa/methods
-      - kind: dataTable
-        label: Every SSO provider
+        label: Password
+        notes: 'Goes into `LoginRequest.credential` with `method: password`. Minimum 8, show/hide. **No
+          workstation is sent: a browser is not a registered device** (CHG-DOOR-001), and no PIN is offered,
+          because a PIN is bounded by a device this door does not have.'
+      - kind: primaryButton
+        label: Sign in
+        operation: login
+        notes: 'Sends `LoginRequest`. 409 means this person already holds a session elsewhere (audit R184):
+          the screen says where and since when, and that only a holder of SESSION_FORCE_LOGOUT can end
+          it; signing in never ends the other session.'
+        provenance: contract identity.yaml POST /auth/login
+      - kind: cardList
+        label: Sign in with your organisation
         bindsTo: SsoProvider
         columns:
-        - SsoProvider.id
         - SsoProvider.displayName
         - SsoProvider.protocol
-        - SsoProvider.iconAssetRef
         - SsoProvider.isEnforced
-        - SsoProvider.scopePath
         operation: listSsoProviders
+        notes: One button per identity provider TICVAI uses for its own staff; **absent, not disabled,
+          when there is none.** Read before sign-in, unauthenticated. When a provider `isEnforced` for
+          this person, the password field is hidden and only this remains.
         provenance: contract identity.yaml GET /auth/sso/providers
-    - name: contextPanel
-      slot: selection
+      - kind: secondaryButton
+        label: Continue with your organisation
+        operation: startSsoAuthorization
+        notes: Hands off to the identity provider with this door's `redirectUri`; nothing is typed here.
+          Staff and partner doors only, never a guest door (audit R167).
+        provenance: contract identity.yaml GET /auth/sso/{providerId}/authorize
+      - kind: progressIndicator
+        label: Finishing sign-in with your organisation
+        operation: completeSsoAuthorization
+        notes: 'On the provider''s redirect back (`code` and `state` from the redirect, never typed).
+          Returns the same `LoginResponse` as `login`, so the second factor and the role prompt follow
+          exactly as below. 403: the provider proved who this is and no group maps to a role in this tenant,
+          which grants nothing.'
+        provenance: contract identity.yaml POST /auth/sso/{providerId}/callback
+    - name: secondFactor
+      slot: form
       components:
-      - kind: detailPanel
-        label: The selected active session
-        bindsTo: ActiveSession
-        columns:
-        - ActiveSession.status
-        - ActiveSession.sessionId
-        - ActiveSession.principalId
-        - ActiveSession.principalName
-        - ActiveSession.roleId
-        - ActiveSession.roleName
-        - ActiveSession.workstationId
-        - ActiveSession.workstationName
-        - ActiveSession.venueId
-        - ActiveSession.ipAddress
-        - ActiveSession.deviceInfo
-        - ActiveSession.hasOpenShift
-        - ActiveSession.mfaSatisfied
-        - ActiveSession.startedAt
-        - ActiveSession.lastSeenAt
-        operation: listActiveSessions
-        provenance: contract identity.yaml GET /auth/sessions
-      - kind: detailPanel
-        label: The session
-        bindsTo: Session
-        columns:
-        - Session.sessionId
-        - Session.principalId
-        - Session.roleId
-        - Session.displayName
-        - Session.scope
-        - Session.effectivePermissions
-        - Session.permissionsByScope
-        - Session.saleBoardId
-        - Session.workstation
-        - Session.openedAt
-        - Session.expiresAt
-        operation: getCurrentSession
-        provenance: contract identity.yaml GET /auth/session
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Login
-        operation: login
-        provenance: contract identity.yaml POST /auth/login
       - kind: textField
         label: Authentication code
         operation: verifyMfaChallenge
-        notes: Shown only in the mfaRequired state, after `login`, for the authenticator-app code or the
-          emailed code (decided 28 September, audit R135, R126 (5)).
+        notes: 'Shown only when the sign-in comes back `requiresMfa`: the person holds a permission in
+          `PasswordPolicy.mfaRequiredForPermissions` (ROLE_MANAGE, LEDGER_APPROVE, every PLATFORM_* permission,
+          or one the tenant added; audit R135). Six digits from the authenticator app.'
         provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
       - kind: primaryButton
         label: Verify
         operation: verifyMfaChallenge
-        notes: Completes sign-in; the session is usable only after it. Five wrong codes lock step-up (429
-          step-up-locked, audit R126 (6)).
+        notes: Completes the sign-in; the session is usable only after it. Five wrong codes lock step-up
+          for the policy's lockout minutes, never permanently (audit R126 (6)), and the screen says until
+          when.
         provenance: contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify
       - kind: secondaryButton
         label: Email me a code instead
         operation: createMfaChallenge
-        notes: 'The fallback: a new challenge with the email method (`emailOtp`) instead of the authenticator
-          app (decided 28 September, audit R126 (5)).'
+        notes: '`action: signIn`. The authenticator app is the primary method and an emailed code the
+          fallback (audit R126 (5)).'
         provenance: contract identity.yaml POST /auth/mfa/challenge
       - kind: secondaryButton
-        label: Enrol MFA method
+        label: Set up the authenticator app
         operation: enrolMfaMethod
-        notes: '**A platform operator must hold a method to sign in** — every platform-staff permission
-          is in the MFA floor (decided 28 September, audit R135). On a first sign-in with no method enrolled,
-          the screen goes to enrolment before anything else. The kind picker offers only the authenticator
-          app (`totp`) and email (`emailOtp`); any other kind is refused 422 mfa-kind-not-allowed (audit
-          R126 (5)).'
+        notes: 'Only when the sign-in comes back `requiresMfa` with `hasMfaMethod: false`: the first method
+          is enrolled here before anything else (audit R135). Authenticator app (`totp`) or email (`emailOtp`)
+          only; the secret as QR and text.'
         provenance: contract identity.yaml POST /auth/mfa/methods
-      - kind: secondaryButton
-        label: Confirm enrolment
+      - kind: credentialDisplay
+        label: Recovery codes
         operation: verifyMfaEnrolment
-        notes: The method is not active until the first code is verified. Recovery codes are shown once,
-          from the enrolment response, and never again.
+        notes: The method is active once its first code is verified. Recovery codes are shown once, with
+          copy and download, and never again.
         provenance: contract identity.yaml POST /auth/mfa/methods/{methodId}
-      - kind: destructiveButton
-        label: Remove MFA method
-        operation: removeMfaMethod
-        notes: Removing the last active method is refused 409 while the principal holds a permission that
-          requires MFA — for platform staff, always (decided 28 September, audit R135).
-        provenance: contract identity.yaml DELETE /auth/mfa/methods/{methodId}
-      - kind: destructiveButton
-        label: Force logout
-        operation: forceLogout
-        provenance: contract identity.yaml POST /auth/sessions/{sessionId}/force-logout
-      - kind: destructiveButton
-        label: Revoke all sessions
-        operation: revokeAllSessions
-        provenance: contract identity.yaml POST /auth/sessions/revoke-all
-  overlays:
-  - id: formEnrolMfaMethod
-    component: modal
-    trigger: Enrol MFA method
-    body: '**Collects what `enrolMfaMethod` sends before it is called.** Required: `kind` — the authenticator
-      app (`totp`) or email (`emailOtp`) only (decided 28 September, audit R126 (5)). Optional: `target`
-      (the email address for `emailOtp`). The response carries the secret or QR for the app and the recovery
-      codes, shown once. Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Enrol
-      operation: enrolMfaMethod
-    dismiss:
-      label: Cancel
-      discards:
-      - kind
-      - target
-    provenance: contract identity.yaml POST /auth/mfa/methods
-  - id: formVerifyMfaEnrolment
-    component: modal
-    trigger: Confirm enrolment
-    body: '**Collects what `verifyMfaEnrolment` sends before it is called.** Required: `code`, the first
-      code from the new method. The method is active only after this. Dismissing sends nothing; the method
-      stays pending.'
-    confirm:
-      label: Confirm enrolment
-      operation: verifyMfaEnrolment
-    dismiss:
-      label: Cancel
-      discards:
-      - code
-    provenance: contract identity.yaml POST /auth/mfa/methods/{methodId}
-  - id: confirmRemoveMfaMethod
-    component: confirmDialog
-    trigger: Remove MFA method
-    body: '**Names the method being removed and what remains.** Removing the last active method is refused
-      409 while the principal holds a permission that requires MFA (decided 28 September, audit R135);
-      the dialog says so before it is sent rather than after.'
-    confirm:
-      label: Remove
-      operation: removeMfaMethod
-    provenance: contract identity.yaml DELETE /auth/mfa/methods/{methodId}
-  - id: confirmForceLogout
-    component: confirmDialog
-    trigger: Force logout
-    body: '**Names what `forceLogout` changes and what it leaves alone**, in the consequence rather than
-      the verb. A platform login mfa this affects should be identified in the dialog, not just counted.
-      **Collects what `forceLogout` sends before it is called.** Required: `reason`.'
-    provenance: contract identity.yaml POST /auth/sessions/{sessionId}/force-logout
-  - id: confirmRevokeAllSessions
-    component: confirmDialog
-    trigger: Revoke all sessions
-    body: '**Names what `revokeAllSessions` changes and what it leaves alone**, in the consequence rather
-      than the verb. A platform login mfa this affects should be identified in the dialog, not just counted.
-      **Collects what `revokeAllSessions` sends before it is called.** Required: `reason`, `stepUpToken`.
-      Optional: `venueId`, `excludeSelf`.'
-    provenance: contract identity.yaml POST /auth/sessions/revoke-all
-  - id: formLogin
-    component: modal
-    trigger: Login
-    body: '**Collects what `login` sends before it is called.** Required: `username`, `credential`, `workstationId`.
-      Optional: `method`, `deviceFingerprint`. Dismissing sends nothing; the screen behind is unchanged.'
-    bindsTo: LoginRequest
-    confirm:
-      label: Login
-      operation: login
-    dismiss:
-      label: Cancel
-      discards:
-      - username
-      - credential
-      - workstationId
-      - method
-      - deviceFingerprint
-    provenance: contract identity.yaml POST /auth/login
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: banner
+        label: Signed in as
+        operation: getCurrentSession
+        notes: 'Read once the sign-in is complete (after the code and the role, where asked): the person''s
+          name and role, then straight on. A platform operator lands on the Platform Dashboard (ADM-002).'
+        provenance: contract identity.yaml GET /auth/session
+      - kind: secondaryButton
+        label: Choose role
+        operation: selectRole
+        notes: 'Only when `LoginResponse.requiresRoleSelection` is true: large role buttons, one per role
+          the person holds (ADR-0003). One role goes straight in. A platform operator lands on the Platform
+          Dashboard (ADM-002).'
+        provenance: contract identity.yaml POST /auth/select-role
+      - kind: textField
+        label: New password
+        operation: changeOwnCredential
+        notes: 'Only when the credential was reset and is temporary: a new one is set before anything
+          else, twice, and the last five cannot be reused (audit R132).'
+        provenance: contract identity.yaml POST /auth/credential
   states:
-    loading: The platform login mfa list.
-    error: Could not load. Names which read failed and leaves the platform login mfa untouched.
-    emptyFirstRun: No platform login mfa yet. **Offers no create action** — this screen declares no operation
-      that makes one — and says so rather than showing an empty table.
-    emptyNoResults: Nothing matches the filter on venueId, principalId, workstationId and the platform
-      login mfa are still there. Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `SESSION_FORCE_LOGOUT`, which `listActiveSessions` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
-      somebody to support with the wrong question.
+    loading: Checking the credential. The form stays visible and disabled.
+    emptyFirstRun: '**Nobody signed in** - the normal state of a door. The form offers username and password
+      and, where TICVAI uses one, its SSO.'
+    error: Identity could not be reached. **Says so rather than saying the password is wrong**, and keeps
+      what was typed.
+    denied: The credential does not match, or the account is locked. One message for both, with the attempts
+      left before the lock; a locked account says when to try again.
+    emptyNoAccess: Signed in, and the person holds no role in this app. Says who at the tenant grants
+      access; distinct from a wrong password. A door has no permission of its own to name, because the
+      person is not signed in until it succeeds.
+    emptyNoResults: 'Never shown: `listSsoProviders` takes no filter; a tenant with no identity provider shows
+      no SSO buttons at all, and the form is the whole door.'
+    sessionHeld: '`login` answered 409: this person already holds a session elsewhere (audit R184, ADR-0004).
+      Says where and since when; only a holder of SESSION_FORCE_LOGOUT ends it, on the staff directory
+      (BO-053), and signing in never ends it by itself.'
     mfaRequired: '**Signed in, not yet through.** The principal holds a permission that requires MFA (ROLE_MANAGE,
-      LEDGER_APPROVE, any platform-staff permission, or one the tenant added), so after `login` the screen
-      calls `createMfaChallenge` and asks for the authenticator code; `verifyMfaChallenge` completes the
-      sign-in. **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy''s
-      lockout minutes and the screen says so. A principal with no enrolled method is sent to enrol first
-      (decided 28 September, audit R135, R126).'
-    mfaEnrolmentRequired: '**First sign-in, no method yet.** A platform operator always requires MFA (every
-      `PLATFORM_*` permission is in the floor), so one with no enrolled method cannot finish signing in:
-      the screen enrols the authenticator app (`enrolMfaMethod`, email as the fallback), confirms it with
-      the first code (`verifyMfaEnrolment`), then continues to the mfaRequired step (decided 28 September,
-      audit R135, R126 (5)).'
+      LEDGER_APPROVE, any PLATFORM_* permission, or one the tenant added), so the screen calls `createMfaChallenge`
+      (`action: signIn`) and asks for the authentication code; `verifyMfaChallenge` completes the sign-in.
+      **Email me a code instead** is the fallback. Five wrong codes lock step-up for the policy''s lockout
+      minutes and the screen says until when (audit R135, R126). A person without such a permission never
+      reaches this state.'
+    mfaEnrolmentRequired: '**First sign-in, no method yet.** A person who requires MFA and has no active
+      method enrols the authenticator app (email as the fallback) with `enrolMfaMethod`, confirms it with
+      the first code (`verifyMfaEnrolment`), sees the recovery codes once, then continues to the code
+      step (audit R135, R126 (5)).'
+    offline: 'Not available, and the offline banner says why: signing in needs a connection.'
   apis:
+  - operationId: login
+    contract: identity
+    purpose: Authenticate from a browser, with no workstation (CHG-DOOR-001)
+    trigger: onAction
+  - operationId: listSsoProviders
+    contract: identity
+    purpose: Which identity providers this door offers; unauthenticated, read before sign-in
+    trigger: onLoad
+  - operationId: startSsoAuthorization
+    contract: identity
+    purpose: Hand off to the identity provider where the tenant has SSO
+    trigger: onAction
+  - operationId: completeSsoAuthorization
+    contract: identity
+    purpose: Exchange the provider's code for the same LoginResponse as login, on the redirect back
+    trigger: background
   - operationId: createMfaChallenge
     contract: identity
-    purpose: Second factor after login when the principal holds a permission in mfaRequiredForPermissions;
-      action `signIn`, the primary method (authenticator app), or the email method as the fallback (decided
-      28 September, audit R135, R126 (5))
+    purpose: Second factor after sign-in when the principal holds a permission in mfaRequiredForPermissions;
+      action `signIn`, the authenticator app, or the email method as the fallback (audit R135, R126 (5))
     trigger: onAction
   - operationId: verifyMfaChallenge
     contract: identity
@@ -366,75 +272,45 @@ screens:
     trigger: onAction
   - operationId: enrolMfaMethod
     contract: identity
-    purpose: A platform operator's first method, at first sign-in — authenticator app, or email as the
-      fallback (decided 28 September, audit R135, R126 (5))
+    purpose: 'The first method, at a first sign-in that requires one: authenticator app, or email as the
+      fallback (audit R135, R126 (5))'
     trigger: onAction
-    invalidates:
-    - listMfaMethods
   - operationId: verifyMfaEnrolment
     contract: identity
-    purpose: Activates the enrolled method with its first code
+    purpose: Activates the enrolled method with its first code; recovery codes shown once
     trigger: onAction
-    invalidates:
-    - listMfaMethods
-  - operationId: removeMfaMethod
+  - operationId: selectRole
     contract: identity
-    purpose: Remove a method; the last one is refused 409 while a listed permission is held (audit R135)
+    purpose: Choose which role to work as when sign-in returns more than one (ADR-0003)
     trigger: onAction
-    invalidates:
-    - listMfaMethods
-  - operationId: login
+  - operationId: changeOwnCredential
     contract: identity
-    purpose: from page inventory
+    purpose: Replace a temporary password or PIN at the first sign-in after a reset (audit R132)
     trigger: onAction
-  - operationId: forceLogout
-    contract: identity
-    purpose: Supervisor termination of an abandoned session
-    trigger: onAction
-    invalidates:
-    - listActiveSessions
   - operationId: getCurrentSession
     contract: identity
-    purpose: Current session and effective permissions
-    trigger: onLoad
-  - operationId: listActiveSessions
-    contract: identity
-    purpose: List active sessions
-    trigger: onLoad
-  - operationId: listMfaMethods
-    contract: identity
-    purpose: Enrolled MFA methods
-    trigger: onLoad
-  - operationId: listSsoProviders
-    contract: identity
-    purpose: Identity providers configured for this tenant
-    trigger: onLoad
-  - operationId: revokeAllSessions
-    contract: identity
-    purpose: Revoke every session in scope
+    purpose: Read the session the sign-in just opened, for the landing
     trigger: onAction
-    invalidates:
-    - listActiveSessions
   entryState:
     params:
     - name: challengeId
       from: navigation
+    - name: providerId
+      from: deepLink
+      optional: true
     - name: methodId
       from: navigation
-    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
-    preloaded:
-    - ActiveSession.status
-    - ActiveSession.sessionId
-    - ActiveSession.principalId
-    - ActiveSession.principalName
-    - ActiveSession.roleId
+    coldEntry: '**Needs nothing; that is what makes it the door.** No workstation travels with a browser
+      sign-in (CHG-DOOR-001). `providerId` arrives only on the identity provider''s redirect back, with
+      the `code` and `state` that `completeSsoAuthorization` exchanges; an expired or replayed redirect
+      lands on the form with "That sign-in link has expired; sign in again".'
+  apisNote: 'Declared by hand on 2 October 2026 (CHG-DOOR-002/003): sign-in, SSO, the second factor and
+    its first enrolment, the role prompt, a temporary credential''s replacement and the session read for
+    the landing. Nothing that needs a signed-in session to list or end sessions is here.'
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-001
-  apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
 - id: ADM-002
   name: Platform Dashboard
   module: Overview & Health
@@ -834,9 +710,9 @@ screens:
         so the edge carries nothing and ADM-158 opens cold
     - to: ADM-318
       trigger: Dead Letters
-      provenance: 'derived — ADM-318 declares entryState.params deadLetterId and ADM-002 holds none of
-        them. The edge carries nothing: deadLetterId only pre-selects (deep link or optional), and ADM-318
-        opens on its own'
+      provenance: 'derived — ADM-318 declares entryState.params deadLetterId, republishId and ADM-002
+        holds none of them. The edge carries nothing: deadLetterId only pre-selects (deep link or optional);
+        ADM-318 finds republishId (listOutboxRepublishes) itself, and ADM-318 opens on its own'
     - to: ADM-024
       trigger: Release Notification Composer
       provenance: structural — ADM-002 is P09's home screen and its exits are its launcher
@@ -1162,9 +1038,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-003 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-003 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-003 holds none of them. The edge
@@ -1522,9 +1399,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-004 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-004 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-004 holds none of them. The edge
@@ -1675,9 +1553,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-005 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-005 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-005 holds none of them. The edge
@@ -2191,9 +2070,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-006 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-006 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-006 holds none of them. The edge
@@ -2511,9 +2391,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-007 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-007 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-007 holds none of them. The edge
@@ -2835,9 +2716,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-008 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-008 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-008 holds none of them. The edge
@@ -3407,9 +3289,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-009 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-009 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-009 holds none of them. The edge
@@ -3710,9 +3593,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-010 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-010 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-010 holds none of them. The edge
@@ -3952,9 +3836,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-011 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-011 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-011 holds none of them. The edge
@@ -4318,9 +4203,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-012 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-012 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-012 holds none of them. The edge
@@ -4610,9 +4496,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-013 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-013 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-013 holds none of them. The edge
@@ -4859,9 +4746,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-014 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-014 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-014 holds none of them. The edge
@@ -5120,9 +5008,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-015 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-015 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-015 holds none of them. The edge
@@ -5537,9 +5426,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-016 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-016 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-016 holds none of them. The edge
@@ -5947,9 +5837,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-017 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-017 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-017 holds none of them. The edge
@@ -6200,9 +6091,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-018 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-018 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-018 holds none of them. The edge
@@ -6472,9 +6364,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-019 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-019 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-019 holds none of them. The edge
@@ -6800,9 +6693,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-020 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-020 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-020 holds none of them. The edge
@@ -6982,9 +6876,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-021 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-021 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-021 holds none of them. The edge
@@ -7116,9 +7011,10 @@ screens:
       provenance: flow F04 step 1→2
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-022 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-022 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-022 holds none of them. The edge
@@ -7378,9 +7274,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-023 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-023 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-023 holds none of them. The edge
@@ -7636,9 +7533,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-024 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-024 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-024 holds none of them. The edge
@@ -7816,9 +7714,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-025 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-025 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-025 holds none of them. The edge
@@ -7950,9 +7849,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-026 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-026 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-026 holds none of them. The edge
@@ -8136,9 +8036,10 @@ screens:
       operation: planMigration
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-027 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-027 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-027 holds none of them. The edge
@@ -8374,9 +8275,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-028 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-028 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-028 holds none of them. The edge
@@ -8512,9 +8414,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-029 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-029 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-029 holds none of them. The edge
@@ -8880,9 +8783,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-030 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-030 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-030 holds none of them. The edge
@@ -9174,9 +9078,10 @@ screens:
       provenance: flow F106 step 1→2
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-031 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-031 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-031 holds none of them. The edge
@@ -9445,9 +9350,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-032 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-032 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-032 holds none of them. The edge
@@ -9738,9 +9644,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-033 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-033 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-033 holds none of them. The edge
@@ -9999,9 +9906,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-034 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-034 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-034 holds none of them. The edge
@@ -10260,9 +10168,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-035 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-035 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-035 holds none of them. The edge
@@ -10408,9 +10317,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-036 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-036 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
     - to: ADM-002
       trigger: Platform Dashboard
       provenance: 'derived — ADM-002 declares entryState.params  and ADM-036 holds none of them. The edge
@@ -10616,9 +10526,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-037 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      carries:
+      - providerId
+      provenance: derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-037
+        holds providerId, so an edge into it carries them
     - to: BO-091
       trigger: AI Policy & Spend
       provenance: flow F100 step 1→2
@@ -46054,9 +45965,10 @@ screens:
     transitions:
     - to: ADM-001
       trigger: Platform Login / MFA
-      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId and ADM-318 holds
-        none of them. The edge carries nothing: ADM-001 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and ADM-001 opens on its own'
+      provenance: 'derived — ADM-001 declares entryState.params challengeId, methodId, providerId and
+        ADM-318 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or
+        optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and
+        ADM-001 opens on its own'
   notes: 'Added 4 September. **47 consumers declare `retryThenDeadLetter` and all 47 are marked `isCritical`,
     and until this screen existed nothing in the package read the table they land in.** Deliberately not
     DEV-005 Webhooks: `replayEvents` is partner-facing redelivery of a customer''s own integration, and

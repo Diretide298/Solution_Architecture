@@ -1,0 +1,48 @@
+id: CHG-DOOR-002
+date: '2026-10-02'
+source: audit
+kind: spec
+summary: The SSO sign-in (listSsoProviders, startSsoAuthorization, completeSsoAuthorization) is wired into the staff
+  and partner web doors ADM-001, SUP-001 and PTR-001, and into the staff handheld door EMP-001.
+decision:
+  what: Every browser staff or partner door offers the tenant's identity providers (absent, not disabled, when there
+    are none; only SSO when a provider is enforced), hands off with startSsoAuthorization and finishes on the redirect
+    with completeSsoAuthorization, which returns the same LoginResponse, so the second factor and the role prompt
+    follow as for a password. Guest doors never offer SSO (R167). (Chinmay, 2 Oct 2026, fix the Block A blockers now.)
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Platform-foundation process finding (corrections on ADM-001 and SUP-001): "startSsoAuthorization and
+  completeSsoAuthorization exist but are not declared on any staff door ... listSsoProviders is declared and nothing
+  uses the provider to sign in." EMP-001''s notes ask for "SSO where the venue uses it" (F64 step 1).'
+keys_touched:
+  operations:
+  - listSsoProviders
+  - startSsoAuthorization
+  - completeSsoAuthorization
+  screens:
+  - ADM-001
+  - SUP-001
+  - PTR-001
+  - EMP-001
+  flows:
+  - F64
+root_class: 'new: door-cannot-open'
+tickets:
+  started: []
+  unstarted:
+  - 'SVC-IDENTITY-SSO-1 (#17788)'
+  - SVC-IDENTITY-SSO-2
+  - APP-CONSOLE-ADM-001
+  - APP-SUPPORT-SUP-001
+  - APP-PARTNER-PTR-001
+  - APP-STAFF-EMP-001
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-doors.py
+  reason: D-DOOR-SSO fails on a browser staff or partner door without the three SSO operations.
+status: closed
+closed_by_commit: 6149ce92
+notes: On the parent commit 12d3f888 D-DOOR-SSO finds 3 doors; none on this branch. No contract change; the SSO
+  operations already existed.

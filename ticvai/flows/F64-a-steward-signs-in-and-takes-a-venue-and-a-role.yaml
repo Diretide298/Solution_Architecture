@@ -25,7 +25,8 @@ steps:
   operations:
   - login
   - listSsoProviders
-  - listMfaMethods
+  - startSsoAuthorization
+  - verifyMfaChallenge
   outcome: '**SSO where the venue uses it, MFA where the role demands it.** A gate steward and a finance
     controller do not need the same ceremony.'
 - step: 2
@@ -45,7 +46,7 @@ steps:
   screen: EMP-003
   action: They go on duty.
   operations:
-  - getCurrentShift
+  - getWorkstationShift
   - listIncidents
   outcome: '**Open incidents surface before anything else.** A steward starting a shift needs yesterday’s
     unresolved problem before today’s first task.'

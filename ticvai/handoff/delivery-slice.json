@@ -265,7 +265,7 @@
    "total": 264
   },
   "OrderService": {
-   "core": 81,
+   "core": 82,
    "setup": 7,
    "total": 289
   },
@@ -874,7 +874,12 @@
     "POS"
    ],
    "screens": [
-    "POS-000"
+    "ADM-001",
+    "EMP-001",
+    "POS-000",
+    "PTR-001",
+    "SCN-001",
+    "SUP-001"
    ],
    "enables": []
   },
@@ -2063,6 +2068,7 @@
    ],
    "screens": [
     "ADM-001",
+    "BO-053",
     "EMP-001",
     "GST-042",
     "GST-073",
@@ -3207,6 +3213,8 @@
     "ADM-001",
     "EMP-042",
     "GST-073",
+    "PTR-001",
+    "SUP-001",
     "WEB-024"
    ],
    "enables": []
@@ -3472,10 +3480,8 @@
     "POS"
    ],
    "screens": [
-    "ADM-001",
-    "POS-000",
-    "PTR-001",
-    "SUP-001"
+    "BO-053",
+    "POS-000"
    ],
    "enables": []
   },
@@ -3797,16 +3803,13 @@
    "screens": [
     "BO-039",
     "BO-040",
-    "EMP-003",
     "EMP-008",
     "EMP-009",
     "EMP-022",
     "POS-001",
     "POS-007",
     "POS-009",
-    "POS-012",
-    "POS-025",
-    "SCN-001"
+    "POS-012"
    ],
    "enables": []
   },
@@ -5553,6 +5556,22 @@
    ],
    "enables": []
   },
+  "getWorkstationShift": {
+   "part": "core",
+   "service": "OrderService",
+   "contract": "shift",
+   "verb": "GET",
+   "path": "/shifts/current/overview",
+   "perm": "REPORT_VIEW_WORKSTATION",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "EMP-003",
+    "POS-025"
+   ],
+   "enables": []
+  },
   "grantDelegation": {
    "part": "core",
    "service": "IdentityService",
@@ -6067,10 +6086,8 @@
     "POS"
    ],
    "screens": [
-    "ADM-001",
-    "POS-000",
-    "PTR-001",
-    "SUP-001"
+    "BO-053",
+    "POS-000"
    ],
    "enables": []
   },
@@ -6956,15 +6973,10 @@
     "WEB"
    ],
    "screens": [
-    "ADM-001",
     "ADM-342",
-    "EMP-001",
     "EMP-002",
     "EMP-042",
     "GST-073",
-    "PTR-001",
-    "SCN-001",
-    "SUP-001",
     "WEB-024"
    ],
    "enables": []
@@ -9182,7 +9194,6 @@
     "WEB"
    ],
    "screens": [
-    "ADM-001",
     "EMP-042",
     "GST-073",
     "WEB-024"
@@ -9896,10 +9907,13 @@
     "POS"
    ],
    "screens": [
+    "ADM-001",
     "EMP-002",
     "POS-000",
     "POS-001",
-    "SCN-001"
+    "PTR-001",
+    "SCN-001",
+    "SUP-001"
    ],
    "enables": []
   },
@@ -13037,6 +13051,7 @@
    ],
    "screens": [
     "ADM-001",
+    "BO-053",
     "EMP-001",
     "GST-042",
     "GST-073",
@@ -13063,6 +13078,8 @@
     "ADM-001",
     "EMP-042",
     "GST-073",
+    "PTR-001",
+    "SUP-001",
     "WEB-024"
    ],
    "enables": []

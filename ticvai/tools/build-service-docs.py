@@ -1611,6 +1611,23 @@ def main() -> int:
         for br in fd.get("branches") or []:
             if isinstance(br, dict) and br.get("resolvedBy") in screens:
                 need_screens.add(br["resolvedBy"])
+    # **Block A takes the door of every app it puts a screen in** (CHG-DOOR-004, Chinmay, 2 October 2026: fix
+    # the Block A blockers now). Block A's Venue Management screens (BO-084, BO-085, BO-124 and the setup
+    # screens) were planned with SUP-001, the only way into Venue Management, in Block B: nothing in this
+    # closure reaches a door, because no flow step and no slice operation names it. A screen nobody can sign in
+    # to cannot be tested end to end. So for every screen of Block A -- the closure above and the setup screens
+    # the slice builds -- the door of its own platform comes too, or, where its platform has none (P08, P13,
+    # P16, P14), every door of its shipped app (`platform.targetApp.app`). A door is a screen calling an
+    # operation that opens a session, the same test tools/check-session-entry.py and tools/check-doors.py use.
+    door_ops = {"login", "verifyGuestOtp", "guestSocialLogin", "guestUaePassLogin"}
+    doors_of_plat, doors_of_app = defaultdict(set), defaultdict(set)
+    for sid_, s_ in screens.items():
+        if str(s_.get("wave")) != "4" and set(screen_ops(sid_)) & door_ops:
+            doors_of_plat[plat_of(sid_)].add(sid_)
+            doors_of_app[((s_["_platform"].get("targetApp") or {}).get("app"))].add(sid_)
+    for sid_ in sorted(need_screens | set(setup_screens)):
+        app_ = (screens[sid_]["_platform"].get("targetApp") or {}).get("app")
+        need_screens |= doors_of_plat.get(plat_of(sid_)) or doors_of_app.get(app_) or set()
     for sid in need_screens:
         need_ops |= set(screen_ops(sid))
     for sid in sorted(screens):

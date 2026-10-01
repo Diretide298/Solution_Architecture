@@ -21673,12 +21673,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; resetPrincipalCredential · listPrincipals · getPrincipal · createPrincipal +6</div>
+          <div><b>OPERATIONS</b> &middot; resetPrincipalCredential · listPrincipals · getPrincipal · createPrincipal +11</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; principalId&larr;session</div>
+          <div><b>ARRIVES WITH</b> &middot; principalId&larr;session, challengeId&larr;navigation, sessionId&larr;session</div>
           <div><b>GOES TO</b> &middot; nothing declared</div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmResetPrincipalCredential &middot; <i>Reset principal credential</i></div><div class="ov"><b>modal</b> formCreatePrincipal &middot; <i>Create principal</i> &middot; <b>Create principal</b> &middot; Cancel <span class="dis">discards username · displayName · initialCredential · mustChangeCredential · validTo · roleIds</span></div><div class="ov"><b>modal</b> formUpdatePrincipal &middot; <i>Save principal</i> &middot; <b>Save principal</b> &middot; Cancel <span class="dis">discards displayName · isActive · validTo · primaryRoleId</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmResetPrincipalCredential &middot; <i>Reset principal credential</i></div><div class="ov"><b>modal</b> formCreatePrincipal &middot; <i>Create principal</i> &middot; <b>Create principal</b> &middot; Cancel <span class="dis">discards username · displayName · initialCredential · mustChangeCredential · validTo · roleIds</span></div><div class="ov"><b>modal</b> formUpdatePrincipal &middot; <i>Save principal</i> &middot; <b>Save principal</b> &middot; Cancel <span class="dis">discards displayName · isActive · validTo · primaryRoleId</span></div><div class="ov"><b>confirmDialog</b> confirmForceLogout &middot; <i>End this session</i> &middot; <b>End session</b></div><div class="ov"><b>confirmDialog</b> confirmRevokeAllSessions &middot; <i>Sign everyone out</i> &middot; <b>Sign everyone out</b></div></div>
         </div>
       </div>
       <div id="bo-054" class="scr">

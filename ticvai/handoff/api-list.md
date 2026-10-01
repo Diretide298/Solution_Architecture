@@ -690,7 +690,7 @@ Defines who is asking, and what they may do.
 | POST | `/access-review-campaigns` | `createAccessReviewCampaign` | `PERMISSION_MANAGE` | — | venue-management-web |
 | GET | `/access-review-campaigns/{campaignId}/items` | `listAccessReviewItems` | `PERMISSION_VIEW` | — | venue-management-web |
 | POST | `/access-review-items/{itemId}/decision` | `decideAccessReviewItem` | `PERMISSION_GRANT` | — | venue-management-web |
-| POST | `/auth/credential` | `changeOwnCredential` | `—` | — | venue-pos |
+| POST | `/auth/credential` | `changeOwnCredential` | `—` | — | partner-web, ticvai-web, venue-pos, venue-scanner, venue-staff-app, venue-support-web |
 | DELETE | `/auth/guest/account` | `deleteGuestAccount` | `—` | — | guest-app, guest-web |
 | POST | `/auth/guest/identity-verifications` | `submitGuestIdentityDocument` | `—` | — | guest-app, guest-web |
 | GET | `/auth/guest/identity-verifications/current` | `getMyIdentityVerification` | `—` | — | guest-app, guest-web |
@@ -706,21 +706,21 @@ Defines who is asking, and what they may do.
 | POST | `/auth/guest/verify-email` | `verifyGuestEmail` | `GUEST_VIEW` | — | guest-app, guest-web |
 | POST | `/auth/login` | `login` | `—` | — | partner-web, ticvai-web, venue-pos, venue-scanner, venue-staff-app, venue-support-web |
 | POST | `/auth/logout` | `logout` | `—` | ✓ | venue-staff-app |
-| POST | `/auth/mfa/challenge` | `createMfaChallenge` | `—` | — | guest-app, guest-web, partner-web, ticvai-web, venue-pos, venue-scanner, venue-staff-app, venue-support-web |
-| POST | `/auth/mfa/challenge/{challengeId}/verify` | `verifyMfaChallenge` | `—` | — | guest-app, guest-web, partner-web, ticvai-web, venue-pos, venue-scanner, venue-staff-app, venue-support-web |
-| GET | `/auth/mfa/methods` | `listMfaMethods` | `—` | — | guest-app, guest-web, partner-web, ticvai-web, venue-scanner, venue-staff-app, venue-support-web |
-| POST | `/auth/mfa/methods` | `enrolMfaMethod` | `—` | — | guest-app, guest-web, ticvai-web, venue-staff-app |
-| DELETE | `/auth/mfa/methods/{methodId}` | `removeMfaMethod` | `—` | — | guest-app, guest-web, ticvai-web, venue-staff-app |
-| POST | `/auth/mfa/methods/{methodId}` | `verifyMfaEnrolment` | `—` | — | guest-app, guest-web, ticvai-web, venue-staff-app |
+| POST | `/auth/mfa/challenge` | `createMfaChallenge` | `—` | — | guest-app, guest-web, partner-web, ticvai-web, venue-management-web, venue-pos, venue-scanner, venue-staff-app, venue-support-web |
+| POST | `/auth/mfa/challenge/{challengeId}/verify` | `verifyMfaChallenge` | `—` | — | guest-app, guest-web, partner-web, ticvai-web, venue-management-web, venue-pos, venue-scanner, venue-staff-app, venue-support-web |
+| GET | `/auth/mfa/methods` | `listMfaMethods` | `—` | — | guest-app, guest-web, ticvai-web, venue-staff-app |
+| POST | `/auth/mfa/methods` | `enrolMfaMethod` | `—` | — | guest-app, guest-web, partner-web, ticvai-web, venue-staff-app, venue-support-web |
+| DELETE | `/auth/mfa/methods/{methodId}` | `removeMfaMethod` | `—` | — | guest-app, guest-web, venue-staff-app |
+| POST | `/auth/mfa/methods/{methodId}` | `verifyMfaEnrolment` | `—` | — | guest-app, guest-web, partner-web, ticvai-web, venue-staff-app, venue-support-web |
 | POST | `/auth/refresh` | `refreshToken` | `—` | — | guest-app, guest-web |
-| POST | `/auth/select-role` | `selectRole` | `—` | — | venue-pos, venue-scanner, venue-staff-app |
+| POST | `/auth/select-role` | `selectRole` | `—` | — | partner-web, ticvai-web, venue-pos, venue-scanner, venue-staff-app, venue-support-web |
 | GET | `/auth/session` | `getCurrentSession` | `—` | ✓ | partner-web, ticvai-web, venue-pos, venue-scanner, venue-staff-app, venue-support-web |
-| GET | `/auth/sessions` | `listActiveSessions` | `SESSION_FORCE_LOGOUT` | — | partner-web, ticvai-web, venue-pos, venue-support-web |
-| POST | `/auth/sessions/revoke-all` | `revokeAllSessions` | `SESSION_FORCE_LOGOUT` | — | partner-web, ticvai-web, venue-support-web |
-| POST | `/auth/sessions/{sessionId}/force-logout` | `forceLogout` | `SESSION_FORCE_LOGOUT` | — | partner-web, ticvai-web, venue-pos, venue-support-web |
-| GET | `/auth/sso/providers` | `listSsoProviders` | `—` | — | partner-web, ticvai-web, venue-scanner, venue-staff-app, venue-support-web |
-| GET | `/auth/sso/{providerId}/authorize` | `startSsoAuthorization` | `—` | — | — |
-| POST | `/auth/sso/{providerId}/callback` | `completeSsoAuthorization` | `—` | — | — |
+| GET | `/auth/sessions` | `listActiveSessions` | `SESSION_FORCE_LOGOUT` | — | venue-management-web, venue-pos |
+| POST | `/auth/sessions/revoke-all` | `revokeAllSessions` | `SESSION_FORCE_LOGOUT` | — | venue-management-web |
+| POST | `/auth/sessions/{sessionId}/force-logout` | `forceLogout` | `SESSION_FORCE_LOGOUT` | — | venue-management-web, venue-pos |
+| GET | `/auth/sso/providers` | `listSsoProviders` | `—` | — | partner-web, ticvai-web, venue-staff-app, venue-support-web |
+| GET | `/auth/sso/{providerId}/authorize` | `startSsoAuthorization` | `—` | — | partner-web, ticvai-web, venue-staff-app, venue-support-web |
+| POST | `/auth/sso/{providerId}/callback` | `completeSsoAuthorization` | `—` | — | partner-web, ticvai-web, venue-staff-app, venue-support-web |
 | GET | `/authorisation-policies` | `listAuthorisationPolicies` | `PERMISSION_VIEW` | — | ticvai-web, venue-management-web |
 | POST | `/authorisation-policies` | `createAuthorisationPolicy` | `PERMISSION_MANAGE` | — | venue-management-web |
 | GET | `/authorisation-policies/bundle` | `getAuthorisationPolicyBundle` | `PERMISSION_VIEW` | ✓ | — |
@@ -753,7 +753,7 @@ Defines who is asking, and what they may do.
 | PUT | `/password-policy` | `setPasswordPolicy` | `TENANT_CONFIGURE` | — | ticvai-web |
 | GET | `/permission-findings` | `listPermissionFindings` | `PERMISSION_VIEW` | — | venue-management-web |
 | GET | `/permissions` | `listPermissions` | `PERMISSION_VIEW` | — | — |
-| POST | `/permissions/resolve` | `resolvePermissions` | `PERMISSION_VIEW` | — | venue-management-web, venue-scanner |
+| POST | `/permissions/resolve` | `resolvePermissions` | `PERMISSION_VIEW` | — | venue-management-web |
 | GET | `/platform-staff-grants` | `listPlatformStaffGrants` | `AUDIT_VIEW` | — | venue-management-web |
 | POST | `/platform-staff-grants` | `openPlatformStaffGrant` | `PLATFORM_TENANT_ACCESS` | — | ticvai-web |
 | GET | `/platform-staff-grants/mine` | `listOwnPlatformStaffGrants` | `PLATFORM_TENANT_ACCESS` | — | ticvai-web |
@@ -1014,7 +1014,8 @@ Cash reconciles to a drawer and a person.
 | POST | `/deposit-boxes/{boxId}/withdraw` | `withdrawFromDepositBox` | `CASH_LIFT` | ✓ | venue-management-web, venue-pos |
 | GET | `/shifts` | `listShifts` | `REPORT_VIEW_WORKSTATION` | — | venue-management-web, venue-pos, venue-staff-app |
 | POST | `/shifts` | `openShift` | `SHIFT_OPEN` | — | venue-management-web, venue-pos, venue-staff-app |
-| GET | `/shifts/current` | `getCurrentShift` | `SHIFT_OPEN` | ✓ | venue-management-web, venue-pos, venue-scanner, venue-staff-app |
+| GET | `/shifts/current` | `getCurrentShift` | `SHIFT_OPEN` | ✓ | venue-management-web, venue-pos, venue-staff-app |
+| GET | `/shifts/current/overview` | `getWorkstationShift` | `REPORT_VIEW_WORKSTATION` | ✓ | venue-pos, venue-staff-app |
 | GET | `/shifts/{shiftId}` | `getShift` | `REPORT_VIEW_WORKSTATION` | ✓ | venue-management-web, venue-pos, venue-staff-app |
 | POST | `/shifts/{shiftId}/accept-variance` | `acceptShiftVariance` | `OVERSHORT_ACCEPT` | — | venue-management-web, venue-pos, venue-staff-app |
 | POST | `/shifts/{shiftId}/approve-close` | `approveShiftClose` | `SHIFT_APPROVE_CLOSE` | — | — |

@@ -1,0 +1,54 @@
+id: CHG-DOOR-001
+date: '2026-10-02'
+source: audit
+kind: contract
+summary: LoginRequest.workstationId is no longer required, so the browser doors (ADM-001, SUP-001, PTR-001) can sign
+  in; the device-bound methods (pin, card, rfid) still need it and are refused 400 workstation-required without it.
+decision:
+  what: Make LoginRequest.workstationId optional (additive against r1); a browser door sends none and offers no PIN;
+    a device door (POS-000, EMP-001, SCN-001) sends its own; pin, card and rfid without a workstationId are refused
+    400 (workstation-required). MFA by permission (R135), the lockout after five wrong codes (R126), the refused
+    second sign-in (R184) and the role prompt (ADR-0003) are unchanged. (Chinmay, 2 Oct 2026, fix the Block A
+    blockers now.)
+  by: Chinmay
+  date: '2026-10-02'
+why: 'Platform-foundation process finding (handoff/design-notes/platform-foundation.yaml, corrections on ADM-001,
+  SUP-001 and PTR-001): "LoginRequest.workstationId is required ... A back-office browser has no workstation", so no
+  staff or partner could sign in from a browser and Block A''s Venue Management screens could not be reached at all.
+  The workstation bounds a PIN (contract note of 10 September) and is never a permission source (ADR-0002), so the
+  rule belongs on the device-bound methods, not on every sign-in.'
+keys_touched:
+  operations:
+  - login
+  schemas:
+  - LoginRequest
+  screens:
+  - ADM-001
+  - SUP-001
+  - PTR-001
+  - EMP-001
+  - SCN-001
+  files:
+  - contracts/spine/identity.yaml
+root_class: 'new: door-cannot-open'
+tickets:
+  started: []
+  unstarted:
+  - 'SVC-IDENTITY-IDENTITY-2 (#17933, login)'
+  - APP-CONSOLE-ADM-001
+  - APP-SUPPORT-SUP-001
+  - APP-PARTNER-PTR-001
+release_tag: pending
+decision_owner: Chinmay
+prevention:
+  type: check
+  ref: tools/check-doors.py
+  reason: D-LOGIN-WORKSTATION fails while LoginRequest.required names workstationId; D-DOOR-WORKSTATION fails on a
+    browser door that asks for one.
+status: closed
+closed_by_commit: c1bc962f
+notes: 'Run on the parent commit (12d3f888) check-doors fails here (D-LOGIN-WORKSTATION 1, D-DOOR-WORKSTATION 6); on
+  this branch it passes. check-contract-compat against r1 classes the change as additive ("is no longer required").
+  Not changed, for the lead: Session.saleBoardId is a required response field derived from the workstation, so a
+  browser session has nothing true to put there; making it optional is breaking against r1 and needs an entry in
+  docs/active/breaking-changes.yaml.'

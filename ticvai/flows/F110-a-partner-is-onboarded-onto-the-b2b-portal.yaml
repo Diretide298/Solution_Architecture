@@ -26,7 +26,7 @@ steps:
   action: The partner manager signs in
   operations:
   - login
-  - listMfaMethods
+  - verifyMfaChallenge
   outcome: A session that can see partner applications
 - step: 2
   screen: PTR-022
